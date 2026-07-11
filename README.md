@@ -10,14 +10,11 @@ Prior work remains in the read-only Research Archive at `/Users/oian/Codes/maste
 
 ## Start here
 
+- [`docs/START_HERE.md`](docs/START_HERE.md) is the repository navigation map.
 - [`CONTEXT.md`](CONTEXT.md) defines the project language.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) maps modules and seams.
 - [`docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`](docs/specs/UNIFIED_RESEARCH_PROTOCOL.md) defines Comparison Mode.
-- [`docs/playbooks/ARIS_RESEARCH_WORKFLOW.md`](docs/playbooks/ARIS_RESEARCH_WORKFLOW.md) carries research from question to accepted claim.
-- [`docs/playbooks/BASELINE_INTEGRATION_PLAYBOOK.md`](docs/playbooks/BASELINE_INTEGRATION_PLAYBOOK.md) explains baseline registration and verification.
-- [`docs/playbooks/PROJECT_STATUS_HARNESS_PLAYBOOK.md`](docs/playbooks/PROJECT_STATUS_HARNESS_PLAYBOOK.md) explains status publication, authority injection, and local recovery.
-- [`docs/playbooks/LOCAL_DATA_ROOT_PLAYBOOK.md`](docs/playbooks/LOCAL_DATA_ROOT_PLAYBOOK.md) keeps restricted EHR state outside Git repositories.
-- [`docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`](docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md) defines the MacBook harness and 319 execution split.
+- [`docs/playbooks/index.md`](docs/playbooks/index.md) indexes operational playbooks.
 - [`baselines/registry.toml`](baselines/registry.toml) records baseline identity and readiness.
 - [`docs/PLANS.md`](docs/PLANS.md) tracks accepted multi-step work.
 
