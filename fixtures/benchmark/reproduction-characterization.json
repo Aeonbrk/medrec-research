@@ -1,0 +1,50 @@
+{
+  "accepted_selection_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "attempts": [
+    {
+      "adapter_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "adapter_smoke_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "artifact_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "attempt_id": "attempt-1",
+      "environment_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "input_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "outcome": "completed",
+      "seed_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "source_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "adapter_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "adapter_smoke_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "artifact_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "attempt_id": "attempt-2",
+      "environment_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "input_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "outcome": "completed",
+      "seed_policy_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "source_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+  ],
+  "baseline_id": "gamenet",
+  "characterization_id": "characterization-f30e5e90ee070e857460",
+  "evaluation_semantics_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "kind": "reproduction_characterization",
+  "mode": "reproduction",
+  "planned_attempts": 2,
+  "policy_sha256": "f84c2fb19b608a88a4205be388c34a3bdac52660ad95c3bf5c3bc7b4d9df2afb",
+  "policy_version": 1,
+  "protocol_violations": 0,
+  "schema_version": 1,
+  "selection_semantics_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "split_semantics_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "status": "stable",
+  "upstream_reference_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "variance_checks": [
+    {
+      "check_id": "medication-count",
+      "evidence_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "observed_variance": 0.005,
+      "predeclared": true,
+      "tolerance": 0.01
+    }
+  ]
+}

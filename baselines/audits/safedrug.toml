@@ -1,0 +1,86 @@
+schema_version = 1
+baseline_id = "safedrug"
+display_name = "SafeDrug"
+identity_kind = "canonical"
+
+[[sources]]
+source_id = "safedrug-archived"
+role = "canonical_model"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+
+[[evidence]]
+evidence_id = "safedrug-archived-readme"
+claims = ["source", "task", "split", "evaluation", "lineage.model_core", "lineage.data_processing", "lineage.split_selection", "lineage.evaluation_reporting"]
+source_id = "safedrug-archived"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/ycq091044/SafeDrug/8deee38cfdb2a38882377ff95cce5922d6d9e8d6/README.md"
+content = "The SafeDrug archived branch documents IJCAI21 reproduction and includes Leap.py and Retain.py baselines."
+content_sha256 = "3a81117049140bf26a58be541e56f11da53e578cbedd517dd0c81964d7311e84"
+
+[[evidence]]
+evidence_id = "safedrug-branch-warning"
+claims = ["source"]
+source_id = "safedrug-archived"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://github.com/ycq091044/SafeDrug/commit/8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+content = "SafeDrug archived revision is retained because later main-branch processing semantics require separate review."
+content_sha256 = "91f62b6a36ef033aefa5ff6936b70a30f61a425d5410527bd9038e56e0b15dc1"
+
+[[claims]]
+name = "source"
+disposition = "pass"
+evidence_ids = ["safedrug-archived-readme", "safedrug-branch-warning"]
+rationale = "The archived reproduction revision is identified and later processing drift remains explicit."
+
+[[claims]]
+name = "license"
+disposition = "unresolved"
+evidence_ids = []
+rationale = "No repository license was verified at the audited revision."
+
+[[claims]]
+name = "task"
+disposition = "pass"
+evidence_ids = ["safedrug-archived-readme"]
+rationale = "The archived repository documents SafeDrug medication recommendation."
+
+[[claims]]
+name = "split"
+disposition = "unresolved"
+evidence_ids = ["safedrug-archived-readme"]
+rationale = "Exact split and selection behavior remains to be characterized."
+
+[[claims]]
+name = "evaluation"
+disposition = "unresolved"
+evidence_ids = ["safedrug-archived-readme"]
+rationale = "Evaluation and reporting behavior remains to be characterized."
+
+[[lineage]]
+layer = "model_core"
+upstream = "safedrug-archived"
+downstream = "safedrug"
+evidence_ids = ["safedrug-archived-readme"]
+
+[[lineage]]
+layer = "data_processing"
+upstream = "safedrug-archived"
+downstream = "safedrug"
+evidence_ids = ["safedrug-archived-readme"]
+
+[[lineage]]
+layer = "split_selection"
+upstream = "safedrug-archived"
+downstream = "safedrug"
+evidence_ids = ["safedrug-archived-readme"]
+
+[[lineage]]
+layer = "evaluation_reporting"
+upstream = "safedrug-archived"
+downstream = "safedrug"
+evidence_ids = ["safedrug-archived-readme"]

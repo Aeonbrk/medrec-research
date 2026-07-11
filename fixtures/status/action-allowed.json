@@ -1,0 +1,38 @@
+{
+  "kind": "action_decision",
+  "reason_code": "action_request_created",
+  "request": {
+    "action_id": "begin_discovery",
+    "authorities": [
+      {
+        "authority_id": "audit-set",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "authority_id": "program",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      {
+        "authority_id": "registry",
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      {
+        "authority_id": "scope",
+        "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    ],
+    "authorization_sha256": "0c16e104268644649a5fe5a98033aa75d53f6f0eab18a835ee13849faf23b47a",
+    "kind": "action_request",
+    "preflight_sha256": "a93276ebea2a58c0e50feacbd7ae7ffc82c8b55784d149a6b2d73c21cf3d2a86",
+    "project_id": "medrec-research",
+    "remote_revision": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "request_id": "request-001",
+    "request_sha256": "6cb4557e97082b377824672b94b1f975840063d3cb7b36450ea56634e54c6c91",
+    "schema_version": 1,
+    "scope_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "snapshot_sha256": "7373d7099ffbce633154349895aa46d512075874d0aea8b88529ea64847ed376",
+    "target_id": "319-wild"
+  },
+  "schema_version": 1,
+  "status": "allowed"
+}

@@ -1,0 +1,78 @@
+{
+  "patients": [
+    {
+      "patient_id": "train-001",
+      "split": "train",
+      "visits": [
+        {
+          "target_medications": [
+            "RX_A",
+            "RX_B"
+          ],
+          "visit_id": "train-001-v1"
+        },
+        {
+          "target_medications": [
+            "RX_A"
+          ],
+          "visit_id": "train-001-v2"
+        }
+      ]
+    },
+    {
+      "patient_id": "train-002",
+      "split": "train",
+      "visits": [
+        {
+          "target_medications": [
+            "RX_B",
+            "RX_C"
+          ],
+          "visit_id": "train-002-v1"
+        }
+      ]
+    },
+    {
+      "patient_id": "validation-001",
+      "split": "validation",
+      "visits": [
+        {
+          "target_medications": [
+            "RX_A"
+          ],
+          "visit_id": "validation-001-v1"
+        }
+      ]
+    },
+    {
+      "patient_id": "test-001",
+      "split": "test",
+      "visits": [
+        {
+          "target_medications": [
+            "RX_A",
+            "RX_B"
+          ],
+          "visit_id": "test-001-v1"
+        },
+        {
+          "target_medications": [
+            "RX_C"
+          ],
+          "visit_id": "test-001-v2"
+        }
+      ]
+    },
+    {
+      "patient_id": "test-002",
+      "split": "test",
+      "visits": [
+        {
+          "target_medications": [],
+          "visit_id": "test-002-v1"
+        }
+      ]
+    }
+  ],
+  "schema_version": 1
+}

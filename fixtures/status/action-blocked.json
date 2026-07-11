@@ -1,0 +1,7 @@
+{
+  "kind": "action_decision",
+  "reason_code": "authority_bundle_missing",
+  "request": null,
+  "schema_version": 1,
+  "status": "blocked"
+}

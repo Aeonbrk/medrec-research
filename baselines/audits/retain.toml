@@ -1,0 +1,103 @@
+schema_version = 1
+baseline_id = "retain"
+display_name = "RETAIN"
+identity_kind = "canonical"
+
+[[sources]]
+source_id = "retain-author"
+role = "canonical_model"
+repository = "https://github.com/mp2893/retain"
+revision = "9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5"
+
+[[sources]]
+source_id = "gamenet-retain"
+role = "medication_comparison"
+repository = "https://github.com/sjy1203/GAMENet"
+revision = "da695b4fc9390882f3a681c82115e81291ae6380"
+
+[[evidence]]
+evidence_id = "retain-readme"
+claims = ["source", "task", "lineage.model_core"]
+source_id = "retain-author"
+repository = "https://github.com/mp2893/retain"
+revision = "9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/mp2893/retain/9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5/README.md"
+content = "RETAIN author repository states that this code performs sequence classification."
+content_sha256 = "780ac281d7c0b94a0fc7db6cec1b6997df2703e0f53ef5434670f2f4d205328f"
+
+[[evidence]]
+evidence_id = "retain-license"
+claims = ["license"]
+source_id = "retain-author"
+repository = "https://github.com/mp2893/retain"
+revision = "9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/mp2893/retain/9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5/LICENSE"
+content = "BSD 3-Clause license, Copyright (c) 2016, mp2893."
+content_sha256 = "d5fd909fd27f6a941db217173b93b609805ad6067be0f6ca5c332bfd8b807d6b"
+
+[[evidence]]
+evidence_id = "retain-comparison"
+claims = ["task", "split", "evaluation", "lineage.data_processing", "lineage.split_selection", "lineage.evaluation_reporting"]
+source_id = "gamenet-retain"
+repository = "https://github.com/sjy1203/GAMENet"
+revision = "da695b4fc9390882f3a681c82115e81291ae6380"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/sjy1203/GAMENet/da695b4fc9390882f3a681c82115e81291ae6380/README.md"
+content = "GAMENet lists RETAIN as a medication-combination comparison implementation."
+content_sha256 = "c20a82a758895d755fc0627865a87fb1181a5d3be5159f06c1a83efc6e9d8074"
+
+[[claims]]
+name = "source"
+disposition = "pass"
+evidence_ids = ["retain-readme"]
+rationale = "The canonical author repository is pinned, separately from medication comparison code."
+
+[[claims]]
+name = "license"
+disposition = "pass"
+evidence_ids = ["retain-license"]
+rationale = "The canonical repository contains a BSD 3-Clause license."
+
+[[claims]]
+name = "task"
+disposition = "unresolved"
+evidence_ids = ["retain-readme", "retain-comparison"]
+rationale = "The canonical code is sequence classification while medication recommendation uses a comparison implementation."
+
+[[claims]]
+name = "split"
+disposition = "unresolved"
+evidence_ids = ["retain-comparison"]
+rationale = "Medication-comparison split behavior remains to be characterized."
+
+[[claims]]
+name = "evaluation"
+disposition = "unresolved"
+evidence_ids = ["retain-comparison"]
+rationale = "Medication-comparison evaluation behavior remains to be characterized."
+
+[[lineage]]
+layer = "model_core"
+upstream = "retain-author"
+downstream = "retain"
+evidence_ids = ["retain-readme"]
+
+[[lineage]]
+layer = "data_processing"
+upstream = "gamenet-retain"
+downstream = "retain"
+evidence_ids = ["retain-comparison"]
+
+[[lineage]]
+layer = "split_selection"
+upstream = "gamenet-retain"
+downstream = "retain"
+evidence_ids = ["retain-comparison"]
+
+[[lineage]]
+layer = "evaluation_reporting"
+upstream = "gamenet-retain"
+downstream = "retain"
+evidence_ids = ["retain-comparison"]

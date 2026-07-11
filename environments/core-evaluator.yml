@@ -1,0 +1,9 @@
+# Provisional 319 evaluator environment. Export an explicit lock before real runs.
+name: medrec-core-evaluator
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - uv==0.11.28

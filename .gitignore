@@ -1,0 +1,44 @@
+# Local tools and environments
+.DS_Store
+.idea/
+.vscode/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.py[cod]
+build/
+dist/
+*.egg-info/
+
+# ARIS runtime and project-local skill installation
+.aris/
+.agents/skills/
+runtime/
+
+# Restricted and generated research state
+data/
+datasets/
+restricted/
+outputs/
+runs/
+logs/
+checkpoints/
+weights/
+baseline-cache/
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.ckpt
+*.model
+*.npy
+*.npz
+*.parquet
+*.csv.gz
+
+# Local configuration
+.env
+.env.*
+!.env.example

@@ -1,0 +1,35 @@
+{
+  "checksum_sha256": "ffcd8f3cefe413d1d6b9448fbf6288a17fb1bdc43f55631f93ec1a604088ca91",
+  "dataset_id": "synthetic-medrec",
+  "medication_vocabulary_sha256": "b493d4d41dda5b325209e17ca7d012a23c110951cb1fcad5b2eab9a036386561",
+  "membership_digest_method": "sha256",
+  "patient_disjoint": true,
+  "privacy": "synthetic",
+  "provenance": "builtin:medrec-research.synthetic",
+  "schema_version": 2,
+  "snapshot_id": "reference-v1",
+  "splits": [
+    {
+      "name": "train",
+      "patient_count": 2,
+      "patient_membership_digest": "5b1a7d81c5c6fbc5424dedd1adf565605b47f1bdee0f2465af7607f27f8cdbba",
+      "visit_count": 3,
+      "visit_membership_digest": "42a2219bad9fe832ece703739205b621c9118ca5fcdcd54385d243471d55061b"
+    },
+    {
+      "name": "validation",
+      "patient_count": 1,
+      "patient_membership_digest": "97c80ec501d638c268823659d21a540f86d35ffba3fa9feef02e135d34a04c71",
+      "visit_count": 1,
+      "visit_membership_digest": "49f87bb1324a9990fb0efef0913eeeb650e787a4d8600bc1fff061980f72b061"
+    },
+    {
+      "name": "test",
+      "patient_count": 2,
+      "patient_membership_digest": "9f8dce803fb705107ae833f34ed3657e122fc5819ff1801e315aa2d15390cbf4",
+      "visit_count": 3,
+      "visit_membership_digest": "31a095136306a45577ead650f9f93a5b67ec2d900eb863868e2df196a00d6775"
+    }
+  ],
+  "test_evaluation_only": true
+}

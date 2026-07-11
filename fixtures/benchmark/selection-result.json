@@ -1,0 +1,104 @@
+{
+  "audit_set_sha256": "36020d00d9db491b1c7318cb868cb137668a3e72e3f576970835779f222a4f11",
+  "candidates": [
+    {
+      "accepted_review_sha256": ["608a18d78e764afb7e57453f67661a77a3b141376df914704585f70f0795b4c3"],
+      "audit_sha256": "062c1883d914602e9881c48f6ccac12bd60e9ac79b336f269fa9ac2fa5ff9710",
+      "baseline_id": "gamenet",
+      "blockers": [],
+      "diagnostics": {
+        "baseline_id": "gamenet",
+        "comparison_representativeness": {"evidence_ids": ["gamenet-readme"], "value": "low"},
+        "integration_cost": {"evidence_ids": ["gamenet-readme"], "value": "high"},
+        "priority_ordinal": 0,
+        "reproduction_risk": {"evidence_ids": ["gamenet-readme"], "value": "high"}
+      },
+      "eligible": true,
+      "priority_ordinal": 0
+    },
+    {
+      "accepted_review_sha256": ["cfb625d97ded50d1367e5d463f3fa59ff518c6851e9754a4a7b7724045a61745"],
+      "audit_sha256": "168044330a423a1b4f0219b1f662b985a28a0ddea9447de33e0e17f14489ca8b",
+      "baseline_id": "safedrug",
+      "blockers": ["license_not_pass"],
+      "diagnostics": {
+        "baseline_id": "safedrug",
+        "comparison_representativeness": {"evidence_ids": ["safedrug-archived-readme"], "value": "high"},
+        "integration_cost": {"evidence_ids": ["safedrug-archived-readme"], "value": "low"},
+        "priority_ordinal": 1,
+        "reproduction_risk": {"evidence_ids": ["safedrug-archived-readme"], "value": "low"}
+      },
+      "eligible": false,
+      "priority_ordinal": 1
+    },
+    {
+      "accepted_review_sha256": ["5426dcdfb278a362f02de4ed9e7a0e906de483d72e3eb6ec9452f4cdcafe8e0c"],
+      "audit_sha256": "83ab9240552b96851058fc2a1ca032b8289924dad0c43d3f8c9a1210d6658b41",
+      "baseline_id": "micron",
+      "blockers": ["license_not_pass"],
+      "diagnostics": {
+        "baseline_id": "micron",
+        "comparison_representativeness": {"evidence_ids": ["micron-readme"], "value": "medium"},
+        "integration_cost": {"evidence_ids": ["micron-readme"], "value": "low"},
+        "priority_ordinal": 2,
+        "reproduction_risk": {"evidence_ids": ["micron-readme"], "value": "low"}
+      },
+      "eligible": false,
+      "priority_ordinal": 2
+    },
+    {
+      "accepted_review_sha256": ["6415e3492aef14d0d6f811e9e741df155418f129a97a102bc0c600ab8b4bc9a5"],
+      "audit_sha256": "2aef46068fe5d56740ef3deee7f2c21dfe20f5804dbdba5d53d387d53e7b5a44",
+      "baseline_id": "molerec",
+      "blockers": [],
+      "diagnostics": {
+        "baseline_id": "molerec",
+        "comparison_representativeness": {"evidence_ids": ["molerec-readme"], "value": "low"},
+        "integration_cost": {"evidence_ids": ["molerec-readme"], "value": "low"},
+        "priority_ordinal": 3,
+        "reproduction_risk": {"evidence_ids": ["molerec-readme"], "value": "low"}
+      },
+      "eligible": true,
+      "priority_ordinal": 3
+    },
+    {
+      "accepted_review_sha256": ["91deeb20d01d4571c104b2db98f8566cfa422b289e926d4cbae7c05a6b48f23d"],
+      "audit_sha256": "0e38e193b9d295e622198e160db6bb24e1a19387dc40c449e146df6e04d45c28",
+      "baseline_id": "retain",
+      "blockers": [],
+      "diagnostics": {
+        "baseline_id": "retain",
+        "comparison_representativeness": {"evidence_ids": ["retain-readme"], "value": "high"},
+        "integration_cost": {"evidence_ids": ["retain-readme"], "value": "low"},
+        "priority_ordinal": 4,
+        "reproduction_risk": {"evidence_ids": ["retain-readme"], "value": "low"}
+      },
+      "eligible": true,
+      "priority_ordinal": 4
+    },
+    {
+      "accepted_review_sha256": [],
+      "audit_sha256": "527ae62428b983fa1cc5c2ff18c7597c8f27c83e5f328afd1bd3a608de28cb23",
+      "baseline_id": "leap-safedrug",
+      "blockers": ["source_not_pass", "license_not_pass"],
+      "diagnostics": {
+        "baseline_id": "leap-safedrug",
+        "comparison_representativeness": {"evidence_ids": ["safedrug-leap-source"], "value": "unresolved"},
+        "integration_cost": {"evidence_ids": ["safedrug-leap-source"], "value": "low"},
+        "priority_ordinal": 5,
+        "reproduction_risk": {"evidence_ids": ["safedrug-leap-source"], "value": "low"}
+      },
+      "eligible": false,
+      "priority_ordinal": 5
+    }
+  ],
+  "kind": "selection_result",
+  "program_sha256": "561e6441401904fe22f9f2b8d9632a4f5d5ff94d7e7c404791d2d0e1103aadd7",
+  "review_set_sha256": "0d9565fcd7a572ff67d061669bb363b5669d0dd275697b597b1e3c0f9713b8ce",
+  "schema_version": 1,
+  "selected_candidate_id": "gamenet",
+  "selection_id": "selection-3c0d1b125a1b96015a0f",
+  "specification_sha256": "f67100e5bada0061f87f1b4222fa98322d2aaad6336da6fdfe367b7e1a3b0024",
+  "specification_version": 1,
+  "status": "proposed"
+}

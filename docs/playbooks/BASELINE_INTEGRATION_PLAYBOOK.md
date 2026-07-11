@@ -1,0 +1,39 @@
+# Baseline Integration Playbook
+
+This playbook adds external medication-recommendation baselines without copying a model zoo into the Active Research Home.
+
+## 1. Register identity
+
+Add the baseline to `baselines/registry.toml`. Record its immutable upstream repository and revision when known, license status, supported scientific modes, environment declaration, adapter command, adapter revision, and readiness. Store historical archive pointers under `archive_evidence`, not `source.repository`. Use `needs_pin` and omit the repository when the archive is the only known source.
+
+An archive path identifies historical evidence, not an upstream release. Do not invent a commit from the copied tree.
+
+## 2. Audit source, license, and lineage
+
+Complete the public-safe Baseline Audit and matching Audit Review before selecting a reproduction lane. Source and license are hard gates. Among eligible candidates, V1 uses the fixed order GAMENet, SafeDrug, MICRON, MoleRec, RETAIN, then `LEAP-SafeDrug`; priority never converts an unresolved gate into a pass. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
+
+Validate the exact classic-six set and publish the content-addressed scorecard with `audit-validate` and `selection-publish`. Do not edit registry readiness to make a blocked candidate selectable.
+
+## 3. Reproduce upstream behavior
+
+Create the declared Conda environment and run the pinned source outside this repository. Record preprocessing, split, feature timing, checkpoint selection, thresholding, metric aggregation, random seeds, and working-directory assumptions. This characterizes Reproduction Mode only. The current repository has no accepted Reproduction Mode record schema; preserve the characterization and restricted outputs until the first concrete upstream contract is reviewed.
+
+## 4. Implement the Prediction Adapter
+
+The Baseline Environment emits target-free Adapter Prediction Payloads containing visit identity, predicted medications, and optional scores. It never emits split or target fields. The core Prediction Adapter joins those payloads to core-owned targets and creates Prediction Records. The baseline-side code may translate identifiers, storage formats, tensors, and output serialization. It may not modify the Baseline Core, add information, select a new threshold, or repair recommendations unless that operation is declared for every compared method.
+
+The core process adapter keeps expected evaluation records outside the subprocess request. It rejects target-bearing requests before launch, nonzero exits, malformed JSON, schema violations, missing or extra visits, duplicate visits, unknown medication codes, and core-owned fields in output. Do not accept best-effort output or let baseline code define evaluation labels.
+
+## 5. Spend the Adaptation Budget
+
+Declare the same allowed tuning and integration allowance for all compared methods before validation runs. Record trial count, search space, selection metric, seeds, stopping rule, and compute allowance. Test data cannot be used.
+
+## 6. Advance readiness
+
+`registered` means identity metadata exists. `smoke_ready` requires a pinned source, immutable adapter revision, environment digest, and content-addressed environment-lock and adapter-smoke evidence. `comparison_ready` requires at least one Comparison Qualification with content-addressed cohort identity, Baseline Core integrity, deterministic translation, Adaptation Budget, and independent metric recomputation evidence. The qualification names one protocol version, Dataset Manifest, and Adaptation Budget; create another qualification when any of them changes. The registry rejects skipped transitions and incomplete evidence sets.
+
+Registration, source checkout, import success, or a reproduced paper number is insufficient for `comparison_ready`.
+
+## 7. Preserve evidence
+
+Commit only public-safe environment declarations, adapter code, protocol-verification tests, aggregate audits, and accepted Run Records. Keep source checkouts, datasets, weights, logs, real Prediction Records, and draft records in repository-independent local storage.

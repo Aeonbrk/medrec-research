@@ -1,0 +1,114 @@
+schema_version = 1
+baseline_id = "molerec"
+display_name = "MoleRec"
+identity_kind = "canonical"
+
+[[sources]]
+source_id = "molerec-source"
+role = "canonical_model"
+repository = "https://github.com/yangnianzu0515/MoleRec"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+
+[[sources]]
+source_id = "safedrug-processing"
+role = "lineage_reference"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
+
+[[evidence]]
+evidence_id = "molerec-readme"
+claims = ["source", "task", "split", "evaluation", "lineage.model_core", "lineage.split_selection", "lineage.evaluation_reporting"]
+source_id = "molerec-source"
+repository = "https://github.com/yangnianzu0515/MoleRec"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/yangnianzu0515/MoleRec/dd5afaf0a503fd3de3229f86ec7f26b345d10e3a/README.md"
+content = "MoleRec identifies this repository as the official implementation of the MoleRec paper."
+content_sha256 = "c856f6205ec6c15e0515b1b66d66c6c560e1b5ed9af08efd46617a16c776040f"
+
+[[evidence]]
+evidence_id = "molerec-license"
+claims = ["license"]
+source_id = "molerec-source"
+repository = "https://github.com/yangnianzu0515/MoleRec"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/yangnianzu0515/MoleRec/dd5afaf0a503fd3de3229f86ec7f26b345d10e3a/LICENSE"
+content = "MIT License, Copyright (c) 2023 Nianzu Yang."
+content_sha256 = "ce03ade1de4114e4c5a9bda2f1f3110e87c98dcd5c2652d18549071303179a1d"
+
+[[evidence]]
+evidence_id = "molerec-safedrug-processing"
+claims = ["lineage.data_processing"]
+source_id = "molerec-source"
+repository = "https://github.com/yangnianzu0515/MoleRec"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/yangnianzu0515/MoleRec/dd5afaf0a503fd3de3229f86ec7f26b345d10e3a/README.md"
+content = "MoleRec states that it follows SafeDrug data processing after commit c7218d0976e5ee5588aeaf5bdbc86b338126bba5."
+content_sha256 = "3b48042fedccab848ce096eeab73541ee04f08e59cf82c76a3c204925a5a5f36"
+
+[[evidence]]
+evidence_id = "molerec-pipeline-acknowledgement"
+claims = ["task"]
+source_id = "molerec-source"
+repository = "https://github.com/yangnianzu0515/MoleRec"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+retrieved_at = "2026-07-11T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/yangnianzu0515/MoleRec/dd5afaf0a503fd3de3229f86ec7f26b345d10e3a/README.md"
+content = "MoleRec acknowledges the GAMENet and SafeDrug pipelines as foundations of its codebase."
+content_sha256 = "77f7c07d082d7fcd9e53d4af626da60104c5e365484e91df098112be5d379dce"
+
+[[claims]]
+name = "source"
+disposition = "pass"
+evidence_ids = ["molerec-readme"]
+rationale = "The official public repository and immutable revision are identified."
+
+[[claims]]
+name = "license"
+disposition = "pass"
+evidence_ids = ["molerec-license"]
+rationale = "The immutable revision contains an MIT license."
+
+[[claims]]
+name = "task"
+disposition = "pass"
+evidence_ids = ["molerec-readme", "molerec-pipeline-acknowledgement"]
+rationale = "The repository targets combinatorial drug recommendation and declares reused pipelines."
+
+[[claims]]
+name = "split"
+disposition = "unresolved"
+evidence_ids = ["molerec-readme"]
+rationale = "Exact split and selection behavior remains to be characterized."
+
+[[claims]]
+name = "evaluation"
+disposition = "unresolved"
+evidence_ids = ["molerec-readme"]
+rationale = "Evaluation and reporting behavior remains to be characterized."
+
+[[lineage]]
+layer = "model_core"
+upstream = "molerec-source"
+downstream = "molerec"
+evidence_ids = ["molerec-readme"]
+
+[[lineage]]
+layer = "data_processing"
+upstream = "safedrug-processing"
+downstream = "molerec"
+evidence_ids = ["molerec-safedrug-processing"]
+
+[[lineage]]
+layer = "split_selection"
+upstream = "molerec-source"
+downstream = "molerec"
+evidence_ids = ["molerec-readme"]
+
+[[lineage]]
+layer = "evaluation_reporting"
+upstream = "molerec-source"
+downstream = "molerec"
+evidence_ids = ["molerec-readme"]

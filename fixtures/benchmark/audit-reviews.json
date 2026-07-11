@@ -1,0 +1,63 @@
+{
+  "reviews": [
+    {
+      "audit_sha256": "062c1883d914602e9881c48f6ccac12bd60e9ac79b336f269fa9ac2fa5ff9710",
+      "candidate_id": "gamenet",
+      "content_sha256": "608a18d78e764afb7e57453f67661a77a3b141376df914704585f70f0795b4c3",
+      "decision": "pass",
+      "issued_at": "2026-07-11T00:00:00Z",
+      "reviewed_claims": [
+        "source",
+        "license"
+      ],
+      "reviewer": "research-steward"
+    },
+    {
+      "audit_sha256": "168044330a423a1b4f0219b1f662b985a28a0ddea9447de33e0e17f14489ca8b",
+      "candidate_id": "safedrug",
+      "content_sha256": "cfb625d97ded50d1367e5d463f3fa59ff518c6851e9754a4a7b7724045a61745",
+      "decision": "pass",
+      "issued_at": "2026-07-11T00:00:00Z",
+      "reviewed_claims": [
+        "source"
+      ],
+      "reviewer": "research-steward"
+    },
+    {
+      "audit_sha256": "83ab9240552b96851058fc2a1ca032b8289924dad0c43d3f8c9a1210d6658b41",
+      "candidate_id": "micron",
+      "content_sha256": "5426dcdfb278a362f02de4ed9e7a0e906de483d72e3eb6ec9452f4cdcafe8e0c",
+      "decision": "pass",
+      "issued_at": "2026-07-11T00:00:00Z",
+      "reviewed_claims": [
+        "source"
+      ],
+      "reviewer": "research-steward"
+    },
+    {
+      "audit_sha256": "2aef46068fe5d56740ef3deee7f2c21dfe20f5804dbdba5d53d387d53e7b5a44",
+      "candidate_id": "molerec",
+      "content_sha256": "6415e3492aef14d0d6f811e9e741df155418f129a97a102bc0c600ab8b4bc9a5",
+      "decision": "pass",
+      "issued_at": "2026-07-11T00:00:00Z",
+      "reviewed_claims": [
+        "source",
+        "license"
+      ],
+      "reviewer": "research-steward"
+    },
+    {
+      "audit_sha256": "0e38e193b9d295e622198e160db6bb24e1a19387dc40c449e146df6e04d45c28",
+      "candidate_id": "retain",
+      "content_sha256": "91deeb20d01d4571c104b2db98f8566cfa422b289e926d4cbae7c05a6b48f23d",
+      "decision": "pass",
+      "issued_at": "2026-07-11T00:00:00Z",
+      "reviewed_claims": [
+        "source",
+        "license"
+      ],
+      "reviewer": "research-steward"
+    }
+  ],
+  "schema_version": 1
+}

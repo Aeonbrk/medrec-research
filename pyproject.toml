@@ -1,0 +1,32 @@
+[build-system]
+requires = ["uv_build>=0.11.28,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "medrec-research"
+version = "0.1.0"
+description = "Unified medication-recommendation research protocol"
+requires-python = ">=3.11,<3.12"
+dependencies = []
+
+[project.scripts]
+medrec-research = "medrec_research.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<9",
+  "ruff>=0.12,<1",
+]
+
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers"]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MedRec Research Harness</title>
+    <link rel="stylesheet" href="/assets/app.css">
+    <script src="/assets/app.js" defer></script>
+  </head>
+  <body data-ui-state="loading">
+    <a class="skip-link" href="#main-content">跳到研究状态</a>
+    <header class="topbar">
+      <div class="shell topbar-inner">
+        <div class="identity"><span class="mark" aria-hidden="true">MR</span> MedRec Research Harness</div>
+        <div class="snapshot-meta"><span id="condition-label">正在载入</span><span id="freshness-label"></span></div>
+      </div>
+    </header>
+
+    <main id="main-content" class="shell" aria-busy="true">
+      <div id="live-polite" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div id="live-assertive" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+      <nav class="stage-rail" aria-label="研究阶段">
+        <ol id="stage-track">
+          <li data-stage="audit_blocked"><span>审计阻塞</span></li>
+          <li data-stage="benchmark_in_progress"><span>基线复现</span></li>
+          <li data-stage="lane_proposed"><span>首通道提议</span></li>
+          <li data-stage="lane_characterizing"><span>稳定性刻画</span></li>
+          <li data-stage="parallel_eligible"><span>并行资格</span></li>
+          <li data-stage="review_pending"><span>比较审查</span></li>
+          <li data-stage="discovery_eligible"><span>新方法研究</span></li>
+        </ol>
+      </nav>
+
+      <section class="command-band" aria-labelledby="page-title">
+        <div class="command-heading">
+          <p class="eyebrow">CURRENT RESEARCH GATE</p>
+          <h1 id="page-title" tabindex="-1">当前研究状态</h1>
+          <p id="ui-message" class="state-message">正在载入项目状态。</p>
+        </div>
+
+        <div class="command-surface">
+          <section class="stage-summary" aria-labelledby="stage-heading">
+            <h2 id="stage-heading">当前阶段</h2>
+            <p id="stage-value" class="primary-value">正在载入</p>
+            <label class="progress-label" for="readiness-progress">
+              可比较基线 <span id="qualified-value">0 / 6</span>
+            </label>
+            <progress id="readiness-progress" max="6" value="0">0 / 6</progress>
+          </section>
+
+          <section class="blocker-summary" aria-labelledby="blocker-heading">
+            <h2 id="blocker-heading">确定性主阻塞</h2>
+            <p id="blocker-value" class="primary-value">正在核验</p>
+            <p id="blocker-code" class="code-line"></p>
+          </section>
+
+          <section id="action-region" class="action-summary" aria-labelledby="action-heading" aria-busy="false">
+            <h2 id="action-heading">下一允许动作</h2>
+            <p id="action-value" class="primary-value">等待状态</p>
+            <div class="action-controls">
+              <button id="action-button" type="button" disabled>等待状态</button>
+              <button id="retry-button" class="secondary" type="button" hidden>重新载入状态</button>
+            </div>
+          </section>
+        </div>
+
+        <section id="action-result" class="action-result" aria-labelledby="result-heading" hidden tabindex="-1">
+          <h2 id="result-heading">动作请求结果</h2>
+          <p id="result-message"></p>
+          <dl id="request-identity" hidden>
+            <div><dt>Request ID</dt><dd id="request-id"></dd></div>
+            <div><dt>Request SHA-256</dt><dd id="request-sha"></dd></div>
+          </dl>
+        </section>
+      </section>
+
+      <section class="data-band" aria-labelledby="candidate-heading">
+        <div class="section-heading">
+          <div><p class="eyebrow">REPRODUCTION QUEUE</p><h2 id="candidate-heading">候选基线</h2></div>
+          <p>优先队列保持来源与许可证硬门。</p>
+        </div>
+        <div class="table-wrap">
+          <table id="candidate-table">
+            <caption>六个经典基线的复现准备度、来源、许可证与公开证据</caption>
+            <thead><tr><th scope="col">候选</th><th scope="col">准备度</th><th scope="col">来源</th><th scope="col">许可证</th><th scope="col">证据</th></tr></thead>
+            <tbody id="candidate-body"><tr><td colspan="5">正在载入候选状态</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="data-band" aria-labelledby="lineage-heading">
+        <div class="section-heading">
+          <div><p class="eyebrow">SHARED LINEAGE</p><h2 id="lineage-heading">共享谱系</h2></div>
+          <p>共享实现不计为独立复现。</p>
+        </div>
+        <div class="table-wrap">
+          <table id="lineage-table">
+            <caption>模型、数据处理、划分选择与评估报告四层共享谱系</caption>
+            <thead><tr><th scope="col">层</th><th scope="col">上游仓库</th><th scope="col">候选</th><th scope="col">证据</th></tr></thead>
+            <tbody id="lineage-body"><tr><td colspan="4">正在载入谱系状态</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="authority-band" aria-labelledby="authority-heading">
+        <div><p class="eyebrow">SNAPSHOT IDENTITY</p><h2 id="authority-heading">状态权威摘要</h2></div>
+        <dl class="authority-grid">
+          <div><dt>Review</dt><dd id="review-value">正在载入</dd></div>
+          <div><dt>Snapshot SHA-256</dt><dd id="snapshot-value">正在载入</dd></div>
+          <div><dt>Authorities</dt><dd id="authority-value">正在载入</dd></div>
+        </dl>
+      </section>
+
+      <noscript><p class="noscript">此状态投影需要浏览器运行本地 JavaScript。</p></noscript>
+    </main>
+  </body>
+</html>

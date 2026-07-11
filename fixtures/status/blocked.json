@@ -1,0 +1,195 @@
+{
+  "authorities": [
+    {
+      "authority_id": "audit-set",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "authority_id": "program",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "authority_id": "registry",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "authority_id": "scope",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    }
+  ],
+  "blockers": [
+    {
+      "candidate_id": "safedrug",
+      "category": "source_license",
+      "reason_code": "license_not_pass"
+    }
+  ],
+  "condition": "current",
+  "generated_at": "2026-07-11T01:02:03Z",
+  "kind": "project_status",
+  "next_action": {
+    "action_id": "resolve_source_license",
+    "label": "Resolve source and license evidence"
+  },
+  "payload": {
+    "candidates": [
+      {
+        "candidate_id": "gamenet",
+        "display_name": "gamenet",
+        "evidence": [
+          {
+            "label": "gamenet-source",
+            "url": "https://github.com/example/gamenet"
+          }
+        ],
+        "license_gate": "pass",
+        "readiness": "registered",
+        "source_gate": "pass"
+      },
+      {
+        "candidate_id": "safedrug",
+        "display_name": "safedrug",
+        "evidence": [
+          {
+            "label": "safedrug-source",
+            "url": "https://github.com/example/safedrug"
+          }
+        ],
+        "license_gate": "unresolved",
+        "readiness": "registered",
+        "source_gate": "pass"
+      },
+      {
+        "candidate_id": "micron",
+        "display_name": "micron",
+        "evidence": [
+          {
+            "label": "micron-source",
+            "url": "https://github.com/example/micron"
+          }
+        ],
+        "license_gate": "unresolved",
+        "readiness": "registered",
+        "source_gate": "pass"
+      },
+      {
+        "candidate_id": "molerec",
+        "display_name": "molerec",
+        "evidence": [
+          {
+            "label": "molerec-source",
+            "url": "https://github.com/example/molerec"
+          }
+        ],
+        "license_gate": "pass",
+        "readiness": "registered",
+        "source_gate": "pass"
+      },
+      {
+        "candidate_id": "retain",
+        "display_name": "retain",
+        "evidence": [
+          {
+            "label": "retain-source",
+            "url": "https://github.com/example/retain"
+          }
+        ],
+        "license_gate": "pass",
+        "readiness": "registered",
+        "source_gate": "pass"
+      },
+      {
+        "candidate_id": "leap-safedrug",
+        "display_name": "leap-safedrug",
+        "evidence": [
+          {
+            "label": "leap-safedrug-source",
+            "url": "https://github.com/example/leap-safedrug"
+          }
+        ],
+        "license_gate": "pass",
+        "readiness": "registered",
+        "source_gate": "pass"
+      }
+    ],
+    "discovery_eligible": false,
+    "kind": "medrec",
+    "qualified_count": 0,
+    "review_state": "not_required",
+    "schema_version": 1,
+    "shared_lineage": [
+      {
+        "candidate_ids": [
+          "safedrug",
+          "molerec"
+        ],
+        "evidence": [
+          {
+            "label": "model_core-lineage",
+            "url": "https://raw.githubusercontent.com/example/shared-pipeline/0123456789abcdef0123456789abcdef01234567/README.md"
+          }
+        ],
+        "layer": "model_core",
+        "upstream_repository": "https://github.com/example/shared-pipeline"
+      },
+      {
+        "candidate_ids": [
+          "safedrug",
+          "molerec"
+        ],
+        "evidence": [
+          {
+            "label": "data_processing-lineage",
+            "url": "https://raw.githubusercontent.com/example/shared-pipeline/0123456789abcdef0123456789abcdef01234567/README.md"
+          }
+        ],
+        "layer": "data_processing",
+        "upstream_repository": "https://github.com/example/shared-pipeline"
+      },
+      {
+        "candidate_ids": [
+          "safedrug",
+          "molerec"
+        ],
+        "evidence": [
+          {
+            "label": "split_selection-lineage",
+            "url": "https://raw.githubusercontent.com/example/shared-pipeline/0123456789abcdef0123456789abcdef01234567/README.md"
+          }
+        ],
+        "layer": "split_selection",
+        "upstream_repository": "https://github.com/example/shared-pipeline"
+      },
+      {
+        "candidate_ids": [
+          "safedrug",
+          "molerec"
+        ],
+        "evidence": [
+          {
+            "label": "evaluation_reporting-lineage",
+            "url": "https://raw.githubusercontent.com/example/shared-pipeline/0123456789abcdef0123456789abcdef01234567/README.md"
+          }
+        ],
+        "layer": "evaluation_reporting",
+        "upstream_repository": "https://github.com/example/shared-pipeline"
+      }
+    ],
+    "stage": "audit_blocked"
+  },
+  "permitted_actions": [
+    {
+      "action_id": "resolve_source_license",
+      "label": "Resolve source and license evidence"
+    }
+  ],
+  "primary_blocker": {
+    "candidate_id": "safedrug",
+    "category": "source_license",
+    "reason_code": "license_not_pass"
+  },
+  "project_id": "medrec-research",
+  "schema_version": 1,
+  "snapshot_sha256": "d165e1e820d994b98e00add52a714a3d3e3dcab23f4aae8373b56e5336c09301",
+  "valid_until": "2026-07-11T01:07:03Z"
+}
