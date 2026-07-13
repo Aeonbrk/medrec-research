@@ -1,5 +1,12 @@
 # Plans
 
+## Completed: Classic-six Baseline Source Preflight Audit
+
+- **Status**: completed on `2026-07-13`; no baseline environment, source checkout, 319 action, restricted-data access, training, or readiness change was authorized by this audit.
+- **Plan**: `docs/plans/2026-07-13-004-docs-classic-six-baseline-preflight-audit.md`.
+- **Goal**: record source-pinned environment, training, seed, split, checkpoint, license, and maintainer-Issue evidence for GAMENet, SafeDrug, MICRON, MoleRec, RETAIN, and LEAP-SafeDrug before execution is considered.
+- **Decision boundary**: a candidate remains `registered` unless its individual source, license, environment, source-native invocation, selection rule, and restricted input/split gates pass. No related repository, bundled checkpoint, or Issue comment fills a missing gate.
+
 ## Accepted: Controlled GAMENet Reproduction Launch
 
 - **Status**: accepted on `2026-07-13`; execution begins with one GAMENet MIMIC-III v1.4 Reproduction Mode lane only.
