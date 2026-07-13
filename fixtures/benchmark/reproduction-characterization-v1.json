@@ -1,4 +1,5 @@
 {
+  "accepted_selection_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "attempts": [
     {
       "adapter_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
@@ -24,52 +25,23 @@
     }
   ],
   "baseline_id": "gamenet",
-  "characterization_id": "characterization-03121471cd0a4c84b379",
+  "characterization_id": "characterization-f30e5e90ee070e857460",
   "evaluation_semantics_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
   "kind": "reproduction_characterization",
   "mode": "reproduction",
   "planned_attempts": 2,
-  "policy_sha256": "1ef6cc36a101c1f24aa69b99f281986b79c113372fe9f752609eb629cd337889",
-  "policy_version": 2,
+  "policy_sha256": "f84c2fb19b608a88a4205be388c34a3bdac52660ad95c3bf5c3bc7b4d9df2afb",
+  "policy_version": 1,
   "protocol_violations": 0,
-  "schema_version": 2,
-  "selection_acceptance_sha256": "d4831f131b0a1b1fd4f98e471322f7dd4ddf9501644abcc71b056486edeb26d4",
+  "schema_version": 1,
   "selection_semantics_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   "split_semantics_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
   "status": "stable",
   "upstream_reference_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
   "variance_checks": [
     {
-      "check_id": "jaccard",
-      "evidence_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
-      "observed_variance": 0.005,
-      "predeclared": true,
-      "tolerance": 0.01
-    },
-    {
-      "check_id": "precision",
-      "evidence_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
-      "observed_variance": 0.005,
-      "predeclared": true,
-      "tolerance": 0.01
-    },
-    {
-      "check_id": "recall",
-      "evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
-      "observed_variance": 0.005,
-      "predeclared": true,
-      "tolerance": 0.01
-    },
-    {
-      "check_id": "f1",
-      "evidence_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
-      "observed_variance": 0.005,
-      "predeclared": true,
-      "tolerance": 0.01
-    },
-    {
-      "check_id": "mean_medication_count",
-      "evidence_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "check_id": "medication-count",
+      "evidence_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       "observed_variance": 0.005,
       "predeclared": true,
       "tolerance": 0.01

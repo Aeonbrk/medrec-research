@@ -37,6 +37,7 @@ baseline-cache/
 *.npz
 *.parquet
 *.csv.gz
+*.traineddata
 
 # Local configuration
 .env

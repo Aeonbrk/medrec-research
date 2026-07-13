@@ -2,17 +2,30 @@ from __future__ import annotations
 
 import itertools
 import json
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
-from medrec_research.baseline_audit import BaselineAudit, BaselineProgram
-from medrec_research.benchmark_program import SelectionResult
+from medrec_research.baseline_audit import AuditReviewSet, BaselineAudit, BaselineProgram
+from medrec_research.benchmark_program import (
+    ReproductionAttempt,
+    ReproductionCharacterization,
+    ReproductionStabilityPolicy,
+    SelectionAcceptance,
+    SelectionDiagnostic,
+    SelectionResult,
+    SelectionSpecification,
+    VarianceCheck,
+)
 from medrec_research.benchmark_state import (
     ComparisonScope,
+    HumanReviewRecord,
     HumanReviewState,
+    LiveBenchmarkAuthority,
     derive_benchmark_state,
+    program_registry_authority_sha256,
 )
 from medrec_research.errors import ProtocolValidationError
 from medrec_research.project_status import (
@@ -31,6 +44,8 @@ from medrec_research.project_status import (
     validate_evidence_url,
 )
 from medrec_research.registry import BaselineRegistry
+
+from .test_benchmark_state import _registry_with_qualified
 
 NOW = datetime(2026, 7, 11, 1, 2, 3, tzinfo=UTC)
 CLASSIC_SIX = (
@@ -145,23 +160,23 @@ def test_publisher_projects_existing_authorities_without_advancing_them() -> Non
         for candidate_id in CLASSIC_SIX
     )
     registry = BaselineRegistry.load(ROOT / "baselines" / "registry.toml")
+    reviews = AuditReviewSet.load(ROOT / "fixtures" / "benchmark" / "audit-reviews.json")
     selection = SelectionResult.load(ROOT / "fixtures" / "benchmark" / "selection-result.json")
-    state = derive_benchmark_state(
+    authority = LiveBenchmarkAuthority.create(
         program=program,
+        audits=audits,
+        reviews=reviews,
         registry=registry,
         scope=ComparisonScope(
             protocol_version="1.0",
             dataset_manifest_sha256="d" * 64,
             adaptation_budget_sha256="a" * 64,
         ),
+        selection=selection,
     )
 
     snapshot = publish_medrec_status(
-        program=program,
-        audits=audits,
-        registry=registry,
-        selection=selection,
-        benchmark_state=state,
+        authority=authority,
         clock=_clock,
     )
 
@@ -172,10 +187,360 @@ def test_publisher_projects_existing_authorities_without_advancing_them() -> Non
         "audit-set",
         "program",
         "registry",
+        "review-set",
         "scope",
         "selection",
     }
     assert registry.get("gamenet").readiness.value == "registered"
+
+
+def test_live_benchmark_authority_rejects_drifted_selection_authorities() -> None:
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    audits = tuple(
+        BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
+        for candidate_id in CLASSIC_SIX
+    )
+    reviews = AuditReviewSet.load(ROOT / "fixtures" / "benchmark" / "audit-reviews.json")
+    registry = BaselineRegistry.load(ROOT / "baselines" / "registry.toml")
+    selection = SelectionResult.load(ROOT / "fixtures" / "benchmark" / "selection-result.json")
+    scope = ComparisonScope(
+        protocol_version="1.0",
+        dataset_manifest_sha256="d" * 64,
+        adaptation_budget_sha256="a" * 64,
+    )
+
+    authority = LiveBenchmarkAuthority.create(
+        program=program,
+        audits=audits,
+        reviews=reviews,
+        registry=registry,
+        scope=scope,
+        selection=selection,
+    )
+
+    assert authority.benchmark_state == derive_benchmark_state(
+        program=program,
+        registry=registry,
+        scope=scope,
+    )
+    assert authority.review_set_sha256 == selection.review_set_sha256
+
+    with pytest.raises(ProtocolValidationError, match="selection review set"):
+        LiveBenchmarkAuthority.create(
+            program=program,
+            audits=audits,
+            reviews=AuditReviewSet(reviews.reviews[:-1]),
+            registry=registry,
+            scope=scope,
+            selection=selection,
+        )
+
+    with pytest.raises(ProtocolValidationError, match="selection scope authority"):
+        LiveBenchmarkAuthority.create(
+            program=program,
+            audits=audits,
+            reviews=reviews,
+            registry=registry,
+            scope=ComparisonScope(
+                protocol_version="1.0",
+                dataset_manifest_sha256="e" * 64,
+                adaptation_budget_sha256="a" * 64,
+            ),
+            selection=selection,
+        )
+
+    drifted_program_payload = selection.to_dict()
+    drifted_program_payload.pop("selection_id")
+    drifted_program_payload["program_sha256"] = "f" * 64
+    drifted_program_selection = SelectionResult.create(**drifted_program_payload)
+    with pytest.raises(ProtocolValidationError, match="selection program authority"):
+        LiveBenchmarkAuthority.create(
+            program=program,
+            audits=audits,
+            reviews=reviews,
+            registry=registry,
+            scope=scope,
+            selection=drifted_program_selection,
+        )
+
+    drifted_registry = BaselineRegistry(
+        tuple(
+            replace(baseline, display_name="Changed GAMENet")
+            if baseline.baseline_id == "gamenet"
+            else baseline
+            for baseline in registry.baselines
+        )
+    )
+    with pytest.raises(ProtocolValidationError, match="selection registry authority"):
+        LiveBenchmarkAuthority.create(
+            program=program,
+            audits=audits,
+            reviews=reviews,
+            registry=drifted_registry,
+            scope=scope,
+            selection=selection,
+        )
+
+    drifted_audits = (replace(audits[0], display_name="Changed GAMENet"), *audits[1:])
+    diagnostics_payload = json.loads(
+        (ROOT / "fixtures" / "benchmark" / "selection-diagnostics.json").read_text(encoding="utf-8")
+    )
+    drifted_selection = SelectionSpecification().select(
+        program,
+        drifted_audits,
+        reviews,
+        tuple(SelectionDiagnostic.from_dict(item) for item in diagnostics_payload["diagnostics"]),
+        registry_authority_sha256=program_registry_authority_sha256(program, registry),
+        scope_sha256=scope.scope_sha256,
+    )
+    with pytest.raises(ProtocolValidationError, match="selection audit set authority"):
+        LiveBenchmarkAuthority.create(
+            program=program,
+            audits=audits,
+            reviews=reviews,
+            registry=registry,
+            scope=scope,
+            selection=drifted_selection,
+        )
+
+    forged_payload = selection.to_dict()
+    forged_payload.pop("selection_id")
+    forged_payload["candidates"][0]["blockers"] = ["source_not_pass"]
+    forged_payload["candidates"][0]["eligible"] = False
+    forged_payload["candidates"][1]["blockers"] = []
+    forged_payload["candidates"][1]["eligible"] = True
+    forged_payload["selected_candidate_id"] = "safedrug"
+    forged_selection = SelectionResult.create(**forged_payload)
+    with pytest.raises(
+        ProtocolValidationError, match="selection does not match current hard-gate result"
+    ):
+        LiveBenchmarkAuthority.create(
+            program=program,
+            audits=audits,
+            reviews=reviews,
+            registry=registry,
+            scope=scope,
+            selection=forged_selection,
+        )
+
+
+def test_blocked_current_selection_suppresses_discovery() -> None:
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    audits = tuple(
+        BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
+        for candidate_id in CLASSIC_SIX
+    )
+    scope = ComparisonScope(
+        protocol_version="1.0",
+        dataset_manifest_sha256="d" * 64,
+        adaptation_budget_sha256="a" * 64,
+    )
+    registry = _registry_with_qualified(*CLASSIC_SIX)
+    state = derive_benchmark_state(program=program, registry=registry, scope=scope)
+    review = HumanReviewRecord.create(
+        scope=scope,
+        program=program,
+        registry=registry,
+        reviewed_qualifications=state.qualifications[:4],
+        reviewer="research-steward",
+        issued_at="2026-07-12T00:00:00Z",
+    )
+    diagnostics_payload = json.loads(
+        (ROOT / "fixtures" / "benchmark" / "selection-diagnostics.json").read_text(encoding="utf-8")
+    )
+    selection = SelectionSpecification().select(
+        program,
+        audits,
+        AuditReviewSet(()),
+        tuple(SelectionDiagnostic.from_dict(item) for item in diagnostics_payload["diagnostics"]),
+        registry_authority_sha256=program_registry_authority_sha256(program, registry),
+        scope_sha256=scope.scope_sha256,
+    )
+    authority = LiveBenchmarkAuthority.create(
+        program=program,
+        audits=audits,
+        reviews=AuditReviewSet(()),
+        registry=registry,
+        scope=scope,
+        selection=selection,
+        review=review,
+    )
+
+    snapshot = publish_medrec_status(authority=authority, clock=_clock)
+
+    assert authority.benchmark_state.discovery_eligible
+    assert selection.status == "blocked"
+    assert snapshot.payload.stage is ProjectStage.AUDIT_BLOCKED
+    assert not snapshot.payload.discovery_eligible
+
+
+def test_reproduction_characterization_requires_current_selection_acceptance() -> None:
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    audits = tuple(
+        BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
+        for candidate_id in CLASSIC_SIX
+    )
+    reviews = AuditReviewSet.load(ROOT / "fixtures" / "benchmark" / "audit-reviews.json")
+    selection = SelectionResult.load(ROOT / "fixtures" / "benchmark" / "selection-result.json")
+    authority = LiveBenchmarkAuthority.create(
+        program=program,
+        audits=audits,
+        reviews=reviews,
+        registry=BaselineRegistry.load(ROOT / "baselines" / "registry.toml"),
+        scope=ComparisonScope(
+            protocol_version="1.0",
+            dataset_manifest_sha256="d" * 64,
+            adaptation_budget_sha256="a" * 64,
+        ),
+        selection=selection,
+    )
+    acceptance = SelectionAcceptance.create(
+        selection=selection,
+        candidate_id="gamenet",
+        reviewer="research-steward",
+        issued_at="2026-07-12T00:00:00Z",
+    )
+    attempts = tuple(
+        ReproductionAttempt(
+            attempt_id=f"attempt-{ordinal}",
+            outcome="completed",
+            source_sha256="1" * 64,
+            environment_sha256="2" * 64,
+            adapter_sha256="3" * 64,
+            adapter_smoke_sha256="4" * 64,
+            input_manifest_sha256="5" * 64,
+            seed_policy_sha256="6" * 64,
+            artifact_sha256=f"{ordinal + 6:x}" * 64,
+        )
+        for ordinal in (1, 2)
+    )
+    policy = ReproductionStabilityPolicy()
+    variance_checks = tuple(
+        VarianceCheck(output_id, True, 0.01, 0.005, f"{ordinal:x}" * 64)
+        for ordinal, output_id in enumerate(
+            ("jaccard", "precision", "recall", "f1", "mean_medication_count"),
+            start=1,
+        )
+    )
+    characterization_evidence = {
+        "baseline_id": "gamenet",
+        "mode": "reproduction",
+        "selection_acceptance_sha256": acceptance.acceptance_sha256,
+        "planned_attempts": 2,
+        "attempts": attempts,
+        "protocol_violations": 0,
+        "upstream_reference_sha256": "c" * 64,
+        "split_semantics_sha256": "d" * 64,
+        "selection_semantics_sha256": "e" * 64,
+        "evaluation_semantics_sha256": "f" * 64,
+    }
+    characterization = ReproductionCharacterization.create(
+        policy,
+        variance_checks=variance_checks,
+        **characterization_evidence,
+    )
+    unresolved_characterization = ReproductionCharacterization.create(
+        policy,
+        variance_checks=variance_checks[:-1],
+        **characterization_evidence,
+    )
+    failed_characterization = ReproductionCharacterization.create(
+        policy,
+        variance_checks=tuple(
+            replace(check, observed_variance=0.02) if check.check_id == "jaccard" else check
+            for check in variance_checks
+        ),
+        **characterization_evidence,
+    )
+
+    missing = publish_medrec_status(
+        authority=authority,
+        characterization=characterization,
+        clock=_clock,
+    )
+    accepted = publish_medrec_status(
+        authority=authority,
+        characterization=characterization,
+        selection_acceptance=acceptance,
+        clock=_clock,
+    )
+    unresolved = publish_medrec_status(
+        authority=authority,
+        characterization=unresolved_characterization,
+        selection_acceptance=acceptance,
+        clock=_clock,
+    )
+    failed = publish_medrec_status(
+        authority=authority,
+        characterization=failed_characterization,
+        selection_acceptance=acceptance,
+        clock=_clock,
+    )
+    stale = publish_medrec_status(
+        authority=authority,
+        characterization=characterization,
+        selection_acceptance=SelectionAcceptance.create(
+            selection=selection,
+            candidate_id="gamenet",
+            reviewer="second-steward",
+            issued_at="2026-07-12T00:01:00Z",
+        ),
+        clock=_clock,
+    )
+    alternate_payload = selection.to_dict()
+    alternate_payload.pop("selection_id")
+    alternate_payload["candidates"][0]["diagnostics"]["comparison_representativeness"]["value"] = (
+        "medium"
+    )
+    alternate_selection = SelectionResult.create(**alternate_payload)
+    alternate_authority = LiveBenchmarkAuthority.create(
+        program=program,
+        audits=audits,
+        reviews=reviews,
+        registry=BaselineRegistry.load(ROOT / "baselines" / "registry.toml"),
+        scope=ComparisonScope(
+            protocol_version="1.0",
+            dataset_manifest_sha256="d" * 64,
+            adaptation_budget_sha256="a" * 64,
+        ),
+        selection=alternate_selection,
+    )
+    selection_drifted = publish_medrec_status(
+        authority=alternate_authority,
+        characterization=characterization,
+        selection_acceptance=acceptance,
+        clock=_clock,
+    )
+    legacy = publish_medrec_status(
+        authority=authority,
+        characterization=ReproductionCharacterization.load(
+            ROOT / "fixtures" / "benchmark" / "reproduction-characterization-v1.json"
+        ),
+        clock=_clock,
+    )
+
+    assert missing.payload.stage is ProjectStage.LANE_PROPOSED
+    assert missing.primary_blocker is not None
+    assert missing.primary_blocker.reason_code == "selection_acceptance_missing"
+    assert accepted.payload.stage is ProjectStage.LANE_PROPOSED
+    assert accepted.primary_blocker is not None
+    assert accepted.primary_blocker.reason_code == "reproduction_characterization_not_controlled"
+    assert unresolved.payload.stage is ProjectStage.LANE_PROPOSED
+    assert unresolved.primary_blocker is not None
+    assert unresolved.primary_blocker.reason_code == "reproduction_characterization_not_controlled"
+    assert failed.payload.stage is ProjectStage.LANE_PROPOSED
+    assert failed.primary_blocker is not None
+    assert failed.primary_blocker.reason_code == "reproduction_characterization_not_controlled"
+    assert stale.primary_blocker is not None
+    assert stale.primary_blocker.reason_code == "selection_acceptance_stale"
+    assert selection_drifted.payload.stage is ProjectStage.LANE_PROPOSED
+    assert selection_drifted.primary_blocker is not None
+    assert selection_drifted.primary_blocker.reason_code == "selection_acceptance_stale"
+    assert "selection-acceptance" not in {
+        item.authority_id for item in selection_drifted.authorities
+    }
+    assert legacy.primary_blocker is not None
+    assert legacy.primary_blocker.reason_code == "reproduction_characterization_legacy"
 
 
 def test_medrec_milestones_are_projected_from_scoped_benchmark_state() -> None:

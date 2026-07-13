@@ -48,6 +48,14 @@ _Avoid_: Prediction Record, model labels
 The predeclared and equal allowance for tuning and mechanical integration granted to every compared method.
 _Avoid_: Tuning freedom, fair tuning
 
+**Comparison Scope**:
+The immutable Unified Research Protocol version, Dataset Manifest identity, and Adaptation Budget identity that delimit one set of comparable qualification and Run Record evidence.
+_Avoid_: Scope digest, comparison context, loose protocol fields
+
+**Live Benchmark Authority**:
+The current correlated Baseline Program, Baseline Audit, Audit Review, Selection Result, Baseline Registry, and Comparison Scope records from which a Project Status Snapshot can be derived. It owns no scientific fact beyond those source records.
+_Avoid_: Status input bundle, mutable status state, controller state
+
 **Active Research Home**:
 The sole authoritative location for future research work and newly produced evidence.
 _Avoid_: Working folder, current checkout
@@ -128,9 +136,25 @@ _Avoid_: README 摘要, 可运行证明
 固定 V1 scorecard 对完整六候选审计、审核和 diagnostics 的内容寻址投影。优先顺序不能绕过来源或许可证硬门。
 _Avoid_: 运行队列, 实验结论
 
+**Selection Acceptance**:
+The content-addressed steward decision that authorizes one candidate from a current Selection Result to enter Reproduction Characterization. It binds the Selection Result, candidate, reviewer, and issue time without changing selection authority or expiring independently; Live Benchmark Authority drift makes it unusable.
+_Avoid_: Selection Result, launch request, approval note
+
+**Reproduction Characterization**:
+The content-addressed account of repeat Reproduction Mode attempts and predeclared stability evidence for one accepted candidate. It determines a three-state stability result without becoming Comparison Mode evidence.
+_Avoid_: Benchmark result, Run Record, comparison qualification
+
+**Reproduction Stability Policy**:
+The versioned Reproduction Mode rule that declares required attempt identities, expected output IDs, and criteria for stable, failed, or unresolved Reproduction Characterization.
+_Avoid_: Variance rule, benchmark policy, training criterion
+
 **Project Status Snapshot**:
 从 program、audit、registry、Comparison Scope、selection 和 qualification 派生的短时公开安全视图。它不拥有科学事实，authority 漂移或过期时必须 fail closed。
 _Avoid_: 数据库, readiness 权威
+
+**Action Context**:
+The public-safe current action binding derived from a Project Status Snapshot and an explicitly injected Authority Bundle. It identifies one allowable action and remote target or declares that no action is usable; callers submit only an opaque `request_id`.
+_Avoid_: Action Intent, ambient authorization, launch context
 
 **Authority Bundle**:
 调用方显式注入的当前 authority digest、Action Authorization 和 Remote Preflight 集合。动作门不会从环境或远端隐式发现 authority。

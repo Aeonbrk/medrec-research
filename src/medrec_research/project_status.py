@@ -23,18 +23,13 @@ from ._validation import (
     write_json_atomic,
 )
 from .baseline_audit import CLASSIC_SIX, LINEAGE_LAYERS, BaselineAudit, BaselineProgram
-from .benchmark_program import (
-    ReproductionCharacterization,
-    SelectionResult,
-    StabilityStatus,
-)
+from .benchmark_program import SelectionAcceptance
 from .benchmark_state import (
-    BenchmarkState,
     HumanReviewState,
-    program_registry_authority_sha256,
+    LiveBenchmarkAuthority,
 )
 from .errors import ProtocolValidationError
-from .registry import BaselineRegistry
+from .reproduction_characterization import ReproductionCharacterization, StabilityStatus
 
 Clock = Callable[[], datetime]
 
@@ -490,10 +485,10 @@ class MedRecStatus:
             raise ProtocolValidationError("MedRec lineage must project all four layers")
         if any(not set(item.candidate_ids) <= set(CLASSIC_SIX) for item in lineage):
             raise ProtocolValidationError("lineage references an unknown candidate")
-        if self.discovery_eligible != (
+        if self.discovery_eligible and not (
             self.qualified_count == len(CLASSIC_SIX) and review_state is HumanReviewState.ACCEPTED
         ):
-            raise ProtocolValidationError("discovery eligibility does not match scoped readiness")
+            raise ProtocolValidationError("discovery eligibility requires scoped readiness")
         if stage is ProjectStage.DISCOVERY_ELIGIBLE and not self.discovery_eligible:
             raise ProtocolValidationError("discovery stage requires discovery eligibility")
         if stage is ProjectStage.REVIEW_PENDING and review_state is not HumanReviewState.PENDING:
@@ -863,29 +858,24 @@ def _project_lineage(
 
 def publish_medrec_status(
     *,
-    program: BaselineProgram,
-    audits: tuple[BaselineAudit, ...],
-    registry: BaselineRegistry,
-    selection: SelectionResult,
-    benchmark_state: BenchmarkState,
+    authority: LiveBenchmarkAuthority,
     clock: Clock,
     characterization: ReproductionCharacterization | None = None,
+    selection_acceptance: SelectionAcceptance | None = None,
     freshness: timedelta = timedelta(minutes=5),
 ) -> ProjectStatus:
     """Project U1-U3 authorities into a public status without mutating them."""
 
-    program.validate_audits(audits)
-    program_sha256 = program.program_sha256
-    selection_sha256 = content_sha256(selection.to_dict())
-    audit_set_sha256 = content_sha256({"audits": [item.audit_sha256 for item in audits]})
-    current_registry_sha256 = program_registry_authority_sha256(program, registry)
-    if (
-        selection.program_sha256 != program_sha256
-        or selection.audit_set_sha256 != audit_set_sha256
-        or benchmark_state.program_sha256 != program_sha256
-        or benchmark_state.registry_authority_sha256 != current_registry_sha256
-    ):
-        raise ProtocolValidationError("status authorities do not match")
+    program = authority.program
+    audits = authority.audits
+    registry = authority.registry
+    selection = authority.selection
+    benchmark_state = authority.benchmark_state
+    discovery_eligible = benchmark_state.discovery_eligible and selection.status != "blocked"
+    selection_acceptance_is_current = authority.accepts_selection_acceptance(selection_acceptance)
+    selection_acceptance_sha256 = (
+        selection_acceptance.acceptance_sha256 if selection_acceptance is not None else None
+    )
     audit_by_id = {item.baseline_id: item for item in audits}
     candidate_statuses = []
     for candidate_id in program.candidate_ids:
@@ -905,27 +895,74 @@ def publish_medrec_status(
         )
 
     blockers: list[StatusBlocker] = []
-    if benchmark_state.discovery_eligible:
-        stage = ProjectStage.DISCOVERY_ELIGIBLE
-    elif benchmark_state.review_state is HumanReviewState.PENDING:
-        stage = ProjectStage.REVIEW_PENDING
-        blockers.append(StatusBlocker(BlockerCategory.READINESS, "comparison_review_pending"))
-    elif selection.status == "blocked":
+    if selection.status == "blocked":
         stage = ProjectStage.AUDIT_BLOCKED
         for candidate in selection.candidates:
             blockers.extend(
                 StatusBlocker(BlockerCategory.SOURCE_LICENSE, reason, candidate.baseline_id)
                 for reason in candidate.blockers
             )
+    elif discovery_eligible:
+        stage = ProjectStage.DISCOVERY_ELIGIBLE
+    elif benchmark_state.review_state is HumanReviewState.PENDING:
+        stage = ProjectStage.REVIEW_PENDING
+        blockers.append(StatusBlocker(BlockerCategory.READINESS, "comparison_review_pending"))
     elif characterization is None:
         stage = ProjectStage.LANE_PROPOSED
     else:
-        if (
-            characterization.baseline_id != selection.selected_candidate_id
-            or characterization.accepted_selection_sha256 not in {None, selection_sha256}
-        ):
+        if characterization.baseline_id != selection.selected_candidate_id:
             raise ProtocolValidationError("characterization does not match selected authority")
-        if characterization.status is StabilityStatus.STABLE:
+        if characterization.policy_version == 1:
+            stage = ProjectStage.LANE_PROPOSED
+            blockers.append(
+                StatusBlocker(
+                    BlockerCategory.READINESS,
+                    "reproduction_characterization_legacy",
+                    characterization.baseline_id,
+                )
+            )
+        elif selection_acceptance is None:
+            stage = ProjectStage.LANE_PROPOSED
+            blockers.append(
+                StatusBlocker(
+                    BlockerCategory.READINESS,
+                    "selection_acceptance_missing",
+                    characterization.baseline_id,
+                )
+            )
+        elif (
+            characterization.selection_acceptance_sha256 != selection_acceptance_sha256
+            or not selection_acceptance_is_current
+        ):
+            stage = ProjectStage.LANE_PROPOSED
+            blockers.append(
+                StatusBlocker(
+                    BlockerCategory.READINESS,
+                    "selection_acceptance_stale",
+                    characterization.baseline_id,
+                )
+            )
+        elif characterization.policy_version != 3:
+            stage = ProjectStage.LANE_PROPOSED
+            blockers.append(
+                StatusBlocker(
+                    BlockerCategory.READINESS,
+                    "reproduction_characterization_not_controlled",
+                    characterization.baseline_id,
+                )
+            )
+        elif not characterization.matches_baseline_definition(
+            authority.registry.get(characterization.baseline_id)
+        ):
+            stage = ProjectStage.LANE_PROPOSED
+            blockers.append(
+                StatusBlocker(
+                    BlockerCategory.READINESS,
+                    "reproduction_identity_mismatch",
+                    characterization.baseline_id,
+                )
+            )
+        elif characterization.status is StabilityStatus.STABLE:
             stage = ProjectStage.PARALLEL_ELIGIBLE
         else:
             stage = ProjectStage.LANE_CHARACTERIZING
@@ -942,17 +979,25 @@ def publish_medrec_status(
         stage=stage,
         qualified_count=benchmark_state.qualified_count,
         review_state=benchmark_state.review_state,
-        discovery_eligible=benchmark_state.discovery_eligible,
+        discovery_eligible=discovery_eligible,
         candidates=tuple(candidate_statuses),
         shared_lineage=_project_lineage(program, audits),
     )
     authorities = [
-        AuthorityDigest("audit-set", audit_set_sha256),
-        AuthorityDigest("program", program_sha256),
-        AuthorityDigest("registry", current_registry_sha256),
-        AuthorityDigest("scope", benchmark_state.scope.scope_sha256),
-        AuthorityDigest("selection", selection_sha256),
+        AuthorityDigest("audit-set", authority.audit_set_sha256),
+        AuthorityDigest("program", program.program_sha256),
+        AuthorityDigest("registry", benchmark_state.registry_authority_sha256),
+        AuthorityDigest("review-set", authority.review_set_sha256),
+        AuthorityDigest("scope", authority.scope.scope_sha256),
+        AuthorityDigest("selection", authority.selection_sha256),
     ]
+    if authority.review is not None:
+        authorities.append(
+            AuthorityDigest("human-review", content_sha256(authority.review.to_dict()))
+        )
+    if selection_acceptance_is_current:
+        assert selection_acceptance_sha256 is not None
+        authorities.append(AuthorityDigest("selection-acceptance", selection_acceptance_sha256))
     if characterization is not None:
         authorities.append(
             AuthorityDigest("characterization", content_sha256(characterization.to_dict()))

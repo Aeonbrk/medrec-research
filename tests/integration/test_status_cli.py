@@ -6,6 +6,11 @@ from pathlib import Path
 
 import pytest
 
+from medrec_research.action_gate import (
+    ActionAuthorization,
+    AuthorityBundle,
+    RemotePreflight,
+)
 from medrec_research.cli import main
 from medrec_research.project_status import ProjectStatus
 
@@ -22,12 +27,49 @@ def _scope(path: Path) -> None:
     path.write_text(
         json.dumps(
             {
-                "adaptation_budget_sha256": "b" * 64,
-                "dataset_manifest_sha256": "a" * 64,
+                "adaptation_budget_sha256": "a" * 64,
+                "dataset_manifest_sha256": "d" * 64,
                 "protocol_version": "1.0",
             }
         ),
         encoding="utf-8",
+    )
+
+
+def _authority_bundle(snapshot: ProjectStatus) -> AuthorityBundle:
+    shared = {
+        "project_id": snapshot.project_id,
+        "target_id": "319-wild",
+        "action_id": "begin_discovery",
+        "snapshot_sha256": snapshot.snapshot_sha256,
+        "scope_sha256": "d" * 64,
+        "authorities": snapshot.authorities,
+        "issued_at": "2026-07-11T01:01:00Z",
+        "expires_at": "2026-07-11T01:05:00Z",
+    }
+    return AuthorityBundle(
+        current_authorities=snapshot.authorities,
+        current_remote_profile_id="319-wild",
+        current_remote_revision="e" * 40,
+        authorization_issuer_id="research-steward",
+        authorization_source_id="steward-approval",
+        preflight_issuer_id="aris",
+        preflight_source_id="remote-preflight",
+        authorizations=(
+            ActionAuthorization.create(
+                issuer_id="research-steward",
+                source_id="steward-approval",
+                **shared,
+            ),
+        ),
+        preflights=(
+            RemotePreflight.create(
+                issuer_id="aris",
+                source_id="remote-preflight",
+                remote_revision="e" * 40,
+                **shared,
+            ),
+        ),
     )
 
 
@@ -48,6 +90,8 @@ def test_real_six_audits_validate_and_selection_publishes(
     )
     assert len(capsys.readouterr().out.strip()) == 64
 
+    scope = tmp_path / "scope.json"
+    _scope(scope)
     output = tmp_path / "selection.json"
     assert (
         main(
@@ -57,8 +101,12 @@ def test_real_six_audits_validate_and_selection_publishes(
                 str(PROGRAM),
                 "--audit-dir",
                 str(AUDITS),
+                "--registry",
+                str(REGISTRY),
                 "--reviews",
                 str(REVIEWS),
+                "--scope",
+                str(scope),
                 "--diagnostics",
                 str(DIAGNOSTICS),
                 "--output",
@@ -89,6 +137,8 @@ def test_status_publish_uses_injected_clock_and_is_byte_stable(
                     str(AUDITS),
                     "--registry",
                     str(REGISTRY),
+                    "--reviews",
+                    str(REVIEWS),
                     "--selection",
                     str(ROOT / "fixtures/benchmark/selection-result.json"),
                     "--scope",
@@ -134,6 +184,8 @@ def test_explicit_stale_review_exits_two_without_output(
                 str(AUDITS),
                 "--registry",
                 str(REGISTRY),
+                "--reviews",
+                str(REVIEWS),
                 "--selection",
                 str(ROOT / "fixtures/benchmark/selection-result.json"),
                 "--scope",
@@ -154,22 +206,13 @@ def test_explicit_stale_review_exits_two_without_output(
 def test_action_blocked_writes_decision_and_returns_two(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    snapshot = ProjectStatus.from_json(
-        (ROOT / "fixtures/status/discovery-eligible.json").read_text(encoding="utf-8")
-    )
-    intent = tmp_path / "intent.json"
-    intent.write_text(
+    request = tmp_path / "request.json"
+    request.write_text(
         json.dumps(
             {
-                "action_id": "begin_discovery",
-                "authorization_sha256": "a" * 64,
-                "kind": "action_intent",
-                "preflight_sha256": "b" * 64,
+                "kind": "action_request_input",
                 "request_id": "cli-request-001",
                 "schema_version": 1,
-                "scope_sha256": "d" * 64,
-                "snapshot_sha256": snapshot.snapshot_sha256,
-                "target_id": "319-wild",
             }
         ),
         encoding="utf-8",
@@ -180,8 +223,8 @@ def test_action_blocked_writes_decision_and_returns_two(
         main(
             [
                 "action-evaluate",
-                "--intent",
-                str(intent),
+                "--request",
+                str(request),
                 "--status",
                 str(ROOT / "fixtures/status/discovery-eligible.json"),
                 "--output",
@@ -194,6 +237,79 @@ def test_action_blocked_writes_decision_and_returns_two(
     decision = json.loads(output.read_text(encoding="utf-8"))
     assert decision["reason_code"] == "authority_bundle_missing"
     assert capsys.readouterr().out.strip() == "authority_bundle_missing"
+
+
+def test_action_cli_derives_context_and_allowed_request_from_opaque_input(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    snapshot_path = ROOT / "fixtures" / "status" / "discovery-eligible.json"
+    snapshot = ProjectStatus.from_json(snapshot_path.read_text(encoding="utf-8"))
+    request = tmp_path / "request.json"
+    bundle = tmp_path / "authority-bundle.json"
+    context_output = tmp_path / "context.json"
+    output = tmp_path / "decision.json"
+    authority_bundle = _authority_bundle(snapshot)
+    bundle.write_text(authority_bundle.to_json(indent=2), encoding="utf-8")
+
+    assert (
+        main(
+            [
+                "action-context",
+                "--status",
+                str(snapshot_path),
+                "--authority-bundle",
+                str(bundle),
+                "--output",
+                str(context_output),
+            ],
+            clock=lambda: NOW,
+        )
+        == 0
+    )
+    context = json.loads(context_output.read_text(encoding="utf-8"))
+    assert context == {
+        "enabled": True,
+        "kind": "action_context",
+        "request_id": context["request_id"],
+        "schema_version": 1,
+    }
+    request.write_text(
+        json.dumps(
+            {
+                "kind": "action_request_input",
+                "request_id": context["request_id"],
+                "schema_version": 1,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert (
+        main(
+            [
+                "action-evaluate",
+                "--request",
+                str(request),
+                "--status",
+                str(snapshot_path),
+                "--authority-bundle",
+                str(bundle),
+                "--output",
+                str(output),
+            ],
+            clock=lambda: NOW,
+        )
+        == 0
+    )
+
+    decision = json.loads(output.read_text(encoding="utf-8"))
+    assert decision == json.loads(
+        (ROOT / "fixtures" / "status" / "action-allowed.json").read_text(encoding="utf-8")
+    )
+    assert capsys.readouterr().out.splitlines() == [
+        context["request_id"],
+        decision["request"]["request_sha256"],
+    ]
 
 
 def test_help_has_no_remote_execution_input_surface(capsys: pytest.CaptureFixture[str]) -> None:

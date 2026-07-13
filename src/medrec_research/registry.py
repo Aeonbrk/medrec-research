@@ -16,6 +16,7 @@ from ._validation import (
     require_sha256,
     strict_fields,
 )
+from .comparison_scope import ComparisonScope
 from .errors import ProtocolValidationError
 
 
@@ -156,10 +157,14 @@ class ComparisonQualification:
         dataset_manifest_sha256: str,
         adaptation_budget_sha256: str,
     ) -> bool:
-        return (
-            self.protocol_version == protocol_version
-            and self.dataset_manifest_sha256 == dataset_manifest_sha256
-            and self.adaptation_budget_sha256 == adaptation_budget_sha256
+        return ComparisonScope(
+            protocol_version=self.protocol_version,
+            dataset_manifest_sha256=self.dataset_manifest_sha256,
+            adaptation_budget_sha256=self.adaptation_budget_sha256,
+        ).matches(
+            protocol_version=protocol_version,
+            dataset_manifest_sha256=dataset_manifest_sha256,
+            adaptation_budget_sha256=adaptation_budget_sha256,
         )
 
     def to_dict(self) -> dict[str, object]:

@@ -11,6 +11,8 @@ from typing import Protocol, runtime_checkable
 from ._validation import (
     canonical_json,
     parse_json_object,
+    require_identifier,
+    require_int,
     require_public_string,
     require_single_line_public_string,
     strict_fields,
@@ -21,6 +23,11 @@ from .prediction import MedicationScore, PredictionRecord
 _REQUEST_TARGET_FIELDS = frozenset(
     {"ground_truth", "labels", "target_medications", "targets", "y_true"}
 )
+_REQUEST_SPLIT_MEMBERSHIP_FIELDS = frozenset(
+    {"cohort_membership", "evaluation_visit_ids", "split", "split_membership", "test_visit_ids"}
+)
+_REQUEST_ALLOWED_FIELDS = frozenset({"dataset_id", "seed"})
+_REQUEST_FORBIDDEN_FIELDS = _REQUEST_TARGET_FIELDS | _REQUEST_SPLIT_MEMBERSHIP_FIELDS
 _OUTPUT_CORE_FIELDS = _REQUEST_TARGET_FIELDS | {"split"}
 
 
@@ -103,8 +110,22 @@ class ProcessPredictionAdapter:
     ) -> tuple[PredictionRecord, ...]:
         if not isinstance(request, Mapping):
             raise ProtocolValidationError("adapter request must be an object")
-        if _contains_key(request, _REQUEST_TARGET_FIELDS):
-            raise ProtocolValidationError("adapter request must not contain core-owned target data")
+        if _contains_key(request, _REQUEST_FORBIDDEN_FIELDS):
+            raise ProtocolValidationError(
+                "adapter request must not contain core-owned target data or split membership"
+            )
+        unknown_request_fields = set(request) - _REQUEST_ALLOWED_FIELDS
+        if unknown_request_fields:
+            raise ProtocolValidationError(
+                "adapter request must use only target-free request fields: dataset_id, seed"
+            )
+        adapter_request: dict[str, object] = {}
+        if "dataset_id" in request:
+            adapter_request["dataset_id"] = require_identifier(
+                request["dataset_id"], field="adapter_request.dataset_id"
+            )
+        if "seed" in request:
+            adapter_request["seed"] = require_int(request["seed"], field="adapter_request.seed")
         try:
             vocabulary = tuple(
                 require_single_line_public_string(code, field="medication_vocabulary")
@@ -134,7 +155,7 @@ class ProcessPredictionAdapter:
             raise ProtocolValidationError(
                 "expected_records contain medications outside medication_vocabulary"
             )
-        input_text = canonical_json({"request": dict(request), "schema_version": 1})
+        input_text = canonical_json({"request": adapter_request, "schema_version": 1})
         try:
             completed = subprocess.run(
                 self.command,

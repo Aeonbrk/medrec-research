@@ -62,7 +62,7 @@ def canonical_json(value: object, *, indent: int | None = None) -> str:
 def parse_json_object(text: str, *, context: str) -> dict[str, Any]:
     try:
         value = json.loads(text)
-    except (json.JSONDecodeError, TypeError) as error:
+    except (json.JSONDecodeError, RecursionError, TypeError) as error:
         raise ProtocolValidationError(f"{context} must be valid JSON") from error
     if not isinstance(value, dict):
         raise ProtocolValidationError(f"{context} must be a JSON object")

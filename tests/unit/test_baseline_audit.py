@@ -5,7 +5,9 @@ from pathlib import Path
 
 import pytest
 
+from medrec_research._validation import content_sha256
 from medrec_research.baseline_audit import (
+    AuditReview,
     AuditReviewSet,
     AuditSource,
     BaselineAudit,
@@ -106,6 +108,32 @@ def test_hard_gate_pass_requires_matching_accepted_review() -> None:
     drifted = deepcopy(gamenet.to_dict())
     drifted["claims"][0]["rationale"] += " Drifted."
     assert not reviews.accepts(BaselineAudit.from_dict(drifted), "source")
+
+
+def test_audit_review_set_is_canonical_and_rejects_conflicting_decisions() -> None:
+    gamenet = BaselineAudit.load(AUDIT_DIR / "gamenet.toml")
+    reviews = AuditReviewSet.load(REVIEWS_PATH)
+
+    assert AuditReviewSet(tuple(reversed(reviews.reviews))) == reviews
+    assert AuditReviewSet(tuple(reversed(reviews.reviews))).to_dict() == reviews.to_dict()
+
+    accepted = reviews.matching_review(gamenet, "source")
+    assert accepted is not None
+    payload = accepted.to_dict()
+    payload.update(
+        {
+            "decision": "fail",
+            "issued_at": "2026-07-12T00:00:00Z",
+            "reviewer": "second-steward",
+        }
+    )
+    payload["content_sha256"] = content_sha256(
+        {key: value for key, value in payload.items() if key != "content_sha256"}
+    )
+    conflicting = AuditReview.from_dict(payload)
+
+    with pytest.raises(ProtocolValidationError, match="conflicting decisions"):
+        AuditReviewSet((*reviews.reviews, conflicting))
 
 
 def test_immutable_evidence_rejects_mutable_url_digest_or_revision_drift() -> None:

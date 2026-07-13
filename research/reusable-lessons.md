@@ -16,6 +16,14 @@ Safety-repair comparisons are not informative when the proposed policy alone rec
 
 A diagnostic distance can rank substitutions sensibly while adding no independent repair value after feasibility is leveled. Carry `D_therapeutic` only as a scoped treatment-drift metric; do not use its construct-validity evidence to justify a solver. Archive evidence: `research-wiki/claims/eg_ter_metric_validity.md` and `research-wiki/ideas/eg_ter.md`.
 
+## Preserve a passed gate's final lifecycle
+
+An early pass can establish a narrow fact while failing to establish the route that motivated it. EGSF E3-Minimal and EG-TER E4 are historical positive gates whose method interpretations were later overturned by stronger controls. Record the pass and the superseding evidence together; never recast either as a surviving success. Archive evidence: `research-wiki/claims/egsf_minimal_selector.md`, `research-wiki/claims/eg_ter_repair_pilot_asymmetric_info.md`, `research-wiki/experiments/egsf_e3b_strong_followup.md`, and `research-wiki/experiments/eg_ter_e5_robustness.md`.
+
+## Keep diagnostics out of deployment claims
+
+Candidate-frontier existence, proxy-risk strata, and a full-method audit can motivate a control or research question without producing a deployable policy. Label each artifact as diagnostic, metric, audit, or action evidence before carrying it forward. Archive evidence: `research-wiki/claims/egsf_dynamic_budget_motivated.md`, `research-wiki/claims/egsf_frontier_exists.md`, and `research-wiki/claims/kdd2025_not_equivalent_to_risk_budgeted_deployment.md`.
+
 ## State guarantees at the calibrated target
 
 A finite-sample bound on a preregistered loss does not certify clinical safety, individual medication correctness, count preservation, confidence calibration, or therapeutic equivalence. Name the bounded loss, assumptions, action family, and guard conditions each time the guarantee is discussed. Archive evidence: `research-wiki/claims/crc_ps_bounded_loss_only.md`.
@@ -27,6 +35,10 @@ When a preregistered gate returns no accepted action, tuning the risk budget, gr
 ## Preserve residue without promoting it
 
 Failed routes can leave useful assets: EGSF left a strong-control diagnostic package, EG-TER left a continuous distortion metric and a leveled hard-filter protocol, and CRC-PS left a calibration stop rule and guarantee boundary. Reuse those assets as controls or diagnostics until new evidence supports a new claim. Archive evidence: `ARCHITECTURE.md`, `docs/PROJECT_SENSE.md`, and the three Failure Records in this directory.
+
+## Keep archive logistics out of active research records
+
+Portable operational lessons are limited to the current repository's remote-execution and privacy contracts. Do not copy archive-specific hosts, paths, sockets, environment names, raw results, or traces into research evidence. Archive evidence: `findings.md` and the source-boundary exclusions in `archive-evidence-index.md`.
 
 ## Keep clinical language narrower than proxy evidence
 

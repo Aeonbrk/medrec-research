@@ -86,64 +86,34 @@ def _immutable_revision(value: object) -> str:
 
 
 @dataclass(frozen=True, slots=True)
-class ActionIntent:
-    """Closed request shape accepted from CLI or Web."""
+class ActionRequestInput:
+    """Opaque caller input for one action-request evaluation."""
 
     request_id: str
-    action_id: str
-    target_id: str
-    snapshot_sha256: str
-    scope_sha256: str
-    authorization_sha256: str
-    preflight_sha256: str
 
     SCHEMA_VERSION: ClassVar[int] = 1
 
     def __post_init__(self) -> None:
-        for field in ("request_id", "action_id", "target_id"):
-            require_identifier(getattr(self, field), field=field)
-        for field in (
-            "snapshot_sha256",
-            "scope_sha256",
-            "authorization_sha256",
-            "preflight_sha256",
-        ):
-            require_sha256(getattr(self, field), field=field)
+        require_identifier(self.request_id, field="request_id")
 
     def to_dict(self) -> dict[str, object]:
         return {
-            "action_id": self.action_id,
-            "authorization_sha256": self.authorization_sha256,
-            "kind": "action_intent",
-            "preflight_sha256": self.preflight_sha256,
+            "kind": "action_request_input",
             "request_id": self.request_id,
             "schema_version": self.SCHEMA_VERSION,
-            "scope_sha256": self.scope_sha256,
-            "snapshot_sha256": self.snapshot_sha256,
-            "target_id": self.target_id,
         }
 
     @classmethod
-    def from_dict(cls, value: object) -> ActionIntent:
+    def from_dict(cls, value: object) -> ActionRequestInput:
         payload = strict_fields(
             value,
-            required=(
-                "schema_version",
-                "kind",
-                "request_id",
-                "action_id",
-                "target_id",
-                "snapshot_sha256",
-                "scope_sha256",
-                "authorization_sha256",
-                "preflight_sha256",
-            ),
-            context="ActionIntent",
+            required=("schema_version", "kind", "request_id"),
+            context="ActionRequestInput",
         )
         if payload.pop("schema_version") != cls.SCHEMA_VERSION:
-            raise ProtocolValidationError("ActionIntent schema_version must be 1")
-        if payload.pop("kind") != "action_intent":
-            raise ProtocolValidationError("ActionIntent kind must be action_intent")
+            raise ProtocolValidationError("ActionRequestInput schema_version must be 1")
+        if payload.pop("kind") != "action_request_input":
+            raise ProtocolValidationError("ActionRequestInput kind must be action_request_input")
         return cls(**payload)
 
 
@@ -476,6 +446,118 @@ class AuthorityBundle:
         return cls.from_json(Path(path).read_text(encoding="utf-8"))
 
 
+@dataclass(frozen=True, slots=True)
+class ActionContext:
+    """Current action binding resolved from status and injected authority."""
+
+    available: bool
+    reason_code: str
+    action_id: str | None = None
+    target_id: str | None = None
+    snapshot_sha256: str | None = None
+    scope_sha256: str | None = None
+    authorities: tuple[AuthorityDigest, ...] = ()
+    authorization_sha256: str | None = None
+    preflight_sha256: str | None = None
+    remote_revision: str | None = None
+
+    SCHEMA_VERSION: ClassVar[int] = 1
+
+    def __post_init__(self) -> None:
+        if type(self.available) is not bool:
+            raise ProtocolValidationError("action context availability must be boolean")
+        require_identifier(self.reason_code, field="action_context.reason_code")
+        bindings = (
+            self.action_id,
+            self.target_id,
+            self.snapshot_sha256,
+            self.scope_sha256,
+            self.authorization_sha256,
+            self.preflight_sha256,
+            self.remote_revision,
+        )
+        if not self.available:
+            if any(value is not None for value in bindings) or self.authorities:
+                raise ProtocolValidationError("unavailable action context cannot contain bindings")
+            return
+        for field in ("action_id", "target_id"):
+            require_identifier(getattr(self, field), field=f"action_context.{field}")
+        for field in (
+            "snapshot_sha256",
+            "scope_sha256",
+            "authorization_sha256",
+            "preflight_sha256",
+        ):
+            require_sha256(getattr(self, field), field=f"action_context.{field}")
+        object.__setattr__(self, "authorities", _authorities(self.authorities))
+        _immutable_revision(self.remote_revision)
+
+    @classmethod
+    def unavailable(cls, reason_code: str) -> ActionContext:
+        return cls(available=False, reason_code=reason_code)
+
+    @classmethod
+    def resolved(
+        cls,
+        *,
+        action_id: str,
+        target_id: str,
+        snapshot_sha256: str,
+        scope_sha256: str,
+        authorities: tuple[AuthorityDigest, ...],
+        authorization_sha256: str,
+        preflight_sha256: str,
+        remote_revision: str,
+    ) -> ActionContext:
+        return cls(
+            available=True,
+            reason_code="action_context_resolved",
+            action_id=action_id,
+            target_id=target_id,
+            snapshot_sha256=snapshot_sha256,
+            scope_sha256=scope_sha256,
+            authorities=authorities,
+            authorization_sha256=authorization_sha256,
+            preflight_sha256=preflight_sha256,
+            remote_revision=remote_revision,
+        )
+
+    @property
+    def request_id(self) -> str | None:
+        if not self.available:
+            return None
+        assert self.action_id is not None
+        assert self.target_id is not None
+        assert self.snapshot_sha256 is not None
+        assert self.scope_sha256 is not None
+        assert self.authorization_sha256 is not None
+        assert self.preflight_sha256 is not None
+        assert self.remote_revision is not None
+        content = {
+            "action_id": self.action_id,
+            "authorities": [item.to_dict() for item in self.authorities],
+            "authorization_sha256": self.authorization_sha256,
+            "kind": "action_context",
+            "preflight_sha256": self.preflight_sha256,
+            "remote_revision": self.remote_revision,
+            "schema_version": self.SCHEMA_VERSION,
+            "scope_sha256": self.scope_sha256,
+            "snapshot_sha256": self.snapshot_sha256,
+            "target_id": self.target_id,
+        }
+        return f"action-context-{content_sha256(content)[:20]}"
+
+    def to_public_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "enabled": self.available,
+            "kind": "action_context",
+            "schema_version": self.SCHEMA_VERSION,
+        }
+        if self.request_id is not None:
+            payload["request_id"] = self.request_id
+        return payload
+
+
 def _request_content(
     *,
     request_id: str,
@@ -599,134 +681,193 @@ def _is_current(record: ActionAuthorization | RemotePreflight, now: datetime) ->
 def _bindings_match(
     record: ActionAuthorization | RemotePreflight,
     *,
-    intent: ActionIntent,
+    action_id: str,
+    target_id: str,
     snapshot: ProjectStatus,
+    scope_sha256: str,
     authorities: tuple[AuthorityDigest, ...],
 ) -> bool:
     return (
         record.project_id == snapshot.project_id
-        and record.target_id == intent.target_id
-        and record.action_id == intent.action_id
-        and record.snapshot_sha256 == intent.snapshot_sha256
-        and record.scope_sha256 == intent.scope_sha256
+        and record.target_id == target_id
+        and record.action_id == action_id
+        and record.snapshot_sha256 == snapshot.snapshot_sha256
+        and record.scope_sha256 == scope_sha256
         and record.authorities == authorities
+    )
+
+
+def _resolve_record(
+    records: tuple[ActionAuthorization | RemotePreflight, ...],
+    *,
+    issuer_id: str,
+    source_id: str,
+    action_id: str,
+    target_id: str,
+    snapshot: ProjectStatus,
+    scope_sha256: str,
+    authorities: tuple[AuthorityDigest, ...],
+    now: datetime,
+    name: str,
+) -> tuple[ActionAuthorization | RemotePreflight | None, str]:
+    has_matching_record = False
+    has_trusted_record = False
+    current_record: ActionAuthorization | RemotePreflight | None = None
+    for record in records:
+        if not _bindings_match(
+            record,
+            action_id=action_id,
+            target_id=target_id,
+            snapshot=snapshot,
+            scope_sha256=scope_sha256,
+            authorities=authorities,
+        ):
+            continue
+        has_matching_record = True
+        if record.issuer_id != issuer_id or record.source_id != source_id:
+            continue
+        has_trusted_record = True
+        if not _is_current(record, now):
+            continue
+        if current_record is not None:
+            return None, f"{name}_duplicate"
+        current_record = record
+    if not has_matching_record:
+        return None, f"{name}_missing"
+    if not has_trusted_record:
+        return None, f"{name}_untrusted"
+    if current_record is None:
+        return None, f"{name}_not_current"
+    return current_record, "action_context_resolved"
+
+
+def resolve_action_context(
+    *,
+    snapshot: ProjectStatus,
+    authority_bundle: AuthorityBundle | None,
+    now: datetime,
+) -> ActionContext:
+    """Resolve one current action binding without side effects or ambient authority."""
+
+    if authority_bundle is None:
+        return ActionContext.unavailable("authority_bundle_missing")
+    usable = snapshot.for_use(
+        clock=lambda: now,
+        expected_authorities=authority_bundle.current_authorities,
+    )
+    if usable.condition is not SnapshotCondition.CURRENT:
+        reason = usable.primary_blocker.reason_code if usable.primary_blocker else ""
+        if reason == "authority_mismatch":
+            return ActionContext.unavailable("authority_drift")
+        if reason == "snapshot_stale":
+            return ActionContext.unavailable("snapshot_expired")
+        return ActionContext.unavailable("snapshot_invalid")
+
+    try:
+        current_now = _now(now)
+    except ProtocolValidationError:
+        return ActionContext.unavailable("snapshot_invalid")
+    scope_sha256 = _authority_sha256(authority_bundle.current_authorities, "scope")
+    if scope_sha256 is None:
+        return ActionContext.unavailable("authority_drift")
+    if len(usable.permitted_actions) != 1:
+        return ActionContext.unavailable(
+            "action_not_permitted" if not usable.permitted_actions else "action_context_ambiguous"
+        )
+    action_id = usable.permitted_actions[0].action_id
+    target_id = authority_bundle.current_remote_profile_id
+    authorization, reason = _resolve_record(
+        authority_bundle.authorizations,
+        issuer_id=authority_bundle.authorization_issuer_id,
+        source_id=authority_bundle.authorization_source_id,
+        action_id=action_id,
+        target_id=target_id,
+        snapshot=usable,
+        scope_sha256=scope_sha256,
+        authorities=authority_bundle.current_authorities,
+        now=current_now,
+        name="authorization",
+    )
+    if authorization is None:
+        return ActionContext.unavailable(reason)
+    preflight, reason = _resolve_record(
+        authority_bundle.preflights,
+        issuer_id=authority_bundle.preflight_issuer_id,
+        source_id=authority_bundle.preflight_source_id,
+        action_id=action_id,
+        target_id=target_id,
+        snapshot=usable,
+        scope_sha256=scope_sha256,
+        authorities=authority_bundle.current_authorities,
+        now=current_now,
+        name="preflight",
+    )
+    if preflight is None:
+        return ActionContext.unavailable(reason)
+    if preflight.remote_revision != authority_bundle.current_remote_revision:
+        return ActionContext.unavailable("remote_target_drift")
+    assert isinstance(authorization, ActionAuthorization)
+    assert isinstance(preflight, RemotePreflight)
+    return ActionContext.resolved(
+        action_id=action_id,
+        target_id=target_id,
+        snapshot_sha256=usable.snapshot_sha256,
+        scope_sha256=scope_sha256,
+        authorities=authority_bundle.current_authorities,
+        authorization_sha256=authorization.authorization_sha256,
+        preflight_sha256=preflight.preflight_sha256,
+        remote_revision=preflight.remote_revision,
     )
 
 
 def evaluate_action(
     *,
-    intent: ActionIntent,
+    request: ActionRequestInput,
     snapshot: ProjectStatus,
     authority_bundle: AuthorityBundle | None,
     now: datetime,
 ) -> ActionDecision:
     """Return a deterministic request or blocked decision without side effects."""
 
-    expected_authorities = (
-        authority_bundle.current_authorities if authority_bundle is not None else ()
-    )
-    usable = snapshot.for_use(clock=lambda: now, expected_authorities=expected_authorities)
-    if authority_bundle is None:
-        return _blocked("authority_bundle_missing")
-    if usable.condition is not SnapshotCondition.CURRENT:
-        reason = usable.primary_blocker.reason_code if usable.primary_blocker else ""
-        if reason == "authority_mismatch":
-            return _blocked("authority_drift")
-        if reason == "snapshot_stale":
-            return _blocked("snapshot_expired")
-        return _blocked("snapshot_invalid")
-
-    try:
-        current_now = _now(now)
-    except ProtocolValidationError:
-        return _blocked("snapshot_invalid")
-    scope_sha256 = _authority_sha256(authority_bundle.current_authorities, "scope")
-    if scope_sha256 is None or intent.scope_sha256 != scope_sha256:
-        return _blocked("authority_drift")
-    if intent.snapshot_sha256 != snapshot.snapshot_sha256:
-        return _blocked("snapshot_invalid")
-    if intent.action_id not in {item.action_id for item in usable.permitted_actions}:
-        return _blocked("action_not_permitted")
-    if intent.target_id != authority_bundle.current_remote_profile_id:
-        return _blocked("remote_target_drift")
-
-    authorizations = tuple(
-        item
-        for item in authority_bundle.authorizations
-        if item.authorization_sha256 == intent.authorization_sha256
-    )
-    if not authorizations:
-        return _blocked("authorization_missing")
-    if len(authorizations) != 1:
-        return _blocked("authorization_duplicate")
-    authorization = authorizations[0]
-    if (
-        authorization.issuer_id != authority_bundle.authorization_issuer_id
-        or authorization.source_id != authority_bundle.authorization_source_id
-    ):
-        return _blocked("authorization_untrusted")
-    if not _is_current(authorization, current_now):
-        return _blocked("authorization_not_current")
-    if not _bindings_match(
-        authorization,
-        intent=intent,
+    context = resolve_action_context(
         snapshot=snapshot,
-        authorities=authority_bundle.current_authorities,
-    ):
-        return _blocked("authorization_mismatch")
-
-    preflights = tuple(
-        item
-        for item in authority_bundle.preflights
-        if item.preflight_sha256 == intent.preflight_sha256
+        authority_bundle=authority_bundle,
+        now=now,
     )
-    if not preflights:
-        return _blocked("preflight_missing")
-    if len(preflights) != 1:
-        return _blocked("preflight_duplicate")
-    preflight = preflights[0]
-    if (
-        preflight.issuer_id != authority_bundle.preflight_issuer_id
-        or preflight.source_id != authority_bundle.preflight_source_id
-    ):
-        return _blocked("preflight_untrusted")
-    if not _is_current(preflight, current_now):
-        return _blocked("preflight_not_current")
-    if not _bindings_match(
-        preflight,
-        intent=intent,
-        snapshot=snapshot,
-        authorities=authority_bundle.current_authorities,
-    ):
-        return _blocked("preflight_mismatch")
-    if preflight.remote_revision != authority_bundle.current_remote_revision:
-        return _blocked("remote_target_drift")
+    if not context.available:
+        return _blocked(context.reason_code)
+    context_request_id = context.request_id
+    assert context_request_id is not None
+    if request.request_id != context_request_id:
+        return _blocked("action_context_stale")
 
-    request = ActionRequest.create(
-        request_id=intent.request_id,
+    action_request = ActionRequest.create(
+        request_id=request.request_id,
         project_id=snapshot.project_id,
-        target_id=intent.target_id,
-        action_id=intent.action_id,
-        snapshot_sha256=intent.snapshot_sha256,
-        scope_sha256=intent.scope_sha256,
-        authorities=authority_bundle.current_authorities,
-        authorization_sha256=intent.authorization_sha256,
-        preflight_sha256=intent.preflight_sha256,
-        remote_revision=preflight.remote_revision,
+        target_id=context.target_id,
+        action_id=context.action_id,
+        snapshot_sha256=context.snapshot_sha256,
+        scope_sha256=context.scope_sha256,
+        authorities=context.authorities,
+        authorization_sha256=context.authorization_sha256,
+        preflight_sha256=context.preflight_sha256,
+        remote_revision=context.remote_revision,
     )
     return ActionDecision(
         status="allowed",
         reason_code="action_request_created",
-        request=request,
+        request=action_request,
     )
 
 
 __all__ = (
     "ActionAuthorization",
+    "ActionContext",
     "ActionDecision",
-    "ActionIntent",
     "ActionRequest",
+    "ActionRequestInput",
     "AuthorityBundle",
     "RemotePreflight",
     "evaluate_action",
+    "resolve_action_context",
 )

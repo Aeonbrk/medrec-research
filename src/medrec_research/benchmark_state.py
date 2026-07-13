@@ -12,57 +12,15 @@ from ._validation import (
     content_sha256,
     parse_json_object,
     require_identifier,
-    require_public_string,
     require_sha256,
     require_single_line_public_string,
     strict_fields,
 )
-from .baseline_audit import BaselineProgram
+from .baseline_audit import AuditReviewSet, BaselineAudit, BaselineProgram
+from .benchmark_program import SelectionAcceptance, SelectionResult, SelectionSpecification
+from .comparison_scope import ComparisonScope
 from .errors import ProtocolValidationError
 from .registry import BaselineRegistry, ComparisonQualification
-
-
-@dataclass(frozen=True, slots=True)
-class ComparisonScope:
-    protocol_version: str
-    dataset_manifest_sha256: str
-    adaptation_budget_sha256: str
-
-    def __post_init__(self) -> None:
-        require_public_string(self.protocol_version, field="scope.protocol_version")
-        require_sha256(
-            self.dataset_manifest_sha256,
-            field="scope.dataset_manifest_sha256",
-        )
-        require_sha256(
-            self.adaptation_budget_sha256,
-            field="scope.adaptation_budget_sha256",
-        )
-
-    @property
-    def scope_sha256(self) -> str:
-        return content_sha256(self.to_dict())
-
-    def to_dict(self) -> dict[str, str]:
-        return {
-            "adaptation_budget_sha256": self.adaptation_budget_sha256,
-            "dataset_manifest_sha256": self.dataset_manifest_sha256,
-            "protocol_version": self.protocol_version,
-        }
-
-    @classmethod
-    def from_dict(cls, value: object) -> ComparisonScope:
-        return cls(
-            **strict_fields(
-                value,
-                required=(
-                    "protocol_version",
-                    "dataset_manifest_sha256",
-                    "adaptation_budget_sha256",
-                ),
-                context="ComparisonScope",
-            )
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -363,11 +321,115 @@ def derive_benchmark_state(
     )
 
 
+@dataclass(frozen=True, slots=True)
+class LiveBenchmarkAuthority:
+    """Current correlated records from which benchmark status may project."""
+
+    program: BaselineProgram
+    audits: tuple[BaselineAudit, ...]
+    reviews: AuditReviewSet
+    registry: BaselineRegistry
+    scope: ComparisonScope
+    selection: SelectionResult
+    review: HumanReviewRecord | None
+    benchmark_state: BenchmarkState
+
+    def __post_init__(self) -> None:
+        audits = tuple(
+            item if isinstance(item, BaselineAudit) else BaselineAudit.from_dict(item)
+            for item in self.audits
+        )
+        object.__setattr__(self, "audits", audits)
+        if not isinstance(self.reviews, AuditReviewSet):
+            object.__setattr__(self, "reviews", AuditReviewSet.from_dict(self.reviews))
+        if not isinstance(self.scope, ComparisonScope):
+            object.__setattr__(self, "scope", ComparisonScope.from_dict(self.scope))
+        if not isinstance(self.selection, SelectionResult):
+            object.__setattr__(self, "selection", SelectionResult.from_dict(self.selection))
+        if self.review is not None and not isinstance(self.review, HumanReviewRecord):
+            object.__setattr__(self, "review", HumanReviewRecord.from_dict(self.review))
+        self.program.validate_audits(self.audits)
+        current_state = derive_benchmark_state(
+            program=self.program,
+            registry=self.registry,
+            scope=self.scope,
+            review=self.review,
+        )
+        if self.review is not None and current_state.review_state is not HumanReviewState.ACCEPTED:
+            raise ProtocolValidationError("human review is stale")
+        if self.benchmark_state != current_state:
+            raise ProtocolValidationError("live benchmark state does not match current authorities")
+        if self.selection.program_sha256 != self.program.program_sha256:
+            raise ProtocolValidationError("selection program authority does not match")
+        if self.selection.audit_set_sha256 != self.audit_set_sha256:
+            raise ProtocolValidationError("selection audit set authority does not match")
+        if self.selection.review_set_sha256 != self.review_set_sha256:
+            raise ProtocolValidationError("selection review set authority does not match")
+        if self.selection.registry_authority_sha256 != current_state.registry_authority_sha256:
+            raise ProtocolValidationError("selection registry authority does not match")
+        if self.selection.scope_sha256 != self.scope.scope_sha256:
+            raise ProtocolValidationError("selection scope authority does not match")
+        expected_selection = SelectionSpecification().select(
+            self.program,
+            self.audits,
+            self.reviews,
+            tuple(candidate.diagnostics for candidate in self.selection.candidates),
+            registry_authority_sha256=current_state.registry_authority_sha256,
+            scope_sha256=self.scope.scope_sha256,
+        )
+        if self.selection != expected_selection:
+            raise ProtocolValidationError("selection does not match current hard-gate result")
+
+    @property
+    def audit_set_sha256(self) -> str:
+        return content_sha256({"audits": [item.audit_sha256 for item in self.audits]})
+
+    @property
+    def review_set_sha256(self) -> str:
+        return content_sha256(self.reviews.to_dict())
+
+    @property
+    def selection_sha256(self) -> str:
+        return content_sha256(self.selection.to_dict())
+
+    def accepts_selection_acceptance(self, acceptance: SelectionAcceptance | None) -> bool:
+        return acceptance is not None and acceptance.matches(self.selection)
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        program: BaselineProgram,
+        audits: tuple[BaselineAudit, ...],
+        reviews: AuditReviewSet,
+        registry: BaselineRegistry,
+        scope: ComparisonScope,
+        selection: SelectionResult,
+        review: HumanReviewRecord | None = None,
+    ) -> LiveBenchmarkAuthority:
+        return cls(
+            program=program,
+            audits=audits,
+            reviews=reviews,
+            registry=registry,
+            scope=scope,
+            selection=selection,
+            review=review,
+            benchmark_state=derive_benchmark_state(
+                program=program,
+                registry=registry,
+                scope=scope,
+                review=review,
+            ),
+        )
+
+
 __all__ = (
     "BenchmarkState",
     "ComparisonScope",
     "HumanReviewRecord",
     "HumanReviewState",
+    "LiveBenchmarkAuthority",
     "QualificationReference",
     "derive_benchmark_state",
     "program_registry_authority_sha256",

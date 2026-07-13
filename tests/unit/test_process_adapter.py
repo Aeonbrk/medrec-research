@@ -46,7 +46,7 @@ def test_process_adapter_implements_protocol_and_parses_complete_records() -> No
     adapter = ProcessPredictionAdapter(_command(source))
 
     records = adapter.predict(
-        {"dataset_id": "synthetic-medrec", "split": "test"},
+        {"dataset_id": "synthetic-medrec"},
         expected_records=(_expected_record(),),
         medication_vocabulary=("RX_A", "RX_B"),
     )
@@ -130,6 +130,32 @@ def test_process_adapter_rejects_target_bearing_request() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "adapter_request",
+    [
+        {"split": "test"},
+        {"nested": {"split": "test"}},
+        {"test_visit_ids": ["visit-1"]},
+    ],
+)
+def test_process_adapter_rejects_split_bearing_request(adapter_request: dict[str, object]) -> None:
+    with pytest.raises(ProtocolValidationError, match="split membership"):
+        ProcessPredictionAdapter(_command("raise SystemExit(99)")).predict(
+            adapter_request,
+            expected_records=(_expected_record(),),
+            medication_vocabulary=("RX_A", "RX_B"),
+        )
+
+
+def test_process_adapter_rejects_request_fields_outside_the_target_free_schema() -> None:
+    with pytest.raises(ProtocolValidationError, match="target-free request fields"):
+        ProcessPredictionAdapter(_command("raise SystemExit(99)")).predict(
+            {"nested": {"dataset_id": "synthetic-medrec"}},
+            expected_records=(_expected_record(),),
+            medication_vocabulary=("RX_A", "RX_B"),
+        )
+
+
 def test_process_adapter_keeps_expected_targets_out_of_subprocess_input() -> None:
     response = {"schema_version": 1, "predictions": [_wire_prediction_payload()]}
     source = (
@@ -139,7 +165,7 @@ def test_process_adapter_keeps_expected_targets_out_of_subprocess_input() -> Non
     )
 
     records = ProcessPredictionAdapter(_command(source)).predict(
-        {"dataset_id": "synthetic-medrec", "split": "test"},
+        {"dataset_id": "synthetic-medrec"},
         expected_records=(_expected_record(),),
         medication_vocabulary=("RX_A", "RX_B"),
     )

@@ -587,11 +587,23 @@ class AuditReviewSet:
 
     def __post_init__(self) -> None:
         reviews = tuple(
-            item if isinstance(item, AuditReview) else AuditReview.from_dict(item)
-            for item in self.reviews
+            sorted(
+                (
+                    item if isinstance(item, AuditReview) else AuditReview.from_dict(item)
+                    for item in self.reviews
+                ),
+                key=lambda item: item.content_sha256,
+            )
         )
         if len({item.content_sha256 for item in reviews}) != len(reviews):
             raise ProtocolValidationError("audit reviews must be unique")
+        decisions: dict[tuple[str, str, str], str] = {}
+        for review in reviews:
+            for claim in review.reviewed_claims:
+                key = (review.candidate_id, review.audit_sha256, claim)
+                previous = decisions.setdefault(key, review.decision)
+                if previous != review.decision:
+                    raise ProtocolValidationError("audit reviews contain conflicting decisions")
         object.__setattr__(self, "reviews", reviews)
 
     def matching_review(self, audit: BaselineAudit, claim: str) -> AuditReview | None:

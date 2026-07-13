@@ -28,7 +28,7 @@ flowchart LR
 
 ## Deep modules
 
-The core library exposes a small set of scientific interfaces. Dataset Manifest construction concentrates membership checks, dataset identity, and privacy constraints. Prediction Adapter validation keeps targets in the core and joins target-free wire payloads to eligible visits. Evaluation owns Comparison Mode metrics and edge cases. Run Record creation binds public-safe provenance to authoritative registry and manifest state. The Baseline Registry owns source and smoke readiness; Comparison Qualifications bind later gates to one protocol version, Dataset Manifest, and Adaptation Budget.
+The core library exposes a small set of scientific interfaces. Dataset Manifest construction concentrates membership checks, dataset identity, and privacy constraints. Prediction Adapter validation keeps targets in the core and joins target-free wire payloads to eligible visits. Evaluation owns Comparison Mode metrics and edge cases. Run Record creation binds public-safe provenance to authoritative registry and manifest state. The Baseline Registry owns source and smoke readiness; Comparison Qualifications bind later gates to one protocol version, Dataset Manifest, and Adaptation Budget. Comparison Scope owns those identity comparisons, while Live Benchmark Authority correlates current program, audit, review, registry, scope, and published selection records before status can project. Reproduction Characterization owns public-safe stability provenance behind Selection Acceptance.
 
 These modules are deep because callers do not reimplement their invariants. Their public interfaces are the test surface.
 
@@ -38,7 +38,7 @@ The process seam has one production implementation and fake subprocesses in test
 
 Reproduction Mode and Comparison Mode answer different questions. Reproduction Mode asks whether a pinned source can reproduce its recorded behavior. Comparison Mode asks how methods behave under one shared protocol. A result from one mode cannot support a claim in the other.
 
-The current Run Record schema accepts Comparison Mode evidence only. No baseline has completed upstream-semantics characterization, so the repository does not yet invent a generic Reproduction Mode record. The synthetic reference emits a Protocol Check Record, not research evidence.
+The current Run Record schema accepts Comparison Mode evidence only. Reproduction Characterization is a Selection-Acceptance-gated, public-safe Reproduction Mode stability record; it preserves provenance but cannot create Comparison Qualification or experimental evidence. The synthetic reference emits a Protocol Check Record, not research evidence.
 
 Comparison Mode freezes the Baseline Core. A Prediction Adapter can map files, identifiers, tensors, and output records. If integration changes model logic, loss, feature availability, thresholding, or selection behavior, the result is a modified method and must receive a separate registry identity.
 

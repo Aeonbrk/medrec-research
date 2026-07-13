@@ -18,6 +18,18 @@ An archive path in Research Memory means that exact path as stored in the source
 - `findings.md`: compact cross-stage statements of the three route failures.
 - `research-wiki/query_pack.md`: materialized gaps, failed ideas, and claim status snapshot.
 
+## Canonical coverage
+
+The [Accumulated Experience](accumulated-experience.md) ledger covers every canonical research record at the pinned source commit:
+
+- 6 idea cards from `research-wiki/ideas/`.
+- 11 experiment cards from `research-wiki/experiments/`.
+- 12 claim cards from `research-wiki/claims/`.
+- 21 paper cards from `research-wiki/papers/`, indexed separately in [Literature Memory](literature-memory.md).
+- Gap definitions G1-G7 from `research-wiki/gap_map.md` and outcome relationships from `research-wiki/graph/edges.jsonl`.
+
+The canonical registry is `research-wiki/index.md`. The archive timeline in `research-wiki/log.md` provides chronology but is not independently promoted as scientific evidence.
+
 ## EGSF selector evidence
 
 - `research-wiki/ideas/egsf.md`: canonical failed-route state and pivot boundary.
@@ -57,4 +69,4 @@ An archive path in Research Memory means that exact path as stored in the source
 
 ## Deliberate exclusions
 
-This Research Memory does not migrate timestamped workflow-log copies, raw or processed EHR data, split membership, patient-level predictions, restricted calibration rows, model weights, checkpoints, private traces, or large metric tables. Fixed-name summaries and stable research-wiki pages provide the public-safe evidence used here.
+This Research Memory does not migrate timestamped workflow-log copies, raw or processed EHR data, split membership, patient-level predictions, restricted calibration rows, model weights, checkpoints, private traces, large metric tables, result CSV or JSON rows, or archive-specific server paths and environment names. Fixed-name summaries and stable research-wiki pages provide the public-safe evidence used here.

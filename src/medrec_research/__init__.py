@@ -2,12 +2,14 @@
 
 from .action_gate import (
     ActionAuthorization,
+    ActionContext,
     ActionDecision,
-    ActionIntent,
     ActionRequest,
+    ActionRequestInput,
     AuthorityBundle,
     RemotePreflight,
     evaluate_action,
+    resolve_action_context,
 )
 from .adapters import (
     AdapterError,
@@ -32,6 +34,7 @@ from .benchmark_program import (
     ReproductionAttempt,
     ReproductionCharacterization,
     ReproductionStabilityPolicy,
+    SelectionAcceptance,
     SelectionDiagnostic,
     SelectionResult,
     SelectionSpecification,
@@ -43,6 +46,7 @@ from .benchmark_state import (
     ComparisonScope,
     HumanReviewRecord,
     HumanReviewState,
+    LiveBenchmarkAuthority,
     QualificationReference,
     derive_benchmark_state,
 )
@@ -89,9 +93,10 @@ from .run_record import ArtifactChecksum, RunParameter, RunParameterValue, RunRe
 
 __all__ = (
     "ActionAuthorization",
+    "ActionContext",
     "ActionDecision",
-    "ActionIntent",
     "ActionRequest",
+    "ActionRequestInput",
     "AdapterError",
     "AdapterLaunchError",
     "AdapterProcessError",
@@ -124,6 +129,7 @@ __all__ = (
     "HumanReviewRecord",
     "HumanReviewState",
     "LineageStatus",
+    "LiveBenchmarkAuthority",
     "MedRecStatus",
     "MedicationScore",
     "MembershipDigestMethod",
@@ -146,6 +152,7 @@ __all__ = (
     "RunParameter",
     "RunParameterValue",
     "RunRecord",
+    "SelectionAcceptance",
     "SelectionDiagnostic",
     "SelectionResult",
     "SelectionSpecification",
@@ -163,5 +170,6 @@ __all__ = (
     "evaluate_predictions",
     "load_status",
     "publish_medrec_status",
+    "resolve_action_context",
     "run_reference_slice",
 )

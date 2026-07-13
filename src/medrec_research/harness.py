@@ -12,7 +12,13 @@ from threading import Lock
 from typing import Any
 
 from ._validation import canonical_json, parse_json_object
-from .action_gate import ActionIntent, AuthorityBundle, evaluate_action
+from .action_gate import (
+    ActionContext,
+    ActionRequestInput,
+    AuthorityBundle,
+    evaluate_action,
+    resolve_action_context,
+)
 from .errors import ProtocolValidationError
 from .project_status import AuthorityDigest, ProjectStatus, SnapshotCondition, load_status
 
@@ -56,13 +62,13 @@ class _HarnessServer(ThreadingHTTPServer):
         expected_authorities: tuple[AuthorityDigest, ...],
         clock: Clock,
         actions_enabled: bool,
-        authority_bundle: AuthorityBundle | None,
+        authority_bundle_path: Path | None,
     ) -> None:
         self.status_path = status_path
         self.expected_authorities = expected_authorities
         self.clock = clock
         self.actions_enabled = actions_enabled
-        self.authority_bundle = authority_bundle
+        self.authority_bundle_path = authority_bundle_path
         self._last_known_good: ProjectStatus | None = None
         self._status_lock = Lock()
         super().__init__(address, _HarnessHandler)
@@ -71,59 +77,50 @@ class _HarnessServer(ThreadingHTTPServer):
     def expected_host(self) -> str:
         return f"{_HOST}:{self.server_port}"
 
-    def current_status(self) -> ProjectStatus:
+    def current_status(
+        self,
+        authority_bundle: AuthorityBundle | None = None,
+        *,
+        clock: Clock | None = None,
+    ) -> ProjectStatus:
+        expected_authorities = (
+            authority_bundle.current_authorities
+            if authority_bundle is not None
+            else self.expected_authorities
+        )
         with self._status_lock:
             status = load_status(
                 self.status_path,
-                clock=self.clock,
-                expected_authorities=self.expected_authorities,
+                clock=clock or self.clock,
+                expected_authorities=expected_authorities,
                 last_known_good=self._last_known_good,
             )
             if status.condition is SnapshotCondition.CURRENT:
                 self._last_known_good = status
             return status
 
-    def action_context(self, status: ProjectStatus) -> dict[str, object]:
-        unavailable = {
-            "enabled": False,
-            "intent": None,
-            "kind": "action_context",
-            "schema_version": 1,
-        }
-        bundle = self.authority_bundle
-        if not self.actions_enabled or bundle is None or status.next_action is None:
-            return unavailable
+    def current_authority_bundle(self) -> AuthorityBundle | None:
+        if self.authority_bundle_path is None:
+            return None
+        try:
+            return AuthorityBundle.load(self.authority_bundle_path)
+        except (OSError, UnicodeError, ProtocolValidationError):
+            return None
 
-        candidates: list[dict[str, str]] = []
-        for authorization in bundle.authorizations:
-            for preflight in bundle.preflights:
-                try:
-                    intent = ActionIntent(
-                        request_id="harness-context-probe",
-                        action_id=status.next_action.action_id,
-                        target_id=bundle.current_remote_profile_id,
-                        snapshot_sha256=status.snapshot_sha256,
-                        scope_sha256=authorization.scope_sha256,
-                        authorization_sha256=authorization.authorization_sha256,
-                        preflight_sha256=preflight.preflight_sha256,
-                    )
-                    decision = evaluate_action(
-                        intent=intent,
-                        snapshot=status,
-                        authority_bundle=bundle,
-                        now=self.clock(),
-                    )
-                except ProtocolValidationError:
-                    continue
-                if decision.status == "allowed":
-                    payload = intent.to_dict()
-                    payload.pop("kind")
-                    payload.pop("request_id")
-                    payload.pop("schema_version")
-                    candidates.append(payload)
-        if len(candidates) != 1:
-            return unavailable
-        return {**unavailable, "enabled": True, "intent": candidates[0]}
+    def action_context(
+        self,
+        status: ProjectStatus,
+        authority_bundle: AuthorityBundle | None,
+        *,
+        clock: Clock,
+    ) -> dict[str, object]:
+        if not self.actions_enabled:
+            return ActionContext.unavailable("actions_disabled").to_public_dict()
+        return resolve_action_context(
+            snapshot=status,
+            authority_bundle=authority_bundle,
+            now=clock(),
+        ).to_public_dict()
 
 
 class _HarnessHandler(BaseHTTPRequestHandler):
@@ -232,11 +229,22 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 return
             self._send_bytes(HTTPStatus.OK, body, content_type)
             return
-        if self.path not in {"/api/status", "/api/action-context"}:
+        if self.path not in {"/api/status", "/api/action-context", "/api/harness-state"}:
             self._send_json(HTTPStatus.NOT_FOUND, _error_payload("route_not_found"))
             return
+        authority_bundle = (
+            self.server.current_authority_bundle() if self.server.actions_enabled else None
+        )
+        now: datetime | None = None
+
+        def request_clock() -> datetime:
+            nonlocal now
+            if now is None:
+                now = self.server.clock()
+            return now
+
         try:
-            status = self.server.current_status()
+            status = self.server.current_status(authority_bundle, clock=request_clock)
         except (OSError, UnicodeError, ProtocolValidationError):
             self._send_json(
                 HTTPStatus.SERVICE_UNAVAILABLE,
@@ -250,7 +258,19 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 f"{_JSON_TYPE}; charset=utf-8",
             )
             return
-        self._send_json(HTTPStatus.OK, self.server.action_context(status))
+        context = self.server.action_context(status, authority_bundle, clock=request_clock)
+        if self.path == "/api/action-context":
+            self._send_json(HTTPStatus.OK, context)
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "action_context": context,
+                "kind": "harness_state",
+                "schema_version": 1,
+                "status": status.to_dict(),
+            },
+        )
 
     def do_POST(self) -> None:
         length = self._post_length()
@@ -261,13 +281,22 @@ class _HarnessHandler(BaseHTTPRequestHandler):
             if len(raw) != length:
                 self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("body_incomplete"))
                 return
-            payload = parse_json_object(raw.decode("utf-8"), context="action intent")
-            intent = ActionIntent.from_dict(payload)
+            payload = parse_json_object(raw.decode("utf-8"), context="action request input")
+            request = ActionRequestInput.from_dict(payload)
         except (UnicodeError, ProtocolValidationError, TypeError):
-            self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("action_intent_invalid"))
+            self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("action_request_input_invalid"))
             return
+        authority_bundle = self.server.current_authority_bundle()
+        now: datetime | None = None
+
+        def request_clock() -> datetime:
+            nonlocal now
+            if now is None:
+                now = self.server.clock()
+            return now
+
         try:
-            status = self.server.current_status()
+            status = self.server.current_status(authority_bundle, clock=request_clock)
         except (OSError, UnicodeError, ProtocolValidationError):
             self._send_json(
                 HTTPStatus.SERVICE_UNAVAILABLE,
@@ -275,10 +304,10 @@ class _HarnessHandler(BaseHTTPRequestHandler):
             )
             return
         decision = evaluate_action(
-            intent=intent,
+            request=request,
             snapshot=status,
-            authority_bundle=self.server.authority_bundle,
-            now=self.server.clock(),
+            authority_bundle=authority_bundle,
+            now=request_clock(),
         )
         self._send_json(HTTPStatus.OK, decision.to_dict())
 
@@ -311,7 +340,7 @@ def create_harness_server(
     host: str = _HOST,
     port: int = 0,
     actions_enabled: bool = False,
-    authority_bundle: AuthorityBundle | None = None,
+    authority_bundle_path: str | Path | None = None,
 ) -> ThreadingHTTPServer:
     """Create an unstarted server with explicit status and action authority."""
 
@@ -319,15 +348,17 @@ def create_harness_server(
         raise ValueError("harness host must be the literal 127.0.0.1 loopback address")
     if type(port) is not int or not 0 <= port <= 65535:
         raise ValueError("harness port must be an integer between 0 and 65535")
-    if actions_enabled and authority_bundle is None:
-        raise ValueError("enabled actions require an explicit authority bundle")
+    if actions_enabled and authority_bundle_path is None:
+        raise ValueError("enabled actions require an explicit authority bundle path")
     return _HarnessServer(
         (host, port),
         status_path=Path(status_path),
         expected_authorities=tuple(expected_authorities),
         clock=clock,
         actions_enabled=actions_enabled,
-        authority_bundle=authority_bundle,
+        authority_bundle_path=(
+            Path(authority_bundle_path) if authority_bundle_path is not None else None
+        ),
     )
 
 

@@ -10,6 +10,7 @@ from medrec_research.benchmark_state import (
     HumanReviewState,
     derive_benchmark_state,
 )
+from medrec_research.comparison_scope import ComparisonScope as ProtocolComparisonScope
 from medrec_research.registry import (
     BaselineDefinition,
     BaselineReadiness,
@@ -43,6 +44,20 @@ OTHER_SCOPE = ComparisonScope(
     dataset_manifest_sha256="0" * 64,
     adaptation_budget_sha256="b" * 64,
 )
+
+
+def test_comparison_scope_is_protocol_owned_identity_matcher() -> None:
+    assert ProtocolComparisonScope is ComparisonScope
+    assert SCOPE.matches(
+        protocol_version="1.0",
+        dataset_manifest_sha256="d" * 64,
+        adaptation_budget_sha256="a" * 64,
+    )
+    assert not SCOPE.matches(
+        protocol_version="1.0",
+        dataset_manifest_sha256="0" * 64,
+        adaptation_budget_sha256="a" * 64,
+    )
 
 
 def _registered_baseline(baseline_id: str) -> BaselineDefinition:

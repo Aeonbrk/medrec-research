@@ -54,18 +54,21 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research audit-validate \
 rtk proxy /opt/homebrew/bin/uv run medrec-research selection-publish \
   --program baselines/programs/classic-six.toml \
   --audit-dir baselines/audits \
+  --registry baselines/registry.toml \
   --reviews fixtures/benchmark/audit-reviews.json \
+  --scope /tmp/medrec-comparison-scope.json \
   --diagnostics fixtures/benchmark/selection-diagnostics.json \
   --output /tmp/medrec-selection.json
 ```
 
-`status-publish` 需要显式 Comparison Scope JSON，并把 registry、selection 和可选的人审记录重新校验后写成内容寻址快照。相同时钟输入会产生相同字节；生产 CLI 使用当前 UTC 时间。
+`status-publish` 需要显式 Comparison Scope JSON、当前 Audit Review Set 和已发布 Selection Result。Live Benchmark Authority 会重新校验 program、audit、review、registry、scope 与 selection；任一 digest 漂移都会拒绝发布，不会重新选择候选。可选的 V2 Reproduction Characterization 只有在提供匹配的 Selection Acceptance 时才影响状态；V1 记录仅供历史解析，不能推进当前状态。相同时钟输入会产生相同字节；生产 CLI 使用当前 UTC 时间。
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec-research status-publish \
   --program baselines/programs/classic-six.toml \
   --audit-dir baselines/audits \
   --registry baselines/registry.toml \
+  --reviews fixtures/benchmark/audit-reviews.json \
   --selection /tmp/medrec-selection.json \
   --scope /tmp/medrec-comparison-scope.json \
   --output /tmp/medrec-status.json
@@ -75,7 +78,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research harness \
   --port 0
 ```
 
-Harness 只绑定 `127.0.0.1`。不传 Authority Bundle 时只读；传入后也只生成允许或 blocked 的 Action Decision/Action Request，不运行 shell、SSH、Conda 或 319 作业。操作与恢复步骤见 status harness playbook。
+Harness 只绑定 `127.0.0.1`。不传 Authority Bundle 时只读；传入后，每次 Action Context GET 和 Action Request POST 都重新解析该 Bundle。浏览器只提交不透明 `request_id`；CLI 调用方先用 `action-context` 取得相同的公共 context。服务器从当前 Status 与显式 Bundle 推导完整绑定并生成允许或 blocked 的 Action Decision/Action Request。它不运行 shell、SSH、Conda 或 319 作业。操作与恢复步骤见 status harness playbook。
 
 External baselines do not run in this environment. Each baseline uses its declared Conda environment and communicates with the core through a separate process.
 

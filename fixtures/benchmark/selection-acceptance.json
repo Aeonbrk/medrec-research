@@ -1,0 +1,10 @@
+{
+  "acceptance_id": "selection-acceptance-f535cb13c19f2be648fb",
+  "candidate_id": "gamenet",
+  "decision": "accepted",
+  "issued_at": "2026-07-12T00:00:00Z",
+  "kind": "selection_acceptance",
+  "reviewer": "research-steward",
+  "schema_version": 1,
+  "selection_sha256": "a33db8e8c09b2719fdc01253f0ff030b1fb76ce549aa78d918d42875347e1f30"
+}

@@ -20,4 +20,9 @@ Use this page to find the source of truth for the question in front of you.
 - [`../research/README.md`](../research/README.md) explains curated Research Memory and Failure Records.
 - [`../README.md`](../README.md) gives runnable local commands and the current public-safe status.
 
+## 科研方法参考
+
+- [基于第一性原理的科研实践](guides/first-principles-research-practice.md) 将选题、解题、实验诊断、记录、阅读、讨论和写作组织为一条可检查的证据链。
+- [来源台账](guides/first-principles-research-practice-sources.md) 记录该资料使用的公开来源、访问状态和未读取内容的限制。
+
 Real data, model training, GPU work, and baseline Conda environments run only on `319-wild` after the remote preflight passes. Local runs are limited to core tests, synthetic fixtures, protocol checks, status publication, and the loopback harness.

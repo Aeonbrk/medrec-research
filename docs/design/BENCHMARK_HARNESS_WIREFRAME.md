@@ -111,7 +111,7 @@ Automatic initial loading never steals focus. A user-initiated retry has a deter
 | `GET /assets/app.js` | Package-owned JavaScript |
 | `GET /api/status` | Current, stale, or degraded `ProjectStatus` projection |
 | `GET /api/action-context` | Minimal request bootstrap projected from explicit authority |
-| `POST /api/action-requests` | Pure U5 `ActionIntent` evaluation |
+| `POST /api/action-requests` | Pure U5 opaque `ActionRequestInput` evaluation through current Action Context |
 
 The server binds only the literal IPv4 loopback address `127.0.0.1`. Every request requires exactly one `Host` equal to the bound literal and actual port. Action POST additionally requires exactly one same-origin `Origin`. These checks occur before body parsing.
 

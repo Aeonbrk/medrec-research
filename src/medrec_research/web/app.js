@@ -94,7 +94,7 @@ const elements = Object.fromEntries(
   ].map((id) => [id, document.getElementById(id)])
 );
 
-let currentContext = null;
+let currentRequestId = null;
 let inFlight = false;
 
 function isRecord(value) {
@@ -134,23 +134,30 @@ function validateContext(value) {
   if (!isRecord(value) || value.kind !== "action_context" || value.schema_version !== 1) {
     throw new Error("malformed:context");
   }
-  if (value.enabled === false && value.intent === null) return value;
-  const fields = [
-    "action_id",
-    "authorization_sha256",
-    "preflight_sha256",
-    "scope_sha256",
-    "snapshot_sha256",
-    "target_id",
-  ];
-  if (value.enabled !== true || !isRecord(value.intent)) {
+  if (typeof value.enabled !== "boolean") {
     throw new Error("malformed:context");
   }
-  fields.forEach((field) => requiredString(value.intent[field], field));
-  if (Object.keys(value.intent).sort().join("|") !== fields.sort().join("|")) {
+  const fields = value.enabled
+    ? ["enabled", "kind", "request_id", "schema_version"]
+    : ["enabled", "kind", "schema_version"];
+  if (Object.keys(value).sort().join("|") !== fields.join("|")) {
     throw new Error("malformed:context_fields");
   }
+  if (value.enabled) requiredString(value.request_id, "context.request_id");
   return value;
+}
+
+function validateHarnessState(value) {
+  if (!isRecord(value) || value.kind !== "harness_state" || value.schema_version !== 1) {
+    throw new Error("malformed:harness_state");
+  }
+  if (Object.keys(value).sort().join("|") !== ["action_context", "kind", "schema_version", "status"].join("|")) {
+    throw new Error("malformed:harness_state_fields");
+  }
+  return {
+    context: validateContext(value.action_context),
+    status: validateStatus(value.status),
+  };
 }
 
 function safeEvidenceUrl(value) {
@@ -344,7 +351,7 @@ function resetAction() {
   elements["retry-button"].hidden = true;
   elements["action-result"].hidden = true;
   elements["request-identity"].hidden = true;
-  currentContext = null;
+  currentRequestId = null;
 }
 
 function configureAction(status, context, focusAfter) {
@@ -372,13 +379,13 @@ function configureAction(status, context, focusAfter) {
   elements["action-value"].textContent = label;
   elements["action-button"].textContent = label;
   if (!context.enabled) {
-    setState("readonly", "状态允许下一步，但本次 harness 未启用动作请求。", { focus: focusAfter ? elements["page-title"] : null });
+    elements["retry-button"].hidden = false;
+    setState("readonly", "状态允许下一步，但当前动作上下文不可用；可重新载入。", {
+      focus: focusAfter ? elements["retry-button"] : null,
+    });
     return;
   }
-  if (context.intent.action_id !== actionId || context.intent.snapshot_sha256 !== status.snapshot_sha256) {
-    throw new Error("malformed:context_binding");
-  }
-  currentContext = context;
+  currentRequestId = requiredString(context.request_id, "context.request_id");
   elements["action-button"].disabled = false;
   setState("ready", "状态与动作授权均为当前版本。", { focus: focusAfter ? elements["page-title"] : null });
 }
@@ -393,10 +400,9 @@ async function loadHarness({ focusAfter = false } = {}) {
   resetAction();
   setState("loading", "正在载入项目状态。", { announceChange: false });
   try {
-    const status = validateStatus(await fetchJson("/api/status"));
-    const context = validateContext(await fetchJson("/api/action-context"));
-    renderStatus(status);
-    configureAction(status, context, focusAfter);
+    const state = validateHarnessState(await fetchJson("/api/harness-state"));
+    renderStatus(state.status);
+    configureAction(state.status, state.context, focusAfter);
   } catch (error) {
     const malformed = error instanceof Error && error.message.startsWith("malformed:");
     const state = malformed ? "malformed" : "transport";
@@ -411,30 +417,22 @@ async function loadHarness({ focusAfter = false } = {}) {
   }
 }
 
-function requestId() {
-  if (typeof crypto.randomUUID === "function") return `browser-${crypto.randomUUID()}`;
-  const bytes = new Uint32Array(4);
-  crypto.getRandomValues(bytes);
-  return `browser-${Array.from(bytes, (value) => value.toString(16)).join("-")}`;
-}
-
 async function requestAction() {
-  if (inFlight || currentContext === null) return;
+  if (inFlight || currentRequestId === null) return;
   inFlight = true;
   elements["action-button"].disabled = true;
   elements["retry-button"].hidden = true;
   setState("submitting", "正在生成内容寻址动作请求。", { focus: elements["action-button"] });
-  const intent = {
+  const request = {
     schema_version: 1,
-    kind: "action_intent",
-    request_id: requestId(),
-    ...currentContext.intent,
+    kind: "action_request_input",
+    request_id: currentRequestId,
   };
   try {
     const decision = await fetchJson("/api/action-requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(intent),
+      body: JSON.stringify(request),
     });
     if (!isRecord(decision) || decision.kind !== "action_decision" || decision.schema_version !== 1) {
       throw new Error("malformed:decision");

@@ -1,5 +1,9 @@
 # MedRec Research Agent Instructions
 
+## Research Guidelines
+
+Must follow the `docs/guides/first-principles-research-practice-sources.md` to be an advanced researcher.
+
 ## Purpose
 
 This repository is the active research home for general medication-recommendation computer science research. Keep reusable research capability independent of any single idea, route, or paper claim.
