@@ -7,6 +7,7 @@
 - **Scope**: non-evidentiary seed `0` smoke followed by pre-registered seeds `7`, `19`, and `31`; MIMIC-IV, Comparison Mode, test-set selection, and registry `comparison_ready` advancement are excluded.
 - **Hard stops**: source and MIT license, data inputs, upstream split and evaluation semantics, patient-level non-overlap, isolated environment lock, target-free adapter contract, available GPU, disk capacity, and restricted-artifact handling all must pass.
 - **Evidence boundary**: successful smoke can create only environment-lock and adapter-smoke readiness evidence. Full runs produce restricted diagnostics plus a public-safe Reproduction Characterization or Failure Record, never a Comparison Qualification.
+- **Current outcome**: blocked before environment creation because the fixed source does not identify a `dnc` version, hardcodes seed `1203` instead of exposing the pre-registered seed policy, and leaves checkpoint selection to an explicit operator-supplied path. See `research/failures/gamenet-reproduction-2026-07-13.md`.
 
 ## 已完成：基于第一性原理的科研实践参考资料
 

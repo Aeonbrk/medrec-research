@@ -14,6 +14,7 @@ This memory is based on `New-Search` commit `9971464253c556345262b22ed6d44b2cc14
 - [Literature Memory](literature-memory.md) inventories every canonical paper card and preserves its archived relevance boundary.
 - [Reusable Lessons](reusable-lessons.md) holds cross-route controls and claim limits that new work must carry forward.
 - [Failure Records](failures/) remain the detailed non-revival boundaries for the three terminal method routes.
+- [GAMENet controlled reproduction](failures/gamenet-reproduction-2026-07-13.md) records the current upstream-reproduction stop conditions. It is an operational failure record, not a method result.
 
 ## Current scientific state
 
