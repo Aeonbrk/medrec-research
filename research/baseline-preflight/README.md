@@ -2,7 +2,9 @@
 
 This index is a public, read-only execution preflight. It records what official source and maintainer evidence establish before an environment is built or a model sees restricted data. `registered` is the only supported registry status for every candidate.
 
-An Issue comment can explain a repository's intent. It does not fill a missing license, dependency pin, training invocation, seed policy, split proof, checkpoint rule, or data manifest.
+An Issue comment can explain a repository's intent. It does not fill a missing license, dependency pin, training invocation, split proof, checkpoint rule, or data manifest.
+
+The current project policy records each source's seed behavior but does not require deterministic execution, a user-configurable seed, or a multi-seed stability result before a source-native reproduction attempt.
 
 ## Status matrix
 
@@ -45,7 +47,7 @@ See [the SafeDrug and MICRON audit](safedrug-micron-source-audit.md).
 ## MoleRec
 
 - The fixed official source and its MIT license pass the source/license gate. `MoleRec.yml` declares a Linux Conda stack: Python 3.8.16, PyTorch 1.9.0, CUDA 10.2.89, PyG 2.0.3, matching extensions, and RDKit 2022.09.1.
-- The source fixes Torch `1203` and NumPy `2048`; it exposes neither as a parameter and does not seed Python `random`. The owner says PyG prevents guaranteed reproducibility even when a seed is fixed.
+- The source fixes Torch `1203` and NumPy `2048`; it exposes neither as a parameter and does not seed Python `random`. The owner says PyG prevents guaranteed reproducibility even when a seed is fixed. This is recorded, not an execution stop under the current policy.
 - It retains SafeDrug-derived processing, splits ordered patient records into two thirds train, middle sixth test, and final sixth evaluation. Data and visit eligibility must follow the pinned processor exactly.
 - Training records strict evaluation-Jaccard improvements in `best.txt` and saves every epoch. A wrapper may use only the final `best.txt` entry and a unique matching checkpoint before test evaluation.
 
@@ -69,7 +71,7 @@ See [the LEAP-SafeDrug audit](leap-safedrug-source-audit.md).
 
 ## Required gate before any launch
 
-Each candidate needs an execution-specific, immutable source and license; a source-compatible resolved environment and explicit lock; source-native training and seed semantics; validation-only checkpoint selection; and a restricted proof of required inputs, patient-level split disjointness, vocabulary, and record ordering. Failure at any gate creates a public-safe Failure Record. It does not justify a substitute dependency, split, data representation, checkpoint, or implementation.
+Each candidate needs an execution-specific, immutable source and license; a source-compatible resolved environment and explicit lock; source-native training semantics; validation-only checkpoint selection; and a restricted proof of required inputs, patient-level split disjointness, vocabulary, and record ordering. Seed behavior remains documented but is not an execution gate. Failure at any other gate creates a public-safe Failure Record. It does not justify a substitute dependency, split, data representation, checkpoint, or implementation.
 
 ## Primary evidence
 
