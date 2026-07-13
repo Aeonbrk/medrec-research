@@ -1,5 +1,12 @@
 # Plans
 
+## Completed: Classic-six License Exception And Source Reconstruction
+
+- **Status**: completed on `2026-07-13`; V2 retains license status as public audit evidence but removes it from current classic-six selection hard gates. V1 source-and-license selection records remain historical and parseable.
+- **Plan**: `docs/plans/2026-07-13-005-feat-classic-six-license-exception-plan.md`.
+- **Source boundary**: GAMENet receives a user-approved, API-compatible `dnc` reconstruction; SafeDrug, MICRON, and LEAP-SafeDrug retain their fixed official sources. CS598 is independent MICRON environment evidence, not an official-source substitution.
+- **Non-goals**: no registry readiness promotion, external-source import into Git, remote environment creation, restricted-data access, or baseline execution.
+
 ## Completed: Classic-six Baseline Source Preflight Audit
 
 - **Status**: completed on `2026-07-13`; no baseline environment, source checkout, 319 action, restricted-data access, training, or readiness change was authorized by this audit.
@@ -14,7 +21,7 @@
 - **Scope**: runtime-only smoke followed by one source-native seed `1203` attempt; MIMIC-IV, Comparison Mode, test-set selection, cross-seed stability claims, and registry readiness advancement are excluded.
 - **Hard stops**: source and MIT license, data inputs, upstream split and evaluation semantics, patient-level non-overlap, isolated environment lock, target-free adapter contract, available GPU, disk capacity, and restricted-artifact handling all must pass.
 - **Evidence boundary**: successful smoke is a runtime check only and creates no readiness evidence. The source-native run produces restricted diagnostics plus a public-safe Reproduction Characterization or Failure Record, never a Comparison Qualification.
-- **Current outcome**: faithful Reproduction Mode remains blocked because the fixed GAMENet source does not attribute the recorded API-matched `dnc` candidate. The source-native `1203` characterization contract selects the source-reported `best_epoch` checkpoint without reading `data_test`, but remote connectivity failed before environment verification and no GPU work began. It cannot establish stability or advance readiness. See `research/failures/gamenet-reproduction-2026-07-13.md`.
+- **Current outcome**: the research owner approved the API-matched `dnc` reconstruction for a compatibility characterization. Remote connectivity failed before environment verification and no GPU work began, so the full restricted preflight must restart. The attempt cannot establish the authors' historical environment, stability, or readiness. See `research/failures/gamenet-reproduction-2026-07-13.md`.
 
 ## 已完成：基于第一性原理的科研实践参考资料
 

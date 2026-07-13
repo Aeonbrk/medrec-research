@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from medrec_research._validation import content_sha256
 from medrec_research.baseline_audit import AuditReviewSet, BaselineAudit, BaselineProgram
 from medrec_research.benchmark_program import (
     Diagnostic,
@@ -109,7 +110,13 @@ def test_selection_uses_accepted_hard_gates_before_fixed_priority() -> None:
     program, audits, reviews = _authorities()
     diagnostics = _diagnostics(audits)
 
-    result = _select(program, audits, reviews, diagnostics)
+    result = _select(
+        program,
+        audits,
+        reviews,
+        diagnostics,
+        specification=SelectionSpecification(version=1),
+    )
 
     assert result.status == "proposed"
     assert result.selected_candidate_id == "gamenet"
@@ -119,26 +126,39 @@ def test_selection_uses_accepted_hard_gates_before_fixed_priority() -> None:
     assert result == SelectionResult.load(SELECTION_FIXTURE)
 
 
-def test_selection_skips_blocked_earlier_candidates_without_hiding_blockers() -> None:
+def test_selection_records_license_without_treating_it_as_a_hard_gate() -> None:
     program, audits, reviews = _authorities()
+    assert SelectionSpecification().version == 2
+    assert SelectionSpecification().hard_gates == ("source",)
     gamenet_license = reviews.matching_review(audits[0], "license")
     assert gamenet_license is not None
-    without_gamenet_license = AuditReviewSet(
-        tuple(review for review in reviews.reviews if review != gamenet_license)
+    source_only_content = {**gamenet_license._content(), "reviewed_claims": ["source"]}
+    source_only_reviews = AuditReviewSet(
+        (
+            *(review for review in reviews.reviews if review != gamenet_license),
+            replace(
+                gamenet_license,
+                reviewed_claims=("source",),
+                content_sha256=content_sha256(source_only_content),
+            ),
+        )
     )
 
-    result = _select(program, audits, without_gamenet_license, _diagnostics(audits))
+    result = _select(program, audits, source_only_reviews, _diagnostics(audits))
 
-    assert result.selected_candidate_id == "molerec"
-    assert result.candidates[0].blockers == (
-        "source_review_missing",
-        "license_review_missing",
+    assert result.selected_candidate_id == "gamenet"
+    assert result.candidates[0].blockers == ()
+
+    v1_result = _select(
+        program,
+        audits,
+        source_only_reviews,
+        _diagnostics(audits),
+        specification=SelectionSpecification(version=1),
     )
-    assert tuple(candidate.baseline_id for candidate in result.candidates[1:4]) == (
-        "safedrug",
-        "micron",
-        "molerec",
-    )
+
+    assert v1_result.selected_candidate_id == "molerec"
+    assert v1_result.candidates[0].blockers == ("license_review_missing",)
 
 
 def test_selection_returns_deterministic_blocked_result_when_none_are_eligible() -> None:

@@ -119,6 +119,34 @@ def test_real_six_audits_validate_and_selection_publishes(
     assert selection["selected_candidate_id"] == "gamenet"
     assert capsys.readouterr().out.strip() == selection["selection_id"]
 
+    status_output = tmp_path / "status.json"
+    assert (
+        main(
+            [
+                "status-publish",
+                "--program",
+                str(PROGRAM),
+                "--audit-dir",
+                str(AUDITS),
+                "--registry",
+                str(REGISTRY),
+                "--reviews",
+                str(REVIEWS),
+                "--selection",
+                str(output),
+                "--scope",
+                str(scope),
+                "--output",
+                str(status_output),
+            ],
+            clock=lambda: NOW,
+        )
+        == 0
+    )
+    assert ProjectStatus.from_json(status_output.read_text(encoding="utf-8")).payload.stage == (
+        "lane_proposed"
+    )
+
 
 def test_status_publish_uses_injected_clock_and_is_byte_stable(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]

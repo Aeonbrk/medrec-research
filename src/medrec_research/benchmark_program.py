@@ -34,7 +34,11 @@ from .reproduction_characterization import (
     VarianceCheck,
 )
 
-_HARD_GATES = ("source", "license")
+_HARD_GATES_BY_VERSION = {
+    1: ("source", "license"),
+    2: ("source",),
+}
+_CURRENT_SELECTION_SPECIFICATION_VERSION = 2
 
 
 def _objects(value: object, *, field: str) -> tuple[dict[str, object], ...]:
@@ -241,8 +245,8 @@ class SelectionResult:
     SCHEMA_VERSION: ClassVar[int] = 2
 
     def __post_init__(self) -> None:
-        if self.specification_version != 1:
-            raise ProtocolValidationError("selection specification version must be 1")
+        if self.specification_version not in _HARD_GATES_BY_VERSION:
+            raise ProtocolValidationError("selection specification version is unsupported")
         for field in (
             "specification_sha256",
             "program_sha256",
@@ -252,8 +256,11 @@ class SelectionResult:
             "scope_sha256",
         ):
             require_sha256(getattr(self, field), field=field)
-        if self.specification_sha256 != SelectionSpecification().specification_sha256:
-            raise ProtocolValidationError("selection result specification digest is not V1")
+        if (
+            self.specification_sha256
+            != SelectionSpecification(version=self.specification_version).specification_sha256
+        ):
+            raise ProtocolValidationError("selection result specification digest is invalid")
         candidates = tuple(
             item if isinstance(item, CandidateSelection) else CandidateSelection.from_dict(item)
             for item in self.candidates
@@ -482,19 +489,23 @@ class SelectionAcceptance:
 
 @dataclass(frozen=True, slots=True)
 class SelectionSpecification:
-    version: int = 1
+    version: int = _CURRENT_SELECTION_SPECIFICATION_VERSION
     priority_order: tuple[str, ...] = CLASSIC_SIX
 
     def __post_init__(self) -> None:
-        if self.version != 1 or tuple(self.priority_order) != CLASSIC_SIX:
+        if self.version not in _HARD_GATES_BY_VERSION or tuple(self.priority_order) != CLASSIC_SIX:
             raise ProtocolValidationError(
-                "SelectionSpecification V1 must use the fixed priority order"
+                "selection specification must use a supported version and fixed priority order"
             )
+
+    @property
+    def hard_gates(self) -> tuple[str, ...]:
+        return _HARD_GATES_BY_VERSION[self.version]
 
     def to_dict(self) -> dict[str, object]:
         return {
             "baseline_id_integrity": "exact",
-            "hard_gates": list(_HARD_GATES),
+            "hard_gates": list(self.hard_gates),
             "missing_value_policy": "unresolved",
             "priority_direction": "ascending",
             "priority_order": list(self.priority_order),
@@ -544,7 +555,7 @@ class SelectionSpecification:
                 )
             blockers: list[str] = []
             accepted_reviews: list[str] = []
-            for claim_name in _HARD_GATES:
+            for claim_name in self.hard_gates:
                 claim = audit.claim(claim_name)
                 if claim.disposition is not Disposition.PASS:
                     blockers.append(f"{claim_name}_not_pass")

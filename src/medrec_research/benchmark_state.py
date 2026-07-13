@@ -369,7 +369,9 @@ class LiveBenchmarkAuthority:
             raise ProtocolValidationError("selection registry authority does not match")
         if self.selection.scope_sha256 != self.scope.scope_sha256:
             raise ProtocolValidationError("selection scope authority does not match")
-        expected_selection = SelectionSpecification().select(
+        expected_selection = SelectionSpecification(
+            version=self.selection.specification_version
+        ).select(
             self.program,
             self.audits,
             self.reviews,

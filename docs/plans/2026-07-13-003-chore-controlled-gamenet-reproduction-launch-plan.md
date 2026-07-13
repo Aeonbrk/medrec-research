@@ -28,7 +28,7 @@ topic: gamenet-reproduction-launch
 - Do not copy external source, restricted data, patient identifiers, split membership, predictions, weights, logs, keys, private paths, or runtime traces into this repository.
 - Do not replace unavailable GAMENet inputs with MIMIC-IV, RxNorm, or another representation. Do not invent a compatible split when upstream semantics cannot be reconstructed.
 - Treat the single source-native attempt as Reproduction Characterization only. It cannot establish cross-seed stability, enter the V3 stability policy, advance readiness, or support Comparison Mode.
-- SafeDrug, MICRON, and LEAP-SafeDrug remain blocked by source or license evidence. MoleRec and RETAIN receive read-only evidence work only and do not enter this execution lane.
+- SafeDrug, MICRON, and LEAP-SafeDrug do not enter this GAMENet lane. Their fixed-source, dependency, training, checkpoint, and input evidence is evaluated separately; a license-policy exception does not resolve those technical conditions. MoleRec and RETAIN receive read-only evidence work only.
 
 ## Preconditions And Stops
 

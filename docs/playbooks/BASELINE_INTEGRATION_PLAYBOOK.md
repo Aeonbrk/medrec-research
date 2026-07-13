@@ -10,7 +10,7 @@ An archive path identifies historical evidence, not an upstream release. Do not 
 
 ## 2. Audit source, license, and lineage
 
-Complete the public-safe Baseline Audit and matching Audit Review before selecting a reproduction lane. Source and license are hard gates. Among eligible candidates, V1 uses the fixed order GAMENet, SafeDrug, MICRON, MoleRec, RETAIN, then `LEAP-SafeDrug`; priority never converts an unresolved gate into a pass. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
+Complete the public-safe Baseline Audit and matching Audit Review before selecting a reproduction lane. Source is always a hard gate; license status is always recorded. Historic V1 classic-six selection treats both source and license as hard gates. Current V2 classic-six selection, by research-owner decision, treats license status as nonblocking without asserting that an unlicensed source is licensed or permitting its distribution in Git. Priority never converts an unresolved active gate into a pass. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
 
 Validate the exact classic-six set with `audit-validate`, then pass the current Registry and explicit Comparison Scope to `selection-publish`. The Selection Result binds both records. Do not edit registry readiness to make a blocked candidate selectable.
 
