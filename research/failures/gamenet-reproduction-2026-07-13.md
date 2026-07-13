@@ -8,6 +8,12 @@ Source boundary: GAMENet commit `da695b4fc9390882f3a681c82115e81291ae6380` and t
 
 Faithful GAMENet Reproduction Mode remains blocked before Conda environment creation, adapter implementation, GPU smoke, and execution because the `dnc` dependency lacks author attribution. GAMENet remains `registered`. A source-native single-run Reproduction Characterization is separately specified below; it cannot advance readiness or establish stability.
 
+## Remote preflight interruption
+
+The restricted source revision, source cleanliness, required preprocessed inputs, remote checkout revision, GPU availability, and disk capacity passed their public-safe preflight checks. The isolated environment creation command did not return a success signal before the existing SSH multiplexing connection failed. A direct BatchMode reconnection also timed out during the SSH banner exchange. The environment state is therefore unverified, and no GPU smoke, source training, evaluation, prediction export, or result intake began.
+
+Do not reuse a potentially partial environment. After remote connectivity returns, re-run the entire restricted preflight, verify the exact remote checkout SHA and environment state, then create or replace the environment only under a new explicit preflight record.
+
 ## What was verified
 
 The fixed source commit checked out cleanly and contains an MIT license. Its README describes the expected preprocessed records, vocabulary, EHR adjacency, DDI adjacency, and medication-code mapping inputs. The restricted source copy passed a checksum comparison against its read-only source.

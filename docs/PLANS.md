@@ -7,7 +7,7 @@
 - **Scope**: runtime-only smoke followed by one source-native seed `1203` attempt; MIMIC-IV, Comparison Mode, test-set selection, cross-seed stability claims, and registry readiness advancement are excluded.
 - **Hard stops**: source and MIT license, data inputs, upstream split and evaluation semantics, patient-level non-overlap, isolated environment lock, target-free adapter contract, available GPU, disk capacity, and restricted-artifact handling all must pass.
 - **Evidence boundary**: successful smoke is a runtime check only and creates no readiness evidence. The source-native run produces restricted diagnostics plus a public-safe Reproduction Characterization or Failure Record, never a Comparison Qualification.
-- **Current outcome**: faithful Reproduction Mode remains blocked before environment creation because the fixed GAMENet source does not attribute the recorded API-matched `dnc` candidate. A source-native `1203` characterization contract now selects the source-reported `best_epoch` checkpoint without reading `data_test`; it cannot establish stability or advance readiness. See `research/failures/gamenet-reproduction-2026-07-13.md`.
+- **Current outcome**: faithful Reproduction Mode remains blocked because the fixed GAMENet source does not attribute the recorded API-matched `dnc` candidate. The source-native `1203` characterization contract selects the source-reported `best_epoch` checkpoint without reading `data_test`, but remote connectivity failed before environment verification and no GPU work began. It cannot establish stability or advance readiness. See `research/failures/gamenet-reproduction-2026-07-13.md`.
 
 ## 已完成：基于第一性原理的科研实践参考资料
 
