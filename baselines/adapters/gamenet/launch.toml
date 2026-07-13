@@ -3,11 +3,21 @@ baseline_id = "gamenet"
 mode = "reproduction"
 dataset_id = "mimic-iii-v1.4"
 source_revision = "da695b4fc9390882f3a681c82115e81291ae6380"
-smoke_seed = 0
-full_seeds = [7, 19, 31]
+source_seed = 1203
 required_inputs = ["diagnoses", "procedures", "prescriptions", "ddi"]
 
 [launch]
 gpu_memory_used_mib_lt = 500
 gpu_utilization_percent = 0
 tmux_session = "medrec-gamenet"
+
+[smoke]
+kind = "environment-adapter"
+trains_baseline = false
+
+[selection]
+checkpoint_glob = "Epoch_{best_epoch}_JA_*.model"
+monitor_partition = "data_eval"
+selection_metric = "jaccard"
+selection_update = "strict-improvement-after-epoch-zero"
+test_partition = "data_test"

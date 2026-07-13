@@ -15,5 +15,6 @@ dependencies:
   - scikit-learn=0.24.2
   - dill=0.3.4
   - pip:
-      # Upstream imports dnc but does not identify a version. Pin before smoke readiness.
-      - dnc
+      # API-matched source candidate; not an author-attested GAMENet lock.
+      # See research/failures/gamenet-reproduction-2026-07-13.md.
+      - "git+https://github.com/ixaxaar/pytorch-dnc.git@bbf48e61e8d3c7dd551aa0e271fbb9ba3fbc6380#egg=dnc"

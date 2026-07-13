@@ -4,10 +4,10 @@
 
 - **Status**: accepted on `2026-07-13`; execution begins with one GAMENet MIMIC-III v1.4 Reproduction Mode lane only.
 - **Plan**: `docs/plans/2026-07-13-003-chore-controlled-gamenet-reproduction-launch-plan.md`.
-- **Scope**: non-evidentiary seed `0` smoke followed by pre-registered seeds `7`, `19`, and `31`; MIMIC-IV, Comparison Mode, test-set selection, and registry `comparison_ready` advancement are excluded.
+- **Scope**: runtime-only smoke followed by one source-native seed `1203` attempt; MIMIC-IV, Comparison Mode, test-set selection, cross-seed stability claims, and registry readiness advancement are excluded.
 - **Hard stops**: source and MIT license, data inputs, upstream split and evaluation semantics, patient-level non-overlap, isolated environment lock, target-free adapter contract, available GPU, disk capacity, and restricted-artifact handling all must pass.
-- **Evidence boundary**: successful smoke can create only environment-lock and adapter-smoke readiness evidence. Full runs produce restricted diagnostics plus a public-safe Reproduction Characterization or Failure Record, never a Comparison Qualification.
-- **Current outcome**: blocked before environment creation because the fixed source does not identify a `dnc` version, hardcodes seed `1203` instead of exposing the pre-registered seed policy, and leaves checkpoint selection to an explicit operator-supplied path. See `research/failures/gamenet-reproduction-2026-07-13.md`.
+- **Evidence boundary**: successful smoke is a runtime check only and creates no readiness evidence. The source-native run produces restricted diagnostics plus a public-safe Reproduction Characterization or Failure Record, never a Comparison Qualification.
+- **Current outcome**: faithful Reproduction Mode remains blocked before environment creation because the fixed GAMENet source does not attribute the recorded API-matched `dnc` candidate. A source-native `1203` characterization contract now selects the source-reported `best_epoch` checkpoint without reading `data_test`; it cannot establish stability or advance readiness. See `research/failures/gamenet-reproduction-2026-07-13.md`.
 
 ## 已完成：基于第一性原理的科研实践参考资料
 

@@ -16,9 +16,10 @@ topic: gamenet-reproduction-launch
 | --- | --- |
 | First lane | GAMENet only, fixed upstream commit `da695b4fc9390882f3a681c82115e81291ae6380`. |
 | Scientific scope | MIMIC-III v1.4, Reproduction Mode only. MIMIC-IV and Comparison Mode are out of scope. |
-| Seed policy | Non-evidentiary seed `0` adapter/environment smoke, then pre-registered full seeds `7`, `19`, and `31`. |
+| Seed policy | Runtime-only smoke without source training, then one source-native run at fixed seed `1203`. |
+| Checkpoint policy | Select the unique source-saved checkpoint for the source-reported `best_epoch`, which tracks strict Jaccard improvements on `data_eval`; evaluate it only on `data_test`. |
 | Execution plane | The Mac is the public-safe harness terminal. Restricted data, source checkout, Conda environment, logs, predictions, models, and run diagnostics remain on 319. |
-| Readiness boundary | GAMENet advances from `registered` to `smoke_ready` only after adapter-smoke and environment-lock evidence. This work never calls `accept-comparison` or claims `comparison_ready`. |
+| Readiness boundary | This source-native single-run lane stays `registered`; neither smoke nor the completed run creates readiness evidence. It never calls `accept-comparison` or claims `comparison_ready`. |
 
 ## Scope Boundaries
 
@@ -26,6 +27,7 @@ topic: gamenet-reproduction-launch
 - Preserve the local `codex/medrec-benchmark-harness` branch. Publish the exact frozen SHA as private remote `main`.
 - Do not copy external source, restricted data, patient identifiers, split membership, predictions, weights, logs, keys, private paths, or runtime traces into this repository.
 - Do not replace unavailable GAMENet inputs with MIMIC-IV, RxNorm, or another representation. Do not invent a compatible split when upstream semantics cannot be reconstructed.
+- Treat the single source-native attempt as Reproduction Characterization only. It cannot establish cross-seed stability, enter the V3 stability policy, advance readiness, or support Comparison Mode.
 - SafeDrug, MICRON, and LEAP-SafeDrug remain blocked by source or license evidence. MoleRec and RETAIN receive read-only evidence work only and do not enter this execution lane.
 
 ## Preconditions And Stops
@@ -74,13 +76,13 @@ No run may preempt, terminate, attach to, or otherwise disrupt another user's GP
 
 ### U4. Execute And Characterize Reproduction
 
-**Goal:** Run seed `0` as non-evidentiary smoke, then run full fixed seeds `7`, `19`, and `31` without test-set selection or undocumented reruns.
+**Goal:** Run a runtime-only smoke, then one fixed source-native seed `1203` attempt without test-set selection or undocumented reruns.
 
 **Files:** Restricted remote run roots and logs; public-safe Reproduction Characterization or Failure Record.
 
-**Approach:** Check selected GPU state immediately before each launch, bind one available device, and use a named restricted `tmux` session. Preserve all raw outputs remotely. Audit restricted outputs before publishing only aggregate, public-safe characterization observations.
+**Approach:** Check selected GPU state immediately before each launch, bind one available device, and use a named restricted `tmux` session. The smoke does not invoke source training. For the source-native run, retain the source's fixed `1203` seed, parse its restricted `best_epoch` output, require exactly one `Epoch_{best_epoch}_JA_*.model` checkpoint, then pass that path to the source `--eval` command. The wrapper must fail closed if parsing or checkpoint resolution fails and must not read `data_test` metrics before choosing the path. Preserve all raw outputs remotely. Audit restricted outputs before publishing only aggregate, public-safe characterization observations.
 
-**Verification:** All three seeds are reported, including failed or unstable seeds. Successful smoke may create the two required readiness evidence records and advance registry readiness to `smoke_ready`; full-seed results remain Reproduction Characterization and do not create a Comparison Qualification.
+**Verification:** Report the one source-native attempt, including any failure. A successful smoke is a runtime check only and cannot create readiness evidence. The completed attempt remains Reproduction Characterization, cannot establish cross-seed stability, and does not create a Comparison Qualification.
 
 ## Verification Contract
 
