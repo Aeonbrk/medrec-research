@@ -1,103 +1,76 @@
 schema_version = 1
 baseline_id = "retain"
-display_name = "RETAIN"
-identity_kind = "canonical"
+display_name = "RETAIN (SafeDrug main)"
+identity_kind = "derivative"
+derivative_of = "retain-original"
 
 [[sources]]
-source_id = "retain-author"
-role = "canonical_model"
-repository = "https://github.com/mp2893/retain"
-revision = "9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5"
-
-[[sources]]
-source_id = "gamenet-retain"
+source_id = "safedrug-main-retain"
 role = "medication_comparison"
-repository = "https://github.com/sjy1203/GAMENet"
-revision = "da695b4fc9390882f3a681c82115e81291ae6380"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
 
 [[evidence]]
-evidence_id = "retain-readme"
-claims = ["source", "task", "lineage.model_core"]
-source_id = "retain-author"
-repository = "https://github.com/mp2893/retain"
-revision = "9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/mp2893/retain/9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5/README.md"
-content = "RETAIN author repository states that this code performs sequence classification."
-content_sha256 = "780ac281d7c0b94a0fc7db6cec1b6997df2703e0f53ef5434670f2f4d205328f"
-
-[[evidence]]
-evidence_id = "retain-license"
-claims = ["license"]
-source_id = "retain-author"
-repository = "https://github.com/mp2893/retain"
-revision = "9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/mp2893/retain/9fd39c46e44b3fdae3a667a47fbdd5ffbd87bff5/LICENSE"
-content = "BSD 3-Clause license, Copyright (c) 2016, mp2893."
-content_sha256 = "d5fd909fd27f6a941db217173b93b609805ad6067be0f6ca5c332bfd8b807d6b"
-
-[[evidence]]
-evidence_id = "retain-comparison"
-claims = ["task", "split", "evaluation", "lineage.data_processing", "lineage.split_selection", "lineage.evaluation_reporting"]
-source_id = "gamenet-retain"
-repository = "https://github.com/sjy1203/GAMENet"
-revision = "da695b4fc9390882f3a681c82115e81291ae6380"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/sjy1203/GAMENet/da695b4fc9390882f3a681c82115e81291ae6380/README.md"
-content = "GAMENet lists RETAIN as a medication-combination comparison implementation."
-content_sha256 = "c20a82a758895d755fc0627865a87fb1181a5d3be5159f06c1a83efc6e9d8074"
+evidence_id = "safedrug-main-retain"
+claims = ["source", "task", "split", "evaluation", "lineage.model_core", "lineage.data_processing", "lineage.split_selection", "lineage.evaluation_reporting"]
+source_id = "safedrug-main-retain"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+retrieved_at = "2026-07-14T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/ycq091044/SafeDrug/88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a/src/Retain.py"
+content = "SafeDrug main contains Retain.py with a fixed two-thirds training split, then equal test and evaluation partitions."
+content_sha256 = "c2350a6a80b1a7817fca9e593e076bd558bb9ca4b94634d8eac6e02c68c1e56e"
 
 [[claims]]
 name = "source"
 disposition = "pass"
-evidence_ids = ["retain-readme"]
-rationale = "The canonical author repository is pinned, separately from medication comparison code."
+evidence_ids = ["safedrug-main-retain"]
+rationale = "The research owner selected the pinned SafeDrug main RETAIN implementation."
 
 [[claims]]
 name = "license"
-disposition = "pass"
-evidence_ids = ["retain-license"]
-rationale = "The canonical repository contains a BSD 3-Clause license."
+disposition = "unresolved"
+evidence_ids = []
+rationale = "No license determination is asserted for the selected SafeDrug revision."
 
 [[claims]]
 name = "task"
-disposition = "unresolved"
-evidence_ids = ["retain-readme", "retain-comparison"]
-rationale = "The canonical code is sequence classification while medication recommendation uses a comparison implementation."
+disposition = "pass"
+evidence_ids = ["safedrug-main-retain"]
+rationale = "The selected entry point is a medication-recommendation implementation."
 
 [[claims]]
 name = "split"
-disposition = "unresolved"
-evidence_ids = ["retain-comparison"]
-rationale = "Medication-comparison split behavior remains to be characterized."
+disposition = "pass"
+evidence_ids = ["safedrug-main-retain"]
+rationale = "The selected entry point defines its source-native data partition."
 
 [[claims]]
 name = "evaluation"
-disposition = "unresolved"
-evidence_ids = ["retain-comparison"]
-rationale = "Medication-comparison evaluation behavior remains to be characterized."
+disposition = "pass"
+evidence_ids = ["safedrug-main-retain"]
+rationale = "The selected entry point defines source-native evaluation and reporting."
 
 [[lineage]]
 layer = "model_core"
-upstream = "retain-author"
+upstream = "safedrug-main-retain"
 downstream = "retain"
-evidence_ids = ["retain-readme"]
+evidence_ids = ["safedrug-main-retain"]
 
 [[lineage]]
 layer = "data_processing"
-upstream = "gamenet-retain"
+upstream = "safedrug-main-retain"
 downstream = "retain"
-evidence_ids = ["retain-comparison"]
+evidence_ids = ["safedrug-main-retain"]
 
 [[lineage]]
 layer = "split_selection"
-upstream = "gamenet-retain"
+upstream = "safedrug-main-retain"
 downstream = "retain"
-evidence_ids = ["retain-comparison"]
+evidence_ids = ["safedrug-main-retain"]
 
 [[lineage]]
 layer = "evaluation_reporting"
-upstream = "gamenet-retain"
+upstream = "safedrug-main-retain"
 downstream = "retain"
-evidence_ids = ["retain-comparison"]
+evidence_ids = ["safedrug-main-retain"]

@@ -60,19 +60,6 @@
         "source_gate": "pass"
       },
       {
-        "candidate_id": "micron",
-        "display_name": "micron",
-        "evidence": [
-          {
-            "label": "micron-source",
-            "url": "https://github.com/example/micron"
-          }
-        ],
-        "license_gate": "unresolved",
-        "readiness": "comparison_ready",
-        "source_gate": "pass"
-      },
-      {
         "candidate_id": "molerec",
         "display_name": "molerec",
         "evidence": [
@@ -190,6 +177,6 @@
   },
   "project_id": "medrec-research",
   "schema_version": 1,
-  "snapshot_sha256": "ab4430a9afd3a8eefcccdebdaa180a99618295b745a3c8fbe5c5a1f0cbbdb9fd",
+  "snapshot_sha256": "97bacb6edb9034cb671ee5582a8d7cd7a6243fba2dfeb3b00db22070cd932290",
   "valid_until": "2026-07-11T01:07:03Z"
 }

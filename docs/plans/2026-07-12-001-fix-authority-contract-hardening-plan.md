@@ -112,7 +112,6 @@ The current modules have correct individual record validation but leave cross-re
 
 - `docs/residual-review-findings/2625b7d7cc657942a27f59c0aa3b0741dc96d746.md`
 - `research/reusable-lessons.md`
-- `docs/plans/2026-07-10-002-feat-medrec-benchmark-harness-plan.md`
 - `docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`
 - `CONTEXT.md`
 

@@ -1,86 +1,75 @@
 schema_version = 1
 baseline_id = "safedrug"
-display_name = "SafeDrug"
+display_name = "SafeDrug (main)"
 identity_kind = "canonical"
 
 [[sources]]
-source_id = "safedrug-archived"
+source_id = "safedrug-main"
 role = "canonical_model"
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
 
 [[evidence]]
-evidence_id = "safedrug-archived-readme"
+evidence_id = "safedrug-main"
 claims = ["source", "task", "split", "evaluation", "lineage.model_core", "lineage.data_processing", "lineage.split_selection", "lineage.evaluation_reporting"]
-source_id = "safedrug-archived"
+source_id = "safedrug-main"
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/ycq091044/SafeDrug/8deee38cfdb2a38882377ff95cce5922d6d9e8d6/README.md"
-content = "The SafeDrug archived branch documents IJCAI21 reproduction and includes Leap.py and Retain.py baselines."
-content_sha256 = "3a81117049140bf26a58be541e56f11da53e578cbedd517dd0c81964d7311e84"
-
-[[evidence]]
-evidence_id = "safedrug-branch-warning"
-claims = ["source"]
-source_id = "safedrug-archived"
-repository = "https://github.com/ycq091044/SafeDrug"
-revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://github.com/ycq091044/SafeDrug/commit/8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-content = "SafeDrug archived revision is retained because later main-branch processing semantics require separate review."
-content_sha256 = "91f62b6a36ef033aefa5ff6936b70a30f61a425d5410527bd9038e56e0b15dc1"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+retrieved_at = "2026-07-14T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/ycq091044/SafeDrug/88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a/src/SafeDrug.py"
+content = "SafeDrug main contains SafeDrug.py with a fixed two-thirds training split, then equal test and evaluation partitions."
+content_sha256 = "0782d37764b11c8703bc872f62ee8e106c82956669d90d91a49b4f4b1a29f9ce"
 
 [[claims]]
 name = "source"
 disposition = "pass"
-evidence_ids = ["safedrug-archived-readme", "safedrug-branch-warning"]
-rationale = "The archived reproduction revision is identified and later processing drift remains explicit."
+evidence_ids = ["safedrug-main"]
+rationale = "The research owner selected the pinned SafeDrug main implementation."
 
 [[claims]]
 name = "license"
 disposition = "unresolved"
 evidence_ids = []
-rationale = "No repository license was verified at the audited revision."
+rationale = "No license determination is asserted for the selected SafeDrug revision."
 
 [[claims]]
 name = "task"
 disposition = "pass"
-evidence_ids = ["safedrug-archived-readme"]
-rationale = "The archived repository documents SafeDrug medication recommendation."
+evidence_ids = ["safedrug-main"]
+rationale = "The selected entry point is a medication-recommendation implementation."
 
 [[claims]]
 name = "split"
-disposition = "unresolved"
-evidence_ids = ["safedrug-archived-readme"]
-rationale = "Exact split and selection behavior remains to be characterized."
+disposition = "pass"
+evidence_ids = ["safedrug-main"]
+rationale = "The selected entry point defines its source-native data partition."
 
 [[claims]]
 name = "evaluation"
-disposition = "unresolved"
-evidence_ids = ["safedrug-archived-readme"]
-rationale = "Evaluation and reporting behavior remains to be characterized."
+disposition = "pass"
+evidence_ids = ["safedrug-main"]
+rationale = "The selected entry point defines source-native evaluation and reporting."
 
 [[lineage]]
 layer = "model_core"
-upstream = "safedrug-archived"
+upstream = "safedrug-main"
 downstream = "safedrug"
-evidence_ids = ["safedrug-archived-readme"]
+evidence_ids = ["safedrug-main"]
 
 [[lineage]]
 layer = "data_processing"
-upstream = "safedrug-archived"
+upstream = "safedrug-main"
 downstream = "safedrug"
-evidence_ids = ["safedrug-archived-readme"]
+evidence_ids = ["safedrug-main"]
 
 [[lineage]]
 layer = "split_selection"
-upstream = "safedrug-archived"
+upstream = "safedrug-main"
 downstream = "safedrug"
-evidence_ids = ["safedrug-archived-readme"]
+evidence_ids = ["safedrug-main"]
 
 [[lineage]]
 layer = "evaluation_reporting"
-upstream = "safedrug-archived"
+upstream = "safedrug-main"
 downstream = "safedrug"
-evidence_ids = ["safedrug-archived-readme"]
+evidence_ids = ["safedrug-main"]

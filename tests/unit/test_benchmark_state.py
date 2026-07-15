@@ -24,16 +24,14 @@ from medrec_research.registry import (
 )
 
 ROOT = Path(__file__).parents[2]
-REVIEW_FIXTURE = ROOT / "fixtures" / "benchmark" / "human-review.json"
-CLASSIC_SIX = (
+FINAL_FIVE = (
     "gamenet",
     "safedrug",
-    "micron",
     "molerec",
     "retain",
     "leap-safedrug",
 )
-PROGRAM = BaselineProgram(program_id="classic-six", candidate_ids=CLASSIC_SIX)
+PROGRAM = BaselineProgram(program_id="final-five", candidate_ids=FINAL_FIVE)
 SCOPE = ComparisonScope(
     protocol_version="1.0",
     dataset_manifest_sha256="d" * 64,
@@ -103,7 +101,7 @@ def _registry_with_qualified(
     comparison_ready_ids: tuple[str, ...] = (),
 ) -> BaselineRegistry:
     baselines = []
-    for ordinal, baseline_id in enumerate(CLASSIC_SIX, start=1):
+    for ordinal, baseline_id in enumerate(FINAL_FIVE, start=1):
         baseline = _registered_baseline(baseline_id)
         if baseline_id in qualified_ids or baseline_id in comparison_ready_ids:
             qualification_scope = SCOPE if baseline_id in qualified_ids else OTHER_SCOPE
@@ -124,17 +122,17 @@ def _registry_with_qualified(
 def test_three_same_scope_qualifications_do_not_require_review() -> None:
     state = derive_benchmark_state(
         program=PROGRAM,
-        registry=_registry_with_qualified(*CLASSIC_SIX[:3]),
+        registry=_registry_with_qualified(*FINAL_FIVE[:3]),
         scope=SCOPE,
     )
 
-    assert state.qualified_baseline_ids == CLASSIC_SIX[:3]
+    assert state.qualified_baseline_ids == FINAL_FIVE[:3]
     assert state.review_state is HumanReviewState.NOT_REQUIRED
     assert not state.discovery_eligible
 
 
 def test_four_same_scope_qualifications_require_content_addressed_review() -> None:
-    registry = _registry_with_qualified(*CLASSIC_SIX[:4])
+    registry = _registry_with_qualified(*FINAL_FIVE[:4])
     pending = derive_benchmark_state(program=PROGRAM, registry=registry, scope=SCOPE)
 
     assert pending.review_state is HumanReviewState.PENDING
@@ -156,13 +154,12 @@ def test_four_same_scope_qualifications_require_content_addressed_review() -> No
 
     assert accepted.review_state is HumanReviewState.ACCEPTED
     assert not accepted.discovery_eligible
-    assert HumanReviewRecord.load(REVIEW_FIXTURE).review_id
 
 
 def test_global_readiness_does_not_cross_comparison_scopes() -> None:
     registry = _registry_with_qualified(
-        *CLASSIC_SIX[:3],
-        comparison_ready_ids=CLASSIC_SIX,
+        *FINAL_FIVE[:3],
+        comparison_ready_ids=FINAL_FIVE,
     )
 
     state = derive_benchmark_state(program=PROGRAM, registry=registry, scope=SCOPE)
@@ -171,22 +168,22 @@ def test_global_readiness_does_not_cross_comparison_scopes() -> None:
     assert state.review_state is HumanReviewState.NOT_REQUIRED
 
 
-def test_six_qualifications_still_require_review() -> None:
+def test_five_qualifications_still_require_review() -> None:
     state = derive_benchmark_state(
         program=PROGRAM,
-        registry=_registry_with_qualified(*CLASSIC_SIX),
+        registry=_registry_with_qualified(*FINAL_FIVE),
         scope=SCOPE,
     )
 
-    assert state.qualified_count == 6
+    assert state.qualified_count == 5
     assert state.review_state is HumanReviewState.PENDING
     assert not state.discovery_eligible
 
 
 def test_later_fifth_and_sixth_qualifications_preserve_accepted_review() -> None:
     four_registry = _registry_with_qualified(
-        *CLASSIC_SIX[:4],
-        comparison_ready_ids=CLASSIC_SIX,
+        *FINAL_FIVE[:4],
+        comparison_ready_ids=FINAL_FIVE,
     )
     four_state = derive_benchmark_state(program=PROGRAM, registry=four_registry, scope=SCOPE)
     review = HumanReviewRecord.create(
@@ -198,8 +195,8 @@ def test_later_fifth_and_sixth_qualifications_preserve_accepted_review() -> None
         issued_at="2026-07-11T00:00:00Z",
     )
     six_registry = _registry_with_qualified(
-        *CLASSIC_SIX,
-        comparison_ready_ids=CLASSIC_SIX,
+        *FINAL_FIVE,
+        comparison_ready_ids=FINAL_FIVE,
     )
 
     six_state = derive_benchmark_state(
@@ -215,7 +212,7 @@ def test_later_fifth_and_sixth_qualifications_preserve_accepted_review() -> None
 
 
 def test_program_definition_or_reviewed_qualification_drift_returns_to_pending() -> None:
-    registry = _registry_with_qualified(*CLASSIC_SIX[:4])
+    registry = _registry_with_qualified(*FINAL_FIVE[:4])
     state = derive_benchmark_state(program=PROGRAM, registry=registry, scope=SCOPE)
     review = HumanReviewRecord.create(
         scope=SCOPE,
@@ -264,7 +261,7 @@ def test_program_definition_or_reviewed_qualification_drift_returns_to_pending()
 
 
 def test_registry_entries_outside_program_do_not_affect_state_or_review() -> None:
-    registry = _registry_with_qualified(*CLASSIC_SIX[:4])
+    registry = _registry_with_qualified(*FINAL_FIVE[:4])
     state = derive_benchmark_state(program=PROGRAM, registry=registry, scope=SCOPE)
     review = HumanReviewRecord.create(
         scope=SCOPE,

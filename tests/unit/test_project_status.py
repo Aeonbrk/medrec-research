@@ -48,10 +48,9 @@ from medrec_research.registry import BaselineRegistry
 from .test_benchmark_state import _registry_with_qualified
 
 NOW = datetime(2026, 7, 11, 1, 2, 3, tzinfo=UTC)
-CLASSIC_SIX = (
+FINAL_FIVE = (
     "gamenet",
     "safedrug",
-    "micron",
     "molerec",
     "retain",
     "leap-safedrug",
@@ -90,7 +89,7 @@ def _payload(
             display_name=candidate_id,
             readiness="comparison_ready" if ordinal < qualified_count else "registered",
             source_gate="pass",
-            license_gate="pass" if candidate_id not in {"safedrug", "micron"} else "unresolved",
+            license_gate="pass" if candidate_id != "safedrug" else "unresolved",
             evidence=(
                 EvidenceLink(
                     label=f"{candidate_id}-source",
@@ -98,7 +97,7 @@ def _payload(
                 ),
             ),
         )
-        for ordinal, candidate_id in enumerate(CLASSIC_SIX)
+        for ordinal, candidate_id in enumerate(FINAL_FIVE)
     )
     lineage = tuple(
         LineageStatus(
@@ -154,10 +153,10 @@ def test_snapshot_is_deterministic_content_addressed_and_round_trips() -> None:
 
 
 def test_publisher_projects_existing_authorities_without_advancing_them() -> None:
-    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "final-five.toml")
     audits = tuple(
         BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
-        for candidate_id in CLASSIC_SIX
+        for candidate_id in FINAL_FIVE
     )
     registry = BaselineRegistry.load(ROOT / "baselines" / "registry.toml")
     reviews = AuditReviewSet.load(ROOT / "fixtures" / "benchmark" / "audit-reviews.json")
@@ -195,10 +194,10 @@ def test_publisher_projects_existing_authorities_without_advancing_them() -> Non
 
 
 def test_live_benchmark_authority_rejects_drifted_selection_authorities() -> None:
-    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "final-five.toml")
     audits = tuple(
         BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
-        for candidate_id in CLASSIC_SIX
+        for candidate_id in FINAL_FIVE
     )
     reviews = AuditReviewSet.load(ROOT / "fixtures" / "benchmark" / "audit-reviews.json")
     registry = BaselineRegistry.load(ROOT / "baselines" / "registry.toml")
@@ -325,17 +324,17 @@ def test_live_benchmark_authority_rejects_drifted_selection_authorities() -> Non
 
 
 def test_blocked_current_selection_suppresses_discovery() -> None:
-    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "final-five.toml")
     audits = tuple(
         BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
-        for candidate_id in CLASSIC_SIX
+        for candidate_id in FINAL_FIVE
     )
     scope = ComparisonScope(
         protocol_version="1.0",
         dataset_manifest_sha256="d" * 64,
         adaptation_budget_sha256="a" * 64,
     )
-    registry = _registry_with_qualified(*CLASSIC_SIX)
+    registry = _registry_with_qualified(*FINAL_FIVE)
     state = derive_benchmark_state(program=program, registry=registry, scope=scope)
     review = HumanReviewRecord.create(
         scope=scope,
@@ -375,10 +374,10 @@ def test_blocked_current_selection_suppresses_discovery() -> None:
 
 
 def test_reproduction_characterization_requires_current_selection_acceptance() -> None:
-    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "classic-six.toml")
+    program = BaselineProgram.load(ROOT / "baselines" / "programs" / "final-five.toml")
     audits = tuple(
         BaselineAudit.load(ROOT / "baselines" / "audits" / f"{candidate_id}.toml")
-        for candidate_id in CLASSIC_SIX
+        for candidate_id in FINAL_FIVE
     )
     reviews = AuditReviewSet.load(ROOT / "fixtures" / "benchmark" / "audit-reviews.json")
     selection = SelectionResult.load(ROOT / "fixtures" / "benchmark" / "selection-result.json")
@@ -549,7 +548,7 @@ def test_medrec_milestones_are_projected_from_scoped_benchmark_state() -> None:
         review_state=HumanReviewState.PENDING,
     )
     eligible = _payload(
-        qualified_count=6,
+        qualified_count=5,
         review_state=HumanReviewState.ACCEPTED,
         discovery_eligible=True,
     )
@@ -557,7 +556,7 @@ def test_medrec_milestones_are_projected_from_scoped_benchmark_state() -> None:
     assert pending.stage is ProjectStage.REVIEW_PENDING
     assert eligible.stage is ProjectStage.DISCOVERY_ELIGIBLE
     assert pending.qualified_count == 4
-    assert eligible.qualified_count == 6
+    assert eligible.qualified_count == 5
 
 
 def test_shared_lineage_is_a_four_layer_projection_not_replication_evidence() -> None:
@@ -636,9 +635,9 @@ def test_primary_blocker_and_next_action_are_permutation_invariant() -> None:
     blockers = (
         StatusBlocker(BlockerCategory.REMOTE_PREFLIGHT, "remote_preflight_expired"),
         StatusBlocker(BlockerCategory.READINESS, "comparison_scope_incomplete", "retain"),
-        StatusBlocker(BlockerCategory.SOURCE_LICENSE, "license_not_pass", "safedrug"),
+        StatusBlocker(BlockerCategory.SOURCE_LICENSE, "license_not_pass", "gamenet"),
         StatusBlocker(BlockerCategory.AUTHORIZATION, "authorization_missing"),
-        StatusBlocker(BlockerCategory.SOURCE_LICENSE, "license_not_pass", "micron"),
+        StatusBlocker(BlockerCategory.SOURCE_LICENSE, "license_not_pass", "safedrug"),
     )
 
     observed = {

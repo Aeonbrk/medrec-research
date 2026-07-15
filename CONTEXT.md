@@ -133,7 +133,7 @@ _Avoid_: Model output, result row
 _Avoid_: README 摘要, 可运行证明
 
 **Selection Result**:
-固定 V1 scorecard 对完整六候选审计、审核和 diagnostics 的内容寻址投影。优先顺序不能绕过来源或许可证硬门。
+固定 V1 scorecard 对完整 final-five 审计、审核和 diagnostics 的内容寻址投影。优先顺序不能绕过来源或许可证硬门。
 _Avoid_: 运行队列, 实验结论
 
 **Selection Acceptance**:

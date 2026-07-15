@@ -303,9 +303,11 @@ function renderStatus(status) {
   elements["condition-label"].textContent = status.condition;
   elements["freshness-label"].textContent = `有效至 ${requiredString(status.valid_until, "valid_until")}`;
   const qualified = status.payload.qualified_count;
-  elements["qualified-value"].textContent = `${qualified} / 6`;
+  const candidateCount = status.payload.candidates.length;
+  elements["qualified-value"].textContent = `${qualified} / ${candidateCount}`;
+  elements["readiness-progress"].max = candidateCount;
   elements["readiness-progress"].value = qualified;
-  elements["readiness-progress"].textContent = `${qualified} / 6`;
+  elements["readiness-progress"].textContent = `${qualified} / ${candidateCount}`;
   elements["review-value"].textContent = requiredString(status.payload.review_state, "review_state");
   elements["snapshot-value"].textContent = status.snapshot_sha256;
   elements["authority-value"].textContent = status.authorities

@@ -1,97 +1,76 @@
 schema_version = 1
 baseline_id = "gamenet"
-display_name = "GAMENet"
-identity_kind = "canonical"
+display_name = "GAMENet (SafeDrug main)"
+identity_kind = "derivative"
+derivative_of = "gamenet-original"
 
 [[sources]]
-source_id = "gamenet-source"
-role = "canonical_model"
-repository = "https://github.com/sjy1203/GAMENet"
-revision = "da695b4fc9390882f3a681c82115e81291ae6380"
+source_id = "safedrug-main-gamenet"
+role = "medication_comparison"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
 
 [[evidence]]
-evidence_id = "gamenet-readme"
+evidence_id = "safedrug-main-gamenet"
 claims = ["source", "task", "split", "evaluation", "lineage.model_core", "lineage.data_processing", "lineage.split_selection", "lineage.evaluation_reporting"]
-source_id = "gamenet-source"
-repository = "https://github.com/sjy1203/GAMENet"
-revision = "da695b4fc9390882f3a681c82115e81291ae6380"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/sjy1203/GAMENet/da695b4fc9390882f3a681c82115e81291ae6380/README.md"
-content = "GAMENet repository describes itself as code for reproducing medication prediction results."
-content_sha256 = "ec0005f7cb705d72d2f24e95f75c255536781aeff63d08fddd1fd5bd49170ecc"
-
-[[evidence]]
-evidence_id = "gamenet-license"
-claims = ["license"]
-source_id = "gamenet-source"
-repository = "https://github.com/sjy1203/GAMENet"
-revision = "da695b4fc9390882f3a681c82115e81291ae6380"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/sjy1203/GAMENet/da695b4fc9390882f3a681c82115e81291ae6380/LICENSE"
-content = "MIT License, Copyright (c) 2018 Junyuan Shang."
-content_sha256 = "87ddc96ec193c7525141444bca31beb6c313ba76ff0dc7c36bf1cb798f4d61cf"
-
-[[evidence]]
-evidence_id = "gamenet-baselines"
-claims = ["task"]
-source_id = "gamenet-source"
-repository = "https://github.com/sjy1203/GAMENet"
-revision = "da695b4fc9390882f3a681c82115e81291ae6380"
-retrieved_at = "2026-07-11T00:00:00Z"
-immutable_url = "https://raw.githubusercontent.com/sjy1203/GAMENet/da695b4fc9390882f3a681c82115e81291ae6380/README.md"
-content = "GAMENet README lists LEAP and RETAIN medication-combination comparison baselines."
-content_sha256 = "af41bfb16312d88ab9cb206d353824622503a2ad6d8e3f7e74f4a7cfea96dffa"
+source_id = "safedrug-main-gamenet"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+retrieved_at = "2026-07-14T00:00:00Z"
+immutable_url = "https://raw.githubusercontent.com/ycq091044/SafeDrug/88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a/src/GAMENet.py"
+content = "SafeDrug main contains GAMENet.py with a fixed two-thirds training split, then equal test and evaluation partitions."
+content_sha256 = "310d56354e4fffc78a0e0fe3c94bcb94804a03a4833398d22dc70ea3bd3c2ef9"
 
 [[claims]]
 name = "source"
 disposition = "pass"
-evidence_ids = ["gamenet-readme"]
-rationale = "The author repository and immutable revision are identified."
+evidence_ids = ["safedrug-main-gamenet"]
+rationale = "The research owner selected the pinned SafeDrug main GAMENet implementation."
 
 [[claims]]
 name = "license"
-disposition = "pass"
-evidence_ids = ["gamenet-license"]
-rationale = "The immutable revision contains an MIT license."
+disposition = "unresolved"
+evidence_ids = []
+rationale = "No license determination is asserted for the selected SafeDrug revision."
 
 [[claims]]
 name = "task"
 disposition = "pass"
-evidence_ids = ["gamenet-readme", "gamenet-baselines"]
-rationale = "The repository explicitly targets medication-combination recommendation."
+evidence_ids = ["safedrug-main-gamenet"]
+rationale = "The selected entry point is a medication-recommendation implementation."
 
 [[claims]]
 name = "split"
-disposition = "unresolved"
-evidence_ids = ["gamenet-readme"]
-rationale = "The exact split and selection behavior remains to be characterized."
+disposition = "pass"
+evidence_ids = ["safedrug-main-gamenet"]
+rationale = "The selected entry point defines its source-native data partition."
 
 [[claims]]
 name = "evaluation"
-disposition = "unresolved"
-evidence_ids = ["gamenet-readme"]
-rationale = "Evaluation and reporting behavior remains to be characterized."
+disposition = "pass"
+evidence_ids = ["safedrug-main-gamenet"]
+rationale = "The selected entry point defines source-native evaluation and reporting."
 
 [[lineage]]
 layer = "model_core"
-upstream = "gamenet-source"
+upstream = "safedrug-main-gamenet"
 downstream = "gamenet"
-evidence_ids = ["gamenet-readme"]
+evidence_ids = ["safedrug-main-gamenet"]
 
 [[lineage]]
 layer = "data_processing"
-upstream = "gamenet-source"
+upstream = "safedrug-main-gamenet"
 downstream = "gamenet"
-evidence_ids = ["gamenet-readme"]
+evidence_ids = ["safedrug-main-gamenet"]
 
 [[lineage]]
 layer = "split_selection"
-upstream = "gamenet-source"
+upstream = "safedrug-main-gamenet"
 downstream = "gamenet"
-evidence_ids = ["gamenet-readme"]
+evidence_ids = ["safedrug-main-gamenet"]
 
 [[lineage]]
 layer = "evaluation_reporting"
-upstream = "gamenet-source"
+upstream = "safedrug-main-gamenet"
 downstream = "gamenet"
-evidence_ids = ["gamenet-readme"]
+evidence_ids = ["safedrug-main-gamenet"]
