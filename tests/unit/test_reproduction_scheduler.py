@@ -96,6 +96,24 @@ def test_non_waivable_exceptions_block_and_repairs_are_budgeted() -> None:
     assert route_exception(endpoint, budget)[0] is ExceptionDisposition.CONTINUE
 
 
+def test_unscoped_non_waivable_exception_blocks_the_schedule() -> None:
+    decision = deterministic_schedule(
+        _lanes(),
+        resource_ceiling=ResourceCeiling(cpu_hours=4, gpu_count=1, memory_gb=8),
+        exceptions=(
+            ExceptionRecord(
+                exception_id="authority-block",
+                kind=ExceptionKind.AUTHORITY,
+                description="remote preflight is not current",
+            ),
+        ),
+    )
+
+    assert decision.ready_lane_ids == ()
+    assert decision.blocked_lane_ids == decision.logical_lane_ids
+    assert decision.next_lane_id is None
+
+
 def test_scheduler_rejects_a_lane_that_cannot_fit_the_ceiling() -> None:
     oversized = LaneSpec(
         lane_id="lane-oversized",

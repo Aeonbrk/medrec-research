@@ -80,6 +80,8 @@ def _qualification(scope: ComparisonScope, digit: str) -> ComparisonQualificatio
         protocol_version=scope.protocol_version,
         dataset_manifest_sha256=scope.dataset_manifest_sha256,
         adaptation_budget_sha256=scope.adaptation_budget_sha256,
+        protocol_amendment_sha256=scope.protocol_amendment_sha256,
+        method_profile_sha256=scope.method_profile_sha256,
         evidence=(
             ReadinessEvidence(ReadinessGate.ADAPTATION_BUDGET, scope.adaptation_budget_sha256),
             ReadinessEvidence(ReadinessGate.COHORT_IDENTITY, digit * 64),
@@ -99,12 +101,13 @@ def _qualification(scope: ComparisonScope, digit: str) -> ComparisonQualificatio
 def _registry_with_qualified(
     *qualified_ids: str,
     comparison_ready_ids: tuple[str, ...] = (),
+    scope: ComparisonScope = SCOPE,
 ) -> BaselineRegistry:
     baselines = []
     for ordinal, baseline_id in enumerate(FINAL_FIVE, start=1):
         baseline = _registered_baseline(baseline_id)
         if baseline_id in qualified_ids or baseline_id in comparison_ready_ids:
-            qualification_scope = SCOPE if baseline_id in qualified_ids else OTHER_SCOPE
+            qualification_scope = scope if baseline_id in qualified_ids else OTHER_SCOPE
             baseline = baseline.advance_readiness(
                 BaselineReadiness.SMOKE_READY,
                 evidence=(
@@ -117,6 +120,23 @@ def _registry_with_qualified(
             )
         baselines.append(baseline)
     return BaselineRegistry(tuple(baselines))
+
+
+def test_v1_1_qualification_matches_complete_scope_identity() -> None:
+    scope = ComparisonScope(
+        protocol_version="1.1",
+        dataset_manifest_sha256="d" * 64,
+        adaptation_budget_sha256="a" * 64,
+        protocol_amendment_sha256="1" * 64,
+        method_profile_sha256="2" * 64,
+    )
+    state = derive_benchmark_state(
+        program=PROGRAM,
+        registry=_registry_with_qualified(*FINAL_FIVE, scope=scope),
+        scope=scope,
+    )
+
+    assert state.qualified_baseline_ids == FINAL_FIVE
 
 
 def test_three_same_scope_qualifications_do_not_require_review() -> None:

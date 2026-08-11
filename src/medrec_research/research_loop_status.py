@@ -11,6 +11,7 @@ from ._validation import (
     content_sha256,
     parse_json_object,
     require_identifier,
+    require_sha256,
     require_single_line_public_string,
     strict_fields,
 )
@@ -171,11 +172,8 @@ class ResearchLoopStatus:
     SCHEMA_VERSION = 1
 
     def __post_init__(self) -> None:
-        if self.contract_sha256 is not None and (
-            len(self.contract_sha256) != 64
-            or any(char not in "0123456789abcdef" for char in self.contract_sha256)
-        ):
-            raise ProtocolValidationError("loop contract_sha256 must be a SHA-256 digest")
+        if self.contract_sha256 is not None:
+            require_sha256(self.contract_sha256, field="loop.contract_sha256")
         if type(self.h1_current) is not bool or type(self.stale) is not bool:
             raise ProtocolValidationError("loop h1_current and stale must be boolean")
         lanes = tuple(
@@ -188,10 +186,7 @@ class ResearchLoopStatus:
         object.__setattr__(self, "blockers", _strings(self.blockers, field="loop.blockers"))
         expected = content_sha256(self._protected_payload())
         if self.status_sha256:
-            if len(self.status_sha256) != 64 or any(
-                char not in "0123456789abcdef" for char in self.status_sha256
-            ):
-                raise ProtocolValidationError("loop status_sha256 must be a SHA-256 digest")
+            require_sha256(self.status_sha256, field="loop.status_sha256")
             if self.status_sha256 != expected:
                 raise ProtocolValidationError("loop status_sha256 does not match snapshot content")
         else:

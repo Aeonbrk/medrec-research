@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import http.client
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 from threading import Thread
@@ -71,6 +72,11 @@ def test_research_loop_route_is_read_only_and_fail_closed(tmp_path: Path) -> Non
         loop_path.write_text("{}", encoding="utf-8")
         unavailable, _ = _get(host, "/api/research-loop")
         assert unavailable == 503
+
+        numeric_digest = json.loads(_status_path(tmp_path).read_text(encoding="utf-8"))
+        numeric_digest["contract_sha256"] = 7
+        loop_path.write_text(json.dumps(numeric_digest), encoding="utf-8")
+        assert _get(host, "/api/research-loop")[0] == 503
     finally:
         server.shutdown()
         server.server_close()

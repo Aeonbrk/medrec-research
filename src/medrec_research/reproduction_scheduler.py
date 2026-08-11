@@ -399,7 +399,8 @@ def schedule_lanes(
     ordered = tuple(sorted(lanes, key=lambda lane: (lane.ordinal, lane.lane_id)))
     if not ordered:
         raise ProtocolValidationError("schedule requires at least one lane")
-    if len({lane.lane_id for lane in ordered}) != len(ordered):
+    lane_ids = {lane.lane_id for lane in ordered}
+    if len(lane_ids) != len(ordered):
         raise ProtocolValidationError("lane IDs must be unique")
     budget = repair_budget or RepairBudget()
     dispositions: list[tuple[str, ExceptionDisposition]] = []
@@ -419,10 +420,11 @@ def schedule_lanes(
         else:
             ready.append(lane)
     if blocked_by_exception and ready:
-        # Exception records are public-safe and do not carry patient or lane
-        # references; a non-waivable exception blocks only the caller's lane
-        # when explicitly named by the exception ID convention.
-        ready = [lane for lane in ready if lane.lane_id not in blocked_by_exception]
+        if blocked_by_exception - lane_ids:
+            blocked.extend(ready)
+            ready = []
+        else:
+            ready = [lane for lane in ready if lane.lane_id not in blocked_by_exception]
     next_lane = ready[0] if ready else None
     admitted = (
         ResourceCeiling(
