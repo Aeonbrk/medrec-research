@@ -109,6 +109,8 @@ class ComparisonQualification:
     dataset_manifest_sha256: str
     adaptation_budget_sha256: str
     evidence: tuple[ReadinessEvidence, ...]
+    protocol_amendment_sha256: str | None = None
+    method_profile_sha256: str | None = None
 
     def __post_init__(self) -> None:
         require_public_string(self.protocol_version, field="protocol_version")
@@ -120,6 +122,10 @@ class ComparisonQualification:
             self.adaptation_budget_sha256,
             field="adaptation_budget_sha256",
         )
+        for field in ("protocol_amendment_sha256", "method_profile_sha256"):
+            value = getattr(self, field)
+            if value is not None:
+                require_sha256(value, field=field)
         evidence = tuple(
             item if isinstance(item, ReadinessEvidence) else ReadinessEvidence.from_dict(item)
             for item in self.evidence
@@ -156,24 +162,35 @@ class ComparisonQualification:
         protocol_version: str,
         dataset_manifest_sha256: str,
         adaptation_budget_sha256: str,
+        protocol_amendment_sha256: str | None = None,
+        method_profile_sha256: str | None = None,
     ) -> bool:
         return ComparisonScope(
             protocol_version=self.protocol_version,
             dataset_manifest_sha256=self.dataset_manifest_sha256,
             adaptation_budget_sha256=self.adaptation_budget_sha256,
+            protocol_amendment_sha256=self.protocol_amendment_sha256,
+            method_profile_sha256=self.method_profile_sha256,
         ).matches(
             protocol_version=protocol_version,
             dataset_manifest_sha256=dataset_manifest_sha256,
             adaptation_budget_sha256=adaptation_budget_sha256,
+            protocol_amendment_sha256=protocol_amendment_sha256,
+            method_profile_sha256=method_profile_sha256,
         )
 
     def to_dict(self) -> dict[str, object]:
-        return {
+        payload: dict[str, object] = {
             "adaptation_budget_sha256": self.adaptation_budget_sha256,
             "dataset_manifest_sha256": self.dataset_manifest_sha256,
             "evidence": [item.to_dict() for item in self.evidence],
             "protocol_version": self.protocol_version,
         }
+        if self.protocol_amendment_sha256 is not None:
+            payload["protocol_amendment_sha256"] = self.protocol_amendment_sha256
+        if self.method_profile_sha256 is not None:
+            payload["method_profile_sha256"] = self.method_profile_sha256
+        return payload
 
     @classmethod
     def from_dict(cls, value: object) -> ComparisonQualification:
@@ -185,6 +202,7 @@ class ComparisonQualification:
                 "adaptation_budget_sha256",
                 "evidence",
             ),
+            optional=("method_profile_sha256", "protocol_amendment_sha256"),
             context="Comparison Qualification",
         )
         evidence = payload["evidence"]
@@ -195,6 +213,8 @@ class ComparisonQualification:
             dataset_manifest_sha256=payload["dataset_manifest_sha256"],
             adaptation_budget_sha256=payload["adaptation_budget_sha256"],
             evidence=tuple(ReadinessEvidence.from_dict(item) for item in evidence),
+            protocol_amendment_sha256=payload.get("protocol_amendment_sha256"),
+            method_profile_sha256=payload.get("method_profile_sha256"),
         )
 
 
@@ -318,6 +338,8 @@ class BaselineDefinition:
                 item.protocol_version,
                 item.dataset_manifest_sha256,
                 item.adaptation_budget_sha256,
+                item.protocol_amendment_sha256,
+                item.method_profile_sha256,
             )
             for item in qualifications
         }
@@ -384,12 +406,16 @@ class BaselineDefinition:
         protocol_version: str,
         dataset_manifest_sha256: str,
         adaptation_budget_sha256: str,
+        protocol_amendment_sha256: str | None = None,
+        method_profile_sha256: str | None = None,
     ) -> bool:
         return self.is_comparable and any(
             qualification.matches(
                 protocol_version=protocol_version,
                 dataset_manifest_sha256=dataset_manifest_sha256,
                 adaptation_budget_sha256=adaptation_budget_sha256,
+                protocol_amendment_sha256=protocol_amendment_sha256,
+                method_profile_sha256=method_profile_sha256,
             )
             for qualification in self.comparison_qualifications
         )

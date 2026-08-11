@@ -21,6 +21,7 @@ from .action_gate import (
 )
 from .errors import ProtocolValidationError
 from .project_status import AuthorityDigest, ProjectStatus, SnapshotCondition, load_status
+from .research_loop_status import load_research_loop
 
 _BODY_LIMIT = 16 * 1024
 _HOST = "127.0.0.1"
@@ -63,12 +64,14 @@ class _HarnessServer(ThreadingHTTPServer):
         clock: Clock,
         actions_enabled: bool,
         authority_bundle_path: Path | None,
+        research_loop_path: Path | None,
     ) -> None:
         self.status_path = status_path
         self.expected_authorities = expected_authorities
         self.clock = clock
         self.actions_enabled = actions_enabled
         self.authority_bundle_path = authority_bundle_path
+        self.research_loop_path = research_loop_path
         self._last_known_good: ProjectStatus | None = None
         self._status_lock = Lock()
         super().__init__(address, _HarnessHandler)
@@ -229,6 +232,33 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 return
             self._send_bytes(HTTPStatus.OK, body, content_type)
             return
+        if self.path == "/api/research-loop":
+            if self.server.research_loop_path is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("research_loop_unavailable"),
+                )
+                return
+            try:
+                loop = load_research_loop(self.server.research_loop_path)
+            except ProtocolValidationError:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("research_loop_unavailable"),
+                )
+                return
+            if not loop.is_current or loop.stale or not loop.h1_current:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("research_loop_unavailable"),
+                )
+                return
+            self._send_bytes(
+                HTTPStatus.OK,
+                loop.to_json().encode("ascii"),
+                f"{_JSON_TYPE}; charset=utf-8",
+            )
+            return
         if self.path not in {"/api/status", "/api/action-context", "/api/harness-state"}:
             self._send_json(HTTPStatus.NOT_FOUND, _error_payload("route_not_found"))
             return
@@ -341,6 +371,7 @@ def create_harness_server(
     port: int = 0,
     actions_enabled: bool = False,
     authority_bundle_path: str | Path | None = None,
+    research_loop_path: str | Path | None = None,
 ) -> ThreadingHTTPServer:
     """Create an unstarted server with explicit status and action authority."""
 
@@ -359,6 +390,7 @@ def create_harness_server(
         authority_bundle_path=(
             Path(authority_bundle_path) if authority_bundle_path is not None else None
         ),
+        research_loop_path=Path(research_loop_path) if research_loop_path is not None else None,
     )
 
 

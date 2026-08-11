@@ -75,6 +75,8 @@ const elements = Object.fromEntries(
     "condition-label",
     "freshness-label",
     "lineage-body",
+    "loop-body",
+    "loop-summary",
     "live-assertive",
     "live-polite",
     "main-content",
@@ -96,6 +98,8 @@ const elements = Object.fromEntries(
 
 let currentRequestId = null;
 let inFlight = false;
+let researchLoopGeneration = 0;
+let researchLoopController = null;
 
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -158,6 +162,48 @@ function validateHarnessState(value) {
     context: validateContext(value.action_context),
     status: validateStatus(value.status),
   };
+}
+
+function validateResearchLoop(value) {
+  if (!isRecord(value) || value.kind !== "research_loop_status" || value.schema_version !== 1) {
+    throw new Error("malformed:research_loop");
+  }
+  requiredString(value.status_sha256, "loop.status_sha256");
+  if (value.contract_sha256 !== null) requiredString(value.contract_sha256, "loop.contract_sha256");
+  if (typeof value.h1_current !== "boolean" || typeof value.stale !== "boolean" || !Array.isArray(value.lanes) || !Array.isArray(value.blockers)) {
+    throw new Error("malformed:research_loop_fields");
+  }
+  value.lanes.forEach((lane) => {
+    if (!isRecord(lane)) throw new Error("malformed:research_lane");
+    ["lane_id", "model_id", "stage", "attempt_status", "conclusion"].forEach((field) => requiredString(lane[field], `loop.${field}`));
+    ["packet_complete", "h2_go_eligible", "current"].forEach((field) => {
+      if (typeof lane[field] !== "boolean") throw new Error("malformed:research_lane_flags");
+    });
+    if (lane.h2_action !== null) requiredString(lane.h2_action, "loop.h2_action");
+    if (!Array.isArray(lane.blockers) || !Array.isArray(lane.evidence_urls)) throw new Error("malformed:research_lane_lists");
+  });
+  return value;
+}
+
+function renderResearchLoop(loop) {
+  const state = loop.stale ? "stale" : loop.h1_current ? "current" : "blocked";
+  elements["loop-summary"].textContent = loop.stale
+    ? "H1 或证据包不是当前版本；浏览器仅显示状态。"
+    : `H1 当前；可审查通道 ${loop.lanes.filter((lane) => lane.h2_go_eligible).length} 个。`;
+  elements["loop-body"].replaceChildren();
+  loop.lanes.forEach((lane) => {
+    const row = document.createElement("tr");
+    row.append(
+      textCell("模型 / 通道", `${lane.model_id} · ${lane.lane_id}`),
+      textCell("阶段", lane.stage),
+      gateCell("数据包", lane.packet_complete ? "pass" : "fail"),
+      gateCell("结论", lane.conclusion),
+      gateCell("H2 go", lane.h2_go_eligible ? "pass" : "unresolved"),
+      textCell("阻塞", lane.blockers.join("、") || "无")
+    );
+    elements["loop-body"].append(row);
+  });
+  elements["loop-summary"].dataset.loopState = state;
 }
 
 function safeEvidenceUrl(value) {
@@ -399,12 +445,14 @@ async function fetchJson(path, options) {
 }
 
 async function loadHarness({ focusAfter = false } = {}) {
+  clearResearchLoop("正在载入研究循环状态。");
   resetAction();
   setState("loading", "正在载入项目状态。", { announceChange: false });
   try {
     const state = validateHarnessState(await fetchJson("/api/harness-state"));
     renderStatus(state.status);
     configureAction(state.status, state.context, focusAfter);
+    loadResearchLoop();
   } catch (error) {
     const malformed = error instanceof Error && error.message.startsWith("malformed:");
     const state = malformed ? "malformed" : "transport";
@@ -417,6 +465,41 @@ async function loadHarness({ focusAfter = false } = {}) {
     elements["retry-button"].hidden = false;
     setState(state, message, { focus: focusAfter ? elements["retry-button"] : null });
   }
+}
+
+async function loadResearchLoop() {
+  const generation = ++researchLoopGeneration;
+  if (researchLoopController !== null) researchLoopController.abort();
+  const controller = new AbortController();
+  researchLoopController = controller;
+  elements["loop-summary"].textContent = "正在载入研究循环状态。";
+  elements["loop-body"].replaceChildren();
+  try {
+    renderResearchLoop(
+      validateResearchLoop(
+        await fetchJson("/api/research-loop", { signal: controller.signal })
+      )
+    );
+  } catch (error) {
+    if (generation !== researchLoopGeneration || error?.name === "AbortError") return;
+    elements["loop-summary"].textContent = "研究循环状态不可用；请通过受控流程核验。";
+    elements["loop-body"].replaceChildren();
+    const row = document.createElement("tr");
+    row.append(textCell("研究循环", "不可用"));
+    elements["loop-body"].append(row);
+  } finally {
+    if (generation === researchLoopGeneration) researchLoopController = null;
+  }
+}
+
+function clearResearchLoop(message) {
+  researchLoopGeneration += 1;
+  if (researchLoopController !== null) {
+    researchLoopController.abort();
+    researchLoopController = null;
+  }
+  elements["loop-summary"].textContent = message;
+  elements["loop-body"].replaceChildren();
 }
 
 async function requestAction() {

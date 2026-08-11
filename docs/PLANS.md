@@ -1,5 +1,20 @@
 # Plans
 
+## Accepted: Researcher HITL Reproduction Decision Loop
+
+- **Status**: implementation-ready plan enriched on `2026-08-10`; local synthetic implementation may proceed, while real-data and 319 execution remain gated.
+- **Plan**: `docs/plans/2026-07-16-011-feat-researcher-hitl-reproduction-loop-plan.md`.
+- **Scope**: one researcher-controlled SafeDrug four-model Reproduction Mode batch at `88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a`, staged MoleRec replay and retraining at `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, and separate five-model Comparison Qualification under a SafeDrug-main-derived protocol scope.
+- **Success target**: one shared H1 freezes common batch authority, each model or MoleRec stage receives independent QA/QC, conclusion, Decision Packet, and H2, and only scope-qualified evidence may enter fair comparison.
+- **Execution boundary**: requirements and audit only; no runtime, remote, real-data, training, registry, or baseline-source change has been authorized by this plan artifact.
+
+## Active: First-Principles Research Practice Guide Review
+
+- **Status**: active on `2026-07-15`; reviewing the current worktree version of the research-practice guide through the `ce-doc-review` workflow.
+- **Plan**: `docs/plans/2026-07-15-010-docs-first-principles-research-practice-review.md`.
+- **Execution boundary**: documentation-only review of `docs/guides/first-principles-research-practice.md`; no research data, model, baseline, remote, or runtime changes.
+- **Evidence target**: role-specific findings, an independent cross-model review where available, and Markdown validation after any accepted edits.
+
 ## Completed: Private Tailscale SSH Connectivity
 
 - **Status**: completed on `2026-07-14`; configured and verified a private relay-to-target SSH path outside Git, without recording host identifiers, Tailnet node identities, keys, or credentials.
