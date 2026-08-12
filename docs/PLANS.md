@@ -1,5 +1,13 @@
 # Plans
 
+## Completed: React Research Console Rebuild
+
+- **Status**: completed locally on `2026-08-12` in the isolated `codex/shadcn-ui-rebuild` worktree; independent PR pending review.
+- **Plan**: `docs/plans/2026-08-12-012-feat-react-research-console-plan.md`.
+- **Scope**: replace the zero-build harness UI with a Chinese-first React, Vite, Tailwind CSS v4, and shadcn/ui console while preserving every API schema, research-state meaning, and action-gate behavior.
+- **Execution boundary**: local public-safe UI, synthetic fixtures, packaging, and browser verification only; no real-data, training, GPU, remote execution, new endpoint, or scientific-authority change.
+- **Evidence**: Python and frontend gates, production Playwright/axe, rebuild drift, clean-wheel/no-Node smoke, and desktop production Lighthouse `99/100/100` for Performance/Accessibility/Best Practices.
+
 ## Accepted: Researcher HITL Reproduction Decision Loop
 
 - **Status**: implementation-ready plan enriched on `2026-08-10`; local synthetic implementation may proceed, while real-data and 319 execution remain gated.

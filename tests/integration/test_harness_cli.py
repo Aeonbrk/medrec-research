@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import http.client
 import json
+import re
 import signal
 import socket
 import subprocess
@@ -99,6 +100,7 @@ def _running_server(
     actions_enabled: bool = False,
     bundle: AuthorityBundle | None = None,
     authority_bundle_path: Path | None = None,
+    research_loop_path: Path | None = None,
     now: datetime = NOW,
     clock: Callable[[], datetime] | None = None,
 ) -> Iterator[tuple[object, str]]:
@@ -112,6 +114,7 @@ def _running_server(
         clock=clock or (lambda: now),
         actions_enabled=actions_enabled,
         authority_bundle_path=authority_bundle_path,
+        research_loop_path=research_loop_path,
         port=0,
     )
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -160,18 +163,41 @@ def test_root_assets_and_status_are_read_only_package_resources(status_path: Pat
     before = status_path.read_bytes()
     with _running_server(status_path) as (_, host):
         root = _request(host, "GET", "/")
-        css = _request(host, "GET", "/assets/app.css")
-        javascript = _request(host, "GET", "/assets/app.js")
+        html = root[2].decode()
+        asset_paths = re.findall(r'(?:href|src)="(/assets/[^"]+)"', html)
+        assets = [_request(host, "GET", path) for path in asset_paths]
         status = _request(host, "GET", "/api/status")
 
-    assert root[0] == css[0] == javascript[0] == status[0] == 200
-    assert b"MedRec Research Harness" in root[2]
-    assert b"prefers-reduced-motion" in css[2]
-    assert b"innerHTML" not in javascript[2]
+    assert root[0] == status[0] == 200
+    assert asset_paths
+    assert all(asset[0] == 200 for asset in assets)
+    assert "MedRec Research · 研究控制台" in html
+    assert 'lang="zh-CN"' in html
+    assert any(asset[1]["Content-Type"].startswith("text/css") for asset in assets)
+    assert any(asset[1]["Content-Type"].startswith("text/javascript") for asset in assets)
     assert json.loads(status[2])["snapshot_sha256"] == _snapshot().snapshot_sha256
     assert status_path.read_bytes() == before
     assert "Access-Control-Allow-Origin" not in status[1]
     assert status[1]["X-Content-Type-Options"] == "nosniff"
+
+
+def test_hashed_assets_fonts_and_static_path_boundary(status_path: Path) -> None:
+    with _running_server(status_path) as (_, host):
+        html = _request(host, "GET", "/")[2].decode()
+        stylesheet = next(path for path in re.findall(r'href="(/assets/[^"]+\.css)"', html))
+        css = _request(host, "GET", stylesheet)
+        font_name = re.search(rb"geist-mono-latin[^)]*\.woff2", css[2])
+        assert font_name is not None
+        font = _request(host, "GET", f"/assets/{font_name.group().decode()}")
+        traversal = _request(host, "GET", "/assets/../index.html")
+        encoded_traversal = _request(host, "GET", "/assets/%2e%2e/index.html")
+        unknown = _request(host, "GET", "/assets/not-built.js")
+        api_confusion = _request(host, "GET", "/api/index.js")
+
+    assert css[0] == font[0] == 200
+    assert font[1]["Content-Type"] == "font/woff2"
+    assert "font-src 'self'" in css[1]["Content-Security-Policy"]
+    assert traversal[0] == encoded_traversal[0] == unknown[0] == api_confusion[0] == 404
 
 
 @pytest.mark.parametrize(
@@ -580,44 +606,17 @@ def test_non_loopback_bind_and_unsupported_methods_are_blocked(status_path: Path
     assert headers["Allow"] == "GET, POST"
 
 
-def test_ui_assets_declare_all_states_and_accessibility_contract(status_path: Path) -> None:
+def test_ui_entrypoint_declares_accessibility_and_runtime_contract(status_path: Path) -> None:
     with _running_server(status_path) as (_, host):
         html = _request(host, "GET", "/")[2].decode()
-        css = _request(host, "GET", "/assets/app.css")[2].decode()
-        javascript = _request(host, "GET", "/assets/app.js")[2].decode()
+        assets = re.findall(r'(?:href|src)="(/assets/[^"]+)"', html)
 
-    assert html.count("<caption>") == 2
-    assert 'aria-live="polite"' in html
-    assert 'aria-live="assertive"' in html
-    assert 'class="skip-link"' in html
-    for state in (
-        "loading",
-        "no-action",
-        "readonly",
-        "ready",
-        "submitting",
-        "allowed",
-        "blocked",
-        "stale",
-        "degraded",
-        "malformed",
-        "transport",
-    ):
-        assert f'"{state}"' in javascript
-    assert "min-height: 2.75rem" in css
-    assert "@media (min-width: 48rem)" in css
-    assert "@media (prefers-reduced-motion: reduce)" in css
-    assert "parsed.port" in javascript
-    assert 'fetchJson("/api/harness-state")' in javascript
-    assert "request_id: currentRequestId" in javascript
-    configure_action = javascript.split("function configureAction", 1)[1].split(
-        "async function fetchJson", 1
-    )[0]
-    assert "当前动作上下文不可用" in configure_action
-    assert "可重新载入。" in configure_action
-    assert 'elements["retry-button"].hidden = false;' in configure_action
-    assert '"passwd"' in javascript
-    assert '"sig"' in javascript
+    assert '<div id="root"></div>' in html
+    assert assets
+    assert all(path.startswith("/assets/") for path in assets)
+    assert "http://" not in html
+    assert "https://" not in html
+    assert "vite.svg" not in html
 
 
 def test_harness_cli_serves_blocked_decision_and_stops_cleanly(tmp_path: Path) -> None:
