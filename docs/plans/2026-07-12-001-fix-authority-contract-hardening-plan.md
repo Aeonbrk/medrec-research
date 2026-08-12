@@ -110,7 +110,7 @@ The current modules have correct individual record validation but leave cross-re
 
 ### Sources and Research
 
-- `docs/residual-review-findings/2625b7d7cc657942a27f59c0aa3b0741dc96d746.md`
+- Historical review record at `fb6ac47:docs/residual-review-findings/2625b7d7cc657942a27f59c0aa3b0741dc96d746.md`
 - `research/reusable-lessons.md`
 - `docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`
 - `CONTEXT.md`
