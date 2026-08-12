@@ -1,33 +1,33 @@
 {
-  "audit_set_sha256": "36020d00d9db491b1c7318cb868cb137668a3e72e3f576970835779f222a4f11",
+  "audit_set_sha256": "efc86e0bde7dfa43845f612e59873088565dbb99a49658b0766daa6adce06401",
   "candidates": [
     {
       "accepted_review_sha256": [
-        "608a18d78e764afb7e57453f67661a77a3b141376df914704585f70f0795b4c3"
+        "d50ac6e857f775e1847e7cf3862344d2ba18c7cdb0fdb855f5eb04690cefd010"
       ],
-      "audit_sha256": "062c1883d914602e9881c48f6ccac12bd60e9ac79b336f269fa9ac2fa5ff9710",
+      "audit_sha256": "9c0741a69f1bc68f2522c814c7d0c0b88db772806045e89c638878e0905b0078",
       "baseline_id": "gamenet",
       "blockers": [],
       "diagnostics": {
         "baseline_id": "gamenet",
         "comparison_representativeness": {
           "evidence_ids": [
-            "gamenet-readme"
+            "safedrug-main-gamenet"
           ],
-          "value": "low"
+          "value": "high"
         },
         "integration_cost": {
           "evidence_ids": [
-            "gamenet-readme"
+            "safedrug-main-gamenet"
           ],
-          "value": "high"
+          "value": "low"
         },
         "priority_ordinal": 0,
         "reproduction_risk": {
           "evidence_ids": [
-            "gamenet-readme"
+            "safedrug-main-gamenet"
           ],
-          "value": "high"
+          "value": "low"
         }
       },
       "eligible": true,
@@ -35,75 +35,39 @@
     },
     {
       "accepted_review_sha256": [
-        "cfb625d97ded50d1367e5d463f3fa59ff518c6851e9754a4a7b7724045a61745"
+        "9c3e20350da95db2a5fb9d04a0bd4a78a8b91433d902aaf601de4074c9ada0b5"
       ],
-      "audit_sha256": "168044330a423a1b4f0219b1f662b985a28a0ddea9447de33e0e17f14489ca8b",
+      "audit_sha256": "09e84836326266208b5eb2424a611feaa61b2b3fa5a7ba395812dbb8ba9dfcf3",
       "baseline_id": "safedrug",
-      "blockers": [
-        "license_not_pass"
-      ],
+      "blockers": [],
       "diagnostics": {
         "baseline_id": "safedrug",
         "comparison_representativeness": {
           "evidence_ids": [
-            "safedrug-archived-readme"
+            "safedrug-main"
           ],
           "value": "high"
         },
         "integration_cost": {
           "evidence_ids": [
-            "safedrug-archived-readme"
+            "safedrug-main"
           ],
           "value": "low"
         },
         "priority_ordinal": 1,
         "reproduction_risk": {
           "evidence_ids": [
-            "safedrug-archived-readme"
+            "safedrug-main"
           ],
           "value": "low"
         }
       },
-      "eligible": false,
+      "eligible": true,
       "priority_ordinal": 1
     },
     {
       "accepted_review_sha256": [
-        "5426dcdfb278a362f02de4ed9e7a0e906de483d72e3eb6ec9452f4cdcafe8e0c"
-      ],
-      "audit_sha256": "83ab9240552b96851058fc2a1ca032b8289924dad0c43d3f8c9a1210d6658b41",
-      "baseline_id": "micron",
-      "blockers": [
-        "license_not_pass"
-      ],
-      "diagnostics": {
-        "baseline_id": "micron",
-        "comparison_representativeness": {
-          "evidence_ids": [
-            "micron-readme"
-          ],
-          "value": "medium"
-        },
-        "integration_cost": {
-          "evidence_ids": [
-            "micron-readme"
-          ],
-          "value": "low"
-        },
-        "priority_ordinal": 2,
-        "reproduction_risk": {
-          "evidence_ids": [
-            "micron-readme"
-          ],
-          "value": "low"
-        }
-      },
-      "eligible": false,
-      "priority_ordinal": 2
-    },
-    {
-      "accepted_review_sha256": [
-        "6415e3492aef14d0d6f811e9e741df155418f129a97a102bc0c600ab8b4bc9a5"
+        "df878dc0f8fd742efdce84085992e515a523714b5953f0a02566aea0c02778ee"
       ],
       "audit_sha256": "2aef46068fe5d56740ef3deee7f2c21dfe20f5804dbdba5d53d387d53e7b5a44",
       "baseline_id": "molerec",
@@ -114,18 +78,50 @@
           "evidence_ids": [
             "molerec-readme"
           ],
-          "value": "low"
+          "value": "medium"
         },
         "integration_cost": {
           "evidence_ids": [
             "molerec-readme"
+          ],
+          "value": "medium"
+        },
+        "priority_ordinal": 2,
+        "reproduction_risk": {
+          "evidence_ids": [
+            "molerec-readme"
+          ],
+          "value": "medium"
+        }
+      },
+      "eligible": true,
+      "priority_ordinal": 2
+    },
+    {
+      "accepted_review_sha256": [
+        "03935a9c1f9b227099814862f4dda56f80853797ba6dd6c310a15193184dee37"
+      ],
+      "audit_sha256": "0ef8a4c782e03fc4cb8a9184fd2f4bb64be6b83999d6a6fa0ffd41f69ef54fcc",
+      "baseline_id": "retain",
+      "blockers": [],
+      "diagnostics": {
+        "baseline_id": "retain",
+        "comparison_representativeness": {
+          "evidence_ids": [
+            "safedrug-main-retain"
+          ],
+          "value": "high"
+        },
+        "integration_cost": {
+          "evidence_ids": [
+            "safedrug-main-retain"
           ],
           "value": "low"
         },
         "priority_ordinal": 3,
         "reproduction_risk": {
           "evidence_ids": [
-            "molerec-readme"
+            "safedrug-main-retain"
           ],
           "value": "low"
         }
@@ -135,79 +131,46 @@
     },
     {
       "accepted_review_sha256": [
-        "91deeb20d01d4571c104b2db98f8566cfa422b289e926d4cbae7c05a6b48f23d"
+        "d85cfe6e1d3018cf54a1369abd0b93ed0b23b5c286d901cd67716bed9e4f956d"
       ],
-      "audit_sha256": "0e38e193b9d295e622198e160db6bb24e1a19387dc40c449e146df6e04d45c28",
-      "baseline_id": "retain",
+      "audit_sha256": "6365d7627ca5a82190668e7616395b7c73b3e49e3dbd4b1d2ee42a6b2b0e6d9a",
+      "baseline_id": "leap-safedrug",
       "blockers": [],
       "diagnostics": {
-        "baseline_id": "retain",
+        "baseline_id": "leap-safedrug",
         "comparison_representativeness": {
           "evidence_ids": [
-            "retain-readme"
+            "safedrug-main-leap"
           ],
           "value": "high"
         },
         "integration_cost": {
           "evidence_ids": [
-            "retain-readme"
+            "safedrug-main-leap"
           ],
           "value": "low"
         },
         "priority_ordinal": 4,
         "reproduction_risk": {
           "evidence_ids": [
-            "retain-readme"
+            "safedrug-main-leap"
           ],
           "value": "low"
         }
       },
       "eligible": true,
       "priority_ordinal": 4
-    },
-    {
-      "accepted_review_sha256": [],
-      "audit_sha256": "527ae62428b983fa1cc5c2ff18c7597c8f27c83e5f328afd1bd3a608de28cb23",
-      "baseline_id": "leap-safedrug",
-      "blockers": [
-        "source_not_pass",
-        "license_not_pass"
-      ],
-      "diagnostics": {
-        "baseline_id": "leap-safedrug",
-        "comparison_representativeness": {
-          "evidence_ids": [
-            "safedrug-leap-source"
-          ],
-          "value": "unresolved"
-        },
-        "integration_cost": {
-          "evidence_ids": [
-            "safedrug-leap-source"
-          ],
-          "value": "low"
-        },
-        "priority_ordinal": 5,
-        "reproduction_risk": {
-          "evidence_ids": [
-            "safedrug-leap-source"
-          ],
-          "value": "low"
-        }
-      },
-      "eligible": false,
-      "priority_ordinal": 5
     }
   ],
   "kind": "selection_result",
-  "program_sha256": "561e6441401904fe22f9f2b8d9632a4f5d5ff94d7e7c404791d2d0e1103aadd7",
-  "registry_authority_sha256": "309cf54af134b7dec2a870749b79bc61653f0174a78ccd8e5fca015ce78f1811",
-  "review_set_sha256": "3bda7fb78b6be5352cca2395082dd80876d4e78ef055d849f1a732e4d685363f",
+  "program_sha256": "455035c88c4e34c0ed403d654fba01a149a376646d025e70fa9dd4a84ba6dfa0",
+  "registry_authority_sha256": "9b4a51514a9d131f813a9bd11770c4c6dacc29fd0b66a7023e9b15d65a5164d6",
+  "review_set_sha256": "e40dabcbd21292d181955209e6bf9fd22d32fe511de133112417f3e368615829",
   "schema_version": 2,
   "scope_sha256": "f5a0664c764dbc9730acba3aaf8312255272ede6bfa4514237018531b70b431f",
   "selected_candidate_id": "gamenet",
-  "selection_id": "selection-8b7cfa5c8c42bc4985ab",
-  "specification_sha256": "f67100e5bada0061f87f1b4222fa98322d2aaad6336da6fdfe367b7e1a3b0024",
-  "specification_version": 1,
+  "selection_id": "selection-0feccd56d1543ddb1476",
+  "specification_sha256": "b5138c2f5a1dc9885dcd1dcc1a79670a5cf8bc78872710dc2a26b7381eca3612",
+  "specification_version": 2,
   "status": "proposed"
 }

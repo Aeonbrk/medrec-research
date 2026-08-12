@@ -18,12 +18,11 @@ from medrec_research.errors import ProtocolValidationError
 
 ROOT = Path(__file__).parents[2]
 AUDIT_DIR = ROOT / "baselines" / "audits"
-PROGRAM_PATH = ROOT / "baselines" / "programs" / "classic-six.toml"
+PROGRAM_PATH = ROOT / "baselines" / "programs" / "final-five.toml"
 REVIEWS_PATH = ROOT / "fixtures" / "benchmark" / "audit-reviews.json"
-CLASSIC_SIX = (
+FINAL_FIVE = (
     "gamenet",
     "safedrug",
-    "micron",
     "molerec",
     "retain",
     "leap-safedrug",
@@ -32,15 +31,15 @@ CLASSIC_SIX = (
 
 def load_audits() -> tuple[BaselineAudit, ...]:
     return tuple(
-        BaselineAudit.load(AUDIT_DIR / f"{baseline_id}.toml") for baseline_id in CLASSIC_SIX
+        BaselineAudit.load(AUDIT_DIR / f"{baseline_id}.toml") for baseline_id in FINAL_FIVE
     )
 
 
-def test_classic_six_program_and_audits_round_trip_deterministically() -> None:
+def test_final_five_program_and_audits_round_trip_deterministically() -> None:
     program = BaselineProgram.load(PROGRAM_PATH)
     audits = load_audits()
 
-    assert program.candidate_ids == CLASSIC_SIX
+    assert program.candidate_ids == FINAL_FIVE
     program.validate_audits(audits)
     assert BaselineProgram.from_dict(program.to_dict()) == program
     assert all(BaselineAudit.from_dict(audit.to_dict()) == audit for audit in audits)
@@ -54,16 +53,16 @@ def test_classic_six_program_and_audits_round_trip_deterministically() -> None:
 @pytest.mark.parametrize(
     "candidate_ids",
     (
-        CLASSIC_SIX[:-1],
-        (*CLASSIC_SIX, "reference"),
-        (*CLASSIC_SIX[:-1], "gamenet"),
+        FINAL_FIVE[:-1],
+        (*FINAL_FIVE, "reference"),
+        (*FINAL_FIVE[:-1], "gamenet"),
     ),
 )
-def test_classic_six_rejects_missing_extra_or_duplicate_candidate(
+def test_final_five_rejects_missing_extra_or_duplicate_candidate(
     candidate_ids: tuple[str, ...],
 ) -> None:
-    with pytest.raises(ProtocolValidationError, match="exact classic-six candidates"):
-        BaselineProgram(program_id="classic-six", candidate_ids=candidate_ids)
+    with pytest.raises(ProtocolValidationError, match="exact final-five candidates"):
+        BaselineProgram(program_id="final-five", candidate_ids=candidate_ids)
 
 
 def test_leap_identity_is_derivative_and_never_official() -> None:
@@ -102,7 +101,7 @@ def test_hard_gate_pass_requires_matching_accepted_review() -> None:
     assert AuditReviewSet.from_dict(reviews.to_dict()) == reviews
     assert reviews.matching_review(gamenet, "source").review_sha256
     assert reviews.accepts(gamenet, "source")
-    assert reviews.accepts(gamenet, "license")
+    assert not reviews.accepts(gamenet, "license")
     assert not AuditReviewSet(()).accepts(gamenet, "source")
 
     drifted = deepcopy(gamenet.to_dict())
@@ -189,10 +188,7 @@ def test_retain_and_shared_pipeline_semantics_remain_explicit() -> None:
     retain = BaselineAudit.load(AUDIT_DIR / "retain.toml")
     molerec = BaselineAudit.load(AUDIT_DIR / "molerec.toml")
 
-    assert {source.role for source in retain.sources} == {
-        "canonical_model",
-        "medication_comparison",
-    }
-    assert "sequence classification" in retain.claim("task").rationale.lower()
+    assert {source.role for source in retain.sources} == {"medication_comparison"}
+    assert "safedrug main" in retain.claim("source").rationale.lower()
     assert any("c7218d0" in item.content for item in molerec.evidence)
     assert any(edge.upstream == "safedrug-processing" for edge in molerec.lineage)

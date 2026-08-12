@@ -30,7 +30,7 @@ Candidate summaries, shared lineage, evidence, and authority digests follow belo
 |  o next                          |
 +----------------------------------+
 | Current stage                    |
-| qualified / 6                    |
+| qualified / 5                    |
 +----------------------------------+
 | Deterministic primary blocker    |
 | category + reason code           |
@@ -55,7 +55,7 @@ Candidate summaries, shared lineage, evidence, and authority digests follow belo
 | audit - benchmark - lane - characterize - parallel - review - discover |
 +-------------------+------------------------+---------------------------+
 | Current stage     | Primary blocker        | Next permitted action     |
-| qualified / 6     | category / reason      | [Generate request]        |
+| qualified / 5     | category / reason      | [Generate request]        |
 +-------------------+------------------------+---------------------------+
 | Candidate comparison table                                           |
 +------------------------------------------------------------------------+

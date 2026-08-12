@@ -22,7 +22,7 @@ from ._validation import (
     strict_fields,
     write_json_atomic,
 )
-from .baseline_audit import CLASSIC_SIX, LINEAGE_LAYERS, BaselineAudit, BaselineProgram
+from .baseline_audit import FINAL_FIVE, LINEAGE_LAYERS, BaselineAudit, BaselineProgram
 from .benchmark_program import SelectionAcceptance
 from .benchmark_state import (
     HumanReviewState,
@@ -467,26 +467,26 @@ class MedRecStatus:
         object.__setattr__(self, "stage", stage)
         object.__setattr__(self, "review_state", review_state)
         require_int(self.qualified_count, field="qualified_count")
-        if self.qualified_count > len(CLASSIC_SIX):
-            raise ProtocolValidationError("qualified_count exceeds the classic-six program")
+        if self.qualified_count > len(FINAL_FIVE):
+            raise ProtocolValidationError("qualified_count exceeds the final-five program")
         if type(self.discovery_eligible) is not bool:
             raise ProtocolValidationError("discovery_eligible must be a boolean")
         candidates = tuple(
             item if isinstance(item, CandidateStatus) else CandidateStatus.from_dict(item)
             for item in self.candidates
         )
-        if tuple(item.candidate_id for item in candidates) != CLASSIC_SIX:
-            raise ProtocolValidationError("MedRec candidates must be the ordered classic-six")
+        if tuple(item.candidate_id for item in candidates) != FINAL_FIVE:
+            raise ProtocolValidationError("MedRec candidates must be the ordered final-five")
         lineage = tuple(
             item if isinstance(item, LineageStatus) else LineageStatus.from_dict(item)
             for item in self.shared_lineage
         )
         if {item.layer for item in lineage} != LINEAGE_LAYERS:
             raise ProtocolValidationError("MedRec lineage must project all four layers")
-        if any(not set(item.candidate_ids) <= set(CLASSIC_SIX) for item in lineage):
+        if any(not set(item.candidate_ids) <= set(FINAL_FIVE) for item in lineage):
             raise ProtocolValidationError("lineage references an unknown candidate")
         if self.discovery_eligible and not (
-            self.qualified_count == len(CLASSIC_SIX) and review_state is HumanReviewState.ACCEPTED
+            self.qualified_count == len(FINAL_FIVE) and review_state is HumanReviewState.ACCEPTED
         ):
             raise ProtocolValidationError("discovery eligibility requires scoped readiness")
         if stage is ProjectStage.DISCOVERY_ELIGIBLE and not self.discovery_eligible:

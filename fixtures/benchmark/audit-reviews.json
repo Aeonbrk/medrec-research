@@ -1,63 +1,10 @@
 {
   "reviews": [
-    {
-      "audit_sha256": "062c1883d914602e9881c48f6ccac12bd60e9ac79b336f269fa9ac2fa5ff9710",
-      "candidate_id": "gamenet",
-      "content_sha256": "608a18d78e764afb7e57453f67661a77a3b141376df914704585f70f0795b4c3",
-      "decision": "pass",
-      "issued_at": "2026-07-11T00:00:00Z",
-      "reviewed_claims": [
-        "source",
-        "license"
-      ],
-      "reviewer": "research-steward"
-    },
-    {
-      "audit_sha256": "168044330a423a1b4f0219b1f662b985a28a0ddea9447de33e0e17f14489ca8b",
-      "candidate_id": "safedrug",
-      "content_sha256": "cfb625d97ded50d1367e5d463f3fa59ff518c6851e9754a4a7b7724045a61745",
-      "decision": "pass",
-      "issued_at": "2026-07-11T00:00:00Z",
-      "reviewed_claims": [
-        "source"
-      ],
-      "reviewer": "research-steward"
-    },
-    {
-      "audit_sha256": "83ab9240552b96851058fc2a1ca032b8289924dad0c43d3f8c9a1210d6658b41",
-      "candidate_id": "micron",
-      "content_sha256": "5426dcdfb278a362f02de4ed9e7a0e906de483d72e3eb6ec9452f4cdcafe8e0c",
-      "decision": "pass",
-      "issued_at": "2026-07-11T00:00:00Z",
-      "reviewed_claims": [
-        "source"
-      ],
-      "reviewer": "research-steward"
-    },
-    {
-      "audit_sha256": "2aef46068fe5d56740ef3deee7f2c21dfe20f5804dbdba5d53d387d53e7b5a44",
-      "candidate_id": "molerec",
-      "content_sha256": "6415e3492aef14d0d6f811e9e741df155418f129a97a102bc0c600ab8b4bc9a5",
-      "decision": "pass",
-      "issued_at": "2026-07-11T00:00:00Z",
-      "reviewed_claims": [
-        "source",
-        "license"
-      ],
-      "reviewer": "research-steward"
-    },
-    {
-      "audit_sha256": "0e38e193b9d295e622198e160db6bb24e1a19387dc40c449e146df6e04d45c28",
-      "candidate_id": "retain",
-      "content_sha256": "91deeb20d01d4571c104b2db98f8566cfa422b289e926d4cbae7c05a6b48f23d",
-      "decision": "pass",
-      "issued_at": "2026-07-11T00:00:00Z",
-      "reviewed_claims": [
-        "source",
-        "license"
-      ],
-      "reviewer": "research-steward"
-    }
+    {"audit_sha256":"0ef8a4c782e03fc4cb8a9184fd2f4bb64be6b83999d6a6fa0ffd41f69ef54fcc","candidate_id":"retain","content_sha256":"03935a9c1f9b227099814862f4dda56f80853797ba6dd6c310a15193184dee37","decision":"pass","issued_at":"2026-07-14T00:00:00Z","reviewed_claims":["source"],"reviewer":"research-steward"},
+    {"audit_sha256":"09e84836326266208b5eb2424a611feaa61b2b3fa5a7ba395812dbb8ba9dfcf3","candidate_id":"safedrug","content_sha256":"9c3e20350da95db2a5fb9d04a0bd4a78a8b91433d902aaf601de4074c9ada0b5","decision":"pass","issued_at":"2026-07-14T00:00:00Z","reviewed_claims":["source"],"reviewer":"research-steward"},
+    {"audit_sha256":"9c0741a69f1bc68f2522c814c7d0c0b88db772806045e89c638878e0905b0078","candidate_id":"gamenet","content_sha256":"d50ac6e857f775e1847e7cf3862344d2ba18c7cdb0fdb855f5eb04690cefd010","decision":"pass","issued_at":"2026-07-14T00:00:00Z","reviewed_claims":["source"],"reviewer":"research-steward"},
+    {"audit_sha256":"6365d7627ca5a82190668e7616395b7c73b3e49e3dbd4b1d2ee42a6b2b0e6d9a","candidate_id":"leap-safedrug","content_sha256":"d85cfe6e1d3018cf54a1369abd0b93ed0b23b5c286d901cd67716bed9e4f956d","decision":"pass","issued_at":"2026-07-14T00:00:00Z","reviewed_claims":["source"],"reviewer":"research-steward"},
+    {"audit_sha256":"2aef46068fe5d56740ef3deee7f2c21dfe20f5804dbdba5d53d387d53e7b5a44","candidate_id":"molerec","content_sha256":"df878dc0f8fd742efdce84085992e515a523714b5953f0a02566aea0c02778ee","decision":"pass","issued_at":"2026-07-14T00:00:00Z","reviewed_claims":["source"],"reviewer":"research-steward"}
   ],
   "schema_version": 1
 }

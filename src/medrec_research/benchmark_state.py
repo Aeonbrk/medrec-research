@@ -263,6 +263,8 @@ def _matching_qualification(
                 protocol_version=scope.protocol_version,
                 dataset_manifest_sha256=scope.dataset_manifest_sha256,
                 adaptation_budget_sha256=scope.adaptation_budget_sha256,
+                protocol_amendment_sha256=scope.protocol_amendment_sha256,
+                method_profile_sha256=scope.method_profile_sha256,
             )
         ),
         None,

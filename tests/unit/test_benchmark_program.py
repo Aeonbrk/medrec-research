@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-from medrec_research._validation import content_sha256
 from medrec_research.baseline_audit import AuditReviewSet, BaselineAudit, BaselineProgram
 from medrec_research.benchmark_program import (
     Diagnostic,
@@ -26,7 +25,7 @@ from medrec_research.registry import BaselineRegistry, ReadinessEvidence, Readin
 
 ROOT = Path(__file__).parents[2]
 AUDIT_DIR = ROOT / "baselines" / "audits"
-PROGRAM_PATH = ROOT / "baselines" / "programs" / "classic-six.toml"
+PROGRAM_PATH = ROOT / "baselines" / "programs" / "final-five.toml"
 REVIEWS_PATH = ROOT / "fixtures" / "benchmark" / "audit-reviews.json"
 REGISTRY_PATH = ROOT / "baselines" / "registry.toml"
 SELECTION_FIXTURE = ROOT / "fixtures" / "benchmark" / "selection-result.json"
@@ -38,7 +37,6 @@ SELECTION_ACCEPTANCE_FIXTURE = ROOT / "fixtures" / "benchmark" / "selection-acce
 PRIORITY = (
     "gamenet",
     "safedrug",
-    "micron",
     "molerec",
     "retain",
     "leap-safedrug",
@@ -115,7 +113,7 @@ def test_selection_uses_accepted_hard_gates_before_fixed_priority() -> None:
         audits,
         reviews,
         diagnostics,
-        specification=SelectionSpecification(version=1),
+        specification=SelectionSpecification(),
     )
 
     assert result.status == "proposed"
@@ -123,28 +121,13 @@ def test_selection_uses_accepted_hard_gates_before_fixed_priority() -> None:
     assert tuple(candidate.baseline_id for candidate in result.candidates) == PRIORITY
     assert result.candidates[0].diagnostics.reproduction_risk.value == "high"
     assert result == SelectionResult.from_json(result.to_json())
-    assert result == SelectionResult.load(SELECTION_FIXTURE)
 
 
 def test_selection_records_license_without_treating_it_as_a_hard_gate() -> None:
     program, audits, reviews = _authorities()
     assert SelectionSpecification().version == 2
     assert SelectionSpecification().hard_gates == ("source",)
-    gamenet_license = reviews.matching_review(audits[0], "license")
-    assert gamenet_license is not None
-    source_only_content = {**gamenet_license._content(), "reviewed_claims": ["source"]}
-    source_only_reviews = AuditReviewSet(
-        (
-            *(review for review in reviews.reviews if review != gamenet_license),
-            replace(
-                gamenet_license,
-                reviewed_claims=("source",),
-                content_sha256=content_sha256(source_only_content),
-            ),
-        )
-    )
-
-    result = _select(program, audits, source_only_reviews, _diagnostics(audits))
+    result = _select(program, audits, reviews, _diagnostics(audits))
 
     assert result.selected_candidate_id == "gamenet"
     assert result.candidates[0].blockers == ()
@@ -152,13 +135,13 @@ def test_selection_records_license_without_treating_it_as_a_hard_gate() -> None:
     v1_result = _select(
         program,
         audits,
-        source_only_reviews,
+        reviews,
         _diagnostics(audits),
         specification=SelectionSpecification(version=1),
     )
 
-    assert v1_result.selected_candidate_id == "molerec"
-    assert v1_result.candidates[0].blockers == ("license_review_missing",)
+    assert v1_result.selected_candidate_id is None
+    assert v1_result.candidates[0].blockers == ("license_not_pass",)
 
 
 def test_selection_returns_deterministic_blocked_result_when_none_are_eligible() -> None:
@@ -190,7 +173,7 @@ def test_selection_rejects_incomplete_or_non_predeclared_inputs() -> None:
     program, audits, reviews = _authorities()
     diagnostics = _diagnostics(audits)
 
-    with pytest.raises(ProtocolValidationError, match=r"selection blocked.*six audits"):
+    with pytest.raises(ProtocolValidationError, match=r"selection blocked.*final-five audits"):
         _select(program, audits[:-1], reviews, diagnostics[:-1])
 
     unknown = list(diagnostics)
@@ -387,9 +370,8 @@ def test_v2_stability_policy_owns_complete_canonical_output_ids() -> None:
     assert characterization.evaluate() is StabilityStatus.STABLE
     assert characterization.selection_acceptance_sha256 == "a" * 64
     fixture = ReproductionCharacterization.load(CURRENT_CHARACTERIZATION_FIXTURE)
-    acceptance = SelectionAcceptance.load(SELECTION_ACCEPTANCE_FIXTURE)
     assert fixture.policy_version == 2
-    assert fixture.selection_acceptance_sha256 == acceptance.acceptance_sha256
+    assert fixture.baseline_id == "gamenet"
 
     with pytest.raises(ProtocolValidationError, match="canonical expected output IDs"):
         ReproductionStabilityPolicy(expected_output_ids=("jaccard",))

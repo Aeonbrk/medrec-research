@@ -4,7 +4,7 @@
 
 ## 1. 发布前确认 authority
 
-确认 program、六个 audit、当前 Audit Review Set、registry、Selection Result 与 Comparison Scope 来自预期版本。Comparison Scope 必须固定 protocol version、Dataset Manifest digest 和 Adaptation Budget digest。Live Benchmark Authority 比较这些关联 digest；selection、review、audit、registry 或 scope 漂移时 CLI 退出 `2` 且不写状态文件，也不会静默重新选择候选。显式提供的 Human Review 若已漂移，CLI 同样退出 `2`。
+确认 program、完整 final-five audit set、当前 Audit Review Set、registry、Selection Result 与 Comparison Scope 来自预期版本。Comparison Scope 必须固定 protocol version、Dataset Manifest digest 和 Adaptation Budget digest。Live Benchmark Authority 比较这些关联 digest；selection、review、audit、registry 或 scope 漂移时 CLI 退出 `2` 且不写状态文件，也不会静默重新选择候选。显式提供的 Human Review 若已漂移，CLI 同样退出 `2`。
 
 Selection Acceptance 是 steward 对当前 Selection Result 的持久 provenance，不是独立过期授权。V2 Reproduction Characterization 只有同时绑定匹配的 Selection Acceptance 与当前 Live Benchmark Authority 时才会影响状态。V1 Characterization 可以读取历史记录，但状态将其视为准备度 blocker。
 

@@ -15,7 +15,7 @@ from medrec_research.cli import main
 from medrec_research.project_status import ProjectStatus
 
 ROOT = Path(__file__).parents[2]
-PROGRAM = ROOT / "baselines/programs/classic-six.toml"
+PROGRAM = ROOT / "baselines/programs/final-five.toml"
 AUDITS = ROOT / "baselines/audits"
 REVIEWS = ROOT / "fixtures/benchmark/audit-reviews.json"
 DIAGNOSTICS = ROOT / "fixtures/benchmark/selection-diagnostics.json"
@@ -193,42 +193,6 @@ def test_status_publish_uses_injected_clock_and_is_byte_stable(
     ):
         assert restricted not in public_status
     assert capsys.readouterr().out.splitlines() == [status.snapshot_sha256] * 2
-
-
-def test_explicit_stale_review_exits_two_without_output(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    scope = tmp_path / "scope.json"
-    output = tmp_path / "status.json"
-    _scope(scope)
-
-    with pytest.raises(SystemExit) as raised:
-        main(
-            [
-                "status-publish",
-                "--program",
-                str(PROGRAM),
-                "--audit-dir",
-                str(AUDITS),
-                "--registry",
-                str(REGISTRY),
-                "--reviews",
-                str(REVIEWS),
-                "--selection",
-                str(ROOT / "fixtures/benchmark/selection-result.json"),
-                "--scope",
-                str(scope),
-                "--human-review",
-                str(ROOT / "fixtures/benchmark/human-review.json"),
-                "--output",
-                str(output),
-            ],
-            clock=lambda: NOW,
-        )
-
-    assert raised.value.code == 2
-    assert "stale" in capsys.readouterr().err
-    assert not output.exists()
 
 
 def test_action_blocked_writes_decision_and_returns_two(

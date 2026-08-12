@@ -18,7 +18,7 @@ from ._validation import (
     strict_fields,
 )
 from .baseline_audit import (
-    CLASSIC_SIX,
+    FINAL_FIVE,
     AuditReviewSet,
     BaselineAudit,
     BaselineProgram,
@@ -267,7 +267,7 @@ class SelectionResult:
         )
         identities = tuple(item.baseline_id for item in candidates)
         ordinals = tuple(item.priority_ordinal for item in candidates)
-        if identities != CLASSIC_SIX or ordinals != tuple(range(len(CLASSIC_SIX))):
+        if identities != FINAL_FIVE or ordinals != tuple(range(len(FINAL_FIVE))):
             raise ProtocolValidationError("selection candidates must preserve fixed priority order")
         first_eligible = next((item.baseline_id for item in candidates if item.eligible), None)
         expected_status = "proposed" if first_eligible is not None else "blocked"
@@ -490,10 +490,10 @@ class SelectionAcceptance:
 @dataclass(frozen=True, slots=True)
 class SelectionSpecification:
     version: int = _CURRENT_SELECTION_SPECIFICATION_VERSION
-    priority_order: tuple[str, ...] = CLASSIC_SIX
+    priority_order: tuple[str, ...] = FINAL_FIVE
 
     def __post_init__(self) -> None:
-        if self.version not in _HARD_GATES_BY_VERSION or tuple(self.priority_order) != CLASSIC_SIX:
+        if self.version not in _HARD_GATES_BY_VERSION or tuple(self.priority_order) != FINAL_FIVE:
             raise ProtocolValidationError(
                 "selection specification must use a supported version and fixed priority order"
             )
@@ -531,7 +531,7 @@ class SelectionSpecification:
             program.validate_audits(audits)
         except ProtocolValidationError as error:
             raise ProtocolValidationError(
-                "selection blocked: all six audits are required in fixed priority order"
+                "selection blocked: all final-five audits are required in fixed priority order"
             ) from error
         normalized = tuple(
             item if isinstance(item, SelectionDiagnostic) else SelectionDiagnostic.from_dict(item)
@@ -539,7 +539,7 @@ class SelectionSpecification:
         )
         if tuple(item.baseline_id for item in normalized) != self.priority_order or tuple(
             item.priority_ordinal for item in normalized
-        ) != tuple(range(6)):
+        ) != tuple(range(len(FINAL_FIVE))):
             raise ProtocolValidationError("diagnostics must match the fixed priority order")
         candidate_results: list[CandidateSelection] = []
         for audit, diagnostic in zip(audits, normalized, strict=True):

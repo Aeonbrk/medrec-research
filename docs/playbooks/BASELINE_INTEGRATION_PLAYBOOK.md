@@ -10,9 +10,9 @@ An archive path identifies historical evidence, not an upstream release. Do not 
 
 ## 2. Audit source, license, and lineage
 
-Complete the public-safe Baseline Audit and matching Audit Review before selecting a reproduction lane. Source is always a hard gate; license status is always recorded. Historic V1 classic-six selection treats both source and license as hard gates. Current V2 classic-six selection, by research-owner decision, treats license status as nonblocking without asserting that an unlicensed source is licensed or permitting its distribution in Git. Priority never converts an unresolved active gate into a pass. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
+Complete the public-safe Baseline Audit and matching Audit Review before selecting a reproduction lane. Source is always a hard gate; license status is always recorded. Current V2 final-five selection treats license status as nonblocking without asserting that an unlicensed source is licensed or permitting its distribution in Git. Priority never converts an unresolved active gate into a pass. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
 
-Validate the exact classic-six set with `audit-validate`, then pass the current Registry and explicit Comparison Scope to `selection-publish`. The Selection Result binds both records. Do not edit registry readiness to make a blocked candidate selectable.
+Validate the exact final-five set with `audit-validate`, then pass the current Registry and explicit Comparison Scope to `selection-publish`. The Selection Result binds both records. Do not edit registry readiness to make a blocked candidate selectable.
 
 ## 3. Reproduce upstream behavior
 
@@ -33,6 +33,14 @@ Declare the same allowed tuning and integration allowance for all compared metho
 `registered` means identity metadata exists. `smoke_ready` requires a pinned source, immutable adapter revision, environment digest, and content-addressed environment-lock and adapter-smoke evidence. `comparison_ready` requires at least one Comparison Qualification with content-addressed cohort identity, Baseline Core integrity, deterministic translation, Adaptation Budget, and independent metric recomputation evidence. The qualification names one protocol version, Dataset Manifest, and Adaptation Budget; create another qualification when any of them changes. The registry rejects skipped transitions and incomplete evidence sets.
 
 Registration, source checkout, import success, or a reproduced paper number is insufficient for `comparison_ready`.
+
+## 6a. Framework implementation lanes
+
+Any additional framework implementation is a distinct Baseline Core from an upstream paper repository. Give it a separate identity and fixed framework revision; do not relabel its result as a source-native reproduction. Freeze one shared task, patient-level partition, vocabulary rule, external DDI or molecular artifact revision, adaptation budget, monitor, checkpoint rule, threshold rule, and metrics for every framework candidate.
+
+Before accepting a framework example, fit every input and output processor, code vocabulary, graph, and molecular artifact from the training partition only. Validation and test data must use frozen training transforms, with a pre-registered OOV or exclusion policy for every field. Some framework split objects retain a reference to the complete pre-split dataset; do not pass that reference to a constructor or training path unless a model-specific proof shows it cannot influence model state.
+
+The subprocess request remains target-free even when a framework's training or evaluation helper normally consumes labels to calculate loss. Do not use that helper as a prediction adapter until a contract test proves its emitted prediction payload is target-free. The adapter must extract predictions only and fail closed on `loss`, `y_true`, labels, targets, split membership, or ground-truth fields in either request or response.
 
 ## 7. Preserve evidence
 

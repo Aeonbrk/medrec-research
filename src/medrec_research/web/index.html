@@ -44,9 +44,9 @@
             <h2 id="stage-heading">当前阶段</h2>
             <p id="stage-value" class="primary-value">正在载入</p>
             <label class="progress-label" for="readiness-progress">
-              可比较基线 <span id="qualified-value">0 / 6</span>
+              可比较基线 <span id="qualified-value">0 / 5</span>
             </label>
-            <progress id="readiness-progress" max="6" value="0">0 / 6</progress>
+            <progress id="readiness-progress" max="5" value="0">0 / 5</progress>
           </section>
 
           <section class="blocker-summary" aria-labelledby="blocker-heading">
@@ -82,7 +82,7 @@
         </div>
         <div class="table-wrap">
           <table id="candidate-table">
-            <caption>六个经典基线的复现准备度、来源、许可证与公开证据</caption>
+            <caption>五个最终候选基线的复现准备度、来源、许可证与公开证据</caption>
             <thead><tr><th scope="col">候选</th><th scope="col">准备度</th><th scope="col">来源</th><th scope="col">许可证</th><th scope="col">证据</th></tr></thead>
             <tbody id="candidate-body"><tr><td colspan="5">正在载入候选状态</td></tr></tbody>
           </table>
@@ -99,6 +99,20 @@
             <caption>模型、数据处理、划分选择与评估报告四层共享谱系</caption>
             <thead><tr><th scope="col">层</th><th scope="col">上游仓库</th><th scope="col">候选</th><th scope="col">证据</th></tr></thead>
             <tbody id="lineage-body"><tr><td colspan="4">正在载入谱系状态</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="data-band" aria-labelledby="loop-heading">
+        <div class="section-heading">
+          <div><p class="eyebrow">HITL REPRODUCTION LOOP</p><h2 id="loop-heading">证据包与 H2 状态</h2></div>
+          <p id="loop-summary">正在载入研究循环状态。</p>
+        </div>
+        <div class="table-wrap">
+          <p class="sr-only">每个模型或阶段独立显示数据包完整性、结论、当前性与 H2 go 资格；此投影不可写入。</p>
+          <table id="research-loop-table">
+            <thead><tr><th scope="col">模型 / 通道</th><th scope="col">阶段</th><th scope="col">数据包</th><th scope="col">结论</th><th scope="col">H2 go</th><th scope="col">阻塞</th></tr></thead>
+            <tbody id="loop-body"><tr><td colspan="6">正在载入研究循环状态</td></tr></tbody>
           </table>
         </div>
       </section>

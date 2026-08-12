@@ -1,12 +1,12 @@
 # Remote 319 Execution Playbook
 
-The MacBook Air is the harness terminal. The `319-wild` server is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
+The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
 
 ## Verified snapshot
 
 A read-only check on 2026-07-10 confirmed eight NVIDIA GeForce RTX 3090 GPUs with 24 GiB each, NVIDIA driver `535.183.01`, and reported CUDA `12.2`. GPU utilization ranged from 25% to 100%, so capacity was not generally available. The filesystem containing `/root/zhb` was 87% used. `/root/zhb/New-Search` existed, while `/root/zhb/medrec-research` did not.
 
-The existing ControlMaster socket at `~/.ssh/cm-319-wild` worked. Direct `BatchMode` authentication failed at that snapshot. These are observations, not permanent guarantees; rerun preflight before every experiment.
+On 2026-07-14, the fallback `319-lab-via-server` SSH profile authenticated through the Tailscale-backed Windows relay and reached the expected remote account. The primary `319-lab` profile must be tried first for each new preflight. The relay address, keys, account name, and target address remain local SSH configuration, not Git. This is an observation, not a permanent guarantee; rerun preflight before every experiment.
 
 ## Hard preconditions
 
@@ -19,20 +19,30 @@ Do not launch a real run until all conditions hold:
 - The declared baseline source revision, Conda environment, adapter, and readiness satisfy the requested mode.
 - GPU memory and disk capacity are adequate without disrupting another job.
 
-This repository currently has no first commit or Git remote, and its 319 checkout is absent. Those facts block real execution but do not block local harness development.
+The repository has a Git history and an `origin` remote, but its 319 checkout is absent. That blocks real execution but does not block local harness development.
 
 ## Connection preflight
 
-Prefer the existing multiplexed connection while it remains valid:
+Try the primary SSH target, `319-lab`, first. If it cannot establish an authenticated `root` session, retry through `319-lab-via-server`, which uses the local SSH `ProxyJump` configuration to reach 319 through the Tailscale relay. Do not use a direct address, a legacy alias, or a ControlMaster socket.
+
+Before every remote operation, select and verify the target in the same local shell session:
 
 ```bash
-rtk ssh -o ControlPath=~/.ssh/cm-319-wild -o ConnectTimeout=10 319-wild 'nvidia-smi'
+REMOTE_319_HOST=319-lab
+if ! remote_user="$(rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" 'id -un')" || [ "$remote_user" != root ]; then
+  REMOTE_319_HOST=319-lab-via-server
+  remote_user="$(rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" 'id -un')"
+fi
+test "$remote_user" = root
+export REMOTE_319_HOST
 ```
+
+Continue only when the selected target returns `root` without an SSH host-key warning. A fallback target that returns another account or exits nonzero blocks remote work. All remaining examples use the exported `REMOTE_319_HOST`.
 
 Check capacity and repository roots without changing remote state:
 
 ```bash
-rtk ssh -o ControlPath=~/.ssh/cm-319-wild 319-wild '
+rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" '
 set -eu
 nvidia-smi --query-gpu=index,name,memory.total,memory.free,utilization.gpu --format=csv,noheader
 df -h /root/zhb
@@ -49,7 +59,7 @@ Use Git as the code synchronization and source-identity mechanism. Configure a r
 Before each run, verify rather than mutate:
 
 ```bash
-rtk ssh -o ControlPath=~/.ssh/cm-319-wild 319-wild '
+rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" '
 set -eu
 cd /root/zhb/medrec-research
 git status --short
@@ -67,7 +77,7 @@ The Homebrew `uv` environment belongs only to the Mac harness and public synthet
 Inspect existing environments and disk before creating one:
 
 ```bash
-rtk ssh -o ControlPath=~/.ssh/cm-319-wild 319-wild '
+rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" '
 set -eu
 source /root/anaconda3/etc/profile.d/conda.sh
 conda env list
@@ -80,7 +90,7 @@ Create a new environment from a registered declaration only when no verified env
 Create the provisional core evaluator only after the checkout revision is fixed:
 
 ```bash
-rtk ssh -o ControlPath=~/.ssh/cm-319-wild 319-wild '
+rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" '
 set -eu
 cd /root/zhb/medrec-research
 source /root/anaconda3/etc/profile.d/conda.sh
@@ -114,7 +124,7 @@ Keep raw data, split membership, checkpoints, logs, and real Prediction Records 
 The core evaluator performs the first acceptance pass on 319:
 
 ```bash
-rtk ssh -o ControlPath=~/.ssh/cm-319-wild 319-wild '
+rtk ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE_319_HOST" '
 set -eu
 cd /root/zhb/medrec-research
 source /root/anaconda3/etc/profile.d/conda.sh

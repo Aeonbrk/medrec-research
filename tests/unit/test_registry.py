@@ -212,8 +212,8 @@ def test_comparison_qualification_does_not_transfer_to_another_dataset() -> None
 
 def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
     baseline = BaselineDefinition(
-        baseline_id="cafemed",
-        display_name="CafeMed",
+        baseline_id="archive-example",
+        display_name="Archive Example",
         source=SourceIdentity(
             repository=None,
             revision=None,
@@ -222,7 +222,7 @@ def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
         supported_modes=(ResearchMode.REPRODUCTION,),
         readiness=BaselineReadiness.REGISTERED,
         archive_evidence=(
-            "New-Search@9971464253c556345262b22ed6d44b2cc14c9da8:medication-rec/CafeMed",
+            "New-Search@9971464253c556345262b22ed6d44b2cc14c9da8:medication-rec/archive-example",
         ),
     )
 
@@ -233,9 +233,9 @@ def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
 def test_project_registry_makes_no_readiness_claims() -> None:
     registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
 
-    assert len(registry.baselines) == 13
+    assert len(registry.baselines) == 6
     assert {baseline.readiness for baseline in registry.baselines} == {BaselineReadiness.REGISTERED}
     leap = registry.get("leap-safedrug")
-    assert leap.display_name == "LEAP-SafeDrug"
-    assert leap.source.status is SourceStatus.NEEDS_PIN
+    assert leap.display_name == "LEAP (SafeDrug main)"
+    assert leap.source.status is SourceStatus.PINNED
     assert not leap.is_comparable

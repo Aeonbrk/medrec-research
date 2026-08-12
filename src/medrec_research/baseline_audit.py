@@ -29,10 +29,9 @@ LINEAGE_LAYERS = frozenset(
     {"model_core", "data_processing", "split_selection", "evaluation_reporting"}
 )
 _SOURCE_ROLES = frozenset({"canonical_model", "medication_comparison", "lineage_reference"})
-CLASSIC_SIX = (
+FINAL_FIVE = (
     "gamenet",
     "safedrug",
-    "micron",
     "molerec",
     "retain",
     "leap-safedrug",
@@ -477,8 +476,8 @@ class BaselineProgram:
             require_identifier(item, field="candidate_ids") for item in self.candidate_ids
         )
         object.__setattr__(self, "candidate_ids", candidates)
-        if self.program_id != "classic-six" or candidates != CLASSIC_SIX:
-            raise ProtocolValidationError("program must contain the exact classic-six candidates")
+        if self.program_id != "final-five" or candidates != FINAL_FIVE:
+            raise ProtocolValidationError("program must contain the exact final-five candidates")
 
     @property
     def program_sha256(self) -> str:
@@ -487,7 +486,7 @@ class BaselineProgram:
     def validate_audits(self, audits: tuple[BaselineAudit, ...]) -> None:
         ids = tuple(audit.baseline_id for audit in audits)
         if ids != self.candidate_ids:
-            raise ProtocolValidationError("audits must match the exact classic-six candidates")
+            raise ProtocolValidationError("audits must match the exact final-five candidates")
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -656,7 +655,7 @@ class AuditReviewSet:
 
 
 __all__ = (
-    "CLASSIC_SIX",
+    "FINAL_FIVE",
     "LINEAGE_LAYERS",
     "AuditReview",
     "AuditReviewSet",

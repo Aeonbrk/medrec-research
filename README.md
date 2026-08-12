@@ -4,7 +4,7 @@ MedRec Research is the active repository for general computer-science research o
 
 ## Current status
 
-The repository has one runnable synthetic Protocol Vertical Slice and a public-safe six-candidate benchmark control surface. GAMENet, SafeDrug, MICRON, MoleRec, RETAIN, and `LEAP-SafeDrug` are registered, but zero candidates are `smoke_ready` or `comparison_ready`. Audit and status output therefore describe blocked research work, not completed reproductions or experimental evidence.
+The repository has one runnable synthetic Protocol Vertical Slice and a public-safe final-five benchmark control surface. GAMENet, SafeDrug, MoleRec, RETAIN, and `LEAP-SafeDrug` are registered, but zero candidates are `smoke_ready` or `comparison_ready`. Audit and status output therefore describe blocked research work, not completed reproductions or experimental evidence.
 
 Prior work remains in the read-only Research Archive at `/Users/oian/Codes/master/New-Search`. Curated findings and failed-route constraints live under [`research/`](research/); new research work belongs here.
 
@@ -44,15 +44,15 @@ This emits a public-safe Protocol Check Record. It exercises dataset, prediction
 
 ## 本地基线控制面
 
-先验证六个审计，再按固定顺序发布选择结果。硬门优先于顺序；当前顺序是 GAMENet、SafeDrug、MICRON、MoleRec、RETAIN、`LEAP-SafeDrug`。
+先验证五个审计，再按固定顺序发布选择结果。硬门优先于顺序；当前顺序是 GAMENet、SafeDrug、MoleRec、RETAIN、`LEAP-SafeDrug`。
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec-research audit-validate \
-  --program baselines/programs/classic-six.toml \
+  --program baselines/programs/final-five.toml \
   --audit-dir baselines/audits
 
 rtk proxy /opt/homebrew/bin/uv run medrec-research selection-publish \
-  --program baselines/programs/classic-six.toml \
+  --program baselines/programs/final-five.toml \
   --audit-dir baselines/audits \
   --registry baselines/registry.toml \
   --reviews fixtures/benchmark/audit-reviews.json \
@@ -65,7 +65,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research selection-publish \
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec-research status-publish \
-  --program baselines/programs/classic-six.toml \
+  --program baselines/programs/final-five.toml \
   --audit-dir baselines/audits \
   --registry baselines/registry.toml \
   --reviews fixtures/benchmark/audit-reviews.json \
@@ -115,7 +115,7 @@ ARIS runtime traces stay local. Gate-approved protocols, aggregate Run Records, 
 
 The MacBook Air is the harness terminal. It runs ARIS, protocol validation, synthetic fixtures, source submission, monitoring, aggregate-result intake, and public-safe audits. Real EHR experiments, training, GPU inference, and external baseline environments run only on `319-wild`.
 
-The 319 checkout does not exist yet, and this new repository has no first commit or Git remote. Do not launch a real experiment until the source has an immutable revision, the remote checkout is verified, and the remote preflight in the playbook passes.
+The 319 checkout does not exist yet. Do not launch a real experiment until the intended source revision is available on 319, the remote checkout is verified, and the remote preflight in the playbook passes.
 
 ## Data safety
 

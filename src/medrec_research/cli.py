@@ -44,6 +44,13 @@ from .project_status import ProjectStatus, publish_medrec_status
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
 from .reproduction_characterization import ReproductionCharacterization
+from .reproduction_contract import (
+    DecisionPacket,
+    H1Approval,
+    H2Decision,
+    SafeDrugBatchContract,
+)
+from .research_loop_status import ResearchLoopStatus
 from .run_record import ArtifactChecksum, RunParameter, RunRecord
 
 Clock = Callable[[], datetime]
@@ -140,8 +147,25 @@ def _build_parser() -> argparse.ArgumentParser:
     harness = commands.add_parser("harness")
     harness.add_argument("--status", type=Path, required=True)
     harness.add_argument("--authority-bundle", type=Path)
+    harness.add_argument("--research-loop", type=Path)
     harness.add_argument("--port", type=_port, default=0)
     harness.set_defaults(handler=_serve_harness)
+
+    reproduction = commands.add_parser(
+        "validate-reproduction",
+        aliases=["reproduction-validate"],
+    )
+    reproduction.add_argument("--contract", type=Path, required=True)
+    reproduction.add_argument("--packet", type=Path, required=True)
+    reproduction.add_argument("--h1", type=Path)
+    reproduction.add_argument("--h2", type=Path)
+    reproduction.add_argument("--output", type=Path, required=True)
+    reproduction.set_defaults(handler=_validate_reproduction)
+
+    loop = commands.add_parser("validate-research-loop")
+    loop.add_argument("--status", type=Path, required=True)
+    loop.add_argument("--output", type=Path, required=True)
+    loop.set_defaults(handler=_validate_research_loop)
     return parser
 
 
@@ -445,6 +469,7 @@ def _serve_harness(arguments: argparse.Namespace, clock: Clock) -> tuple[int, st
         port=arguments.port,
         actions_enabled=arguments.authority_bundle is not None,
         authority_bundle_path=arguments.authority_bundle,
+        research_loop_path=arguments.research_loop,
     )
     print(f"http://127.0.0.1:{server.server_port}", flush=True)
     try:
@@ -454,6 +479,47 @@ def _serve_harness(arguments: argparse.Namespace, clock: Clock) -> tuple[int, st
     finally:
         server.server_close()
     return 0, None
+
+
+def _validate_reproduction(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
+    del clock
+    contract = SafeDrugBatchContract.from_json(arguments.contract.read_text(encoding="utf-8"))
+    packet = DecisionPacket.from_json(arguments.packet.read_text(encoding="utf-8"))
+    if packet.contract_sha256 != contract.contract_sha256 or not contract.is_current():
+        raise ProtocolValidationError("reproduction packet does not match the current contract")
+    h1 = (
+        H1Approval.from_json(arguments.h1.read_text(encoding="utf-8"))
+        if arguments.h1 is not None
+        else None
+    )
+    if h1 is not None and not h1.is_current(contract):
+        raise ProtocolValidationError("H1 approval is stale")
+    h2 = (
+        H2Decision.from_json(arguments.h2.read_text(encoding="utf-8"))
+        if arguments.h2 is not None
+        else None
+    )
+    if h2 is not None and not h2.is_current(contract=contract, packet=packet):
+        raise ProtocolValidationError("H2 decision is stale")
+    payload = {
+        "contract": contract.to_dict(),
+        "h1": h1.to_dict() if h1 is not None else None,
+        "h2": h2.to_dict() if h2 is not None else None,
+        "kind": "reproduction_validation",
+        "packet": packet.to_dict(),
+        "schema_version": 1,
+    }
+    _write_json_atomic(arguments.output, payload)
+    return 0, packet.packet_sha256
+
+
+def _validate_research_loop(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
+    del clock
+    status = ResearchLoopStatus.from_json(arguments.status.read_text(encoding="utf-8"))
+    if not status.is_current or status.stale or not status.h1_current:
+        raise ProtocolValidationError("research loop status is stale")
+    _write_json_atomic(arguments.output, status.to_dict())
+    return 0, status.status_sha256
 
 
 def main(

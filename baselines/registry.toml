@@ -12,121 +12,55 @@ status = "needs_pin"
 
 [[baselines]]
 baseline_id = "gamenet"
-display_name = "GAMENet"
-supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
-
-[baselines.source]
-repository = "https://github.com/sjy1203/GAMENet"
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "safedrug"
-display_name = "SafeDrug"
+display_name = "GAMENet (SafeDrug main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "armr2"
-display_name = "ARMR2"
-supported_modes = ["reproduction"]
-readiness = "registered"
-
-[baselines.source]
-repository = "https://github.com/seucoin/armr2"
-revision = "c0de843d43a1f2867d45ede836b918abd11a0fda"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
 status = "pinned"
 
 [[baselines]]
-baseline_id = "cognet"
-display_name = "COGNet"
-supported_modes = ["reproduction"]
+baseline_id = "safedrug"
+display_name = "SafeDrug (main)"
+supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 
 [baselines.source]
-repository = "https://github.com/BarryRun/COGNet"
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "cafemed"
-display_name = "CafeMed"
-supported_modes = ["reproduction"]
-readiness = "registered"
-archive_evidence = ["New-Search@9971464253c556345262b22ed6d44b2cc14c9da8:medication-rec/CafeMed"]
-
-[baselines.source]
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "kgdnet"
-display_name = "KGDNet"
-supported_modes = ["reproduction"]
-readiness = "registered"
-archive_evidence = ["New-Search@9971464253c556345262b22ed6d44b2cc14c9da8:medication-rec/KGDNet"]
-
-[baselines.source]
-status = "needs_pin"
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+status = "pinned"
 
 [[baselines]]
 baseline_id = "molerec"
 display_name = "MoleRec"
-supported_modes = ["reproduction"]
+supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 
 [baselines.source]
 repository = "https://github.com/yangnianzu0515/MoleRec"
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "tracedr"
-display_name = "TraceDR"
-supported_modes = ["reproduction"]
-readiness = "registered"
-
-[baselines.source]
-repository = "https://github.com/zhenjia2017/TraceDR"
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "dgcl"
-display_name = "DGCL"
-supported_modes = ["reproduction"]
-readiness = "registered"
-archive_evidence = ["New-Search@9971464253c556345262b22ed6d44b2cc14c9da8:medication-rec/dgcl"]
-
-[baselines.source]
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "micron"
-display_name = "MICRON"
-supported_modes = ["reproduction"]
-readiness = "registered"
-
-[baselines.source]
-repository = "https://github.com/ycq091044/MICRON"
-status = "needs_pin"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+status = "pinned"
 
 [[baselines]]
 baseline_id = "retain"
-display_name = "RETAIN"
-supported_modes = ["reproduction"]
-readiness = "registered"
-archive_evidence = ["New-Search@9971464253c556345262b22ed6d44b2cc14c9da8:medication-rec/retain"]
-
-[baselines.source]
-status = "needs_pin"
-
-[[baselines]]
-baseline_id = "leap-safedrug"
-display_name = "LEAP-SafeDrug"
+display_name = "RETAIN (SafeDrug main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-status = "needs_pin"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+status = "pinned"
+
+[[baselines]]
+baseline_id = "leap-safedrug"
+display_name = "LEAP (SafeDrug main)"
+supported_modes = ["reproduction", "comparison"]
+readiness = "registered"
+
+[baselines.source]
+repository = "https://github.com/ycq091044/SafeDrug"
+revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+status = "pinned"
