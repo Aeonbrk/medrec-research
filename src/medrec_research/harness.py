@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from http import HTTPStatus
@@ -10,6 +11,7 @@ from importlib.resources import files
 from pathlib import Path
 from threading import Lock
 from typing import Any
+from urllib.parse import urlsplit
 
 from ._validation import canonical_json, parse_json_object
 from .action_gate import (
@@ -29,7 +31,7 @@ _JSON_TYPE = "application/json"
 _SECURITY_HEADERS = {
     "Cache-Control": "no-store",
     "Content-Security-Policy": (
-        "default-src 'none'; script-src 'self'; style-src 'self'; "
+        "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; "
         "connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
     ),
     "Cross-Origin-Opener-Policy": "same-origin",
@@ -38,10 +40,11 @@ _SECURITY_HEADERS = {
     "Referrer-Policy": "no-referrer",
     "X-Content-Type-Options": "nosniff",
 }
-_ASSETS = {
-    "/": ("index.html", "text/html; charset=utf-8"),
-    "/assets/app.css": ("app.css", "text/css; charset=utf-8"),
-    "/assets/app.js": ("app.js", "text/javascript; charset=utf-8"),
+_ASSET_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
+_ASSET_TYPES = {
+    ".css": "text/css; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".woff2": "font/woff2",
 }
 
 Clock = Callable[[], datetime]
@@ -49,6 +52,24 @@ Clock = Callable[[], datetime]
 
 def _error_payload(code: str) -> dict[str, object]:
     return {"error": code, "kind": "harness_error", "schema_version": 1}
+
+
+def _static_asset(target: str) -> tuple[tuple[str, ...], str] | None:
+    """Resolve only the Vite entrypoint and one-level hashed build assets."""
+
+    path = urlsplit(target).path
+    if path == "/":
+        return ("index.html",), "text/html; charset=utf-8"
+    prefix = "/assets/"
+    if not path.startswith(prefix):
+        return None
+    name = path.removeprefix(prefix)
+    if not _ASSET_NAME.fullmatch(name):
+        return None
+    content_type = _ASSET_TYPES.get(Path(name).suffix)
+    if content_type is None:
+        return None
+    return ("assets", name), content_type
 
 
 class _HarnessServer(ThreadingHTTPServer):
@@ -219,12 +240,15 @@ class _HarnessHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if not self._valid_host():
             return
-        asset = _ASSETS.get(self.path)
+        asset = _static_asset(self.path)
         if asset is not None:
-            name, content_type = asset
+            parts, content_type = asset
             try:
-                body = files("medrec_research.web").joinpath(name).read_bytes()
-            except (FileNotFoundError, ModuleNotFoundError, OSError):
+                body = files("medrec_research.web").joinpath(*parts).read_bytes()
+            except FileNotFoundError:
+                self._send_json(HTTPStatus.NOT_FOUND, _error_payload("route_not_found"))
+                return
+            except (ModuleNotFoundError, OSError):
                 self._send_json(
                     HTTPStatus.INTERNAL_SERVER_ERROR,
                     _error_payload("asset_unavailable"),

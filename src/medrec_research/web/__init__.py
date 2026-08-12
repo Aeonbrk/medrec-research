@@ -1,3 +1,1 @@
-"""Package resources for the loopback benchmark harness."""
-
-__all__: tuple[str, ...] = ()
+"""Built MedRec research console package resources."""
