@@ -101,6 +101,7 @@ def _running_server(
     bundle: AuthorityBundle | None = None,
     authority_bundle_path: Path | None = None,
     research_loop_path: Path | None = None,
+    hitl_session: object | None = None,
     now: datetime = NOW,
     clock: Callable[[], datetime] | None = None,
 ) -> Iterator[tuple[object, str]]:
@@ -115,6 +116,7 @@ def _running_server(
         actions_enabled=actions_enabled,
         authority_bundle_path=authority_bundle_path,
         research_loop_path=research_loop_path,
+        hitl_session=hitl_session,
         port=0,
     )
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -325,6 +327,67 @@ def test_action_context_drives_allowed_request_without_execution(status_path: Pa
     assert decision["status"] == "allowed"
     assert decision["request"]["request_sha256"]
     assert "execut" not in json.dumps(decision).lower()
+
+
+def test_allowed_action_fails_closed_when_runtime_queue_is_unavailable(
+    status_path: Path,
+) -> None:
+    class UnavailableQueue:
+        actions_enabled = True
+
+        def queue_action_request(self, value: object) -> None:
+            del value
+            raise OSError("private storage detail")
+
+    snapshot = _snapshot()
+    with _running_server(
+        status_path,
+        actions_enabled=True,
+        bundle=_bundle(snapshot),
+        hitl_session=UnavailableQueue(),
+    ) as (_, host):
+        context = json.loads(_request(host, "GET", "/api/action-context")[2])
+        status, _, body = _request(
+            host,
+            "POST",
+            "/api/action-requests",
+            body=json.dumps(
+                {
+                    "kind": "action_request_input",
+                    "request_id": context["request_id"],
+                    "schema_version": 1,
+                }
+            ).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Origin": f"http://{host}",
+            },
+        )
+
+    assert status == 503
+    assert json.loads(body)["error"] == "action_queue_unavailable"
+    assert b"private storage detail" not in body
+
+
+def test_hitl_session_action_authority_is_rechecked_per_request(status_path: Path) -> None:
+    class DynamicSession:
+        actions_enabled = False
+
+    snapshot = _snapshot()
+    session = DynamicSession()
+    bundle_path = status_path.with_name("authority-bundle.json")
+    bundle_path.write_text(_bundle(snapshot).to_json(indent=2), encoding="utf-8")
+    with _running_server(
+        status_path,
+        authority_bundle_path=bundle_path,
+        hitl_session=session,
+    ) as (_, host):
+        disabled = json.loads(_request(host, "GET", "/api/action-context")[2])
+        session.actions_enabled = True
+        enabled = json.loads(_request(host, "GET", "/api/action-context")[2])
+
+    assert disabled["enabled"] is False
+    assert enabled["enabled"] is True
 
 
 def test_cli_and_harness_emit_the_same_canonical_action_decision(

@@ -19,7 +19,7 @@ Do not launch a real run until all conditions hold:
 - The declared baseline source revision, Conda environment, adapter, and readiness satisfy the requested mode.
 - GPU memory and disk capacity are adequate without disrupting another job.
 
-The repository has a Git history and an `origin` remote, but its 319 checkout is absent. That blocks real execution but does not block local harness development.
+The repository has a Git history and an `origin` remote. A 2026-08-12 read-only observation found a clean `/root/zhb/medrec-research` checkout through the fallback profile, but its revision differed from the current local accepted revision and `MEDREC_DATA_ROOT` was not configured. This supersedes the earlier missing-checkout observation without authorizing synchronization or environment changes.
 
 ## Connection preflight
 

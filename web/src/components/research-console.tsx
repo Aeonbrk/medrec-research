@@ -1,3 +1,4 @@
+import * as React from "react"
 import {
   IconAlertTriangle,
   IconArrowUpRight,
@@ -9,6 +10,7 @@ import {
   IconFingerprint,
   IconGitBranch,
   IconLock,
+  IconUserCheck,
   IconRefresh,
   IconRoute,
   IconSend,
@@ -16,7 +18,7 @@ import {
   IconTimeline,
 } from "@tabler/icons-react"
 
-import type { ActionState, LoopState } from "@/App"
+import type { ActionState, HitlControlState, LoopState } from "@/App"
 import {
   EvidenceDisclosure,
   safeEvidenceUrl,
@@ -25,6 +27,7 @@ import { StateBadge } from "@/components/state-badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Empty,
   EmptyDescription,
@@ -33,6 +36,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Table,
   TableBody,
@@ -341,9 +345,9 @@ function Overview({
   return (
     <div className="space-y-5">
       <SectionHeading
-        eyebrow="CONTROL PLANE / READ ONLY"
+        eyebrow="CONTROL PLANE / BOUNDED HITL"
         title="当前研究状态，一屏完成可信判断"
-        description="所有数值、门禁与证据均来自 Python harness 的现有 API；界面不推断 readiness，也不补写科学结论。"
+        description="所有数值、门禁与证据均来自 Python harness；只有 H1/H2 是绑定当前记录的人工决策，界面不推断 readiness，也不补写科学结论。"
         aside={
           <StateBadge
             state={status.condition === "current" ? "pass" : "attention"}
@@ -822,7 +826,209 @@ function LaneCards({ rows }: { rows: ResearchLane[] }) {
   )
 }
 
-function Hitl({ loop, view }: { loop: LoopState; view: ViewState }) {
+function HumanDecisionPanel({
+  hitl,
+  onDecision,
+}: {
+  hitl: HitlControlState
+  onDecision: (
+    path: "/api/h1" | "/api/h2",
+    payload: Record<string, unknown>
+  ) => void
+}) {
+  const [researcher, setResearcher] = React.useState("")
+  const [rationale, setRationale] = React.useState("")
+  const [laneId, setLaneId] = React.useState("")
+  const [action, setAction] = React.useState("hold")
+  const ready = hitl.phase === "ready"
+  const control = ready ? hitl.value : null
+  const submitting = hitl.phase === "submitting"
+  const h1Enabled = Boolean(control?.h1.enabled && !control.h1.current)
+  const h2Lane = control?.h2.find((lane) => lane.lane_id === laneId)
+
+  React.useEffect(() => {
+    if (control?.h2.length && !laneId) setLaneId(control.h2[0].lane_id)
+  }, [control, laneId])
+
+  return (
+    <section
+      className="border border-border bg-surface-raised"
+      aria-busy={submitting}
+    >
+      <div className="flex items-start gap-3 border-b px-4 py-3">
+        <div className="grid size-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+          <IconUserCheck aria-hidden="true" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold">Human authority</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            你的决定绑定服务器当前 contract / packet；不会执行远程任务。
+          </p>
+        </div>
+      </div>
+      {!ready ? (
+        <Alert
+          variant={hitl.phase === "rejected" ? "destructive" : "default"}
+          className="m-4"
+        >
+          <IconAlertTriangle aria-hidden="true" />
+          <AlertTitle>
+            {hitl.phase === "rejected"
+              ? "科学决策被拒绝"
+              : "人工控制状态不可用"}
+          </AlertTitle>
+          <AlertDescription>
+            {hitl.phase === "rejected"
+              ? "contract、H1 或 packet 已变化，或 go 不满足 usable + accepted 条件。请重新载入。"
+              : "当前不能安全创建 H1/H2；研究状态保持不变。"}
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div className="grid gap-5 p-4 xl:grid-cols-2">
+          <form
+            className="space-y-3"
+            onSubmit={(event) => {
+              event.preventDefault()
+              onDecision("/api/h1", {
+                kind: "h1_input",
+                schema_version: 1,
+                owner: researcher,
+                rationale,
+              })
+            }}
+          >
+            <div>
+              <h4 className="text-sm font-semibold">H1 · 冻结当前复现契约</h4>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {control?.h1.current
+                  ? `current · ${control.h1.owner ?? "unknown"}`
+                  : h1Enabled
+                    ? "完整 production contract 已就绪，等待你的明确接受。"
+                    : "production contract 缺失或无效。"}
+              </p>
+            </div>
+            <label
+              className="block text-xs font-medium"
+              htmlFor="hitl-researcher"
+            >
+              研究负责人 ID
+            </label>
+            <Input
+              id="hitl-researcher"
+              value={researcher}
+              onChange={(event) => setResearcher(event.target.value)}
+              placeholder="例如 oian"
+              autoComplete="off"
+            />
+            <label
+              className="block text-xs font-medium"
+              htmlFor="hitl-rationale"
+            >
+              决策理由（公开安全、单行）
+            </label>
+            <Textarea
+              id="hitl-rationale"
+              value={rationale}
+              onChange={(event) =>
+                setRationale(event.target.value.replace(/[\r\n]+/g, " "))
+              }
+              placeholder="说明为什么接受或如何处置证据"
+            />
+            <Button
+              type="submit"
+              disabled={!h1Enabled || !researcher || submitting}
+              aria-disabled={!h1Enabled || !researcher || submitting}
+              className="min-h-11"
+            >
+              明确接受并创建 H1
+            </Button>
+          </form>
+          <form
+            className="space-y-3 border-t pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-5"
+            onSubmit={(event) => {
+              event.preventDefault()
+              onDecision("/api/h2", {
+                kind: "h2_input",
+                schema_version: 1,
+                lane_id: laneId,
+                researcher,
+                action,
+                rationale,
+              })
+            }}
+          >
+            <div>
+              <h4 className="text-sm font-semibold">H2 · 处置当前证据包</h4>
+              <p className="mt-1 text-xs text-muted-foreground">
+                go 仅在 current + complete + usable + accepted 时成立。
+              </p>
+            </div>
+            <label className="block text-xs font-medium" htmlFor="hitl-lane">
+              lane
+            </label>
+            <select
+              id="hitl-lane"
+              className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
+              value={laneId}
+              onChange={(event) => setLaneId(event.target.value)}
+              disabled={!control?.h2.length}
+            >
+              {control?.h2.map((lane) => (
+                <option key={lane.lane_id} value={lane.lane_id}>
+                  {lane.lane_id} · {lane.current_action ?? "pending"}
+                </option>
+              ))}
+            </select>
+            <label className="block text-xs font-medium" htmlFor="hitl-action">
+              决策
+            </label>
+            <select
+              id="hitl-action"
+              className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
+              value={action}
+              onChange={(event) => setAction(event.target.value)}
+            >
+              <option value="hold">hold</option>
+              <option value="revise">revise</option>
+              <option value="kill">kill</option>
+              <option value="go" disabled={!h2Lane?.go_eligible}>
+                go
+              </option>
+            </select>
+            <Button
+              type="submit"
+              disabled={!h2Lane?.enabled || !researcher || submitting}
+              aria-disabled={!h2Lane?.enabled || !researcher || submitting}
+              className="min-h-11"
+            >
+              创建 H2 决策
+            </Button>
+          </form>
+        </div>
+      )}
+      {control?.blockers.length ? (
+        <div className="border-t px-4 py-3 text-xs text-destructive">
+          {control.blockers.join(" · ")}
+        </div>
+      ) : null}
+    </section>
+  )
+}
+
+function Hitl({
+  loop,
+  hitl,
+  view,
+  onDecision,
+}: {
+  loop: LoopState
+  hitl: HitlControlState
+  view: ViewState
+  onDecision: (
+    path: "/api/h1" | "/api/h2",
+    payload: Record<string, unknown>
+  ) => void
+}) {
   if (loop.phase === "loading")
     return (
       <div className="space-y-4">
@@ -843,17 +1049,6 @@ function Hitl({ loop, view }: { loop: LoopState; view: ViewState }) {
           description="仅显示 Python harness 判定为 current 的研究循环状态。"
         />
         <LoopUnavailable phase={loop.phase} />
-      </div>
-    )
-  if (loop.value.stale || !loop.value.h1_current)
-    return (
-      <div className="space-y-5">
-        <SectionHeading
-          eyebrow="HUMAN IN THE LOOP"
-          title="HITL 循环"
-          description="非当前状态不用于展示 lane 详情。"
-        />
-        <LoopUnavailable phase="unavailable" />
       </div>
     )
   const filtered = loop.value.lanes.filter(
@@ -884,8 +1079,21 @@ function Hitl({ loop, view }: { loop: LoopState; view: ViewState }) {
         eyebrow="HUMAN IN THE LOOP"
         title="HITL 循环"
         description="H1 current 只允许审查当前 evidence packet；h2_go_eligible 不是浏览器审批或执行。"
-        aside={<StateBadge state="pass" label="H1 current" />}
+        aside={
+          <StateBadge
+            state={loop.value.h1_current ? "pass" : "blocked"}
+            label={loop.value.h1_current ? "H1 current" : "H1 required"}
+          />
+        }
       />
+      {loop.value.blockers.length > 0 && (
+        <Alert variant="destructive">
+          <IconAlertTriangle aria-hidden="true" />
+          <AlertTitle>当前循环 fail closed</AlertTitle>
+          <AlertDescription>{loop.value.blockers.join(" · ")}</AlertDescription>
+        </Alert>
+      )}
+      <HumanDecisionPanel hitl={hitl} onDecision={onDecision} />
       {rows.length === 0 ? (
         <NoResults />
       ) : (
@@ -1037,17 +1245,24 @@ function Authority({
 export function ResearchConsole({
   harness,
   loop,
+  hitl,
   view,
   action,
   onRequest,
   onRetry,
+  onHitlDecision,
 }: {
   harness: HarnessState
   loop: LoopState
+  hitl: HitlControlState
   view: ViewState
   action: ActionState
   onRequest: () => void
   onRetry: () => void
+  onHitlDecision: (
+    path: "/api/h1" | "/api/h2",
+    payload: Record<string, unknown>
+  ) => void
 }) {
   return (
     <main
@@ -1071,7 +1286,9 @@ export function ResearchConsole({
       {view.section === "lineage" && (
         <Lineage status={harness.status} view={view} />
       )}
-      {view.section === "hitl" && <Hitl loop={loop} view={view} />}
+      {view.section === "hitl" && (
+        <Hitl loop={loop} hitl={hitl} view={view} onDecision={onHitlDecision} />
+      )}
       {view.section === "authority" && (
         <Authority status={harness.status} view={view} />
       )}

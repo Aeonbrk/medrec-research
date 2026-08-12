@@ -10,7 +10,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
 from pathlib import Path
 from threading import Lock
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlsplit
 
 from ._validation import canonical_json, parse_json_object
@@ -24,6 +24,9 @@ from .action_gate import (
 from .errors import ProtocolValidationError
 from .project_status import AuthorityDigest, ProjectStatus, SnapshotCondition, load_status
 from .research_loop_status import load_research_loop
+
+if TYPE_CHECKING:
+    from .research_session import ResearchSession
 
 _BODY_LIMIT = 16 * 1024
 _HOST = "127.0.0.1"
@@ -86,13 +89,15 @@ class _HarnessServer(ThreadingHTTPServer):
         actions_enabled: bool,
         authority_bundle_path: Path | None,
         research_loop_path: Path | None,
+        hitl_session: ResearchSession | None,
     ) -> None:
         self.status_path = status_path
         self.expected_authorities = expected_authorities
         self.clock = clock
-        self.actions_enabled = actions_enabled
+        self._actions_enabled = actions_enabled
         self.authority_bundle_path = authority_bundle_path
         self.research_loop_path = research_loop_path
+        self.hitl_session = hitl_session
         self._last_known_good: ProjectStatus | None = None
         self._status_lock = Lock()
         super().__init__(address, _HarnessHandler)
@@ -100,6 +105,12 @@ class _HarnessServer(ThreadingHTTPServer):
     @property
     def expected_host(self) -> str:
         return f"{_HOST}:{self.server_port}"
+
+    @property
+    def actions_enabled(self) -> bool:
+        if self.hitl_session is not None:
+            return self.hitl_session.actions_enabled
+        return self._actions_enabled
 
     def current_status(
         self,
@@ -204,11 +215,15 @@ class _HarnessHandler(BaseHTTPRequestHandler):
     def _post_length(self) -> int | None:
         if not self._valid_host() or not self._valid_origin():
             return None
-        if not self.server.actions_enabled:
+        routes = {"/api/action-requests", "/api/h1", "/api/h2"}
+        if self.path not in routes:
+            self._reject(HTTPStatus.NOT_FOUND, "route_not_found")
+            return None
+        if self.path == "/api/action-requests" and not self.server.actions_enabled:
             self._reject(HTTPStatus.FORBIDDEN, "actions_disabled")
             return None
-        if self.path != "/api/action-requests":
-            self._reject(HTTPStatus.NOT_FOUND, "route_not_found")
+        if self.path in {"/api/h1", "/api/h2"} and self.server.hitl_session is None:
+            self._reject(HTTPStatus.FORBIDDEN, "hitl_control_disabled")
             return None
         if self.headers.get_all("Transfer-Encoding", failobj=[]):
             self._reject(HTTPStatus.BAD_REQUEST, "transfer_encoding_rejected")
@@ -271,7 +286,9 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                     _error_payload("research_loop_unavailable"),
                 )
                 return
-            if not loop.is_current or loop.stale or not loop.h1_current:
+            if not loop.is_current or (
+                self.server.hitl_session is None and (loop.stale or not loop.h1_current)
+            ):
                 self._send_json(
                     HTTPStatus.SERVICE_UNAVAILABLE,
                     _error_payload("research_loop_unavailable"),
@@ -282,6 +299,15 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 loop.to_json().encode("ascii"),
                 f"{_JSON_TYPE}; charset=utf-8",
             )
+            return
+        if self.path == "/api/hitl-control":
+            if self.server.hitl_session is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("hitl_control_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, self.server.hitl_session.control_state())
             return
         if self.path not in {"/api/status", "/api/action-context", "/api/harness-state"}:
             self._send_json(HTTPStatus.NOT_FOUND, _error_payload("route_not_found"))
@@ -335,9 +361,26 @@ class _HarnessHandler(BaseHTTPRequestHandler):
             if len(raw) != length:
                 self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("body_incomplete"))
                 return
-            payload = parse_json_object(raw.decode("utf-8"), context="action request input")
-            request = ActionRequestInput.from_dict(payload)
+            payload = parse_json_object(raw.decode("utf-8"), context="HITL input")
         except (UnicodeError, ProtocolValidationError, TypeError):
+            self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("request_input_invalid"))
+            return
+        if self.path in {"/api/h1", "/api/h2"}:
+            assert self.server.hitl_session is not None
+            try:
+                record = (
+                    self.server.hitl_session.create_h1(payload)
+                    if self.path == "/api/h1"
+                    else self.server.hitl_session.create_h2(payload)
+                )
+            except ProtocolValidationError:
+                self._send_json(HTTPStatus.CONFLICT, _error_payload("hitl_decision_rejected"))
+                return
+            self._send_json(HTTPStatus.CREATED, record)
+            return
+        try:
+            request = ActionRequestInput.from_dict(payload)
+        except (ProtocolValidationError, TypeError):
             self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("action_request_input_invalid"))
             return
         authority_bundle = self.server.current_authority_bundle()
@@ -363,6 +406,15 @@ class _HarnessHandler(BaseHTTPRequestHandler):
             authority_bundle=authority_bundle,
             now=request_clock(),
         )
+        if decision.request is not None and self.server.hitl_session is not None:
+            try:
+                self.server.hitl_session.queue_action_request(decision.request.to_dict())
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("action_queue_unavailable"),
+                )
+                return
         self._send_json(HTTPStatus.OK, decision.to_dict())
 
     def _method_not_allowed(self) -> None:
@@ -396,6 +448,7 @@ def create_harness_server(
     actions_enabled: bool = False,
     authority_bundle_path: str | Path | None = None,
     research_loop_path: str | Path | None = None,
+    hitl_session: ResearchSession | None = None,
 ) -> ThreadingHTTPServer:
     """Create an unstarted server with explicit status and action authority."""
 
@@ -415,6 +468,7 @@ def create_harness_server(
             Path(authority_bundle_path) if authority_bundle_path is not None else None
         ),
         research_loop_path=Path(research_loop_path) if research_loop_path is not None else None,
+        hitl_session=hitl_session,
     )
 
 

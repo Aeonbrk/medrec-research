@@ -1,5 +1,13 @@
 # Plans
 
+## Completed: One-command HITL Research Session
+
+- **Status**: completed locally on `2026-08-12`; ARIS is updated and the one-command launcher is implemented and verified.
+- **Plan**: `docs/plans/2026-08-12-013-feat-one-command-hitl-research-session-plan.md`.
+- **Scope**: replace manual status and harness arguments with `./start-research`, a real-state coordinator that performs fail-closed 319 preflight, publishes ignored runtime projections, starts the production console, and exposes narrowly controlled H1/H2 decisions without bypassing the Action Gate.
+- **Execution boundary**: startup and preflight are read-only on 319. The launcher never substitutes fixtures, mutates the remote checkout or environment, allocates resources, or executes an Action Request.
+- **Current blockers**: remote/local source drift, missing remote `MEDREC_DATA_ROOT`, unverified declared environments and readiness, unresolved license evidence, and incomplete H1 acceptance authority.
+
 ## Completed: React Research Console Rebuild
 
 - **Status**: completed locally on `2026-08-12` in the isolated `codex/shadcn-ui-rebuild` worktree; independent PR pending review.
@@ -42,7 +50,7 @@
 - **Status**: active on `2026-07-14`; GAMENet, SafeDrug, RETAIN, and LEAP-SafeDrug use `ycq091044/SafeDrug@88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a`; MoleRec uses `yangnianzu0515/MoleRec@dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`.
 - **Plan**: `docs/plans/2026-07-14-007-chore-final-five-baseline-program.md`.
 - **Execution boundary**: four SafeDrug-main entries share repository-native data, split, and evaluation semantics. MoleRec remains source-native. Every candidate is `registered` until 319 preflight and mode-specific evidence pass.
-- **Current blocker**: the 319 SSH connection times out during banner exchange. No remote checkout, environment, data access, or training began.
+- **Current blocker**: the previous SSH and missing-checkout observation is superseded by the 2026-08-12 read-only preflight. The fallback route reaches a clean remote checkout, but source revision drift, a missing `MEDREC_DATA_ROOT`, unverified environment/readiness, and unresolved license/acceptance authority still block real execution.
 
 ## Completed: Benchmark Authority Contract Hardening
 

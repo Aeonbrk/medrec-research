@@ -15,9 +15,11 @@ import { fetchJson, TransportError } from "@/lib/api"
 import {
   validateActionDecision,
   validateHarnessState,
+  validateHitlControl,
   validateResearchLoop,
   type ActionDecision,
   type HarnessState,
+  type HitlControl,
   type ResearchLoop,
 } from "@/lib/domain"
 
@@ -32,6 +34,11 @@ export type ActionState =
   | { phase: "submitting" }
   | { phase: "allowed" | "blocked"; decision: ActionDecision }
   | { phase: LoadFailure }
+
+export type HitlControlState =
+  | { phase: "loading" }
+  | { phase: "ready"; value: HitlControl }
+  | { phase: "submitting" | "rejected" | LoadFailure }
 
 function failureKind(error: unknown): LoadFailure {
   return error instanceof TransportError || error instanceof TypeError
@@ -73,6 +80,7 @@ export function App() {
   const [harness, setHarness] = React.useState<HarnessState | null>(null)
   const [failure, setFailure] = React.useState<LoadFailure | null>(null)
   const [loop, setLoop] = React.useState<LoopState>({ phase: "loading" })
+  const [hitl, setHitl] = React.useState<HitlControlState>({ phase: "loading" })
   const [action, setAction] = React.useState<ActionState>({ phase: "idle" })
   const inFlight = React.useRef(false)
 
@@ -80,6 +88,7 @@ export function App() {
     setHarness(null)
     setFailure(null)
     setLoop({ phase: "loading" })
+    setHitl({ phase: "loading" })
     setAction({ phase: "idle" })
     inFlight.current = false
     try {
@@ -104,6 +113,14 @@ export function App() {
             ? "unavailable"
             : failureKind(error),
       })
+    }
+    try {
+      setHitl({
+        phase: "ready",
+        value: validateHitlControl(await fetchJson("/api/hitl-control")),
+      })
+    } catch (error) {
+      setHitl({ phase: failureKind(error) })
     }
   }, [])
 
@@ -133,6 +150,28 @@ export function App() {
       setAction({ phase: failureKind(error) })
     }
   }, [harness])
+
+  const submitHitl = React.useCallback(
+    async (path: "/api/h1" | "/api/h2", payload: Record<string, unknown>) => {
+      setHitl({ phase: "submitting" })
+      try {
+        await fetchJson(path, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+        await load()
+      } catch (error) {
+        setHitl({
+          phase:
+            error instanceof TransportError && error.status === 409
+              ? "rejected"
+              : failureKind(error),
+        })
+      }
+    },
+    [load]
+  )
 
   return (
     <ThemeProvider theme={view.theme}>
@@ -170,10 +209,14 @@ export function App() {
               <ResearchConsole
                 harness={harness}
                 loop={loop}
+                hitl={hitl}
                 view={view}
                 action={action}
                 onRequest={() => void requestAction()}
                 onRetry={() => void load()}
+                onHitlDecision={(path, payload) =>
+                  void submitHitl(path, payload)
+                }
               />
             ) : (
               <main

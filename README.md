@@ -10,6 +10,16 @@ Prior work remains in the read-only Research Archive at `/Users/oian/Codes/maste
 
 ## Start here
 
+日常推进真实 HITL 科研会话只需要：
+
+```bash
+./start-research
+```
+
+该入口自动读取当前项目与 ARIS 安装、执行只读 319 preflight、在 `runtime/hitl/` 发布公开安全状态、启动 production Web 控制台并打开浏览器。它不会使用 `fixtures/` 填充缺失状态。缺少 production contract、H1/H2、远端 source revision、`MEDREC_DATA_ROOT`、环境 readiness、许可证或动作 authority 时，控制台会明确列出 blocker 并保持 fail closed。首次启动通常约需 20 秒，因为会先尝试 primary SSH profile，再按 playbook 回退。
+
+你作为 Human-in-the-loop 中的 H，主要在控制台的「HITL 循环」完成两类动作：H1 接受并冻结当前复现契约；H2 对当前 Decision Packet 选择 `go`、`revise`、`kill` 或 `hold` 并填写理由。H1/H2 是科学决策记录，不是远端执行权限。`go` 只在 current、complete、usable、accepted 的 packet 上成立；Action Request 即使获准也只会进入 ignored runtime 队列，不会直接运行 SSH、Conda 或 GPU 作业。按 `Ctrl-C` 停止本机控制台。
+
 - [`docs/START_HERE.md`](docs/START_HERE.md) is the repository navigation map.
 - [`CONTEXT.md`](CONTEXT.md) defines the project language.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) maps modules and seams.
@@ -115,7 +125,7 @@ ARIS runtime traces stay local. Gate-approved protocols, aggregate Run Records, 
 
 The MacBook Air is the harness terminal. It runs ARIS, protocol validation, synthetic fixtures, source submission, monitoring, aggregate-result intake, and public-safe audits. Real EHR experiments, training, GPU inference, and external baseline environments run only on `319-wild`.
 
-The 319 checkout does not exist yet. Do not launch a real experiment until the intended source revision is available on 319, the remote checkout is verified, and the remote preflight in the playbook passes.
+2026-08-12 的只读 preflight 已通过 fallback SSH profile 到达 319，并看到已有 clean checkout 与可用 GPU 容量；但 remote revision 与当前本地 revision 不一致，且远端未配置 `MEDREC_DATA_ROOT`。环境/readiness、许可证与 H1 acceptance authority 也仍未满足。以每次 `./start-research` 生成的实时 preflight 为准，不要把这一观察当作长期容量保证。
 
 ## Data safety
 

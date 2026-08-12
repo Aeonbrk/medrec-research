@@ -86,7 +86,7 @@ export function AppSidebar({
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
             <p className="truncate text-sm font-semibold">MedRec Research</p>
             <p className="truncate text-xs text-sidebar-foreground/65">
-              本机只读投影
+              本机受控 HITL 投影
             </p>
           </div>
         </div>
@@ -102,7 +102,7 @@ export function AppSidebar({
           Python production
         </Badge>
         <p className="text-xs text-sidebar-foreground/65">
-          无执行面，无科学写接口
+          H1/H2 有界写入，无直接执行面
         </p>
       </SidebarFooter>
       <SidebarRail />

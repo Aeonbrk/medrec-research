@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import webbrowser
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from hashlib import sha256
@@ -51,6 +52,7 @@ from .reproduction_contract import (
     SafeDrugBatchContract,
 )
 from .research_loop_status import ResearchLoopStatus
+from .research_session import ResearchSession
 from .run_record import ArtifactChecksum, RunParameter, RunRecord
 
 Clock = Callable[[], datetime]
@@ -150,6 +152,13 @@ def _build_parser() -> argparse.ArgumentParser:
     harness.add_argument("--research-loop", type=Path)
     harness.add_argument("--port", type=_port, default=0)
     harness.set_defaults(handler=_serve_harness)
+
+    research = commands.add_parser("research")
+    research.add_argument("--root", type=Path, default=Path.cwd())
+    research.add_argument("--port", type=_port, default=0)
+    research.add_argument("--no-browser", action="store_true")
+    research.add_argument("--preflight-timeout", type=_positive_integer, default=12)
+    research.set_defaults(handler=_serve_research_session)
 
     reproduction = commands.add_parser(
         "validate-reproduction",
@@ -472,6 +481,35 @@ def _serve_harness(arguments: argparse.Namespace, clock: Clock) -> tuple[int, st
         research_loop_path=arguments.research_loop,
     )
     print(f"http://127.0.0.1:{server.server_port}", flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+    return 0, None
+
+
+def _serve_research_session(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
+    root = arguments.root.resolve()
+    if not (root / "pyproject.toml").is_file() or not (root / "baselines").is_dir():
+        raise ProtocolValidationError("research root is not a medrec-research checkout")
+    session = ResearchSession(root, clock=clock)
+    snapshot, _ = session.prepare(timeout_seconds=arguments.preflight_timeout)
+    server = create_harness_server(
+        status_path=session.status_path,
+        expected_authorities=snapshot.authorities,
+        clock=clock,
+        port=arguments.port,
+        actions_enabled=session.actions_enabled,
+        authority_bundle_path=session.authority_bundle_path,
+        research_loop_path=session.loop_path,
+        hitl_session=session,
+    )
+    url = f"http://127.0.0.1:{server.server_port}/?section=hitl"
+    print(url, flush=True)
+    if not arguments.no_browser:
+        webbrowser.open(url)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

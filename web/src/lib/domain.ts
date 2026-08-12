@@ -120,6 +120,23 @@ export type ResearchLoop = {
   blockers: string[]
 }
 
+export type HitlControl = {
+  kind: "hitl_control"
+  schema_version: 1
+  blockers: string[]
+  h1: {
+    current: boolean
+    enabled: boolean
+    owner: string | null
+  }
+  h2: Array<{
+    current_action: string | null
+    enabled: boolean
+    go_eligible: boolean
+    lane_id: string
+  }>
+}
+
 export type ActionDecision =
   | {
       kind: "action_decision"
@@ -451,6 +468,50 @@ export function validateResearchLoop(value: unknown): ResearchLoop {
           lane.evidence_urls,
           `lane.${index}.evidence_urls`
         ),
+      }
+    }),
+  }
+}
+
+export function validateHitlControl(value: unknown): HitlControl {
+  if (
+    !isRecord(value) ||
+    value.kind !== "hitl_control" ||
+    value.schema_version !== 1 ||
+    !Array.isArray(value.blockers) ||
+    !Array.isArray(value.h2) ||
+    !isRecord(value.h1)
+  ) {
+    throw new Error("malformed:hitl_control")
+  }
+  if (value.h1.owner !== null && typeof value.h1.owner !== "string") {
+    throw new Error("malformed:hitl_control.h1.owner")
+  }
+  return {
+    kind: "hitl_control",
+    schema_version: 1,
+    blockers: stringArray(value.blockers, "hitl_control.blockers"),
+    h1: {
+      current: booleanValue(value.h1.current, "hitl_control.h1.current"),
+      enabled: booleanValue(value.h1.enabled, "hitl_control.h1.enabled"),
+      owner: value.h1.owner,
+    },
+    h2: value.h2.map((item, index) => {
+      if (!isRecord(item)) throw new Error(`malformed:hitl_control.h2.${index}`)
+      if (
+        item.current_action !== null &&
+        typeof item.current_action !== "string"
+      ) {
+        throw new Error(`malformed:hitl_control.h2.${index}.current_action`)
+      }
+      return {
+        current_action: item.current_action,
+        enabled: booleanValue(item.enabled, `hitl_control.h2.${index}.enabled`),
+        go_eligible: booleanValue(
+          item.go_eligible,
+          `hitl_control.h2.${index}.go_eligible`
+        ),
+        lane_id: stringValue(item.lane_id, `hitl_control.h2.${index}.lane_id`),
       }
     }),
   }
