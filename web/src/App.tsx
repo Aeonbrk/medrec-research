@@ -175,7 +175,7 @@ export function App() {
 
   return (
     <ThemeProvider theme={view.theme}>
-      <TooltipProvider delayDuration={180}>
+      <TooltipProvider delay={180}>
         <SidebarProvider>
           <a className="skip-link" href="#main-content">
             跳到主要内容
