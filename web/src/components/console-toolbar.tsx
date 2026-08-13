@@ -29,6 +29,18 @@ const themeIcons = {
   dark: IconMoon,
 }
 
+const sortItems = [
+  { label: "按标识", value: "identity" },
+  { label: "按状态", value: "state" },
+]
+
+const statusItems = [
+  { label: "全部状态", value: "all" },
+  { label: "通过", value: "pass" },
+  { label: "待核验", value: "attention" },
+  { label: "阻塞", value: "blocked" },
+]
+
 export function ConsoleToolbar({
   view,
   update,
@@ -68,18 +80,22 @@ export function ConsoleToolbar({
       <div className="flex flex-wrap items-center gap-2">
         {dataSection && (
           <Select
+            items={sortItems}
             value={view.sort}
-            onValueChange={(sort) =>
-              update({ sort: sort as ViewState["sort"] })
-            }
+            onValueChange={(sort) => {
+              if (sort) update({ sort: sort as ViewState["sort"] })
+            }}
           >
             <SelectTrigger aria-label="排序字段">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent position="popper">
+            <SelectContent alignItemWithTrigger={false}>
               <SelectGroup>
-                <SelectItem value="identity">按标识</SelectItem>
-                <SelectItem value="state">按状态</SelectItem>
+                {sortItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -102,20 +118,22 @@ export function ConsoleToolbar({
         )}
         {statusSection && (
           <Select
+            items={statusItems}
             value={view.status}
-            onValueChange={(status) =>
-              update({ status: status as ViewState["status"] })
-            }
+            onValueChange={(status) => {
+              if (status) update({ status: status as ViewState["status"] })
+            }}
           >
             <SelectTrigger aria-label="状态筛选">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent position="popper">
+            <SelectContent alignItemWithTrigger={false}>
               <SelectGroup>
-                <SelectItem value="all">全部状态</SelectItem>
-                <SelectItem value="pass">通过</SelectItem>
-                <SelectItem value="attention">待核验</SelectItem>
-                <SelectItem value="blocked">阻塞</SelectItem>
+                {statusItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
