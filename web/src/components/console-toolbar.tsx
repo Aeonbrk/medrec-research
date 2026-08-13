@@ -121,11 +121,11 @@ export function ConsoleToolbar({
           </Select>
         )}
         <ToggleGroup
-          type="single"
-          value={view.density}
-          onValueChange={(density) =>
-            density && update({ density: density as ViewState["density"] })
-          }
+          value={[view.density]}
+          onValueChange={(density) => {
+            const nextDensity = density[0] as ViewState["density"] | undefined
+            if (nextDensity) update({ density: nextDensity })
+          }}
           variant="outline"
           size="sm"
           aria-label="信息密度"
@@ -134,11 +134,11 @@ export function ConsoleToolbar({
           <ToggleGroupItem value="comfortable">舒适</ToggleGroupItem>
         </ToggleGroup>
         <ToggleGroup
-          type="single"
-          value={view.theme}
-          onValueChange={(theme) =>
-            theme && update({ theme: theme as ViewState["theme"] })
-          }
+          value={[view.theme]}
+          onValueChange={(theme) => {
+            const nextTheme = theme[0] as ViewState["theme"] | undefined
+            if (nextTheme) update({ theme: nextTheme })
+          }}
           variant="outline"
           size="sm"
           aria-label="主题"
