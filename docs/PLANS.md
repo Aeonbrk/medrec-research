@@ -1,5 +1,13 @@
 # Plans
 
+## Active: Single-project HITL Research Control Console and Base UI Migration
+
+- **Status**: active on `2026-08-13`; fact audit and local green baseline are complete, implementation is in progress on `codex/hitl-base-ui-control-console`.
+- **Plan**: `docs/plans/2026-08-13-014-feat-hitl-control-console-base-ui-plan.md`.
+- **Scope**: turn the production Python harness into the single-project decision console for contract drafting, H1, declared execution, monitoring, restricted public-safe evidence intake, Decision Packet review, H2, and next-round routing; migrate every production Radix wrapper and consumer to Base UI.
+- **Execution boundary**: local control-plane code, synthetic/no-data rehearsals, public-safe records, package assets, and read-only remote preflight are authorized. Real 319 writes, data access, GPU work, environment creation, cost-bearing execution, and the GAMENet canary remain blocked pending explicit human authorization and all scientific gates.
+- **Evidence target**: durable idempotent queue, registered execution declarations, fixed ARIS bridge commands, replayable monitor state, fail-closed downstream dependencies, Base UI migration reports, production Playwright/axe evidence, package/drift/security gates, and honest final-five blocker projection.
+
 ## Completed: One-command HITL Research Session
 
 - **Status**: completed locally on `2026-08-12`; ARIS is updated and the one-command launcher is implemented and verified.

@@ -1,0 +1,136 @@
+schema_version = 1
+project_id = "medrec-research"
+target_id = "319-wild"
+initial_lane_id = "gamenet"
+
+[actions.refresh_authorization]
+kind = "manual"
+command_template_id = "manual-authority-review"
+
+[actions.resolve_source_license]
+kind = "manual"
+command_template_id = "manual-source-license-review"
+
+[actions.advance_readiness]
+kind = "manual"
+command_template_id = "manual-readiness-review"
+
+[actions.refresh_remote_preflight]
+kind = "local"
+command_template_id = "fixed-read-only-preflight"
+
+[actions.request_reproduction]
+kind = "remote"
+command_template_id = "aris-source-native-reproduction"
+
+[actions.submit_reproduction_evidence]
+kind = "local"
+command_template_id = "restricted-evidence-intake"
+
+[actions.request_next_lane]
+kind = "remote"
+command_template_id = "aris-next-declared-lane"
+
+[actions.submit_human_review]
+kind = "manual"
+command_template_id = "manual-comparison-review"
+
+[actions.begin_discovery]
+kind = "local"
+command_template_id = "local-codex-aris-draft"
+
+[[lanes]]
+lane_id = "gamenet"
+baseline_id = "gamenet"
+source_revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+environment_id = "medrec-gamenet"
+resource_profile_id = "single-gpu-low-cost"
+launch_template_id = "safedrug-main-gamenet-source-native"
+evidence_schema_id = "safedrug-source-native-v1"
+source_path_id = "safedrug-main-checkout"
+data_path_id = "medrec-data-root"
+output_path_id = "gamenet-reproduction-output"
+blockers = [
+  "license-unresolved",
+  "environment-lock-unverified",
+  "adapter-smoke-missing",
+  "remote-revision-unverified",
+  "data-root-unverified",
+]
+
+[[lanes]]
+lane_id = "safedrug"
+baseline_id = "safedrug"
+source_revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+environment_id = "medrec-safedrug"
+resource_profile_id = "single-gpu-low-cost"
+launch_template_id = "safedrug-main-source-native"
+evidence_schema_id = "safedrug-source-native-v1"
+source_path_id = "safedrug-main-checkout"
+data_path_id = "medrec-data-root"
+output_path_id = "safedrug-reproduction-output"
+blockers = [
+  "license-unresolved",
+  "environment-lock-unverified",
+  "adapter-smoke-missing",
+  "remote-revision-unverified",
+  "data-root-unverified",
+]
+
+[[lanes]]
+lane_id = "molerec"
+baseline_id = "molerec"
+source_revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+environment_id = "medrec-molerec"
+resource_profile_id = "single-gpu-low-cost"
+launch_template_id = "molerec-source-native"
+evidence_schema_id = "molerec-source-native-v1"
+source_path_id = "molerec-checkout"
+data_path_id = "medrec-data-root"
+output_path_id = "molerec-reproduction-output"
+blockers = [
+  "license-unresolved",
+  "environment-declaration-missing",
+  "adapter-smoke-missing",
+  "remote-revision-unverified",
+  "data-root-unverified",
+  "brics-lineage-unverified",
+]
+
+[[lanes]]
+lane_id = "retain"
+baseline_id = "retain"
+source_revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+environment_id = "medrec-retain"
+resource_profile_id = "single-gpu-low-cost"
+launch_template_id = "safedrug-main-retain-source-native"
+evidence_schema_id = "safedrug-source-native-v1"
+source_path_id = "safedrug-main-checkout"
+data_path_id = "medrec-data-root"
+output_path_id = "retain-reproduction-output"
+blockers = [
+  "license-unresolved",
+  "environment-declaration-missing",
+  "adapter-smoke-missing",
+  "remote-revision-unverified",
+  "data-root-unverified",
+]
+
+[[lanes]]
+lane_id = "leap-safedrug"
+baseline_id = "leap-safedrug"
+source_revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+environment_id = "medrec-leap-safedrug"
+resource_profile_id = "single-gpu-low-cost"
+launch_template_id = "safedrug-main-leap-source-native"
+evidence_schema_id = "safedrug-source-native-v1"
+source_path_id = "safedrug-main-checkout"
+data_path_id = "medrec-data-root"
+output_path_id = "leap-reproduction-output"
+blockers = [
+  "license-unresolved",
+  "environment-declaration-missing",
+  "adapter-smoke-missing",
+  "remote-revision-unverified",
+  "data-root-unverified",
+]

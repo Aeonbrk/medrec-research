@@ -29,6 +29,7 @@ def main() -> None:
         )
         wheel = next(distribution.glob("medrec_research-*.whl"))
         with ZipFile(wheel) as archive:
+            names = set(archive.namelist())
             resources = {
                 name.removeprefix("medrec_research/web/")
                 for name in archive.namelist()
@@ -40,6 +41,7 @@ def main() -> None:
         assert any(name.startswith("assets/") and name.endswith(".js") for name in resources)
         assert any(name.startswith("assets/") and name.endswith(".css") for name in resources)
         assert len([name for name in resources if name.endswith(".woff2")]) == 2
+        assert "medrec_research/resources/execution-declarations.toml" in names
 
         environment = temporary / "venv"
         _run([arguments.uv, "venv", "--python", "3.11", str(environment)], cwd=temporary)

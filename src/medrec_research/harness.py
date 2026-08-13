@@ -195,6 +195,38 @@ class _HarnessHandler(BaseHTTPRequestHandler):
         body = canonical_json(value).encode("ascii")
         self._send_bytes(status, body, f"{_JSON_TYPE}; charset=utf-8")
 
+    def _send_execution_events(self) -> None:
+        if self.server.hitl_session is None:
+            self._send_json(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                _error_payload("execution_control_unavailable"),
+            )
+            return
+        cursor = self.headers.get("Last-Event-ID")
+        try:
+            events = self.server.hitl_session.execution_queue.events_after(cursor)
+        except ProtocolValidationError:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                _error_payload("execution_event_cursor_invalid"),
+            )
+            return
+        chunks = ["retry: 1500\n\n"]
+        for item in events:
+            chunks.extend(
+                (
+                    f"id: {item['event_id']}\n",
+                    "event: execution\n",
+                    f"data: {canonical_json(item)}\n\n",
+                )
+            )
+        self._send_bytes(
+            HTTPStatus.OK,
+            "".join(chunks).encode("ascii"),
+            "text/event-stream; charset=utf-8",
+            extra_headers={"X-Accel-Buffering": "no"},
+        )
+
     def _reject(self, status: HTTPStatus, code: str) -> bool:
         self._send_json(status, _error_payload(code))
         return False
@@ -308,6 +340,18 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 )
                 return
             self._send_json(HTTPStatus.OK, self.server.hitl_session.control_state())
+            return
+        if self.path == "/api/executions":
+            if self.server.hitl_session is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("execution_control_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, self.server.hitl_session.execution_state())
+            return
+        if self.path == "/api/execution-events":
+            self._send_execution_events()
             return
         if self.path not in {"/api/status", "/api/action-context", "/api/harness-state"}:
             self._send_json(HTTPStatus.NOT_FOUND, _error_payload("route_not_found"))

@@ -10,10 +10,11 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, ClassVar
 
-from ._validation import content_sha256, require_sha256, strict_fields, write_json_atomic
-from .action_gate import AuthorityBundle
+from ._validation import content_sha256, strict_fields, write_json_atomic
+from .action_gate import ActionRequest, AuthorityBundle
 from .baseline_audit import BaselineAudit, BaselineProgram
 from .errors import ProtocolValidationError
+from .execution_control import DurableExecutionQueue, ExecutionDeclarationRegistry
 from .project_status import (
     AuthorityDigest,
     BlockerCategory,
@@ -400,32 +401,26 @@ class ResearchSession:
         self.preflight_path = self.runtime / "remote-preflight.json"
         self.authority_bundle_path = self.runtime / "authority-bundle.json"
         self.action_request_dir = self.runtime / "action-requests"
+        self.execution_dir = self.runtime / "executions"
         self.contract_path = self.runtime / "contract.json"
         self.h1_path = self.runtime / "h1.json"
         self.packet_dir = self.runtime / "packets"
         self.h2_dir = self.runtime / "h2"
         self.preflight: RemoteSessionPreflight | None = None
+        self.execution_registry = ExecutionDeclarationRegistry.load_package()
+        self.execution_queue = DurableExecutionQueue(self.execution_dir, clock=clock)
         self._decision_lock = Lock()
 
     @property
     def actions_enabled(self) -> bool:
         bundle = self.authority_bundle()
-        contract, h1, packets, decisions, _ = self._records()
-        has_current_go = any(
-            decisions.get(packet.lane_id) is not None
-            and decisions[packet.lane_id].go_eligible
-            and decisions[packet.lane_id].is_current(contract=contract, packet=packet)
-            for packet in packets
-            if contract is not None
-        )
+        contract, h1, _, _, _ = self._records()
         return bool(
             bundle is not None
             and self.preflight is not None
-            and not self.preflight.blockers
             and contract is not None
             and h1 is not None
             and h1.is_current(contract)
-            and has_current_go
         )
 
     def prepare(self, *, timeout_seconds: int = 12) -> tuple[ProjectStatus, ResearchLoopStatus]:
@@ -433,6 +428,7 @@ class ResearchSession:
         self.packet_dir.mkdir(exist_ok=True)
         self.h2_dir.mkdir(exist_ok=True)
         self.action_request_dir.mkdir(exist_ok=True)
+        self.execution_dir.mkdir(exist_ok=True)
         local_revision = _git_value(self.root, "rev-parse", "HEAD")
         self.preflight = run_remote_preflight(
             local_revision=local_revision,
@@ -731,12 +727,79 @@ class ResearchSession:
         except (OSError, UnicodeError, ProtocolValidationError):
             return None
 
-    def queue_action_request(self, value: Mapping[str, object]) -> None:
-        request_sha256 = value.get("request_sha256")
-        if not isinstance(request_sha256, str):
-            raise ProtocolValidationError("allowed Action Request must have a digest")
-        require_sha256(request_sha256, field="request_sha256")
-        write_json_atomic(self.action_request_dir / f"{request_sha256}.json", value)
+    def _execution_binding(
+        self, action_id: str
+    ) -> tuple[SafeDrugBatchContract, H1Approval, str | None, str]:
+        contract, h1, packets, decisions, _ = self._records()
+        if contract is None or h1 is None or not h1.is_current(contract):
+            raise ProtocolValidationError("execution requires current H1 authority")
+        current_records = [
+            record
+            for record in self.execution_queue.records()
+            if record.contract_sha256 == contract.contract_sha256
+            and record.h1_approval_sha256 == h1.approval_sha256
+        ]
+        current_record = (
+            max(current_records, key=lambda record: record.events[-1].journal_sequence)
+            if current_records
+            else None
+        )
+        current_lane_id = (
+            current_record.lane_id
+            if current_record is not None
+            else self.execution_registry.initial_lane_id
+        )
+        packets_by_lane = {packet.lane_id: packet for packet in packets}
+        packet = packets_by_lane.get(current_lane_id)
+        decision = decisions.get(current_lane_id)
+        if decision is not None and (
+            packet is None or not decision.is_current(contract=contract, packet=packet)
+        ):
+            decision = None
+        if action_id != "request_next_lane":
+            if decision is not None:
+                raise ProtocolValidationError("decided lane cannot continue execution")
+            return (
+                contract,
+                h1,
+                current_record.h2_decision_sha256 if current_record is not None else None,
+                current_lane_id,
+            )
+        if decision is None or not decision.go_eligible:
+            raise ProtocolValidationError("next lane requires current H2 GO")
+        lane_ids = self.execution_registry.lane_ids
+        try:
+            lane_id = lane_ids[lane_ids.index(current_lane_id) + 1]
+        except (ValueError, IndexError) as error:
+            raise ProtocolValidationError("no next registered execution lane") from error
+        return contract, h1, decision.decision_sha256, lane_id
+
+    def queue_action_request(self, value: Mapping[str, object]) -> dict[str, object]:
+        request = ActionRequest.from_dict(value)
+        contract, h1, h2_decision_sha256, lane_id = self._execution_binding(request.action_id)
+        declaration = self.execution_registry.get(lane_id, request.action_id)
+        write_json_atomic(
+            self.action_request_dir / f"{request.request_sha256}.json",
+            request.to_dict(),
+        )
+        return self.execution_queue.enqueue(
+            request=request,
+            declaration=declaration,
+            contract_sha256=contract.contract_sha256,
+            h1_approval_sha256=h1.approval_sha256,
+            h2_decision_sha256=h2_decision_sha256,
+            blockers=(
+                self.preflight.blockers if self.preflight is not None else ("preflight-missing",)
+            ),
+        ).to_public_dict()
+
+    def execution_state(self) -> dict[str, object]:
+        return {
+            "queue": self.execution_queue.to_public_dict(),
+            "registry": self.execution_registry.to_public_dict(),
+            "kind": "execution_control",
+            "schema_version": 1,
+        }
 
 
 __all__ = ("RemoteSessionPreflight", "ResearchSession", "run_remote_preflight")

@@ -79,6 +79,10 @@ def _hitl_session(tmp_path: Path) -> ResearchSession:
     session.preflight_path = tmp_path / "remote-preflight.json"
     session.authority_bundle_path = tmp_path / "authority-bundle.json"
     session.action_request_dir = tmp_path / "action-requests"
+    session.execution_dir = tmp_path / "executions"
+    session.execution_queue = session.execution_queue.__class__(
+        session.execution_dir, clock=session.clock
+    )
     session.contract_path = tmp_path / "contract.json"
     session.h1_path = tmp_path / "h1.json"
     session.packet_dir = tmp_path / "packets"
@@ -86,6 +90,7 @@ def _hitl_session(tmp_path: Path) -> ResearchSession:
     session.packet_dir.mkdir()
     session.h2_dir.mkdir()
     session.action_request_dir.mkdir()
+    session.execution_dir.mkdir()
     session.contract_path.write_bytes(
         (ROOT / "fixtures/benchmark/safedrug-batch-h1.json").read_bytes()
     )
@@ -190,3 +195,37 @@ def test_hitl_http_routes_bind_server_records_and_enforce_same_origin(tmp_path: 
     assert json.loads(h1_body)["owner"] == "oian"
     assert json.loads(control_body)["h1"]["current"] is True
     assert json.loads(h2_body)["action"] == "go"
+
+
+def test_execution_routes_expose_registry_and_replayable_sse(tmp_path: Path) -> None:
+    session = _hitl_session(tmp_path)
+    server = create_harness_server(
+        status_path=session.status_path,
+        expected_authorities=(),
+        clock=session.clock,
+        research_loop_path=session.loop_path,
+        hitl_session=session,
+        port=0,
+    )
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    host = f"127.0.0.1:{server.server_port}"
+    try:
+        status, body = _get(host, "/api/executions")
+        event_status, event_body = _get(host, "/api/execution-events")
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+    payload = json.loads(body)
+    assert status == event_status == 200
+    assert payload["registry"]["lane_ids"] == [
+        "gamenet",
+        "safedrug",
+        "molerec",
+        "retain",
+        "leap-safedrug",
+    ]
+    assert len(payload["registry"]["declarations"]) == 45
+    assert event_body == b"retry: 1500\n\n"

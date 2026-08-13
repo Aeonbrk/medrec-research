@@ -1,0 +1,5 @@
+.agents/**
+build/**
+dist/**
+web/dist/**
+web/node_modules/**

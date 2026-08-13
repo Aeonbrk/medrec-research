@@ -5,6 +5,11 @@ import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
+from medrec_research.action_gate import ActionRequest
+from medrec_research.errors import ProtocolValidationError
+from medrec_research.execution_control import ExecutionState
 from medrec_research.reproduction_contract import H1Approval, H2Decision
 from medrec_research.research_session import ResearchSession, run_remote_preflight
 
@@ -104,6 +109,10 @@ def test_h1_and_h2_bind_server_loaded_records(tmp_path: Path) -> None:
     session.preflight_path = tmp_path / "remote-preflight.json"
     session.authority_bundle_path = tmp_path / "authority-bundle.json"
     session.action_request_dir = tmp_path / "action-requests"
+    session.execution_dir = tmp_path / "executions"
+    session.execution_queue = session.execution_queue.__class__(
+        session.execution_dir, clock=session.clock
+    )
     session.contract_path = tmp_path / "contract.json"
     session.h1_path = tmp_path / "h1.json"
     session.packet_dir = tmp_path / "packets"
@@ -111,6 +120,7 @@ def test_h1_and_h2_bind_server_loaded_records(tmp_path: Path) -> None:
     session.packet_dir.mkdir()
     session.h2_dir.mkdir()
     session.action_request_dir.mkdir()
+    session.execution_dir.mkdir()
     session.contract_path.write_bytes(
         (ROOT / "fixtures/benchmark/safedrug-batch-h1.json").read_bytes()
     )
@@ -140,3 +150,169 @@ def test_h1_and_h2_bind_server_loaded_records(tmp_path: Path) -> None:
     assert H1Approval.from_dict(approval).owner == "oian"
     assert H2Decision.from_dict(decision).go_eligible
     assert session.control_state()["h1"]["current"]
+
+
+def test_allowed_request_binds_registered_declaration_and_stays_blocked(
+    tmp_path: Path,
+) -> None:
+    session = ResearchSession(ROOT, clock=lambda: NOW)
+    session.runtime = tmp_path
+    session.status_path = tmp_path / "project-status.json"
+    session.loop_path = tmp_path / "research-loop.json"
+    session.preflight_path = tmp_path / "remote-preflight.json"
+    session.authority_bundle_path = tmp_path / "authority-bundle.json"
+    session.action_request_dir = tmp_path / "action-requests"
+    session.execution_dir = tmp_path / "executions"
+    session.execution_queue = session.execution_queue.__class__(
+        session.execution_dir, clock=session.clock
+    )
+    session.contract_path = tmp_path / "contract.json"
+    session.h1_path = tmp_path / "h1.json"
+    session.packet_dir = tmp_path / "packets"
+    session.h2_dir = tmp_path / "h2"
+    session.packet_dir.mkdir()
+    session.h2_dir.mkdir()
+    session.action_request_dir.mkdir()
+    session.execution_dir.mkdir()
+    session.contract_path.write_bytes(
+        (ROOT / "fixtures/benchmark/safedrug-batch-h1.json").read_bytes()
+    )
+    (session.packet_dir / "lane.json").write_bytes(
+        (ROOT / "fixtures/benchmark/decision-packet-accepted.json").read_bytes()
+    )
+    session.create_h1(
+        {
+            "kind": "h1_input",
+            "schema_version": 1,
+            "owner": "oian",
+            "rationale": "contract reviewed",
+        }
+    )
+    request = {
+        "action_id": "request_reproduction",
+        "authorities": [{"authority_id": "scope", "sha256": "b" * 64}],
+        "authorization_sha256": "c" * 64,
+        "kind": "action_request",
+        "preflight_sha256": "d" * 64,
+        "project_id": "medrec-research",
+        "remote_revision": "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a",
+        "request_id": "action-context-aaaaaaaaaaaaaaaaaaaa",
+        "schema_version": 1,
+        "scope_sha256": "b" * 64,
+        "snapshot_sha256": "a" * 64,
+        "target_id": "319-wild",
+    }
+    action_request = ActionRequest.create(
+        **{key: value for key, value in request.items() if key not in {"kind", "schema_version"}}
+    )
+    execution = session.queue_action_request(action_request.to_dict())
+
+    assert execution["state"] == ExecutionState.BLOCKED.value
+    assert execution["lane_id"] == "gamenet"
+    assert execution["h2_decision_sha256"] is None
+    assert "remote-authorization-required" in execution["blockers"]
+    assert "preflight-missing" in execution["blockers"]
+    assert session.execution_state()["queue"]["records"] == [execution]
+
+
+def test_h2_non_go_blocks_next_execution_and_go_advances_registered_lane(
+    tmp_path: Path,
+) -> None:
+    session = ResearchSession(ROOT, clock=lambda: NOW)
+    session.runtime = tmp_path
+    session.action_request_dir = tmp_path / "action-requests"
+    session.execution_dir = tmp_path / "executions"
+    session.execution_queue = session.execution_queue.__class__(
+        session.execution_dir, clock=session.clock
+    )
+    session.contract_path = tmp_path / "contract.json"
+    session.h1_path = tmp_path / "h1.json"
+    session.packet_dir = tmp_path / "packets"
+    session.h2_dir = tmp_path / "h2"
+    session.loop_path = tmp_path / "research-loop.json"
+    session.packet_dir.mkdir()
+    session.h2_dir.mkdir()
+    session.action_request_dir.mkdir()
+    session.execution_dir.mkdir()
+    session.contract_path.write_bytes(
+        (ROOT / "fixtures/benchmark/safedrug-batch-h1.json").read_bytes()
+    )
+    (session.packet_dir / "lane.json").write_bytes(
+        (ROOT / "fixtures/benchmark/decision-packet-accepted.json").read_bytes()
+    )
+    session.create_h1(
+        {
+            "kind": "h1_input",
+            "schema_version": 1,
+            "owner": "oian",
+            "rationale": "contract reviewed",
+        }
+    )
+    session.create_h2(
+        {
+            "kind": "h2_input",
+            "schema_version": 1,
+            "lane_id": "gamenet",
+            "researcher": "oian",
+            "action": "hold",
+            "rationale": "awaiting independent review",
+        }
+    )
+
+    held = ActionRequest.create(
+        request_id="action-context-hhhhhhhhhhhhhhhhhhhh",
+        project_id="medrec-research",
+        target_id="319-wild",
+        action_id="request_next_lane",
+        snapshot_sha256="a" * 64,
+        scope_sha256="b" * 64,
+        authorities=({"authority_id": "scope", "sha256": "b" * 64},),
+        authorization_sha256="c" * 64,
+        preflight_sha256="d" * 64,
+        remote_revision="e" * 40,
+    )
+    with pytest.raises(ProtocolValidationError, match="current H2 GO"):
+        session.queue_action_request(held.to_dict())
+
+    session.create_h2(
+        {
+            "kind": "h2_input",
+            "schema_version": 1,
+            "lane_id": "gamenet",
+            "researcher": "oian",
+            "action": "go",
+            "rationale": "evidence accepted",
+        }
+    )
+    advanced = ActionRequest.create(
+        request_id="action-context-gggggggggggggggggggg",
+        project_id="medrec-research",
+        target_id="319-wild",
+        action_id="request_next_lane",
+        snapshot_sha256="a" * 64,
+        scope_sha256="b" * 64,
+        authorities=({"authority_id": "scope", "sha256": "b" * 64},),
+        authorization_sha256="c" * 64,
+        preflight_sha256="d" * 64,
+        remote_revision="e" * 40,
+    )
+
+    execution = session.queue_action_request(advanced.to_dict())
+    assert execution["lane_id"] == "safedrug"
+    assert execution["h2_decision_sha256"] is not None
+
+    follow_up = ActionRequest.create(
+        request_id="action-context-iiiiiiiiiiiiiiiiiiii",
+        project_id="medrec-research",
+        target_id="319-wild",
+        action_id="submit_reproduction_evidence",
+        snapshot_sha256="a" * 64,
+        scope_sha256="b" * 64,
+        authorities=({"authority_id": "scope", "sha256": "b" * 64},),
+        authorization_sha256="c" * 64,
+        preflight_sha256="d" * 64,
+        remote_revision="e" * 40,
+    )
+    evidence = session.queue_action_request(follow_up.to_dict())
+    assert evidence["lane_id"] == "safedrug"
+    assert evidence["h2_decision_sha256"] == execution["h2_decision_sha256"]

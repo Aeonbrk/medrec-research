@@ -636,12 +636,47 @@ class ActionRequest:
     def to_dict(self) -> dict[str, object]:
         return {**self._content(), "request_sha256": self.request_sha256}
 
+    def to_json(self, *, indent: int | None = None) -> str:
+        return canonical_json(self.to_dict(), indent=indent)
+
     @classmethod
     def create(cls, **values: object) -> ActionRequest:
         authorities = _authorities(values["authorities"])
         normalized = {**values, "authorities": authorities}
         digest = content_sha256(_request_content(**normalized))
         return cls(request_sha256=digest, **normalized)
+
+    @classmethod
+    def from_dict(cls, value: object) -> ActionRequest:
+        payload = strict_fields(
+            value,
+            required=(
+                "action_id",
+                "authorities",
+                "authorization_sha256",
+                "kind",
+                "preflight_sha256",
+                "project_id",
+                "remote_revision",
+                "request_id",
+                "request_sha256",
+                "schema_version",
+                "scope_sha256",
+                "snapshot_sha256",
+                "target_id",
+            ),
+            context="ActionRequest",
+        )
+        if payload.pop("schema_version") != cls.SCHEMA_VERSION:
+            raise ProtocolValidationError("ActionRequest schema_version must be 1")
+        if payload.pop("kind") != "action_request":
+            raise ProtocolValidationError("ActionRequest kind must be action_request")
+        payload["authorities"] = _authority_objects(payload["authorities"])
+        return cls(**payload)
+
+    @classmethod
+    def from_json(cls, text: str) -> ActionRequest:
+        return cls.from_dict(parse_json_object(text, context="ActionRequest"))
 
 
 @dataclass(frozen=True, slots=True)
