@@ -81,21 +81,23 @@ export function EvidenceDisclosure({
   const [open, setOpen] = React.useState(false)
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label={`${open ? "收起" : "展开"}${label}`}
-        >
-          {evidence.length} 项
-          <IconChevronDown
-            data-icon="inline-end"
-            className={
-              open ? "rotate-180 transition-transform" : "transition-transform"
-            }
-            aria-hidden="true"
+      <CollapsibleTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={`${open ? "收起" : "展开"}${label}`}
           />
-        </Button>
+        }
+      >
+        {evidence.length} 项
+        <IconChevronDown
+          data-icon="inline-end"
+          className={
+            open ? "rotate-180 transition-transform" : "transition-transform"
+          }
+          aria-hidden="true"
+        />
       </CollapsibleTrigger>
       <CollapsibleContent className="pt-2">
         <ul className="flex flex-col gap-1.5" aria-label={label}>
