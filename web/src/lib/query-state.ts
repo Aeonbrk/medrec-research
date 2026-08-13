@@ -25,6 +25,7 @@ export function parseViewState(search: string): ViewState {
       sections,
       defaultViewState.section
     ),
+    selected: (params.get("selected") ?? "").slice(0, 160),
     query: (params.get("q") ?? "").slice(0, 160),
     status: enumValue(
       params.get("status"),
@@ -46,6 +47,7 @@ export function serializeViewState(state: ViewState) {
   const params = new URLSearchParams()
   if (state.section !== defaultViewState.section)
     params.set("section", state.section)
+  if (state.selected) params.set("selected", state.selected)
   if (state.query) params.set("q", state.query)
   if (state.status !== defaultViewState.status)
     params.set("status", state.status)

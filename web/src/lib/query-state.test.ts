@@ -8,6 +8,7 @@ describe("URL query view state", () => {
     expect(serializeViewState(defaultViewState)).toBe("")
     const search = serializeViewState({
       section: "hitl",
+      selected: "request-abc",
       query: "molerec SHA",
       status: "blocked",
       sort: "state",
@@ -17,6 +18,7 @@ describe("URL query view state", () => {
     })
     expect(parseViewState(search)).toEqual({
       section: "hitl",
+      selected: "request-abc",
       query: "molerec SHA",
       status: "blocked",
       sort: "state",

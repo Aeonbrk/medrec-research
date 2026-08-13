@@ -1,4 +1,5 @@
 export const sections = [
+  "pending",
   "overview",
   "candidates",
   "lineage",
@@ -10,6 +11,26 @@ export const sortFields = ["identity", "state"] as const
 export const sortOrders = ["asc", "desc"] as const
 export const themes = ["system", "light", "dark"] as const
 export const densities = ["compact", "comfortable"] as const
+export const executionStates = [
+  "blocked",
+  "queued",
+  "submitting",
+  "running",
+  "monitoring",
+  "intake",
+  "review_pending",
+  "completed",
+  "cancelled",
+  "failed",
+  "stuck",
+] as const
+export const executionOutcomes = [
+  "pending",
+  "succeeded",
+  "failed",
+  "stuck",
+  "cancelled",
+] as const
 
 export type Section = (typeof sections)[number]
 export type StatusFilter = (typeof statusFilters)[number]
@@ -18,6 +39,8 @@ export type SortOrder = (typeof sortOrders)[number]
 export type Theme = (typeof themes)[number]
 export type Density = (typeof densities)[number]
 export type RowState = Exclude<StatusFilter, "all">
+export type ExecutionState = (typeof executionStates)[number]
+export type ExecutionOutcome = (typeof executionOutcomes)[number]
 
 export type Evidence = {
   label: string
@@ -153,8 +176,76 @@ export type ActionDecision =
       request: null
     }
 
+export type ExecutionEvent = {
+  kind: "execution_event"
+  schema_version: 1
+  sequence: number
+  journal_sequence: number
+  state: ExecutionState
+  outcome: ExecutionOutcome
+  reason_code: string
+  occurred_at: string
+  event_sha256: string
+}
+
+export type ExecutionRecord = {
+  schema_version: 1
+  request_id: string
+  request_sha256: string
+  contract_sha256: string
+  h1_approval_sha256: string
+  h2_decision_sha256: string | null
+  declaration_id: string
+  lane_id: string
+  action_id: string
+  blockers: string[]
+  state: ExecutionState
+  outcome: ExecutionOutcome
+  events: ExecutionEvent[]
+}
+
+export type ExecutionDeclaration = {
+  schema_version: 1
+  declaration_id: string
+  declaration_sha256: string
+  lane_id: string
+  baseline_id: string
+  action_id: string
+  kind: "local" | "manual" | "remote"
+  source_revision: string
+  environment_id: string
+  resource_profile_id: string
+  evidence_schema_id: string
+  blockers: string[]
+}
+
+export type ExecutionControl = {
+  kind: "execution_control"
+  schema_version: 1
+  queue: {
+    kind: "execution_queue"
+    schema_version: 1
+    records: ExecutionRecord[]
+  }
+  registry: {
+    kind: "execution_declaration_registry"
+    schema_version: 1
+    initial_lane_id: string
+    lane_ids: string[]
+    action_ids: string[]
+    declarations: ExecutionDeclaration[]
+  }
+}
+
+export type ExecutionStreamEvent = {
+  event_id: string
+  request_sha256: string
+  event: ExecutionEvent
+}
+
 export type ViewState = {
   section: Section
+  selected: string
   query: string
   status: StatusFilter
   sort: SortField
@@ -164,7 +255,8 @@ export type ViewState = {
 }
 
 export const defaultViewState: ViewState = {
-  section: "overview",
+  section: "pending",
+  selected: "",
   query: "",
   status: "all",
   sort: "identity",
@@ -193,6 +285,28 @@ function stringValue(value: unknown, field: string) {
 function booleanValue(value: unknown, field: string) {
   if (typeof value !== "boolean") throw new Error(`malformed:${field}`)
   return value
+}
+
+function integerValue(value: unknown, field: string) {
+  if (!Number.isInteger(value) || (value as number) < 1) {
+    throw new Error(`malformed:${field}`)
+  }
+  return value as number
+}
+
+function nullableString(value: unknown, field: string) {
+  if (value === null) return null
+  return stringValue(value, field)
+}
+
+function enumMember<T extends string>(
+  value: unknown,
+  options: readonly T[],
+  field: string
+): T {
+  const member = stringValue(value, field)
+  if (!options.includes(member as T)) throw new Error(`malformed:${field}`)
+  return member as T
 }
 
 function stringArray(value: unknown, field: string) {
@@ -514,6 +628,299 @@ export function validateHitlControl(value: unknown): HitlControl {
         lane_id: stringValue(item.lane_id, `hitl_control.h2.${index}.lane_id`),
       }
     }),
+  }
+}
+
+const actionIds = [
+  "refresh_authorization",
+  "resolve_source_license",
+  "advance_readiness",
+  "refresh_remote_preflight",
+  "request_reproduction",
+  "submit_reproduction_evidence",
+  "request_next_lane",
+  "submit_human_review",
+  "begin_discovery",
+] as const
+
+const laneIds = [
+  "gamenet",
+  "safedrug",
+  "molerec",
+  "retain",
+  "leap-safedrug",
+] as const
+
+function executionEventValue(value: unknown, field: string): ExecutionEvent {
+  if (
+    !isRecord(value) ||
+    !exactKeys(value, [
+      "event_sha256",
+      "journal_sequence",
+      "kind",
+      "occurred_at",
+      "outcome",
+      "reason_code",
+      "schema_version",
+      "sequence",
+      "state",
+    ]) ||
+    value.kind !== "execution_event" ||
+    value.schema_version !== 1
+  ) {
+    throw new Error(`malformed:${field}`)
+  }
+  return {
+    kind: "execution_event",
+    schema_version: 1,
+    sequence: integerValue(value.sequence, `${field}.sequence`),
+    journal_sequence: integerValue(
+      value.journal_sequence,
+      `${field}.journal_sequence`
+    ),
+    state: enumMember(value.state, executionStates, `${field}.state`),
+    outcome: enumMember(value.outcome, executionOutcomes, `${field}.outcome`),
+    reason_code: stringValue(value.reason_code, `${field}.reason_code`),
+    occurred_at: stringValue(value.occurred_at, `${field}.occurred_at`),
+    event_sha256: stringValue(value.event_sha256, `${field}.event_sha256`),
+  }
+}
+
+function executionRecordValue(value: unknown, index: number): ExecutionRecord {
+  const field = `execution.records.${index}`
+  if (
+    !isRecord(value) ||
+    !exactKeys(value, [
+      "action_id",
+      "blockers",
+      "contract_sha256",
+      "declaration_id",
+      "events",
+      "h1_approval_sha256",
+      "h2_decision_sha256",
+      "lane_id",
+      "outcome",
+      "request_id",
+      "request_sha256",
+      "schema_version",
+      "state",
+    ]) ||
+    value.schema_version !== 1 ||
+    !Array.isArray(value.events) ||
+    value.events.length === 0
+  ) {
+    throw new Error(`malformed:${field}`)
+  }
+  const events = value.events.map((item, eventIndex) =>
+    executionEventValue(item, `${field}.events.${eventIndex}`)
+  )
+  if (
+    events.some((event, eventIndex) => event.sequence !== eventIndex + 1) ||
+    new Set(events.map((event) => event.journal_sequence)).size !==
+      events.length
+  ) {
+    throw new Error(`malformed:${field}.events`)
+  }
+  const state = enumMember(value.state, executionStates, `${field}.state`)
+  const outcome = enumMember(
+    value.outcome,
+    executionOutcomes,
+    `${field}.outcome`
+  )
+  const latest = events.at(-1)!
+  if (latest.state !== state || latest.outcome !== outcome) {
+    throw new Error(`malformed:${field}.projection`)
+  }
+  return {
+    schema_version: 1,
+    request_id: stringValue(value.request_id, `${field}.request_id`),
+    request_sha256: stringValue(
+      value.request_sha256,
+      `${field}.request_sha256`
+    ),
+    contract_sha256: stringValue(
+      value.contract_sha256,
+      `${field}.contract_sha256`
+    ),
+    h1_approval_sha256: stringValue(
+      value.h1_approval_sha256,
+      `${field}.h1_approval_sha256`
+    ),
+    h2_decision_sha256: nullableString(
+      value.h2_decision_sha256,
+      `${field}.h2_decision_sha256`
+    ),
+    declaration_id: stringValue(
+      value.declaration_id,
+      `${field}.declaration_id`
+    ),
+    lane_id: enumMember(value.lane_id, laneIds, `${field}.lane_id`),
+    action_id: enumMember(value.action_id, actionIds, `${field}.action_id`),
+    blockers: stringArray(value.blockers, `${field}.blockers`),
+    state,
+    outcome,
+    events,
+  }
+}
+
+function declarationValue(value: unknown, index: number): ExecutionDeclaration {
+  const field = `execution.declarations.${index}`
+  if (
+    !isRecord(value) ||
+    !exactKeys(value, [
+      "action_id",
+      "baseline_id",
+      "blockers",
+      "declaration_id",
+      "declaration_sha256",
+      "environment_id",
+      "evidence_schema_id",
+      "kind",
+      "lane_id",
+      "resource_profile_id",
+      "schema_version",
+      "source_revision",
+    ]) ||
+    value.schema_version !== 1
+  ) {
+    throw new Error(`malformed:${field}`)
+  }
+  const kind = enumMember(
+    value.kind,
+    ["local", "manual", "remote"] as const,
+    `${field}.kind`
+  )
+  return {
+    schema_version: 1,
+    declaration_id: stringValue(
+      value.declaration_id,
+      `${field}.declaration_id`
+    ),
+    declaration_sha256: stringValue(
+      value.declaration_sha256,
+      `${field}.declaration_sha256`
+    ),
+    lane_id: enumMember(value.lane_id, laneIds, `${field}.lane_id`),
+    baseline_id: stringValue(value.baseline_id, `${field}.baseline_id`),
+    action_id: enumMember(value.action_id, actionIds, `${field}.action_id`),
+    kind,
+    source_revision: stringValue(
+      value.source_revision,
+      `${field}.source_revision`
+    ),
+    environment_id: stringValue(
+      value.environment_id,
+      `${field}.environment_id`
+    ),
+    resource_profile_id: stringValue(
+      value.resource_profile_id,
+      `${field}.resource_profile_id`
+    ),
+    evidence_schema_id: stringValue(
+      value.evidence_schema_id,
+      `${field}.evidence_schema_id`
+    ),
+    blockers: stringArray(value.blockers, `${field}.blockers`),
+  }
+}
+
+export function validateExecutionControl(value: unknown): ExecutionControl {
+  if (
+    !isRecord(value) ||
+    !exactKeys(value, ["kind", "queue", "registry", "schema_version"]) ||
+    value.kind !== "execution_control" ||
+    value.schema_version !== 1 ||
+    !isRecord(value.queue) ||
+    !isRecord(value.registry)
+  ) {
+    throw new Error("malformed:execution")
+  }
+  if (
+    !exactKeys(value.queue, ["kind", "records", "schema_version"]) ||
+    value.queue.kind !== "execution_queue" ||
+    value.queue.schema_version !== 1 ||
+    !Array.isArray(value.queue.records)
+  ) {
+    throw new Error("malformed:execution.queue")
+  }
+  if (
+    !exactKeys(value.registry, [
+      "action_ids",
+      "declarations",
+      "initial_lane_id",
+      "kind",
+      "lane_ids",
+      "schema_version",
+    ]) ||
+    value.registry.kind !== "execution_declaration_registry" ||
+    value.registry.schema_version !== 1 ||
+    !Array.isArray(value.registry.action_ids) ||
+    !Array.isArray(value.registry.lane_ids) ||
+    !Array.isArray(value.registry.declarations)
+  ) {
+    throw new Error("malformed:execution.registry")
+  }
+  const registeredActions = stringArray(
+    value.registry.action_ids,
+    "execution.registry.action_ids"
+  )
+  const registeredLanes = stringArray(
+    value.registry.lane_ids,
+    "execution.registry.lane_ids"
+  )
+  const declarations = value.registry.declarations.map(declarationValue)
+  const matrix = new Set(
+    declarations.map((item) => `${item.lane_id}:${item.action_id}`)
+  )
+  if (
+    registeredActions.join("|") !== actionIds.join("|") ||
+    registeredLanes.join("|") !== laneIds.join("|") ||
+    value.registry.initial_lane_id !== laneIds[0] ||
+    declarations.length !== laneIds.length * actionIds.length ||
+    matrix.size !== declarations.length
+  ) {
+    throw new Error("malformed:execution.registry.matrix")
+  }
+  return {
+    kind: "execution_control",
+    schema_version: 1,
+    queue: {
+      kind: "execution_queue",
+      schema_version: 1,
+      records: value.queue.records.map(executionRecordValue),
+    },
+    registry: {
+      kind: "execution_declaration_registry",
+      schema_version: 1,
+      initial_lane_id: value.registry.initial_lane_id,
+      lane_ids: registeredLanes,
+      action_ids: registeredActions,
+      declarations,
+    },
+  }
+}
+
+export function validateExecutionStreamEvent(
+  value: unknown
+): ExecutionStreamEvent {
+  if (
+    !isRecord(value) ||
+    !exactKeys(value, ["event", "event_id", "request_sha256"])
+  ) {
+    throw new Error("malformed:execution_stream")
+  }
+  const event = executionEventValue(value.event, "execution_stream.event")
+  const eventId = stringValue(value.event_id, "execution_stream.event_id")
+  if (!/^\d+$/.test(eventId) || Number(eventId) !== event.journal_sequence) {
+    throw new Error("malformed:execution_stream.cursor")
+  }
+  return {
+    event,
+    event_id: eventId,
+    request_sha256: stringValue(
+      value.request_sha256,
+      "execution_stream.request_sha256"
+    ),
   }
 }
 

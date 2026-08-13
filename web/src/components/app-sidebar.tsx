@@ -3,6 +3,7 @@ import {
   IconFingerprint,
   IconGitBranch,
   IconLayoutDashboard,
+  IconListCheck,
   IconStack2,
   IconUserCheck,
 } from "@tabler/icons-react"
@@ -24,6 +25,7 @@ import {
 import type { Section } from "@/lib/domain"
 
 const navigation = [
+  { id: "pending", label: "待决工作台", icon: IconListCheck },
   { id: "overview", label: "总览", icon: IconLayoutDashboard },
   { id: "candidates", label: "候选基线", icon: IconStack2 },
   { id: "lineage", label: "共享谱系", icon: IconGitBranch },

@@ -185,6 +185,7 @@ export function ConsoleToolbar({
 
 export function sectionTitle(section: Section) {
   return {
+    pending: "待决工作台",
     overview: "研究总览",
     candidates: "候选基线",
     lineage: "共享谱系",
