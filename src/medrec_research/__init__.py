@@ -20,6 +20,16 @@ from .adapters import (
     PredictionAdapter,
     ProcessPredictionAdapter,
 )
+from .aris_bridge import ArisBridge, ArisRevisionRecord
+from .aris_transport import (
+    ArisLaunchTemplate,
+    ArisResourceProfile,
+    ArisTransportManifest,
+    ArisTransportReceipt,
+    ArisTransportRegistry,
+    ArisTransportStatus,
+    FixedArisTransport,
+)
 from .baseline_audit import (
     AuditReview,
     AuditReviewSet,
@@ -71,6 +81,7 @@ from .dataset import (
 )
 from .errors import ProtocolValidationError
 from .evaluation import EvaluationResult, evaluate_predictions
+from .execution_worker import DeclarationBoundWorker, ExecutionSubmission
 from .harness import create_harness_server
 from .molerec import MoleRecArtifactBundle, require_bundle_for_stage
 from .prediction import MedicationScore, PredictionRecord
@@ -176,6 +187,14 @@ __all__ = (
     "AdapterProcessError",
     "AdapterProtocolError",
     "AdapterTimeoutError",
+    "ArisBridge",
+    "ArisLaunchTemplate",
+    "ArisResourceProfile",
+    "ArisRevisionRecord",
+    "ArisTransportManifest",
+    "ArisTransportReceipt",
+    "ArisTransportRegistry",
+    "ArisTransportStatus",
     "ArtifactChecksum",
     "AttemptRecord",
     "AttemptStatus",
@@ -204,6 +223,7 @@ __all__ = (
     "DatasetPrivacy",
     "DatasetSplit",
     "DecisionPacket",
+    "DeclarationBoundWorker",
     "DecoderClass",
     "DecoderProfile",
     "Diagnostic",
@@ -215,6 +235,8 @@ __all__ = (
     "ExceptionDisposition",
     "ExceptionKind",
     "ExceptionRecord",
+    "ExecutionSubmission",
+    "FixedArisTransport",
     "H1Approval",
     "H2Action",
     "H2Decision",

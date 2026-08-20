@@ -73,7 +73,7 @@ def test_registry_covers_final_five_by_closed_nine_action_set() -> None:
     assert "source_path_id" not in registry.get("gamenet", "request_reproduction").to_public_dict()
 
 
-def test_remote_enqueue_is_idempotent_and_blocked_without_authorization(tmp_path: Path) -> None:
+def test_remote_enqueue_is_idempotent_and_uses_declared_blockers(tmp_path: Path) -> None:
     registry = ExecutionDeclarationRegistry.load_package()
     queue = DurableExecutionQueue(tmp_path, clock=lambda: NOW)
     request = _request()
@@ -94,8 +94,15 @@ def test_remote_enqueue_is_idempotent_and_blocked_without_authorization(tmp_path
 
     assert first == second
     assert first.state is ExecutionState.BLOCKED
-    assert "remote-authorization-required" in first.blockers
+    assert first.blockers == declaration.blockers
     assert len(tuple(tmp_path.glob("*.json"))) == 1
+
+
+def test_corrupt_durable_record_fails_closed(tmp_path: Path) -> None:
+    queue = DurableExecutionQueue(tmp_path, clock=lambda: NOW)
+    (tmp_path / "broken.json").write_text("{", encoding="utf-8")
+    with pytest.raises(ProtocolValidationError, match="durable execution record is invalid"):
+        queue.records()
 
 
 def test_failed_or_stuck_dependency_blocks_downstream(tmp_path: Path) -> None:

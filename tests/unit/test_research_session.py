@@ -10,7 +10,7 @@ import pytest
 from medrec_research.action_gate import ActionRequest
 from medrec_research.errors import ProtocolValidationError
 from medrec_research.execution_control import ExecutionState
-from medrec_research.reproduction_contract import H1Approval, H2Decision
+from medrec_research.reproduction_contract import DecisionPacket, H1Approval, H2Decision
 from medrec_research.research_session import ResearchSession, run_remote_preflight
 
 ROOT = Path(__file__).parents[2]
@@ -102,8 +102,7 @@ def test_remote_preflight_fails_closed_on_malformed_capacity() -> None:
 
 
 def test_h1_and_h2_bind_server_loaded_records(tmp_path: Path) -> None:
-    session = ResearchSession(ROOT, clock=lambda: NOW)
-    session.runtime = tmp_path
+    session = ResearchSession(ROOT, clock=lambda: NOW, runtime=tmp_path)
     session.status_path = tmp_path / "project-status.json"
     session.loop_path = tmp_path / "research-loop.json"
     session.preflight_path = tmp_path / "remote-preflight.json"
@@ -150,13 +149,32 @@ def test_h1_and_h2_bind_server_loaded_records(tmp_path: Path) -> None:
     assert H1Approval.from_dict(approval).owner == "oian"
     assert H2Decision.from_dict(decision).go_eligible
     assert session.control_state()["h1"]["current"]
+    assert (
+        session.create_h1(
+            {
+                "kind": "h1_input",
+                "schema_version": 1,
+                "owner": "oian",
+                "rationale": "contract reviewed",
+            }
+        )
+        == approval
+    )
+    with pytest.raises(ProtocolValidationError, match="H1 approval for this contract is immutable"):
+        session.create_h1(
+            {
+                "kind": "h1_input",
+                "schema_version": 1,
+                "owner": "another-researcher",
+                "rationale": "changed authority",
+            }
+        )
 
 
 def test_allowed_request_binds_registered_declaration_and_stays_blocked(
     tmp_path: Path,
 ) -> None:
-    session = ResearchSession(ROOT, clock=lambda: NOW)
-    session.runtime = tmp_path
+    session = ResearchSession(ROOT, clock=lambda: NOW, runtime=tmp_path)
     session.status_path = tmp_path / "project-status.json"
     session.loop_path = tmp_path / "research-loop.json"
     session.preflight_path = tmp_path / "remote-preflight.json"
@@ -210,7 +228,7 @@ def test_allowed_request_binds_registered_declaration_and_stays_blocked(
     assert execution["state"] == ExecutionState.BLOCKED.value
     assert execution["lane_id"] == "gamenet"
     assert execution["h2_decision_sha256"] is None
-    assert "remote-authorization-required" in execution["blockers"]
+    assert "license-unresolved" in execution["blockers"]
     assert "preflight-missing" in execution["blockers"]
     assert session.execution_state()["queue"]["records"] == [execution]
 
@@ -218,8 +236,7 @@ def test_allowed_request_binds_registered_declaration_and_stays_blocked(
 def test_h2_non_go_blocks_next_execution_and_go_advances_registered_lane(
     tmp_path: Path,
 ) -> None:
-    session = ResearchSession(ROOT, clock=lambda: NOW)
-    session.runtime = tmp_path
+    session = ResearchSession(ROOT, clock=lambda: NOW, runtime=tmp_path)
     session.action_request_dir = tmp_path / "action-requests"
     session.execution_dir = tmp_path / "executions"
     session.execution_queue = session.execution_queue.__class__(
@@ -257,6 +274,57 @@ def test_h2_non_go_blocks_next_execution_and_go_advances_registered_lane(
             "action": "hold",
             "rationale": "awaiting independent review",
         }
+    )
+    replay = session.create_h2(
+        {
+            "kind": "h2_input",
+            "schema_version": 1,
+            "lane_id": "gamenet",
+            "researcher": "oian",
+            "action": "hold",
+            "rationale": "awaiting independent review",
+        }
+    )
+    assert H2Decision.from_dict(replay).action.value == "hold"
+
+    with pytest.raises(ProtocolValidationError, match="H2 decision for this packet is immutable"):
+        session.create_h2(
+            {
+                "kind": "h2_input",
+                "schema_version": 1,
+                "lane_id": "gamenet",
+                "researcher": "oian",
+                "action": "go",
+                "rationale": "evidence accepted",
+            }
+        )
+
+    packet = DecisionPacket.from_json(
+        (session.packet_dir / "lane.json").read_text(encoding="utf-8")
+    )
+    outcomes = {key: value + 0.01 for key, value in packet.to_dict()["outcomes"].items()}
+    session.packet_dir.joinpath("lane.json").write_text(
+        DecisionPacket(
+            packet_id=packet.packet_id,
+            contract_sha256=packet.contract_sha256,
+            lane_id=packet.lane_id,
+            attempts=packet.attempts,
+            conclusion=packet.conclusion,
+            validity=packet.validity,
+            stage=packet.stage,
+            required_outcomes=packet.required_outcomes,
+            outcomes=outcomes,
+            uncertainty=packet.uncertainty,
+            limitations=packet.limitations,
+            allowed_claims=packet.allowed_claims,
+            blockers=packet.blockers,
+            action_consequences=packet.action_consequences,
+            attempted_lane_ids=packet.attempted_lane_ids,
+            completed_lane_ids=packet.completed_lane_ids,
+            created_at=packet.created_at,
+            notes=packet.notes,
+        ).to_json(),
+        encoding="utf-8",
     )
 
     held = ActionRequest.create(

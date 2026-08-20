@@ -70,6 +70,7 @@ source_path_id = "safedrug-main-checkout"
 data_path_id = "medrec-data-root"
 output_path_id = "safedrug-reproduction-output"
 blockers = [
+  "aris-transport-contract-missing",
   "license-unresolved",
   "environment-lock-unverified",
   "adapter-smoke-missing",
@@ -89,6 +90,7 @@ source_path_id = "molerec-checkout"
 data_path_id = "medrec-data-root"
 output_path_id = "molerec-reproduction-output"
 blockers = [
+  "aris-transport-contract-missing",
   "license-unresolved",
   "environment-declaration-missing",
   "adapter-smoke-missing",
@@ -109,6 +111,7 @@ source_path_id = "safedrug-main-checkout"
 data_path_id = "medrec-data-root"
 output_path_id = "retain-reproduction-output"
 blockers = [
+  "aris-transport-contract-missing",
   "license-unresolved",
   "environment-declaration-missing",
   "adapter-smoke-missing",
@@ -128,6 +131,7 @@ source_path_id = "safedrug-main-checkout"
 data_path_id = "medrec-data-root"
 output_path_id = "leap-reproduction-output"
 blockers = [
+  "aris-transport-contract-missing",
   "license-unresolved",
   "environment-declaration-missing",
   "adapter-smoke-missing",

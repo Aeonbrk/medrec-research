@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import http.client
 import webbrowser
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
+from threading import Thread
 
 from ._validation import (
     content_sha256,
@@ -159,6 +161,18 @@ def _build_parser() -> argparse.ArgumentParser:
     research.add_argument("--no-browser", action="store_true")
     research.add_argument("--preflight-timeout", type=_positive_integer, default=12)
     research.set_defaults(handler=_serve_research_session)
+
+    monitor = commands.add_parser("monitor-apply")
+    monitor.add_argument("--root", type=Path, default=Path.cwd())
+    monitor.add_argument("--input", type=Path, required=True)
+    monitor.add_argument("--output", type=Path, required=True)
+    monitor.set_defaults(handler=_apply_monitor_observation)
+
+    intake = commands.add_parser("evidence-intake")
+    intake.add_argument("--root", type=Path, default=Path.cwd())
+    intake.add_argument("--input", type=Path, required=True)
+    intake.add_argument("--output", type=Path, required=True)
+    intake.set_defaults(handler=_intake_reproduction_evidence)
 
     reproduction = commands.add_parser(
         "validate-reproduction",
@@ -490,11 +504,39 @@ def _serve_harness(arguments: argparse.Namespace, clock: Clock) -> tuple[int, st
     return 0, None
 
 
+def _check_harness_health(server: object) -> None:
+    port = server.server_port
+    thread = Thread(target=server.handle_request, daemon=True)
+    thread.start()
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=2)
+    response: http.client.HTTPResponse | None = None
+    try:
+        try:
+            connection.request("GET", "/api/harness-state")
+            response = connection.getresponse()
+            body = response.read()
+        except (OSError, UnicodeError) as error:
+            raise ProtocolValidationError("research harness health check failed") from error
+    finally:
+        connection.close()
+        thread.join(timeout=2)
+    if thread.is_alive() or response is None or response.status != 200:
+        raise ProtocolValidationError("research harness health check failed")
+    try:
+        payload = strict_fields(
+            parse_json_object(body.decode("ascii"), context="research harness health"),
+            required=("action_context", "kind", "schema_version", "status"),
+            context="research harness health",
+        )
+    except (ProtocolValidationError, UnicodeError) as error:
+        raise ProtocolValidationError("research harness health check failed") from error
+    if payload["kind"] != "harness_state" or payload["schema_version"] != 1:
+        raise ProtocolValidationError("research harness health check failed")
+
+
 def _serve_research_session(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    root = arguments.root.resolve()
-    if not (root / "pyproject.toml").is_file() or not (root / "baselines").is_dir():
-        raise ProtocolValidationError("research root is not a medrec-research checkout")
-    session = ResearchSession(root, clock=clock)
+    session = _local_research_session(arguments.root, clock)
+
     snapshot, _ = session.prepare(timeout_seconds=arguments.preflight_timeout)
     server = create_harness_server(
         status_path=session.status_path,
@@ -506,17 +548,66 @@ def _serve_research_session(arguments: argparse.Namespace, clock: Clock) -> tupl
         research_loop_path=session.loop_path,
         hitl_session=session,
     )
-    url = f"http://127.0.0.1:{server.server_port}/?section=hitl"
-    print(url, flush=True)
-    if not arguments.no_browser:
-        webbrowser.open(url)
     try:
+        _check_harness_health(server)
+        aris_revision = getattr(session, "aris_revision", None)
+        if aris_revision is not None and (
+            not aris_revision.candidate_valid or aris_revision.active_revision is None
+        ):
+            raise ProtocolValidationError(
+                "ARIS candidate validation failed; last-known-good was retained without startup"
+            )
+        url = f"http://127.0.0.1:{server.server_port}/"
+        print(url, flush=True)
+        if not arguments.no_browser:
+            webbrowser.open(url)
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
         server.server_close()
     return 0, None
+
+
+def _local_research_session(root: Path, clock: Clock) -> ResearchSession:
+    root = root.resolve()
+    if not (root / "pyproject.toml").is_file() or not (root / "baselines").is_dir():
+        raise ProtocolValidationError("research root is not a medrec-research checkout")
+    return ResearchSession(root, clock=clock)
+
+
+def _local_control_input(path: Path, *, context: str) -> dict[str, object]:
+    if path.stat().st_size > 1024 * 1024:
+        raise ProtocolValidationError(f"{context} is oversized")
+    return parse_json_object(path.read_text(encoding="utf-8"), context=context)
+
+
+def _apply_monitor_observation(
+    arguments: argparse.Namespace,
+    clock: Clock,
+) -> tuple[int, str | None]:
+    session = _local_research_session(arguments.root, clock)
+    value = _local_control_input(arguments.input, context="monitor observation input")
+    record = session.apply_monitor_observation(value)
+    request_sha256 = record.get("request_sha256")
+    if not isinstance(request_sha256, str):
+        raise ProtocolValidationError("monitor observation result is invalid")
+    _write_json_atomic(arguments.output, record)
+    return 0, request_sha256
+
+
+def _intake_reproduction_evidence(
+    arguments: argparse.Namespace,
+    clock: Clock,
+) -> tuple[int, str | None]:
+    session = _local_research_session(arguments.root, clock)
+    value = _local_control_input(arguments.input, context="restricted evidence input")
+    packet = session.intake_reproduction_evidence(value)
+    packet_sha256 = packet.get("packet_sha256")
+    if not isinstance(packet_sha256, str):
+        raise ProtocolValidationError("restricted evidence result is invalid")
+    _write_json_atomic(arguments.output, packet)
+    return 0, packet_sha256
 
 
 def _validate_reproduction(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:

@@ -18,7 +18,7 @@ def test_gamenet_launch_declaration_is_pinned_and_controlled() -> None:
         "required_inputs": ["diagnoses", "procedures", "prescriptions", "ddi"],
         "schema_version": 1,
         "source_seed": 1203,
-        "source_revision": "da695b4fc9390882f3a681c82115e81291ae6380",
+        "source_revision": "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a",
         "launch": {
             "gpu_memory_used_mib_lt": 500,
             "gpu_utilization_percent": 0,

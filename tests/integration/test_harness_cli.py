@@ -7,6 +7,7 @@ import signal
 import socket
 import subprocess
 import sys
+from argparse import Namespace
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
@@ -21,7 +22,8 @@ from medrec_research.action_gate import (
     AuthorityBundle,
     RemotePreflight,
 )
-from medrec_research.cli import main
+from medrec_research.cli import _check_harness_health, _serve_research_session, main
+from medrec_research.errors import ProtocolValidationError
 from medrec_research.harness import create_harness_server
 from medrec_research.project_status import AuthorityDigest, ProjectStatus
 
@@ -183,6 +185,121 @@ def test_root_assets_and_status_are_read_only_package_resources(status_path: Pat
     assert status[1]["X-Content-Type-Options"] == "nosniff"
 
 
+def test_research_launcher_health_checks_real_loopback_handler(status_path: Path) -> None:
+    snapshot = _snapshot()
+    server = create_harness_server(
+        status_path=status_path,
+        expected_authorities=snapshot.authorities,
+        clock=lambda: NOW,
+        port=0,
+    )
+    try:
+        _check_harness_health(server)
+    finally:
+        server.server_close()
+
+
+def test_research_launcher_health_check_fails_closed_on_connection_error() -> None:
+    class UnreachableServer:
+        server_port = 0
+
+        def handle_request(self) -> None:
+            return None
+
+    with pytest.raises(ProtocolValidationError, match="health check failed"):
+        _check_harness_health(UnreachableServer())
+
+
+def test_research_launcher_opens_pending_root_after_health_check(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+
+    class FakeSession:
+        def __init__(self, root: Path, *, clock: Callable[[], datetime]) -> None:
+            del root, clock
+            self.status_path = Path("status.json")
+            self.authority_bundle_path = Path("authority-bundle.json")
+            self.loop_path = Path("research-loop.json")
+            self.actions_enabled = False
+
+        def prepare(self, *, timeout_seconds: int) -> tuple[ProjectStatus, None]:
+            assert timeout_seconds == 1
+            return _snapshot(), None
+
+    class FakeServer:
+        server_port = 4321
+
+        def serve_forever(self) -> None:
+            calls.append("serve")
+
+        def server_close(self) -> None:
+            calls.append("close")
+
+    server = FakeServer()
+    monkeypatch.setattr("medrec_research.cli.ResearchSession", FakeSession)
+    monkeypatch.setattr("medrec_research.cli.create_harness_server", lambda **_: server)
+    monkeypatch.setattr(
+        "medrec_research.cli._check_harness_health", lambda value: calls.append("health")
+    )
+    monkeypatch.setattr(
+        "medrec_research.cli.webbrowser.open", lambda url: calls.append(f"open:{url}")
+    )
+
+    status, record_id = _serve_research_session(
+        Namespace(root=ROOT, preflight_timeout=1, port=0, no_browser=False),
+        lambda: NOW,
+    )
+
+    assert (status, record_id) == (0, None)
+    assert calls == ["health", "open:http://127.0.0.1:4321/", "serve", "close"]
+
+
+def test_research_launcher_does_not_open_browser_when_health_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[str] = []
+
+    class FakeSession:
+        def __init__(self, root: Path, *, clock: Callable[[], datetime]) -> None:
+            del root, clock
+            self.status_path = Path("status.json")
+            self.authority_bundle_path = Path("authority-bundle.json")
+            self.loop_path = Path("research-loop.json")
+            self.actions_enabled = False
+
+        def prepare(self, *, timeout_seconds: int) -> tuple[ProjectStatus, None]:
+            del timeout_seconds
+            return _snapshot(), None
+
+    class FakeServer:
+        server_port = 4321
+
+        def server_close(self) -> None:
+            calls.append("close")
+
+    monkeypatch.setattr("medrec_research.cli.ResearchSession", FakeSession)
+    monkeypatch.setattr("medrec_research.cli.create_harness_server", lambda **_: FakeServer())
+
+    def fail_health(server: object) -> None:
+        del server
+        calls.append("health")
+        raise ProtocolValidationError("research harness health check failed")
+
+    monkeypatch.setattr("medrec_research.cli._check_harness_health", fail_health)
+    monkeypatch.setattr(
+        "medrec_research.cli.webbrowser.open", lambda url: calls.append(f"open:{url}")
+    )
+
+    with pytest.raises(ProtocolValidationError, match="health check failed"):
+        _serve_research_session(
+            Namespace(root=ROOT, preflight_timeout=1, port=0, no_browser=False),
+            lambda: NOW,
+        )
+
+    assert calls == ["health", "close"]
+
+
 def test_hashed_assets_fonts_and_static_path_boundary(status_path: Path) -> None:
     with _running_server(status_path) as (_, host):
         html = _request(host, "GET", "/")[2].decode()
@@ -335,6 +452,9 @@ def test_allowed_action_fails_closed_when_runtime_queue_is_unavailable(
     class UnavailableQueue:
         actions_enabled = True
 
+        def advance_transport(self) -> tuple[()]:
+            return ()
+
         def queue_action_request(self, value: object) -> None:
             del value
             raise OSError("private storage detail")
@@ -372,6 +492,9 @@ def test_allowed_action_fails_closed_when_runtime_queue_is_unavailable(
 def test_hitl_session_action_authority_is_rechecked_per_request(status_path: Path) -> None:
     class DynamicSession:
         actions_enabled = False
+
+        def advance_transport(self) -> tuple[()]:
+            return ()
 
     snapshot = _snapshot()
     session = DynamicSession()

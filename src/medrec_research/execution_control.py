@@ -102,6 +102,7 @@ _TRANSITIONS = {
     ExecutionState.SUBMITTING: frozenset(
         {
             ExecutionState.RUNNING,
+            ExecutionState.REVIEW_PENDING,
             ExecutionState.BLOCKED,
             ExecutionState.FAILED,
             ExecutionState.STUCK,
@@ -111,6 +112,7 @@ _TRANSITIONS = {
     ExecutionState.RUNNING: frozenset(
         {
             ExecutionState.MONITORING,
+            ExecutionState.REVIEW_PENDING,
             ExecutionState.FAILED,
             ExecutionState.STUCK,
             ExecutionState.CANCELLED,
@@ -119,6 +121,7 @@ _TRANSITIONS = {
     ExecutionState.MONITORING: frozenset(
         {
             ExecutionState.INTAKE,
+            ExecutionState.REVIEW_PENDING,
             ExecutionState.FAILED,
             ExecutionState.STUCK,
             ExecutionState.CANCELLED,
@@ -132,7 +135,12 @@ _TRANSITIONS = {
         }
     ),
     ExecutionState.REVIEW_PENDING: frozenset(
-        {ExecutionState.COMPLETED, ExecutionState.BLOCKED, ExecutionState.CANCELLED}
+        {
+            ExecutionState.SUBMITTING,
+            ExecutionState.COMPLETED,
+            ExecutionState.BLOCKED,
+            ExecutionState.CANCELLED,
+        }
     ),
 }
 
@@ -634,8 +642,10 @@ class DurableExecutionQueue:
         for path in sorted(self.root.glob("*.json")):
             try:
                 records.append(ExecutionRecord.from_json(path.read_text(encoding="utf-8")))
-            except (OSError, UnicodeError, ProtocolValidationError):
-                continue
+            except (OSError, UnicodeError, ProtocolValidationError) as error:
+                raise ProtocolValidationError(
+                    f"durable execution record is invalid: {path.name}"
+                ) from error
         return tuple(records)
 
     def enqueue(
@@ -669,8 +679,6 @@ class DurableExecutionQueue:
                 continue
             if not dependency.successful:
                 dynamic_blockers.append("dependency-not-successful")
-        if declaration.kind is DeclarationKind.REMOTE:
-            dynamic_blockers.append("remote-authorization-required")
         all_blockers = tuple(dict.fromkeys((*declaration.blockers, *dynamic_blockers)))
         if all_blockers:
             initial_state = ExecutionState.BLOCKED

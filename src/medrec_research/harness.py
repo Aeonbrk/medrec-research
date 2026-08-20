@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import time
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from http import HTTPStatus
@@ -157,6 +158,19 @@ class _HarnessServer(ThreadingHTTPServer):
             now=clock(),
         ).to_public_dict()
 
+    def service_actions(self) -> None:
+        """Advance the server-owned transport without coupling it to browser reads."""
+
+        super().service_actions()
+        if self.hitl_session is None:
+            return
+        try:
+            self.hitl_session.advance_transport()
+        except (OSError, UnicodeError, ProtocolValidationError):
+            # Bound transport failures are persisted by the wrapper. A malformed
+            # local control record must not take down the loopback review server.
+            return
+
 
 class _HarnessHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -211,21 +225,42 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 _error_payload("execution_event_cursor_invalid"),
             )
             return
-        chunks = ["retry: 1500\n\n"]
-        for item in events:
-            chunks.extend(
-                (
-                    f"id: {item['event_id']}\n",
-                    "event: execution\n",
-                    f"data: {canonical_json(item)}\n\n",
-                )
-            )
-        self._send_bytes(
-            HTTPStatus.OK,
-            "".join(chunks).encode("ascii"),
-            "text/event-stream; charset=utf-8",
-            extra_headers={"X-Accel-Buffering": "no"},
-        )
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Connection", "keep-alive")
+        for name, value in _SECURITY_HEADERS.items():
+            self.send_header(name, value)
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+        self.close_connection = False
+        current_cursor = cursor
+        heartbeat_at = time.monotonic() + 15
+        try:
+            self.wfile.write(b"retry: 1500\n\n")
+            self.wfile.flush()
+            while True:
+                if not events:
+                    events = self.server.hitl_session.execution_queue.events_after(current_cursor)
+                for item in events:
+                    self.wfile.write(
+                        (
+                            f"id: {item['event_id']}\n"
+                            "event: execution\n"
+                            f"data: {canonical_json(item)}\n\n"
+                        ).encode("ascii")
+                    )
+                    current_cursor = item["event_id"]
+                if events:
+                    self.wfile.flush()
+                    events = ()
+                    heartbeat_at = time.monotonic() + 15
+                elif time.monotonic() >= heartbeat_at:
+                    self.wfile.write(b": keepalive\n\n")
+                    self.wfile.flush()
+                    heartbeat_at = time.monotonic() + 15
+                time.sleep(0.25)
+        except (BrokenPipeError, ConnectionResetError, OSError, ProtocolValidationError):
+            self.close_connection = True
 
     def _reject(self, status: HTTPStatus, code: str) -> bool:
         self._send_json(status, _error_payload(code))
@@ -247,14 +282,23 @@ class _HarnessHandler(BaseHTTPRequestHandler):
     def _post_length(self) -> int | None:
         if not self._valid_host() or not self._valid_origin():
             return None
-        routes = {"/api/action-requests", "/api/h1", "/api/h2"}
+        routes = {
+            "/api/action-requests",
+            "/api/contract-ai",
+            "/api/execution-control",
+            "/api/h1",
+            "/api/h2",
+        }
         if self.path not in routes:
             self._reject(HTTPStatus.NOT_FOUND, "route_not_found")
             return None
         if self.path == "/api/action-requests" and not self.server.actions_enabled:
             self._reject(HTTPStatus.FORBIDDEN, "actions_disabled")
             return None
-        if self.path in {"/api/h1", "/api/h2"} and self.server.hitl_session is None:
+        if (
+            self.path in {"/api/contract-ai", "/api/execution-control", "/api/h1", "/api/h2"}
+            and self.server.hitl_session is None
+        ):
             self._reject(HTTPStatus.FORBIDDEN, "hitl_control_disabled")
             return None
         if self.headers.get_all("Transfer-Encoding", failobj=[]):
@@ -341,6 +385,40 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 return
             self._send_json(HTTPStatus.OK, self.server.hitl_session.control_state())
             return
+        if self.path == "/api/contract":
+            if self.server.hitl_session is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("contract_unavailable"),
+                )
+                return
+            try:
+                contract = self.server.hitl_session.contract_state()
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("contract_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, contract)
+            return
+        if self.path == "/api/decision-packets":
+            if self.server.hitl_session is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("decision_packets_unavailable"),
+                )
+                return
+            try:
+                packets = self.server.hitl_session.decision_packet_state()
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("decision_packets_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, packets)
+            return
         if self.path == "/api/executions":
             if self.server.hitl_session is None:
                 self._send_json(
@@ -348,7 +426,49 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                     _error_payload("execution_control_unavailable"),
                 )
                 return
-            self._send_json(HTTPStatus.OK, self.server.hitl_session.execution_state())
+            try:
+                state = self.server.hitl_session.execution_state()
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("execution_control_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, state)
+            return
+        if self.path == "/api/execution-dispatch":
+            if self.server.hitl_session is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("execution_control_unavailable"),
+                )
+                return
+            try:
+                dispatch = self.server.hitl_session.execution_dispatch_state()
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("execution_dispatch_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, dispatch)
+            return
+        if self.path == "/api/aris-revision":
+            if self.server.hitl_session is None:
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("aris_revision_unavailable"),
+                )
+                return
+            try:
+                revision = self.server.hitl_session.aris_revision_state()
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    _error_payload("aris_revision_unavailable"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, revision)
             return
         if self.path == "/api/execution-events":
             self._send_execution_events()
@@ -409,6 +529,15 @@ class _HarnessHandler(BaseHTTPRequestHandler):
         except (UnicodeError, ProtocolValidationError, TypeError):
             self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("request_input_invalid"))
             return
+        if self.path == "/api/contract-ai":
+            assert self.server.hitl_session is not None
+            try:
+                result = self.server.hitl_session.contract_ai(payload)
+            except ProtocolValidationError:
+                self._send_json(HTTPStatus.BAD_REQUEST, _error_payload("contract_ai_input_invalid"))
+                return
+            self._send_json(HTTPStatus.OK, result)
+            return
         if self.path in {"/api/h1", "/api/h2"}:
             assert self.server.hitl_session is not None
             try:
@@ -421,6 +550,18 @@ class _HarnessHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.CONFLICT, _error_payload("hitl_decision_rejected"))
                 return
             self._send_json(HTTPStatus.CREATED, record)
+            return
+        if self.path == "/api/execution-control":
+            assert self.server.hitl_session is not None
+            try:
+                result = self.server.hitl_session.control_transport(payload)
+            except (OSError, UnicodeError, ProtocolValidationError):
+                self._send_json(
+                    HTTPStatus.CONFLICT,
+                    _error_payload("transport_control_rejected"),
+                )
+                return
+            self._send_json(HTTPStatus.OK, result)
             return
         try:
             request = ActionRequestInput.from_dict(payload)
