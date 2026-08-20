@@ -7,69 +7,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import type { Evidence } from "@/lib/domain"
-
-const approvedHosts = new Set([
-  "aclanthology.org",
-  "arxiv.org",
-  "dl.acm.org",
-  "doi.org",
-  "github.com",
-  "ieeexplore.ieee.org",
-  "openreview.net",
-  "proceedings.mlr.press",
-  "pubmed.ncbi.nlm.nih.gov",
-  "raw.githubusercontent.com",
-])
-
-const credentialKeys = new Set([
-  "access_token",
-  "api_key",
-  "apikey",
-  "auth",
-  "authorization",
-  "credential",
-  "key",
-  "password",
-  "passwd",
-  "secret",
-  "sig",
-  "signature",
-  "token",
-])
-
-export function safeEvidenceUrl(value: string) {
-  try {
-    const decoded = decodeURIComponent(value)
-    if (
-      [...decoded].some(
-        (character) =>
-          character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127
-      )
-    ) {
-      return null
-    }
-    const authority = value.match(/^https:\/\/([^/?#]+)/i)?.[1] ?? ""
-    const parsed = new URL(value)
-    if (
-      parsed.protocol !== "https:" ||
-      parsed.username ||
-      parsed.password ||
-      authority.includes(":") ||
-      parsed.port ||
-      parsed.hash ||
-      !approvedHosts.has(parsed.hostname)
-    ) {
-      return null
-    }
-    for (const key of parsed.searchParams.keys()) {
-      if (credentialKeys.has(key.toLocaleLowerCase("en"))) return null
-    }
-    return parsed.href
-  } catch {
-    return null
-  }
-}
+import { safeEvidenceUrl, type Evidence } from "@/lib/domain"
 
 export function EvidenceDisclosure({
   evidence,

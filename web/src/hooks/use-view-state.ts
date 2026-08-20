@@ -7,29 +7,58 @@ import {
   serializeViewState,
 } from "@/lib/query-state"
 
+let currentSearch = typeof window !== "undefined" ? window.location.search : ""
+const listeners = new Set<() => void>()
+
+function subscribe(callback: () => void) {
+  listeners.add(callback)
+  const onPopState = () => {
+    currentSearch = window.location.search
+    callback()
+  }
+  window.addEventListener("popstate", onPopState)
+  return () => {
+    listeners.delete(callback)
+    window.removeEventListener("popstate", onPopState)
+  }
+}
+
+function getSnapshot() {
+  if (typeof window !== "undefined") {
+    currentSearch = window.location.search
+  }
+  return currentSearch
+}
+
+function getServerSnapshot() {
+  return ""
+}
+
 export function useViewState() {
-  const [state, setState] = React.useState<ViewState>(() =>
-    parseViewState(window.location.search)
+  const search = React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
   )
+  const state = React.useMemo(() => parseViewState(search), [search])
 
-  React.useEffect(() => {
-    const restore = () => setState(parseViewState(window.location.search))
-    window.addEventListener("popstate", restore)
-    return () => window.removeEventListener("popstate", restore)
-  }, [])
-
-  const update = React.useCallback((patch: Partial<ViewState>) => {
-    setState((current) => {
+  const update = React.useCallback(
+    (patch: Partial<ViewState>) => {
+      const current = parseViewState(window.location.search)
       const next = mergeViewState(current, patch)
-      const search = serializeViewState(next)
-      window.history.replaceState(
-        null,
-        "",
-        `${window.location.pathname}${search}`
-      )
-      return next
-    })
-  }, [])
+      const nextSearch = serializeViewState(next)
+      if (nextSearch !== window.location.search) {
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${nextSearch}`
+        )
+        currentSearch = nextSearch
+        listeners.forEach((listener) => listener())
+      }
+    },
+    []
+  )
 
   return [state, update] as const
 }

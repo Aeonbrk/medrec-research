@@ -25,7 +25,7 @@ export function StateBadge({
 }) {
   if (state === "pass") {
     return (
-      <Badge className={className}>
+      <Badge variant="success" className={className}>
         <IconCircleCheck data-icon="inline-start" />
         {label}
       </Badge>
@@ -40,7 +40,7 @@ export function StateBadge({
     )
   }
   return (
-    <Badge variant="secondary" className={className}>
+    <Badge variant="warning" className={className}>
       {label === "stale" ? (
         <IconClock data-icon="inline-start" />
       ) : (

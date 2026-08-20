@@ -107,6 +107,7 @@ def main() -> None:
         session.h2_dir.mkdir()
         session.action_request_dir.mkdir()
         session.execution_dir.mkdir()
+        session.contract_path.parent.mkdir(parents=True, exist_ok=True)
         session.contract_path.write_bytes(
             (root / "fixtures/benchmark/safedrug-batch-h1.json").read_bytes()
         )

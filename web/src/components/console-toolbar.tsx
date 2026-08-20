@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
-import type { Section, ViewState } from "@/lib/domain"
+import type { ViewState } from "@/lib/domain"
 
 const themeIcons = {
   system: IconBrightness,
@@ -53,7 +53,7 @@ export function ConsoleToolbar({
   return (
     <section
       aria-label="研究视图工具"
-      className="flex min-w-0 flex-col gap-2 border-b bg-background px-4 py-3 lg:flex-row lg:items-center lg:px-6"
+      className="flex min-w-0 flex-col gap-2 border-b border-border/60 bg-background/60 px-4 py-2.5 backdrop-blur-sm lg:flex-row lg:items-center lg:px-6"
     >
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <InputGroup className="max-w-xl">
@@ -139,19 +139,6 @@ export function ConsoleToolbar({
           </Select>
         )}
         <ToggleGroup
-          value={[view.density]}
-          onValueChange={(density) => {
-            const nextDensity = density[0] as ViewState["density"] | undefined
-            if (nextDensity) update({ density: nextDensity })
-          }}
-          variant="outline"
-          size="sm"
-          aria-label="信息密度"
-        >
-          <ToggleGroupItem value="compact">紧凑</ToggleGroupItem>
-          <ToggleGroupItem value="comfortable">舒适</ToggleGroupItem>
-        </ToggleGroup>
-        <ToggleGroup
           value={[view.theme]}
           onValueChange={(theme) => {
             const nextTheme = theme[0] as ViewState["theme"] | undefined
@@ -181,15 +168,4 @@ export function ConsoleToolbar({
       </div>
     </section>
   )
-}
-
-export function sectionTitle(section: Section) {
-  return {
-    pending: "待决工作台",
-    overview: "研究总览",
-    candidates: "候选基线",
-    lineage: "共享谱系",
-    hitl: "HITL 循环",
-    authority: "权威摘要",
-  }[section]
 }

@@ -1,5 +1,19 @@
 # Plans
 
+## Completed: Refactor Frontend Sidebar and Aesthetic with shadcn sidebar-08 & b1GdfqsQE Preset
+
+- **Status**: completed on `2026-08-20`; sidebar-08 inset architecture, Breadcrumb navigation, b1GdfqsQE translucent/subtle preset details, and full WCAG AA accessibility compliance are implemented and verified.
+- **Plan**: `docs/plans/2026-08-20-016-refactor-frontend-shadcn-sidebar-preset-plan.md`.
+- **Scope**: integrated shadcn `sidebar-08` inset layout, `NavMain`, `NavLanes`, `NavSecondary`, and `NavHarness` footer with `b1GdfqsQE` preset (translucent glassmorphism, subtle accent, amber attention badges).
+- **Execution boundary**: frontend UI refactoring and polish; 100% passing Vitest and Playwright e2e test suites with zero axe accessibility violations.
+
+## Completed: Refactor HITL Vibe-Research Architecture and Multi-Agent Team Composition
+
+- **Status**: completed on `2026-08-20`; deep backend subsystems (`RemotePreflightProbe`, `ResearchContractStore`, `ExecutionOrchestrator`, `AgentTeamBridge`), lean `ResearchSession` facade, and modularized frontend workbench components (`DecisionQueuePanel`, `TransportRecoveryCard`, `TeamCompositionConsole`, `EvidenceInspectorPanel`) are fully implemented and verified.
+- **Plan**: `docs/plans/2026-08-20-015-refactor-hitl-vibe-research-team-architecture-plan.md`.
+- **Scope**: decomposed monolithic `ResearchSession` (1,623 lines down to ~690 lines) into `RemotePreflightProbe`, `ResearchContractStore`, `ExecutionOrchestrator`, and `AgentTeamBridge` ($team-composition-patterns with 7 presets, sizing heuristics, and display modes); decomposed `pending-workbench.tsx` (956 lines down to ~400 lines) into composable panels.
+- **Execution boundary**: local public-safe harness and architecture refactor; all 325 Python tests and 25 Vitest tests pass with zero regressions, strict typechecks, and clean linters.
+
 ## Active: Single-project HITL Research Control Console and Base UI Migration
 
 - **Status**: active on `2026-08-18`; Base UI migration, production decision workbench, fixed SafeDrug-main wrapper, Web exception takeover, persistent replayable SSE, local restricted ingress, and local gates are complete on `codex/hitl-base-ui-control-console`. Authorized 319 canary evidence and PR publication remain open.

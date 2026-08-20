@@ -43,6 +43,18 @@ try {
     fullPage: true,
   })
 
+  const desktopDark = await browser.newPage({
+    colorScheme: "dark",
+    viewport: { width: 1440, height: 1024 },
+  })
+  await desktopDark.goto(`http://127.0.0.1:${port}/?theme=dark`, {
+    waitUntil: "networkidle",
+  })
+  await desktopDark.screenshot({
+    path: `${root}docs/assets/research-console/after-desktop-dark.png`,
+    fullPage: true,
+  })
+
   const mobile = await browser.newPage({
     colorScheme: "dark",
     deviceScaleFactor: 1,

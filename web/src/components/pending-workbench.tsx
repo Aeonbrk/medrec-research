@@ -2,12 +2,8 @@ import {
   IconActivity,
   IconAlertTriangle,
   IconChecklist,
-  IconCircleCheck,
-  IconDatabase,
   IconFileAnalytics,
   IconLock,
-  IconPlayerPlay,
-  IconPlayerStop,
   IconRefresh,
 } from "@tabler/icons-react"
 
@@ -19,12 +15,17 @@ import type {
   LoopState,
   PacketState,
   TransportControlState,
-} from "@/App"
-import { EvidenceDisclosure } from "@/components/evidence-disclosure"
+} from "@/hooks/use-research-session"
+import {
+  DecisionQueuePanel,
+  type PendingItem,
+} from "@/components/decision-queue-panel"
+import { EvidenceInspectorPanel } from "@/components/evidence-inspector-panel"
 import { StateBadge } from "@/components/state-badge"
+import { TeamCompositionConsole } from "@/components/team-composition-console"
+import { TransportRecoveryCard } from "@/components/transport-recovery-card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Empty,
   EmptyDescription,
@@ -44,23 +45,10 @@ import type {
   ExecutionDeclaration,
   ExecutionRecord,
   HarnessState,
-  PublicJson,
   ResearchLane,
   RowState,
   TransportControlOperation,
 } from "@/lib/domain"
-
-type PendingKind = "authority" | "h1" | "execution" | "packet"
-
-type PendingItem = {
-  id: string
-  kind: PendingKind
-  title: string
-  summary: string
-  state: RowState
-  lane?: ResearchLane
-  record?: ExecutionRecord
-}
 
 const executionLabels: Record<ExecutionRecord["state"], string> = {
   blocked: "阻塞",
@@ -76,37 +64,19 @@ const executionLabels: Record<ExecutionRecord["state"], string> = {
   stuck: "卡住",
 }
 
+const dateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
+  dateStyle: "medium",
+  timeStyle: "medium",
+  hour12: false,
+})
+
 function shortSha(value: string) {
   return `${value.slice(0, 10)}...${value.slice(-6)}`
 }
 
 function dateTime(value: string) {
   const parsed = new Date(value)
-  return Number.isNaN(parsed.valueOf())
-    ? value
-    : new Intl.DateTimeFormat("zh-CN", {
-        dateStyle: "medium",
-        timeStyle: "medium",
-        hour12: false,
-      }).format(parsed)
-}
-
-export function aggregateTableRows(
-  value: PublicJson
-): Array<Record<string, PublicJson>> | null {
-  if (!Array.isArray(value) || value.length === 0) return null
-  if (
-    value.some(
-      (row) => row === null || typeof row !== "object" || Array.isArray(row)
-    )
-  ) {
-    return null
-  }
-  return value as Array<Record<string, PublicJson>>
-}
-
-function displayPublicJson(value: PublicJson) {
-  return typeof value === "string" ? value : JSON.stringify(value)
+  return Number.isNaN(parsed.valueOf()) ? value : dateTimeFormatter.format(parsed)
 }
 
 function executionState(record: ExecutionRecord): RowState {
@@ -117,22 +87,6 @@ function executionState(record: ExecutionRecord): RowState {
     return "pass"
   }
   return "attention"
-}
-
-export function permittedTransportOperations(
-  record: ExecutionRecord
-): TransportControlOperation[] {
-  if (["submitting", "running", "monitoring"].includes(record.state)) {
-    return ["cancel"]
-  }
-  const reason = record.events.at(-1)!.reason_code
-  if (
-    record.state === "review_pending" &&
-    reason.startsWith("aris-transport-")
-  ) {
-    return ["resume", "cancel"]
-  }
-  return []
 }
 
 function pendingItems({
@@ -176,7 +130,7 @@ function pendingItems({
     })
   }
   if (execution.phase === "ready") {
-    const records = [...execution.value.queue.records].sort(
+    const records = execution.value.queue.records.toSorted(
       (left, right) =>
         right.events.at(-1)!.journal_sequence -
         left.events.at(-1)!.journal_sequence
@@ -237,118 +191,6 @@ function StreamBadge({ state }: { state: ExecutionStreamState }) {
   )
 }
 
-function QueueState({
-  execution,
-  onRetry,
-}: {
-  execution: ExecutionControlState
-  onRetry: () => void
-}) {
-  if (execution.phase === "ready") return null
-  if (execution.phase === "loading") {
-    return (
-      <div
-        className="border-b px-3 py-3 text-xs text-muted-foreground"
-        role="status"
-      >
-        正在读取 durable queue
-      </div>
-    )
-  }
-  const label = {
-    unavailable: "execution control unavailable",
-    malformed: "execution response malformed",
-    transport: "execution transport failure",
-  }[execution.phase]
-  return (
-    <div
-      className="flex items-center justify-between gap-2 border-b px-3 py-3 text-xs text-destructive"
-      role="alert"
-    >
-      <span>{label}</span>
-      <Button type="button" size="sm" variant="outline" onClick={onRetry}>
-        <IconRefresh data-icon="inline-start" />
-        重试
-      </Button>
-    </div>
-  )
-}
-
-function PendingQueue({
-  execution,
-  items,
-  onRetry,
-  onSelect,
-  selected,
-}: {
-  execution: ExecutionControlState
-  items: PendingItem[]
-  onRetry: () => void
-  onSelect: (selected: string) => void
-  selected: string
-}) {
-  return (
-    <section
-      className="min-w-0 border border-border bg-surface-raised"
-      aria-label="待决队列"
-    >
-      <header className="flex min-h-12 items-center justify-between border-b px-3 py-2">
-        <div>
-          <h2 className="text-sm font-semibold">待决队列</h2>
-          <p className="text-xs text-muted-foreground">{items.length} 项</p>
-        </div>
-        <IconChecklist aria-hidden="true" className="text-primary" />
-      </header>
-      <QueueState execution={execution} onRetry={onRetry} />
-      {items.length ? (
-        <ul className="divide-y" aria-label="待决研究事项">
-          {items.map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                className="flex min-h-16 w-full items-start gap-2 px-3 py-3 text-left hover:bg-muted/60 data-active:bg-accent data-active:text-accent-foreground"
-                data-active={selected === item.id || undefined}
-                aria-current={selected === item.id ? "true" : undefined}
-                aria-controls="pending-detail"
-                onClick={() => onSelect(item.id)}
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">
-                    {item.title}
-                  </span>
-                  <span className="mt-1 block text-xs break-words text-muted-foreground">
-                    {item.summary}
-                  </span>
-                </span>
-                <StateBadge
-                  state={item.state}
-                  className={
-                    selected === item.id
-                      ? item.state === "blocked"
-                        ? "border-destructive bg-destructive text-background"
-                        : "border-accent-foreground/30 bg-accent-foreground text-accent"
-                      : undefined
-                  }
-                />
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <Empty className="min-h-52 rounded-none border-0">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <IconCircleCheck aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyTitle>没有待决事项</EmptyTitle>
-            <EmptyDescription>当前公开投影中没有未处置记录。</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      )}
-    </section>
-  )
-}
-
 function Definition({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 border-b py-2 last:border-b-0">
@@ -372,13 +214,6 @@ function ExecutionDetail({
   record: ExecutionRecord
   transportControl: TransportControlState
 }) {
-  const operations = permittedTransportOperations(record)
-  const controlState =
-    transportControl.phase !== "idle" &&
-    transportControl.requestId === record.request_id
-      ? transportControl
-      : null
-  const submitting = controlState?.phase === "submitting"
   return (
     <div className="space-y-5">
       <div>
@@ -403,61 +238,11 @@ function ExecutionDetail({
           <AlertDescription>{record.blockers.join(" · ")}</AlertDescription>
         </Alert>
       )}
-      {operations.length > 0 && (
-        <section className="space-y-2" aria-labelledby="transport-takeover">
-          <h3 id="transport-takeover" className="text-sm font-semibold">
-            异常接管
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {operations.includes("resume") && (
-              <Button
-                type="button"
-                size="sm"
-                disabled={submitting}
-                onClick={() => onTransportControl(record.request_id, "resume")}
-              >
-                <IconPlayerPlay data-icon="inline-start" />
-                恢复固定传输
-              </Button>
-            )}
-            {operations.includes("cancel") && (
-              <Button
-                type="button"
-                size="sm"
-                variant="destructive"
-                disabled={submitting}
-                onClick={() => onTransportControl(record.request_id, "cancel")}
-              >
-                <IconPlayerStop data-icon="inline-start" />
-                取消固定作业
-              </Button>
-            )}
-          </div>
-          {controlState && (
-            <p
-              className={
-                controlState.phase === "rejected" ||
-                controlState.phase === "malformed" ||
-                controlState.phase === "transport"
-                  ? "text-xs text-destructive"
-                  : "text-xs text-muted-foreground"
-              }
-              role="status"
-              aria-live="polite"
-            >
-              {
-                {
-                  submitting: "正在提交固定控制动作",
-                  succeeded: "固定控制动作已记录",
-                  rejected: "当前状态拒绝该控制动作",
-                  malformed: "控制响应格式不可用",
-                  transport: "控制动作传输失败，结果未知",
-                }[controlState.phase]
-              }
-            </p>
-          )}
-        </section>
-      )}
+      <TransportRecoveryCard
+        onTransportControl={onTransportControl}
+        record={record}
+        transportControl={transportControl}
+      />
       <section aria-labelledby="execution-basis">
         <h3 id="execution-basis" className="text-sm font-semibold">
           依据
@@ -537,10 +322,6 @@ function PacketDetail({
     label: `${lane.lane_id}-evidence-${index + 1}`,
     url,
   }))
-  const rawRows = packet ? aggregateTableRows(packet.raw_aggregate_table) : null
-  const rawColumns = rawRows
-    ? [...new Set(rawRows.flatMap((row) => Object.keys(row)))]
-    : []
   return (
     <div className="space-y-5">
       <div>
@@ -583,84 +364,12 @@ function PacketDetail({
             <AlertDescription>{lane.blockers.join(" · ")}</AlertDescription>
           </Alert>
         )}
-        {packet ? (
-          <>
-            <h3 className="mt-4 text-sm font-semibold">聚合依据</h3>
-            <dl className="mt-2 border-y">
-              <Definition
-                label="outcomes"
-                value={JSON.stringify(packet.outcomes)}
-              />
-              <Definition
-                label="uncertainty"
-                value={JSON.stringify(packet.uncertainty)}
-              />
-              <Definition
-                label="validity"
-                value={`${packet.validity} · ${packet.go_eligible ? "go eligible" : "not go eligible"}`}
-              />
-            </dl>
-          </>
-        ) : null}
       </section>
-      <section aria-labelledby="packet-artifacts">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 id="packet-artifacts" className="text-sm font-semibold">
-            原始工件
-          </h3>
-          {evidence.length ? <EvidenceDisclosure evidence={evidence} /> : null}
-        </div>
-        {packets.phase !== "ready" ? (
-          <Alert variant="destructive" className="mt-3">
-            <IconDatabase aria-hidden="true" />
-            <AlertTitle>Decision Packet 依据不可用</AlertTitle>
-            <AlertDescription>
-              服务端没有返回当前 packet projection。
-            </AlertDescription>
-          </Alert>
-        ) : rawRows ? (
-          <div
-            className="mt-3 overflow-x-auto border-y focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            role="region"
-            aria-label="Decision Packet 公开聚合数据表"
-            tabIndex={0}
-          >
-            <Table>
-              <caption className="px-2 py-2 text-left text-xs text-muted-foreground">
-                服务端 receipt 提供的公开聚合数据表
-              </caption>
-              <TableHeader>
-                <TableRow>
-                  {rawColumns.map((column) => (
-                    <TableHead key={column}>{column}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rawRows.map((row, index) => (
-                  <TableRow key={`aggregate-row-${index}`}>
-                    {rawColumns.map((column) => (
-                      <TableCell key={column} className="whitespace-normal">
-                        {column in row ? displayPublicJson(row[column]) : "—"}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        ) : (
-          <Alert className="mt-3">
-            <IconDatabase aria-hidden="true" />
-            <AlertTitle>聚合 outcomes 原始数据表未公开</AlertTitle>
-            <AlertDescription>
-              当前 API 返回 outcomes 与
-              uncertainty，但没有曲线或对应原始聚合数据表；
-              不能据此推断未公开的曲线结论。
-            </AlertDescription>
-          </Alert>
-        )}
-      </section>
+      <EvidenceInspectorPanel
+        evidence={evidence}
+        packet={packet}
+        phase={packets.phase}
+      />
     </div>
   )
 }
@@ -758,7 +467,7 @@ function H1Detail({
               />
             ))}
           </dl>
-          {contract.value.ai.status !== "ready" && (
+          {contract.value.ai.status !== "ready" ? (
             <Alert className="mt-3">
               <IconAlertTriangle aria-hidden="true" />
               <AlertTitle>AI 草案/质询不可用</AlertTitle>
@@ -766,6 +475,13 @@ function H1Detail({
                 {contract.value.ai.reason_code}
               </AlertDescription>
             </Alert>
+          ) : (
+            <div className="mt-3">
+              <TeamCompositionConsole
+                reasonCode={contract.value.ai.reason_code}
+                status={contract.value.ai.status}
+              />
+            </div>
           )}
         </section>
       ) : (
@@ -835,7 +551,7 @@ function DetailPanel({
   return (
     <section
       id="pending-detail"
-      className="min-w-0 border border-border bg-surface-raised p-4 lg:max-h-[calc(100svh-11.5rem)] lg:overflow-y-auto"
+      className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-xs lg:max-h-[calc(100svh-11.5rem)] lg:overflow-y-auto"
       aria-label="待决详情"
       tabIndex={0}
     >
@@ -927,7 +643,7 @@ export function PendingWorkbench({
         {current ? `已选择 ${current.title}` : "当前没有待决事项"}
       </p>
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(16rem,0.8fr)_minmax(24rem,1.5fr)_minmax(19rem,0.9fr)] lg:items-start">
-        <PendingQueue
+        <DecisionQueuePanel
           execution={execution}
           items={items}
           onRetry={onRetry}

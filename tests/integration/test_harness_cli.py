@@ -305,7 +305,7 @@ def test_hashed_assets_fonts_and_static_path_boundary(status_path: Path) -> None
         html = _request(host, "GET", "/")[2].decode()
         stylesheet = next(path for path in re.findall(r'href="(/assets/[^"]+\.css)"', html))
         css = _request(host, "GET", stylesheet)
-        font_name = re.search(rb"geist-mono-latin[^)]*\.woff2", css[2])
+        font_name = re.search(rb"inter-latin[^)]*\.woff2", css[2])
         assert font_name is not None
         font = _request(host, "GET", f"/assets/{font_name.group().decode()}")
         traversal = _request(host, "GET", "/assets/../index.html")

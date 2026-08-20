@@ -28,12 +28,10 @@ import type {
   LoopState,
   PacketState,
   TransportControlState,
-} from "@/App"
+} from "@/hooks/use-research-session"
 import { PendingWorkbench } from "@/components/pending-workbench"
-import {
-  EvidenceDisclosure,
-  safeEvidenceUrl,
-} from "@/components/evidence-disclosure"
+import { TeamCompositionConsole } from "@/components/team-composition-console"
+import { EvidenceDisclosure } from "@/components/evidence-disclosure"
 import { StateBadge } from "@/components/state-badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -62,6 +60,7 @@ import {
   laneState,
   matchesQuery,
   matchesStatus,
+  safeEvidenceUrl,
   stableSort,
   type CandidateStatus,
   type HarnessState,
@@ -95,15 +94,17 @@ const actionLabels: Record<string, string> = {
   begin_discovery: "生成新方法研究请求",
 }
 
+const dateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
+  dateStyle: "medium",
+  timeStyle: "medium",
+  hour12: false,
+})
+
 function dateTime(value: string) {
   const parsed = new Date(value)
   return Number.isNaN(parsed.valueOf())
     ? value
-    : new Intl.DateTimeFormat("zh-CN", {
-        dateStyle: "medium",
-        timeStyle: "medium",
-        hour12: false,
-      }).format(parsed)
+    : dateTimeFormatter.format(parsed)
 }
 
 function shortSha(value: string) {
@@ -166,7 +167,7 @@ function ConditionAlert({ status }: { status: ProjectStatus }) {
   )
 }
 
-export function ActionPanel({
+function ActionPanel({
   harness,
   action,
   onRequest,
@@ -216,14 +217,17 @@ export function ActionPanel({
 
   return (
     <section
-      className="border border-border bg-surface-raised"
+      className="overflow-hidden rounded-xl border border-border bg-card shadow-xs"
       aria-labelledby="action-heading"
       aria-busy={submitting}
       data-action-state={state}
     >
-      <div className="flex items-start gap-3 border-b px-4 py-3">
-        <div className="grid size-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
-          <IconLock aria-hidden="true" />
+      <div className="flex items-start gap-3 border-b px-4 py-3.5">
+        <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary text-foreground">
+          <IconLock
+            aria-hidden="true"
+            className="size-4 text-muted-foreground"
+          />
         </div>
         <div className="min-w-0 flex-1">
           <h3 id="action-heading" className="text-sm font-semibold">
@@ -321,12 +325,12 @@ function Metric({
   detail: string
 }) {
   return (
-    <div className="border-l-2 border-primary bg-surface-raised px-4 py-3">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-xs">
       <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <Icon className="text-primary" aria-hidden="true" />
+        <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
         {label}
       </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">
+      <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground tabular-nums">
         {value}
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
@@ -401,11 +405,14 @@ function Overview({
       </div>
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.6fr)]">
         <section
-          className="border border-border bg-surface-raised"
+          className="overflow-hidden rounded-xl border border-border bg-card shadow-xs"
           aria-labelledby="snapshot-heading"
         >
-          <div className="flex items-center gap-3 border-b px-4 py-3">
-            <IconRoute className="text-primary" aria-hidden="true" />
+          <div className="flex items-center gap-3 border-b px-4 py-3.5">
+            <IconRoute
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <div>
               <h3 id="snapshot-heading" className="text-sm font-semibold">
                 研究阶段与快照
@@ -415,7 +422,7 @@ function Overview({
               </p>
             </div>
           </div>
-          <dl className="grid gap-px bg-border sm:grid-cols-2">
+          <dl className="grid gap-px bg-border/60 sm:grid-cols-2">
             {[
               [
                 "stage",
@@ -425,7 +432,7 @@ function Overview({
               ["generated_at", dateTime(status.generated_at)],
               ["valid_until", dateTime(status.valid_until)],
             ].map(([label, value]) => (
-              <div key={label} className="bg-background px-4 py-3">
+              <div key={label} className="bg-card px-4 py-3">
                 <dt className="font-mono text-[0.68rem] text-muted-foreground">
                   {label}
                 </dt>
@@ -443,7 +450,7 @@ function Overview({
           </div>
         </section>
         <section
-          className="border border-border bg-surface-raised p-4"
+          className="rounded-xl border border-border bg-card p-5 shadow-xs"
           aria-labelledby="blockers-heading"
         >
           <div className="flex items-center justify-between gap-3">
@@ -456,9 +463,9 @@ function Overview({
           </div>
           {status.blockers.length ? (
             <ul className="mt-3 space-y-3">
-              {status.blockers.map((blocker, index) => (
+              {status.blockers.map((blocker) => (
                 <li
-                  key={`${blocker.reason_code}:${index}`}
+                  key={`${blocker.category}:${blocker.reason_code}:${blocker.candidate_id ?? "global"}`}
                   className="border-l-2 border-destructive pl-3 text-sm"
                 >
                   <Raw>{blocker.reason_code}</Raw>
@@ -512,27 +519,29 @@ function CandidateCards({ rows }: { rows: CandidateStatus[] }) {
       {rows.map((candidate) => (
         <article
           key={candidate.candidate_id}
-          className="border border-border bg-surface-raised p-4"
+          className="rounded-xl border border-border bg-card p-4 shadow-xs"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-medium">{candidate.display_name}</h3>
-              <Raw>{candidate.candidate_id}</Raw>
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
+                {candidate.candidate_id}
+              </p>
             </div>
             <StateBadge state={candidateState(candidate)} />
           </div>
-          <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
+          <dl className="mt-4 grid grid-cols-2 gap-2 text-xs">
             <div>
               <dt className="text-muted-foreground">readiness</dt>
-              <dd className="mt-1 font-mono">{candidate.readiness}</dd>
+              <dd className="mt-0.5 font-medium">{candidate.readiness}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">source_gate</dt>
-              <dd className="mt-1 font-mono">{candidate.source_gate}</dd>
+              <dd className="mt-0.5 font-medium">{candidate.source_gate}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">license_gate</dt>
-              <dd className="mt-1 font-mono">{candidate.license_gate}</dd>
+              <dd className="mt-0.5 font-medium">{candidate.license_gate}</dd>
             </div>
           </dl>
           <Separator className="my-3" />
@@ -589,7 +598,7 @@ function Candidates({
       ) : (
         <>
           <CandidateCards rows={rows} />
-          <div className="hidden border border-border bg-surface-raised md:block">
+          <div className="hidden overflow-hidden rounded-xl border border-border bg-card shadow-xs md:block">
             <Table className="density-table">
               <TableCaption className="px-4 pb-3 text-left">
                 候选基线及其独立 gate；状态文字与图标共同表达结果。
@@ -660,10 +669,13 @@ function LineageCards({ rows }: { rows: LineageStatus[] }) {
       {rows.map((item) => (
         <article
           key={item.layer}
-          className="border border-border bg-surface-raised p-4"
+          className="rounded-xl border border-border bg-card p-4 shadow-xs"
         >
           <div className="flex items-center gap-2">
-            <IconGitBranch className="text-primary" aria-hidden="true" />
+            <IconGitBranch
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <h3>
               <Raw>{item.layer}</Raw>
             </h3>
@@ -721,7 +733,7 @@ function Lineage({ status, view }: { status: ProjectStatus; view: ViewState }) {
       ) : (
         <>
           <LineageCards rows={rows} />
-          <div className="hidden border border-border bg-surface-raised md:block">
+          <div className="hidden overflow-hidden rounded-xl border border-border bg-card shadow-xs md:block">
             <Table className="density-table">
               <TableCaption className="px-4 pb-3 text-left">
                 共享谱系层、上游仓库、关联候选及公开证据。
@@ -801,7 +813,7 @@ function LaneCards({ rows }: { rows: ResearchLane[] }) {
       {rows.map((lane) => (
         <article
           key={lane.lane_id}
-          className="border border-border bg-surface-raised p-4"
+          className="rounded-xl border border-border bg-card p-4 shadow-xs"
         >
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -839,7 +851,7 @@ function LaneCards({ rows }: { rows: ResearchLane[] }) {
   )
 }
 
-export function HumanDecisionPanel({
+function HumanDecisionPanel({
   contractAI,
   hitl,
   onContractAI,
@@ -865,20 +877,20 @@ export function HumanDecisionPanel({
   const h1Enabled = Boolean(control?.h1.enabled && !control.h1.current)
   const aiBusy = contractAI.phase === "submitting"
   const aiEnabled = Boolean(control?.h1.enabled && !control.h1.current)
-  const h2Lane = control?.h2.find((lane) => lane.lane_id === laneId)
-
-  React.useEffect(() => {
-    if (control?.h2.length && !laneId) setLaneId(control.h2[0].lane_id)
-  }, [control, laneId])
+  const selectedLaneId = laneId || control?.h2[0]?.lane_id || ""
+  const h2Lane = control?.h2.find((lane) => lane.lane_id === selectedLaneId)
 
   return (
     <section
-      className="border border-border bg-surface-raised"
+      className="overflow-hidden rounded-xl border border-border bg-card shadow-xs"
       aria-busy={submitting}
     >
-      <div className="flex items-start gap-3 border-b px-4 py-3">
-        <div className="grid size-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
-          <IconUserCheck aria-hidden="true" />
+      <div className="flex items-start gap-3 border-b px-4 py-3.5">
+        <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary text-foreground">
+          <IconUserCheck
+            aria-hidden="true"
+            className="size-4 text-muted-foreground"
+          />
         </div>
         <div>
           <h3 className="text-sm font-semibold">Human authority</h3>
@@ -981,31 +993,43 @@ export function HumanDecisionPanel({
                 AI 质询契约
               </Button>
             </div>
-            {contractAI.phase === "ready" && (
-              <Alert
-                className="mt-3"
-                variant={
-                  contractAI.value.status === "ready"
-                    ? "default"
-                    : "destructive"
-                }
-              >
-                <IconFileAnalytics aria-hidden="true" />
-                <AlertTitle>
-                  {contractAI.value.status === "ready"
-                    ? "AI 结果（仅供审阅）"
-                    : "AI bridge 未完成"}
-                </AlertTitle>
-                <AlertDescription>
-                  <span className="block">{contractAI.value.reason_code}</span>
-                  {contractAI.value.output ? (
-                    <pre className="mt-2 max-h-64 overflow-auto text-xs whitespace-pre-wrap">
-                      {contractAI.value.output}
-                    </pre>
-                  ) : null}
-                </AlertDescription>
-              </Alert>
-            )}
+            {contractAI.phase === "ready" &&
+              (contractAI.value.team_config ? (
+                <div className="mt-3">
+                  <TeamCompositionConsole
+                    config={contractAI.value.team_config}
+                    output={contractAI.value.output}
+                    reasonCode={contractAI.value.reason_code}
+                    status={contractAI.value.status}
+                  />
+                </div>
+              ) : (
+                <Alert
+                  className="mt-3"
+                  variant={
+                    contractAI.value.status === "ready"
+                      ? "default"
+                      : "destructive"
+                  }
+                >
+                  <IconFileAnalytics aria-hidden="true" />
+                  <AlertTitle>
+                    {contractAI.value.status === "ready"
+                      ? "AI 结果（仅供审阅）"
+                      : "AI bridge 未完成"}
+                  </AlertTitle>
+                  <AlertDescription>
+                    <span className="block">
+                      {contractAI.value.reason_code}
+                    </span>
+                    {contractAI.value.output ? (
+                      <pre className="mt-2 max-h-64 overflow-auto text-xs whitespace-pre-wrap">
+                        {contractAI.value.output}
+                      </pre>
+                    ) : null}
+                  </AlertDescription>
+                </Alert>
+              ))}
             {(contractAI.phase === "error" ||
               contractAI.phase === "malformed" ||
               contractAI.phase === "transport") && (
@@ -1028,7 +1052,7 @@ export function HumanDecisionPanel({
               onDecision("/api/h2", {
                 kind: "h2_input",
                 schema_version: 1,
-                lane_id: laneId,
+                lane_id: selectedLaneId,
                 researcher,
                 action,
                 rationale,
@@ -1047,7 +1071,7 @@ export function HumanDecisionPanel({
             <select
               id="hitl-lane"
               className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
-              value={laneId}
+              value={selectedLaneId}
               onChange={(event) => setLaneId(event.target.value)}
               disabled={!control?.h2.length}
             >
@@ -1186,7 +1210,7 @@ function Hitl({
       ) : (
         <>
           <LaneCards rows={rows} />
-          <div className="hidden border border-border bg-surface-raised md:block">
+          <div className="hidden overflow-hidden rounded-xl border border-border bg-card shadow-xs md:block">
             <Table className="density-table">
               <TableCaption className="px-4 pb-3 text-left">
                 当前 HITL lane、证据包完整性与 H2 eligibility。
@@ -1272,12 +1296,12 @@ function Authority({
         }
       />
       <ConditionAlert status={status} />
-      <section className="border border-border bg-surface-raised">
-        <div className="grid gap-px bg-border sm:grid-cols-2 xl:grid-cols-4">
+      <section className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+        <div className="grid gap-px bg-border/60 sm:grid-cols-2 xl:grid-cols-4">
           {authorities.map((item) => (
-            <div key={item.authority_id} className="min-w-0 bg-background p-4">
+            <div key={item.authority_id} className="min-w-0 bg-card p-4">
               <IconFingerprint
-                className="mb-3 text-primary"
+                className="mb-3 size-5 text-muted-foreground"
                 aria-hidden="true"
               />
               <h3 className="font-mono text-sm font-semibold">
@@ -1291,9 +1315,12 @@ function Authority({
         </div>
         {authorities.length === 0 && <NoResults />}
       </section>
-      <section className="border border-border bg-surface-raised p-4">
+      <section className="rounded-xl border border-border bg-card p-5 shadow-xs">
         <div className="flex items-center gap-2">
-          <IconBracketsContain className="text-primary" aria-hidden="true" />
+          <IconBracketsContain
+            className="size-4 text-muted-foreground"
+            aria-hidden="true"
+          />
           <h3 className="text-sm font-semibold">项目快照</h3>
         </div>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">

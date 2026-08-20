@@ -182,16 +182,45 @@ export type ResearchContract = {
   }
 }
 
+export type TeamCompositionPreset =
+  | "review_team"
+  | "debug_team"
+  | "feature_team"
+  | "fullstack_team"
+  | "research_team"
+  | "security_team"
+  | "migration_team"
+
+export type DisplayMode = "tmux" | "iterm2" | "in-process"
+
+export type TeammateSpec = {
+  agent_id: string
+  focus_dimension: string
+  read_only: boolean
+  role: string
+}
+
+export type TeamCompositionConfig = {
+  kind: "team_composition_config"
+  schema_version: 1
+  preset: TeamCompositionPreset | string
+  team_size: number
+  display_mode: DisplayMode
+  teammates: TeammateSpec[]
+  complexity: "simple" | "moderate" | "complex" | "very_complex"
+}
+
 export type ContractAIResult = {
   kind: "contract_ai_result"
   schema_version: 1
   contract_sha256: string
-  operation: "draft" | "challenge"
+  operation: "draft" | "challenge" | "review_team" | "debug_team"
   request_id: string
   status: "unavailable" | "ready" | "error"
   reason_code: string
   output: string | null
   h1_written: false
+  team_config?: TeamCompositionConfig
 }
 
 export type PublicJson =
@@ -358,7 +387,7 @@ export function isRecord(value: unknown): value is RecordValue {
 }
 
 function exactKeys(value: RecordValue, keys: string[]) {
-  return Object.keys(value).sort().join("|") === [...keys].sort().join("|")
+  return Object.keys(value).toSorted().join("|") === keys.toSorted().join("|")
 }
 
 function stringValue(value: unknown, field: string) {
@@ -826,6 +855,48 @@ export function validateContractAIResult(value: unknown): ContractAIResult {
     value.output === null
       ? null
       : stringValue(value.output, "contract_ai.output")
+  let teamConfig: TeamCompositionConfig | undefined
+  if (isRecord(value.team_config)) {
+    const rawConfig = value.team_config
+    if (
+      rawConfig.kind === "team_composition_config" &&
+      rawConfig.schema_version === 1 &&
+      Array.isArray(rawConfig.teammates)
+    ) {
+      teamConfig = {
+        kind: "team_composition_config",
+        schema_version: 1,
+        preset: stringValue(rawConfig.preset, "team_config.preset"),
+        team_size:
+          typeof rawConfig.team_size === "number"
+            ? rawConfig.team_size
+            : rawConfig.teammates.length,
+        display_mode: enumMember(
+          rawConfig.display_mode,
+          ["tmux", "iterm2", "in-process"] as const,
+          "team_config.display_mode"
+        ),
+        complexity: enumMember(
+          rawConfig.complexity,
+          ["simple", "moderate", "complex", "very_complex"] as const,
+          "team_config.complexity"
+        ),
+        teammates: rawConfig.teammates.map((item, idx) => {
+          if (!isRecord(item)) throw new Error(`malformed:teammate.${idx}`)
+          return {
+            agent_id: stringValue(item.agent_id, `teammate.${idx}.agent_id`),
+            focus_dimension: stringValue(
+              item.focus_dimension,
+              `teammate.${idx}.focus_dimension`
+            ),
+            read_only: Boolean(item.read_only),
+            role: stringValue(item.role, `teammate.${idx}.role`),
+          }
+        }),
+      }
+    }
+  }
+
   return {
     kind: "contract_ai_result",
     schema_version: 1,
@@ -835,7 +906,7 @@ export function validateContractAIResult(value: unknown): ContractAIResult {
     ),
     operation: enumMember(
       value.operation,
-      ["draft", "challenge"] as const,
+      ["draft", "challenge", "review_team", "debug_team"] as const,
       "contract_ai.operation"
     ),
     request_id: stringValue(value.request_id, "contract_ai.request_id"),
@@ -847,6 +918,7 @@ export function validateContractAIResult(value: unknown): ContractAIResult {
     reason_code: stringValue(value.reason_code, "contract_ai.reason_code"),
     output,
     h1_written: false,
+    team_config: teamConfig,
   }
 }
 
@@ -1373,3 +1445,96 @@ export function stableSort<T>(
     })
     .map(({ value }) => value)
 }
+
+const approvedHosts = new Set([
+  "aclanthology.org",
+  "arxiv.org",
+  "dl.acm.org",
+  "doi.org",
+  "github.com",
+  "ieeexplore.ieee.org",
+  "openreview.net",
+  "proceedings.mlr.press",
+  "pubmed.ncbi.nlm.nih.gov",
+  "raw.githubusercontent.com",
+])
+
+const credentialKeys = new Set([
+  "access_token",
+  "api_key",
+  "apikey",
+  "auth",
+  "authorization",
+  "credential",
+  "key",
+  "password",
+  "passwd",
+  "secret",
+  "sig",
+  "signature",
+  "token",
+])
+
+export function safeEvidenceUrl(value: string): string | null {
+  try {
+    const decoded = decodeURIComponent(value)
+    if (
+      [...decoded].some(
+        (character) =>
+          character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127
+      )
+    ) {
+      return null
+    }
+    const authority = value.match(/^https:\/\/([^/?#]+)/i)?.[1] ?? ""
+    const parsed = new URL(value)
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.username ||
+      parsed.password ||
+      authority.includes(":") ||
+      parsed.port ||
+      parsed.hash ||
+      !approvedHosts.has(parsed.hostname)
+    ) {
+      return null
+    }
+    for (const key of parsed.searchParams.keys()) {
+      if (credentialKeys.has(key.toLocaleLowerCase("en"))) return null
+    }
+    return parsed.href
+  } catch {
+    return null
+  }
+}
+
+export function aggregateTableRows(
+  value: PublicJson
+): Array<Record<string, PublicJson>> | null {
+  if (!Array.isArray(value) || value.length === 0) return null
+  if (
+    value.some(
+      (row) => row === null || typeof row !== "object" || Array.isArray(row)
+    )
+  ) {
+    return null
+  }
+  return value as Array<Record<string, PublicJson>>
+}
+
+export function permittedTransportOperations(
+  record: ExecutionRecord
+): TransportControlOperation[] {
+  if (["submitting", "running", "monitoring"].includes(record.state)) {
+    return ["cancel"]
+  }
+  const reason = record.events.at(-1)?.reason_code ?? ""
+  if (
+    record.state === "review_pending" &&
+    reason.startsWith("aris-transport-")
+  ) {
+    return ["resume", "cancel"]
+  }
+  return []
+}
+

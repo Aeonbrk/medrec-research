@@ -5,10 +5,8 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 
-import {
-  EvidenceDisclosure,
-  safeEvidenceUrl,
-} from "@/components/evidence-disclosure"
+import { EvidenceDisclosure } from "@/components/evidence-disclosure"
+import { safeEvidenceUrl } from "@/lib/domain"
 
 describe("public evidence URL boundary", () => {
   it("accepts allowlisted HTTPS evidence without credentials", () => {
