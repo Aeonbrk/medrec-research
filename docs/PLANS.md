@@ -1,5 +1,12 @@
 # Plans
 
+## Active: Refactor HITL Research Control Console into Task-Oriented Research Cockpit
+
+- **Status**: active on `2026-08-20`; implementing Task-Oriented Cockpit with Research Lifecycle Stepper, 1-Click AI Contract Generation, Top Environment Health Bar, Real-time 319 Cluster Monitoring, and Baseline Leaderboard.
+- **Plan**: `docs/plans/2026-08-20-016-refactor-hitl-cockpit-ux-and-observability-plan.md`.
+- **Scope**: overhaul frontend UX (`pending-workbench.tsx`, `environment-health-bar.tsx`, `research-task-cockpit.tsx`, `contract-cockpit-card.tsx`, `cluster-monitor-panel.tsx`, `baseline-matrix-table.tsx`); fix backend contract file path and fallback support in `research_session.py`.
+- **Execution boundary**: local public-safe harness and frontend redesign; zero patient data leakage, preserving fail-closed Action Gate and H1/H2 human authority invariants.
+
 ## Completed: Refactor Frontend Sidebar and Aesthetic with shadcn sidebar-08 & b1GdfqsQE Preset
 
 - **Status**: completed on `2026-08-20`; sidebar-08 inset architecture, Breadcrumb navigation, b1GdfqsQE translucent/subtle preset details, and full WCAG AA accessibility compliance are implemented and verified.

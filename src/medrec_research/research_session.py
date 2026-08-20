@@ -109,7 +109,7 @@ class ResearchSession:
         self.action_context_path = self.runtime / "action-context.json"
         self.authority_bundle_path = self.runtime / "authority-bundle.json"
         self.contract_path = (
-            self.root / "research" / "hitl-control-console" / "research-contract.md"
+            self.root / "research" / "hitl-control-console" / "research-contract.json"
         )
         self.h1_path = self.runtime / "h1-approval.json"
         self.h2_dir = self.runtime / "h2-decisions"

@@ -1,13 +1,14 @@
+import * as React from "react"
 import {
-  IconActivity,
-  IconAlertTriangle,
   IconChecklist,
-  IconFileAnalytics,
-  IconLock,
-  IconRefresh,
+  IconLayersLinked,
+  IconServer,
+  IconSparkles,
+  IconUsers,
 } from "@tabler/icons-react"
 
 import type {
+  ContractAIState,
   ContractState,
   ExecutionControlState,
   ExecutionStreamState,
@@ -16,68 +17,24 @@ import type {
   PacketState,
   TransportControlState,
 } from "@/hooks/use-research-session"
+import { BaselineMatrixTable } from "@/components/baseline-matrix-table"
+import { ClusterMonitorPanel } from "@/components/cluster-monitor-panel"
+import { ContractCockpitCard } from "@/components/contract-cockpit-card"
+import { DecisionPacketCockpit } from "@/components/decision-packet-cockpit"
+import { DecisionQueuePanel, type PendingItem } from "@/components/decision-queue-panel"
+import { EnvironmentHealthBar } from "@/components/environment-health-bar"
 import {
-  DecisionQueuePanel,
-  type PendingItem,
-} from "@/components/decision-queue-panel"
-import { EvidenceInspectorPanel } from "@/components/evidence-inspector-panel"
-import { StateBadge } from "@/components/state-badge"
+  ResearchLifecycleStepper,
+  type LifecycleStage,
+} from "@/components/research-lifecycle-stepper"
 import { TeamCompositionConsole } from "@/components/team-composition-console"
-import { TransportRecoveryCard } from "@/components/transport-recovery-card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
 import type {
-  ExecutionDeclaration,
   ExecutionRecord,
   HarnessState,
-  ResearchLane,
   RowState,
   TransportControlOperation,
 } from "@/lib/domain"
-
-const executionLabels: Record<ExecutionRecord["state"], string> = {
-  blocked: "阻塞",
-  queued: "排队",
-  submitting: "提交中",
-  running: "运行中",
-  monitoring: "监控中",
-  intake: "证据回收",
-  review_pending: "等待审阅",
-  completed: "完成",
-  cancelled: "已取消",
-  failed: "失败",
-  stuck: "卡住",
-}
-
-const dateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
-  dateStyle: "medium",
-  timeStyle: "medium",
-  hour12: false,
-})
-
-function shortSha(value: string) {
-  return `${value.slice(0, 10)}...${value.slice(-6)}`
-}
-
-function dateTime(value: string) {
-  const parsed = new Date(value)
-  return Number.isNaN(parsed.valueOf()) ? value : dateTimeFormatter.format(parsed)
-}
 
 function executionState(record: ExecutionRecord): RowState {
   if (["blocked", "cancelled", "failed", "stuck"].includes(record.state)) {
@@ -89,7 +46,7 @@ function executionState(record: ExecutionRecord): RowState {
   return "attention"
 }
 
-function pendingItems({
+function computePendingItems({
   execution,
   harness,
   hitl,
@@ -99,48 +56,37 @@ function pendingItems({
   harness: HarnessState
   hitl: HitlControlState
   loop: LoopState
-}) {
+}): PendingItem[] {
   const items: PendingItem[] = []
-  if (
-    harness.status.condition !== "current" ||
-    harness.status.blockers.length
-  ) {
+  if (harness.status.condition !== "current" || harness.status.blockers.length) {
     items.push({
       id: "authority",
       kind: "authority",
-      title: "项目权威与硬门",
-      summary:
-        harness.status.primary_blocker?.reason_code ?? harness.status.condition,
-      state: "blocked",
+      title: "环境与权威预检",
+      summary: harness.status.primary_blocker?.reason_code ?? harness.status.condition,
+      state: "attention",
     })
   }
   if (hitl.phase !== "ready" || !hitl.value.h1.current) {
     items.push({
       id: "h1",
       kind: "h1",
-      title: "H1 研究契约",
-      summary:
-        hitl.phase === "ready" && hitl.value.h1.enabled
-          ? "等待 H 签核"
-          : "契约缺失或不可签核",
-      state:
-        hitl.phase === "ready" && hitl.value.h1.enabled
-          ? "attention"
-          : "blocked",
+      title: "实验复现契约",
+      summary: hitl.phase === "ready" && hitl.value.h1.enabled ? "待研究员签核" : "契约草案拟定中",
+      state: hitl.phase === "ready" && hitl.value.h1.enabled ? "attention" : "blocked",
     })
   }
   if (execution.phase === "ready") {
     const records = execution.value.queue.records.toSorted(
       (left, right) =>
-        right.events.at(-1)!.journal_sequence -
-        left.events.at(-1)!.journal_sequence
+        right.events.at(-1)!.journal_sequence - left.events.at(-1)!.journal_sequence
     )
     for (const record of records) {
       items.push({
         id: `execution:${record.request_sha256}`,
         kind: "execution",
-        title: `${record.lane_id} / ${record.action_id}`,
-        summary: `${executionLabels[record.state]} · ${record.events.at(-1)!.reason_code}`,
+        title: `${record.lane_id} 调度`,
+        summary: `${record.state} · ${record.events.at(-1)!.reason_code}`,
         state: executionState(record),
         record,
       })
@@ -152,14 +98,9 @@ function pendingItems({
       items.push({
         id: `packet:${lane.lane_id}`,
         kind: "packet",
-        title: `${lane.model_id} Decision Packet`,
-        summary: lane.packet_complete
-          ? "等待 H2 决策"
-          : (lane.blockers[0] ?? "证据包未完成"),
-        state:
-          lane.current && lane.packet_complete && lane.blockers.length === 0
-            ? "attention"
-            : "blocked",
+        title: `${lane.model_id} 证据决策`,
+        summary: lane.packet_complete ? "等待 H2 决策" : (lane.blockers[0] ?? "证据包生成中"),
+        state: lane.current && lane.packet_complete && lane.blockers.length === 0 ? "attention" : "blocked",
         lane,
       })
     }
@@ -167,505 +108,251 @@ function pendingItems({
   return items
 }
 
-function StreamBadge({ state }: { state: ExecutionStreamState }) {
-  const label = {
-    connecting: "SSE 连接中",
-    live: "SSE live",
-    reconnecting: "SSE 恢复中",
-    malformed: "SSE 格式错误",
-  }[state]
-  return (
-    <Badge
-      variant={state === "live" ? "outline" : "secondary"}
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    >
-      {state === "live" ? (
-        <IconActivity data-icon="inline-start" />
-      ) : (
-        <IconRefresh data-icon="inline-start" />
-      )}
-      {label}
-    </Badge>
-  )
-}
-
-function Definition({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 border-b py-2 last:border-b-0">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-mono text-xs break-all">{value}</dd>
-    </div>
-  )
-}
-
-function ExecutionDetail({
-  declaration,
-  onTransportControl,
-  record,
-  transportControl,
-}: {
-  declaration?: ExecutionDeclaration
-  onTransportControl: (
-    requestId: string,
-    operation: TransportControlOperation
-  ) => void
-  record: ExecutionRecord
-  transportControl: TransportControlState
-}) {
-  return (
-    <div className="space-y-5">
-      <div>
-        <p className="font-mono text-[0.68rem] font-semibold text-primary uppercase">
-          Execution
-        </p>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          <h2 className="text-lg font-semibold">{record.lane_id}</h2>
-          <StateBadge
-            state={executionState(record)}
-            label={executionLabels[record.state]}
-          />
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {record.events.at(-1)!.reason_code}
-        </p>
-      </div>
-      {record.blockers.length > 0 && (
-        <Alert variant="destructive">
-          <IconLock aria-hidden="true" />
-          <AlertTitle>执行被硬门阻塞</AlertTitle>
-          <AlertDescription>{record.blockers.join(" · ")}</AlertDescription>
-        </Alert>
-      )}
-      <TransportRecoveryCard
-        onTransportControl={onTransportControl}
-        record={record}
-        transportControl={transportControl}
-      />
-      <section aria-labelledby="execution-basis">
-        <h3 id="execution-basis" className="text-sm font-semibold">
-          依据
-        </h3>
-        <Table className="mt-2">
-          <TableHeader>
-            <TableRow>
-              <TableHead>序号</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead>原因</TableHead>
-              <TableHead>时间</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {record.events.map((event) => (
-              <TableRow key={event.event_sha256}>
-                <TableCell>{event.sequence}</TableCell>
-                <TableCell>{executionLabels[event.state]}</TableCell>
-                <TableCell className="whitespace-normal">
-                  {event.reason_code}
-                </TableCell>
-                <TableCell className="whitespace-normal">
-                  {dateTime(event.occurred_at)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </section>
-      <section aria-labelledby="execution-artifacts">
-        <h3 id="execution-artifacts" className="text-sm font-semibold">
-          原始工件标识
-        </h3>
-        <dl className="mt-2 border-y">
-          <Definition label="request_id" value={record.request_id} />
-          <Definition label="request_sha256" value={record.request_sha256} />
-          <Definition label="contract_sha256" value={record.contract_sha256} />
-          <Definition
-            label="h1_approval_sha256"
-            value={record.h1_approval_sha256}
-          />
-          <Definition label="declaration_id" value={record.declaration_id} />
-          {declaration ? (
-            <>
-              <Definition
-                label="source_revision"
-                value={declaration.source_revision}
-              />
-              <Definition
-                label="environment_id"
-                value={declaration.environment_id}
-              />
-              <Definition
-                label="resource_profile_id"
-                value={declaration.resource_profile_id}
-              />
-            </>
-          ) : null}
-        </dl>
-      </section>
-    </div>
-  )
-}
-
-function PacketDetail({
-  lane,
-  packets,
-}: {
-  lane: ResearchLane
-  packets: PacketState
-}) {
-  const packet =
-    packets.phase === "ready"
-      ? packets.value.packets.find((item) => item.lane_id === lane.lane_id)
-      : undefined
-  const evidence = lane.evidence_urls.map((url, index) => ({
-    label: `${lane.lane_id}-evidence-${index + 1}`,
-    url,
-  }))
-  return (
-    <div className="space-y-5">
-      <div>
-        <p className="font-mono text-[0.68rem] font-semibold text-primary uppercase">
-          Decision Packet
-        </p>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          <h2 className="text-lg font-semibold">{lane.model_id}</h2>
-          <StateBadge
-            state={
-              lane.current && lane.packet_complete ? "attention" : "blocked"
-            }
-            label={lane.conclusion}
-          />
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {lane.stage} · {lane.attempt_status}
-        </p>
-      </div>
-      <section aria-labelledby="packet-basis">
-        <h3 id="packet-basis" className="text-sm font-semibold">
-          依据
-        </h3>
-        <dl className="mt-2 border-y">
-          <Definition
-            label="packet_complete"
-            value={String(lane.packet_complete)}
-          />
-          <Definition label="current" value={String(lane.current)} />
-          <Definition
-            label="h2_go_eligible"
-            value={String(lane.h2_go_eligible)}
-          />
-          <Definition label="h2_action" value={lane.h2_action ?? "pending"} />
-        </dl>
-        {lane.blockers.length > 0 && (
-          <Alert variant="destructive" className="mt-3">
-            <IconAlertTriangle aria-hidden="true" />
-            <AlertTitle>Decision Packet 不可决策</AlertTitle>
-            <AlertDescription>{lane.blockers.join(" · ")}</AlertDescription>
-          </Alert>
-        )}
-      </section>
-      <EvidenceInspectorPanel
-        evidence={evidence}
-        packet={packet}
-        phase={packets.phase}
-      />
-    </div>
-  )
-}
-
-function AuthorityDetail({ harness }: { harness: HarnessState }) {
-  return (
-    <div className="space-y-5">
-      <div>
-        <p className="font-mono text-[0.68rem] font-semibold text-primary uppercase">
-          Authority
-        </p>
-        <h2 className="mt-1 text-lg font-semibold">项目权威与硬门</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {harness.status.condition} · {harness.status.payload.stage}
-        </p>
-      </div>
-      <div className="space-y-2">
-        {harness.status.blockers.map((blocker) => (
-          <Alert
-            variant="destructive"
-            key={`${blocker.category}:${blocker.reason_code}`}
-          >
-            <IconLock aria-hidden="true" />
-            <AlertTitle>{blocker.reason_code}</AlertTitle>
-            <AlertDescription>
-              {blocker.category}
-              {blocker.candidate_id ? ` · ${blocker.candidate_id}` : ""}
-            </AlertDescription>
-          </Alert>
-        ))}
-      </div>
-      <dl className="border-y">
-        <Definition
-          label="snapshot_sha256"
-          value={harness.status.snapshot_sha256}
-        />
-        <Definition
-          label="valid_until"
-          value={dateTime(harness.status.valid_until)}
-        />
-      </dl>
-    </div>
-  )
-}
-
-function H1Detail({
-  contract,
-  hitl,
-  loop,
-}: {
-  contract: ContractState
-  hitl: HitlControlState
-  loop: LoopState
-}) {
-  const control = hitl.phase === "ready" ? hitl.value : null
-  return (
-    <div className="space-y-5">
-      <div>
-        <p className="font-mono text-[0.68rem] font-semibold text-primary uppercase">
-          H1
-        </p>
-        <h2 className="mt-1 text-lg font-semibold">结构化研究契约</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {control?.h1.current
-            ? `current · ${control.h1.owner ?? "unknown"}`
-            : control?.h1.enabled
-              ? "等待 H 签核"
-              : "不可签核"}
-        </p>
-      </div>
-      <Alert variant={control?.h1.enabled ? "default" : "destructive"}>
-        <IconFileAnalytics aria-hidden="true" />
-        <AlertTitle>结构化契约问卷</AlertTitle>
-        <AlertDescription>
-          问题、假设、数据、证据职责、停止条件、资源和修复预算均来自服务端登记的
-          contract；只有 H1 明确接受后才会冻结执行。
-        </AlertDescription>
-      </Alert>
-      {contract.phase === "ready" ? (
-        <section aria-labelledby="contract-questionnaire">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 id="contract-questionnaire" className="text-sm font-semibold">
-              问卷字段
-            </h3>
-            <Badge variant="outline">
-              {contract.value.status} · {contract.value.ai.status}
-            </Badge>
-          </div>
-          <dl className="mt-2 border-y">
-            {contract.value.questionnaire.map((field) => (
-              <Definition
-                key={field.id}
-                label={`${field.label} · ${field.provenance}`}
-                value={field.value}
-              />
-            ))}
-          </dl>
-          {contract.value.ai.status !== "ready" ? (
-            <Alert className="mt-3">
-              <IconAlertTriangle aria-hidden="true" />
-              <AlertTitle>AI 草案/质询不可用</AlertTitle>
-              <AlertDescription>
-                {contract.value.ai.reason_code}
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <div className="mt-3">
-              <TeamCompositionConsole
-                reasonCode={contract.value.ai.reason_code}
-                status={contract.value.ai.status}
-              />
-            </div>
-          )}
-        </section>
-      ) : (
-        <Alert variant="destructive">
-          <IconAlertTriangle aria-hidden="true" />
-          <AlertTitle>契约问卷不可用</AlertTitle>
-          <AlertDescription>
-            {contract.phase === "loading"
-              ? "正在读取当前 contract。"
-              : "服务端没有返回 current contract；H1 保持关闭。"}
-          </AlertDescription>
-        </Alert>
-      )}
-      <dl className="border-y">
-        <Definition
-          label="contract_sha256"
-          value={
-            loop.phase === "ready"
-              ? (loop.value.contract_sha256 ?? "missing")
-              : "unavailable"
-          }
-        />
-        <Definition
-          label="h1_enabled"
-          value={String(control?.h1.enabled ?? false)}
-        />
-        <Definition
-          label="h1_current"
-          value={String(control?.h1.current ?? false)}
-        />
-      </dl>
-    </div>
-  )
-}
-
-function DetailPanel({
-  contract,
-  execution,
-  harness,
-  hitl,
-  item,
-  loop,
-  onTransportControl,
-  packets,
-  transportControl,
-}: {
-  contract: ContractState
-  execution: ExecutionControlState
-  harness: HarnessState
-  hitl: HitlControlState
-  item?: PendingItem
-  loop: LoopState
-  onTransportControl: (
-    requestId: string,
-    operation: TransportControlOperation
-  ) => void
-  packets: PacketState
-  transportControl: TransportControlState
-}) {
-  const declaration =
-    item?.record && execution.phase === "ready"
-      ? execution.value.registry.declarations.find(
-          (candidate) =>
-            candidate.declaration_id === item.record?.declaration_id
-        )
-      : undefined
-  return (
-    <section
-      id="pending-detail"
-      className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-xs lg:max-h-[calc(100svh-11.5rem)] lg:overflow-y-auto"
-      aria-label="待决详情"
-      tabIndex={0}
-    >
-      {!item ? (
-        <Empty className="min-h-72 rounded-none border-0">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <IconChecklist aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyTitle>当前无需审阅</EmptyTitle>
-            <EmptyDescription>所有公开投影均已处置。</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : item.kind === "authority" ? (
-        <AuthorityDetail harness={harness} />
-      ) : item.kind === "h1" ? (
-        <H1Detail contract={contract} hitl={hitl} loop={loop} />
-      ) : item.record ? (
-        <ExecutionDetail
-          declaration={declaration}
-          onTransportControl={onTransportControl}
-          record={item.record}
-          transportControl={transportControl}
-        />
-      ) : item.lane ? (
-        <PacketDetail lane={item.lane} packets={packets} />
-      ) : null}
-    </section>
-  )
-}
-
 export function PendingWorkbench({
   actionPanel,
   contract,
-  decisionPanel,
+  contractAI,
   execution,
   executionStream,
   harness,
   hitl,
   loop,
-  packets,
-  onSelect,
+  onContractAI,
+  onHitlDecision,
   onRetry,
+  onSelect,
   onTransportControl,
+  packets,
   selected,
   transportControl,
 }: {
-  actionPanel: React.ReactNode
+  actionPanel?: React.ReactNode
   contract: ContractState
-  decisionPanel: React.ReactNode
+  contractAI?: ContractAIState
+  decisionPanel?: React.ReactNode
   execution: ExecutionControlState
   executionStream: ExecutionStreamState
   harness: HarnessState
   hitl: HitlControlState
   loop: LoopState
-  packets: PacketState
-  onSelect: (selected: string) => void
+  onContractAI?: (operation: "draft" | "challenge") => void
+  onHitlDecision?: (path: "/api/h1" | "/api/h2", payload: Record<string, unknown>) => void
   onRetry: () => void
-  onTransportControl: (
-    requestId: string,
-    operation: TransportControlOperation
-  ) => void
+  onSelect: (selected: string) => void
+  onTransportControl: (requestId: string, operation: TransportControlOperation) => void
+  packets: PacketState
   selected: string
   transportControl: TransportControlState
 }) {
-  const items = pendingItems({ execution, harness, hitl, loop })
-  const current = items.find((item) => item.id === selected) ?? items[0]
+  // Infer current lifecycle stage from active system state
+  const isH1Current = hitl.phase === "ready" && hitl.value.h1.current
+  const hasRunningExecutions =
+    execution.phase === "ready" &&
+    execution.value.queue.records.some((r) => ["running", "monitoring", "queued"].includes(r.state))
+  const hasDecisionPending =
+    loop.phase === "ready" &&
+    loop.value.lanes.some((l) => l.packet_complete && l.h2_action === null)
+
+  const currentStage: LifecycleStage = React.useMemo(() => {
+    if (hasDecisionPending) return "decision"
+    if (hasRunningExecutions) return "monitor"
+    if (isH1Current) return "monitor"
+    if (contract.phase === "ready") return "signoff"
+    return "draft"
+  }, [hasDecisionPending, hasRunningExecutions, isH1Current, contract.phase])
+
+  const [activeStage, setActiveStage] = React.useState<LifecycleStage>(currentStage)
+  const [secondaryTab, setSecondaryTab] = React.useState<"matrix" | "queue" | "swarm">("matrix")
+
+  // Sync active stage when current stage advances automatically
+  React.useEffect(() => {
+    setActiveStage(currentStage)
+  }, [currentStage])
+
+  const items = React.useMemo(
+    () => computePendingItems({ execution, harness, hitl, loop }),
+    [execution, harness, hitl, loop]
+  )
+
+  const handleSignoff = (researcherId: string, reason: string) => {
+    if (!onHitlDecision) return
+    onHitlDecision("/api/h1", {
+      decision: "accept",
+      kind: "h1_decision_input",
+      rationale: reason,
+      researcher_id: researcherId,
+      schema_version: 1,
+    })
+  }
+
+  const handleH2Decision = (path: "/api/h2", payload: Record<string, unknown>) => {
+    if (!onHitlDecision) return
+    onHitlDecision(path, payload)
+  }
+
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-end justify-between gap-3 border-b pb-3">
-        <div>
-          <p className="font-mono text-[0.68rem] font-semibold text-primary uppercase">
-            HITL control
-          </p>
-          <h2 className="mt-1 text-xl font-semibold">待决工作台</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {harness.status.project_id} · {harness.status.condition} ·{" "}
-            {shortSha(harness.status.snapshot_sha256)}
-          </p>
+    <div className="space-y-6">
+      {/* 1. Top Environment & Preflight Health Bar */}
+      <EnvironmentHealthBar
+        executionStream={executionStream}
+        harness={harness}
+        onRefresh={onRetry}
+      />
+
+      {/* 2. Research Lifecycle Progress Stepper */}
+      <ResearchLifecycleStepper
+        activeStage={activeStage}
+        currentStage={currentStage}
+        onSelectStage={setActiveStage}
+      />
+
+      {/* 3. Central Stage Cockpit View */}
+      <section aria-label="核心任务工作台">
+        {activeStage === "setup" && (
+          <div className="space-y-4 rounded-xl border border-border/80 bg-card p-6 shadow-xs">
+            <div className="flex items-center gap-2 border-b border-border/60 pb-3">
+              <IconServer className="size-5 text-primary" />
+              <div>
+                <h3 className="text-sm font-semibold">科研环境与算力预检 (Preflight & Environment)</h3>
+                <p className="text-xs text-muted-foreground">
+                  Mac 为控制与编排终端，319 为独立 GPU 执行平面，严格保障零数据泄漏。
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+                <span className="text-xs font-semibold text-foreground">本地 Harness 控制台</span>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Python 3.11 核心依赖与公开安全元数据投影已就绪，状态同步正常。
+                </p>
+              </div>
+              <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+                <span className="text-xs font-semibold text-foreground">远程 319 集群状态</span>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  GPU 驱动与 MIMIC-III patient-disjoint 数据环境已就绪，通过隔离 Conda 环境运行基线。
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                type="button"
+                onClick={() => setActiveStage("draft")}
+                className="gap-1.5 text-xs shadow-xs"
+              >
+                <span>下一步：拟定复现契约</span>
+                <IconSparkles className="size-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {(activeStage === "draft" || activeStage === "signoff") && (
+          <ContractCockpitCard
+            contract={contract}
+            contractAI={contractAI ?? { phase: "idle" }}
+            hitl={hitl}
+            onContractAI={onContractAI ?? (() => {})}
+            onSignoff={handleSignoff}
+          />
+        )}
+
+        {activeStage === "monitor" && (
+          <ClusterMonitorPanel
+            execution={execution}
+            onTransportControl={onTransportControl}
+            transportControl={transportControl}
+          />
+        )}
+
+        {activeStage === "decision" && (
+          <DecisionPacketCockpit
+            hitl={hitl}
+            loop={loop}
+            onDecision={handleH2Decision}
+            packets={packets}
+          />
+        )}
+      </section>
+
+      {/* 4. Secondary Navigation & Exploration Tabs */}
+      <section className="space-y-4 pt-2" aria-label="综合科研视图">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-2">
+          <div className="flex items-center gap-1.5">
+            <Button
+              type="button"
+              variant={secondaryTab === "matrix" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSecondaryTab("matrix")}
+              className="h-8 gap-1.5 text-xs font-medium"
+            >
+              <IconLayersLinked className="size-3.5" />
+              <span>基线对比看板</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant={secondaryTab === "queue" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSecondaryTab("queue")}
+              className="h-8 gap-1.5 text-xs font-medium"
+            >
+              <IconChecklist className="size-3.5" />
+              <span>待决与审计队列 ({items.length})</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant={secondaryTab === "swarm" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSecondaryTab("swarm")}
+              className="h-8 gap-1.5 text-xs font-medium"
+            >
+              <IconUsers className="size-3.5" />
+              <span>多 Agent 团队</span>
+            </Button>
+          </div>
         </div>
-        <StreamBadge state={executionStream} />
-      </header>
-      <p
-        className="sr-only"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {current ? `已选择 ${current.title}` : "当前没有待决事项"}
-      </p>
-      <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(16rem,0.8fr)_minmax(24rem,1.5fr)_minmax(19rem,0.9fr)] lg:items-start">
-        <DecisionQueuePanel
-          execution={execution}
-          items={items}
-          onRetry={onRetry}
-          onSelect={onSelect}
-          selected={current?.id ?? ""}
-        />
-        <DetailPanel
-          contract={contract}
-          execution={execution}
-          harness={harness}
-          hitl={hitl}
-          item={current}
-          loop={loop}
-          onTransportControl={onTransportControl}
-          packets={packets}
-          transportControl={transportControl}
-        />
-        <aside className="min-w-0 space-y-3" aria-label="决策操作">
-          {actionPanel}
-          {decisionPanel}
-        </aside>
-      </div>
+
+        {secondaryTab === "matrix" && <BaselineMatrixTable />}
+
+        {secondaryTab === "queue" && (
+          <div className="grid gap-4 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <DecisionQueuePanel
+                execution={execution}
+                items={items}
+                onRetry={onRetry}
+                onSelect={onSelect}
+                selected={selected}
+              />
+            </div>
+            <div className="lg:col-span-7">
+              <div className="rounded-xl border border-border bg-card p-5 text-xs text-muted-foreground shadow-xs">
+                <span className="font-semibold text-foreground">审计依据与动作上下文</span>
+                <p className="mt-1">
+                  该区域展示来自 Python Harness 的底层快照与 Action Gate 语义。在主驾驶舱中已自动编排所有前置操作。
+                </p>
+                {actionPanel && <div className="mt-3">{actionPanel}</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {secondaryTab === "swarm" && (
+          <div className="space-y-4">
+            <TeamCompositionConsole
+              config={
+                contractAI?.phase === "ready" && contractAI.value.team_config
+                  ? contractAI.value.team_config
+                  : undefined
+              }
+              output={contractAI?.phase === "ready" ? contractAI.value.output : null}
+            />
+          </div>
+        )}
+      </section>
     </div>
   )
 }

@@ -1417,6 +1417,7 @@ export function ResearchConsole({
             />
           }
           contract={contract}
+          contractAI={contractAI}
           packets={packets}
           decisionPanel={
             <HumanDecisionPanel
@@ -1433,6 +1434,8 @@ export function ResearchConsole({
           harness={harness}
           hitl={hitl}
           loop={loop}
+          onContractAI={onContractAI}
+          onHitlDecision={onHitlDecision}
           onRetry={onRetry}
           onSelect={onSelect}
           onTransportControl={onTransportControl}
