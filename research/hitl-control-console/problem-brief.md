@@ -6,7 +6,7 @@ Reduce the uncertainty and operational risk between a human research decision an
 
 ## Current problem
 
-The production console can display project state and create H1/H2 records, but it stops at an Action Request JSON file. There is no registered execution declaration, durable worker state, fixed ARIS bridge, monitor stream, restricted public-safe evidence intake, or automatic Decision Packet assembly. The current UI is Radix-based and organizes information around sections rather than the researcher's pending decisions.
+The production console now binds an opaque Action Request to a registered declaration, durable queue, fixed server-only ARIS transport, monitor stream, restricted public-safe evidence intake, Decision Packet assembly, and H2. The transport is implemented and tested locally only. The remaining gap is authorized installation and validation on 319 together with the still-blocked scientific authorities. The Base UI workbench organizes the production surface around pending human decisions.
 
 ## Evaluation setting
 
@@ -17,18 +17,15 @@ The production console can display project state and create H1/H2 records, but i
 
 ## Known failures
 
-- Allowed Action Requests are queued as isolated files and never advance.
-- Dependencies cannot distinguish successful terminal state from failed or stuck terminal state.
-- Browser has no replayable status stream or reconnect cursor.
-- Decision evidence is not assembled from conclusion to grounds to raw public-safe artifacts.
+- The fixed ARIS wrapper has no authorized 319 deployment or live receipt evidence; local tests never claim remote execution success.
+- A missing, dirty, digest-mismatched, symlink-escaped, or process-identity-mismatched remote authority fails closed into durable review.
 - GAMENet has unresolved license, environment-lock, adapter-smoke, readiness, remote-revision, and data-root gates.
-- ARIS startup does not validate and atomically activate a latest candidate with last-known-good fallback.
+- ARIS startup now validates and atomically records a clean `main` candidate with last-known-good fallback; a failed candidate prevents startup.
 
 ## Current unknowns
 
-- Whether one declaration schema can cover all final-five lanes without weakening per-lane scientific identity.
-- Whether ARIS exposes a stable non-interactive bridge surface suitable for fixed declaration-owned commands.
-- Which exact SafeDrug-main launch command and environment lock will be accepted after authorized 319 inspection.
+- Whether the fixed transport package and queue-manager digests match an authorized clean 319 installation.
+- Which SafeDrug-main environment lock, private data layout, and adapter smoke result will be accepted after authorized 319 inspection.
 - Whether the user will authorize real data, GPU, 319 writes, cost, license work, and canary duration.
 
 ## Exit conditions

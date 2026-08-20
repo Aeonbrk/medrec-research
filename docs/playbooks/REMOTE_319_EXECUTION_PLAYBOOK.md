@@ -107,7 +107,9 @@ python -c "import medrec_research; print(medrec_research.__file__)"
 
 ARIS submits a frozen run specification from the Mac harness. The remote job records source revision, protocol version, baseline identity and source revision, adapter revision, Dataset Manifest identity, Conda environment identity, seed, GPU assignment, start time, and expected restricted and public-safe outputs.
 
-Use the project-local ARIS `experiment-queue` workflow when it supports the run. A manually launched fallback must use a named `tmux` session and a restricted log under the 319 Local Data Root. Never store real run logs or patient-level output in the Git checkout.
+The production control-console path uses only the package-owned `aris-transport.toml` registry and `medrec_research.aris_transport_remote` wrapper. A schema-v2 manifest binds declaration, contract, H1, preflight, SafeDrug revision, ARIS revision, transport policy, wrapper package, and queue-manager digests before submission. The wrapper may use the ARIS `experiment-queue` scheduler internally, but the browser and operator do not supply its free-form manifest, SSH target, command, working directory, Conda environment, path, GPU assignment, or expected output.
+
+A manually launched `tmux`, `screen`, or direct scheduler job is outside this production contract. It must not be imported as a successful control-console run or scientific attempt. Never store real run logs or patient-level output in the Git checkout.
 
 Check GPU state immediately before launch and assign devices explicitly. Do not select a device from the stale snapshot in this document.
 
@@ -145,6 +147,22 @@ conda run -n medrec-core-evaluator medrec-research accept-comparison \
 The command requires a `comparison_ready` registry entry, a canonical sorted medication-vocabulary file, the same private membership-HMAC key used by the restricted Dataset Manifest builder, complete test Prediction Records, a frozen run config, and a nonempty Adaptation Budget artifact. It verifies vocabulary identity and exact eligible-visit membership, recomputes metrics, and writes only aggregate identities and checksums.
 
 Before accepting the candidate into Git, independently inspect the Readiness Evidence, verify artifact checksums, scan the record for paths and identifiers, and confirm every claim stays within the protocol's evidence boundary.
+
+After an explicitly authorized transfer places a schema-conforming public-safe observation or aggregate evidence file on the Mac, apply it through the local ingress commands:
+
+```bash
+rtk proxy /opt/homebrew/bin/uv run medrec-research monitor-apply \
+  --root /Users/oian/Codes/master/medrec-research \
+  --input /path/to/public-safe-monitor.json \
+  --output /path/to/public-monitor-result.json
+
+rtk proxy /opt/homebrew/bin/uv run medrec-research evidence-intake \
+  --root /Users/oian/Codes/master/medrec-research \
+  --input /path/to/public-safe-evidence.json \
+  --output /path/to/public-decision-packet.json
+```
+
+These commands do not run remote preflight or submit work. They accept only the existing strict monitor/evidence schemas, bind the input to the durable request and declaration, and reject patient rows, predictions, weights, paths inside the payload, credentials, raw logs, and unknown fields. The browser never supplies the input or output paths.
 
 ## Destructive operations
 
