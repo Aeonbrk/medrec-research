@@ -64,6 +64,7 @@ flowchart TD
 ```
 
 ### 阶段 1: 建立基线并定位偏差 (Baseline Establishment)
+
 ```bash
 # 验证基线配置与执行计划 (Dry-run)
 medrec baseline establish safedrug --dry-run
@@ -71,6 +72,7 @@ medrec baseline establish safedrug --dry-run
 # 正式在远程计算节点运行并记录偏差
 medrec baseline establish safedrug
 ```
+
 - **协作团队**: Baseline Team (3 agents: implementer, reviewer, explore)
 - **产出文件**:
   - `research/baselines/safedrug/result.json`
@@ -80,9 +82,11 @@ medrec baseline establish safedrug
 ---
 
 ### 阶段 2: 剖析失败并提出竞争性假设 (Idea Discovery)
+
 ```bash
 medrec idea discover safedrug
 ```
+
 - **协作团队**: Research Team (4 agents: failure analyst, literature, codebase, hypothesis generator)
 - **产出文件**:
   - `research/hypotheses/H001-{slug}.md` ~ `H003-{slug}.md`
@@ -91,9 +95,11 @@ medrec idea discover safedrug
 ---
 
 ### 阶段 3: 独立三维度盲审评审 (Idea Review)
+
 ```bash
 medrec idea review H001
 ```
+
 - **协作团队**: Review Team (3 reviewers: 新颖性, 可行性, 证据强度)
 - **产出文件**:
   - `research/reviews/H001-review.md`
@@ -102,9 +108,11 @@ medrec idea review H001
 ---
 
 ### 阶段 4: 实验矩阵设计与契约锁定 (Experiment Design & Contract Locking)
+
 ```bash
 medrec experiment design H001
 ```
+
 - **协作团队**: Feature Team (3 agents: lead, config engineer, contract generator)
 - **产出文件**:
   - `research/contracts/H001-contract.json` (包含不可篡改的成功判据与资源上限)
@@ -114,6 +122,7 @@ medrec experiment design H001
 ---
 
 ### 阶段 5: GPU 实验运行与监控 (Execution & Telemetry)
+
 ```bash
 # Dry-run 预检
 medrec experiment run H001-substructure --dry-run
@@ -121,15 +130,18 @@ medrec experiment run H001-substructure --dry-run
 # 远程 GPU 运行
 medrec experiment run H001-substructure
 ```
+
 - **协作团队**: Execution Team (2 agents: deployer, telemetry monitor)
 - **运行特征**: 自动监控训练 Epoch 与 Loss 曲线，触发早停或 OOM 保护
 
 ---
 
 ### 阶段 6: 证据链归因与决策分析 (Evidence Analysis & Decision)
+
 ```bash
 medrec evidence analyze H001-substructure
 ```
+
 - **协作团队**: Review Team (3 reviewers)
 - **产出文件**:
   - `research/evidence/H001-evidence.md`
