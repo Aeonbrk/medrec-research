@@ -99,6 +99,8 @@ class _HarnessServer(ThreadingHTTPServer):
         self.authority_bundle_path = authority_bundle_path
         self.research_loop_path = research_loop_path
         self.hitl_session = hitl_session
+        if hitl_session is not None and getattr(hitl_session, "_actions_enabled", False) is None:
+            hitl_session.actions_enabled = actions_enabled
         self._last_known_good: ProjectStatus | None = None
         self._status_lock = Lock()
         super().__init__(address, _HarnessHandler)

@@ -167,3 +167,19 @@ _Avoid_: Job, launch result
 **Project Status Harness**:
 只绑定 `127.0.0.1` 的本地 Web 投影，读取 Project Status Snapshot 并调用共享动作门。它没有数据库、科学写接口或执行面。
 _Avoid_: 319 controller, experiment dashboard
+
+**Remote Preflight Probe**:
+The read-only probe interface executing fixed hardware, environment, and revision checks on the 319 Execution Plane.
+_Avoid_: Remote executor, live session runner
+
+**Research Contract Store**:
+The atomic, immutable persistence and verification authority for H1 Approval and H2 Decision records under the current contract.
+_Avoid_: Contract database, mutable decision state
+
+**Execution Orchestrator**:
+The durable state coordinator that manages queue transitions, worker submission envelopes, manifest sealing, transport failure recovery, and restricted evidence intake.
+_Avoid_: Job runner, execution daemon
+
+**Agent Team Supervisor**:
+The multi-agent coordinator that manages sizing, role assignment, and display modes (tmux, iterm2, in-process) for research tasks according to team composition patterns without bypassing fail-closed human gates.
+_Avoid_: Autonomous PI, unconstrained agent swarm
