@@ -20,10 +20,19 @@ from ._validation import (
     strict_fields,
 )
 from .errors import ProtocolValidationError
-from .reproduction_contract import (
-    MOLEREC_SAFEDRUG_LINEAGE_REVISION,
-    REQUIRED_OUTCOMES,
-    SAFE_DRUG_MAIN_REVISION,
+
+SAFE_DRUG_REPOSITORY = "https://github.com/ycq091044/SafeDrug"
+SAFE_DRUG_MAIN_REVISION = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+MOLEREC_REPOSITORY = "https://github.com/yangnianzu0515/MoleRec"
+MOLEREC_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+MOLEREC_SAFEDRUG_LINEAGE_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
+
+REQUIRED_OUTCOMES = (
+    "ddi_rate",
+    "jaccard",
+    "f1",
+    "prauc",
+    "average_medication_count",
 )
 
 

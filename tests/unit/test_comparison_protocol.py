@@ -12,7 +12,7 @@ from medrec_research import (
     ProtocolValidationError,
     ThresholdSelectionRule,
 )
-from medrec_research.reproduction_contract import (
+from medrec_research.comparison_protocol import (
     MOLEREC_SAFEDRUG_LINEAGE_REVISION,
     SAFE_DRUG_MAIN_REVISION,
 )

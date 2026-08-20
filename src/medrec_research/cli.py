@@ -1,60 +1,27 @@
-"""Command-line entry points for public protocol workflows."""
+"""Unified Command-Line Interface for MedRec Research & the Idea Loop System."""
 
 from __future__ import annotations
 
 import argparse
-import http.client
-import webbrowser
+import sys
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
-from threading import Thread
 
 from ._validation import (
-    content_sha256,
     parse_json_object,
-    require_public_string,
     require_single_line_public_string,
     strict_fields,
-    write_json_atomic,
 )
-from .action_gate import (
-    ActionRequestInput,
-    AuthorityBundle,
-    evaluate_action,
-    resolve_action_context,
-)
-from .baseline_audit import AuditReviewSet, BaselineAudit, BaselineProgram
-from .benchmark_program import (
-    SelectionAcceptance,
-    SelectionDiagnostic,
-    SelectionResult,
-    SelectionSpecification,
-)
-from .benchmark_state import (
-    ComparisonScope,
-    HumanReviewRecord,
-    LiveBenchmarkAuthority,
-    program_registry_authority_sha256,
-)
-from .dataset import DatasetManifest
+from .dataset import DatasetManifest, SplitName
 from .errors import ProtocolValidationError
 from .evaluation import evaluate_predictions
-from .harness import create_harness_server
 from .prediction import PredictionRecord
-from .project_status import ProjectStatus, publish_medrec_status
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
-from .reproduction_characterization import ReproductionCharacterization
-from .reproduction_contract import (
-    DecisionPacket,
-    H1Approval,
-    H2Decision,
-    SafeDrugBatchContract,
-)
-from .research_loop_status import ResearchLoopStatus
-from .research_session import ResearchSession
+from .remote_executor import SSHConfig
+from .research_orchestrator import ResearchOrchestrator
 from .run_record import ArtifactChecksum, RunParameter, RunRecord
 
 Clock = Callable[[], datetime]
@@ -80,238 +47,119 @@ def _nonnegative_integer(value: str) -> int:
     return parsed
 
 
-def _port(value: str) -> int:
-    parsed = _nonnegative_integer(value)
-    if parsed > 65535:
-        raise argparse.ArgumentTypeError("must be an integer between 0 and 65535")
-    return parsed
+def _load_user_config() -> SSHConfig:
+    """Load SSH and execution config from ~/.medrec/config.yaml or fallback."""
+    config_file = Path("~/.medrec/config.yaml").expanduser()
+    if config_file.exists():
+        try:
+            import yaml  # type: ignore
+
+            data = yaml.safe_load(config_file.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and "ssh" in data:
+                return SSHConfig.from_dict(data["ssh"])
+        except Exception:
+            pass
+    return SSHConfig()
 
 
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="medrec-research")
-    commands = parser.add_subparsers(dest="command", required=True)
-    reference = commands.add_parser("reference")
-    reference.add_argument("--manifest", type=Path, required=True)
-    reference.add_argument("--visits", type=Path, required=True)
-    reference.add_argument("--output", type=Path, required=True)
-    reference.add_argument("--top-k", type=_positive_integer, default=2)
-    reference.add_argument("--seed", type=_nonnegative_integer, default=0)
-    reference.set_defaults(handler=_reference)
-    acceptance = commands.add_parser("accept-comparison")
-    acceptance.add_argument("--manifest", type=Path, required=True)
-    acceptance.add_argument("--registry", type=Path, required=True)
-    acceptance.add_argument("--baseline-id", required=True)
-    acceptance.add_argument("--predictions", type=Path, required=True)
-    acceptance.add_argument("--medication-vocabulary", type=Path, required=True)
-    acceptance.add_argument("--membership-hmac-key", type=Path)
-    acceptance.add_argument("--run-config", type=Path, required=True)
-    acceptance.add_argument("--adaptation-budget", type=Path, required=True)
-    acceptance.add_argument("--artifact", action="append", default=[], metavar="NAME=PATH")
-    acceptance.add_argument("--output", type=Path, required=True)
-    acceptance.set_defaults(handler=_accept_comparison_command)
-
-    audit = commands.add_parser("audit-validate")
-    _add_program_audits(audit)
-    audit.set_defaults(handler=_audit_validate)
-
-    selection = commands.add_parser("selection-publish")
-    _add_program_audits(selection)
-    selection.add_argument("--registry", type=Path, required=True)
-    selection.add_argument("--reviews", type=Path, required=True)
-    selection.add_argument("--scope", type=Path, required=True)
-    selection.add_argument("--diagnostics", type=Path, required=True)
-    selection.add_argument("--output", type=Path, required=True)
-    selection.set_defaults(handler=_selection_publish)
-
-    status = commands.add_parser("status-publish")
-    _add_program_audits(status)
-    status.add_argument("--registry", type=Path, required=True)
-    status.add_argument("--reviews", type=Path, required=True)
-    status.add_argument("--selection", type=Path, required=True)
-    status.add_argument("--selection-acceptance", type=Path)
-    status.add_argument("--scope", type=Path, required=True)
-    status.add_argument("--human-review", type=Path)
-    status.add_argument("--characterization", type=Path)
-    status.add_argument("--output", type=Path, required=True)
-    status.set_defaults(handler=_status_publish)
-
-    action_context = commands.add_parser("action-context")
-    action_context.add_argument("--status", type=Path, required=True)
-    action_context.add_argument("--authority-bundle", type=Path)
-    action_context.add_argument("--output", type=Path, required=True)
-    action_context.set_defaults(handler=_action_context)
-
-    action = commands.add_parser("action-evaluate")
-    action.add_argument("--request", type=Path, required=True)
-    action.add_argument("--status", type=Path, required=True)
-    action.add_argument("--authority-bundle", type=Path)
-    action.add_argument("--output", type=Path, required=True)
-    action.set_defaults(handler=_action_evaluate)
-
-    harness = commands.add_parser("harness")
-    harness.add_argument("--status", type=Path, required=True)
-    harness.add_argument("--authority-bundle", type=Path)
-    harness.add_argument("--research-loop", type=Path)
-    harness.add_argument("--port", type=_port, default=0)
-    harness.set_defaults(handler=_serve_harness)
-
-    research = commands.add_parser("research")
-    research.add_argument("--root", type=Path, default=Path.cwd())
-    research.add_argument("--port", type=_port, default=0)
-    research.add_argument("--no-browser", action="store_true")
-    research.add_argument("--preflight-timeout", type=_positive_integer, default=12)
-    research.set_defaults(handler=_serve_research_session)
-
-    monitor = commands.add_parser("monitor-apply")
-    monitor.add_argument("--root", type=Path, default=Path.cwd())
-    monitor.add_argument("--input", type=Path, required=True)
-    monitor.add_argument("--output", type=Path, required=True)
-    monitor.set_defaults(handler=_apply_monitor_observation)
-
-    intake = commands.add_parser("evidence-intake")
-    intake.add_argument("--root", type=Path, default=Path.cwd())
-    intake.add_argument("--input", type=Path, required=True)
-    intake.add_argument("--output", type=Path, required=True)
-    intake.set_defaults(handler=_intake_reproduction_evidence)
-
-    reproduction = commands.add_parser(
-        "validate-reproduction",
-        aliases=["reproduction-validate"],
-    )
-    reproduction.add_argument("--contract", type=Path, required=True)
-    reproduction.add_argument("--packet", type=Path, required=True)
-    reproduction.add_argument("--h1", type=Path)
-    reproduction.add_argument("--h2", type=Path)
-    reproduction.add_argument("--output", type=Path, required=True)
-    reproduction.set_defaults(handler=_validate_reproduction)
-
-    loop = commands.add_parser("validate-research-loop")
-    loop.add_argument("--status", type=Path, required=True)
-    loop.add_argument("--output", type=Path, required=True)
-    loop.set_defaults(handler=_validate_research_loop)
-    return parser
-
-
-def _add_program_audits(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--program", type=Path, required=True)
-    parser.add_argument("--audit-dir", type=Path, required=True)
-
-
-def _system_clock() -> datetime:
-    return datetime.now(UTC)
-
-
-def _write_json_atomic(path: Path, value: object) -> None:
-    write_json_atomic(path, value)
-
-
-def _load_program_audits(
-    arguments: argparse.Namespace,
-) -> tuple[BaselineProgram, tuple[BaselineAudit, ...]]:
-    program = BaselineProgram.load(arguments.program)
-    audits = tuple(
-        BaselineAudit.load(arguments.audit_dir / f"{candidate_id}.toml")
-        for candidate_id in program.candidate_ids
-    )
-    program.validate_audits(audits)
-    return program, audits
-
-
-def _load_diagnostics(path: Path) -> tuple[SelectionDiagnostic, ...]:
-    payload = strict_fields(
-        parse_json_object(path.read_text(encoding="utf-8"), context="selection diagnostics"),
-        required=("schema_version", "kind", "diagnostics"),
-        context="selection diagnostics",
-    )
-    if payload["schema_version"] != 1 or payload["kind"] != "selection_diagnostics":
-        raise ProtocolValidationError("selection diagnostics must use schema version 1")
-    diagnostics = payload["diagnostics"]
-    if not isinstance(diagnostics, list):
-        raise ProtocolValidationError("selection diagnostics must be a list")
-    return tuple(SelectionDiagnostic.from_dict(item) for item in diagnostics)
-
-
-def _canonical_vocabulary(path: Path) -> tuple[tuple[str, ...], str]:
-    raw = path.read_bytes()
-    try:
-        text = raw.decode("utf-8")
-    except UnicodeDecodeError as error:
-        raise ProtocolValidationError("medication vocabulary must be UTF-8") from error
-    codes = tuple(
-        require_single_line_public_string(code, field="medication_vocabulary")
-        for code in text.splitlines()
-    )
-    canonical = "".join(f"{code}\n" for code in sorted(codes))
-    if not codes or len(codes) != len(set(codes)) or text != canonical:
-        raise ProtocolValidationError(
-            "medication vocabulary must be canonical sorted unique codes with trailing newlines"
-        )
-    return codes, sha256(raw).hexdigest()
-
-
-def _artifact_argument(value: str) -> tuple[str, Path]:
-    name, separator, raw_path = value.partition("=")
-    if not separator:
-        raise ProtocolValidationError("artifact must use NAME=PATH")
-    return require_public_string(name, field="artifact.name"), Path(raw_path)
-
-
-def _accept_comparison(arguments: argparse.Namespace) -> RunRecord:
-    manifest = DatasetManifest.load(arguments.manifest)
-    registry = BaselineRegistry.load(arguments.registry)
-    try:
-        baseline = registry.get(arguments.baseline_id)
-    except KeyError as error:
-        raise ProtocolValidationError(
-            f"baseline is not registered: {arguments.baseline_id}"
-        ) from error
-
-    vocabulary, vocabulary_sha256 = _canonical_vocabulary(arguments.medication_vocabulary)
-    if vocabulary_sha256 != manifest.medication_vocabulary_sha256:
-        raise ProtocolValidationError(
-            "medication vocabulary checksum does not match Dataset Manifest"
-        )
-    vocabulary_set = set(vocabulary)
-
-    prediction_bytes = arguments.predictions.read_bytes()
-    try:
-        prediction_text = prediction_bytes.decode("utf-8")
-    except UnicodeDecodeError as error:
-        raise ProtocolValidationError("Prediction Records must be UTF-8 JSON") from error
-    prediction_payload = strict_fields(
-        parse_json_object(prediction_text, context="Prediction Records"),
-        required=("schema_version", "predictions"),
-        context="Prediction Records",
-    )
-    if prediction_payload["schema_version"] != 1:
-        raise ProtocolValidationError("Prediction Records schema_version must be 1")
-    raw_predictions = prediction_payload["predictions"]
-    if not isinstance(raw_predictions, list):
-        raise ProtocolValidationError("Prediction Records predictions must be a list")
-    predictions = tuple(PredictionRecord.from_dict(item) for item in raw_predictions)
-    if any(
-        not set((*record.target_medications, *record.predicted_medications)) <= vocabulary_set
-        for record in predictions
-    ):
-        raise ProtocolValidationError(
-            "Prediction Records contain medications outside the declared vocabulary"
-        )
-    evaluation = evaluate_predictions(predictions)
-    membership_hmac_key = (
-        arguments.membership_hmac_key.read_bytes()
-        if arguments.membership_hmac_key is not None
-        else None
-    )
-    evaluation_visit_membership_digest = manifest.verify_evaluation_visits(
-        ((record.patient_id, record.visit_id) for record in predictions),
-        membership_hmac_key=membership_hmac_key,
+def _create_orchestrator(args: argparse.Namespace) -> ResearchOrchestrator:
+    ssh_cfg = _load_user_config()
+    root = getattr(args, "root", None) or Path.cwd()
+    interactive = not getattr(args, "non_interactive", False)
+    return ResearchOrchestrator(
+        root=root,
+        ssh_config=ssh_cfg,
+        interactive=interactive,
     )
 
-    config = strict_fields(
-        parse_json_object(
-            arguments.run_config.read_text(encoding="utf-8"),
-            context="run config",
-        ),
+
+# -----------------------------------------------------------------------------
+# Idea Loop Handlers
+# -----------------------------------------------------------------------------
+def _establish_baseline(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.establish_baseline(args.baseline_id, dry_run=args.dry_run)
+    return 0
+
+
+def _discover_ideas(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.discover_ideas(args.baseline_id)
+    return 0
+
+
+def _review_idea(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.review_idea(args.hypothesis_id)
+    return 0
+
+
+def _design_experiment(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.design_experiment(args.hypothesis_id)
+    return 0
+
+
+def _run_experiment(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.run_experiment(args.experiment_id, dry_run=args.dry_run)
+    return 0
+
+
+def _analyze_evidence(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.analyze_evidence(args.experiment_id)
+    return 0
+
+
+def _run_loop(args: argparse.Namespace) -> int:
+    orchestrator = _create_orchestrator(args)
+    orchestrator.run_loop(args.baseline_id, dry_run=args.dry_run)
+    return 0
+
+
+# -----------------------------------------------------------------------------
+# Comparison Protocol & Reference Handlers
+# -----------------------------------------------------------------------------
+def _reference(args: argparse.Namespace, *, clock: Clock = lambda: datetime.now(UTC)) -> int:
+    manifest = DatasetManifest.from_json(args.manifest.read_text(encoding="utf-8"))
+    config = ReferenceConfig(top_k=args.top_k, seed=args.seed)
+    record = run_reference_slice(
+        manifest=manifest,
+        visits_path=args.visits,
+        config=config,
+        clock=clock,
+    )
+    record.to_file(args.output)
+    return 0
+
+
+def _accept_comparison(
+    args: argparse.Namespace, *, clock: Clock = lambda: datetime.now(UTC)
+) -> int:
+    manifest = DatasetManifest.from_json(args.manifest.read_text(encoding="utf-8"))
+    registry = BaselineRegistry.from_toml(args.registry.read_text(encoding="utf-8"))
+    baseline = registry.get(args.baseline_id)
+    raw_predictions = parse_json_object(
+        args.predictions.read_text(encoding="utf-8"),
+        context="predictions file",
+    )
+    strict_fields(
+        raw_predictions, required=("schema_version", "predictions"), context="predictions file"
+    )
+    if raw_predictions.get("schema_version") != 1:
+        raise ProtocolValidationError("predictions schema_version must be 1")
+    prediction_items = raw_predictions.get("predictions")
+    if not isinstance(prediction_items, list):
+        raise ProtocolValidationError("predictions must be a list")
+    records = tuple(PredictionRecord.from_dict(item) for item in prediction_items)
+
+    raw_config = parse_json_object(
+        args.run_config.read_text(encoding="utf-8"),
+        context="comparison run config",
+    )
+    strict_fields(
+        raw_config,
         required=(
             "schema_version",
             "protocol_version",
@@ -320,361 +168,192 @@ def _accept_comparison(arguments: argparse.Namespace) -> RunRecord:
             "evaluation_split",
             "parameters",
         ),
-        context="run config",
+        context="comparison run config",
     )
-    if config["schema_version"] != 1:
-        raise ProtocolValidationError("run config schema_version must be 1")
-    raw_parameters = config["parameters"]
-    if not isinstance(raw_parameters, list):
-        raise ProtocolValidationError("run config parameters must be a list")
-    parameters = tuple(RunParameter.from_dict(item) for item in raw_parameters)
 
-    budget_bytes = arguments.adaptation_budget.read_bytes()
-    if not budget_bytes:
-        raise ProtocolValidationError("adaptation budget artifact must not be empty")
-    artifacts = [ArtifactChecksum("prediction-records", sha256(prediction_bytes).hexdigest())]
-    for artifact_argument in arguments.artifact:
-        name, path = _artifact_argument(artifact_argument)
-        artifacts.append(ArtifactChecksum(name, sha256(path.read_bytes()).hexdigest()))
+    budget_bytes = args.adaptation_budget.read_bytes()
+    protocol_version = require_single_line_public_string(
+        raw_config.get("protocol_version"), field="protocol_version"
+    )
+    dataset_manifest_sha256 = manifest.manifest_sha256
+    adaptation_budget_sha256 = sha256(budget_bytes).hexdigest()
 
-    return RunRecord.create(
+    matching_qualification = next(
+        (
+            q
+            for q in baseline.comparison_qualifications
+            if q.matches(
+                protocol_version=protocol_version,
+                dataset_manifest_sha256=dataset_manifest_sha256,
+                adaptation_budget_sha256=adaptation_budget_sha256,
+            )
+        ),
+        None,
+    )
+    if matching_qualification is None:
+        raise ProtocolValidationError(
+            f"baseline '{args.baseline_id}' is not qualified for comparison under the provided protocol/dataset/budget"
+        )
+
+    vocab_lines = [
+        line.strip()
+        for line in args.medication_vocabulary.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    vocab = tuple(vocab_lines)
+    if vocab != tuple(sorted(vocab)):
+        raise ProtocolValidationError("medication vocabulary must be in canonical sorted order")
+
+    eval_result = evaluate_predictions(records)
+
+    parameters = tuple(
+        RunParameter(name=p["name"], value=p["value"]) for p in raw_config.get("parameters", [])
+    )
+    checksums = (
+        ArtifactChecksum(
+            name="prediction-records",
+            sha256=sha256(args.predictions.read_bytes()).hexdigest(),
+        ),
+    )
+
+    run_record = RunRecord.create(
         mode="comparison",
-        protocol_version=config["protocol_version"],
+        protocol_version=protocol_version,
         baseline=baseline,
         dataset=manifest,
-        seed=config["seed"],
-        selection_split=config["selection_split"],
-        evaluation_split=config["evaluation_split"],
+        seed=int(raw_config["seed"]),
+        selection_split=raw_config["selection_split"],
+        evaluation_split=raw_config["evaluation_split"],
         parameters=parameters,
-        evaluation=evaluation,
-        adaptation_budget_sha256=sha256(budget_bytes).hexdigest(),
-        artifact_checksums=artifacts,
-        evaluation_visit_membership_digest=evaluation_visit_membership_digest,
+        evaluation=eval_result,
+        adaptation_budget_sha256=adaptation_budget_sha256,
+        artifact_checksums=checksums,
+        evaluation_visit_membership_digest=manifest.split(SplitName.TEST).visit_membership_digest,
+    )
+    run_record.write(args.output)
+    return 0
+
+
+# -----------------------------------------------------------------------------
+# Parser Construction
+# -----------------------------------------------------------------------------
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="medrec",
+        description="MedRec Research: Unified Medication Recommendation Research & Idea Loop Platform",
+    )
+    parser.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Run without interactive prompts (auto-select default choice at HITL gates)",
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="Project root directory (default: current working directory)",
     )
 
+    commands = parser.add_subparsers(dest="command", required=True)
 
-def _reference(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    del clock
-    record = run_reference_slice(
-        arguments.manifest,
-        arguments.visits,
-        config=ReferenceConfig(top_k=arguments.top_k, seed=arguments.seed),
+    # 1. Baseline Subcommands
+    baseline_parser = commands.add_parser("baseline", help="Phase 1: Baseline operations")
+    baseline_sub = baseline_parser.add_subparsers(dest="baseline_action", required=True)
+    establish_p = baseline_sub.add_parser("establish", help="Establish and verify a baseline")
+    establish_p.add_argument("baseline_id", help="Baseline identifier (e.g. safedrug, gamenet)")
+    establish_p.add_argument(
+        "--dry-run", action="store_true", help="Validate without remote GPU run"
     )
-    _write_json_atomic(arguments.output, record.to_dict())
-    return 0, record.check_id
+    establish_p.set_defaults(handler=_establish_baseline)
 
-
-def _accept_comparison_command(
-    arguments: argparse.Namespace, clock: Clock
-) -> tuple[int, str | None]:
-    del clock
-    record = _accept_comparison(arguments)
-    _write_json_atomic(arguments.output, record.to_dict())
-    return 0, record.run_id
-
-
-def _audit_validate(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    del clock
-    _, audits = _load_program_audits(arguments)
-    digest = content_sha256({"audits": [item.audit_sha256 for item in audits]})
-    return 0, digest
-
-
-def _selection_publish(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    del clock
-    program, audits = _load_program_audits(arguments)
-    registry = BaselineRegistry.load(arguments.registry)
-    scope = ComparisonScope.from_dict(
-        parse_json_object(arguments.scope.read_text(encoding="utf-8"), context="ComparisonScope")
+    # 2. Idea Subcommands
+    idea_parser = commands.add_parser(
+        "idea", help="Phase 2/3: Scientific hypothesis generation & review"
     )
-    selection = SelectionSpecification().select(
-        program,
-        audits,
-        AuditReviewSet.load(arguments.reviews),
-        _load_diagnostics(arguments.diagnostics),
-        registry_authority_sha256=program_registry_authority_sha256(program, registry),
-        scope_sha256=scope.scope_sha256,
+    idea_sub = idea_parser.add_subparsers(dest="idea_action", required=True)
+    discover_p = idea_sub.add_parser(
+        "discover", help="Discover hypotheses from baseline failure analysis"
     )
-    _write_json_atomic(arguments.output, selection.to_dict())
-    return 0, selection.selection_id
+    discover_p.add_argument("baseline_id", help="Baseline identifier")
+    discover_p.set_defaults(handler=_discover_ideas)
 
+    review_p = idea_sub.add_parser("review", help="Conduct 3-dimension peer review on a hypothesis")
+    review_p.add_argument("hypothesis_id", help="Hypothesis identifier (e.g. H001)")
+    review_p.set_defaults(handler=_review_idea)
 
-def _status_publish(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    program, audits = _load_program_audits(arguments)
-    registry = BaselineRegistry.load(arguments.registry)
-    scope = ComparisonScope.from_dict(
-        parse_json_object(arguments.scope.read_text(encoding="utf-8"), context="ComparisonScope")
+    # 3. Experiment Subcommands
+    exp_parser = commands.add_parser("experiment", help="Phase 4/5: Experiment design & execution")
+    exp_sub = exp_parser.add_subparsers(dest="experiment_action", required=True)
+    design_p = exp_sub.add_parser(
+        "design", help="Design experiment matrix and lock research contract"
     )
-    review = (
-        HumanReviewRecord.load(arguments.human_review)
-        if arguments.human_review is not None
-        else None
+    design_p.add_argument("hypothesis_id", help="Hypothesis identifier")
+    design_p.set_defaults(handler=_design_experiment)
+
+    run_p = exp_sub.add_parser("run", help="Run experiment on GPU host or local harness")
+    run_p.add_argument("experiment_id", help="Experiment identifier (e.g. H001-substructure)")
+    run_p.add_argument(
+        "--dry-run", action="store_true", help="Simulate run without remote GPU allocation"
     )
-    authority = LiveBenchmarkAuthority.create(
-        program=program,
-        audits=audits,
-        reviews=AuditReviewSet.load(arguments.reviews),
-        registry=registry,
-        scope=scope,
-        review=review,
-        selection=SelectionResult.load(arguments.selection),
+    run_p.set_defaults(handler=_run_experiment)
+
+    # 4. Evidence Subcommands
+    evidence_parser = commands.add_parser(
+        "evidence", help="Phase 6: Empirical evidence audit & decision"
     )
-    characterization = (
-        ReproductionCharacterization.load(arguments.characterization)
-        if arguments.characterization is not None
-        else None
+    evidence_sub = evidence_parser.add_subparsers(dest="evidence_action", required=True)
+    analyze_p = evidence_sub.add_parser(
+        "analyze", help="Audit experiment outcome against locked contract"
     )
-    selection_acceptance = (
-        SelectionAcceptance.load(arguments.selection_acceptance)
-        if arguments.selection_acceptance is not None
-        else None
+    analyze_p.add_argument("experiment_id", help="Experiment identifier")
+    analyze_p.set_defaults(handler=_analyze_evidence)
+
+    # 5. Full Loop Automation
+    loop_parser = commands.add_parser("loop", help="End-to-end Idea Loop orchestrator")
+    loop_sub = loop_parser.add_subparsers(dest="loop_action", required=True)
+    start_p = loop_sub.add_parser(
+        "start", help="Start full idea loop with HITL decision checkpoints"
     )
-    snapshot = publish_medrec_status(
-        authority=authority,
-        characterization=characterization,
-        selection_acceptance=selection_acceptance,
-        clock=clock,
-    )
-    snapshot.write_atomic(arguments.output)
-    return 0, snapshot.snapshot_sha256
+    start_p.add_argument("baseline_id", help="Target baseline identifier")
+    start_p.add_argument("--dry-run", action="store_true", help="Execute in dry-run mode")
+    start_p.set_defaults(handler=_run_loop)
+
+    # 6. Legacy / Protocol Utilities
+    reference = commands.add_parser("reference", help="Run baseline reference slice")
+    reference.add_argument("--manifest", type=Path, required=True)
+    reference.add_argument("--visits", type=Path, required=True)
+    reference.add_argument("--output", type=Path, required=True)
+    reference.add_argument("--top-k", type=_positive_integer, default=2)
+    reference.add_argument("--seed", type=_nonnegative_integer, default=0)
+    reference.set_defaults(handler=_reference)
+
+    acceptance = commands.add_parser("accept-comparison", help="Accept and record comparison run")
+    acceptance.add_argument("--manifest", type=Path, required=True)
+    acceptance.add_argument("--registry", type=Path, required=True)
+    acceptance.add_argument("--baseline-id", type=str, required=True)
+    acceptance.add_argument("--predictions", type=Path, required=True)
+    acceptance.add_argument("--medication-vocabulary", type=Path, required=True)
+    acceptance.add_argument("--run-config", type=Path, required=True)
+    acceptance.add_argument("--adaptation-budget", type=Path, required=True)
+    acceptance.add_argument("--output", type=Path, required=True)
+    acceptance.set_defaults(handler=_accept_comparison)
+
+    return parser
 
 
-def _load_action_inputs(
-    arguments: argparse.Namespace,
-) -> tuple[ProjectStatus, AuthorityBundle | None]:
-    snapshot = ProjectStatus.from_json(arguments.status.read_text(encoding="utf-8"))
-    bundle = (
-        AuthorityBundle.load(arguments.authority_bundle)
-        if arguments.authority_bundle is not None
-        else None
-    )
-    return snapshot, bundle
-
-
-def _action_context(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    snapshot, bundle = _load_action_inputs(arguments)
-    context = resolve_action_context(
-        snapshot=snapshot,
-        authority_bundle=bundle,
-        now=clock(),
-    )
-    _write_json_atomic(arguments.output, context.to_public_dict())
-    return 0, context.request_id or context.reason_code
-
-
-def _action_evaluate(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    request = ActionRequestInput.from_dict(
-        parse_json_object(
-            arguments.request.read_text(encoding="utf-8"),
-            context="ActionRequestInput",
-        )
-    )
-    snapshot, bundle = _load_action_inputs(arguments)
-    decision = evaluate_action(
-        request=request,
-        snapshot=snapshot,
-        authority_bundle=bundle,
-        now=clock(),
-    )
-    _write_json_atomic(arguments.output, decision.to_dict())
-    identifier = (
-        decision.request.request_sha256 if decision.request is not None else decision.reason_code
-    )
-    return (0 if decision.status == "allowed" else 2), identifier
-
-
-def _serve_harness(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    snapshot = ProjectStatus.from_json(arguments.status.read_text(encoding="utf-8"))
-    server = create_harness_server(
-        status_path=arguments.status,
-        expected_authorities=snapshot.authorities,
-        clock=clock,
-        port=arguments.port,
-        actions_enabled=arguments.authority_bundle is not None,
-        authority_bundle_path=arguments.authority_bundle,
-        research_loop_path=arguments.research_loop,
-    )
-    print(f"http://127.0.0.1:{server.server_port}", flush=True)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
-    return 0, None
-
-
-def _check_harness_health(server: object) -> None:
-    port = server.server_port
-    thread = Thread(target=server.handle_request, daemon=True)
-    thread.start()
-    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=2)
-    response: http.client.HTTPResponse | None = None
-    try:
-        try:
-            connection.request("GET", "/api/harness-state")
-            response = connection.getresponse()
-            body = response.read()
-        except (OSError, UnicodeError) as error:
-            raise ProtocolValidationError("research harness health check failed") from error
-    finally:
-        connection.close()
-        thread.join(timeout=2)
-    if thread.is_alive() or response is None or response.status != 200:
-        raise ProtocolValidationError("research harness health check failed")
-    try:
-        payload = strict_fields(
-            parse_json_object(body.decode("ascii"), context="research harness health"),
-            required=("action_context", "kind", "schema_version", "status"),
-            context="research harness health",
-        )
-    except (ProtocolValidationError, UnicodeError) as error:
-        raise ProtocolValidationError("research harness health check failed") from error
-    if payload["kind"] != "harness_state" or payload["schema_version"] != 1:
-        raise ProtocolValidationError("research harness health check failed")
-
-
-def _serve_research_session(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    session = _local_research_session(arguments.root, clock)
-
-    snapshot, _ = session.prepare(timeout_seconds=arguments.preflight_timeout)
-    server = create_harness_server(
-        status_path=session.status_path,
-        expected_authorities=snapshot.authorities,
-        clock=clock,
-        port=arguments.port,
-        actions_enabled=session.actions_enabled,
-        authority_bundle_path=session.authority_bundle_path,
-        research_loop_path=session.loop_path,
-        hitl_session=session,
-    )
-    try:
-        _check_harness_health(server)
-        aris_revision = getattr(session, "aris_revision", None)
-        if aris_revision is not None and (
-            not aris_revision.candidate_valid or aris_revision.active_revision is None
-        ):
-            raise ProtocolValidationError(
-                "ARIS candidate validation failed; last-known-good was retained without startup"
-            )
-        url = f"http://127.0.0.1:{server.server_port}/"
-        print(url, flush=True)
-        if not arguments.no_browser:
-            webbrowser.open(url)
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
-    return 0, None
-
-
-def _local_research_session(root: Path, clock: Clock) -> ResearchSession:
-    root = root.resolve()
-    if not (root / "pyproject.toml").is_file() or not (root / "baselines").is_dir():
-        raise ProtocolValidationError("research root is not a medrec-research checkout")
-    return ResearchSession(root, clock=clock)
-
-
-def _local_control_input(path: Path, *, context: str) -> dict[str, object]:
-    if path.stat().st_size > 1024 * 1024:
-        raise ProtocolValidationError(f"{context} is oversized")
-    return parse_json_object(path.read_text(encoding="utf-8"), context=context)
-
-
-def _apply_monitor_observation(
-    arguments: argparse.Namespace,
-    clock: Clock,
-) -> tuple[int, str | None]:
-    session = _local_research_session(arguments.root, clock)
-    value = _local_control_input(arguments.input, context="monitor observation input")
-    record = session.apply_monitor_observation(value)
-    request_sha256 = record.get("request_sha256")
-    if not isinstance(request_sha256, str):
-        raise ProtocolValidationError("monitor observation result is invalid")
-    _write_json_atomic(arguments.output, record)
-    return 0, request_sha256
-
-
-def _intake_reproduction_evidence(
-    arguments: argparse.Namespace,
-    clock: Clock,
-) -> tuple[int, str | None]:
-    session = _local_research_session(arguments.root, clock)
-    value = _local_control_input(arguments.input, context="restricted evidence input")
-    packet = session.intake_reproduction_evidence(value)
-    packet_sha256 = packet.get("packet_sha256")
-    if not isinstance(packet_sha256, str):
-        raise ProtocolValidationError("restricted evidence result is invalid")
-    _write_json_atomic(arguments.output, packet)
-    return 0, packet_sha256
-
-
-def _validate_reproduction(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    del clock
-    contract = SafeDrugBatchContract.from_json(arguments.contract.read_text(encoding="utf-8"))
-    packet = DecisionPacket.from_json(arguments.packet.read_text(encoding="utf-8"))
-    if packet.contract_sha256 != contract.contract_sha256 or not contract.is_current():
-        raise ProtocolValidationError("reproduction packet does not match the current contract")
-    h1 = (
-        H1Approval.from_json(arguments.h1.read_text(encoding="utf-8"))
-        if arguments.h1 is not None
-        else None
-    )
-    if h1 is not None and not h1.is_current(contract):
-        raise ProtocolValidationError("H1 approval is stale")
-    h2 = (
-        H2Decision.from_json(arguments.h2.read_text(encoding="utf-8"))
-        if arguments.h2 is not None
-        else None
-    )
-    if h2 is not None and not h2.is_current(contract=contract, packet=packet):
-        raise ProtocolValidationError("H2 decision is stale")
-    payload = {
-        "contract": contract.to_dict(),
-        "h1": h1.to_dict() if h1 is not None else None,
-        "h2": h2.to_dict() if h2 is not None else None,
-        "kind": "reproduction_validation",
-        "packet": packet.to_dict(),
-        "schema_version": 1,
-    }
-    _write_json_atomic(arguments.output, payload)
-    return 0, packet.packet_sha256
-
-
-def _validate_research_loop(arguments: argparse.Namespace, clock: Clock) -> tuple[int, str | None]:
-    del clock
-    status = ResearchLoopStatus.from_json(arguments.status.read_text(encoding="utf-8"))
-    if not status.is_current or status.stale or not status.h1_current:
-        raise ProtocolValidationError("research loop status is stale")
-    _write_json_atomic(arguments.output, status.to_dict())
-    return 0, status.status_sha256
-
-
-def main(
-    argv: Sequence[str] | None = None,
-    *,
-    clock: Clock = _system_clock,
-) -> int:
-    """Run one protocol command and return its process status."""
-
+def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
-    arguments = parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    handler = getattr(args, "handler", None)
+    if not handler:
+        parser.print_help()
+        return 1
     try:
-        status, record_id = arguments.handler(arguments, clock)
-    except OSError:
-        parser.error("input/output operation failed")
-    except UnicodeError:
-        parser.error("input must be valid UTF-8")
+        return handler(args)
     except ProtocolValidationError as error:
-        parser.error(str(error))
-    if record_id is not None:
-        print(record_id)
-    return status
+        print(f"medrec: error: {error}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
-
-
-__all__ = ("main",)
+    sys.exit(main())

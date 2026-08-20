@@ -10,4 +10,4 @@ if [ ! -x "$UV" ]; then
 fi
 
 exec rtk proxy "$UV" run --project "$RESEARCH_ROOT" \
-  medrec-research research "$@" --root "$RESEARCH_ROOT"
+  medrec "$@" --root "$RESEARCH_ROOT"

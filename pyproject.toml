@@ -10,6 +10,7 @@ requires-python = ">=3.11,<3.12"
 dependencies = []
 
 [project.scripts]
+medrec = "medrec_research.cli:main"
 medrec-research = "medrec_research.cli:main"
 
 [dependency-groups]
@@ -26,7 +27,9 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+exclude = ["archive", ".venv", "dist"]
 
 [tool.ruff.lint]
 select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+ignore = ["E501", "RUF001", "RUF002", "RUF003"]
 

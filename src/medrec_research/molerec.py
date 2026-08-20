@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import ClassVar
 
 from ._validation import (
@@ -14,13 +15,24 @@ from ._validation import (
     require_single_line_public_string,
     strict_fields,
 )
-from .errors import ProtocolValidationError
-from .reproduction_contract import (
+from .comparison_protocol import (
     MOLEREC_REPOSITORY,
     MOLEREC_REVISION,
     MOLEREC_SAFEDRUG_LINEAGE_REVISION,
-    Stage,
 )
+from .errors import ProtocolValidationError
+
+
+class Stage(StrEnum):
+    """The three separately attributable MoleRec evidence stages."""
+
+    CHECKPOINT_REPLAY = "checkpoint_replay"
+    TRAINING_REPRODUCTION = "training_reproduction"
+    COMPARISON_QUALIFICATION = "comparison_qualification"
+
+    REPLAY = "checkpoint_replay"
+    TRAINING = "training_reproduction"
+    COMPARISON = "comparison_qualification"
 
 
 @dataclass(frozen=True, slots=True)
