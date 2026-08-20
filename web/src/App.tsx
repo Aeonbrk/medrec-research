@@ -14,13 +14,24 @@ import { useViewState } from "@/hooks/use-view-state"
 import { fetchJson, TransportError } from "@/lib/api"
 import {
   validateActionDecision,
+  validateContractAIResult,
+  validateDecisionPacketControl,
+  validateExecutionControl,
+  validateExecutionStreamEvent,
   validateHarnessState,
   validateHitlControl,
+  validateResearchContract,
   validateResearchLoop,
+  validateTransportControlResult,
   type ActionDecision,
+  type ContractAIResult,
+  type DecisionPacketControl,
+  type ExecutionControl,
   type HarnessState,
   type HitlControl,
+  type ResearchContract,
   type ResearchLoop,
+  type TransportControlOperation,
 } from "@/lib/domain"
 
 type LoadFailure = "malformed" | "transport"
@@ -39,6 +50,37 @@ export type HitlControlState =
   | { phase: "loading" }
   | { phase: "ready"; value: HitlControl }
   | { phase: "submitting" | "rejected" | LoadFailure }
+
+export type ContractState =
+  | { phase: "loading" }
+  | { phase: "ready"; value: ResearchContract }
+  | { phase: "unavailable" | LoadFailure }
+
+export type ContractAIState =
+  | { phase: "idle" | "submitting" }
+  | { phase: "ready"; value: ContractAIResult }
+  | { phase: "error" | LoadFailure }
+
+export type PacketState =
+  | { phase: "loading" }
+  | { phase: "ready"; value: DecisionPacketControl }
+  | { phase: "unavailable" | LoadFailure }
+
+export type ExecutionControlState =
+  | { phase: "loading" }
+  | { phase: "ready"; value: ExecutionControl }
+  | { phase: "unavailable" | LoadFailure }
+
+export type ExecutionStreamState =
+  "connecting" | "live" | "reconnecting" | "malformed"
+
+export type TransportControlState =
+  | { phase: "idle" }
+  | {
+      phase: "submitting" | "succeeded" | "rejected" | LoadFailure
+      operation: TransportControlOperation
+      requestId: string
+    }
 
 function failureKind(error: unknown): LoadFailure {
   return error instanceof TransportError || error instanceof TypeError
@@ -81,22 +123,74 @@ export function App() {
   const [failure, setFailure] = React.useState<LoadFailure | null>(null)
   const [loop, setLoop] = React.useState<LoopState>({ phase: "loading" })
   const [hitl, setHitl] = React.useState<HitlControlState>({ phase: "loading" })
+  const [contract, setContract] = React.useState<ContractState>({
+    phase: "loading",
+  })
+  const [contractAI, setContractAI] = React.useState<ContractAIState>({
+    phase: "idle",
+  })
+  const [packets, setPackets] = React.useState<PacketState>({
+    phase: "loading",
+  })
   const [action, setAction] = React.useState<ActionState>({ phase: "idle" })
+  const [execution, setExecution] = React.useState<ExecutionControlState>({
+    phase: "loading",
+  })
+  const [executionStream, setExecutionStream] =
+    React.useState<ExecutionStreamState>("connecting")
+  const [transportControl, setTransportControl] =
+    React.useState<TransportControlState>({ phase: "idle" })
   const inFlight = React.useRef(false)
+  const executionInFlight = React.useRef(false)
+  const loadInFlight = React.useRef(false)
+  const executionRecoveryRequired = React.useRef(false)
+
+  const refreshExecution = React.useCallback(async (force = false) => {
+    if (
+      executionInFlight.current ||
+      (!force && (loadInFlight.current || executionRecoveryRequired.current))
+    )
+      return
+    executionInFlight.current = true
+    try {
+      const value = validateExecutionControl(await fetchJson("/api/executions"))
+      executionRecoveryRequired.current = false
+      setExecution({ phase: "ready", value })
+    } catch (error) {
+      executionRecoveryRequired.current = true
+      setExecution({
+        phase:
+          error instanceof TransportError && error.status === 503
+            ? "unavailable"
+            : failureKind(error),
+      })
+    } finally {
+      executionInFlight.current = false
+    }
+  }, [])
 
   const load = React.useCallback(async () => {
+    if (loadInFlight.current) return
+    loadInFlight.current = true
     setHarness(null)
     setFailure(null)
     setLoop({ phase: "loading" })
     setHitl({ phase: "loading" })
+    setContract({ phase: "loading" })
+    setContractAI({ phase: "idle" })
+    setPackets({ phase: "loading" })
+    setExecution({ phase: "loading" })
+    setTransportControl({ phase: "idle" })
     setAction({ phase: "idle" })
     inFlight.current = false
+    executionRecoveryRequired.current = false
     try {
       const nextHarness = validateHarnessState(
         await fetchJson("/api/harness-state")
       )
       setHarness(nextHarness)
     } catch (error) {
+      loadInFlight.current = false
       setFailure(failureKind(error))
       return
     }
@@ -122,11 +216,66 @@ export function App() {
     } catch (error) {
       setHitl({ phase: failureKind(error) })
     }
-  }, [])
+    try {
+      setContract({
+        phase: "ready",
+        value: validateResearchContract(await fetchJson("/api/contract")),
+      })
+    } catch (error) {
+      setContract({
+        phase:
+          error instanceof TransportError && error.status === 503
+            ? "unavailable"
+            : failureKind(error),
+      })
+    }
+    try {
+      setPackets({
+        phase: "ready",
+        value: validateDecisionPacketControl(
+          await fetchJson("/api/decision-packets")
+        ),
+      })
+    } catch (error) {
+      setPackets({
+        phase:
+          error instanceof TransportError && error.status === 503
+            ? "unavailable"
+            : failureKind(error),
+      })
+    }
+    loadInFlight.current = false
+    await refreshExecution(true)
+  }, [refreshExecution])
 
   React.useEffect(() => {
     void load()
   }, [load])
+
+  React.useEffect(() => {
+    if (!harness) return
+    const source = new EventSource("/api/execution-events")
+    setExecutionStream("connecting")
+    source.onopen = () => setExecutionStream("live")
+    source.onerror = () => setExecutionStream("reconnecting")
+    const receive = (message: Event) => {
+      if (!(message instanceof MessageEvent)) return
+      try {
+        validateExecutionStreamEvent(JSON.parse(message.data) as unknown)
+      } catch {
+        source.close()
+        setExecutionStream("malformed")
+        setExecution({ phase: "malformed" })
+        return
+      }
+      void refreshExecution()
+    }
+    source.addEventListener("execution", receive)
+    return () => {
+      source.removeEventListener("execution", receive)
+      source.close()
+    }
+  }, [harness, refreshExecution])
 
   const requestAction = React.useCallback(async () => {
     const context = harness?.action_context
@@ -173,6 +322,78 @@ export function App() {
     [load]
   )
 
+  const requestContractAI = React.useCallback(
+    async (operation: "draft" | "challenge") => {
+      setContractAI({ phase: "submitting" })
+      try {
+        const value = validateContractAIResult(
+          await fetchJson("/api/contract-ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              kind: "contract_ai_input",
+              operation,
+              request_id: crypto.randomUUID(),
+              schema_version: 1,
+            }),
+          })
+        )
+        setContractAI({ phase: "ready", value })
+      } catch (error) {
+        setContractAI({
+          phase:
+            error instanceof TransportError && error.status === 503
+              ? "error"
+              : failureKind(error),
+        })
+      }
+    },
+    []
+  )
+
+  const controlTransport = React.useCallback(
+    async (requestId: string, operation: TransportControlOperation) => {
+      if (transportControl.phase === "submitting") return
+      setTransportControl({ phase: "submitting", operation, requestId })
+      try {
+        const result = validateTransportControlResult(
+          await fetchJson("/api/execution-control", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              kind: "transport_control_input",
+              operation,
+              request_id: requestId,
+              schema_version: 1,
+            }),
+          })
+        )
+        if (
+          result.operation !== operation ||
+          result.record.request_id !== requestId
+        ) {
+          throw new Error("malformed:transport_control.binding")
+        }
+        setTransportControl({
+          phase: "succeeded",
+          operation,
+          requestId,
+        })
+        await refreshExecution(true)
+      } catch (error) {
+        setTransportControl({
+          phase:
+            error instanceof TransportError && error.status === 409
+              ? "rejected"
+              : failureKind(error),
+          operation,
+          requestId,
+        })
+      }
+    },
+    [refreshExecution, transportControl.phase]
+  )
+
   return (
     <ThemeProvider theme={view.theme}>
       <TooltipProvider delay={180}>
@@ -210,12 +431,23 @@ export function App() {
                 harness={harness}
                 loop={loop}
                 hitl={hitl}
+                contract={contract}
+                packets={packets}
+                execution={execution}
+                executionStream={executionStream}
+                transportControl={transportControl}
                 view={view}
                 action={action}
                 onRequest={() => void requestAction()}
                 onRetry={() => void load()}
+                onSelect={(selected) => updateView({ selected })}
                 onHitlDecision={(path, payload) =>
                   void submitHitl(path, payload)
+                }
+                contractAI={contractAI}
+                onContractAI={(operation) => void requestContractAI(operation)}
+                onTransportControl={(requestId, operation) =>
+                  void controlTransport(requestId, operation)
                 }
               />
             ) : (

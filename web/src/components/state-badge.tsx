@@ -17,13 +17,15 @@ const labels: Record<RowState, string> = {
 export function StateBadge({
   state,
   label = labels[state],
+  className,
 }: {
   state: RowState
   label?: string
+  className?: string
 }) {
   if (state === "pass") {
     return (
-      <Badge>
+      <Badge className={className}>
         <IconCircleCheck data-icon="inline-start" />
         {label}
       </Badge>
@@ -31,14 +33,14 @@ export function StateBadge({
   }
   if (state === "blocked") {
     return (
-      <Badge variant="destructive">
+      <Badge variant="destructive" className={className}>
         <IconCircleX data-icon="inline-start" />
         {label}
       </Badge>
     )
   }
   return (
-    <Badge variant="secondary">
+    <Badge variant="secondary" className={className}>
       {label === "stale" ? (
         <IconClock data-icon="inline-start" />
       ) : (

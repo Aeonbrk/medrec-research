@@ -160,6 +160,83 @@ export type HitlControl = {
   }>
 }
 
+export type ResearchContract = {
+  kind: "research_contract"
+  schema_version: 1
+  contract_sha256: string
+  status: "current" | "stale"
+  source: {
+    repository: string
+    revision: string
+    branch: string
+  }
+  questionnaire: Array<{
+    id: string
+    label: string
+    provenance: "protected" | "derived"
+    value: string
+  }>
+  ai: {
+    status: "unavailable" | "ready" | "error"
+    reason_code: string
+  }
+}
+
+export type ContractAIResult = {
+  kind: "contract_ai_result"
+  schema_version: 1
+  contract_sha256: string
+  operation: "draft" | "challenge"
+  request_id: string
+  status: "unavailable" | "ready" | "error"
+  reason_code: string
+  output: string | null
+  h1_written: false
+}
+
+export type PublicJson =
+  | null
+  | boolean
+  | number
+  | string
+  | PublicJson[]
+  | { [key: string]: PublicJson }
+
+export type DecisionPacketRecord = {
+  packet_id: string
+  packet_sha256: string
+  lane_id: string
+  conclusion: string
+  validity: string
+  current: boolean
+  go_eligible: boolean
+  required_outcomes: string[]
+  outcomes: PublicJson
+  uncertainty: PublicJson
+  limitations: string[]
+  blockers: string[]
+  attempts: Array<{
+    attempt_id: string
+    lane_id: string
+    status: string
+    validity: string
+    outcomes: PublicJson
+    uncertainty: PublicJson
+    artifact_digests: { [key: string]: string }
+    deviations: string[]
+  }>
+  raw_aggregate_table: PublicJson
+  raw_artifact_reason: string
+}
+
+export type DecisionPacketControl = {
+  kind: "decision_packet_control"
+  schema_version: 1
+  contract_sha256: string
+  blockers: string[]
+  packets: DecisionPacketRecord[]
+}
+
 export type ActionDecision =
   | {
       kind: "action_decision"
@@ -237,6 +314,15 @@ export type ExecutionControl = {
   }
 }
 
+export type TransportControlOperation = "resume" | "cancel"
+
+export type TransportControlResult = {
+  kind: "transport_control_result"
+  schema_version: 1
+  operation: TransportControlOperation
+  record: ExecutionRecord
+}
+
 export type ExecutionStreamEvent = {
   event_id: string
   request_sha256: string
@@ -312,6 +398,28 @@ function enumMember<T extends string>(
 function stringArray(value: unknown, field: string) {
   if (!Array.isArray(value)) throw new Error(`malformed:${field}`)
   return value.map((item, index) => stringValue(item, `${field}.${index}`))
+}
+
+function publicJson(value: unknown, field: string): PublicJson {
+  if (
+    value === null ||
+    typeof value === "boolean" ||
+    typeof value === "string"
+  ) {
+    return value
+  }
+  if (typeof value === "number" && Number.isFinite(value)) return value
+  if (Array.isArray(value))
+    return value.map((item, index) => publicJson(item, `${field}.${index}`))
+  if (isRecord(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        publicJson(item, `${field}.${key}`),
+      ])
+    )
+  }
+  throw new Error(`malformed:${field}`)
 }
 
 function evidenceArray(value: unknown, field: string): Evidence[] {
@@ -631,6 +739,241 @@ export function validateHitlControl(value: unknown): HitlControl {
   }
 }
 
+export function validateResearchContract(value: unknown): ResearchContract {
+  if (
+    !isRecord(value) ||
+    value.kind !== "research_contract" ||
+    value.schema_version !== 1 ||
+    !isRecord(value.source) ||
+    !isRecord(value.ai) ||
+    !Array.isArray(value.questionnaire)
+  ) {
+    throw new Error("malformed:research_contract")
+  }
+  const aiStatus = enumMember(
+    value.ai.status,
+    ["unavailable", "ready", "error"] as const,
+    "research_contract.ai.status"
+  )
+  const status = enumMember(
+    value.status,
+    ["current", "stale"] as const,
+    "research_contract.status"
+  )
+  return {
+    kind: "research_contract",
+    schema_version: 1,
+    contract_sha256: stringValue(
+      value.contract_sha256,
+      "research_contract.contract_sha256"
+    ),
+    status,
+    source: {
+      branch: stringValue(
+        value.source.branch,
+        "research_contract.source.branch"
+      ),
+      repository: stringValue(
+        value.source.repository,
+        "research_contract.source.repository"
+      ),
+      revision: stringValue(
+        value.source.revision,
+        "research_contract.source.revision"
+      ),
+    },
+    questionnaire: value.questionnaire.map((item, index) => {
+      if (!isRecord(item)) {
+        throw new Error(`malformed:research_contract.questionnaire.${index}`)
+      }
+      return {
+        id: stringValue(item.id, `research_contract.questionnaire.${index}.id`),
+        label: stringValue(
+          item.label,
+          `research_contract.questionnaire.${index}.label`
+        ),
+        provenance: enumMember(
+          item.provenance,
+          ["protected", "derived"] as const,
+          `research_contract.questionnaire.${index}.provenance`
+        ),
+        value: stringValue(
+          item.value,
+          `research_contract.questionnaire.${index}.value`
+        ),
+      }
+    }),
+    ai: {
+      status: aiStatus,
+      reason_code: stringValue(
+        value.ai.reason_code,
+        "research_contract.ai.reason_code"
+      ),
+    },
+  }
+}
+
+export function validateContractAIResult(value: unknown): ContractAIResult {
+  if (
+    !isRecord(value) ||
+    value.kind !== "contract_ai_result" ||
+    value.schema_version !== 1 ||
+    value.h1_written !== false
+  ) {
+    throw new Error("malformed:contract_ai_result")
+  }
+  const output =
+    value.output === null
+      ? null
+      : stringValue(value.output, "contract_ai.output")
+  return {
+    kind: "contract_ai_result",
+    schema_version: 1,
+    contract_sha256: stringValue(
+      value.contract_sha256,
+      "contract_ai.contract_sha256"
+    ),
+    operation: enumMember(
+      value.operation,
+      ["draft", "challenge"] as const,
+      "contract_ai.operation"
+    ),
+    request_id: stringValue(value.request_id, "contract_ai.request_id"),
+    status: enumMember(
+      value.status,
+      ["unavailable", "ready", "error"] as const,
+      "contract_ai.status"
+    ),
+    reason_code: stringValue(value.reason_code, "contract_ai.reason_code"),
+    output,
+    h1_written: false,
+  }
+}
+
+export function validateDecisionPacketControl(
+  value: unknown
+): DecisionPacketControl {
+  if (
+    !isRecord(value) ||
+    value.kind !== "decision_packet_control" ||
+    value.schema_version !== 1 ||
+    !Array.isArray(value.blockers) ||
+    !Array.isArray(value.packets)
+  ) {
+    throw new Error("malformed:decision_packet_control")
+  }
+  return {
+    kind: "decision_packet_control",
+    schema_version: 1,
+    contract_sha256: stringValue(
+      value.contract_sha256,
+      "decision_packet_control.contract_sha256"
+    ),
+    blockers: stringArray(value.blockers, "decision_packet_control.blockers"),
+    packets: value.packets.map((raw, index) => {
+      if (!isRecord(raw) || !Array.isArray(raw.attempts)) {
+        throw new Error(`malformed:decision_packet.${index}`)
+      }
+      return {
+        packet_id: stringValue(
+          raw.packet_id,
+          `decision_packet.${index}.packet_id`
+        ),
+        packet_sha256: stringValue(
+          raw.packet_sha256,
+          `decision_packet.${index}.packet_sha256`
+        ),
+        lane_id: stringValue(raw.lane_id, `decision_packet.${index}.lane_id`),
+        conclusion: stringValue(
+          raw.conclusion,
+          `decision_packet.${index}.conclusion`
+        ),
+        validity: stringValue(
+          raw.validity,
+          `decision_packet.${index}.validity`
+        ),
+        current: booleanValue(raw.current, `decision_packet.${index}.current`),
+        go_eligible: booleanValue(
+          raw.go_eligible,
+          `decision_packet.${index}.go_eligible`
+        ),
+        required_outcomes: stringArray(
+          raw.required_outcomes,
+          `decision_packet.${index}.required_outcomes`
+        ),
+        outcomes: publicJson(raw.outcomes, `decision_packet.${index}.outcomes`),
+        uncertainty: publicJson(
+          raw.uncertainty,
+          `decision_packet.${index}.uncertainty`
+        ),
+        limitations: stringArray(
+          raw.limitations,
+          `decision_packet.${index}.limitations`
+        ),
+        blockers: stringArray(
+          raw.blockers,
+          `decision_packet.${index}.blockers`
+        ),
+        attempts: raw.attempts.map((attempt, attemptIndex) => {
+          if (!isRecord(attempt) || !isRecord(attempt.artifact_digests)) {
+            throw new Error(
+              `malformed:decision_packet.${index}.attempt.${attemptIndex}`
+            )
+          }
+          const artifactDigests: Record<string, string> = {}
+          for (const [key, digest] of Object.entries(
+            attempt.artifact_digests
+          )) {
+            artifactDigests[key] = stringValue(
+              digest,
+              `decision_packet.${index}.attempt.${attemptIndex}.artifact_digests.${key}`
+            )
+          }
+          return {
+            attempt_id: stringValue(
+              attempt.attempt_id,
+              `decision_packet.${index}.attempt.${attemptIndex}.attempt_id`
+            ),
+            lane_id: stringValue(
+              attempt.lane_id,
+              `decision_packet.${index}.attempt.${attemptIndex}.lane_id`
+            ),
+            status: stringValue(
+              attempt.status,
+              `decision_packet.${index}.attempt.${attemptIndex}.status`
+            ),
+            validity: stringValue(
+              attempt.validity,
+              `decision_packet.${index}.attempt.${attemptIndex}.validity`
+            ),
+            outcomes: publicJson(
+              attempt.outcomes,
+              `decision_packet.${index}.attempt.${attemptIndex}.outcomes`
+            ),
+            uncertainty: publicJson(
+              attempt.uncertainty,
+              `decision_packet.${index}.attempt.${attemptIndex}.uncertainty`
+            ),
+            artifact_digests: artifactDigests,
+            deviations: stringArray(
+              attempt.deviations,
+              `decision_packet.${index}.attempt.${attemptIndex}.deviations`
+            ),
+          }
+        }),
+        raw_aggregate_table: publicJson(
+          raw.raw_aggregate_table,
+          `decision_packet.${index}.raw_aggregate_table`
+        ),
+        raw_artifact_reason: stringValue(
+          raw.raw_artifact_reason,
+          `decision_packet.${index}.raw_artifact_reason`
+        ),
+      }
+    }),
+  }
+}
+
 const actionIds = [
   "refresh_authorization",
   "resolve_source_license",
@@ -897,6 +1240,26 @@ export function validateExecutionControl(value: unknown): ExecutionControl {
       action_ids: registeredActions,
       declarations,
     },
+  }
+}
+
+export function validateTransportControlResult(
+  value: unknown
+): TransportControlResult {
+  if (
+    !isRecord(value) ||
+    !exactKeys(value, ["kind", "operation", "record", "schema_version"]) ||
+    value.kind !== "transport_control_result" ||
+    value.schema_version !== 1 ||
+    (value.operation !== "resume" && value.operation !== "cancel")
+  ) {
+    throw new Error("malformed:transport_control")
+  }
+  return {
+    kind: "transport_control_result",
+    schema_version: 1,
+    operation: value.operation,
+    record: executionRecordValue(value.record, 0),
   }
 }
 

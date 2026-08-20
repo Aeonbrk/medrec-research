@@ -5,13 +5,14 @@
 ## Changed
 
 - `src/components/ui/toggle.tsx:3` now imports the Base UI toggle primitive and adopts `TogglePrimitive.Props`.
-- Existing variants, sizes, semantic-token classes, `aria-pressed` styling, and public exports are unchanged.
+- `src/components/ui/toggle.tsx:7` uses paired `bg-foreground` and `text-background` semantic tokens for pressed state so hover preserves WCAG AA contrast in both themes.
+- Existing variants, sizes, and public exports are unchanged.
 - The required leftover scan `grep -n "radix-ui\|@radix-ui" src/components/ui/toggle.tsx` is clean.
 
 ## Left alone
 
 - Toggle consumers required no prop changes because both wrappers expose controlled and uncontrolled pressed state compatibly.
-- `toggle-group` remains separate until its root and array value semantics are migrated and verified.
+- `toggle-group` has its own migration report and remains outside this wrapper's scope.
 
 ## Behavior changes
 

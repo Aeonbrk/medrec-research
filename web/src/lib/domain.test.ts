@@ -7,8 +7,10 @@ import {
   stableSort,
   validateActionContext,
   validateActionDecision,
+  validateContractAIResult,
   validateExecutionControl,
   validateExecutionStreamEvent,
+  validateTransportControlResult,
   type CandidateStatus,
   type ResearchLane,
 } from "@/lib/domain"
@@ -56,6 +58,36 @@ function executionFixture() {
       lane_ids: laneIds,
       schema_version: 1,
     },
+  }
+}
+
+function executionRecordFixture() {
+  return {
+    action_id: "request_reproduction",
+    blockers: [],
+    contract_sha256: "c".repeat(64),
+    declaration_id: "gamenet-request_reproduction",
+    events: [
+      {
+        event_sha256: "d".repeat(64),
+        journal_sequence: 7,
+        kind: "execution_event",
+        occurred_at: "2026-08-18T12:00:00Z",
+        outcome: "pending",
+        reason_code: "aris-transport-unreachable",
+        schema_version: 1,
+        sequence: 1,
+        state: "review_pending",
+      },
+    ],
+    h1_approval_sha256: "e".repeat(64),
+    h2_decision_sha256: null,
+    lane_id: "gamenet",
+    outcome: "pending",
+    request_id: "action-context-recovery",
+    request_sha256: "f".repeat(64),
+    schema_version: 1,
+    state: "review_pending",
   }
 }
 
@@ -154,6 +186,24 @@ describe("action schema validation", () => {
   })
 })
 
+describe("contract AI projection validation", () => {
+  it("keeps AI output separate from H1 authority", () => {
+    const result = validateContractAIResult({
+      contract_sha256: "a".repeat(64),
+      h1_written: false,
+      kind: "contract_ai_result",
+      operation: "challenge",
+      output: "Review the stopping rule.",
+      reason_code: "local-ai-complete",
+      request_id: "request-123",
+      schema_version: 1,
+      status: "ready",
+    })
+    expect(result.h1_written).toBe(false)
+    expect(result.operation).toBe("challenge")
+  })
+})
+
 describe("execution projection validation", () => {
   it("accepts only the closed final-five declaration matrix", () => {
     const control = validateExecutionControl(executionFixture())
@@ -192,5 +242,18 @@ describe("execution projection validation", () => {
     expect(() =>
       validateExecutionStreamEvent({ ...event, event_id: "8" })
     ).toThrow("malformed:execution_stream.cursor")
+  })
+
+  it("validates fixed transport control results and rejects extra fields", () => {
+    const result = {
+      kind: "transport_control_result",
+      operation: "resume",
+      record: executionRecordFixture(),
+      schema_version: 1,
+    }
+    expect(validateTransportControlResult(result).operation).toBe("resume")
+    expect(() =>
+      validateTransportControlResult({ ...result, host: "319-wild" })
+    ).toThrow("malformed:transport_control")
   })
 })

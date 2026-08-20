@@ -50,7 +50,7 @@ try {
     isMobile: true,
     viewport: { width: 390, height: 844 },
   })
-  await mobile.goto(`http://127.0.0.1:${port}/?section=candidates&theme=dark`, {
+  await mobile.goto(`http://127.0.0.1:${port}/?theme=dark`, {
     waitUntil: "networkidle",
   })
   await mobile.screenshot({

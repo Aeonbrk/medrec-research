@@ -31,6 +31,7 @@
 ## Automated verification
 
 - `npm run typecheck`, `npm run lint`, and `npm run format:check` pass.
-- Vitest passes 15 tests, including Base Collapsible disclosure behavior and the public-evidence URL boundary.
+- Vitest passes 24 tests, including Base Collapsible disclosure, pending-workbench state, fixed transport takeover, and public-evidence URL boundaries.
 - `npm run build` and `npm run build:check` pass; six production asset files match a clean rebuild.
-- `npm ls radix-ui @base-ui/react --depth=0` reports only `@base-ui/react@1.7.0`, and `npm audit` reports zero vulnerabilities.
+- `shadcn info --json` reports `base-nova`, Base UI, Tailwind v4, semantic CSS variables, and Tabler icons; all 17 wrapper reports remain present.
+- `npm ls radix-ui @base-ui/react --depth=0` reports only `@base-ui/react@1.7.0`, the runtime leftover scan is clean, and `npm audit` reports zero vulnerabilities.

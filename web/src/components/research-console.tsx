@@ -18,7 +18,18 @@ import {
   IconTimeline,
 } from "@tabler/icons-react"
 
-import type { ActionState, HitlControlState, LoopState } from "@/App"
+import type {
+  ActionState,
+  ContractAIState,
+  ContractState,
+  ExecutionControlState,
+  ExecutionStreamState,
+  HitlControlState,
+  LoopState,
+  PacketState,
+  TransportControlState,
+} from "@/App"
+import { PendingWorkbench } from "@/components/pending-workbench"
 import {
   EvidenceDisclosure,
   safeEvidenceUrl,
@@ -57,8 +68,10 @@ import {
   type LineageStatus,
   type ProjectStatus,
   type ResearchLane,
+  type TransportControlOperation,
   type ViewState,
 } from "@/lib/domain"
+import { cn } from "@/lib/utils"
 
 const stageLabels: Record<string, string> = {
   audit_blocked: "审计阻塞",
@@ -153,7 +166,7 @@ function ConditionAlert({ status }: { status: ProjectStatus }) {
   )
 }
 
-function ActionPanel({
+export function ActionPanel({
   harness,
   action,
   onRequest,
@@ -826,15 +839,21 @@ function LaneCards({ rows }: { rows: ResearchLane[] }) {
   )
 }
 
-function HumanDecisionPanel({
+export function HumanDecisionPanel({
+  contractAI,
   hitl,
+  onContractAI,
   onDecision,
+  compact = false,
 }: {
+  contractAI: ContractAIState
   hitl: HitlControlState
+  compact?: boolean
   onDecision: (
     path: "/api/h1" | "/api/h2",
     payload: Record<string, unknown>
   ) => void
+  onContractAI: (operation: "draft" | "challenge") => void
 }) {
   const [researcher, setResearcher] = React.useState("")
   const [rationale, setRationale] = React.useState("")
@@ -844,6 +863,8 @@ function HumanDecisionPanel({
   const control = ready ? hitl.value : null
   const submitting = hitl.phase === "submitting"
   const h1Enabled = Boolean(control?.h1.enabled && !control.h1.current)
+  const aiBusy = contractAI.phase === "submitting"
+  const aiEnabled = Boolean(control?.h1.enabled && !control.h1.current)
   const h2Lane = control?.h2.find((lane) => lane.lane_id === laneId)
 
   React.useEffect(() => {
@@ -884,7 +905,7 @@ function HumanDecisionPanel({
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="grid gap-5 p-4 xl:grid-cols-2">
+        <div className={cn("grid gap-5 p-4", !compact && "xl:grid-cols-2")}>
           <form
             className="space-y-3"
             onSubmit={(event) => {
@@ -942,9 +963,66 @@ function HumanDecisionPanel({
             >
               明确接受并创建 H1
             </Button>
+            <div className="flex flex-wrap gap-2 border-t pt-3">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!aiEnabled || aiBusy}
+                onClick={() => onContractAI("draft")}
+              >
+                {aiBusy ? "AI 处理中" : "AI 草拟契约"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!aiEnabled || aiBusy}
+                onClick={() => onContractAI("challenge")}
+              >
+                AI 质询契约
+              </Button>
+            </div>
+            {contractAI.phase === "ready" && (
+              <Alert
+                className="mt-3"
+                variant={
+                  contractAI.value.status === "ready"
+                    ? "default"
+                    : "destructive"
+                }
+              >
+                <IconFileAnalytics aria-hidden="true" />
+                <AlertTitle>
+                  {contractAI.value.status === "ready"
+                    ? "AI 结果（仅供审阅）"
+                    : "AI bridge 未完成"}
+                </AlertTitle>
+                <AlertDescription>
+                  <span className="block">{contractAI.value.reason_code}</span>
+                  {contractAI.value.output ? (
+                    <pre className="mt-2 max-h-64 overflow-auto text-xs whitespace-pre-wrap">
+                      {contractAI.value.output}
+                    </pre>
+                  ) : null}
+                </AlertDescription>
+              </Alert>
+            )}
+            {(contractAI.phase === "error" ||
+              contractAI.phase === "malformed" ||
+              contractAI.phase === "transport") && (
+              <Alert className="mt-3" variant="destructive">
+                <IconAlertTriangle aria-hidden="true" />
+                <AlertTitle>AI bridge 请求失败</AlertTitle>
+                <AlertDescription>
+                  H1 未写入；请重新载入并检查本机 bridge 状态。
+                </AlertDescription>
+              </Alert>
+            )}
           </form>
           <form
-            className="space-y-3 border-t pt-5 xl:border-t-0 xl:border-l xl:pt-0 xl:pl-5"
+            className={cn(
+              "space-y-3 border-t pt-5",
+              !compact && "xl:border-t-0 xl:border-l xl:pt-0 xl:pl-5"
+            )}
             onSubmit={(event) => {
               event.preventDefault()
               onDecision("/api/h2", {
@@ -1016,11 +1094,14 @@ function HumanDecisionPanel({
 }
 
 function Hitl({
+  contractAI,
   loop,
   hitl,
   view,
+  onContractAI,
   onDecision,
 }: {
+  contractAI: ContractAIState
   loop: LoopState
   hitl: HitlControlState
   view: ViewState
@@ -1028,6 +1109,7 @@ function Hitl({
     path: "/api/h1" | "/api/h2",
     payload: Record<string, unknown>
   ) => void
+  onContractAI: (operation: "draft" | "challenge") => void
 }) {
   if (loop.phase === "loading")
     return (
@@ -1093,7 +1175,12 @@ function Hitl({
           <AlertDescription>{loop.value.blockers.join(" · ")}</AlertDescription>
         </Alert>
       )}
-      <HumanDecisionPanel hitl={hitl} onDecision={onDecision} />
+      <HumanDecisionPanel
+        contractAI={contractAI}
+        hitl={hitl}
+        onContractAI={onContractAI}
+        onDecision={onDecision}
+      />
       {rows.length === 0 ? (
         <NoResults />
       ) : (
@@ -1243,26 +1330,47 @@ function Authority({
 }
 
 export function ResearchConsole({
+  contractAI,
+  contract,
   harness,
   loop,
   hitl,
+  packets,
+  execution,
+  executionStream,
+  transportControl,
   view,
   action,
   onRequest,
   onRetry,
+  onSelect,
+  onTransportControl,
   onHitlDecision,
+  onContractAI,
 }: {
+  contract: ContractState
+  contractAI: ContractAIState
   harness: HarnessState
   loop: LoopState
   hitl: HitlControlState
+  packets: PacketState
+  execution: ExecutionControlState
+  executionStream: ExecutionStreamState
+  transportControl: TransportControlState
   view: ViewState
   action: ActionState
   onRequest: () => void
   onRetry: () => void
+  onSelect: (selected: string) => void
+  onTransportControl: (
+    requestId: string,
+    operation: TransportControlOperation
+  ) => void
   onHitlDecision: (
     path: "/api/h1" | "/api/h2",
     payload: Record<string, unknown>
   ) => void
+  onContractAI: (operation: "draft" | "challenge") => void
 }) {
   return (
     <main
@@ -1271,6 +1379,39 @@ export function ResearchConsole({
       data-density={view.density}
       tabIndex={-1}
     >
+      {view.section === "pending" && (
+        <PendingWorkbench
+          actionPanel={
+            <ActionPanel
+              action={action}
+              harness={harness}
+              onRequest={onRequest}
+              onRetry={onRetry}
+            />
+          }
+          contract={contract}
+          packets={packets}
+          decisionPanel={
+            <HumanDecisionPanel
+              compact
+              contractAI={contractAI}
+              hitl={hitl}
+              onContractAI={onContractAI}
+              onDecision={onHitlDecision}
+            />
+          }
+          execution={execution}
+          executionStream={executionStream}
+          transportControl={transportControl}
+          harness={harness}
+          hitl={hitl}
+          loop={loop}
+          onRetry={onRetry}
+          onSelect={onSelect}
+          onTransportControl={onTransportControl}
+          selected={view.selected}
+        />
+      )}
       {view.section === "overview" && (
         <Overview
           harness={harness}
@@ -1287,7 +1428,14 @@ export function ResearchConsole({
         <Lineage status={harness.status} view={view} />
       )}
       {view.section === "hitl" && (
-        <Hitl loop={loop} hitl={hitl} view={view} onDecision={onHitlDecision} />
+        <Hitl
+          contractAI={contractAI}
+          loop={loop}
+          hitl={hitl}
+          view={view}
+          onContractAI={onContractAI}
+          onDecision={onHitlDecision}
+        />
       )}
       {view.section === "authority" && (
         <Authority status={harness.status} view={view} />
