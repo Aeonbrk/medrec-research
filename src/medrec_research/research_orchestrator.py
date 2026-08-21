@@ -33,7 +33,7 @@ class ResearchOrchestrator:
 
         # Orchestrator Sub-systems
         self.remote_executor = RemoteExecutor(self.ssh_config)
-        self.team_spawner = TeamSpawner(display_mode="tmux")
+        self.team_spawner = TeamSpawner(display_mode="tmux", remote_executor=self.remote_executor)
 
         # Working Directories
         self.baselines_dir = self.root / "research" / "baselines"

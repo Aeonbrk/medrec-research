@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 
@@ -23,6 +26,7 @@ class BaselineTeam:
     baseline_id: str
     config: dict[str, Any]
     display_mode: str = "tmux"
+    remote_executor: Any = None  # RemoteExecutor instance
     members: list[AgentRole] = field(
         default_factory=lambda: [
             AgentRole(
@@ -53,14 +57,90 @@ class BaselineTeam:
     def execute(self, dry_run: bool = False) -> dict[str, Any]:
         """Execute baseline verification and synthesis."""
         if not dry_run:
-            raise NotImplementedError(
-                f"Non-dry-run execution not implemented for {self.baseline_id}.\n"
-                "Manual workflow:\n"
-                "  1. SSH to 319-wild and run baseline manually\n"
-                "  2. Place result.json in research/baselines/{baseline_id}/\n"
-                "  3. Continue with: medrec idea discover {baseline_id}"
+            # Real remote execution
+            if self.remote_executor is None:
+                raise RuntimeError(
+                    "RemoteExecutor not configured. Cannot run non-dry-run baseline.\n"
+                    "Manual workflow:\n"
+                    "  1. SSH to 319-wild and run baseline manually\n"
+                    "  2. Place result.json in research/baselines/{baseline_id}/\n"
+                    "  3. Continue with: medrec idea discover {baseline_id}"
+                )
+
+            return self._execute_remote()
+
+        # Dry-run: validate config and generate plan
+        return self._execute_dry_run()
+
+    def _execute_remote(self) -> dict[str, Any]:
+        """Execute baseline on remote GPU host via RemoteExecutor."""
+        print(f"🚀 Launching baseline {self.baseline_id} on 319-wild...")
+
+        # 1. Launch remote job
+        session_name = self.remote_executor.run_baseline(
+            baseline_id=self.baseline_id,
+            config=self.config,
+            dry_run=False
+        )
+        print(f"✓ Remote session started: {session_name}")
+
+        # 2. Poll for completion
+        max_wait = self.config.get("max_wait_seconds", 7200)  # 2 hours default
+        poll_interval = 30  # 30 seconds
+        elapsed = 0
+
+        print(f"⏳ Monitoring progress (max wait: {max_wait}s)...")
+        while elapsed < max_wait:
+            time.sleep(poll_interval)
+            elapsed += poll_interval
+
+            status = self.remote_executor.check_status(session_name)
+
+            if status.status == "completed":
+                print(f"✓ Job completed after {elapsed}s")
+                break
+            elif status.status == "failed":
+                raise RuntimeError(f"Remote job failed: {status.log_tail}")
+            else:
+                # Running
+                print(f"  [{elapsed}s] {status.progress}")
+
+        if elapsed >= max_wait:
+            raise TimeoutError(
+                f"Baseline {self.baseline_id} did not complete within {max_wait}s.\n"
+                f"Session {session_name} is still running on 319-wild.\n"
+                f"Check manually: ssh 319-wild 'tmux attach -t {session_name}'"
             )
 
+        # 3. Collect results
+        remote_result_path = self.config.get(
+            "remote_result_path",
+            f"{self.remote_executor.ssh_config.remote_data_root}/result.json"
+        )
+        local_dest = Path(f"research/baselines/{self.baseline_id}/result.json")
+
+        print(f"📥 Collecting results from {remote_result_path}...")
+        self.remote_executor.collect_results(
+            job_id=session_name,
+            remote_path=remote_result_path,
+            local_dest=local_dest
+        )
+        print(f"✓ Results saved to {local_dest}")
+
+        # 4. Parse and return
+        with local_dest.open() as f:
+            result = json.load(f)
+
+        # Add metadata
+        result["baseline_id"] = self.baseline_id
+        result["timestamp"] = datetime.now(UTC).isoformat()
+        result["status"] = "completed"
+        result["session_name"] = session_name
+
+        return result
+
+    def _execute_dry_run(self) -> dict[str, Any]:
+        """Validate config and generate execution plan (dry-run mode)."""
         # 1. Config validation
         target_dataset = self.config.get("dataset", "mimic-iii")
         expected_metrics = self.config.get("expected_metrics", {})
@@ -112,7 +192,7 @@ class BaselineTeam:
             "metrics": actual_metrics,
             "expected_metrics": expected_metrics,
             "deviation_from_paper": deviations,
-            "status": "completed" if not dry_run else "dry_run",
+            "status": "dry_run",
             "analysis": (
                 f"Baseline {self.baseline_id} reproduced with minor deviation within acceptable bound "
                 f"(Jaccard diff: {deviations.get('jaccard', {}).get('diff')}). "

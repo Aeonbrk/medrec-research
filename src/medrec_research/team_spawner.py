@@ -7,6 +7,7 @@ from typing import Any
 from .baseline_team import BaselineTeam
 from .execution_team import ExecutionTeam
 from .feature_team import FeatureTeam
+from .remote_executor import RemoteExecutor
 from .research_team import ResearchTeam
 from .review_team import ReviewTeam
 
@@ -14,8 +15,9 @@ from .review_team import ReviewTeam
 class TeamSpawner:
     """Factory for multi-agent teams across the 6 research phases."""
 
-    def __init__(self, display_mode: str = "tmux"):
+    def __init__(self, display_mode: str = "tmux", remote_executor: RemoteExecutor | None = None):
         self.display_mode = display_mode
+        self.remote_executor = remote_executor
 
     def spawn_baseline_team(
         self, baseline_id: str, config: dict[str, Any] | None = None
@@ -26,6 +28,7 @@ class TeamSpawner:
             baseline_id=baseline_id,
             config=cfg,
             display_mode=self.display_mode,
+            remote_executor=self.remote_executor,
         )
 
     def spawn_research_team(self, baseline_result: dict[str, Any]) -> ResearchTeam:
@@ -59,4 +62,5 @@ class TeamSpawner:
             experiment_id=experiment_id,
             exp_config=exp_config,
             display_mode=self.display_mode,
+            remote_executor=self.remote_executor,
         )
