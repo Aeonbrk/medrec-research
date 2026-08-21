@@ -17,6 +17,7 @@ scp baselines/scripts/*.sh 319-lab:/tmp/
 ```
 
 **验证**: 确认 3 个脚本都已上传
+
 ```bash
 ssh 319-lab 'ls -lh /tmp/*.sh'
 ```
@@ -36,6 +37,7 @@ bash verify_319_env.sh
 ```
 
 **预期输出**:
+
 - ✓ CUDA 可用（显示 GPU 列表）
 - ✓ Conda 环境存在
 - ✓ PyTorch + CUDA 正常
@@ -48,13 +50,15 @@ bash verify_319_env.sh
 **如果验证失败**，根据错误信息处理：
 
 #### 问题 A: PyTorch 不可用或 CUDA 失败
+
 ```bash
 # 运行 PyTorch 修复脚本
 bash setup_pytorch_319.sh medrec-gamenet
 ```
 
 **预期输出**:
-```
+
+```text
 PyTorch: 1.8.0+cu111
 CUDA available: True
 CUDA version: 11.1
@@ -63,6 +67,7 @@ GPU 0: NVIDIA GeForce RTX 3090
 ```
 
 #### 问题 B: 数据目录不存在
+
 ```bash
 # 创建数据目录
 sudo mkdir -p /data/medrec/mimic-iii
@@ -75,6 +80,7 @@ source ~/.bashrc
 ```
 
 #### 问题 C: SafeDrug 代码不存在
+
 ```bash
 # 克隆 SafeDrug 仓库
 cd /root/zhb
@@ -84,6 +90,7 @@ git checkout 88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a  # 固定版本
 ```
 
 #### 问题 D: 磁盘空间不足（使用率 > 90%）
+
 ```bash
 # 清理旧日志和缓存
 cd /root/zhb
@@ -97,7 +104,8 @@ df -h /data/medrec
 ### 1.3 验证成功标准
 
 所有检查项都显示 ✓，输出类似：
-```
+
+```text
 === 环境验证通过 ===
 
 建议的环境变量:
@@ -116,6 +124,7 @@ ls -lh /data/medrec/mimic-iii/
 ```
 
 **应包含**:
+
 - `PRESCRIPTIONS.csv` 或 `PRESCRIPTIONS.csv.gz`
 - `DIAGNOSES_ICD.csv` 或 `DIAGNOSES_ICD.csv.gz`
 - `PROCEDURES_ICD.csv` 或 `PROCEDURES_ICD.csv.gz`
@@ -125,6 +134,7 @@ ls -lh /data/medrec/mimic-iii/
 **停止！** MIMIC-III 数据需要申请授权，无法公开下载。
 
 **选项 1**: 如果你已有授权，从 PhysioNet 下载：
+
 ```bash
 # 需要 PhysioNet 账号和授权
 wget -r -N -c -np --user=<username> --password=<password> \
@@ -132,8 +142,10 @@ wget -r -N -c -np --user=<username> --password=<password> \
 ```
 
 **选项 2**: 使用已有的数据
+
 - 检查是否已经在 `/root/zhb/Search/dataset/mimic-iii-1.4`
 - 如果存在，创建软链接：
+
 ```bash
 ln -s /root/zhb/Search/dataset/mimic-iii-1.4 /data/medrec/mimic-iii
 ```
@@ -188,7 +200,8 @@ watch -n 5 nvidia-smi
 ```
 
 **预期训练输出**:
-```
+
+```text
 Epoch 1/50:
   Train Loss: 0.5234
   Val Jaccard: 0.4123, PRAUC: 0.6891, F1: 0.5432, DDI: 0.0956
@@ -222,6 +235,7 @@ cat /data/medrec/baselines/gamenet/result.json
 ```
 
 **预期输出**（指标应在合理范围内）:
+
 ```json
 {
   "baseline_id": "gamenet",
@@ -249,12 +263,14 @@ cat /data/medrec/baselines/gamenet/result.json
 ### 4.2 指标合理性检查
 
 **GAMENet 论文报告的指标**（MIMIC-III）:
+
 - Jaccard: 0.507 ± 0.01
 - PRAUC: 0.756 ± 0.02
 - F1: 0.672 ± 0.02
 - DDI Rate: 0.082 ± 0.01
 
 **验证规则**:
+
 - ✓ 如果你的指标在 ±10% 范围内 → 成功
 - ⚠ 如果偏差 10-20% → 可能是超参数或随机种子差异
 - ✗ 如果偏差 > 20% 或指标全为 0 → 训练失败，检查日志
@@ -292,6 +308,7 @@ rm -f /tmp/*.sh
 ### 5.2 记录运行信息
 
 在本地创建运行记录：
+
 ```bash
 cd /Users/oian/Codes/master/medrec-research
 cat > research/baselines/gamenet/RUN_RECORD.md << 'EOF'
@@ -397,9 +414,10 @@ ps aux | grep python | grep GAMENet
 ## 下一步
 
 运行成功后：
-1. 在本地运行 `medrec idea discover gamenet` 开始 Phase 2（想法发现）
-2. 或继续运行其他 baseline（SafeDrug, RETAIN, LEAP...）
-3. 开始构建完整的 baseline 对比
+
+1. 将预测结果通过 `accept-comparison` 或 `evaluate` 纳管到评测基线
+2. 继续运行其他 baseline（SafeDrug, RETAIN, LEAP...）
+3. 按照 `RESEARCH_WORKFLOW.md` 进入对比评测与假设验证流程
 
 ---
 

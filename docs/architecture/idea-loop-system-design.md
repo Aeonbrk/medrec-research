@@ -3,7 +3,7 @@
 > **Document Version**: 1.0.0  
 > **Author**: MedRec Research Team  
 > **Date**: 2026-08-20  
-> **Status**: Approved for Implementation  
+> **Status**: Historical Architecture Reference (Lessons absorbed into core toolkit in ce2e71f)  
 > **Methodological Foundation**: [First-Principles Research Practice](file:///Users/oian/Codes/master/medrec-research/docs/guides/first-principles-research-practice.md)
 
 ---
@@ -20,7 +20,7 @@ $$\text{Baseline} \xrightarrow{} \text{Failure Analysis} \xrightarrow{} \text{Hy
 
 ### 2.1 三层架构模型
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │               Human-in-the-Loop Layer (HITL)                │
 │  - 5 个结构化决策点 (Baseline / Hypo / Review / Exp / Evid)   │
@@ -49,7 +49,7 @@ $$\text{Baseline} \xrightarrow{} \text{Failure Analysis} \xrightarrow{} \text{Hy
 ### 2.2 数据流与产物契约
 
 | Phase | 输入 | 协同团队 | 产出物 | HITL 决策选项 |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **Phase 1: Baseline Establishment** | `baselines/registry.toml`, 数据集声明 | Baseline Team (3) | `research/baselines/{id}/result.json`, `analysis.md` | [1] 继续分析失败<br>[2] 先跑其他基线<br>[3] 接受偏差标记 ready |
 | **Phase 2: Idea Discovery** | 基线结果与偏差剖析 | Research Team (4) | `research/hypotheses/H{NNN}-{slug}.md` (3-5个竞争性假设) | [1..N] 选择假设验证<br>[+] 重新生成假设<br>[-] 放弃方向 |
 | **Phase 3: Idea Review** | 候选假设 | Review Team (3) | `research/reviews/H{NNN}-review.md` (三维度打分与判词) | [1] Go (通过立项)<br>[2] Revise (修改假设)<br>[3] Kill (终止并记录) |
@@ -102,6 +102,7 @@ medrec-research/
 ## 3. Phase 详细设计与团队职责
 
 ### 3.1 Phase 1: Baseline Establishment (基线确立)
+
 - **目标**: 在统一数据口径与指标规约下建立真实基线，定位复现偏差与关键瓶颈。
 - **团队构成 (Baseline Team - 3 agents)**:
   1. `team-implementer`: 负责在远程计算卡 (319-wild) 部署与运行指定基线。
@@ -114,6 +115,7 @@ medrec-research/
   - 选项: `继续分析这个失败` / `先跑其他基线` / `这个偏差可接受，标记为 baseline-ready`
 
 ### 3.2 Phase 2: Idea Discovery (假设发现)
+
 - **目标**: 基于基线失败模式剖析根本原因，提出 3-5 个具因果机制的竞争性假设。
 - **团队构成 (Research Team - 4 agents)**:
   1. `general-purpose` (Failure Analyst): 剖析基线在哪些子群体或分子结构上表现不佳。
@@ -126,6 +128,7 @@ medrec-research/
   - 选项: 选定特定假设 `[H001]...` / `重新生成假设` / `放弃该方向`
 
 ### 3.3 Phase 3: Idea Review (独立评审)
+
 - **目标**: 针对选定假设进行独立三维度盲审，严格防范过早乐观与虚假创新。
 - **团队构成 (Review Team - 3 reviewers)**:
   1. `Reviewer 1 (Novelty)`: 评估新颖性，核查是否是已有工作的简单变体。
@@ -137,6 +140,7 @@ medrec-research/
   - 选项: `Go (通过立项)` / `Revise (修改假设)` / `Kill (终止方向)`
 
 ### 3.4 Phase 4: Experiment Design & Contract Locking (实验设计与研究契约)
+
 - **目标**: 固化最小可区分实验设计，锁定不可篡改的“研究契约（Research Contract）”。
 - **团队构成 (Feature Team - 3 agents)**:
   1. `Team Lead`: 统筹实验变量控制与指标口径。
@@ -149,6 +153,7 @@ medrec-research/
   - 选项: `确认签署并锁定研究契约` / `调整实验配置`
 
 ### 3.5 Phase 5: Execution & Monitoring (实验执行与监控)
+
 - **目标**: 在远程环境稳健执行实验并采集全量运行轨迹与指标。
 - **团队构成 (Execution Team - 2 agents)**:
   1. `team-implementer`: 远程任务提交、环境管理与 GPU 调度。
@@ -157,6 +162,7 @@ medrec-research/
   - 远程运行作业日志、中间 Checkpoint、最终评测指标。
 
 ### 3.6 Phase 6: Evidence Analysis & Decision (证据分析与行动决策)
+
 - **目标**: 对照研究契约检验实验结果，判断假设成立程度，规划下一步科研路径。
 - **团队构成 (Review Team - 3 agents)**:
   1. `Reviewer 1`: 假设支持度与效应量检验。
@@ -172,6 +178,7 @@ medrec-research/
 ## 4. 核心类接口定义
 
 ### 4.1 RemoteExecutor
+
 ```python
 @dataclass
 class SSHConfig:
@@ -198,6 +205,7 @@ class RemoteExecutor:
 ```
 
 ### 4.2 HITLDecisionGate
+
 ```python
 @dataclass
 class Decision:
@@ -223,6 +231,7 @@ class HITLDecisionGate:
 ```
 
 ### 4.3 TeamSpawner & Teams
+
 ```python
 class Team(Protocol):
     def execute(self, **kwargs) -> dict[str, Any]: ...
@@ -237,6 +246,7 @@ class TeamSpawner:
 ```
 
 ### 4.4 ResearchOrchestrator
+
 ```python
 class ResearchOrchestrator:
     def __init__(self, root: Path, ssh_config: SSHConfig, clock: Callable[[], datetime] | None = None): ...
@@ -309,13 +319,16 @@ hitl:
 ## 7. 验收与质量验证标准
 
 1. **Dry-Run 基准验收**:
+
    ```bash
    medrec baseline establish safedrug --dry-run
    ```
+
    输出包含：
    - `✓ Team spawned (3 agents)`
    - `✓ Baseline config validated`
    - `✓ Execution plan generated`
    - `→ Would run on 319, but dry-run mode`
+
 2. **决策链完整性**: 每次 HITL 操作均在 `research/decisions/` 留下包含时间戳与决策上下文的结构化 JSON。
 3. **单元与集成测试覆盖**: `pytest` 跑通核心调度器、远程执行器、团队生成器与决策门逻辑。

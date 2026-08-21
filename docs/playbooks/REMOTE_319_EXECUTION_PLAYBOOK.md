@@ -2,10 +2,6 @@
 
 The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
 
-# Remote 319 Execution Playbook
-
-The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
-
 ## Current snapshot (2026-08-21)
 
 **SSH Connection**: ✅ Primary `319-lab` profile works (root access)  
@@ -15,11 +11,14 @@ The MacBook Air is the harness terminal. The 319 remote host is the execution pl
 **Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured (added to `~/.bashrc`)  
 **Data Location**: ✅ MIMIC-III and MIMIC-IV datasets at `/root/zhb/Search/dataset` (symlinked)  
 **Conda Environments**: ⚠️ Only `medrec-gamenet` exists, missing:
-  - `medrec-safedrug` (spec exists at `environments/safedrug.yml`)
-  - `medrec-core-evaluator` (spec needed)
+
+- `medrec-safedrug` (spec exists at `environments/safedrug.yml`)
+- `medrec-core-evaluator` (spec needed)
+
 **Baseline Adapters**: ⚠️ Only `gamenet` adapter exists, `safedrug` adapter missing
 
 **Status Summary**: Infrastructure configured, but baseline execution requires:
+
 1. Create SafeDrug conda environment from `environments/safedrug.yml`
 2. Create SafeDrug baseline adapter (similar to `baselines/adapters/gamenet/`)
 3. Clone SafeDrug source repository to remote

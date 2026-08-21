@@ -1,31 +1,42 @@
 # Plans
 
-## Active: Refactor HITL Research Control Console into Task-Oriented Research Cockpit
+## Active: 319-wild GAMENet Baseline Reproduction and Execution
 
-- **Status**: active on `2026-08-20`; implementing Task-Oriented Cockpit with Research Lifecycle Stepper, 1-Click AI Contract Generation, Top Environment Health Bar, Real-time 319 Cluster Monitoring, and Baseline Leaderboard.
+- **Status**: active on `2026-08-21`; execution scripts and environment verification tools deployed in `baselines/scripts/`, full execution plan in `docs/playbooks/319-GAMENET-EXECUTION-PLAN.md`.
+- **Plan**: `docs/playbooks/319-GAMENET-EXECUTION-PLAN.md`.
+- **Scope**: configure Conda environment `medrec-gamenet`, resolve PyTorch MKL symbol conflict, run GAMENet on MIMIC-III on 319-wild, collect standardized metrics, and accept comparison Run Records.
+- **Execution boundary**: execution on 319-wild GPU cluster; local MacBook terminal serves as harness terminal for verification and intake.
+
+## Completed: Core Toolkit Simplification and ARIS Workflow Layer Strip
+
+- **Status**: completed on `2026-08-21`; stripped complex multi-agent orchestration and UI mock layers in favor of the clean 4-command CLI (`reference`, `accept-comparison`, `evaluate`, `baseline list`), strict Comparison Protocol, and process-isolated 319 remote execution scripts.
+- **Commit**: `ce2e71f`.
+- **Scope**: streamlined `src/medrec_research` to pure protocol validation, run records, dataset manifests, and prediction evaluation; archived overengineered web artifacts to `archive/v0-overengineered/`; retained 76 core pytest unit and integration tests.
+- **Execution boundary**: local repository simplification; zero regressions on core test suite, strict typechecks and clean linters.
+
+## Archived: Refactor HITL Research Control Console into Task-Oriented Research Cockpit
+
+- **Status**: archived on `2026-08-21` (superseded by Core Toolkit Simplification; web frontend archived to `archive/v0-overengineered/`).
 - **Plan**: `docs/plans/2026-08-20-016-refactor-hitl-cockpit-ux-and-observability-plan.md`.
-- **Scope**: overhaul frontend UX (`pending-workbench.tsx`, `environment-health-bar.tsx`, `research-task-cockpit.tsx`, `contract-cockpit-card.tsx`, `cluster-monitor-panel.tsx`, `baseline-matrix-table.tsx`); fix backend contract file path and fallback support in `research_session.py`.
-- **Execution boundary**: local public-safe harness and frontend redesign; zero patient data leakage, preserving fail-closed Action Gate and H1/H2 human authority invariants.
+- **Scope**: overhaul frontend UX (`pending-workbench.tsx`, `environment-health-bar.tsx`, `research-task-cockpit.tsx`, `contract-cockpit-card.tsx`, `cluster-monitor-panel.tsx`, `baseline-matrix-table.tsx`).
 
 ## Completed: Refactor Frontend Sidebar and Aesthetic with shadcn sidebar-08 & b1GdfqsQE Preset
 
-- **Status**: completed on `2026-08-20`; sidebar-08 inset architecture, Breadcrumb navigation, b1GdfqsQE translucent/subtle preset details, and full WCAG AA accessibility compliance are implemented and verified.
+- **Status**: completed on `2026-08-20`; sidebar-08 inset architecture, Breadcrumb navigation, b1GdfqsQE translucent/subtle preset details, and full WCAG AA accessibility compliance are implemented and verified (now archived in `archive/v0-overengineered/`).
 - **Plan**: `docs/plans/2026-08-20-016-refactor-frontend-shadcn-sidebar-preset-plan.md`.
-- **Scope**: integrated shadcn `sidebar-08` inset layout, `NavMain`, `NavLanes`, `NavSecondary`, and `NavHarness` footer with `b1GdfqsQE` preset (translucent glassmorphism, subtle accent, amber attention badges).
-- **Execution boundary**: frontend UI refactoring and polish; 100% passing Vitest and Playwright e2e test suites with zero axe accessibility violations.
+- **Scope**: integrated shadcn `sidebar-08` inset layout, `NavMain`, `NavLanes`, `NavSecondary`, and `NavHarness` footer with `b1GdfqsQE` preset.
 
 ## Completed: Refactor HITL Vibe-Research Architecture and Multi-Agent Team Composition
 
-- **Status**: completed on `2026-08-20`; deep backend subsystems (`RemotePreflightProbe`, `ResearchContractStore`, `ExecutionOrchestrator`, `AgentTeamBridge`), lean `ResearchSession` facade, and modularized frontend workbench components (`DecisionQueuePanel`, `TransportRecoveryCard`, `TeamCompositionConsole`, `EvidenceInspectorPanel`) are fully implemented and verified.
+- **Status**: completed on `2026-08-20`; deep backend subsystems and modular workbench components implemented; lessons absorbed into core toolkit in `ce2e71f`.
 - **Plan**: `docs/plans/2026-08-20-015-refactor-hitl-vibe-research-team-architecture-plan.md`.
-- **Scope**: decomposed monolithic `ResearchSession` (1,623 lines down to ~690 lines) into `RemotePreflightProbe`, `ResearchContractStore`, `ExecutionOrchestrator`, and `AgentTeamBridge` ($team-composition-patterns with 7 presets, sizing heuristics, and display modes); decomposed `pending-workbench.tsx` (956 lines down to ~400 lines) into composable panels.
-- **Execution boundary**: local public-safe harness and architecture refactor; all 325 Python tests and 25 Vitest tests pass with zero regressions, strict typechecks, and clean linters.
+- **Scope**: decomposed monolithic `ResearchSession` into `RemotePreflightProbe`, `ResearchContractStore`, `ExecutionOrchestrator`, and `AgentTeamBridge`.
 
-## Active: Single-project HITL Research Control Console and Base UI Migration
+## Archived: Single-project HITL Research Control Console and Base UI Migration
 
-- **Status**: active on `2026-08-18`; Base UI migration, production decision workbench, fixed SafeDrug-main wrapper, Web exception takeover, persistent replayable SSE, local restricted ingress, and local gates are complete on `codex/hitl-base-ui-control-console`. Authorized 319 canary evidence and PR publication remain open.
+- **Status**: archived on `2026-08-21` (superseded by Core Toolkit Simplification).
 - **Plan**: `docs/plans/2026-08-13-014-feat-hitl-control-console-base-ui-plan.md`.
-- **Scope**: turn the production Python harness into the single-project decision console for contract drafting, H1, declared execution, monitoring, restricted public-safe evidence intake, Decision Packet review, H2, and next-round routing; migrate every production Radix wrapper and consumer to Base UI.
+- **Scope**: turn production Python harness into single-project decision console; migrate Radix wrappers to Base UI.
 - **Execution boundary**: H selected SafeDrug-main and authorized the fixed server-only wrapper for local implementation and tests. Real 319 writes, wrapper installation, data access, GPU work, environment creation, cost-bearing execution, GAMENet canary, commit, push, and PR publication remain blocked pending explicit human authorization and all scientific gates.
 - **Evidence target**: durable idempotent queue, registered execution declarations, fixed bridge commands, replayable monitor state, opaque Web recovery/cancellation, schema-gated public-safe monitor/evidence ingress, fail-closed downstream dependencies, Base UI migration reports, production Playwright/axe evidence, package/drift/security gates, and honest final-five blocker projection.
 

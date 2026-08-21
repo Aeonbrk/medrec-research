@@ -30,6 +30,7 @@ bash baselines/runners/run_baseline.sh safedrug
 ## Data Processing
 
 The script handles data processing automatically:
+
 1. Links MIMIC-III files from data root
 2. Runs `data/processing.py` if `records_final.pkl` doesn't exist
 3. All baselines share the same processed data
@@ -37,6 +38,7 @@ The script handles data processing automatically:
 ## Output Format
 
 Each run produces:
+
 - `{baseline}_result.json` - Standardized metrics (jaccard, prauc, f1, ddi_rate)
 - `{baseline}_{timestamp}.log` - Full training log
 

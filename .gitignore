@@ -2,6 +2,8 @@
 .DS_Store
 .idea/
 .vscode/
+.claude/
+.codegraph/
 .venv/
 .pytest_cache/
 .ruff_cache/

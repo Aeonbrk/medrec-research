@@ -12,8 +12,10 @@ topic: hitl-cockpit-ux-and-observability
 
 ## Goal capsule
 
-Transform the HITL (Human-in-the-Loop) Control Console from a fragmented, confusing state-machine debugger into a polished, human-friendly **Task-Oriented Research Cockpit**. 
+Transform the HITL (Human-in-the-Loop) Control Console from a fragmented, confusing state-machine debugger into a polished, human-friendly **Task-Oriented Research Cockpit**.
+
 Key improvements:
+
 1. **Research Lifecycle Stepper**: Guided flow (`[1. 前置准备] -> [2. 契约拟定与AI评审] -> [3. 人工签核冻结] -> [4. 319算力调度监控] -> [5. 证据评估与决策]`).
 2. **1-Click AI Contract Generation**: Replace raw error callouts and manual forms with a smart contract generation card, preset baseline selectors, and interactive questionnaire preview.
 3. **Top Environment & Preflight Health Bar**: Unify Git dirty status, 319 connection reachability, and Harness SSE status into a non-blocking top bar with clear human explanations and 1-click diagnostics.
@@ -36,11 +38,13 @@ Can we completely modernize the interaction model, visual hierarchy, and actiona
 ## Work units
 
 ### U1. Backend Contract Path & Auto-Drafting Support
+
 - Update `research_session.py` to target `research-contract.json` (with fallback to default reproduction template when first drafting).
 - Ensure `/api/contract-ai` with operation `"draft"` can generate a valid initial `SafeDrugBatchContract` when no contract exists.
 - Verify contract persistence and immutability validation.
 
 ### U2. Frontend Environment & Preflight Health Bar (`environment-health-bar.tsx`)
+
 - Create top status bar summarizing:
   - Git Working Tree (Clean vs Dirty with friendly tooltip: "存在未提交改动，保证可复现性建议提交/暂存")
   - 319 Compute Cluster (Reachable / GPU ready / Latency)
@@ -49,6 +53,7 @@ Can we completely modernize the interaction model, visual hierarchy, and actiona
 - Replace full-page red blockers with actionable status chips.
 
 ### U3. Research Lifecycle Stepper & Task Cockpit (`research-task-cockpit.tsx`)
+
 - Implement 5-stage visual progress stepper:
   1. **环境与准备 (Setup & Preflight)**
   2. **契约拟定与评审 (Drafting & Review)**
@@ -58,16 +63,19 @@ Can we completely modernize the interaction model, visual hierarchy, and actiona
 - Dynamic primary action card (CTA) tailored to the active stage.
 
 ### U4. Intelligent Contract Drafting & Sign-off Card (`contract-cockpit-card.tsx`)
+
 - **Empty State**: Clean, elegant card: "准备启动基线复现实验", baseline selection pills (SafeDrug, GAMENet, RETAIN, MoleRec, LEAP), and button `✨ 由 AI Team 智能起草实验契约`.
 - **Draft State**: Rich visual preview of hypothesis, datasets, model annexes, resource ceiling, stopping rules, plus `TeamCompositionConsole` (3 Reviewers' comments & challenge points).
 - **Sign-off Action**: 1-click `✍️ 审核通过并签核冻结`, auto-populating researcher ID and providing quick presets for decision reasons.
 
 ### U5. Live 319 Cluster Monitoring & Log Streamer (`cluster-monitor-panel.tsx`)
+
 - Real-time visual progress bars for each model lane (`gamenet`, `retain`, `safedrug`, `leap`).
 - GPU/VRAM mock/live gauge indicators, epoch progress, ETA, and transport recovery controls (Resume / Cancel).
 - Streaming log console tab with terminal aesthetic.
 
 ### U6. Baseline Comparison Matrix & Leaderboard (`baseline-matrix-table.tsx`)
+
 - Side-by-side comparison table for the 5 baselines:
   - Model Name & Paper Source
   - Reproduction Mode & Target
@@ -75,6 +83,7 @@ Can we completely modernize the interaction model, visual hierarchy, and actiona
   - Verification & Evidence Status (Pass / In Progress / Blocked)
 
 ### U7. Refactor Pending Workbench & Navigation Layout
+
 - Reassemble `pending-workbench.tsx` using the new modular components:
   - `EnvironmentHealthBar` at top
   - `ResearchLifecycleStepper`
@@ -83,6 +92,7 @@ Can we completely modernize the interaction model, visual hierarchy, and actiona
 - Humanize all text labels and badges across the UI.
 
 ### U8. Verification and Test Suite Expansion
+
 - Update and add unit/integration tests in Vitest for new components.
 - Run Python pytest suite (`pytest`), Ruff check and format.
 - Run frontend typecheck (`tsc`), lint (`eslint`), and test (`npm test`).
