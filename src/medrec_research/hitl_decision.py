@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import sys
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+from ._atomic_write import atomic_write
 
 
 @dataclass
@@ -57,6 +60,7 @@ class HITLDecisionGate:
         options: list[str],
         context: dict[str, Any] | None = None,
         auto_choice: str | None = None,
+        timeout_seconds: int = 3600,
     ) -> str:
         """Present options to human researcher and record their binding choice."""
         ctx = context or {}
@@ -90,19 +94,35 @@ class HITLDecisionGate:
             chosen = options[0] if options else ""
             print(f"\n[Non-interactive] 自动选择默认项: {chosen}")
         else:
-            # Interactive user prompt
-            while True:
-                user_input = input("\n👉 你的选择 (输入编号或内容): ").strip()
-                match = self._resolve_input(user_input, options)
-                if match:
-                    chosen = match
-                    break
-                print(f"⚠️ 无效选择，请输入 1 到 {len(options)} 之间的编号。")
+            # Interactive user prompt with timeout
+            def timeout_handler(signum, frame):
+                raise TimeoutError("HITL decision timeout")
+
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(timeout_seconds)
 
             try:
-                notes = input("💬 决策备注 (可选, 直接回车跳过): ").strip()
-            except EOFError:
-                notes = ""
+                while True:
+                    user_input = input("\n👉 你的选择 (输入编号或内容): ").strip()
+                    match = self._resolve_input(user_input, options)
+                    if match:
+                        chosen = match
+                        break
+                    print(f"⚠️ 无效选择，请输入 1 到 {len(options)} 之间的编号。")
+
+                try:
+                    notes = input("💬 决策备注 (可选, 直接回车跳过): ").strip()
+                except EOFError:
+                    notes = ""
+            except TimeoutError:
+                print(f"\n⏰ Decision timeout after {timeout_seconds}s.")
+                print(f"Phase '{phase}' requires explicit human decision.")
+                raise TimeoutError(
+                    f"HITL decision gate timeout after {timeout_seconds}s. "
+                    f"No automatic approval. Restart the phase manually."
+                )
+            finally:
+                signal.alarm(0)
 
         decision = Decision(
             decision_id=decision_id,
@@ -124,7 +144,7 @@ class HITLDecisionGate:
     def record_decision(self, decision: Decision) -> Path:
         """Persist decision record as a structured JSON file."""
         filepath = self.decisions_dir / f"{decision.decision_id}.json"
-        filepath.write_text(json.dumps(decision.to_dict(), indent=2, ensure_ascii=False))
+        atomic_write(filepath, json.dumps(decision.to_dict(), indent=2, ensure_ascii=False))
         return filepath
 
     def _resolve_input(self, user_input: str, options: list[str]) -> str | None:

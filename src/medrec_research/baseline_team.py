@@ -52,6 +52,15 @@ class BaselineTeam:
 
     def execute(self, dry_run: bool = False) -> dict[str, Any]:
         """Execute baseline verification and synthesis."""
+        if not dry_run:
+            raise NotImplementedError(
+                f"Non-dry-run execution not implemented for {self.baseline_id}.\n"
+                "Manual workflow:\n"
+                "  1. SSH to 319-wild and run baseline manually\n"
+                "  2. Place result.json in research/baselines/{baseline_id}/\n"
+                "  3. Continue with: medrec idea discover {baseline_id}"
+            )
+
         # 1. Config validation
         target_dataset = self.config.get("dataset", "mimic-iii")
         expected_metrics = self.config.get("expected_metrics", {})

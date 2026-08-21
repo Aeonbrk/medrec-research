@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from ._atomic_write import atomic_write
 from .hitl_decision import HITLDecisionGate
 from .remote_executor import RemoteExecutor, SSHConfig
 from .team_spawner import TeamSpawner
@@ -79,15 +80,19 @@ class ResearchOrchestrator:
 
         result = team.execute(dry_run=False)
 
-        # Save result JSON and analysis markdown
+        # Save result JSON and analysis markdown (atomic writes)
         baseline_out = self.baselines_dir / baseline_id
         baseline_out.mkdir(parents=True, exist_ok=True)
-        (baseline_out / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False))
-        (baseline_out / "analysis.md").write_text(
+
+        result_json = json.dumps(result, indent=2, ensure_ascii=False)
+        atomic_write(baseline_out / "result.json", result_json)
+
+        analysis_md = (
             f"# Baseline Analysis: {baseline_id}\n\n{result.get('analysis', '')}\n\n"
             f"## Metrics\n```json\n{json.dumps(result.get('metrics', {}), indent=2)}\n```\n\n"
             f"## Deviations\n```json\n{json.dumps(result.get('deviation_from_paper', {}), indent=2)}\n```\n"
         )
+        atomic_write(baseline_out / "analysis.md", analysis_md)
 
         # HITL Decision Point #1
         options = [
@@ -128,12 +133,12 @@ class ResearchOrchestrator:
 
         hypotheses = team.execute()
 
-        # Save hypotheses
+        # Save hypotheses (atomic writes)
         for hyp in hypotheses:
             hyp_id = hyp["id"]
             slug = hyp["slug"]
             md_path = self.hypotheses_dir / f"{hyp_id}-{slug}.md"
-            md_path.write_text(hyp["markdown"])
+            atomic_write(md_path, hyp["markdown"])
 
         options = [f"[{h['id']}] {h['title']}" for h in hypotheses]
         options.extend(["修改假设 (重新生成)", "放弃这个方向"])
@@ -166,9 +171,9 @@ class ResearchOrchestrator:
 
         report = team.review_hypothesis(hyp_data)
 
-        # Save review report
+        # Save review report (atomic write)
         out_path = self.reviews_dir / f"{hypothesis_id}-review.md"
-        out_path.write_text(report["markdown"])
+        atomic_write(out_path, report["markdown"])
 
         options = [
             "Go (通过立项，进入实验设计)",
@@ -204,12 +209,12 @@ class ResearchOrchestrator:
 
         contract, exp_yaml = team.execute()
 
-        # Save contract & YAML
+        # Save contract & YAML (atomic writes)
         contract_path = self.contracts_dir / f"{hypothesis_id}-contract.json"
-        contract_path.write_text(json.dumps(contract, indent=2, ensure_ascii=False))
+        atomic_write(contract_path, json.dumps(contract, indent=2, ensure_ascii=False))
 
         exp_yaml_path = self.experiments_dir / f"{hypothesis_id}-exp.yaml"
-        exp_yaml_path.write_text(exp_yaml)
+        atomic_write(exp_yaml_path, exp_yaml)
 
         options = [
             "确认签署并锁定研究契约 (Lock Contract & Proceed)",
@@ -286,9 +291,9 @@ class ResearchOrchestrator:
 
         report = team.review_evidence(experiment_id, contract, results)
 
-        # Save evidence markdown
+        # Save evidence markdown (atomic write)
         out_path = self.evidence_dir / f"{hypothesis_id}-evidence.md"
-        out_path.write_text(report["markdown"])
+        atomic_write(out_path, report["markdown"])
 
         options = [
             "证据充分，进入论文撰写 (Evidence Supported -> Paper Writing)",

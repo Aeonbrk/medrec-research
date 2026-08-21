@@ -39,6 +39,16 @@ class ExecutionTeam:
 
     def execute(self, dry_run: bool = False) -> dict[str, Any]:
         """Execute experiment run or generate dry-run telemetry execution plan."""
+        if not dry_run:
+            raise NotImplementedError(
+                f"Non-dry-run execution not implemented for {self.experiment_id}.\n"
+                "Manual workflow:\n"
+                "  1. SSH to 319-wild and submit experiment manually\n"
+                "  2. Monitor progress and collect results\n"
+                "  3. Place results in experiments/{experiment_id}/results.json\n"
+                "  4. Continue with: medrec evidence analyze {experiment_id}"
+            )
+
         now = datetime.now(UTC).isoformat()
         if dry_run:
             return {
