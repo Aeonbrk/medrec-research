@@ -10,16 +10,16 @@ date: 2026-07-10
 
 ## Goal Capsule
 
-Create `/Users/oian/Codes/master/medrec-research` as the independent Active Research Home for general medication-recommendation research. The core Python package must run without ARIS, external baselines must cross an isolated process seam, and the repository must contain a curated account of prior progress and failed routes without copying private data or noisy workflow logs.
+Create `/Users/oian/Codes/master/medrec-research` as the independent Active Research Home for general medication-recommendation research. The core Python package must remain self-contained, external baselines must cross an isolated process seam, and the repository must contain a curated account of prior progress and failed routes without copying private data or noisy workflow logs.
 
 ## Scope Boundaries
 
-- Do not copy raw or processed EHR data, split membership, patient-level predictions, weights, checkpoints, restricted outputs, `.aris` traces, or timestamped workflow logs.
+- Do not copy raw or processed EHR data, split membership, patient-level predictions, weights, checkpoints, restricted outputs, or timestamped workflow logs.
 - Do not copy all imported baseline source trees.
 - Do not claim GAMENet or SafeDrug Comparison Mode readiness until their real adapters, environments, checkpoints, and protocol verification pass.
 - Do not revive EGSF, EG-TER repair, or CRC-PS action-family routes as active architecture.
 - Do not move, delete, chmod, or rewrite the `New-Search` archive.
-- Do not make ARIS a runtime dependency of the core package.
+- Do not make external workflow tools a runtime dependency of the core package.
 
 ## Verification Contract
 
@@ -41,7 +41,7 @@ Create `/Users/oian/Codes/master/medrec-research` as the independent Active Rese
 
 **Files**: `AGENTS.md`, `CONTEXT.md`, `README.md`, `ARCHITECTURE.md`, `docs/**`.
 
-**Approach**: keep top-level docs short and route details into specifications and playbooks. Record the archive, ARIS, protocol, and Conda adapter decisions as ADRs.
+**Approach**: keep top-level docs short and route details into specifications and playbooks. Record the archive, protocol, and Conda adapter decisions as ADRs.
 
 **Verification**: markdownlint passes and every top-level documentation link resolves.
 
@@ -89,15 +89,15 @@ Create `/Users/oian/Codes/master/medrec-research` as the independent Active Rese
 
 **Verification**: all archive references exist; no copied private or patient-level content appears.
 
-### U6. ARIS installation and archive handoff
+### U6. Documentation and archive handoff
 
-**Goal**: install project-local ARIS Codex skills, document the gated workflow, and mark `New-Search` as the non-destructive Research Archive.
+**Goal**: document the gated workflow, and mark `New-Search` as the non-destructive Research Archive.
 
-**Files**: `.aris/**`, `.agents/skills/**`, `AGENTS.md`, `README.md`, `ARCHIVED.md` in the archive.
+**Files**: `AGENTS.md`, `README.md`, `ARCHIVED.md` in the archive.
 
-**Approach**: use the ARIS installer, keep runtime files ignored, and add a clear archive pointer without changing historical research content.
+**Approach**: keep runtime files ignored, and add a clear archive pointer without changing historical research content.
 
-**Verification**: ARIS manifest resolves to the upstream skill repository; archive path and Git history remain intact; agent-document completion gates pass.
+**Verification**: archive path and Git history remain intact; agent-document completion gates pass.
 
 ## Definition of Done
 

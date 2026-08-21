@@ -221,3 +221,83 @@ def test_accept_comparison_rejects_noncanonical_vocabulary(tmp_path: Path) -> No
 
     assert completed.returncode == 2
     assert "canonical" in completed.stderr
+
+
+def test_cli_reference_slice(tmp_path: Path) -> None:
+    output_path = tmp_path / "protocol-check.json"
+    completed = subprocess.run(
+        (
+            sys.executable,
+            "-m",
+            "medrec_research.cli",
+            "reference",
+            "--manifest",
+            str(FIXTURE_ROOT / "manifest.json"),
+            "--visits",
+            str(FIXTURE_ROOT / "visits.json"),
+            "--output",
+            str(output_path),
+            "--top-k",
+            "2",
+            "--seed",
+            "0",
+        ),
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert output_path.exists()
+    content = json.loads(output_path.read_text(encoding="utf-8"))
+    assert content["schema_version"] == 1
+    assert content["kind"] == "protocol_check"
+
+
+def test_cli_evaluate_predictions(tmp_path: Path) -> None:
+    predictions_path = tmp_path / "predictions.json"
+    predictions_path.write_text(json.dumps(_prediction_payload()), encoding="utf-8")
+    output_path = tmp_path / "metrics.json"
+
+    completed = subprocess.run(
+        (
+            sys.executable,
+            "-m",
+            "medrec_research.cli",
+            "evaluate",
+            "--predictions",
+            str(predictions_path),
+            "--output",
+            str(output_path),
+        ),
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert output_path.exists()
+    metrics = json.loads(output_path.read_text(encoding="utf-8"))
+    assert metrics["visit_count"] == 3
+    assert metrics["jaccard"] == 1 / 3
+
+
+def test_cli_baseline_list() -> None:
+    completed = subprocess.run(
+        (
+            sys.executable,
+            "-m",
+            "medrec_research.cli",
+            "baseline",
+            "list",
+            "--registry",
+            str(PROJECT_ROOT / "baselines" / "registry.toml"),
+        ),
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "gamenet" in completed.stdout
+    assert "safedrug" in completed.stdout

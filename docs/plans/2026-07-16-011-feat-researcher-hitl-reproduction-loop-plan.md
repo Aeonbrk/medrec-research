@@ -16,7 +16,7 @@ deepened: 2026-08-10
 ## Goal Capsule
 
 - **Objective:** Give one accountable researcher a two-gate evidence loop for a four-model SafeDrug Reproduction Mode batch, a staged MoleRec reproduction, and later five-model Comparison Qualification under one protocol-owned scope.
-- **Product authority:** The research owner signs H1 and every H2; Reproduction Contracts own source-native claims; the Unified Research Protocol owns comparison claims; neither Codex, ARIS, nor the browser may override scientific evidence.
+- **Product authority:** The research owner signs H1 and every H2; Reproduction Contracts own source-native claims; the Unified Research Protocol owns comparison claims; neither external tools nor the browser may override scientific evidence.
 - **Execution profile:** Code and documentation live in the Active Research Home, while real EHR processing, baseline environments, training, checkpoint inference, and GPU evaluation remain on 319 after a fresh remote preflight.
 - **Open blockers:** Local synthetic implementation may proceed, but real execution remains blocked by 319 authority and data checks, unresolved SafeDrug license evidence, and source-backed per-model acceptance intervals that must be frozen at H1.
 
@@ -56,8 +56,8 @@ The system must remove repetitive execution work without turning model agreement
 ### Actors
 
 - A1. **Research owner:** Defines scientific intent, approves H1, reviews each Decision Packet, signs H2, and remains accountable for every conclusion and next action.
-- A2. **Codex and ARIS control plane:** Drafts contracts, derives known facts, coordinates authorized work, monitors exceptions, assembles evidence, and propagates signed decisions without final scientific authority.
-- A3. **MedRec Research Library:** Validates public-safe records, mode boundaries, evidence freshness, protocol scope, and action eligibility without depending on ARIS or imported baseline frameworks.
+- A2. **Agent control plane:** Drafts contracts, derives known facts, coordinates authorized work, monitors exceptions, assembles evidence, and propagates signed decisions without final scientific authority.
+- A3. **MedRec Research Library:** Validates public-safe records, mode boundaries, evidence freshness, protocol scope, and action eligibility without depending on imported baseline frameworks.
 - A4. **319 execution plane:** Runs isolated source-native and Comparison Mode environments, retains restricted artifacts, and emits only approved public-safe evidence after preflight.
 - A5. **Independent core evaluator:** Joins target-free predictions to core-owned targets, recomputes protocol metrics, and rejects incomplete, malformed, stale, or scope-mismatched evidence.
 
@@ -240,7 +240,7 @@ Product Contract unchanged. This enrichment resolves the planning questions belo
 - **KTD5. Reproduction uncertainty is explicit and source-native.** Add `src/medrec_research/reproduction_evaluation.py` with the five required outcomes (`ddi_rate`, `jaccard`, `f1`, `prauc`, `average_medication_count`), a fixed ten-round, 80%-of-test, with-replacement bootstrap specification, source-backed acceptance intervals, and attempt/conclusion classification. Bootstrap uncertainty is never serialized as training-seed variance. A missing credible source interval caps the affected model at `inconclusive`. (Governs R15-R19, AE4-AE5.)
 - **KTD6. Comparison Protocol v1.1 is an explicit amendment.** Add `src/medrec_research/comparison_protocol.py` and `docs/specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md`. It defines the five outcomes, `score_threshold` versus `structural_sequence` decoder classes, validation-only threshold selection, equal Adaptation Budget fields, and independent evaluator inputs. Existing Protocol 1.0 and existing records remain readable; only a v1.1 `ComparisonQualification` may use the new profile fields. (Governs R28-R38, AE8-AE10.)
 - **KTD7. MoleRec bundle identity is exact and staged.** Add `src/medrec_research/molerec.py` with an immutable `MoleRecArtifactBundle` digest over variant, pinned source revisions, checkpoint, vocabulary, preprocessing, DDI, and BRICS artifacts. `MoleRecStageContract` permits replay, training reproduction, and comparison qualification as separate stages; each later stage requires the prior packet's eligible H2 `go`. Replay never implies training or comparison readiness. (Governs R21-R27, AE6-AE8.)
-- **KTD8. Scheduler ownership stays at the Mac/ARIS boundary.** Add only a deterministic public-safe `src/medrec_research/reproduction_scheduler.py` contract for logical lanes, resource ceilings, exception routing, and repair accounting. It produces a schedule/decision description and never opens SSH, reads restricted data, launches Conda, or mutates an Action Gate. ARIS remains responsible for remote submission/monitoring and 319 remains responsible for restricted execution. (Governs R4, R7, R11, R39-R43.)
+- **KTD8. Scheduler ownership stays at the Mac/harness boundary.** Add only a deterministic public-safe `src/medrec_research/reproduction_scheduler.py` contract for logical lanes, resource ceilings, exception routing, and repair accounting. It produces a schedule/decision description and never opens SSH, reads restricted data, launches Conda, or mutates an Action Gate. The harness remains responsible for remote submission/monitoring and 319 remains responsible for restricted execution. (Governs R4, R7, R11, R39-R43.)
 - **KTD9. Browser status is additive and read-only.** Add `src/medrec_research/research_loop_status.py` for per-model/stage packet completeness, conclusion, H2 eligibility, stale state, and blockers. Expose it through a read-only `/api/research-loop` harness response and render progressive disclosure in the existing status page; no browser action may approve H1/H2 or execute work. (Governs R6-R8, R20, R25, R44.)
 - **KTD10. Fixtures precede production wiring.** Add public synthetic fixtures for H1, one accepted/rejected/inconclusive packet, H2 decisions, MoleRec bundle/stages, v1.1 protocol profiles, bootstrap/interval evidence, scheduler lanes, and browser status. Use these fixtures to drive schema and projection tests before any real-data integration is considered. (Governs R4, R15-R17, R22-R26, R30-R37, R43.)
 
@@ -262,7 +262,7 @@ flowchart LR
     status --> browser[Read-only harness/browser projection]
 ```
 
-Core records are frozen dataclasses with strict JSON round-trips, content-addressed IDs, and public-safe field validation. The scheduler accepts lane/resource declarations and emits deterministic next-lane decisions; ARIS translates those decisions into the existing Action Context and remote playbook. The evaluator consumes complete target-free predictions plus core-owned targets and emits a packet-ready outcome/uncertainty record. No unit imports ARIS or a baseline framework.
+Core records are frozen dataclasses with strict JSON round-trips, content-addressed IDs, and public-safe field validation. The scheduler accepts lane/resource declarations and emits deterministic next-lane decisions; the runner translates those decisions into the existing Action Context and remote playbook. The evaluator consumes complete target-free predictions plus core-owned targets and emits a packet-ready outcome/uncertainty record. No unit imports an external baseline framework.
 
 ## Implementation Units
 
@@ -329,7 +329,7 @@ Core records are frozen dataclasses with strict JSON round-trips, content-addres
 1. Define `LaneSpec`, `ResourceCeiling`, `LaneState`, `ScheduleDecision`, `RepairBudget`, and `ExceptionDisposition` as public-safe pure records.
 2. Schedule all four SafeDrug lanes logically in stable annex order while enforcing total CPU/GPU/memory limits; physical concurrency is an execution-plane choice.
 3. Keep authority, privacy, legality, and resource exceptions non-waivable. Route scientific/dependency exceptions through the declared repair budget and mark the affected attempt `usable-with-limits` when equivalence evidence is absent.
-4. Emit no SSH/Conda/process commands. ARIS consumes the decision and calls the existing Action Context/remote playbook once; there is no second gate or ambient state loader.
+4. Emit no SSH/Conda/process commands. The runner consumes the decision and calls the existing Action Context/remote playbook once; there is no second gate or ambient state loader.
 
 **Tests:** deterministic ordering; resource ceiling never exceeded; one lane failure does not cancel independent lanes; repair budget exhaustion fails closed; non-waivable exception cannot be waived; serialization contains no paths, credentials, or patient data.
 
@@ -381,7 +381,7 @@ Execution-time gates remain outside this local implementation: SafeDrug license 
 | Digest includes mutable presentation text | Central protected-field projection with tests for presentation-only edits and scientific-field staleness. |
 | DDI/PRAUC inputs are incomplete or target-bearing | Require explicit validated inputs and complete target-free prediction coverage; cap at invalid/inconclusive. |
 | Existing Protocol 1.0 fixtures break | Make v1.1 fields optional/additive and preserve legacy constructors/parsers. |
-| Scheduler becomes a second authority gate | Pure schedule/exception records only; ARIS invokes the existing Action Context. |
+| Scheduler becomes a second authority gate | Pure schedule/exception records only; runner invokes the existing Action Context. |
 | Browser implies scientific authorization | Read-only route, packet completeness display, and no H1/H2 mutation endpoint. |
 | Restricted data leaks into public fixtures | Public-string/path validators, synthetic-only fixtures, and serialization tests for forbidden fields. |
 | User worktree contains unrelated documentation edits | Keep implementation changes scoped to U1-U7 paths; do not revert or fold unrelated edits into feature decisions. |

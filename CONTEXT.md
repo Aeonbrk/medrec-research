@@ -5,15 +5,11 @@ This context covers reusable computational research for medication recommendatio
 ## Language
 
 **MedRec Research Library**:
-The idea-agnostic body of reusable medication-recommendation research capability. It remains usable without ARIS.
+The idea-agnostic body of reusable medication-recommendation research capability.
 _Avoid_: Baseline collection, route code
 
-**ARIS Control Plane**:
-The research-workflow authority that carries work through discovery, protocol, execution, audit, and claim formation while recording provenance. It orchestrates the MedRec Research Library but is not part of its runtime.
-_Avoid_: ARIS runtime, ARIS library
-
 **Harness Terminal**:
-The local MacBook Air that runs ARIS, protocol checks, synthetic validation, remote submission, monitoring, and public-safe evidence intake without running real-data experiments.
+The local MacBook Air that runs protocol checks, synthetic validation, remote submission, monitoring, and public-safe evidence intake without running real-data experiments.
 _Avoid_: Local experiment machine, training laptop
 
 **319 Execution Plane**:
@@ -89,7 +85,7 @@ A public-safe identity record built while membership is available on 319. It rec
 _Avoid_: Dataset README, data path
 
 **Protocol Vertical Slice**:
-The smallest end-to-end research path that proves the Unified Research Protocol, evaluation, provenance, and ARIS orchestration work together.
+The smallest end-to-end research path that proves the Unified Research Protocol, evaluation, and provenance work together.
 _Avoid_: Scaffold, demo pipeline
 
 **Protocol Check Record**:
@@ -113,7 +109,7 @@ The content-addressed evidence that one smoke-ready baseline passed Comparison M
 _Avoid_: Global comparable flag, baseline quality score
 
 **Workflow Trace**:
-Local operational detail produced while ARIS performs research work. It is diagnostic context, not accepted scientific evidence.
+Local operational detail produced while performing research work. It is diagnostic context, not accepted scientific evidence.
 _Avoid_: Research record, provenance
 
 **Baseline Environment**:

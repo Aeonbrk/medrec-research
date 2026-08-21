@@ -10,7 +10,7 @@ Completed locally on 2026-08-12. This plan replaces the manual collection of sta
 
 ## Product contract
 
-The command starts a real project session, not a synthetic demonstration. It discovers the repository and installed ARIS checkout, performs a read-only 319 preflight, publishes public-safe current projections under the ignored `runtime/hitl/` directory, starts the packaged production Web console on literal loopback, and opens it in the default browser. The existing versioned `research/` directory prevents a same-name root executable on Unix, so the unambiguous root entrypoint is `start-research`.
+The command starts a real project session, not a synthetic demonstration. It discovers the repository state, performs a read-only 319 preflight, publishes public-safe current projections under the ignored `runtime/hitl/` directory, starts the packaged production Web console on literal loopback, and opens it in the default browser. The existing versioned `research/` directory prevents a same-name root executable on Unix, so the unambiguous root entrypoint is `start-research`.
 
 The human researcher remains the only scientific authority:
 
@@ -54,7 +54,7 @@ The coordinator fails closed when any required observation is missing. In partic
 
 ## Session state and actions
 
-The generated Project Status uses repository-owned program, audits, registry, ARIS manifest, local source identity, and the remote preflight as authorities. Runtime blockers are additive to existing source/license/readiness blockers.
+The generated Project Status uses repository-owned program, audits, registry, local source identity, and the remote preflight as authorities. Runtime blockers are additive to existing source/license/readiness blockers.
 
 The generated Research Loop Status is always structurally available, including before H1. This lets the console explain `contract-missing`, `h1-stale-or-missing`, packet gaps, and remote blockers instead of replacing them with an opaque unavailable panel.
 

@@ -108,7 +108,7 @@ cd "${SAFEDRUG_ROOT}/src"
 export CUDA_VISIBLE_DEVICES="$GPU_ID"
 
 echo "  开始训练（日志: ${LOG_FILE}）..."
-python GAMENet.py 2>&1 | tee -a "${LOG_FILE}"
+python GAMENet.py --cuda 0 2>&1 | tee -a "${LOG_FILE}"
 
 echo "✓ 训练完成"
 echo ""

@@ -7,7 +7,7 @@ Under the existing Action Gate, H1/H2, Reproduction Mode, and privacy boundaries
 ## Frozen setting
 
 - Project: `medrec-research`.
-- Control plane: local production Python harness and ARIS checkout recorded by actual Git revision.
+- Control plane: local production Python harness recorded by actual Git revision.
 - Initial lane: `gamenet`, source-native Reproduction Mode.
 - Source identity: SafeDrug main `88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a`.
 - Source-native seed: `1203`; no seed argument or source patch is permitted.

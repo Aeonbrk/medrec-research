@@ -99,14 +99,11 @@ class RemoteExecutor:
         if config_path:
             cmd_args.extend(["--config", config_path])
 
-        # Use shlex.join to properly quote for shell execution
-        run_cmd = shlex.join(cmd_args)
-
         # 1. Start tmux session
         self.ssh(f"tmux new-session -d -s {shlex.quote(session_name)}")
 
         # 2. Use conda run instead of manual activation (more robust)
-        conda_cmd = ["conda", "run", "-n", conda_env, "--no-capture-output"] + cmd_args
+        conda_cmd = ["conda", "run", "-n", conda_env, "--no-capture-output", *cmd_args]
         full_cmd = shlex.join(conda_cmd)
 
         # 3. Send command to tmux - the entire command is quoted, preventing inner shell injection
@@ -138,7 +135,7 @@ class RemoteExecutor:
         self.ssh(f"tmux new-session -d -s {shlex.quote(session_name)}")
 
         # 2. Use conda run for execution
-        conda_cmd = ["conda", "run", "-n", conda_env, "--no-capture-output"] + cmd_args
+        conda_cmd = ["conda", "run", "-n", conda_env, "--no-capture-output", *cmd_args]
         full_cmd = shlex.join(conda_cmd)
 
         # 3. Send properly quoted command to tmux
@@ -159,7 +156,9 @@ class RemoteExecutor:
         log_tail = ""
         if status == "running":
             try:
-                log_tail = self.ssh(f"tmux capture-pane -t {shlex.quote(job_id)} -p | tail -n 20", check=False)
+                log_tail = self.ssh(
+                    f"tmux capture-pane -t {shlex.quote(job_id)} -p | tail -n 20", check=False
+                )
             except Exception:
                 log_tail = ""
 

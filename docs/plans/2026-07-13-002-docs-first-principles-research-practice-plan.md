@@ -25,7 +25,7 @@ execution: knowledge-work
 
 ## 非目标
 
-- 不修改 ARIS、Unified Research Protocol、基线规范、研究结论或医学推荐实验的任何政策。
+- 不修改 Unified Research Protocol、基线规范、研究结论或医学推荐实验的任何政策。
 - 不把教学材料包装为本项目的实验结果，也不把通用方法当作针对真实患者数据的操作许可。
 - 不扩展为对互联网所有嵌套链接的无限递归抓取。
 

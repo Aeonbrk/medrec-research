@@ -77,6 +77,6 @@ A baseline may advance from `registered` to `smoke_ready` after its pinned sourc
 
 GAMENet and SafeDrug are not `comparison_ready` in the initial repository. Registration or a successful import does not make them comparable.
 
-## ARIS gates
+## Research gates
 
-ARIS carries a research question through protocol definition, experiment planning, execution, integrity audit, result-to-claim review, and writing. A stage may consume only gate-approved artifacts from the prior stage. Workflow Traces and local logs help diagnose operation but are not evidence. Failed routes become Failure Records so later work inherits their constraints without inheriting their code structure.
+A research question progresses through protocol definition, experiment planning, execution, integrity audit, result-to-claim review, and writing. A stage may consume only gate-approved artifacts from the prior stage. Local logs help diagnose operation but are not evidence. Failed routes become Failure Records so later work inherits their constraints without inheriting their code structure.

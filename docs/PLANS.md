@@ -27,11 +27,11 @@
 - **Plan**: `docs/plans/2026-08-13-014-feat-hitl-control-console-base-ui-plan.md`.
 - **Scope**: turn the production Python harness into the single-project decision console for contract drafting, H1, declared execution, monitoring, restricted public-safe evidence intake, Decision Packet review, H2, and next-round routing; migrate every production Radix wrapper and consumer to Base UI.
 - **Execution boundary**: H selected SafeDrug-main and authorized the fixed server-only wrapper for local implementation and tests. Real 319 writes, wrapper installation, data access, GPU work, environment creation, cost-bearing execution, GAMENet canary, commit, push, and PR publication remain blocked pending explicit human authorization and all scientific gates.
-- **Evidence target**: durable idempotent queue, registered execution declarations, fixed ARIS bridge commands, replayable monitor state, opaque Web recovery/cancellation, schema-gated public-safe monitor/evidence ingress, fail-closed downstream dependencies, Base UI migration reports, production Playwright/axe evidence, package/drift/security gates, and honest final-five blocker projection.
+- **Evidence target**: durable idempotent queue, registered execution declarations, fixed bridge commands, replayable monitor state, opaque Web recovery/cancellation, schema-gated public-safe monitor/evidence ingress, fail-closed downstream dependencies, Base UI migration reports, production Playwright/axe evidence, package/drift/security gates, and honest final-five blocker projection.
 
 ## Completed: One-command HITL Research Session
 
-- **Status**: completed locally on `2026-08-12`; ARIS is updated and the one-command launcher is implemented and verified.
+- **Status**: completed locally on `2026-08-12`; the one-command launcher is implemented and verified.
 - **Plan**: `docs/plans/2026-08-12-013-feat-one-command-hitl-research-session-plan.md`.
 - **Scope**: replace manual status and harness arguments with `./start-research`, a real-state coordinator that performs fail-closed 319 preflight, publishes ignored runtime projections, starts the production console, and exposes narrowly controlled H1/H2 decisions without bypassing the Action Gate.
 - **Execution boundary**: startup and preflight are read-only on 319. The launcher never substitutes fixtures, mutates the remote checkout or environment, allocates resources, or executes an Action Request.

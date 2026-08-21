@@ -2,7 +2,7 @@
 
 ## Security
 
-The current browser boundary is narrow and same-origin protected. Action Requests bind server-side to content-addressed declarations and durable records without exposing command or path identifiers. The local AI bridge is fixed, read-only, opt-in, and advisory. The ARIS transport is also fixed and server-only: schema-v2 manifests carry identities and digests, while the package registry owns SSH, commands, Conda, GPU, and paths. It is implemented and tested locally but remains unauthorized on 319. Adding generic browser command fields would be a critical regression.
+The current browser boundary is narrow and same-origin protected. Action Requests bind server-side to content-addressed declarations and durable records without exposing command or path identifiers. The local AI bridge is fixed, read-only, opt-in, and advisory. The remote transport is also fixed and server-only: schema-v2 manifests carry identities and digests, while the package registry owns SSH, commands, Conda, GPU, and paths. It is implemented and tested locally but remains unauthorized on 319. Adding generic browser command fields would be a critical regression.
 
 ## Research integrity
 
@@ -18,7 +18,7 @@ An independent code review found that H2 was previously written to `<lane_id>.js
 
 ## Operations
 
-`./start-research` performs fail-closed read-only preflight, validates the ARIS `main` candidate, atomically records candidate/active/last-known-good revision state, creates the production handler, health-checks `/api/harness-state`, and opens the pending root only after the checks pass. A failed candidate is recorded and falls back to the last-known-good revision without starting. The real start command was not executed because it probes 319 and this work has no explicit 319 authorization. The declaration worker now seals a fixed manifest and can invoke the server-only submit/monitor/cancel/resume wrapper; no live invocation occurred.
+`./start-research` performs fail-closed read-only preflight, creates the production handler, health-checks the service, and opens the pending root only after the checks pass. The declaration worker now seals a fixed manifest and can invoke the server-only submit/monitor/cancel/resume wrapper; no live invocation occurred.
 
 ## Verification update
 
@@ -27,8 +27,6 @@ An independent code review found that H2 was previously written to `<lane_id>.js
 - Package/security: wheel verified with `9` web resources; npm audit reports `0` vulnerabilities.
 - Lighthouse: performance `99`, accessibility `100`, best practices `100`.
 - Screenshots: `docs/assets/research-console/after-desktop.png` and `after-mobile.png` show the default pending workbench without overlap or horizontal overflow.
-- ARIS: clean `main` checkout at `e12e07c7b85ee1a4dc07e5463089aa16836af2bf`.
-- ARIS revision: candidate validation, atomic runtime activation, fallback recording, and `/api/aris-revision` projection are covered by unit tests; the current candidate is valid.
 
 The production browser harness uses one temporary `ResearchSession` for contract, H1, Decision Packet, H2, declarations, queue, and SSE. It never calls remote preflight. The only execution blocker is the explicit synthetic `remote-execution-not-authorized`, so no local test can be mistaken for 319 readiness or scientific evidence.
 
@@ -40,7 +38,7 @@ H1 is immutable per contract digest with exact replay idempotency. Queue parsing
 
 The Decision Packet detail now reads `/api/decision-packets` and displays aggregate outcomes and uncertainty before the raw-artifact section. When the evaluator receipt contains public-safe aggregate rows, the UI renders those rows as a table; otherwise it shows an explicit unavailable blocker. No curve or table is synthesized from summary metrics.
 
-The local production-domain rehearsal now covers H1, declaration-bound queueing, immutable submission envelopes, monitor transitions, restricted evidence intake, evaluator packet assembly, receipt corruption fail-closed behavior, H2 GO, and next-lane binding. It does not submit to ARIS or 319 and cannot establish readiness or scientific evidence.
+The local production-domain rehearsal now covers H1, declaration-bound queueing, immutable submission envelopes, monitor transitions, restricted evidence intake, evaluator packet assembly, receipt corruption fail-closed behavior, H2 GO, and next-lane binding. It does not submit to 319 and cannot establish readiness or scientific evidence.
 
 ## Control-plane correction
 
@@ -59,9 +57,7 @@ No 319 access, real data, GPU, credentials, remote write, license acceptance, so
 
 ## Remote bridge authority audit
 
-The pinned ARIS checkout contains a generic `experiment-queue` scheduler, but not a versioned medrec/319 production submission API. Its manifest accepts free `cwd`, command, GPU, and expected-output values; SSH target and remote roots remain operator-supplied; monitoring is an SSH/`jq` recipe; cancellation has no external CLI; and result synchronization is explicitly unsupported. The scheduler state schema and atomic resume behavior are reusable implementation evidence, but the interactive skill is not a sufficient fixed transport contract.
-
-The local fixed wrapper now supplies the missing immutable manifest, runtime root, submission identity, monitor/cancel/recovery surface, and public-safe receipt schema. GAMENet therefore no longer carries `aris-transport-contract-missing`. Live 319 installation and verification remain blocked, and the other four lanes retain the blocker because their launch templates are disabled.
+The local fixed wrapper now supplies the missing immutable manifest, runtime root, submission identity, monitor/cancel/recovery surface, and public-safe receipt schema.
 
 The GAMENet audit also confirmed that evidence belongs to distinct source identities. H selected SafeDrug-main; its own source establishes seed `1203` and checkpoint selection for this source-native lane. The original repository's MIT-license observation is not transferable. SafeDrug-main license disposition, a content-addressed environment lock, and adapter-smoke evidence remain absent.
 
@@ -69,7 +65,7 @@ The GAMENet audit also confirmed that evidence belongs to distinct source identi
 
 H selected SafeDrug-main and authorized a fixed server-only wrapper for local implementation and tests only. `baselines/adapters/gamenet/launch.toml` and the GAMENet execution declaration now bind SafeDrug-main. The existing human audit stayed unchanged because changing content without a new content-addressed review would invalidate its approval; new immutable-source evidence is recorded in this research memory instead.
 
-The wrapper binds transport policy, wrapper package, queue-manager artifact, ARIS revision, SafeDrug revision, contract, H1, preflight, declaration, and submission digests. Local and remote per-request OS file locks close duplicate-scheduler races. Remote containment rejects escaped or symlinked mutable roots. Scheduler cancellation verifies PID start time, process group, and command digest before `killpg`. Explicit recovery reconciles existing queue state and preserves the scientific attempt when only an acknowledgement or control process was lost. Dispatch and monitor validation failures become durable `review_pending` records instead of silent retries.
+The wrapper binds transport policy, wrapper package, queue-manager artifact, SafeDrug revision, contract, H1, preflight, declaration, and submission digests. Local and remote per-request OS file locks close duplicate-scheduler races. Remote containment rejects escaped or symlinked mutable roots. Scheduler cancellation verifies PID start time, process group, and command digest before `killpg`. Explicit recovery reconciles existing queue state and preserves the scientific attempt when only an acknowledgement or control process was lost. Dispatch and monitor validation failures become durable `review_pending` records instead of silent retries.
 
 Focused transport/HITL verification passes `18` tests, and focused ingress/evidence verification passes `6`. The full Python suite passes `321`; frontend typecheck, lint, format, `24` unit tests, production build, `10` applicable Playwright/axe scenarios, package drift, wheel resources, and npm audit remain green. Independent security findings about policy binding, duplicate submission, PID reuse, path containment, uncertain-completion reconciliation, detached recovery, browser control opacity, and SSE cursor replay are covered by regression tests. A 507 kB production chunk warning remains non-blocking.
 
@@ -77,4 +73,4 @@ The pending workbench now exposes declaration-internal `resume` and `cancel` onl
 
 `/api/execution-events` now keeps one HTTP/1.1 stream open, sends heartbeats, delivers journal additions on the same connection, and resumes after disconnect from `Last-Event-ID`. `monitor-apply` and `evidence-intake` make the already validated public-safe monitor/evidence paths locally callable without `ResearchSession.prepare()`, SSH, remote transport, or browser filesystem authority.
 
-No 319 access, remote write, environment creation, data/GPU/cost use, canary, commit, push, Draft PR, or Ready transition occurred. The GAMENet lane remains honestly blocked by license, environment lock, adapter smoke, remote revision/package match, data root, and real authorization. The other four final-five lanes additionally retain `aris-transport-contract-missing` because their launch templates are disabled and unverified.
+No 319 access, remote write, environment creation, data/GPU/cost use, canary, commit, push, Draft PR, or Ready transition occurred. The GAMENet lane remains honestly blocked by license, environment lock, adapter smoke, remote revision/package match, data root, and real authorization. The other four final-five lanes additionally retain `remote-transport-contract-missing` because their launch templates are disabled and unverified.

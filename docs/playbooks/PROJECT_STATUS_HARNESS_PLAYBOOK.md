@@ -24,7 +24,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research harness \
 
 Action Authorization 与 Remote Preflight 必须由对应 authority 在仓库外产生，并组成严格、内容寻址的 Authority Bundle。启动时通过 `--authority-bundle` 显式指定其路径。Bundle 必须绑定当前项目、status snapshot、Comparison Scope、动作、`319-wild` profile、immutable remote revision、issuer/source 与有效期。
 
-`action-context`、Web 和 `action-evaluate` 调用同一个纯 Action Context resolver 与 `evaluate_action`。调用方先通过 `action-context` 或 Harness 取得仅含不透明 `request_id` 的公共 context，再将该 ID 交给 `action-evaluate` 或 Harness POST；resolver 从当前 Status 和显式 Bundle 推导唯一 action、target、snapshot、scope、authorization 与 preflight 绑定。Harness 在每次 `GET /api/action-context` 和 `POST /api/action-requests` 时重新解析 Bundle；轮换、撤销、缺失或损坏的 Bundle 会使 context 不可用或 POST blocked，不会复用启动时内存中的旧值。允许时只生成 Action Request；拒绝时写 Action Decision 并退出 `2`。两者都不调用 subprocess、shell、SSH、Conda、ARIS job submission 或任何远端接口。ARIS 是否执行该请求属于后续独立授权和 remote preflight 流程。
+`action-context`、Web 和 `action-evaluate` 调用同一个纯 Action Context resolver 与 `evaluate_action`。调用方先通过 `action-context` 或 Harness 取得仅含不透明 `request_id` 的公共 context，再将该 ID 交给 `action-evaluate` 或 Harness POST；resolver 从当前 Status 和显式 Bundle 推导唯一 action、target、snapshot、scope、authorization 与 preflight 绑定。Harness 在每次 `GET /api/action-context` 和 `POST /api/action-requests` 时重新解析 Bundle；轮换、撤销、缺失或损坏的 Bundle 会使 context 不可用或 POST blocked，不会复用启动时内存中的旧值。允许时只生成 Action Request；拒绝时写 Action Decision 并退出 `2`。两者都不调用 subprocess、shell、SSH、Conda、作业提交或任何远端接口。是否执行该请求属于后续独立授权和 remote preflight 流程。
 
 ## 4. 恢复与失效
 

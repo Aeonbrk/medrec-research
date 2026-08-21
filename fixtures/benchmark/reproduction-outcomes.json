@@ -1,1 +1,0 @@
-{"kind":"reproduction_outcomes","model_id":"gamenet","observations":[{"metric_values":{"average_medication_count":2.0,"ddi_rate":0.1,"f1":0.6,"jaccard":0.5,"prauc":0.7},"observation_id":"visit-1"},{"metric_values":{"average_medication_count":1.0,"ddi_rate":0.2,"f1":0.5,"jaccard":0.4,"prauc":0.8},"observation_id":"visit-2"}],"schema_version":1}

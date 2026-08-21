@@ -13,7 +13,7 @@ if ! command -v nvidia-smi &> /dev/null; then
     echo "✗ nvidia-smi 不可用"
     exit 1
 fi
-nvidia-smi --query-gpu=index,name,memory.total,memory.free,utilization.gpu --format=csv,noheader | head -2
+nvidia-smi --query-gpu=index,name,memory.total,memory.free,utilization.gpu --format=csv,noheader | head -n 4 || true
 echo "✓ CUDA 可用"
 echo ""
 

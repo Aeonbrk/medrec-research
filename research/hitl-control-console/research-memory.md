@@ -2,7 +2,7 @@
 
 ## Current state
 
-The project now has immutable scientific records, Action Gate, H1/H2, a production decision workbench, declaration-bound durable execution, a fixed server-only ARIS transport, restricted evidence intake, and Decision Packet assembly. The transport is locally implemented and tested but has not been installed or exercised on 319. Remaining uncertainty is scientific and operational authority, not another browser execution API.
+The project now has immutable scientific records, Action Gate, H1/H2, a production decision workbench, declaration-bound durable execution, a fixed server-only remote transport, restricted evidence intake, and Decision Packet assembly. The transport is locally implemented and tested but has not been installed or exercised on 319. Remaining uncertainty is scientific and operational authority, not another browser execution API.
 
 ## Reusable lessons
 
@@ -19,7 +19,7 @@ The project now has immutable scientific records, Action Gate, H1/H2, a producti
 - Source-native reproduction fixes source behavior, including inconvenient seed and checkpoint rules. Compatibility work cannot silently turn into method modification.
 - Testing every H2 enum by overwriting one packet is not coverage; it demonstrates a research-integrity defect. Each packet has one immutable H2, exact retries are idempotent, and action-matrix tests need independent packet identities.
 - Aggregate evidence must be revalidated against the frozen contract at intake. A Decision Packet can expose a raw table only through a digest-checked receipt; missing, malformed, or conflicting receipts must remove GO eligibility rather than leave a summary-only success path.
-- A Git revision does not bind dirty runtime policy. Bind the canonical transport registry, fixed wrapper modules, and queue-manager artifact by digest, then require clean source and ARIS checkouts remotely.
+- A Git revision does not bind dirty runtime policy. Bind the canonical transport registry, fixed wrapper modules, and queue-manager artifact by digest, then require clean source checkouts remotely.
 - PID liveness is not process identity. Cancellation needs start time, process group, and command identity and must fail closed when any binding changes.
 - Transport acknowledgement recovery is not a scientific retry. Reconcile the remote durable state first and increment only when a declared workload attempt is actually created.
 - A recovery button is safe only when the server re-resolves the opaque request against the durable receipt and fixed manifest. Showing a button based on a generic `review_pending` state would conflate operational loss with a scientific exception.
@@ -34,7 +34,7 @@ The project now has immutable scientific records, Action Gate, H1/H2, a producti
 - GAMENet adapter smoke and readiness evidence.
 - Remote/local accepted revision and data-root readiness.
 - Independent production security, UI, research, and code reviews after the remaining implementation. The first code review found and drove the H2 immutability correction.
-- Live ARIS/319 submission, monitor, recovery/cancellation receipts, and actual canary evidence. The fixed wrapper exists locally but is not authorized or verified remotely.
+- Live 319 submission, monitor, recovery/cancellation receipts, and actual canary evidence. The fixed wrapper exists locally but is not authorized or verified remotely.
 - Public-safe curves when an authorized evidence source supplies them; no curve may be inferred from aggregate summaries.
 
 ## Current execution semantics
@@ -51,9 +51,9 @@ The project now has immutable scientific records, Action Gate, H1/H2, a producti
 - Restricted intake validates model/source/interval/conclusion bindings, stores only aggregate-safe receipt rows, and makes receipt integrity part of H2 GO eligibility.
 - `monitor-apply` and `evidence-intake` are bounded local ingress commands over those validators. They never call remote preflight or let the browser name an input path.
 - AI contract assistance is advisory: only fixed `draft`/`challenge` operations reach the local Codex bridge, the bridge is opt-in and read-only, output is bounded, and no AI response can write H1.
-- ARIS startup validates only a clean `main` candidate with an immutable HEAD and, when present, the local `origin/main` candidate ref. Candidate failure writes a public-safe fallback record and prevents startup; a valid candidate is atomically activated and its digest is included in project authorities.
+- Startup validates clean repository revision and includes its digest in project authorities.
 - Declaration dispatch derives target, revision, environment, resource, launch, and evidence identities from the registered declaration. The sealed browser-safe manifest carries only identities and digests; the server-only transport registry owns SSH, command, path, Conda, and GPU values.
-- GAMENet no longer carries `aris-transport-contract-missing`; the other four lanes retain it because their launch templates are unverified. GAMENet still remains blocked by license, environment, adapter, remote revision, and data readiness.
+- GAMENet still remains blocked by license, environment, adapter, remote revision, and data readiness.
 
 ## Recent lessons
 
@@ -61,7 +61,6 @@ The project now has immutable scientific records, Action Gate, H1/H2, a producti
 - A durable queue's recovery control needs an explicit ownership boundary between SSE refresh and human retry. Once transport recovery is visible, background replay must not erase that state before H can act.
 - Independent review cannot collapse GAMENet source identities. SafeDrug-main and original-GAMENet revisions are distinct authority domains; seed `1203` does not bridge them.
 - `protected` is an integrity/provenance term in the current contract, not a confidentiality guarantee. Opt-in local AI must remain public-safe, and confidentiality would require a separate contract field and enforcement boundary.
-- ARIS queue state is reusable evidence, not an API guarantee. A free-form manifest plus SSH recipe does not bind target, paths, cancellation, authorization, or evidence return strongly enough for production automation.
 - GAMENet evidence is source-specific. Original-source seed/checkpoint/license observations cannot be transferred to the SafeDrug derivative without attributable evidence and an explicit H source decision.
 - H selected SafeDrug-main `88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a`; immutable source bytes confirm seed and checkpoint semantics, while the missing attributable license and the upstream main-versus-paper warning remain explicit blockers.
 - Per-request OS locks are required on both Mac control state and remote runtime state. Atomic JSON replacement alone does not make a read-check-start sequence idempotent.

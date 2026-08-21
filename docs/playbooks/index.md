@@ -4,7 +4,7 @@ Choose the playbook that owns the operation. The protocol and architecture docum
 
 | Task | Playbook |
 | --- | --- |
-| Move a research question through ARIS to accepted evidence | [`ARIS_RESEARCH_WORKFLOW.md`](ARIS_RESEARCH_WORKFLOW.md) |
+| Move a research question through evidence gates to accepted evidence | [`RESEARCH_WORKFLOW.md`](RESEARCH_WORKFLOW.md) |
 | Audit, register, adapt, and qualify a baseline | [`BASELINE_INTEGRATION_PLAYBOOK.md`](BASELINE_INTEGRATION_PLAYBOOK.md) |
 | Publish status or run the local action-request harness | [`PROJECT_STATUS_HARNESS_PLAYBOOK.md`](PROJECT_STATUS_HARNESS_PLAYBOOK.md) |
 | Locate or create restricted local data without putting it in Git | [`LOCAL_DATA_ROOT_PLAYBOOK.md`](LOCAL_DATA_ROOT_PLAYBOOK.md) |

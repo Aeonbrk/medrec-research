@@ -67,7 +67,7 @@ The current modules have correct individual record validation but leave cross-re
 - A1. Research steward supplies Selection Acceptance as durable provenance without becoming the selection authority.
 - A2. Status publisher provides current public-safe records and receives a deterministic blocked projection when authority drifts.
 - A3. Harness reader requests one currently permitted action using only an opaque request identifier.
-- A4. Future ARIS consumer receives a fully bound Action Request but remains the only execution owner.
+- A4. Remote execution consumer receives a fully bound Action Request but remains the only execution owner.
 
 ### Key Flows
 

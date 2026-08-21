@@ -44,9 +44,12 @@ else
 fi
 
 echo ""
-echo "[3/3] 验证安装..."
+echo "[3/3] 验证安装与依赖..."
+pip install dnc rdkit-pypi --quiet 2>/dev/null || true
 python -c "
 import torch
+import dnc
+import rdkit
 print(f'PyTorch: {torch.__version__}')
 print(f'CUDA available: {torch.cuda.is_available()}')
 if torch.cuda.is_available():
@@ -59,4 +62,4 @@ else:
 "
 
 echo ""
-echo "✓ PyTorch 安装成功"
+echo "✓ PyTorch 及依赖环境安装成功"

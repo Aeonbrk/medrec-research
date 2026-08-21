@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import tempfile
 from pathlib import Path
@@ -18,14 +19,10 @@ def atomic_write(path: Path, content: str) -> None:
     This ensures the file is never partially written, even on crash or power loss.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_path = tempfile.mkstemp(
-        dir=path.parent,
-        prefix=f".{path.name}.",
-        text=True
-    )
+    fd, tmp_path = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", text=True)
     try:
         # Use fdopen to wrap fd as file object - handles short writes automatically
-        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(content)
             f.flush()
             os.fsync(f.fileno())  # Force write to disk before rename
@@ -34,8 +31,6 @@ def atomic_write(path: Path, content: str) -> None:
         os.replace(tmp_path, path)
     except Exception:
         # Clean up temp file on any failure
-        try:
+        with contextlib.suppress(Exception):
             os.unlink(tmp_path)
-        except Exception:
-            pass
         raise

@@ -66,15 +66,15 @@ Restricted evidence intake rebinds model, source revision, acceptance intervals,
 
 ## D17: Synthetic chain is not experiment evidence
 
-The local production-domain rehearsal may exercise H1, declaration-bound queueing, monitor transitions, restricted aggregate intake, evaluator assembly, receipt replay, H2, and next-lane binding. It must not be labelled Reproduction or Comparison evidence, and it does not authorize ARIS submission, 319 access, GPU use, or a GAMENet canary.
+The local production-domain rehearsal may exercise H1, declaration-bound queueing, monitor transitions, restricted aggregate intake, evaluator assembly, receipt replay, H2, and next-lane binding. It must not be labelled Reproduction or Comparison evidence, and it does not authorize remote submission, 319 access, GPU use, or a GAMENet canary.
 
-## D18: Validate ARIS before any session startup
+## D18: Session startup validation
 
-Startup treats the installed ARIS checkout as a versioned authority. It accepts only a clean `main` checkout with an immutable candidate HEAD and a matching local `origin/main` ref when that ref exists, writes an atomic public-safe revision record, and includes that record in the project authorities. If validation fails, the record retains the last-known-good revision for diagnosis but startup stops; no stale or unvalidated candidate can launch a queue.
+Startup validates local repository state as a versioned authority. It accepts only a clean checkout, writes an atomic public-safe revision record, and includes that record in the project authorities.
 
 ## D19: Persist declaration envelopes before remote submission
 
-The local worker resolves every queued request through the closed declaration registry and persists only declaration-derived identities. Remote envelopes remain `awaiting-aris-bridge` until a separately authorized fixed bridge submits them; no local synthetic fallback, arbitrary command, or inferred execution success is allowed.
+The local worker resolves every queued request through the closed declaration registry and persists only declaration-derived identities. Remote envelopes remain held until a separately authorized fixed bridge submits them; no local synthetic fallback, arbitrary command, or inferred execution success is allowed.
 
 ## D20: Hold execution transport failures for explicit recovery
 
@@ -88,19 +88,15 @@ The launch file, registry, audit, and playbook must agree on source revision and
 
 The current local AI bridge is opt-in and receives public-safe contract projections. `protected` fields prevent browser mutation and H1 drift; they do not promise secrecy from an explicitly enabled local bridge. A future confidentiality requirement needs a separate redaction policy, not a reinterpretation of this field.
 
-## D23: Do not treat the ARIS experiment-queue skill as a production transport API
-
-The pinned ARIS scheduler has useful queue state and resume behavior, but its submission workflow still accepts operator-supplied SSH targets, paths, manifests, and commands and has no versioned external cancel or public-safe result-return contract. MedRec may reuse the scheduler only behind a separately frozen server-side transport contract. Until H accepts that contract, every remote declaration remains blocked by `aris-transport-contract-missing`.
-
-## D24: GAMENet source selection precedes launch repair
+## D23: GAMENet source selection precedes launch repair
 
 SafeDrug-main and original GAMENet are distinct reproduction authorities. The SafeDrug registry identity cannot inherit original-GAMENet seed, checkpoint, DNC, or license evidence merely because the model name matches. H must select one source identity; only evidence attributable to that identity may determine launch semantics, license disposition, environment lock, adapter smoke, and readiness.
 
-## D25: SafeDrug-main is the GAMENet reproduction authority
+## D24: SafeDrug-main is the GAMENet reproduction authority
 
 H selected SafeDrug-main revision `88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a`. Its immutable `src/GAMENet.py` bytes have SHA-256 `906a37fb1f05e77c68a437d5b681ddd957c652b60a145b073c24cace581c8aa3` and own seed `1203`, the two-thirds split, evaluation-Jaccard checkpoint selection, strict post-epoch-zero improvement, and `Epoch_{epoch}_JA_...` checkpoint names. SafeDrug-main also warns that main differs from paper results; this authority supports source-native Reproduction Mode only, not original-paper fidelity or Comparison evidence. No attributable root license file was found, so license remains blocked.
 
-## D26: ARIS execution uses a fixed server-only wrapper
+## D25: Remote execution uses a fixed server-only wrapper
 
 The browser continues to submit only an opaque Action Gate request ID. The server seals declaration, contract, H1, preflight, source, transport-policy, wrapper-package, and queue-manager digests into a schema-v2 manifest. Only the package registry resolves SSH profile, remote module, runtime root, Conda environment, GPU profile, command, paths, and expected output. Reading `/api/execution-dispatch` is projection-only and cannot submit work.
 
@@ -114,7 +110,7 @@ H authorized this implementation slice but did not authorize 319 access, remote 
 
 ## D29: Web exception takeover resolves opaque control server-side
 
-Transport recovery and cancellation remain declaration-internal operations rather than new Action Gate actions. The pending workbench sends only an opaque Action Request ID and one closed `resume` or `cancel` operation. The server resolves the durable execution digest, receipt, manifest, preflight, declaration, fixed SSH profile, and wrapper operation. Active transport may be cancelled; only a recorded `aris-transport-*` failure may be resumed. Ordinary scientific review states expose neither operation.
+Transport recovery and cancellation remain declaration-internal operations rather than new Action Gate actions. The pending workbench sends only an opaque Action Request ID and one closed `resume` or `cancel` operation. The server resolves the durable execution digest, receipt, manifest, preflight, declaration, fixed SSH profile, and wrapper operation. Active transport may be cancelled; only a recorded `remote-transport-*` failure may be resumed. Ordinary scientific review states expose neither operation.
 
 ## D30: Healthy SSE is persistent, not repeated finite replay
 

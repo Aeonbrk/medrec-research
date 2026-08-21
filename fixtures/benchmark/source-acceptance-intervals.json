@@ -1,1 +1,0 @@
-{"acceptance_intervals":{"average_medication_count":[0.0,1.0],"ddi_rate":[0.0,1.0],"f1":[0.0,1.0],"jaccard":[0.0,1.0],"prauc":[0.0,1.0]},"model_id":"gamenet","required_outcomes":["ddi_rate","jaccard","f1","prauc","average_medication_count"],"schema_version":1,"source_reference":"synthetic-source-target","source_revision":"88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"}

@@ -141,11 +141,9 @@ python -c "import medrec_research; print(medrec_research.__file__)"
 
 ## Submission contract
 
-ARIS submits a frozen run specification from the Mac harness. The remote job records source revision, protocol version, baseline identity and source revision, adapter revision, Dataset Manifest identity, Conda environment identity, seed, GPU assignment, start time, and expected restricted and public-safe outputs.
+Submit a frozen run specification from the Mac harness. The remote job records source revision, protocol version, baseline identity and source revision, adapter revision, Dataset Manifest identity, Conda environment identity, seed, GPU assignment, start time, and expected restricted and public-safe outputs.
 
-The production control-console path uses only the package-owned `aris-transport.toml` registry and `medrec_research.aris_transport_remote` wrapper. A schema-v2 manifest binds declaration, contract, H1, preflight, SafeDrug revision, ARIS revision, transport policy, wrapper package, and queue-manager digests before submission. The wrapper may use the ARIS `experiment-queue` scheduler internally, but the browser and operator do not supply its free-form manifest, SSH target, command, working directory, Conda environment, path, GPU assignment, or expected output.
-
-A manually launched `tmux`, `screen`, or direct scheduler job is outside this production contract. It must not be imported as a successful control-console run or scientific attempt. Never store real run logs or patient-level output in the Git checkout.
+A remote job binds declaration, contract, preflight, baseline source revision, and environment lock before submission. Never store real run logs or patient-level output in the Git checkout.
 
 Check GPU state immediately before launch and assign devices explicitly. Do not select a device from the stale snapshot in this document.
 

@@ -1,4 +1,4 @@
-"""Public interfaces for the MedRec Research Library & Idea Loop System."""
+"""Public interfaces for the MedRec Research Library."""
 
 from .adapters import (
     AdapterError,
@@ -9,7 +9,6 @@ from .adapters import (
     PredictionAdapter,
     ProcessPredictionAdapter,
 )
-from .baseline_team import AgentRole, BaselineTeam
 from .comparison_protocol import (
     AdaptationBudget,
     ComparisonMethodProfile,
@@ -32,9 +31,6 @@ from .dataset import (
 )
 from .errors import ProtocolValidationError
 from .evaluation import EvaluationResult, evaluate_predictions
-from .execution_team import ExecutionTeam
-from .feature_team import FeatureTeam
-from .hitl_decision import Decision, HITLDecisionGate
 from .molerec import MoleRecArtifactBundle, require_bundle_for_stage
 from .prediction import MedicationScore, PredictionRecord
 from .protocol_check import ProtocolCheckRecord
@@ -51,11 +47,7 @@ from .registry import (
     SourceStatus,
 )
 from .remote_executor import JobStatus, RemoteExecutor, SSHConfig
-from .research_orchestrator import ResearchOrchestrator
-from .research_team import ResearchTeam
-from .review_team import ReviewTeam
 from .run_record import ArtifactChecksum, RunParameter, RunParameterValue, RunRecord
-from .team_spawner import TeamSpawner
 
 __all__ = (
     "AdaptationBudget",
@@ -64,12 +56,10 @@ __all__ = (
     "AdapterProcessError",
     "AdapterProtocolError",
     "AdapterTimeoutError",
-    "AgentRole",
     "ArtifactChecksum",
     "BaselineDefinition",
     "BaselineReadiness",
     "BaselineRegistry",
-    "BaselineTeam",
     "ComparisonMethodProfile",
     "ComparisonProfile",
     "ComparisonProtocolV1_1",
@@ -78,13 +68,9 @@ __all__ = (
     "DatasetManifest",
     "DatasetPrivacy",
     "DatasetSplit",
-    "Decision",
     "DecoderClass",
     "DecoderProfile",
     "EvaluationResult",
-    "ExecutionTeam",
-    "FeatureTeam",
-    "HITLDecisionGate",
     "IndependentEvaluationInput",
     "JobStatus",
     "MedicationScore",
@@ -101,9 +87,6 @@ __all__ = (
     "ReferenceConfig",
     "RemoteExecutor",
     "ResearchMode",
-    "ResearchOrchestrator",
-    "ResearchTeam",
-    "ReviewTeam",
     "RunParameter",
     "RunParameterValue",
     "RunRecord",
@@ -112,7 +95,6 @@ __all__ = (
     "SourceIdentity",
     "SourceStatus",
     "SplitName",
-    "TeamSpawner",
     "ThresholdSelectionRule",
     "evaluate_predictions",
     "require_bundle_for_stage",

@@ -6,7 +6,7 @@ Reduce the uncertainty and operational risk between a human research decision an
 
 ## Current problem
 
-The production console now binds an opaque Action Request to a registered declaration, durable queue, fixed server-only ARIS transport, monitor stream, restricted public-safe evidence intake, Decision Packet assembly, and H2. The transport is implemented and tested locally only. The remaining gap is authorized installation and validation on 319 together with the still-blocked scientific authorities. The Base UI workbench organizes the production surface around pending human decisions.
+The production console now binds an opaque Action Request to a registered declaration, durable queue, fixed server-only remote transport, monitor stream, restricted public-safe evidence intake, Decision Packet assembly, and H2. The transport is implemented and tested locally only. The remaining gap is authorized installation and validation on 319 together with the still-blocked scientific authorities. The Base UI workbench organizes the production surface around pending human decisions.
 
 ## Evaluation setting
 
@@ -17,10 +17,9 @@ The production console now binds an opaque Action Request to a registered declar
 
 ## Known failures
 
-- The fixed ARIS wrapper has no authorized 319 deployment or live receipt evidence; local tests never claim remote execution success.
+- The fixed remote wrapper has no authorized 319 deployment or live receipt evidence; local tests never claim remote execution success.
 - A missing, dirty, digest-mismatched, symlink-escaped, or process-identity-mismatched remote authority fails closed into durable review.
 - GAMENet has unresolved license, environment-lock, adapter-smoke, readiness, remote-revision, and data-root gates.
-- ARIS startup now validates and atomically records a clean `main` candidate with last-known-good fallback; a failed candidate prevents startup.
 
 ## Current unknowns
 

@@ -1,3 +1,3 @@
-# Keep ARIS in the control plane
+# Keep the core package independent of workflow frameworks
 
-ARIS orchestrates discovery, protocol, experiments, audits, and claims, but the core Python package does not depend on ARIS. This keeps research workflow provenance without making reusable MedRec computation depend on one agent framework or its traces.
+The core Python package does not depend on any external workflow framework or orchestrator. This keeps research workflow provenance without making reusable MedRec computation depend on one agent framework or its traces.
