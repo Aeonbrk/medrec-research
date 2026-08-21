@@ -99,6 +99,17 @@ The reported revision must equal the accepted experiment-plan revision. A dirty 
 
 The Homebrew `uv` environment belongs only to the Mac harness and public synthetic checks. On 319, each external baseline uses its own Conda environment and process. A separate `medrec-core-evaluator` Conda environment reads restricted Prediction Records, recomputes metrics, and creates candidate Run Records. Never install the core evaluator into a Baseline Environment.
 
+### Known Environment Issues
+
+**PyTorch MKL Symbol Conflict** (2026-08-21): The `medrec-gamenet` environment exhibits `ImportError: undefined symbol: iJIT_NotifyEvent` when importing torch. This is a known Intel MKL library version conflict. Fix:
+
+```bash
+conda activate medrec-gamenet
+conda install -y mkl=2021.4.0 mkl-service=2.4.0 -c conda-forge
+```
+
+Verify the fix before declaring the environment ready for production runs. This pattern may affect other baseline environments using PyTorch 1.8.0 + Conda.
+
 Inspect existing environments and disk before creating one:
 
 ```bash
