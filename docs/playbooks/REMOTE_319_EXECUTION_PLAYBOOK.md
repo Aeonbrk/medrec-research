@@ -2,29 +2,18 @@
 
 The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
 
-## Current snapshot (2026-08-21)
+## Current snapshot (2026-08-22)
 
-**SSH Connection**: ✅ Primary `319-lab` profile works (root access)  
+**SSH Connection**: ✅ Fallback `319-lab-via-server` profile authenticated and verified (root access)  
 **GPU Status**: ✅ 8× NVIDIA GeForce RTX 3090 (24 GiB each), all idle (0% utilization, ~24 GiB free each)  
-**Disk**: ⚠️ `/root/zhb` filesystem at 90% (22T used / 26T total)  
-**Repository**: ✅ `/root/zhb/medrec-research` synced to latest (`4907bbc`, matches local `05e86ed`)  
-**Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured (added to `~/.bashrc`)  
+**Disk**: ✅ `/root/zhb` filesystem has >2.6 TiB free capacity  
+**Repository**: ✅ `/root/zhb/medrec-research` clean checkout on 319  
+**Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured  
 **Data Location**: ✅ MIMIC-III and MIMIC-IV datasets at `/root/zhb/Search/dataset` (symlinked)  
-**Conda Environments**: ⚠️ Only `medrec-gamenet` exists, missing:
+**Conda Environments**: 🔄 `medrec-gamenet` configured for SafeDrug family reproduction (`safedrug`, `retain`, `leap-safedrug`)  
+**Baseline Adapters**: ✅ SafeDrug family runner (`baselines/scripts/run_safedrug_family_319.sh`) and strict result parser (`baselines/scripts/parse_safedrug_family_results.py`) implemented and tested  
 
-- `medrec-safedrug` (spec exists at `environments/safedrug.yml`)
-- `medrec-core-evaluator` (spec needed)
-
-**Baseline Adapters**: ⚠️ Only `gamenet` adapter exists, `safedrug` adapter missing
-
-**Status Summary**: Infrastructure configured, but baseline execution requires:
-
-1. Create SafeDrug conda environment from `environments/safedrug.yml`
-2. Create SafeDrug baseline adapter (similar to `baselines/adapters/gamenet/`)
-3. Clone SafeDrug source repository to remote
-4. Test baseline execution manually before automation
-
-**Recommendation**: Do NOT attempt automated baseline execution yet. The baseline implementation layer (adapters, entrypoints) is incomplete. Current `RemoteExecutor` would fail because there's no `run_safedrug.py` or adapter to call.
+**Status Summary**: SafeDrug family reproduction architecture is verified and ready for 3-GPU concurrent reproduction.
 
 ## Verified snapshot
 

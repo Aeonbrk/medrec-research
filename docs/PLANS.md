@@ -7,6 +7,13 @@
 - **Scope**: extract deterministic value-level CLI helpers and add a remote-only GAMENet Reproduction Mode path with fail-closed source, environment, input-data, GPU, disk, and launch gates.
 - **Execution boundary**: local implementation, synthetic verification, and read-only 319 reconnaissance only. The GAMENet registry entry records observed environment and launcher identities but remains `registered`; this work did not perform a baseline run, remote mutation, environment change, or readiness transition.
 
+## Active: SafeDrug Family Reproduction (SafeDrug, RETAIN, LEAP-SafeDrug) on 319
+
+- **Status**: active on `2026-08-22`; run-scoped bash runner (`baselines/scripts/run_safedrug_family_319.sh`) and strict result parser (`baselines/scripts/parse_safedrug_family_results.py`) implemented and tested.
+- **Plan**: `docs/plans/2026-08-22-1756-feat-safedrug-family-reproduction-plan.md`.
+- **Scope**: repair shared Conda environment `medrec-gamenet`, execute concurrent 3-GPU Reproduction Mode runs for `safedrug`, `retain`, and `leap-safedrug`, validate 50 training epochs, best checkpoint selection, 10 test rounds, aggregate metrics, and atomic `result.json` Artifact Contract output.
+- **Execution boundary**: execution on 319-wild GPU cluster across 3 distinct physical GPUs; local MacBook terminal serves as harness terminal for verification and intake.
+
 ## Active: 319-wild GAMENet Baseline Reproduction and Execution
 
 - **Status**: active on `2026-08-21`; execution scripts and environment verification tools deployed in `baselines/scripts/`, full execution plan in `docs/playbooks/319-GAMENET-EXECUTION-PLAN.md`.

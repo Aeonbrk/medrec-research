@@ -29,6 +29,9 @@ baseline_id = "safedrug"
 display_name = "SafeDrug (main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "safedrug"]
+adapter_revision = "sha256:622d3b37a4b45ce4cb09e35d14438c0708ff6318c23546ae74aee25560ade791"
+environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -51,6 +54,9 @@ baseline_id = "retain"
 display_name = "RETAIN (SafeDrug main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "retain"]
+adapter_revision = "sha256:622d3b37a4b45ce4cb09e35d14438c0708ff6318c23546ae74aee25560ade791"
+environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -62,6 +68,9 @@ baseline_id = "leap-safedrug"
 display_name = "LEAP (SafeDrug main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "leap-safedrug"]
+adapter_revision = "sha256:622d3b37a4b45ce4cb09e35d14438c0708ff6318c23546ae74aee25560ade791"
+environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"

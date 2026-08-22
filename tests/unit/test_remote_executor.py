@@ -14,36 +14,48 @@ REMOTE_ROOT = "/root/zhb/medrec-research"
 DATA_ROOT = "/root/zhb/medrec-data"
 
 
-def _baseline(*, readiness: str = "smoke_ready") -> BaselineDefinition:
-    readiness_fields = ""
-    if readiness != "registered":
-        readiness_fields = f'''adapter_command = ["python", "adapter.py"]
-adapter_revision = "adapter-0123456789abcdef"
-environment_sha256 = "{ENVIRONMENT_SHA256}"
+ADAPTER_REVISION = "sha256:" + "0" * 64
 
-[[baselines.readiness_evidence]]
-gate = "adapter_smoke"
-artifact_sha256 = "{"1" * 64}"
 
-[[baselines.readiness_evidence]]
-gate = "environment_lock"
-artifact_sha256 = "{"2" * 64}"
-'''
+def _baseline(
+    *,
+    baseline_id: str = "gamenet",
+    readiness: str = "registered",
+    command: list[str] | None = None,
+    adapter_revision: str | None = ADAPTER_REVISION,
+    environment_sha256: str | None = ENVIRONMENT_SHA256,
+    pinned: bool = True,
+) -> BaselineDefinition:
+    cmd = command or (
+        ["bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"]
+        if baseline_id == "gamenet"
+        else ["bash", "baselines/scripts/run_safedrug_family_319.sh", baseline_id]
+    )
+    cmd_toml = str(cmd).replace("'", '"')
+    source_status = "pinned" if pinned else "needs_pin"
+    source_rev = 'revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"' if pinned else ""
+
+    adapter_rev_line = f'adapter_revision = "{adapter_revision}"' if adapter_revision else ""
+    env_line = f'environment_sha256 = "{environment_sha256}"' if environment_sha256 else ""
+
     return BaselineRegistry.from_toml(
-        f'''schema_version = 1
+        f"""schema_version = 1
 
 [[baselines]]
-baseline_id = "gamenet"
-display_name = "GAMENet"
+baseline_id = "{baseline_id}"
+display_name = "{baseline_id}"
 supported_modes = ["reproduction", "comparison"]
 readiness = "{readiness}"
-{readiness_fields}
+adapter_command = {cmd_toml}
+{adapter_rev_line}
+{env_line}
+
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
-status = "pinned"
-'''
-    ).get("gamenet")
+{source_rev}
+status = "{source_status}"
+"""
+    ).get(baseline_id)
 
 
 class ScriptedExecutor(RemoteExecutor):
@@ -71,9 +83,12 @@ class ScriptedExecutor(RemoteExecutor):
             "data-root": "ok",
             "data-input": "ok",
             "launcher": "ok",
+            "launcher-digest": ADAPTER_REVISION,
             "baseline-source-clean": "",
             "baseline-source-revision": "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a",
+            "baseline-inputs": "ok",
             "environment": ENVIRONMENT_SHA256,
+            "environment-imports": "ok",
             "gpu": self.gpu_output,
             "gpu-processes": "",
             "disk": str(200 * 1024 * 1024),
@@ -143,6 +158,7 @@ def test_remote_executor_dry_run_uses_explicit_launcher_without_ssh() -> None:
     assert not submission.preflight_performed
     assert submission.host is None
     assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in submission.command
+    assert f"MEDREC_RUN_ID={submission.session_id}" in submission.command
     assert executor.calls == []
 
 
@@ -165,11 +181,20 @@ def test_primary_connection_failure_uses_only_approved_fallback() -> None:
     ]
 
 
-def test_registered_baseline_fails_before_ssh() -> None:
+def test_undeclared_adapter_fails_before_ssh() -> None:
     executor = ScriptedExecutor()
 
-    with pytest.raises(ProtocolValidationError, match="smoke_ready"):
-        _run(executor, baseline=_baseline(readiness="registered"))
+    with pytest.raises(ProtocolValidationError, match="adapter_command"):
+        _run(executor, baseline=_baseline(command=["custom", "adapter.py"]))
+
+    assert executor.calls == []
+
+
+def test_unpinned_source_fails_before_ssh() -> None:
+    executor = ScriptedExecutor()
+
+    with pytest.raises(ProtocolValidationError, match="pinned"):
+        _run(executor, baseline=_baseline(pinned=False))
 
     assert executor.calls == []
 
@@ -190,9 +215,11 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "data-root",
         "data-input",
         "launcher",
+        "launcher-digest",
         "baseline-source-clean",
         "baseline-source-revision",
         "environment",
+        "environment-imports",
         "gpu",
         "gpu-processes",
         "disk",
@@ -204,18 +231,30 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         if gate in {"source-clean", "baseline-source-clean"}
     }
     assert clean_commands.keys() == {"source-clean", "baseline-source-clean"}
-    assert all(
-        "status --porcelain --untracked-files=all" in command for command in clean_commands.values()
-    )
+    assert "status --porcelain --untracked-files=all" in clean_commands["source-clean"]
+    assert "status --porcelain --untracked-files=no" in clean_commands["baseline-source-clean"]
+    assert "safe.directory" in clean_commands["baseline-source-clean"]
     data_input = next(command for _, command, gate in executor.calls if gate == "data-input")
     assert f"test -d {DATA_ROOT}/mimic-iii" in data_input
     launch = executor.calls[-1][1]
+    assert f"MEDREC_RUN_ID={submission.session_id}" in launch
     assert f"MEDREC_DATA_ROOT={DATA_ROOT}" in launch
     assert "SAFEDRUG_ROOT=/root/zhb/SafeDrug" in launch
     assert "CUDA_VISIBLE_DEVICES=0" in launch
     assert "GPU_ID=" not in launch
     assert "CONDA_ENV=medrec-gamenet" in launch
     assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in launch
+
+
+def test_safedrug_family_profiles_launch_and_preflight() -> None:
+    for profile in ["safedrug", "retain", "leap-safedrug"]:
+        executor = ScriptedExecutor()
+        base = _baseline(baseline_id=profile)
+        sub = _run(executor, baseline=base)
+        assert sub.baseline_id == profile
+        assert sub.session_id.startswith(f"medrec-baseline-{profile}-")
+        assert f"baselines/scripts/run_safedrug_family_319.sh {profile}" in sub.command
+        assert "baseline-inputs" in [gate for _, _, gate in executor.calls]
 
 
 @pytest.mark.parametrize(
@@ -227,9 +266,12 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "data-root",
         "data-input",
         "launcher",
+        "launcher-digest",
         "baseline-source-clean",
         "baseline-source-revision",
+        "baseline-inputs",
         "environment",
+        "environment-imports",
         "gpu",
         "gpu-processes",
         "disk",
@@ -237,9 +279,10 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
 )
 def test_failed_preflight_never_creates_tmux(gate: str) -> None:
     executor = ScriptedExecutor(fail_gate=gate)
+    base = _baseline(baseline_id="safedrug")
 
     with pytest.raises(ProtocolValidationError, match=gate):
-        _run(executor)
+        _run(executor, baseline=base)
 
     assert "tmux-launch" not in [observed for _, _, observed in executor.calls]
 
@@ -253,9 +296,12 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
         ({"data-root": "missing"}, "data-root"),
         ({"data-input": "missing"}, "data-input"),
         ({"launcher": "missing"}, "launcher"),
+        ({"launcher-digest": "sha256:" + "f" * 64}, "adapter digest"),
         ({"baseline-source-clean": "?? untracked.py"}, "baseline-source-clean"),
         ({"baseline-source-revision": "b" * 40}, "baseline-source-revision"),
+        ({"baseline-inputs": "missing"}, "baseline required input"),
         ({"environment": "f" * 64}, "environment"),
+        ({"environment-imports": "failed"}, "environment import probe"),
         ({"gpu": "not,a,valid,report,shape"}, "GPU report is invalid"),
         ({"gpu": "1, GPU-0, 24000, 0"}, "GPU report is invalid"),
         ({"gpu": "0, GPU-0, 24000, 1"}, "GPU is busy"),
@@ -270,7 +316,7 @@ def test_invalid_preflight_result_never_creates_tmux(responses: dict[str, str], 
     executor = ScriptedExecutor(responses=responses)
 
     with pytest.raises(ProtocolValidationError, match=error):
-        _run(executor)
+        _run(executor, baseline=_baseline(baseline_id="safedrug"))
 
     assert "tmux-launch" not in [gate for _, _, gate in executor.calls]
 

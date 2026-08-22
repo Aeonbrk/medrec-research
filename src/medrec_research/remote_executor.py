@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 import secrets
 import shlex
@@ -13,7 +14,7 @@ from pathlib import Path, PurePosixPath
 
 from ._validation import require_int
 from .errors import ProtocolValidationError
-from .registry import BaselineDefinition, BaselineReadiness, ResearchMode
+from .registry import BaselineDefinition, ResearchMode, SourceStatus
 
 APPROVED_319_HOSTS = ("319-lab", "319-lab-via-server")
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40,64}")
@@ -54,6 +55,8 @@ class BaselineLauncher:
     upstream_root: str
     required_data_subdirectory: str
     command: tuple[str, ...]
+    adapter_files: tuple[str, ...] = ()
+    required_inputs: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -88,6 +91,26 @@ class JobStatus:
     log_tail: str
 
 
+_SAFEDRUG_FAMILY_ADAPTER_FILES = (
+    "baselines/scripts/run_safedrug_family_319.sh",
+    "baselines/scripts/parse_safedrug_family_results.py",
+)
+
+_SAFEDRUG_FAMILY_REQUIRED_INPUTS_COMMON = (
+    "data/output/records_final.pkl",
+    "data/output/voc_final.pkl",
+    "data/output/ddi_A_final.pkl",
+)
+
+_SAFEDRUG_REQUIRED_INPUTS = (
+    "data/output/records_final.pkl",
+    "data/output/voc_final.pkl",
+    "data/output/ddi_A_final.pkl",
+    "data/output/ddi_mask_H.pkl",
+    "data/output/atc3toSMILES.pkl",
+)
+
+
 _LAUNCHERS = {
     "gamenet": BaselineLauncher(
         baseline_id="gamenet",
@@ -95,8 +118,54 @@ _LAUNCHERS = {
         upstream_root="/root/zhb/SafeDrug",
         required_data_subdirectory="mimic-iii",
         command=("bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"),
-    )
+        adapter_files=("baselines/scripts/run_gamenet_319.sh",),
+        required_inputs=(),
+    ),
+    "safedrug": BaselineLauncher(
+        baseline_id="safedrug",
+        conda_environment="medrec-gamenet",
+        upstream_root="/root/zhb/SafeDrug",
+        required_data_subdirectory="mimic-iii",
+        command=("bash", "baselines/scripts/run_safedrug_family_319.sh", "safedrug"),
+        adapter_files=_SAFEDRUG_FAMILY_ADAPTER_FILES,
+        required_inputs=_SAFEDRUG_REQUIRED_INPUTS,
+    ),
+    "retain": BaselineLauncher(
+        baseline_id="retain",
+        conda_environment="medrec-gamenet",
+        upstream_root="/root/zhb/SafeDrug",
+        required_data_subdirectory="mimic-iii",
+        command=("bash", "baselines/scripts/run_safedrug_family_319.sh", "retain"),
+        adapter_files=_SAFEDRUG_FAMILY_ADAPTER_FILES,
+        required_inputs=_SAFEDRUG_FAMILY_REQUIRED_INPUTS_COMMON,
+    ),
+    "leap-safedrug": BaselineLauncher(
+        baseline_id="leap-safedrug",
+        conda_environment="medrec-gamenet",
+        upstream_root="/root/zhb/SafeDrug",
+        required_data_subdirectory="mimic-iii",
+        command=("bash", "baselines/scripts/run_safedrug_family_319.sh", "leap-safedrug"),
+        adapter_files=_SAFEDRUG_FAMILY_ADAPTER_FILES,
+        required_inputs=_SAFEDRUG_FAMILY_REQUIRED_INPUTS_COMMON,
+    ),
 }
+
+
+def compute_adapter_digest(repo_root: Path | str, files: tuple[str, ...]) -> str:
+    """Compute deterministic SHA-256 digest for adapter files."""
+    root = Path(repo_root)
+    if len(files) == 1:
+        hasher = hashlib.sha256()
+        hasher.update((root / files[0]).read_bytes())
+        return f"sha256:{hasher.hexdigest()}"
+    hasher = hashlib.sha256()
+    for rel_path in files:
+        file_path = root / rel_path
+        hasher.update(rel_path.encode("utf-8"))
+        hasher.update(b"\0")
+        hasher.update(file_path.read_bytes())
+        hasher.update(b"\0")
+    return f"sha256:{hasher.hexdigest()}"
 
 
 class RemoteExecutor:
@@ -161,7 +230,6 @@ class RemoteExecutor:
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
         )
-        self._require_readiness(baseline)
         host = self._select_host()
 
         quoted_remote_root = shlex.quote(remote_root)
@@ -200,31 +268,63 @@ class RemoteExecutor:
         ):
             raise ProtocolValidationError("remote data-input check failed")
 
-        launcher_path = PurePosixPath(remote_root) / launcher.command[1]
-        if (
-            self.ssh(
-                host,
-                f"test -f {shlex.quote(str(launcher_path))} && printf ok",
-                gate="launcher",
+        # Verify adapter files exist on remote and match declared adapter_revision digest
+        adapter_check_cmd = (
+            " && ".join(
+                f"test -f {shlex.quote(str(PurePosixPath(remote_root) / f))}"
+                for f in launcher.adapter_files
             )
-            != "ok"
-        ):
+            + " && printf ok"
+        )
+        if self.ssh(host, adapter_check_cmd, gate="launcher") != "ok":
             raise ProtocolValidationError("remote launcher check failed")
 
+        recompute_script = (
+            "import hashlib, sys; from pathlib import Path; "
+            "root = Path(sys.argv[1]); files = sys.argv[2:]; "
+            "hasher = hashlib.sha256(); "
+            "if len(files) == 1: "
+            "    hasher.update((root / files[0]).read_bytes()); "
+            "else: "
+            "    for rel in files: "
+            "        p = root / rel; "
+            "        hasher.update(rel.encode('utf-8')); hasher.update(b'\\0'); "
+            "        hasher.update(p.read_bytes()); hasher.update(b'\\0'); "
+            "print('sha256:' + hasher.hexdigest())"
+        )
+        cmd_parts = ["python3", "-c", recompute_script, remote_root, *launcher.adapter_files]
+        remote_adapter_digest = self.ssh(host, shlex.join(cmd_parts), gate="launcher-digest")
+        if remote_adapter_digest != baseline.adapter_revision:
+            raise ProtocolValidationError(
+                "remote adapter digest does not match declared adapter_revision"
+            )
+
         quoted_upstream_root = shlex.quote(launcher.upstream_root)
+        upstream_clean_cmd = f"git -c safe.directory={quoted_upstream_root} -C {quoted_upstream_root} status --porcelain --untracked-files=no"
         if self.ssh(
             host,
-            f"git -C {quoted_upstream_root} status --porcelain --untracked-files=all",
+            upstream_clean_cmd,
             gate="baseline-source-clean",
         ):
             raise ProtocolValidationError("remote baseline-source-clean check failed")
         observed_baseline_revision = self.ssh(
             host,
-            f"git -C {quoted_upstream_root} rev-parse HEAD",
+            f"git -c safe.directory={quoted_upstream_root} -C {quoted_upstream_root} rev-parse HEAD",
             gate="baseline-source-revision",
         )
         if observed_baseline_revision != baseline.source.revision:
             raise ProtocolValidationError("remote baseline-source-revision check failed")
+
+        if launcher.required_inputs:
+            inputs_check_cmd = (
+                " && ".join(
+                    f"test -f {shlex.quote(str(PurePosixPath(launcher.upstream_root) / f))} && ! test -L {shlex.quote(str(PurePosixPath(launcher.upstream_root) / f))}"
+                    for f in launcher.required_inputs
+                )
+                + " && printf ok"
+            )
+            if self.ssh(host, inputs_check_cmd, gate="baseline-inputs") != "ok":
+                raise ProtocolValidationError("remote baseline required input files check failed")
 
         environment_command = (
             "source /root/anaconda3/etc/profile.d/conda.sh && "
@@ -234,6 +334,21 @@ class RemoteExecutor:
         observed_environment = self.ssh(host, environment_command, gate="environment")
         if observed_environment != baseline.environment_sha256:
             raise ProtocolValidationError("remote environment check failed")
+
+        import_probe_cmd = (
+            "source /root/anaconda3/etc/profile.d/conda.sh && "
+            f"conda activate {shlex.quote(launcher.conda_environment)} && "
+            f"CUDA_VISIBLE_DEVICES={gpu_index} python -c "
+            + shlex.quote(
+                f"import sys; sys.path.insert(0, '{launcher.upstream_root}/src'); "
+                "import torch, dnc, rdkit, pandas, dill, sklearn, models, util; "
+                "assert torch.cuda.is_available(), 'CUDA not available'; "
+                "assert torch.cuda.device_count() == 1, 'Expected exactly 1 visible CUDA device'; "
+                "print('ok')"
+            )
+        )
+        if self.ssh(host, import_probe_cmd, gate="environment-imports") != "ok":
+            raise ProtocolValidationError("remote environment import probe failed")
 
         gpu_output = self.ssh(
             host,
@@ -304,14 +419,15 @@ class RemoteExecutor:
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
         )
+        session_id = (
+            f"medrec-baseline-{baseline.baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
+        )
         command = self._launch_command(
             launcher,
             remote_root=remote_root,
             data_root=data_root,
             gpu_index=gpu_index,
-        )
-        session_id = (
-            f"medrec-baseline-{baseline.baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
+            run_id=session_id,
         )
         if dry_run:
             return RemoteSubmission(
@@ -466,15 +582,33 @@ class RemoteExecutor:
         data_path = PurePosixPath(data_root)
         if data_path == repository_path or repository_path in data_path.parents:
             raise ProtocolValidationError("data_root must be outside remote_root")
+        self._validate_declaration(baseline, launcher)
         return launcher, remote_root, data_root
 
     @staticmethod
-    def _require_readiness(baseline: BaselineDefinition) -> None:
-        if baseline.readiness not in {
-            BaselineReadiness.SMOKE_READY,
-            BaselineReadiness.COMPARISON_READY,
-        }:
-            raise ProtocolValidationError("remote submission requires a smoke_ready baseline")
+    def _validate_declaration(baseline: BaselineDefinition, launcher: BaselineLauncher) -> None:
+        if baseline.source.status is not SourceStatus.PINNED or not baseline.source.revision:
+            raise ProtocolValidationError("reproduction launch requires a pinned baseline source")
+        if not _IMMUTABLE_REVISION.fullmatch(baseline.source.revision):
+            raise ProtocolValidationError(
+                "baseline source revision must be an immutable Git revision"
+            )
+        if not baseline.adapter_command or baseline.adapter_command != launcher.command:
+            raise ProtocolValidationError(
+                "baseline adapter_command does not match declared launcher"
+            )
+        if not baseline.adapter_revision or not re.fullmatch(
+            r"sha256:[0-9a-f]{64}", baseline.adapter_revision
+        ):
+            raise ProtocolValidationError(
+                "baseline adapter_revision must be an immutable sha256 digest"
+            )
+        if not baseline.environment_sha256 or not re.fullmatch(
+            r"[0-9a-f]{64}", baseline.environment_sha256
+        ):
+            raise ProtocolValidationError(
+                "baseline environment_sha256 must be a valid 64-hex digest"
+            )
 
     @staticmethod
     def _remote_path(value: str, *, field: str) -> str:
@@ -516,10 +650,12 @@ class RemoteExecutor:
         remote_root: str,
         data_root: str,
         gpu_index: int,
+        run_id: str,
     ) -> str:
         command = shlex.join(
             (
                 "env",
+                f"MEDREC_RUN_ID={run_id}",
                 f"MEDREC_DATA_ROOT={data_root}",
                 f"SAFEDRUG_ROOT={launcher.upstream_root}",
                 f"CUDA_VISIBLE_DEVICES={gpu_index}",

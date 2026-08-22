@@ -247,7 +247,42 @@ def test_project_registry_makes_no_readiness_claims() -> None:
     assert gamenet.environment_sha256 == (
         "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
     )
+    safedrug = registry.get("safedrug")
+    assert safedrug.adapter_command == (
+        "bash",
+        "baselines/scripts/run_safedrug_family_319.sh",
+        "safedrug",
+    )
+    assert safedrug.adapter_revision == (
+        "sha256:622d3b37a4b45ce4cb09e35d14438c0708ff6318c23546ae74aee25560ade791"
+    )
+    assert safedrug.environment_sha256 == (
+        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
+    )
+    retain = registry.get("retain")
+    assert retain.adapter_command == (
+        "bash",
+        "baselines/scripts/run_safedrug_family_319.sh",
+        "retain",
+    )
+    assert retain.adapter_revision == (
+        "sha256:622d3b37a4b45ce4cb09e35d14438c0708ff6318c23546ae74aee25560ade791"
+    )
+    assert retain.environment_sha256 == (
+        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
+    )
     leap = registry.get("leap-safedrug")
     assert leap.display_name == "LEAP (SafeDrug main)"
+    assert leap.adapter_command == (
+        "bash",
+        "baselines/scripts/run_safedrug_family_319.sh",
+        "leap-safedrug",
+    )
+    assert leap.adapter_revision == (
+        "sha256:622d3b37a4b45ce4cb09e35d14438c0708ff6318c23546ae74aee25560ade791"
+    )
+    assert leap.environment_sha256 == (
+        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
+    )
     assert leap.source.status is SourceStatus.PINNED
     assert not leap.is_comparable

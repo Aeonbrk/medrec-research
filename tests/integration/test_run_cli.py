@@ -41,28 +41,35 @@ def _run_args(*, dry_run: bool) -> argparse.Namespace:
 
 
 def test_run_cli_dry_run_prints_explicit_plan_without_preflight() -> None:
-    completed = _cli(
-        "--mode",
-        "reproduction",
-        "--baseline-id",
-        "gamenet",
-        "--gpu",
-        "0",
-        "--min-free-gpu-mib",
-        "20000",
-        "--min-free-disk-gib",
-        "100",
-        "--dry-run",
-    )
+    for baseline_id in ("gamenet", "safedrug", "retain", "leap-safedrug"):
+        completed = _cli(
+            "--mode",
+            "reproduction",
+            "--baseline-id",
+            baseline_id,
+            "--gpu",
+            "0",
+            "--min-free-gpu-mib",
+            "20000",
+            "--min-free-disk-gib",
+            "100",
+            "--dry-run",
+        )
 
-    assert completed.returncode == 0, completed.stderr
-    payload = json.loads(completed.stdout)
-    assert payload["baseline_id"] == "gamenet"
-    assert payload["mode"] == "reproduction"
-    assert payload["host"] is None
-    assert payload["preflight"] == "not_run_dry_run"
-    assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in payload["command"]
-    assert "MEDREC_DATA_ROOT=/root/zhb/medrec-data" in payload["command"]
+        assert completed.returncode == 0, completed.stderr
+        payload = json.loads(completed.stdout)
+        assert payload["baseline_id"] == baseline_id
+        assert payload["mode"] == "reproduction"
+        assert payload["host"] is None
+        assert payload["preflight"] == "not_run_dry_run"
+        if baseline_id == "gamenet":
+            assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in payload["command"]
+        else:
+            assert (
+                f"bash baselines/scripts/run_safedrug_family_319.sh {baseline_id}"
+                in payload["command"]
+            )
+        assert "MEDREC_DATA_ROOT=/root/zhb/medrec-data" in payload["command"]
 
 
 def test_run_parser_uses_documented_319_data_root() -> None:
