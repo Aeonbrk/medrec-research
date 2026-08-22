@@ -5,25 +5,21 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Callable, Sequence
-from datetime import UTC, datetime
+from collections.abc import Sequence
 from hashlib import sha256
 from pathlib import Path
 
-from ._validation import (
-    parse_json_object,
-    require_single_line_public_string,
-    strict_fields,
+from ._validation import parse_json_object
+from .commands import (
+    accept_comparison_command,
+    format_baseline_table,
+    parse_prediction_records,
 )
-from .dataset import DatasetManifest, SplitName
+from .dataset import DatasetManifest
 from .errors import ProtocolValidationError
 from .evaluation import evaluate_predictions
-from .prediction import PredictionRecord
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
-from .run_record import ArtifactChecksum, RunParameter, RunRecord
-
-Clock = Callable[[], datetime]
 
 
 def _positive_integer(value: str) -> int:
@@ -61,9 +57,7 @@ def _reference(args: argparse.Namespace) -> int:
     return 0
 
 
-def _accept_comparison(
-    args: argparse.Namespace, *, clock: Clock = lambda: datetime.now(UTC)
-) -> int:
+def _accept_comparison(args: argparse.Namespace) -> int:
     """Accept and record comparison run."""
     manifest = DatasetManifest.from_json(args.manifest.read_text(encoding="utf-8"))
     registry = BaselineRegistry.from_toml(args.registry.read_text(encoding="utf-8"))
@@ -72,91 +66,28 @@ def _accept_comparison(
         args.predictions.read_text(encoding="utf-8"),
         context="predictions file",
     )
-    strict_fields(
-        raw_predictions, required=("schema_version", "predictions"), context="predictions file"
-    )
-    if raw_predictions.get("schema_version") != 1:
-        raise ProtocolValidationError("predictions schema_version must be 1")
-    prediction_items = raw_predictions.get("predictions")
-    if not isinstance(prediction_items, list):
-        raise ProtocolValidationError("predictions must be a list")
-    records = tuple(PredictionRecord.from_dict(item) for item in prediction_items)
+    records = parse_prediction_records(raw_predictions)
 
     raw_config = parse_json_object(
         args.run_config.read_text(encoding="utf-8"),
         context="comparison run config",
     )
-    strict_fields(
-        raw_config,
-        required=(
-            "schema_version",
-            "protocol_version",
-            "seed",
-            "selection_split",
-            "evaluation_split",
-            "parameters",
-        ),
-        context="comparison run config",
-    )
-
     budget_bytes = args.adaptation_budget.read_bytes()
-    protocol_version = require_single_line_public_string(
-        raw_config.get("protocol_version"), field="protocol_version"
-    )
-    dataset_manifest_sha256 = manifest.manifest_sha256
     adaptation_budget_sha256 = sha256(budget_bytes).hexdigest()
-
-    matching_qualification = next(
-        (
-            q
-            for q in baseline.comparison_qualifications
-            if q.matches(
-                protocol_version=protocol_version,
-                dataset_manifest_sha256=dataset_manifest_sha256,
-                adaptation_budget_sha256=adaptation_budget_sha256,
-            )
-        ),
-        None,
-    )
-    if matching_qualification is None:
-        raise ProtocolValidationError(
-            f"baseline '{args.baseline_id}' is not qualified for comparison under the provided protocol/dataset/budget"
-        )
 
     vocab_lines = [
         line.strip()
         for line in args.medication_vocabulary.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    vocab = tuple(vocab_lines)
-    if vocab != tuple(sorted(vocab)):
-        raise ProtocolValidationError("medication vocabulary must be in canonical sorted order")
-
-    eval_result = evaluate_predictions(records)
-
-    parameters = tuple(
-        RunParameter(name=p["name"], value=p["value"]) for p in raw_config.get("parameters", [])
-    )
-    checksums = (
-        ArtifactChecksum(
-            name="prediction-records",
-            sha256=sha256(args.predictions.read_bytes()).hexdigest(),
-        ),
-    )
-
-    run_record = RunRecord.create(
-        mode="comparison",
-        protocol_version=protocol_version,
+    run_record = accept_comparison_command(
         baseline=baseline,
-        dataset=manifest,
-        seed=int(raw_config["seed"]),
-        selection_split=raw_config["selection_split"],
-        evaluation_split=raw_config["evaluation_split"],
-        parameters=parameters,
-        evaluation=eval_result,
+        manifest=manifest,
+        predictions=records,
+        run_config=raw_config,
+        medication_vocabulary=tuple(vocab_lines),
         adaptation_budget_sha256=adaptation_budget_sha256,
-        artifact_checksums=checksums,
-        evaluation_visit_membership_digest=manifest.split(SplitName.TEST).visit_membership_digest,
+        prediction_artifact_sha256=sha256(args.predictions.read_bytes()).hexdigest(),
     )
     run_record.write(args.output)
     return 0
@@ -168,13 +99,7 @@ def _evaluate(args: argparse.Namespace) -> int:
         args.predictions.read_text(encoding="utf-8"),
         context="predictions file",
     )
-    strict_fields(
-        raw_predictions, required=("schema_version", "predictions"), context="predictions file"
-    )
-    prediction_items = raw_predictions.get("predictions")
-    if not isinstance(prediction_items, list):
-        raise ProtocolValidationError("predictions must be a list")
-    records = tuple(PredictionRecord.from_dict(item) for item in prediction_items)
+    records = parse_prediction_records(raw_predictions)
     eval_result = evaluate_predictions(records)
     output_dict = eval_result.to_dict()
     if args.output:
@@ -191,11 +116,7 @@ def _baseline_list(args: argparse.Namespace) -> int:
         print(f"medrec: error: registry file not found: {registry_path}", file=sys.stderr)
         return 1
     registry = BaselineRegistry.from_toml(registry_path.read_text(encoding="utf-8"))
-    print(f"{'Baseline ID':<20} {'Display Name':<25} {'Readiness':<20} {'Modes'}")
-    print("-" * 80)
-    for b in registry.baselines:
-        modes_str = ", ".join(m.value for m in b.supported_modes)
-        print(f"{b.baseline_id:<20} {b.display_name:<25} {b.readiness.value:<20} {modes_str}")
+    print(format_baseline_table(registry))
     return 0
 
 
