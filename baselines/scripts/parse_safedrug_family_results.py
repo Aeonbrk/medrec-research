@@ -222,7 +222,7 @@ def parse_test_log(log_text: str) -> dict[str, Any]:
     raw_line, pairs = matching_summary_lines[0]
     summary_keys = ["ddi_rate", "jaccard", "avg_f1", "prauc", "avg_medications"]
     upstream_metrics: dict[str, dict[str, float]] = {}
-    for key, (mean_str, std_str) in zip(summary_keys, pairs, strict=True):
+    for key, (mean_str, std_str) in zip(summary_keys, pairs):
         m_val = float(mean_str)
         s_val = float(std_str)
         if not math.isfinite(m_val) or not math.isfinite(s_val):

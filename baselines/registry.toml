@@ -30,7 +30,7 @@ display_name = "SafeDrug (main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "safedrug"]
-adapter_revision = "sha256:6b41609974a6bb9eedc00fb8ee1d9afa90c5ba2c256b03028d4b18357d7d475a"
+adapter_revision = "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
 environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
@@ -55,7 +55,7 @@ display_name = "RETAIN (SafeDrug main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "retain"]
-adapter_revision = "sha256:6b41609974a6bb9eedc00fb8ee1d9afa90c5ba2c256b03028d4b18357d7d475a"
+adapter_revision = "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
 environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
@@ -69,7 +69,7 @@ display_name = "LEAP (SafeDrug main)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
 adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "leap-safedrug"]
-adapter_revision = "sha256:6b41609974a6bb9eedc00fb8ee1d9afa90c5ba2c256b03028d4b18357d7d475a"
+adapter_revision = "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
 environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]

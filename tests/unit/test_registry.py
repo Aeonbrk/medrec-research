@@ -254,7 +254,7 @@ def test_project_registry_makes_no_readiness_claims() -> None:
         "safedrug",
     )
     assert safedrug.adapter_revision == (
-        "sha256:6b41609974a6bb9eedc00fb8ee1d9afa90c5ba2c256b03028d4b18357d7d475a"
+        "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
     )
     assert safedrug.environment_sha256 == (
         "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
@@ -266,7 +266,7 @@ def test_project_registry_makes_no_readiness_claims() -> None:
         "retain",
     )
     assert retain.adapter_revision == (
-        "sha256:6b41609974a6bb9eedc00fb8ee1d9afa90c5ba2c256b03028d4b18357d7d475a"
+        "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
     )
     assert retain.environment_sha256 == (
         "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
@@ -279,7 +279,7 @@ def test_project_registry_makes_no_readiness_claims() -> None:
         "leap-safedrug",
     )
     assert leap.adapter_revision == (
-        "sha256:6b41609974a6bb9eedc00fb8ee1d9afa90c5ba2c256b03028d4b18357d7d475a"
+        "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
     )
     assert leap.environment_sha256 == (
         "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
