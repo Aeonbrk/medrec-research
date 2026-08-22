@@ -66,8 +66,9 @@ def _accept_comparison(args: argparse.Namespace) -> int:
     manifest = DatasetManifest.from_json(args.manifest.read_text(encoding="utf-8"))
     registry = BaselineRegistry.from_toml(args.registry.read_text(encoding="utf-8"))
     baseline = registry.get(args.baseline_id)
+    prediction_bytes = args.predictions.read_bytes()
     raw_predictions = parse_json_object(
-        args.predictions.read_text(encoding="utf-8"),
+        prediction_bytes.decode("utf-8"),
         context="predictions file",
     )
     records = parse_prediction_records(raw_predictions)
@@ -91,7 +92,7 @@ def _accept_comparison(args: argparse.Namespace) -> int:
         run_config=raw_config,
         medication_vocabulary=tuple(vocab_lines),
         adaptation_budget_sha256=adaptation_budget_sha256,
-        prediction_artifact_sha256=sha256(args.predictions.read_bytes()).hexdigest(),
+        prediction_artifact_sha256=sha256(prediction_bytes).hexdigest(),
     )
     run_record.write(args.output)
     return 0
@@ -146,28 +147,8 @@ def _local_source_revision(
             raise ProtocolValidationError("local Git source check failed")
         return completed.stdout.strip()
 
-    repository_root = git("rev-parse", "--show-toplevel")
-    if require_clean:
-        try:
-            completed = runner(
-                [
-                    "git",
-                    "-C",
-                    repository_root,
-                    "status",
-                    "--porcelain",
-                    "--untracked-files=all",
-                ],
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-        except (OSError, subprocess.CalledProcessError) as error:
-            raise ProtocolValidationError("local Git source check failed") from error
-        if completed.returncode != 0:
-            raise ProtocolValidationError("local Git source check failed")
-        if completed.stdout:
-            raise ProtocolValidationError("remote submission requires a clean Git worktree")
+    if require_clean and git("status", "--porcelain", "--untracked-files=all"):
+        raise ProtocolValidationError("remote submission requires a clean Git worktree")
     return git("rev-parse", "HEAD")
 
 
@@ -178,9 +159,10 @@ def _run(
     git_runner: Runner = subprocess.run,
 ) -> int:
     """Plan or submit one remote-only Reproduction Mode baseline run."""
-    if not args.registry.exists():
-        raise ProtocolValidationError("baseline registry file not found")
-    registry = BaselineRegistry.load(args.registry)
+    try:
+        registry = BaselineRegistry.load(args.registry)
+    except FileNotFoundError as error:
+        raise ProtocolValidationError("baseline registry file not found") from error
     try:
         baseline = registry.get(args.baseline_id)
     except KeyError as error:
