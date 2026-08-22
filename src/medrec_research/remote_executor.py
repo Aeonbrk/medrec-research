@@ -281,19 +281,13 @@ class RemoteExecutor:
 
         recompute_script = (
             "import hashlib, sys; from pathlib import Path; "
-            "root = Path(sys.argv[1]); files = sys.argv[2:]; "
-            "hasher = hashlib.sha256(); "
-            "if len(files) == 1: "
-            "    hasher.update((root / files[0]).read_bytes()); "
-            "else: "
-            "    for rel in files: "
-            "        p = root / rel; "
-            "        hasher.update(rel.encode('utf-8')); hasher.update(b'\\0'); "
-            "        hasher.update(p.read_bytes()); hasher.update(b'\\0'); "
+            "root = Path(sys.argv[1]); files = sys.argv[2:]; hasher = hashlib.sha256(); "
+            "[hasher.update((root / files[0]).read_bytes())] if len(files) == 1 else "
+            "[(hasher.update(rel.encode('utf-8')), hasher.update(b'\\x00'), hasher.update((root / rel).read_bytes()), hasher.update(b'\\x00')) for rel in files]; "
             "print('sha256:' + hasher.hexdigest())"
         )
         cmd_parts = ["python3", "-c", recompute_script, remote_root, *launcher.adapter_files]
-        remote_adapter_digest = self.ssh(host, shlex.join(cmd_parts), gate="launcher-digest")
+        remote_adapter_digest = self.ssh(host, shlex.join(cmd_parts), gate="launcher-digest").strip()
         if remote_adapter_digest != baseline.adapter_revision:
             raise ProtocolValidationError(
                 "remote adapter digest does not match declared adapter_revision"
