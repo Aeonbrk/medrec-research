@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from medrec_research import ProtocolValidationError
-from medrec_research.cli import _local_source_revision, _run
+from medrec_research.cli import _build_parser, _local_source_revision, _run
 from medrec_research.remote_executor import RemoteSubmission
 
 PROJECT_ROOT = Path(__file__).parents[2]
@@ -35,7 +35,7 @@ def _run_args(*, dry_run: bool) -> argparse.Namespace:
         min_free_disk_gib=100,
         registry=REGISTRY_PATH,
         remote_root="/root/zhb/medrec-research",
-        data_root="/data/medrec",
+        data_root="/root/zhb/medrec-data",
         dry_run=dry_run,
     )
 
@@ -62,6 +62,27 @@ def test_run_cli_dry_run_prints_explicit_plan_without_preflight() -> None:
     assert payload["host"] is None
     assert payload["preflight"] == "not_run_dry_run"
     assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in payload["command"]
+    assert "MEDREC_DATA_ROOT=/root/zhb/medrec-data" in payload["command"]
+
+
+def test_run_parser_uses_documented_319_data_root() -> None:
+    args = _build_parser().parse_args(
+        [
+            "run",
+            "--mode",
+            "reproduction",
+            "--baseline-id",
+            "gamenet",
+            "--gpu",
+            "0",
+            "--min-free-gpu-mib",
+            "20000",
+            "--min-free-disk-gib",
+            "100",
+        ]
+    )
+
+    assert args.data_root == "/root/zhb/medrec-data"
 
 
 def test_run_cli_rejects_comparison_and_unknown_baseline() -> None:

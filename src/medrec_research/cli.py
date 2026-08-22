@@ -295,7 +295,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument(
         "--data-root",
-        default="/data/medrec",
+        default="/root/zhb/medrec-data",
         help="External 319 data root",
     )
     run.add_argument("--dry-run", action="store_true")

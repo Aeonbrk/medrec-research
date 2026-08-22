@@ -10,7 +10,7 @@ from medrec_research.remote_executor import RemoteExecutor, RemoteSubmission
 LOCAL_REVISION = "a" * 40
 ENVIRONMENT_SHA256 = "e" * 64
 REMOTE_ROOT = "/root/zhb/medrec-research"
-DATA_ROOT = "/data/medrec"
+DATA_ROOT = "/root/zhb/medrec-data"
 
 
 def _baseline(*, readiness: str = "smoke_ready") -> BaselineDefinition:
@@ -46,11 +46,18 @@ status = "pinned"
 
 
 class ScriptedExecutor(RemoteExecutor):
-    def __init__(self, *, fail_gate: str | None = None, gpu_output: str | None = None):
+    def __init__(
+        self,
+        *,
+        fail_gate: str | None = None,
+        gpu_output: str | None = None,
+        responses: dict[str, str] | None = None,
+    ):
         super().__init__()
         self.calls: list[tuple[str, str, str]] = []
         self.fail_gate = fail_gate
         self.gpu_output = gpu_output or "0, GPU-0, 24000, 0"
+        self.responses = responses or {}
 
     def ssh(self, host: str, command: str, *, gate: str) -> str:
         self.calls.append((host, command, gate))
@@ -71,6 +78,7 @@ class ScriptedExecutor(RemoteExecutor):
             "tmux-launch": "",
             "tmux-cleanup": "",
         }
+        outputs.update(self.responses)
         return outputs[gate]
 
 
@@ -187,8 +195,17 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "disk",
         "tmux-launch",
     ]
+    clean_commands = {
+        gate: command
+        for _, command, gate in executor.calls
+        if gate in {"source-clean", "baseline-source-clean"}
+    }
+    assert clean_commands.keys() == {"source-clean", "baseline-source-clean"}
+    assert all(
+        "status --porcelain --untracked-files=all" in command for command in clean_commands.values()
+    )
     launch = executor.calls[-1][1]
-    assert "MEDREC_DATA_ROOT=/data/medrec" in launch
+    assert f"MEDREC_DATA_ROOT={DATA_ROOT}" in launch
     assert "GPU_ID=0" in launch
     assert "CONDA_ENV=medrec-gamenet" in launch
     assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in launch
@@ -217,6 +234,44 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
         _run(executor)
 
     assert "tmux-launch" not in [observed for _, _, observed in executor.calls]
+
+
+@pytest.mark.parametrize(
+    ("responses", "error"),
+    [
+        ({"identity": "not-root"}, "identity"),
+        ({"source-clean": "?? untracked.py"}, "source-clean"),
+        ({"source-revision": "b" * 40}, "source-revision"),
+        ({"data-root": "missing"}, "data-root"),
+        ({"launcher": "missing"}, "launcher"),
+        ({"baseline-source-clean": "?? untracked.py"}, "baseline-source-clean"),
+        ({"baseline-source-revision": "b" * 40}, "baseline-source-revision"),
+        ({"environment": "f" * 64}, "environment"),
+        ({"gpu": "not,a,valid,report,shape"}, "GPU report is invalid"),
+        ({"gpu": "1, GPU-0, 24000, 0"}, "GPU report is invalid"),
+        ({"gpu": "0, GPU-0, 24000, 1"}, "GPU is busy"),
+        ({"gpu": "0, GPU-0, 19999, 0"}, "GPU capacity is insufficient"),
+        ({"gpu-processes": "not-a-gpu-uuid"}, "GPU process report is invalid"),
+        ({"gpu-processes": "GPU-0"}, "GPU is busy"),
+        ({"disk": "not-an-integer"}, "disk report is invalid"),
+        ({"disk": str(99 * 1024 * 1024)}, "disk capacity is insufficient"),
+    ],
+)
+def test_invalid_preflight_result_never_creates_tmux(responses: dict[str, str], error: str) -> None:
+    executor = ScriptedExecutor(responses=responses)
+
+    with pytest.raises(ProtocolValidationError, match=error):
+        _run(executor)
+
+    assert "tmux-launch" not in [gate for _, _, gate in executor.calls]
+
+
+def test_nvidia_idle_process_sentinel_allows_tmux_launch() -> None:
+    executor = ScriptedExecutor(responses={"gpu-processes": "No running processes found"})
+
+    _run(executor)
+
+    assert "tmux-launch" in [gate for _, _, gate in executor.calls]
 
 
 def test_busy_gpu_fails_before_tmux() -> None:

@@ -164,7 +164,7 @@ class RemoteExecutor:
         quoted_remote_root = shlex.quote(remote_root)
         if self.ssh(
             host,
-            f"git -C {quoted_remote_root} status --porcelain",
+            f"git -C {quoted_remote_root} status --porcelain --untracked-files=all",
             gate="source-clean",
         ):
             raise ProtocolValidationError("remote source-clean check failed")
@@ -200,7 +200,7 @@ class RemoteExecutor:
         quoted_upstream_root = shlex.quote(launcher.upstream_root)
         if self.ssh(
             host,
-            f"git -C {quoted_upstream_root} status --porcelain",
+            f"git -C {quoted_upstream_root} status --porcelain --untracked-files=all",
             gate="baseline-source-clean",
         ):
             raise ProtocolValidationError("remote baseline-source-clean check failed")
@@ -238,7 +238,11 @@ class RemoteExecutor:
             "nvidia-smi --query-compute-apps=gpu_uuid --format=csv,noheader",
             gate="gpu-processes",
         )
-        process_uuids = {line.strip() for line in process_output.splitlines() if line.strip()}
+        process_uuids = (
+            set()
+            if process_output.strip() == "No running processes found"
+            else {line.strip() for line in process_output.splitlines() if line.strip()}
+        )
         if any(not _GPU_UUID.fullmatch(value) for value in process_uuids):
             raise ProtocolValidationError("remote GPU process report is invalid")
         if gpu_uuid in process_uuids:
