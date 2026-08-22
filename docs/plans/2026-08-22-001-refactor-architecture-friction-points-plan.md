@@ -53,7 +53,7 @@ This work preserves all four existing CLI commands, adds one remote-only Reprodu
 - **R1: Focused CLI seam.** Extract only deterministic value transformations currently embedded in CLI handlers. File access and terminal output remain in `cli.py`.
 - **R2: Compatibility.** Preserve the existing CLI surface and public-safe Comparison Mode acceptance semantics.
 - **R3: Remote-only submission.** Add no local baseline launcher. Production submission targets only the approved `319-lab` and `319-lab-via-server` SSH aliases and requires remote `root` identity.
-- **R4: Mandatory preflight.** Before creating tmux state, verify local source immutability, remote identity and host-key acceptance, clean exact remote checkout, external data root, registered source identity, baseline readiness, live Conda environment identity, launcher presence, selected GPU capacity, and disk capacity.
+- **R4: Mandatory preflight.** Before creating tmux state, verify local source immutability, remote identity and host-key acceptance, clean exact remote checkout, external data root and required baseline input directory, registered source identity, baseline readiness, live Conda environment identity, launcher presence, selected GPU capacity, and disk capacity.
 - **R5: Explicit launcher.** GAMENet resolves to `bash baselines/scripts/run_gamenet_319.sh gamenet` in the verified remote checkout. Unsupported baselines fail before SSH submission.
 - **R6: Fail-closed security.** Quote every remote argument, reject unapproved hosts and unsafe identifiers, never expose SSH credentials or private remote output, and create no remote state when validation or preflight fails.
 - **R7: Evidence-scaled scope.** Keep Registry and Protocol evaluation deferred until at least two baseline implementations have runnable, mode-relevant evidence.
@@ -63,7 +63,7 @@ This work preserves all four existing CLI commands, adds one remote-only Reprodu
 - **KTD1: Value helpers, not a command framework.** Add a small `commands.py` module for prediction payload parsing, comparison acceptance, and registry table formatting. `reference` already delegates to `run_reference_slice()` and does not need another wrapper.
 - **KTD2: Complete pure-function inputs.** `accept_comparison_command()` receives a `DatasetManifest`, `BaselineDefinition`, parsed `PredictionRecord` values, parsed run-config mapping, the canonical medication vocabulary, adaptation-budget checksum, and prediction-artifact checksum. It returns a `RunRecord` and performs no path I/O.
 - **KTD3: One production target means no target protocol.** Extend `RemoteExecutor` directly. Unit tests inject its command runner or override its SSH boundary; no production `FakeTarget` type is added.
-- **KTD4: Declaration separate from scientific readiness.** A small immutable GAMENet launcher declaration in `remote_executor.py` names its command, Conda environment, and upstream checkout. `BaselineRegistry` remains the authority for source revision, adapter revision, environment checksum, supported mode, and readiness.
+- **KTD4: Declaration separate from scientific readiness.** A small immutable GAMENet launcher declaration in `remote_executor.py` names its command, Conda environment, upstream checkout, and required data subdirectory. `BaselineRegistry` remains the authority for source revision, adapter revision, environment checksum, supported mode, and readiness.
 - **KTD5: Live evidence, not presence checks.** Preflight hashes `conda list --explicit` for the declared environment and compares it with `BaselineDefinition.environment_sha256`; merely finding an environment name is insufficient. It also verifies the upstream checkout revision against `baseline.source.revision`.
 - **KTD6: Reproduction first.** The legacy shell launcher trains and emits native aggregate metrics, not strict Prediction Records. The new command therefore rejects Comparison Mode rather than pretending the output satisfies the Unified Research Protocol.
 
@@ -103,7 +103,7 @@ sequenceDiagram
     U->>S: try 319-lab, then approved fallback
     S->>R: require root and strict host-key acceptance
     S->>R: verify clean HEAD equals local HEAD
-    S->>R: verify external data root and launcher
+    S->>R: verify external data root, required input, and launcher
     S->>R: verify upstream source revision and environment hash
     S->>R: verify selected GPU and disk thresholds
     alt every gate passes
@@ -164,18 +164,19 @@ sequenceDiagram
 
 1. Replace the permissive `SSHConfig` defaults (`319-wild`, username, key, and arbitrary port) with approved alias selection: primary `319-lab`, fallback `319-lab-via-server`. OpenSSH configuration owns user, key, proxy, and port details; repository code stores none of them.
 2. Add strict SSH options `BatchMode=yes`, `ConnectTimeout=10`, and `StrictHostKeyChecking=yes`. Accept a host only when `id -un` returns exactly `root`.
-3. Add one immutable launcher declaration for GAMENet: baseline ID, `medrec-gamenet` Conda environment, `/root/zhb/SafeDrug` upstream root, and argument vector `bash baselines/scripts/run_gamenet_319.sh gamenet` relative to the verified remote repository root.
+3. Add one immutable launcher declaration for GAMENet: baseline ID, `medrec-gamenet` Conda environment, `/root/zhb/SafeDrug` upstream root, required `mimic-iii` data subdirectory, and argument vector `bash baselines/scripts/run_gamenet_319.sh gamenet` relative to the verified remote repository root.
 4. Add a preflight method that accepts the chosen `BaselineDefinition`, local source revision, selected GPU index, remote checkout root, external data root, and explicit minimum free-GPU-memory and free-disk thresholds.
-5. Verify before submission: supported Reproduction Mode; at least `smoke_ready`; immutable adapter revision and environment checksum present; clean remote checkout; exact remote/local revision match; data root exists and is outside the checkout; launcher exists; upstream checkout is clean and matches the registered source revision; declared Conda environment exists; hash of its explicit package export matches `environment_sha256`; selected GPU exists, has utilization 0, has no less than the requested free memory, and has no visible compute process; target filesystem has no less than the requested free space.
+5. Verify before submission: supported Reproduction Mode; at least `smoke_ready`; immutable adapter revision and environment checksum present; clean remote checkout; exact remote/local revision match; data root exists and is outside the checkout; required `mimic-iii` directory and launcher exist; upstream checkout is clean and matches the registered source revision; declared Conda environment exists; hash of its explicit package export matches `environment_sha256`; selected GPU exists, has utilization 0, has no less than the requested free memory, and has no visible compute process; target filesystem has no less than the requested free space.
 6. Return only a small public-safe preflight result containing selected host and verified identifiers. Do not return command output, paths discovered from the environment, process tables, or credentials.
 7. Change `run_baseline()` to accept the verified baseline and explicit launch inputs. It must call preflight itself immediately before creating tmux, so callers cannot submit against a stale or skipped report.
-8. Build the remote command as an argument vector with explicit `MEDREC_DATA_ROOT`, `GPU_ID`, and `CONDA_ENV` values, use `shlex.join()`, and quote the full tmux payload. Remove the fictional Python entrypoint default and deprecated string-generating helpers.
-9. Preserve status polling and result collection only where their current behavior remains valid; do not broaden them into a scheduler API.
+8. Build the remote command as an argument vector with explicit `MEDREC_DATA_ROOT`, `SAFEDRUG_ROOT`, `CUDA_VISIBLE_DEVICES`, and `CONDA_ENV` values, use `shlex.join()`, and quote the full tmux payload. GAMENet receives the selected physical device as its sole visible logical device and continues to use `--cuda 0`.
+9. Give each launch a timestamped random session suffix. If the tmux launch call fails after preflight, attempt cleanup of that new session ID and re-raise the original public-safe failure.
+10. Preserve status polling and result collection only where their current behavior remains valid; do not broaden them into a scheduler API.
 
 **Edge cases:**
 
 - Primary connection failure may try the approved fallback once; wrong identity, host-key failure, or both aliases failing blocks submission.
-- A `registered` baseline, missing launcher declaration, dirty checkout, revision drift, missing data root, environment hash drift, busy GPU, visible compute process, insufficient capacity, or unsafe path blocks before `tmux new-session`.
+- A `registered` baseline, missing launcher declaration, dirty checkout, revision drift, missing data root or required input directory, environment hash drift, busy GPU, visible compute process, insufficient capacity, or unsafe path blocks before `tmux new-session`.
 - SSH or parsing failures become a public-safe `ProtocolValidationError` that names the failed gate without embedding raw remote stderr.
 - `dry_run` resolves and quotes the local declaration but performs no SSH call and reports preflight as not run.
 
@@ -254,6 +255,7 @@ rtk markdownlint '**/*.md' --ignore '.agents/**'
 
 - Search confirms no `LocalTarget`, `ExecutionTarget`, `run_<baseline>.py`, arbitrary host flag, or local baseline subprocess was introduced.
 - Mocked failure tests confirm no tmux command follows a failed preflight gate.
+- A mocked launch failure confirms best-effort cleanup targets only the newly generated session ID.
 - Test command logs confirm no SSH connection was attempted.
 - `git diff --check` passes.
 
@@ -282,3 +284,5 @@ No real-data, baseline Conda, GPU, training, or remote mutation command is part 
 ## Review Record
 
 The mandatory non-interactive document review used coherence, feasibility, product, security, scope, and adversarial lenses. It found no P0 issue and eight blocking P1 themes, all resolved in this revision: prohibited local execution, missing preflight, fictional launcher mapping, incomplete comparison-helper inputs, stale SafeDrug assumptions, unfalsifiable deferred work, hypothetical Web/API consumers, and unnecessary pattern documents. One safe wording correction was auto-applied. Cross-model routes were attempted but returned provider authorization or availability errors, so they contributed no findings and were not retried.
+
+The implementation review added the required data-input gate, bound the verified SafeDrug root and physical GPU into the launch environment, and added best-effort cleanup for an ambiguous tmux launch failure. Read-only 319 reconnaissance supplied the real environment digest but did not produce the environment-lock or adapter-smoke artifacts required for `smoke_ready`. The registry therefore records the observed launcher and environment identities while remaining `registered`. The proposed `ExecutionTarget` correction did not apply: this plan already chooses direct `RemoteExecutor` extension and explicitly excludes `ExecutionTarget`, `LocalTarget`, `RunSpec`, and `RunHandle`.

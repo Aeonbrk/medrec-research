@@ -235,6 +235,18 @@ def test_project_registry_makes_no_readiness_claims() -> None:
 
     assert len(registry.baselines) == 6
     assert {baseline.readiness for baseline in registry.baselines} == {BaselineReadiness.REGISTERED}
+    gamenet = registry.get("gamenet")
+    assert gamenet.adapter_command == (
+        "bash",
+        "baselines/scripts/run_gamenet_319.sh",
+        "gamenet",
+    )
+    assert gamenet.adapter_revision == (
+        "sha256:580f1eebe9bb48c8966d9c616e4f6c65825ee1115f3c4ee30b36676c69136cb1"
+    )
+    assert gamenet.environment_sha256 == (
+        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
+    )
     leap = registry.get("leap-safedrug")
     assert leap.display_name == "LEAP (SafeDrug main)"
     assert leap.source.status is SourceStatus.PINNED

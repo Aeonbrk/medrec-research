@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import secrets
 import shlex
 import subprocess
 from collections.abc import Callable
@@ -51,6 +52,7 @@ class BaselineLauncher:
     baseline_id: str
     conda_environment: str
     upstream_root: str
+    required_data_subdirectory: str
     command: tuple[str, ...]
 
 
@@ -91,6 +93,7 @@ _LAUNCHERS = {
         baseline_id="gamenet",
         conda_environment="medrec-gamenet",
         upstream_root="/root/zhb/SafeDrug",
+        required_data_subdirectory="mimic-iii",
         command=("bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"),
     )
 }
@@ -185,6 +188,17 @@ class RemoteExecutor:
         )
         if self.ssh(host, data_check, gate="data-root") != "ok":
             raise ProtocolValidationError("remote data-root check failed")
+
+        required_data_path = PurePosixPath(data_root) / launcher.required_data_subdirectory
+        if (
+            self.ssh(
+                host,
+                f"test -d {shlex.quote(str(required_data_path))} && printf ok",
+                gate="data-input",
+            )
+            != "ok"
+        ):
+            raise ProtocolValidationError("remote data-input check failed")
 
         launcher_path = PurePosixPath(remote_root) / launcher.command[1]
         if (
@@ -296,7 +310,9 @@ class RemoteExecutor:
             data_root=data_root,
             gpu_index=gpu_index,
         )
-        session_id = f"medrec-baseline-{baseline.baseline_id}-{self._timestamp()}"
+        session_id = (
+            f"medrec-baseline-{baseline.baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
+        )
         if dry_run:
             return RemoteSubmission(
                 baseline_id=baseline.baseline_id,
@@ -315,11 +331,15 @@ class RemoteExecutor:
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
         )
-        self.ssh(
-            result.host,
-            f"tmux new-session -d -s {shlex.quote(session_id)} {shlex.quote(command)}",
-            gate="tmux-launch",
-        )
+        try:
+            self.ssh(
+                result.host,
+                f"tmux new-session -d -s {shlex.quote(session_id)} {shlex.quote(command)}",
+                gate="tmux-launch",
+            )
+        except ProtocolValidationError:
+            self.cleanup_session(session_id, host=result.host)
+            raise
         return RemoteSubmission(
             baseline_id=baseline.baseline_id,
             host=result.host,
@@ -501,7 +521,8 @@ class RemoteExecutor:
             (
                 "env",
                 f"MEDREC_DATA_ROOT={data_root}",
-                f"GPU_ID={gpu_index}",
+                f"SAFEDRUG_ROOT={launcher.upstream_root}",
+                f"CUDA_VISIBLE_DEVICES={gpu_index}",
                 f"CONDA_ENV={launcher.conda_environment}",
                 *launcher.command,
             )

@@ -1,17 +1,17 @@
 # Plans
 
-## Accepted: Architecture Friction-Point Refactor
+## Completed: Architecture Friction-Point Refactor
 
-- **Status**: implementation-ready on `2026-08-22` after mandatory coherence, feasibility, product, security, scope, and adversarial review.
+- **Status**: implemented and review-hardened on `2026-08-22` after coherence, feasibility, product, security, scope, and adversarial review.
 - **Plan**: `docs/plans/2026-08-22-001-refactor-architecture-friction-points-plan.md`.
-- **Scope**: extract deterministic value-level CLI helpers, make the GAMENet remote launcher explicit, and add a remote-only Reproduction Mode submission path with mandatory fail-closed 319 preflight.
-- **Execution boundary**: local implementation and synthetic/mock verification only. The project registry still makes no readiness claims, so this work does not authorize or perform a real baseline run, remote mutation, environment change, or readiness transition.
+- **Scope**: extract deterministic value-level CLI helpers and add a remote-only GAMENet Reproduction Mode path with fail-closed source, environment, input-data, GPU, disk, and launch gates.
+- **Execution boundary**: local implementation, synthetic verification, and read-only 319 reconnaissance only. The GAMENet registry entry records observed environment and launcher identities but remains `registered`; this work did not perform a baseline run, remote mutation, environment change, or readiness transition.
 
 ## Active: 319-wild GAMENet Baseline Reproduction and Execution
 
 - **Status**: active on `2026-08-21`; execution scripts and environment verification tools deployed in `baselines/scripts/`, full execution plan in `docs/playbooks/319-GAMENET-EXECUTION-PLAN.md`.
 - **Plan**: `docs/playbooks/319-GAMENET-EXECUTION-PLAN.md`.
-- **Scope**: configure Conda environment `medrec-gamenet`, resolve PyTorch MKL symbol conflict, run GAMENet on MIMIC-III on 319-wild, collect standardized metrics, and accept comparison Run Records.
+- **Scope**: configure Conda environment `medrec-gamenet`, resolve the PyTorch MKL symbol conflict, run GAMENet on MIMIC-III on 319-wild, and collect upstream aggregate metrics. Prediction Record output and Comparison Mode acceptance remain separate work.
 - **Execution boundary**: execution on 319-wild GPU cluster; local MacBook terminal serves as harness terminal for verification and intake.
 
 ## Completed: Core Toolkit Simplification and ARIS Workflow Layer Strip

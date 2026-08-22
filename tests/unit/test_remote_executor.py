@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shlex
 import subprocess
 
 import pytest
@@ -68,6 +69,7 @@ class ScriptedExecutor(RemoteExecutor):
             "source-clean": "",
             "source-revision": LOCAL_REVISION,
             "data-root": "ok",
+            "data-input": "ok",
             "launcher": "ok",
             "baseline-source-clean": "",
             "baseline-source-revision": "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a",
@@ -186,6 +188,7 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "source-clean",
         "source-revision",
         "data-root",
+        "data-input",
         "launcher",
         "baseline-source-clean",
         "baseline-source-revision",
@@ -204,9 +207,13 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
     assert all(
         "status --porcelain --untracked-files=all" in command for command in clean_commands.values()
     )
+    data_input = next(command for _, command, gate in executor.calls if gate == "data-input")
+    assert f"test -d {DATA_ROOT}/mimic-iii" in data_input
     launch = executor.calls[-1][1]
     assert f"MEDREC_DATA_ROOT={DATA_ROOT}" in launch
-    assert "GPU_ID=0" in launch
+    assert "SAFEDRUG_ROOT=/root/zhb/SafeDrug" in launch
+    assert "CUDA_VISIBLE_DEVICES=0" in launch
+    assert "GPU_ID=" not in launch
     assert "CONDA_ENV=medrec-gamenet" in launch
     assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in launch
 
@@ -218,6 +225,7 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "source-clean",
         "source-revision",
         "data-root",
+        "data-input",
         "launcher",
         "baseline-source-clean",
         "baseline-source-revision",
@@ -243,6 +251,7 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
         ({"source-clean": "?? untracked.py"}, "source-clean"),
         ({"source-revision": "b" * 40}, "source-revision"),
         ({"data-root": "missing"}, "data-root"),
+        ({"data-input": "missing"}, "data-input"),
         ({"launcher": "missing"}, "launcher"),
         ({"baseline-source-clean": "?? untracked.py"}, "baseline-source-clean"),
         ({"baseline-source-revision": "b" * 40}, "baseline-source-revision"),
@@ -283,13 +292,16 @@ def test_busy_gpu_fails_before_tmux() -> None:
     assert "tmux-launch" not in [gate for _, _, gate in executor.calls]
 
 
-def test_launch_failure_does_not_terminate_remote_jobs_automatically() -> None:
+def test_launch_failure_attempts_cleanup_for_the_new_session() -> None:
     executor = ScriptedExecutor(fail_gate="tmux-launch")
 
     with pytest.raises(ProtocolValidationError, match="tmux-launch"):
         _run(executor)
 
-    assert "tmux-cleanup" not in [gate for _, _, gate in executor.calls]
+    assert [gate for _, _, gate in executor.calls[-2:]] == ["tmux-launch", "tmux-cleanup"]
+    launch_parts = shlex.split(executor.calls[-2][1])
+    cleanup_parts = shlex.split(executor.calls[-1][1])
+    assert launch_parts[4] == cleanup_parts[3]
 
 
 @pytest.mark.parametrize("unsafe_path", ["relative/path", "/data/../private", "/data/bad\npath"])

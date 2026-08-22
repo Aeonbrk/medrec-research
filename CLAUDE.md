@@ -11,6 +11,7 @@
 ### 1. caveman Mode - ALWAYS ACTIVE
 
 Apply ultra-compressed communication style to reduce token usage by ~65%:
+
 - Direct, concise responses
 - No conversational filler
 - Technical accuracy maintained
@@ -21,6 +22,7 @@ Apply ultra-compressed communication style to reduce token usage by ~65%:
 ### 2. ponytail Mode - ALWAYS ACTIVE
 
 Force the laziest solution that actually works:
+
 - Minimum code to solve the problem
 - Standard library over dependencies
 - One line before fifty lines
@@ -33,6 +35,7 @@ Force the laziest solution that actually works:
 ### 3. shuorenhua Mode - ALWAYS ACTIVE (for prose)
 
 Remove AI artifacts from any external-facing text:
+
 - Natural human tone
 - No AI clichés or templated phrases
 - Direct language
@@ -46,6 +49,7 @@ Remove AI artifacts from any external-facing text:
 ## Project Context
 
 Medical AI research codebase focused on:
+
 - GAMENet model execution and evaluation
 - ARIS workflow pattern refactoring (active branch: `refactor/strip-workflow-layer`)
 - 319-wild baseline dataset experiments
@@ -59,6 +63,7 @@ Medical AI research codebase focused on:
 - Brainstorms: `docs/brainstorms/`
 
 Import additional rules:
+
 - @~/.claude/CLAUDE.md (global conventions)
 - @~/.claude/RTK.md (token optimization)
 - @.claude/rules/subagent-patterns.md
@@ -70,38 +75,38 @@ Import additional rules:
 
 ### Python Commands
 
-**MUST** use conda base environment:
+Use the project `uv` environment for core Python commands:
+
 ```bash
-conda run -n base python script.py
-conda run -n base pytest
+rtk proxy /opt/homebrew/bin/uv run python script.py
+rtk proxy /opt/homebrew/bin/uv run pytest
 ```
 
 ### Shell Commands
 
 Prefix with `rtk` to reduce token output:
+
 ```bash
 rtk git status
-rtk pytest -q
-rtk python train.py
+rtk proxy /opt/homebrew/bin/uv run pytest -q
 ```
 
 ### Verification
 
-Before completion:
-```bash
-./scripts/verify  # if exists
-```
+Before completion, run the repository gates listed below.
 
 ---
 
 ## Domain Context
 
 ### GAMENet Models
+
 - Plans: `docs/playbooks/gemini-gamenet-plan.md`
 - Baseline scripts: `*-wild.py` in root
 - Known issues: PyTorch MKL symbol conflicts
 
 ### Dataset Conventions
+
 - Primary: 319-wild dataset
 - Preprocessing: See `docs/playbooks/`
 
@@ -112,21 +117,25 @@ Before completion:
 Skills load automatically by context:
 
 ### Code Quality
+
 - `simplify` - After implementation
 - `code-review` - Pre-PR review
 - `ce-simplify-code` - Aggressive simplification
 
 ### Planning
+
 - `ce-brainstorm` - Requirements exploration
 - `ce-plan` - Multi-step task breakdown
 - `research` - Topic investigation
 
 ### Git Workflows
+
 - `ce-commit` - Smart commit messages
 - `ce-commit-push-pr` - Full PR flow
 - `ce-resolve-pr-feedback` - Address reviews
 
 ### Debugging
+
 - `diagnosing-bugs` - Hard bugs loop
 - `ce-debug` - Structured debugging
 
@@ -136,12 +145,14 @@ Skills load automatically by context:
 
 See @.claude/rules/subagent-patterns.md
 
-### Work Directly:
+### Work Directly
+
 - Known files < 500 lines
 - Code you're editing
 - Foundational docs
 
-### Delegate:
+### Delegate
+
 - Cross-directory exploration
 - Large log analysis
 - Parallel verification
@@ -153,20 +164,20 @@ See @.claude/rules/subagent-patterns.md
 See @.claude/rules/verification.md
 
 Before completion:
-1. Run `./scripts/verify`
-2. Type check: `conda run -n base mypy src/`
-3. Lint: `conda run -n base ruff check .`
-4. Tests: `rtk conda run -n base pytest -q`
-5. Markdown: `markdownlint docs/`
+
+1. Lint: `rtk proxy /opt/homebrew/bin/uv run ruff check .`
+2. Format check: `rtk proxy /opt/homebrew/bin/uv run ruff format --check .`
+3. Tests: `rtk proxy /opt/homebrew/bin/uv run pytest -q`
+4. Markdown: `rtk markdownlint '**/*.md' --ignore '.agents/**'`
 
 ---
 
 ## Common Tasks
 
 | Task | Command |
-|------|---------|
-| Run tests | `rtk conda run -n base pytest -q` |
-| Train model | `conda run -n base python train_gamenet.py` |
+| ------ | --------- |
+| Run tests | `rtk proxy /opt/homebrew/bin/uv run pytest -q` |
+| Train model | Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` |
 | Check status | `rtk git status` |
 | Commit | Ask Claude (auto-uses `ce-commit`) |
 | Review code | Ask "review this" (auto-uses `code-review`) |
@@ -175,12 +186,12 @@ Before completion:
 
 ## Anti-Patterns
 
-❌ Python without conda wrapper
+❌ Core Python outside the project `uv` environment
 ❌ Commit without verification
 ❌ Abstractions for single-use code
 ❌ Refactor adjacent code during bug fixes
-❌ Direct pip usage (use conda or document why)
+❌ Direct pip usage (use `uv`; remote baselines use their declared Conda environment)
 
 ---
 
-_Version: 26.24 | Updated: 2026-08-21_
+Version: 26.24 | Updated: 2026-08-22

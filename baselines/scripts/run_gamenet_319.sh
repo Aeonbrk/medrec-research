@@ -11,7 +11,7 @@ BASELINE_NAME="${1:-gamenet}"
 SAFEDRUG_ROOT="${SAFEDRUG_ROOT:-/root/zhb/SafeDrug}"
 MEDREC_DATA_ROOT="${MEDREC_DATA_ROOT:-/data/medrec}"
 CONDA_ENV="${CONDA_ENV:-medrec-gamenet}"
-GPU_ID="${GPU_ID:-0}"
+GPU_ID="${CUDA_VISIBLE_DEVICES:-${GPU_ID:-0}}"
 
 # 输出路径
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
@@ -104,7 +104,7 @@ echo ""
 echo "[Phase 3/4] 训练 GAMENet..."
 cd "${SAFEDRUG_ROOT}/src"
 
-# 设置 GPU
+# GAMENet 的 --cuda 0 指向 CUDA_VISIBLE_DEVICES 中唯一可见的逻辑设备。
 export CUDA_VISIBLE_DEVICES="$GPU_ID"
 
 echo "  开始训练（日志: ${LOG_FILE}）..."
