@@ -1,5 +1,12 @@
 # Plans
 
+## Accepted: Architecture Friction-Point Refactor
+
+- **Status**: implementation-ready on `2026-08-22` after mandatory coherence, feasibility, product, security, scope, and adversarial review.
+- **Plan**: `docs/plans/2026-08-22-001-refactor-architecture-friction-points-plan.md`.
+- **Scope**: extract deterministic value-level CLI helpers, make the GAMENet remote launcher explicit, and add a remote-only Reproduction Mode submission path with mandatory fail-closed 319 preflight.
+- **Execution boundary**: local implementation and synthetic/mock verification only. The project registry still makes no readiness claims, so this work does not authorize or perform a real baseline run, remote mutation, environment change, or readiness transition.
+
 ## Active: 319-wild GAMENet Baseline Reproduction and Execution
 
 - **Status**: active on `2026-08-21`; execution scripts and environment verification tools deployed in `baselines/scripts/`, full execution plan in `docs/playbooks/319-GAMENET-EXECUTION-PLAN.md`.

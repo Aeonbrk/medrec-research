@@ -146,6 +146,22 @@ A remote job binds declaration, contract, preflight, baseline source revision, a
 
 Check GPU state immediately before launch and assign devices explicitly. Do not select a device from the stale snapshot in this document.
 
+The harness exposes a remote-only Reproduction Mode submission command for the declared GAMENet launcher. Inspect the local command without contacting 319 first:
+
+```bash
+rtk proxy /opt/homebrew/bin/uv run medrec-research run \
+  --mode reproduction \
+  --baseline-id gamenet \
+  --gpu 0 \
+  --min-free-gpu-mib 20000 \
+  --min-free-disk-gib 100 \
+  --dry-run
+```
+
+Dry-run validates the registry identity, local Git revision, remote paths, thresholds, and explicit launcher, then reports `preflight: not_run_dry_run`; it does not open SSH or establish readiness. A non-dry invocation first requires a clean local worktree and at least `smoke_ready`, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies the exact clean harness and upstream revisions, external data root, launcher, Conda environment checksum, selected idle GPU, and free disk before creating one tmux session. Any failed gate blocks submission without mutating the checkout, environment, data root, or existing jobs.
+
+The checked-in registry currently leaves every baseline at `registered`, so the command does not yet authorize a real run. The GAMENet launcher preserves upstream Reproduction Mode behavior and emits legacy aggregate output; it cannot feed `accept-comparison` until separate work produces strict Prediction Records and matching Comparison Qualification evidence. The manual checks above remain the operator-level source of truth and must agree with the automated preflight.
+
 ## Monitoring and failure
 
 The Mac harness may poll scheduler state, process state, aggregate progress, disk, and GPU utilization. It must not stream patient rows or raw Prediction Records into local logs.

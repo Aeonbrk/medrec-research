@@ -6,7 +6,9 @@ MedRec Research separates reusable scientific semantics from workflow orchestrat
 
 ```mermaid
 flowchart LR
-    Mac["MacBook Harness Terminal"] -->|"frozen plan + source revision"| Remote["319 Execution Plane"]
+    Mac["MacBook Harness Terminal"] -->|"frozen plan + source revision"| Preflight["Read-only 319 Preflight"]
+    Registry["Baseline Registry"] --> Preflight
+    Preflight -->|"verified declaration + capacity"| Remote["319 Execution Plane"]
     Data["319 Local Data Root"] -->|"local snapshot"| Remote
     Remote -->|"aggregate public-safe evidence"| Mac
     Mac --> Core["MedRec Research Library"]
@@ -26,11 +28,11 @@ flowchart LR
 
 ## Deep modules
 
-The core library exposes a small set of scientific interfaces. Dataset Manifest construction concentrates membership checks, dataset identity, and privacy constraints. Prediction Adapter validation keeps targets in the core and joins target-free wire payloads to eligible visits. Evaluation owns Comparison Mode metrics and edge cases. Run Record creation binds public-safe provenance to authoritative registry and manifest state. The Baseline Registry owns source and smoke readiness; Comparison Qualifications bind later gates to one protocol version, Dataset Manifest, and Adaptation Budget. Comparison Scope owns those identity comparisons.
+The core library exposes a small set of scientific interfaces. Dataset Manifest construction concentrates membership checks, dataset identity, and privacy constraints. Prediction Adapter validation keeps targets in the core and joins target-free wire payloads to eligible visits. Evaluation owns Comparison Mode metrics and edge cases. Run Record creation binds public-safe provenance to authoritative registry and manifest state. The Baseline Registry owns source and smoke readiness; Comparison Qualifications bind later gates to one protocol version, Dataset Manifest, and Adaptation Budget. Comparison Scope owns those identity comparisons. CLI handlers own path I/O and presentation, while `commands.py` holds only deterministic value transformations shared by those handlers.
 
 These modules are deep because callers do not reimplement their invariants. Their public interfaces are the test surface.
 
-The process seam has one production implementation and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface should be invented in advance.
+The process seam has one production implementation and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface should be invented in advance. `RemoteExecutor` is the single remote submission seam: it accepts only approved 319 aliases and declared launchers, performs the read-only preflight immediately before submission, and creates no local execution variant.
 
 ## Scientific modes
 

@@ -58,6 +58,20 @@ You can use `./start-research` or `medrec` / `medrec-research`:
      --output /path/to/run-record.json
    ```
 
+5. **Plan a remote GAMENet reproduction run**:
+
+   ```bash
+   ./start-research run \
+     --mode reproduction \
+     --baseline-id gamenet \
+     --gpu 0 \
+     --min-free-gpu-mib 20000 \
+     --min-free-disk-gib 100 \
+     --dry-run
+   ```
+
+   Dry-run validates the local declaration and prints the explicit 319 command without opening SSH or running remote preflight. Removing `--dry-run` is allowed only for a clean immutable local revision after the registry entry reaches at least `smoke_ready`; the checked-in registry currently leaves every baseline at `registered`, so it authorizes no real submission.
+
 ## Key documents
 
 - [`docs/START_HERE.md`](docs/START_HERE.md): Repository navigation map.
@@ -70,7 +84,7 @@ You can use `./start-research` or `medrec` / `medrec-research`:
 ## Execution model
 
 - **Local MacBook Terminal**: Runs core tests, synthetic fixtures, protocol checks, and public-safe evidence intake.
-- **319 Execution Plane**: Runs real EHR data processing, training, GPU inference, and isolated baseline Conda environments.
+- **319 Execution Plane**: Runs real EHR data processing, training, GPU inference, and isolated baseline Conda environments after the remote submission preflight passes.
 
 ## Data safety
 
