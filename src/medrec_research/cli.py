@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from hashlib import sha256
 from pathlib import Path
 
@@ -20,6 +21,9 @@ from .errors import ProtocolValidationError
 from .evaluation import evaluate_predictions
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
+from .remote_executor import RemoteExecutor
+
+Runner = Callable[..., subprocess.CompletedProcess[str]]
 
 
 def _positive_integer(value: str) -> int:
@@ -120,6 +124,99 @@ def _baseline_list(args: argparse.Namespace) -> int:
     return 0
 
 
+def _local_source_revision(
+    repository: Path,
+    *,
+    require_clean: bool,
+    runner: Runner = subprocess.run,
+) -> str:
+    """Return the immutable local revision without exposing Git output."""
+
+    def git(*arguments: str) -> str:
+        try:
+            completed = runner(
+                ["git", "-C", str(repository), *arguments],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as error:
+            raise ProtocolValidationError("local Git source check failed") from error
+        if completed.returncode != 0:
+            raise ProtocolValidationError("local Git source check failed")
+        return completed.stdout.strip()
+
+    repository_root = git("rev-parse", "--show-toplevel")
+    if require_clean:
+        try:
+            completed = runner(
+                [
+                    "git",
+                    "-C",
+                    repository_root,
+                    "status",
+                    "--porcelain",
+                    "--untracked-files=all",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as error:
+            raise ProtocolValidationError("local Git source check failed") from error
+        if completed.returncode != 0:
+            raise ProtocolValidationError("local Git source check failed")
+        if completed.stdout:
+            raise ProtocolValidationError("remote submission requires a clean Git worktree")
+    return git("rev-parse", "HEAD")
+
+
+def _run(
+    args: argparse.Namespace,
+    *,
+    executor: RemoteExecutor | None = None,
+    git_runner: Runner = subprocess.run,
+) -> int:
+    """Plan or submit one remote-only Reproduction Mode baseline run."""
+    if not args.registry.exists():
+        raise ProtocolValidationError("baseline registry file not found")
+    registry = BaselineRegistry.load(args.registry)
+    try:
+        baseline = registry.get(args.baseline_id)
+    except KeyError as error:
+        raise ProtocolValidationError(f"baseline '{args.baseline_id}' is not registered") from error
+    source_revision = _local_source_revision(
+        Path.cwd(),
+        require_clean=not args.dry_run,
+        runner=git_runner,
+    )
+    submission = (executor or RemoteExecutor()).run_baseline(
+        baseline,
+        source_revision=source_revision,
+        gpu_index=args.gpu,
+        remote_root=args.remote_root,
+        data_root=args.data_root,
+        min_free_gpu_mib=args.min_free_gpu_mib,
+        min_free_disk_gib=args.min_free_disk_gib,
+        dry_run=args.dry_run,
+    )
+    print(
+        json.dumps(
+            {
+                "baseline_id": submission.baseline_id,
+                "command": submission.command,
+                "host": submission.host,
+                "mode": args.mode,
+                "preflight": ("passed" if submission.preflight_performed else "not_run_dry_run"),
+                "session_id": submission.session_id,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -195,6 +292,32 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Path to registry.toml (default: baselines/registry.toml)",
     )
     list_p.set_defaults(handler=_baseline_list)
+
+    # 5. Remote Reproduction Submission
+    run = commands.add_parser("run", help="Submit a preflight-gated baseline run on 319")
+    run.add_argument("--mode", choices=("reproduction",), required=True)
+    run.add_argument("--baseline-id", required=True)
+    run.add_argument("--gpu", type=_nonnegative_integer, required=True)
+    run.add_argument("--min-free-gpu-mib", type=_positive_integer, required=True)
+    run.add_argument("--min-free-disk-gib", type=_positive_integer, required=True)
+    run.add_argument(
+        "--registry",
+        type=Path,
+        default=Path("baselines/registry.toml"),
+        help="Path to registry.toml (default: baselines/registry.toml)",
+    )
+    run.add_argument(
+        "--remote-root",
+        default="/root/zhb/medrec-research",
+        help="Verified 319 checkout root",
+    )
+    run.add_argument(
+        "--data-root",
+        default="/data/medrec",
+        help="External 319 data root",
+    )
+    run.add_argument("--dry-run", action="store_true")
+    run.set_defaults(handler=_run)
 
     return parser
 
