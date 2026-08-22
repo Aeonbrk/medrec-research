@@ -205,7 +205,8 @@ import hashlib, json, os, sys
 from pathlib import Path
 
 safedrug_root = Path(sys.argv[1])
-required_inputs = sys.argv[2:]
+required_inputs = sys.argv[2:-1]
+out_path = Path(sys.argv[-1])
 hashes = {}
 
 for rel_path in required_inputs:
@@ -219,7 +220,6 @@ for rel_path in required_inputs:
             hasher.update(chunk)
     hashes[rel_path] = hasher.hexdigest()
 
-out_path = Path(sys.argv[len(sys.argv)-1])
 with open(out_path, "w", encoding="utf-8") as f:
     json.dump(hashes, f, indent=2)
 ' "$SAFEDRUG_ROOT" "${REQUIRED_INPUTS[@]}" "$INPUT_HASHES_FILE"
