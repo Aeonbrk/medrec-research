@@ -53,9 +53,9 @@ The core package has no baseline-framework dependency. Baseline processes emit t
 ## Repository layout
 
 ```text
-baselines/      Baseline identities and integration metadata
+baselines/      Baseline identities; archived integration code lands only after audit
 docs/           Decisions, specifications, plans, and operational playbooks
-environments/   Isolated baseline and 319 core-evaluator declarations
+environments/   Verified or explicitly provisional 319 environment declarations
 fixtures/       Public synthetic data only
 research/       Curated Research Memory and Failure Records
 src/            Reusable protocol implementation

@@ -6,7 +6,7 @@ import subprocess
 import pytest
 
 from medrec_research import BaselineDefinition, BaselineRegistry, ProtocolValidationError
-from medrec_research.remote_executor import RemoteExecutor, RemoteSubmission
+from medrec_research.remote_executor import BaselineLauncher, RemoteExecutor, RemoteSubmission
 
 LOCAL_REVISION = "a" * 40
 ENVIRONMENT_SHA256 = "e" * 64
@@ -16,6 +16,24 @@ TEST_BASELINE_REVISION = "1" * 40
 
 
 ADAPTER_REVISION = "sha256:" + "0" * 64
+TEST_RUNNER = "baselines/adapters/safedrug_archived.py"
+TEST_INPUTS = (
+    "data/records_final.pkl",
+    "data/voc_final.pkl",
+    "data/ddi_A_final.pkl",
+)
+
+
+def _launcher(baseline_id: str = "gamenet") -> BaselineLauncher:
+    return BaselineLauncher(
+        baseline_id=baseline_id,
+        conda_environment="medrec-safedrug-archived",
+        upstream_root="/root/zhb/SafeDrug",
+        required_data_subdirectory="mimic-iii",
+        command=("python", TEST_RUNNER, baseline_id),
+        adapter_files=(TEST_RUNNER,),
+        required_inputs=TEST_INPUTS,
+    )
 
 
 def _baseline(
@@ -28,11 +46,7 @@ def _baseline(
     pinned: bool = True,
     source_revision: str = TEST_BASELINE_REVISION,
 ) -> BaselineDefinition:
-    cmd = command or (
-        ["bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"]
-        if baseline_id == "gamenet"
-        else ["bash", "baselines/scripts/run_safedrug_family_319.sh", baseline_id]
-    )
+    cmd = command or list(_launcher(baseline_id).command)
     cmd_toml = str(cmd).replace("'", '"')
     source_status = "pinned" if pinned else "needs_pin"
     source_rev = f'revision = "{source_revision}"' if pinned else ""
@@ -68,7 +82,12 @@ class ScriptedExecutor(RemoteExecutor):
         gpu_output: str | None = None,
         responses: dict[str, str] | None = None,
     ):
-        super().__init__()
+        super().__init__(
+            launchers={
+                baseline_id: _launcher(baseline_id)
+                for baseline_id in ("gamenet", "safedrug", "retain", "leap-safedrug")
+            }
+        )
         self.calls: list[tuple[str, str, str]] = []
         self.fail_gate = fail_gate
         self.gpu_output = gpu_output or "0, GPU-0, 24000, 0"
@@ -126,7 +145,7 @@ def test_ssh_uses_only_approved_alias_and_strict_options() -> None:
         calls.append(argv)
         return subprocess.CompletedProcess(argv, 0, "root\n", "")
 
-    executor = RemoteExecutor(runner=runner)
+    executor = RemoteExecutor(launchers={"gamenet": _launcher()}, runner=runner)
     assert executor.ssh("319-lab", "id -un", gate="identity") == "root"
     assert calls == [
         [
@@ -163,7 +182,7 @@ def test_remote_executor_dry_run_uses_explicit_launcher_without_ssh() -> None:
 
     assert not submission.preflight_performed
     assert submission.host is None
-    assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in submission.command
+    assert f"python {TEST_RUNNER} gamenet" in submission.command
     assert f"MEDREC_RUN_ID={submission.session_id}" in submission.command
     assert executor.calls == []
 
@@ -224,6 +243,7 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "launcher-digest",
         "baseline-source-clean",
         "baseline-source-revision",
+        "baseline-inputs",
         "environment",
         "environment-imports",
         "gpu",
@@ -248,8 +268,8 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
     assert "SAFEDRUG_ROOT=/root/zhb/SafeDrug" in launch
     assert "CUDA_VISIBLE_DEVICES=0" in launch
     assert "GPU_ID=" not in launch
-    assert "CONDA_ENV=medrec-gamenet" in launch
-    assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in launch
+    assert "CONDA_ENV=medrec-safedrug-archived" in launch
+    assert f"python {TEST_RUNNER} gamenet" in launch
 
 
 def test_safedrug_family_profiles_launch_and_preflight() -> None:
@@ -259,7 +279,7 @@ def test_safedrug_family_profiles_launch_and_preflight() -> None:
         sub = _run(executor, baseline=base)
         assert sub.baseline_id == profile
         assert sub.session_id.startswith(f"medrec-baseline-{profile}-")
-        assert f"baselines/scripts/run_safedrug_family_319.sh {profile}" in sub.command
+        assert f"python {TEST_RUNNER} {profile}" in sub.command
         assert "baseline-inputs" in [gate for _, _, gate in executor.calls]
 
 
@@ -372,10 +392,3 @@ def test_remote_paths_must_be_absolute_normalized_values(unsafe_path: str) -> No
         )
 
     assert executor.calls == []
-
-
-def test_remote_executor_parse_progress() -> None:
-    executor = RemoteExecutor()
-    assert executor._parse_progress("") == "Idle / Not started"
-    assert executor._parse_progress("Training Epoch 15/50 in progress...") == "Epoch 15/50"
-    assert executor._parse_progress("Processing batch 100, completed 75%") == "75%"

@@ -48,10 +48,6 @@ _Avoid_: Tuning freedom, fair tuning
 The immutable Unified Research Protocol version, Dataset Manifest identity, and Adaptation Budget identity that delimit one set of comparable qualification and Run Record evidence.
 _Avoid_: Scope digest, comparison context, loose protocol fields
 
-**Live Benchmark Authority**:
-The current correlated Baseline Registry, Comparison Scope, qualification, and accepted evidence records from which a Project Status Snapshot can be derived. It owns no scientific fact beyond those source records.
-_Avoid_: Status input bundle, mutable status state, controller state
-
 **Active Research Home**:
 The sole authoritative location for future research work and newly produced evidence.
 _Avoid_: Working folder, current checkout
@@ -124,54 +120,6 @@ _Avoid_: Baseline Environment, Mac core environment
 The protocol-defined medication prediction and evaluation evidence emitted by a method without exposing its internal representation.
 _Avoid_: Model output, result row
 
-**Selection Result**:
-从当前 Baseline Registry、Comparison Scope 和公开安全资格证据派生的内容寻址选择记录。它不能绕过来源、数据、环境或协议硬门。
-_Avoid_: 运行队列, 实验结论
-
-**Selection Acceptance**:
-The content-addressed steward decision that authorizes one candidate from a current Selection Result to enter Reproduction Characterization. It binds the Selection Result, candidate, reviewer, and issue time without changing selection authority or expiring independently; Live Benchmark Authority drift makes it unusable.
-_Avoid_: Selection Result, launch request, approval note
-
-**Reproduction Characterization**:
-The content-addressed account of repeat Reproduction Mode attempts and predeclared stability evidence for one accepted candidate. It determines a three-state stability result without becoming Comparison Mode evidence.
-_Avoid_: Benchmark result, Run Record, comparison qualification
-
-**Reproduction Stability Policy**:
-The versioned Reproduction Mode rule that declares required attempt identities, expected output IDs, and criteria for stable, failed, or unresolved Reproduction Characterization.
-_Avoid_: Variance rule, benchmark policy, training criterion
-
-**Project Status Snapshot**:
-从 program、audit、registry、Comparison Scope、selection 和 qualification 派生的短时公开安全视图。它不拥有科学事实，authority 漂移或过期时必须 fail closed。
-_Avoid_: 数据库, readiness 权威
-
-**Action Context**:
-The public-safe current action binding derived from a Project Status Snapshot and an explicitly injected Authority Bundle. It identifies one allowable action and remote target or declares that no action is usable; callers submit only an opaque `request_id`.
-_Avoid_: Action Intent, ambient authorization, launch context
-
-**Authority Bundle**:
-调用方显式注入的当前 authority digest、Action Authorization 和 Remote Preflight 集合。动作门不会从环境或远端隐式发现 authority。
-_Avoid_: 环境变量权限, ambient credentials
-
-**Action Request**:
-通过共享动作门后生成的内容寻址请求记录。它描述被允许请求什么，不执行命令、SSH、环境创建或远端作业。
-_Avoid_: Job, launch result
-
-**Project Status Harness**:
-只绑定 `127.0.0.1` 的本地 Web 投影，读取 Project Status Snapshot 并调用共享动作门。它没有数据库、科学写接口或执行面。
-_Avoid_: 319 controller, experiment dashboard
-
-**Remote Preflight Probe**:
-The read-only probe interface executing fixed hardware, environment, and revision checks on the 319 Execution Plane.
-_Avoid_: Remote executor, live session runner
-
-**Research Contract Store**:
-The atomic, immutable persistence and verification authority for H1 Approval and H2 Decision records under the current contract.
-_Avoid_: Contract database, mutable decision state
-
-**Execution Orchestrator**:
-The durable state coordinator that manages queue transitions, worker submission envelopes, manifest sealing, transport failure recovery, and restricted evidence intake.
-_Avoid_: Job runner, execution daemon
-
-**Agent Team Supervisor**:
-The multi-agent coordinator that manages sizing, role assignment, and display modes (tmux, iterm2, in-process) for research tasks according to team composition patterns without bypassing fail-closed human gates.
-_Avoid_: Autonomous PI, unconstrained agent swarm
+**Remote Preflight**:
+The read-only revision, environment, data, GPU, and disk checks performed immediately before a declared 319 submission.
+_Avoid_: Readiness evidence, successful training, remote cleanup

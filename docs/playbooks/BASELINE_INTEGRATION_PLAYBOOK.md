@@ -16,7 +16,7 @@ The active Baseline Registry and explicit Comparison Scope own selection. Do not
 
 ## 3. Reproduce upstream behavior
 
-Create the declared Conda environment and run the pinned source outside this repository. Record preprocessing, split, feature timing, checkpoint selection, thresholding, metric aggregation, random seeds, and working-directory assumptions. This characterizes Reproduction Mode only. Reproduction Characterization is public-safe stability evidence, not a Comparison Mode Run Record. V2 records bind a steward Selection Acceptance and complete `jaccard`, `precision`, `recall`, `f1`, and `mean_medication_count` output observations; missing expected outputs remain unresolved, and V2 cannot open a new lane. The controlled GAMENet V3 record also requires its fixed source revision, `mimic-iii-v1.4`, and exact full seeds `7`, `19`, and `31`; seed `0` remains adapter/environment smoke only. Preserve restricted outputs outside Git.
+Create the declared Conda environment and run the pinned source outside this repository. Record preprocessing, split, feature timing, checkpoint selection, thresholding, metric aggregation, random seeds, and working-directory assumptions. This characterizes Reproduction Mode only and cannot create a Comparison Mode Run Record. Preserve restricted outputs outside Git.
 
 ## 4. Implement the Prediction Adapter
 

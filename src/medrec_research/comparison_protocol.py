@@ -23,9 +23,6 @@ from .errors import ProtocolValidationError
 
 SAFE_DRUG_REPOSITORY = "https://github.com/ycq091044/SafeDrug"
 SAFE_DRUG_ARCHIVED_REVISION = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-MOLEREC_REPOSITORY = "https://github.com/yangnianzu0515/MoleRec"
-MOLEREC_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
-MOLEREC_SAFEDRUG_LINEAGE_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
 
 REQUIRED_OUTCOMES = (
     "ddi_rate",
@@ -255,9 +252,9 @@ class DecoderProfile:
         object.__setattr__(self, "decoder_class", decoder)
         require_sha256(self.baseline_core_sha256, field="decoder.baseline_core_sha256")
         require_identifier(self.data_lineage_revision, field="decoder.data_lineage_revision")
-        if self.data_lineage_revision == MOLEREC_SAFEDRUG_LINEAGE_REVISION:
+        if self.data_lineage_revision != SAFE_DRUG_ARCHIVED_REVISION:
             raise ProtocolValidationError(
-                "MoleRec source-native c7218d0 lineage cannot satisfy Comparison Protocol v1.1"
+                "decoder profiles must use the SafeDrug archived comparison lineage"
             )
         if decoder is DecoderClass.SCORE_THRESHOLD:
             if (
@@ -403,7 +400,7 @@ class IndependentEvaluationInput:
 
 @dataclass(frozen=True, slots=True)
 class ComparisonProtocolV1_1:
-    """Versioned amendment that owns the five-method comparison semantics."""
+    """Versioned amendment that owns shared comparison semantics."""
 
     protocol_version: str = "1.1"
     data_lineage_revision: str = SAFE_DRUG_ARCHIVED_REVISION
@@ -561,20 +558,12 @@ class ComparisonProtocolV1_1:
         return cls.from_dict(parse_json_object(text, context="ComparisonProtocolV1_1"))
 
 
-ComparisonMethodProfile = DecoderProfile
-ComparisonProfile = DecoderProfile
-ProtocolV1_1 = ComparisonProtocolV1_1
-
-
 __all__ = (
     "AdaptationBudget",
-    "ComparisonMethodProfile",
-    "ComparisonProfile",
     "ComparisonProtocolV1_1",
     "DecoderClass",
     "DecoderProfile",
     "IndependentEvaluationInput",
-    "ProtocolV1_1",
     "SelectionSplit",
     "ThresholdSelectionRule",
 )

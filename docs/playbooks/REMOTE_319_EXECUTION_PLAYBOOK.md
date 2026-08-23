@@ -87,16 +87,7 @@ The reported revision must equal the accepted experiment-plan revision. A dirty 
 
 The Homebrew `uv` environment belongs only to the Mac harness and public synthetic checks. On 319, each external baseline uses its own Conda environment and process. A separate `medrec-core-evaluator` Conda environment reads restricted Prediction Records, recomputes metrics, and creates candidate Run Records. Never install the core evaluator into a Baseline Environment.
 
-### Known Environment Issues
-
-**PyTorch MKL Symbol Conflict** (2026-08-21): The `medrec-gamenet` environment exhibits `ImportError: undefined symbol: iJIT_NotifyEvent` when importing torch. This is a known Intel MKL library version conflict. Fix:
-
-```bash
-conda activate medrec-gamenet
-conda install -y mkl=2021.4.0 mkl-service=2.4.0 -c conda-forge
-```
-
-Verify the fix before declaring the environment ready for production runs. This pattern may affect other baseline environments using PyTorch 1.8.0 + Conda.
+Historical SafeDrug-main environment repair details remain in Git history and the historical run summary. They do not define the archived environment. Resolve archived dependencies from the pinned archived source and verified 319 compatibility evidence; do not repair or reuse the old environment by default.
 
 Inspect existing environments and disk before creating one:
 
@@ -151,11 +142,9 @@ After archived declarations exist, dry-run must validate registry identity, loca
 
 The checked-in registry leaves every archived lane at `registered` with no adapter or environment identity. This intentionally blocks both dry and real submission. Do not restore the removed main-oriented declarations; add new identities only after the archived runner and environment are implemented and verified.
 
-### Read-only observation on 2026-08-22
+### Archived implementation gate
 
-The primary alias did not establish a session; the approved fallback reached the expected `root` account. The observed `medrec-gamenet` explicit-package digest is `971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe`, the declared `mimic-iii` directory exists, and preprocessed GAMENet input is present.
-
-Submission remains blocked. The registered SafeDrug source is now `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. That branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`, so the current main-oriented runners cannot train archived code unchanged. Before changing readiness, the remote operator must synchronize clean checkouts, regenerate the archived dataset, verify 6,350 patients, 14,995 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures, audit the minimal training-mode adaptation, then record new adapter and environment evidence.
+Submission remains blocked. The registered SafeDrug source is `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. This branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`. Before changing readiness, synchronize clean checkouts, regenerate the archived dataset, verify 6,350 patients, 14,995 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures, audit the minimal training-mode adaptation, then record new adapter and environment evidence.
 
 ## Monitoring and failure
 

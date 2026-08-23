@@ -57,7 +57,7 @@ def test_run_cli_dry_run_rejects_archived_baselines_without_adapters() -> None:
         )
 
         assert completed.returncode == 2
-        assert "adapter_command" in completed.stderr
+        assert "no declared remote launcher" in completed.stderr
         assert completed.stdout == ""
 
 

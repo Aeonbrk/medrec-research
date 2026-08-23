@@ -12,10 +12,7 @@ from medrec_research import (
     ProtocolValidationError,
     ThresholdSelectionRule,
 )
-from medrec_research.comparison_protocol import (
-    MOLEREC_SAFEDRUG_LINEAGE_REVISION,
-    SAFE_DRUG_ARCHIVED_REVISION,
-)
+from medrec_research.comparison_protocol import SAFE_DRUG_ARCHIVED_REVISION
 
 
 def _budget() -> AdaptationBudget:
@@ -45,10 +42,10 @@ def _score_profile() -> DecoderProfile:
 
 def _structural_profile() -> DecoderProfile:
     return DecoderProfile(
-        method_id="molerec",
+        method_id="gamenet",
         decoder_class=DecoderClass.STRUCTURAL_SEQUENCE,
         baseline_core_sha256="b" * 64,
-        native_decoder="brics-sequence",
+        native_decoder="stop-token",
     )
 
 
@@ -65,7 +62,7 @@ def test_v1_1_protocol_and_profiles_round_trip() -> None:
     assert restored == protocol
     assert protocol.protocol_sha256 == restored.protocol_sha256
     assert protocol.profile_for("retain").decoder_class is DecoderClass.SCORE_THRESHOLD
-    assert protocol.profile_for("molerec").decoder_class is DecoderClass.STRUCTURAL_SEQUENCE
+    assert protocol.profile_for("gamenet").decoder_class is DecoderClass.STRUCTURAL_SEQUENCE
 
     scope = ComparisonScope(
         protocol_version="1.1",
@@ -111,14 +108,14 @@ def test_structural_decoder_cannot_be_mutated_into_threshold_selection() -> None
         )
 
 
-def test_molerec_source_native_lineage_cannot_be_reused_for_comparison() -> None:
-    with pytest.raises(ProtocolValidationError, match="c7218d0"):
+def test_decoder_profile_rejects_non_archived_lineage() -> None:
+    with pytest.raises(ProtocolValidationError, match="archived comparison lineage"):
         DecoderProfile(
-            method_id="molerec",
+            method_id="gamenet",
             decoder_class=DecoderClass.STRUCTURAL_SEQUENCE,
             baseline_core_sha256="b" * 64,
-            data_lineage_revision=MOLEREC_SAFEDRUG_LINEAGE_REVISION,
-            native_decoder="brics-sequence",
+            data_lineage_revision="c7218d0976e5ee5588aeaf5bdbc86b338126bba5",
+            native_decoder="stop-token",
         )
 
 

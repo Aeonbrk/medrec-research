@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import re
 import secrets
 import shlex
@@ -10,7 +9,7 @@ import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path, PurePosixPath
+from pathlib import PurePosixPath
 
 from ._validation import require_int
 from .errors import ProtocolValidationError
@@ -81,93 +80,6 @@ class RemoteSubmission:
     preflight_performed: bool
 
 
-@dataclass(frozen=True, slots=True)
-class JobStatus:
-    """Status snapshot of a remote background tmux job."""
-
-    job_id: str
-    status: str
-    progress: str
-    log_tail: str
-
-
-_SAFEDRUG_FAMILY_ADAPTER_FILES = (
-    "baselines/scripts/run_safedrug_family_319.sh",
-    "baselines/scripts/parse_safedrug_family_results.py",
-)
-
-_SAFEDRUG_FAMILY_REQUIRED_INPUTS_COMMON = (
-    "data/output/records_final.pkl",
-    "data/output/voc_final.pkl",
-    "data/output/ddi_A_final.pkl",
-)
-
-_SAFEDRUG_REQUIRED_INPUTS = (
-    "data/output/records_final.pkl",
-    "data/output/voc_final.pkl",
-    "data/output/ddi_A_final.pkl",
-    "data/output/ddi_mask_H.pkl",
-    "data/output/atc3toSMILES.pkl",
-)
-
-
-_LAUNCHERS = {
-    "gamenet": BaselineLauncher(
-        baseline_id="gamenet",
-        conda_environment="medrec-gamenet",
-        upstream_root="/root/zhb/SafeDrug",
-        required_data_subdirectory="mimic-iii",
-        command=("bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"),
-        adapter_files=("baselines/scripts/run_gamenet_319.sh",),
-        required_inputs=(),
-    ),
-    "safedrug": BaselineLauncher(
-        baseline_id="safedrug",
-        conda_environment="medrec-gamenet",
-        upstream_root="/root/zhb/SafeDrug",
-        required_data_subdirectory="mimic-iii",
-        command=("bash", "baselines/scripts/run_safedrug_family_319.sh", "safedrug"),
-        adapter_files=_SAFEDRUG_FAMILY_ADAPTER_FILES,
-        required_inputs=_SAFEDRUG_REQUIRED_INPUTS,
-    ),
-    "retain": BaselineLauncher(
-        baseline_id="retain",
-        conda_environment="medrec-gamenet",
-        upstream_root="/root/zhb/SafeDrug",
-        required_data_subdirectory="mimic-iii",
-        command=("bash", "baselines/scripts/run_safedrug_family_319.sh", "retain"),
-        adapter_files=_SAFEDRUG_FAMILY_ADAPTER_FILES,
-        required_inputs=_SAFEDRUG_FAMILY_REQUIRED_INPUTS_COMMON,
-    ),
-    "leap-safedrug": BaselineLauncher(
-        baseline_id="leap-safedrug",
-        conda_environment="medrec-gamenet",
-        upstream_root="/root/zhb/SafeDrug",
-        required_data_subdirectory="mimic-iii",
-        command=("bash", "baselines/scripts/run_safedrug_family_319.sh", "leap-safedrug"),
-        adapter_files=_SAFEDRUG_FAMILY_ADAPTER_FILES,
-        required_inputs=_SAFEDRUG_FAMILY_REQUIRED_INPUTS_COMMON,
-    ),
-}
-
-
-def compute_adapter_digest(repo_root: Path | str, files: tuple[str, ...]) -> str:
-    """Compute deterministic SHA-256 digest for adapter files."""
-    root = Path(repo_root)
-    if len(files) == 1:
-        hasher = hashlib.sha256()
-        hasher.update((root / files[0]).read_bytes())
-        return f"sha256:{hasher.hexdigest()}"
-    hasher = hashlib.sha256()
-    for rel_path in files:
-        file_path = root / rel_path
-        hasher.update(rel_path.encode("utf-8"))
-        hasher.update(b"\0")
-        hasher.update(file_path.read_bytes())
-        hasher.update(b"\0")
-    return f"sha256:{hasher.hexdigest()}"
-
-
 class RemoteExecutor:
     """Preflight and submit declared baselines on the approved 319 host."""
 
@@ -175,9 +87,11 @@ class RemoteExecutor:
         self,
         ssh_config: SSHConfig | None = None,
         *,
+        launchers: dict[str, BaselineLauncher] | None = None,
         runner: Runner = subprocess.run,
     ) -> None:
         self.ssh_config = ssh_config or SSHConfig()
+        self._launchers = {} if launchers is None else dict(launchers)
         self._runner = runner
 
     def ssh(self, host: str, command: str, *, gate: str) -> str:
@@ -287,7 +201,9 @@ class RemoteExecutor:
             "print('sha256:' + hasher.hexdigest())"
         )
         cmd_parts = ["python3", "-c", recompute_script, remote_root, *launcher.adapter_files]
-        remote_adapter_digest = self.ssh(host, shlex.join(cmd_parts), gate="launcher-digest").strip()
+        remote_adapter_digest = self.ssh(
+            host, shlex.join(cmd_parts), gate="launcher-digest"
+        ).strip()
         if remote_adapter_digest != baseline.adapter_revision:
             raise ProtocolValidationError(
                 "remote adapter digest does not match declared adapter_revision"
@@ -448,7 +364,7 @@ class RemoteExecutor:
                 gate="tmux-launch",
             )
         except ProtocolValidationError:
-            self.cleanup_session(session_id, host=result.host)
+            self._cleanup_session(session_id, host=result.host)
             raise
         return RemoteSubmission(
             baseline_id=baseline.baseline_id,
@@ -458,73 +374,7 @@ class RemoteExecutor:
             preflight_performed=True,
         )
 
-    def check_status(self, job_id: str, *, host: str) -> JobStatus:
-        """Check a previously submitted tmux session without changing it."""
-        self._validate_job_id(job_id)
-        try:
-            self.ssh(
-                host,
-                f"tmux has-session -t {shlex.quote(job_id)}",
-                gate="status",
-            )
-            status = "running"
-        except ProtocolValidationError:
-            status = "unknown"
-        log_tail = ""
-        if status == "running":
-            try:
-                log_tail = self.ssh(
-                    host,
-                    f"tmux capture-pane -t {shlex.quote(job_id)} -p | tail -n 20",
-                    gate="status",
-                )
-            except ProtocolValidationError:
-                status = "unknown"
-        return JobStatus(
-            job_id=job_id,
-            status=status,
-            progress=self._parse_progress(log_tail),
-            log_tail=log_tail,
-        )
-
-    def collect_results(
-        self,
-        job_id: str,
-        remote_path: str,
-        local_dest: Path,
-        *,
-        host: str,
-    ) -> Path:
-        """Copy an explicitly selected remote artifact through an approved alias."""
-        self._validate_job_id(job_id)
-        if host not in self.ssh_config.hosts or host not in APPROVED_319_HOSTS:
-            raise ProtocolValidationError("remote host must use an approved 319 alias")
-        remote_path = self._remote_path(remote_path, field="remote_path")
-        local_dest.parent.mkdir(parents=True, exist_ok=True)
-        argv = [
-            "scp",
-            "-o",
-            "BatchMode=yes",
-            "-o",
-            f"ConnectTimeout={self.ssh_config.connect_timeout_seconds}",
-            "-o",
-            "StrictHostKeyChecking=yes",
-            f"{host}:{remote_path}",
-            str(local_dest),
-        ]
-        try:
-            self._runner(
-                argv,
-                capture_output=True,
-                text=True,
-                timeout=self.ssh_config.command_timeout_seconds,
-                check=True,
-            )
-        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
-            raise ProtocolValidationError("remote result collection failed") from error
-        return local_dest
-
-    def cleanup_session(self, session_id: str, *, host: str) -> bool:
+    def _cleanup_session(self, session_id: str, *, host: str) -> bool:
         """Best-effort cleanup when a newly created session fails to launch."""
         self._validate_job_id(session_id)
         try:
@@ -558,7 +408,7 @@ class RemoteExecutor:
         min_free_gpu_mib: int,
         min_free_disk_gib: int,
     ) -> tuple[BaselineLauncher, str, str]:
-        launcher = _LAUNCHERS.get(baseline.baseline_id)
+        launcher = self._launchers.get(baseline.baseline_id)
         if launcher is None:
             raise ProtocolValidationError(
                 f"baseline '{baseline.baseline_id}' has no declared remote launcher"
@@ -665,24 +515,12 @@ class RemoteExecutor:
             raise ProtocolValidationError("job_id must be a safe identifier")
 
     @staticmethod
-    def _parse_progress(log_tail: str) -> str:
-        if not log_tail:
-            return "Idle / Not started"
-        matches = re.findall(
-            r"(Epoch\s+\d+/\d+|\b\d+%\b|\d+%|Step\s+\[?\d+/\d+\]?)",
-            log_tail,
-        )
-        return matches[-1] if matches else "Executing"
-
-    @staticmethod
     def _timestamp() -> str:
         return datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
 
 
 __all__ = (
     "APPROVED_319_HOSTS",
-    "BaselineLauncher",
-    "JobStatus",
     "PreflightResult",
     "RemoteExecutor",
     "RemoteSubmission",

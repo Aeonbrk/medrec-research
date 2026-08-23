@@ -58,7 +58,7 @@ You can use `./start-research` or `medrec` / `medrec-research`:
      --output /path/to/run-record.json
    ```
 
-5. **Plan a remote GAMENet reproduction run**:
+5. **Check that archived execution remains blocked before its declarations exist**:
 
    ```bash
    ./start-research run \
@@ -70,7 +70,7 @@ You can use `./start-research` or `medrec` / `medrec-research`:
      --dry-run
    ```
 
-   Dry-run validates the local declaration and prints the explicit 319 command without opening SSH or running remote preflight. Removing `--dry-run` is allowed only for a clean immutable local revision after the registry entry reaches at least `smoke_ready`; the checked-in registry currently leaves every baseline at `registered`, so it authorizes no real submission.
+   The checked-in registry records archived source identity but no launcher or environment. Dry-run therefore fails closed before SSH. After an audited archived adapter and verified environment are added, dry-run will validate and print the explicit 319 command without opening SSH.
 
 ## Key documents
 

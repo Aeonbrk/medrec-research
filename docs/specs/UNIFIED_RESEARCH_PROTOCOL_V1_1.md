@@ -9,10 +9,9 @@ digest; source-native reproduction evidence alone cannot satisfy either field.
 ## Lineage boundary
 
 The Comparison Scope is built from the SafeDrug `archived` paper-reproduction
-lineage at `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. MoleRec's source-native
-preprocessing lineage at `c7218d0976e5ee5588aeaf5bdbc86b338126bba5` remains
-valid only for Reproduction Mode. It cannot be copied into a v1.1 comparison
-qualification.
+lineage at `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. Every method profile must bind
+that lineage; a profile from any other preprocessing lineage is a different
+scope and cannot be copied into a v1.1 comparison qualification.
 
 SafeDrug `main@88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a` is historical
 Reproduction Mode provenance only. It does not define a future Comparison
