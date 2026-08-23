@@ -72,6 +72,10 @@ _Avoid_: Baseline folder list, model zoo
 An external baseline source fixed to an immutable revision from which a Baseline Core can be reproduced.
 _Avoid_: Latest upstream, copied checkout
 
+**Reproduction Program**:
+The harness-owned executable module that preserves one Pinned Baseline Source's recorded upstream semantics, enforces its reproduction gates, and publishes aggregate reproduction evidence. Several model lanes may share one Reproduction Program when they share source, data, environment, and evaluation lineage.
+_Avoid_: Prediction Adapter, runner collection, baseline script
+
 **Local Data Root**:
 The repository-independent local home for restricted EHR inputs, derived datasets, and private experiment outputs.
 _Avoid_: Repository data folder, archived dataset

@@ -14,6 +14,7 @@ from ._validation import (
     require_identifier,
     require_public_string,
     require_sha256,
+    require_string,
     strict_fields,
 )
 from .comparison_scope import ComparisonScope
@@ -270,6 +271,101 @@ class SourceIdentity:
 
 
 @dataclass(frozen=True, slots=True)
+class ReproductionProgram:
+    """One executable upstream-semantics program shared by baseline lanes."""
+
+    program_id: str
+    entrypoint: str
+    conda_environment: str
+    upstream_root: str
+    dataset_subdirectory: str
+    run_subdirectory: str
+    required_inputs: tuple[str, ...]
+    import_modules: tuple[str, ...]
+    environment_sha256: str | None = None
+
+    def __post_init__(self) -> None:
+        require_identifier(self.program_id, field="program_id")
+        for field in (
+            "entrypoint",
+            "conda_environment",
+            "upstream_root",
+            "dataset_subdirectory",
+            "run_subdirectory",
+        ):
+            require_string(getattr(self, field), field=field)
+        entrypoint = Path(self.entrypoint)
+        if entrypoint.is_absolute() or ".." in entrypoint.parts:
+            raise ProtocolValidationError("entrypoint must be a repository-relative path")
+        upstream_root = Path(self.upstream_root)
+        if not upstream_root.is_absolute() or ".." in upstream_root.parts:
+            raise ProtocolValidationError("upstream_root must be an absolute normalized path")
+        for field in ("dataset_subdirectory", "run_subdirectory"):
+            path = Path(getattr(self, field))
+            if path.is_absolute() or ".." in path.parts:
+                raise ProtocolValidationError(f"{field} must be a relative normalized path")
+        for field in ("required_inputs", "import_modules"):
+            values = tuple(require_string(value, field=field) for value in getattr(self, field))
+            if not values or len(values) != len(set(values)):
+                raise ProtocolValidationError(f"{field} must contain unique values")
+            object.__setattr__(self, field, values)
+        if self.environment_sha256 is not None:
+            require_sha256(self.environment_sha256, field="environment_sha256")
+
+    @property
+    def is_319_verified(self) -> bool:
+        return self.environment_sha256 is not None
+
+    def to_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "conda_environment": self.conda_environment,
+            "dataset_subdirectory": self.dataset_subdirectory,
+            "entrypoint": self.entrypoint,
+            "import_modules": list(self.import_modules),
+            "program_id": self.program_id,
+            "required_inputs": list(self.required_inputs),
+            "run_subdirectory": self.run_subdirectory,
+            "upstream_root": self.upstream_root,
+        }
+        if self.environment_sha256 is not None:
+            payload["environment_sha256"] = self.environment_sha256
+        return payload
+
+    @classmethod
+    def from_dict(cls, value: object) -> ReproductionProgram:
+        payload = strict_fields(
+            value,
+            required=(
+                "program_id",
+                "entrypoint",
+                "conda_environment",
+                "upstream_root",
+                "dataset_subdirectory",
+                "run_subdirectory",
+                "required_inputs",
+                "import_modules",
+            ),
+            optional=("environment_sha256",),
+            context="Reproduction Program",
+        )
+        required_inputs = payload["required_inputs"]
+        import_modules = payload["import_modules"]
+        if not isinstance(required_inputs, list) or not isinstance(import_modules, list):
+            raise ProtocolValidationError("Reproduction Program inputs and imports must be lists")
+        return cls(
+            program_id=payload["program_id"],
+            entrypoint=payload["entrypoint"],
+            conda_environment=payload["conda_environment"],
+            upstream_root=payload["upstream_root"],
+            dataset_subdirectory=payload["dataset_subdirectory"],
+            run_subdirectory=payload["run_subdirectory"],
+            required_inputs=tuple(required_inputs),
+            import_modules=tuple(import_modules),
+            environment_sha256=payload.get("environment_sha256"),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class BaselineDefinition:
     """One baseline's source, modes, adapter, and verified readiness."""
 
@@ -281,6 +377,7 @@ class BaselineDefinition:
     adapter_command: tuple[str, ...] = ()
     adapter_revision: str | None = None
     environment_sha256: str | None = None
+    reproduction_program: str | None = None
     readiness_evidence: tuple[ReadinessEvidence, ...] = ()
     comparison_qualifications: tuple[ComparisonQualification, ...] = ()
     archive_evidence: tuple[str, ...] = ()
@@ -320,6 +417,8 @@ class BaselineDefinition:
         object.__setattr__(self, "adapter_revision", adapter_revision)
         if self.environment_sha256 is not None:
             require_sha256(self.environment_sha256, field="environment_sha256")
+        if self.reproduction_program is not None:
+            require_identifier(self.reproduction_program, field="reproduction_program")
         evidence = tuple(
             item if isinstance(item, ReadinessEvidence) else ReadinessEvidence.from_dict(item)
             for item in self.readiness_evidence
@@ -491,6 +590,8 @@ class BaselineDefinition:
             payload["adapter_revision"] = self.adapter_revision
         if self.environment_sha256 is not None:
             payload["environment_sha256"] = self.environment_sha256
+        if self.reproduction_program is not None:
+            payload["reproduction_program"] = self.reproduction_program
         return payload
 
     @classmethod
@@ -510,6 +611,7 @@ class BaselineDefinition:
                 "archive_evidence",
                 "comparison_qualifications",
                 "environment_sha256",
+                "reproduction_program",
                 "readiness_evidence",
             ),
             context="baseline",
@@ -538,6 +640,7 @@ class BaselineDefinition:
             adapter_command=tuple(command),
             adapter_revision=payload.get("adapter_revision"),
             environment_sha256=payload.get("environment_sha256"),
+            reproduction_program=payload.get("reproduction_program"),
             readiness_evidence=tuple(ReadinessEvidence.from_dict(item) for item in evidence),
             comparison_qualifications=tuple(
                 ComparisonQualification.from_dict(item) for item in qualifications
@@ -553,6 +656,7 @@ class BaselineRegistry:
     SCHEMA_VERSION: ClassVar[int] = 1
 
     baselines: tuple[BaselineDefinition, ...]
+    reproduction_programs: tuple[ReproductionProgram, ...] = ()
 
     def __post_init__(self) -> None:
         baselines = tuple(
@@ -563,7 +667,29 @@ class BaselineRegistry:
         )
         if len({baseline.baseline_id for baseline in baselines}) != len(baselines):
             raise ProtocolValidationError("baseline_id values must be unique")
+        programs = tuple(
+            program
+            if isinstance(program, ReproductionProgram)
+            else ReproductionProgram.from_dict(program)
+            for program in self.reproduction_programs
+        )
+        if len({program.program_id for program in programs}) != len(programs):
+            raise ProtocolValidationError("program_id values must be unique")
+        program_ids = {program.program_id for program in programs}
+        missing = sorted(
+            {
+                baseline.reproduction_program
+                for baseline in baselines
+                if baseline.reproduction_program is not None
+                and baseline.reproduction_program not in program_ids
+            }
+        )
+        if missing:
+            raise ProtocolValidationError(
+                "baseline references unknown Reproduction Program(s): " + ", ".join(missing)
+            )
         object.__setattr__(self, "baselines", baselines)
+        object.__setattr__(self, "reproduction_programs", programs)
 
     def get(self, baseline_id: str) -> BaselineDefinition:
         for baseline in self.baselines:
@@ -571,9 +697,22 @@ class BaselineRegistry:
                 return baseline
         raise KeyError(baseline_id)
 
+    def reproduction_program_for(self, baseline: BaselineDefinition) -> ReproductionProgram:
+        if baseline.reproduction_program is None:
+            raise ProtocolValidationError(
+                f"baseline '{baseline.baseline_id}' has no Reproduction Program"
+            )
+        for program in self.reproduction_programs:
+            if program.program_id == baseline.reproduction_program:
+                return program
+        raise ProtocolValidationError(
+            f"baseline '{baseline.baseline_id}' references an unknown Reproduction Program"
+        )
+
     def to_dict(self) -> dict[str, object]:
         return {
             "baselines": [baseline.to_dict() for baseline in self.baselines],
+            "reproduction_programs": [program.to_dict() for program in self.reproduction_programs],
             "schema_version": self.SCHEMA_VERSION,
         }
 
@@ -582,6 +721,7 @@ class BaselineRegistry:
         payload = strict_fields(
             value,
             required=("schema_version", "baselines"),
+            optional=("reproduction_programs",),
             context="BaselineRegistry",
         )
         if payload["schema_version"] != cls.SCHEMA_VERSION:
@@ -591,7 +731,13 @@ class BaselineRegistry:
         baselines = payload["baselines"]
         if not isinstance(baselines, list):
             raise ProtocolValidationError("BaselineRegistry.baselines must be a list")
-        return cls(tuple(BaselineDefinition.from_dict(item) for item in baselines))
+        programs = payload.get("reproduction_programs", [])
+        if not isinstance(programs, list):
+            raise ProtocolValidationError("BaselineRegistry.reproduction_programs must be a list")
+        return cls(
+            tuple(BaselineDefinition.from_dict(item) for item in baselines),
+            tuple(ReproductionProgram.from_dict(item) for item in programs),
+        )
 
     @classmethod
     def from_toml(cls, text: str) -> BaselineRegistry:
@@ -616,6 +762,7 @@ __all__ = (
     "ComparisonQualification",
     "ReadinessEvidence",
     "ReadinessGate",
+    "ReproductionProgram",
     "ResearchMode",
     "SourceIdentity",
     "SourceStatus",

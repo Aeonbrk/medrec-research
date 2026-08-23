@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from medrec_research import ProtocolValidationError
-from medrec_research.cli import _build_parser, _local_source_revision, _run
+from medrec_research import BaselineRegistry, ProtocolValidationError
+from medrec_research.cli import _build_parser, _local_source_revision, _reproduce
 from medrec_research.remote_executor import RemoteSubmission
 
 PROJECT_ROOT = Path(__file__).parents[2]
@@ -18,7 +18,7 @@ REGISTRY_PATH = PROJECT_ROOT / "baselines" / "registry.toml"
 
 def _cli(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        (sys.executable, "-m", "medrec_research.cli", "run", *args),
+        (sys.executable, "-m", "medrec_research.cli", "reproduce", *args),
         cwd=PROJECT_ROOT,
         capture_output=True,
         text=True,
@@ -26,11 +26,11 @@ def _cli(*args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def _run_args(*, dry_run: bool) -> argparse.Namespace:
+def _args(*, baseline_id: str = "gamenet", dry_run: bool = True) -> argparse.Namespace:
     return argparse.Namespace(
-        mode="reproduction",
-        baseline_id="gamenet",
-        gpu=0,
+        baseline_id=baseline_id,
+        gpu=0 if baseline_id != "all" else None,
+        gpus=(0, 1, 2, 3) if baseline_id == "all" else None,
         min_free_gpu_mib=20000,
         min_free_disk_gib=100,
         registry=REGISTRY_PATH,
@@ -40,127 +40,125 @@ def _run_args(*, dry_run: bool) -> argparse.Namespace:
     )
 
 
-def test_run_cli_dry_run_rejects_archived_baselines_without_adapters() -> None:
-    for baseline_id in ("gamenet", "safedrug", "retain", "leap-safedrug"):
-        completed = _cli(
-            "--mode",
-            "reproduction",
-            "--baseline-id",
-            baseline_id,
-            "--gpu",
-            "0",
-            "--min-free-gpu-mib",
-            "20000",
-            "--min-free-disk-gib",
-            "100",
-            "--dry-run",
-        )
+def test_reproduce_dry_run_prints_complete_archived_command() -> None:
+    completed = _cli("gamenet", "--gpu", "0", "--dry-run")
 
-        assert completed.returncode == 2
-        assert "no declared remote launcher" in completed.stderr
-        assert completed.stdout == ""
-
-
-def test_run_parser_uses_documented_319_data_root() -> None:
-    args = _build_parser().parse_args(
-        [
-            "run",
-            "--mode",
-            "reproduction",
-            "--baseline-id",
-            "gamenet",
-            "--gpu",
-            "0",
-            "--min-free-gpu-mib",
-            "20000",
-            "--min-free-disk-gib",
-            "100",
-        ]
+    assert completed.returncode == 0
+    result = json.loads(completed.stdout)["results"][0]
+    assert result["state"] == "planned"
+    assert "baselines/safedrug_archived.py gamenet" in result["command"]
+    assert "--upstream-root /root/zhb/SafeDrug" in result["command"]
+    assert (
+        "--dataset-root /root/zhb/medrec-data/snapshots/safedrug-archived-ijcai21"
+        in result["command"]
     )
+    assert completed.stderr == ""
+
+
+def test_reproduce_all_dry_run_maps_four_independent_lanes() -> None:
+    completed = _cli("all", "--gpus", "2,3,4,5", "--dry-run")
+
+    assert completed.returncode == 0
+    results = json.loads(completed.stdout)["results"]
+    assert [(item["baseline_id"], item["gpu"]) for item in results] == [
+        ("gamenet", 2),
+        ("safedrug", 3),
+        ("retain", 4),
+        ("leap-safedrug", 5),
+    ]
+    assert all(item["state"] == "planned" for item in results)
+
+
+@pytest.mark.parametrize(
+    ("arguments", "message"),
+    [
+        (("all", "--gpu", "0", "--dry-run"), "four unique --gpus"),
+        (("gamenet", "--gpus", "0,1", "--dry-run"), "requires --gpu"),
+    ],
+)
+def test_reproduce_rejects_incoherent_gpu_selection(
+    arguments: tuple[str, ...], message: str
+) -> None:
+    completed = _cli(*arguments)
+
+    assert completed.returncode == 2
+    assert message in completed.stderr
+
+
+def test_reproduce_parser_uses_documented_319_roots() -> None:
+    args = _build_parser().parse_args(["reproduce", "gamenet", "--gpu", "0"])
 
     assert args.data_root == "/root/zhb/medrec-data"
+    assert args.remote_root == "/root/zhb/medrec-research"
 
 
-def test_run_cli_rejects_comparison_and_unknown_baseline() -> None:
-    comparison = _cli(
-        "--mode",
-        "comparison",
-        "--baseline-id",
-        "gamenet",
-        "--gpu",
-        "0",
-        "--min-free-gpu-mib",
-        "20000",
-        "--min-free-disk-gib",
-        "100",
-        "--dry-run",
-    )
-    assert comparison.returncode == 2
-    assert "invalid choice" in comparison.stderr
+def test_batch_continues_after_one_lane_is_blocked(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    class RecordingExecutor:
+        def __init__(self) -> None:
+            self.baseline_ids: list[str] = []
 
-    unknown = _cli(
-        "--mode",
-        "reproduction",
-        "--baseline-id",
-        "unknown",
-        "--gpu",
-        "0",
-        "--min-free-gpu-mib",
-        "20000",
-        "--min-free-disk-gib",
-        "100",
-        "--dry-run",
-    )
-    assert unknown.returncode == 2
-    assert "not registered" in unknown.stderr
-    assert "Traceback" not in unknown.stderr
+        def run_baseline(self, baseline_id, **kwargs):
+            self.baseline_ids.append(baseline_id)
+            if baseline_id == "safedrug":
+                raise ProtocolValidationError("synthetic lane failure")
+            return RemoteSubmission(
+                baseline_id=baseline_id,
+                host=None,
+                session_id=f"medrec-baseline-{baseline_id}-test",
+                command=f"command {baseline_id}",
+                preflight_performed=False,
+            )
+
+    executor = RecordingExecutor()
+    assert _reproduce(_args(baseline_id="all"), executor=executor) == 2
+
+    assert executor.baseline_ids == ["gamenet", "safedrug", "retain", "leap-safedrug"]
+    results = json.loads(capsys.readouterr().out)["results"]
+    assert [item["state"] for item in results] == [
+        "planned",
+        "blocked",
+        "planned",
+        "planned",
+    ]
 
 
-def test_non_dry_handler_passes_clean_revision_to_executor(
+def test_real_handler_passes_clean_revision_to_executor(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     class RecordingExecutor:
         def __init__(self) -> None:
             self.source_revision: str | None = None
 
-        def run_baseline(self, baseline, **kwargs):
+        def run_baseline(self, baseline_id, **kwargs):
             self.source_revision = kwargs["source_revision"]
             return RemoteSubmission(
-                baseline_id=baseline.baseline_id,
+                baseline_id=baseline_id,
                 host="319-lab",
-                session_id="medrec-baseline-gamenet-20260822-120000",
+                session_id="medrec-baseline-gamenet-test",
                 command="remote command",
                 preflight_performed=True,
             )
 
     def git_runner(argv: list[str], **_: object) -> subprocess.CompletedProcess[str]:
-        command = argv[-1]
-        if command == "--show-toplevel":
-            stdout = f"{PROJECT_ROOT}\n"
-        elif command == "HEAD":
-            stdout = f"{'a' * 40}\n"
-        else:
-            stdout = ""
+        stdout = f"{'a' * 40}\n" if argv[-1] == "HEAD" else ""
         return subprocess.CompletedProcess(argv, 0, stdout, "")
 
     executor = RecordingExecutor()
-    assert _run(_run_args(dry_run=False), executor=executor, git_runner=git_runner) == 0
+    assert _reproduce(_args(dry_run=False), executor=executor, git_runner=git_runner) == 0
 
     assert executor.source_revision == "a" * 40
-    payload = json.loads(capsys.readouterr().out)
-    assert payload["preflight"] == "passed"
-    assert payload["host"] == "319-lab"
+    assert json.loads(capsys.readouterr().out)["results"][0]["state"] == "submitted"
 
 
 def test_local_source_revision_rejects_dirty_worktree_without_exposing_output() -> None:
     def git_runner(argv: list[str], **_: object) -> subprocess.CompletedProcess[str]:
-        command = argv[-1]
-        if command == "--show-toplevel":
-            stdout = f"{PROJECT_ROOT}\n"
-        elif command == "--untracked-files=all":
-            stdout = " M private-patient-notes.txt\n"
-        else:
-            stdout = f"{'a' * 40}\n"
+        stdout = (
+            " M private-patient-notes.txt\n"
+            if argv[-1] == "--untracked-files=all"
+            else f"{'a' * 40}\n"
+        )
         return subprocess.CompletedProcess(argv, 0, stdout, "secret stderr")
 
     with pytest.raises(ProtocolValidationError, match="clean Git worktree") as caught:
@@ -168,3 +166,12 @@ def test_local_source_revision_rejects_dirty_worktree_without_exposing_output() 
 
     assert "private-patient-notes" not in str(caught.value)
     assert "secret stderr" not in str(caught.value)
+
+
+def test_project_registry_program_is_shared_by_all_archived_lanes() -> None:
+    registry = BaselineRegistry.load(REGISTRY_PATH)
+
+    assert {
+        registry.reproduction_program_for(registry.get(baseline_id)).program_id
+        for baseline_id in ("gamenet", "safedrug", "retain", "leap-safedrug")
+    } == {"safedrug-archived"}

@@ -17,18 +17,18 @@ rtk proxy /opt/homebrew/bin/uv run ruff format --check .
 
 ### CLI commands
 
-You can use `./start-research` or `medrec` / `medrec-research`:
+Use `medrec` or `medrec-research` after `uv sync`:
 
 1. **List baselines**:
 
    ```bash
-   ./start-research baseline list
+   rtk proxy /opt/homebrew/bin/uv run medrec baseline list
    ```
 
 2. **Run synthetic reference slice**:
 
    ```bash
-   ./start-research reference \
+   rtk proxy /opt/homebrew/bin/uv run medrec reference \
      --manifest fixtures/synthetic/manifest.json \
      --visits fixtures/synthetic/visits.json \
      --output /tmp/medrec-reference-run.json \
@@ -39,7 +39,7 @@ You can use `./start-research` or `medrec` / `medrec-research`:
 3. **Evaluate predictions**:
 
    ```bash
-   ./start-research evaluate \
+   rtk proxy /opt/homebrew/bin/uv run medrec evaluate \
      --predictions /path/to/predictions.json \
      --output /tmp/metrics.json
    ```
@@ -47,7 +47,7 @@ You can use `./start-research` or `medrec` / `medrec-research`:
 4. **Accept comparison run (Comparison Mode)**:
 
    ```bash
-   ./start-research accept-comparison \
+   rtk proxy /opt/homebrew/bin/uv run medrec accept-comparison \
      --manifest fixtures/synthetic/manifest.json \
      --registry baselines/registry.toml \
      --baseline-id comparison-reference \
@@ -58,26 +58,30 @@ You can use `./start-research` or `medrec` / `medrec-research`:
      --output /path/to/run-record.json
    ```
 
-5. **Check that archived execution remains blocked before its declarations exist**:
+5. **Plan one archived reproduction lane without SSH**:
 
    ```bash
-   ./start-research run \
-     --mode reproduction \
-     --baseline-id gamenet \
+   rtk proxy /opt/homebrew/bin/uv run medrec reproduce gamenet \
      --gpu 0 \
-     --min-free-gpu-mib 20000 \
-     --min-free-disk-gib 100 \
      --dry-run
    ```
 
-   The checked-in registry records archived source identity but no launcher or environment. Dry-run therefore fails closed before SSH. After an audited archived adapter and verified environment are added, dry-run will validate and print the explicit 319 command without opening SSH.
+6. **Plan four independent archived lanes**:
+
+   ```bash
+   rtk proxy /opt/homebrew/bin/uv run medrec reproduce all \
+     --gpus 0,1,2,3 \
+     --dry-run
+   ```
+
+   Dry-run prints the complete command for each lane without SSH. Remove `--dry-run` only after the registry records the 319-verified environment identity. Real submission then checks clean revisions, the Reproduction Program, external dataset, imports, GPU capacity, and disk before creating independent tmux sessions.
 
 ## Key documents
 
 - [`docs/START_HERE.md`](docs/START_HERE.md): Repository navigation map.
 - [`CONTEXT.md`](CONTEXT.md): Canonical domain language and definitions.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md): Architecture module and seam map.
-- [`docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`](docs/specs/UNIFIED_RESEARCH_PROTOCOL.md): Unified Research Protocol specification.
+- [`docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`](docs/specs/UNIFIED_RESEARCH_PROTOCOL.md) and [`docs/specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md`](docs/specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md): Comparison Mode base contract and current amendment.
 - [`baselines/registry.toml`](baselines/registry.toml): Baseline identity and readiness registry.
 - [`docs/PLANS.md`](docs/PLANS.md): Multi-step work tracker.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run one pinned SafeDrug archived reproduction lane on 319."""
+"""Run one pinned SafeDrug archived Baseline Program lane on 319."""
 
 from __future__ import annotations
 

@@ -24,6 +24,7 @@ from .registry import BaselineRegistry
 from .remote_executor import RemoteExecutor
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
+ARCHIVED_BASELINES = ("gamenet", "safedrug", "retain", "leap-safedrug")
 
 
 def _positive_integer(value: str) -> int:
@@ -152,51 +153,89 @@ def _local_source_revision(
     return git("rev-parse", "HEAD")
 
 
-def _run(
+def _gpu_list(value: str) -> tuple[int, ...]:
+    try:
+        parsed = tuple(int(item) for item in value.split(","))
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("must be comma-separated nonnegative integers") from error
+    if not parsed or any(item < 0 for item in parsed) or len(parsed) != len(set(parsed)):
+        raise argparse.ArgumentTypeError("must be unique comma-separated nonnegative integers")
+    return parsed
+
+
+def _reproduction_lanes(args: argparse.Namespace) -> tuple[tuple[str, int], ...]:
+    if args.baseline_id == "all":
+        if args.gpu is not None or args.gpus is None or len(args.gpus) != len(ARCHIVED_BASELINES):
+            raise ProtocolValidationError("'all' requires exactly four unique --gpus and no --gpu")
+        return tuple(zip(ARCHIVED_BASELINES, args.gpus, strict=True))
+    if args.gpu is None or args.gpus is not None:
+        raise ProtocolValidationError("one baseline requires --gpu and no --gpus")
+    return ((args.baseline_id, args.gpu),)
+
+
+def _reproduce(
     args: argparse.Namespace,
     *,
     executor: RemoteExecutor | None = None,
     git_runner: Runner = subprocess.run,
 ) -> int:
-    """Plan or submit one remote-only Reproduction Mode baseline run."""
+    """Plan or submit one or four independent Reproduction Mode lanes."""
     try:
         registry = BaselineRegistry.load(args.registry)
     except FileNotFoundError as error:
         raise ProtocolValidationError("baseline registry file not found") from error
-    try:
-        baseline = registry.get(args.baseline_id)
-    except KeyError as error:
-        raise ProtocolValidationError(f"baseline '{args.baseline_id}' is not registered") from error
+    lanes = _reproduction_lanes(args)
     source_revision = _local_source_revision(
         Path.cwd(),
         require_clean=not args.dry_run,
         runner=git_runner,
     )
-    submission = (executor or RemoteExecutor()).run_baseline(
-        baseline,
-        source_revision=source_revision,
-        gpu_index=args.gpu,
-        remote_root=args.remote_root,
-        data_root=args.data_root,
-        min_free_gpu_mib=args.min_free_gpu_mib,
-        min_free_disk_gib=args.min_free_disk_gib,
-        dry_run=args.dry_run,
-    )
+    active_executor = executor or RemoteExecutor(registry)
+    results: list[dict[str, object]] = []
+    failed = False
+    for baseline_id, gpu_index in lanes:
+        try:
+            submission = active_executor.run_baseline(
+                baseline_id,
+                source_revision=source_revision,
+                gpu_index=gpu_index,
+                remote_root=args.remote_root,
+                data_root=args.data_root,
+                min_free_gpu_mib=args.min_free_gpu_mib,
+                min_free_disk_gib=args.min_free_disk_gib,
+                dry_run=args.dry_run,
+            )
+            results.append(
+                {
+                    "baseline_id": submission.baseline_id,
+                    "command": submission.command,
+                    "gpu": gpu_index,
+                    "host": submission.host,
+                    "preflight": (
+                        "passed" if submission.preflight_performed else "not_run_dry_run"
+                    ),
+                    "session_id": submission.session_id,
+                    "state": "submitted" if submission.preflight_performed else "planned",
+                }
+            )
+        except ProtocolValidationError as error:
+            failed = True
+            results.append(
+                {
+                    "baseline_id": baseline_id,
+                    "error": str(error),
+                    "gpu": gpu_index,
+                    "state": "blocked",
+                }
+            )
     print(
         json.dumps(
-            {
-                "baseline_id": submission.baseline_id,
-                "command": submission.command,
-                "host": submission.host,
-                "mode": args.mode,
-                "preflight": ("passed" if submission.preflight_performed else "not_run_dry_run"),
-                "session_id": submission.session_id,
-            },
+            {"mode": "reproduction", "results": results},
             indent=2,
             sort_keys=True,
         )
     )
-    return 0
+    return 2 if failed else 0
 
 
 # -----------------------------------------------------------------------------
@@ -276,30 +315,32 @@ def _build_parser() -> argparse.ArgumentParser:
     list_p.set_defaults(handler=_baseline_list)
 
     # 5. Remote Reproduction Submission
-    run = commands.add_parser("run", help="Submit a preflight-gated baseline run on 319")
-    run.add_argument("--mode", choices=("reproduction",), required=True)
-    run.add_argument("--baseline-id", required=True)
-    run.add_argument("--gpu", type=_nonnegative_integer, required=True)
-    run.add_argument("--min-free-gpu-mib", type=_positive_integer, required=True)
-    run.add_argument("--min-free-disk-gib", type=_positive_integer, required=True)
-    run.add_argument(
+    reproduce = commands.add_parser(
+        "reproduce", help="Plan or submit archived baseline reproduction on 319"
+    )
+    reproduce.add_argument("baseline_id", choices=(*ARCHIVED_BASELINES, "all"))
+    reproduce.add_argument("--gpu", type=_nonnegative_integer)
+    reproduce.add_argument("--gpus", type=_gpu_list)
+    reproduce.add_argument("--min-free-gpu-mib", type=_positive_integer, default=20000)
+    reproduce.add_argument("--min-free-disk-gib", type=_positive_integer, default=100)
+    reproduce.add_argument(
         "--registry",
         type=Path,
         default=Path("baselines/registry.toml"),
         help="Path to registry.toml (default: baselines/registry.toml)",
     )
-    run.add_argument(
+    reproduce.add_argument(
         "--remote-root",
         default="/root/zhb/medrec-research",
         help="Verified 319 checkout root",
     )
-    run.add_argument(
+    reproduce.add_argument(
         "--data-root",
         default="/root/zhb/medrec-data",
         help="External 319 data root",
     )
-    run.add_argument("--dry-run", action="store_true")
-    run.set_defaults(handler=_run)
+    reproduce.add_argument("--dry-run", action="store_true")
+    reproduce.set_defaults(handler=_reproduce)
 
     return parser
 

@@ -16,6 +16,8 @@ The active Baseline Registry and explicit Comparison Scope own selection. Do not
 
 ## 3. Reproduce upstream behavior
 
+When a pinned source needs harness-owned invocation, implement one Reproduction Program and declare it in the Baseline Registry. Put model profiles inside that module when they share source, data, environment, and evaluation lineage; do not create runner or script directories in advance. The program owns source-native preprocessing gates, mechanical invocation adaptation, training, checkpoint selection, upstream test aggregation, and terminal result publication.
+
 Create the declared Conda environment and run the pinned source outside this repository. Record preprocessing, split, feature timing, checkpoint selection, thresholding, metric aggregation, random seeds, and working-directory assumptions. This characterizes Reproduction Mode only and cannot create a Comparison Mode Run Record. Preserve restricted outputs outside Git.
 
 ## 4. Implement the Prediction Adapter

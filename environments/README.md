@@ -17,4 +17,4 @@ Create these environments only on 319 after checking disk, GPU, driver, and exis
 conda env create --file environments/core-evaluator.yml
 ```
 
-After verification, add one archived baseline declaration or explicit per-lane declarations only where dependency differences require them. Export target-platform locks, record their checksums in the Baseline Registry, and record the core evaluator checksum in the experiment plan. Do not advance readiness merely because Conda resolves a file.
+The Baseline Registry already declares one shared archived environment name. After verification, record its target-platform identity there; split into per-lane declarations only if observed dependency differences require it. Record the core evaluator identity in the experiment plan. Do not advance readiness merely because Conda resolves a file.

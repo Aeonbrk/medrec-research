@@ -8,8 +8,8 @@ from types import SimpleNamespace
 
 import pytest
 
-ADAPTER_PATH = Path(__file__).parents[2] / "baselines" / "adapters" / "safedrug_archived.py"
-SPEC = importlib.util.spec_from_file_location("safedrug_archived", ADAPTER_PATH)
+PROGRAM_PATH = Path(__file__).parents[2] / "baselines" / "safedrug_archived.py"
+SPEC = importlib.util.spec_from_file_location("safedrug_archived_program", PROGRAM_PATH)
 assert SPEC and SPEC.loader
 adapter = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = adapter

@@ -6,7 +6,8 @@ Use this page to find the source of truth for the question in front of you.
 
 - [`../CONTEXT.md`](../CONTEXT.md) defines domain terms, research modes, records, and readiness states.
 - [`../ARCHITECTURE.md`](../ARCHITECTURE.md) maps modules, ownership, dependency direction, and trust boundaries.
-- [`specs/UNIFIED_RESEARCH_PROTOCOL.md`](specs/UNIFIED_RESEARCH_PROTOCOL.md) defines first-party comparison semantics.
+- [`specs/UNIFIED_RESEARCH_PROTOCOL.md`](specs/UNIFIED_RESEARCH_PROTOCOL.md) defines the Comparison Mode 1.0 base contract.
+- [`specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md`](specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md) is the current additive Comparison Mode amendment. Read it with the 1.0 base contract; neither document silently replaces the other.
 
 ## Work on the repository
 
@@ -16,7 +17,8 @@ Use this page to find the source of truth for the question in front of you.
 
 ## Inspect research state
 
-- [`../baselines/registry.toml`](../baselines/registry.toml) is the baseline identity and readiness registry.
+- [`../baselines/registry.toml`](../baselines/registry.toml) is the baseline identity, Reproduction Program, and readiness registry.
+- [`../baselines/safedrug_archived.py`](../baselines/safedrug_archived.py) is the implemented four-lane archived Reproduction Program.
 - [`../research/README.md`](../research/README.md) explains curated Research Memory and Failure Records.
 - [`../README.md`](../README.md) gives runnable local commands and the current public-safe status.
 

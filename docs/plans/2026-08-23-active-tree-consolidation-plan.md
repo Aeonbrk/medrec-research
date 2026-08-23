@@ -60,3 +60,7 @@ Keep the checked-out tree focused on the current research system: SafeDrug `arch
 - The active tree has one current research authority and no executable fallback to SafeDrug main.
 - Every remaining top-level directory has a current purpose described by `ARCHITECTURE.md` or `docs/START_HERE.md`.
 - Historical evidence remains interpretable without retaining historical implementation surfaces.
+
+## Superseded execution state
+
+At completion, archived `medrec run --dry-run` intentionally failed because no archived launcher existed. The later SafeDrug Archived Baseline Program work replaced that temporary state with the registry-driven `medrec reproduce` interface. This plan remains the record of the cleanup decision, not current execution guidance.

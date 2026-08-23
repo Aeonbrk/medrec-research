@@ -1,5 +1,12 @@
 # Plans
 
+## Completed: Baseline Program Architecture
+
+- **Status**: completed locally on `2026-08-23`; the repository now exposes one registry-driven SafeDrug archived Reproduction Program and no empty baseline directory skeleton.
+- **Plan**: `docs/plans/2026-08-23-baseline-program-architecture-plan.md`.
+- **Interface**: `medrec reproduce gamenet --gpu 0 --dry-run` plans one lane; `medrec reproduce all --gpus 0,1,2,3 --dry-run` plans four independent lanes.
+- **Boundary**: dry-run is executable now. Real submission remains blocked until the 319 dataset and environment identity pass their declared gates; the clean exact harness revision binds the program.
+
 ## Completed: Active Tree Consolidation
 
 - **Status**: completed on `2026-08-23`; the checked-out tree now retains only current protocol, archived-lineage identity, generic remote execution, and durable research evidence.
@@ -19,7 +26,7 @@
 
 ## Accepted: SafeDrug Archived Single-Baseline Program
 
-- **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family source and the common baseline for future innovation. The shared four-model adapter and local synthetic contract tests are implemented; 319 data and environment gates remain blocked.
+- **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family source and the common baseline for future innovation. The shared four-model Reproduction Program, registry-driven dry-run, and local synthetic contract tests are implemented; 319 data and environment gates remain blocked.
 - **Plan**: `docs/plans/2026-08-23-archived-single-baseline-plan.md`.
 - **Scope**: reuse the existing `gamenet`, `safedrug`, `retain`, and `leap-safedrug` IDs under one archived lineage; regenerate paper-matching preprocessing, add only the mechanical training-mode adaptation required by the archived entrypoints, run four independent GPU lanes, and compare aggregate results with SafeDrug Table 2.
 - **Execution boundary**: no archived run is launchable until the exact paper aggregate counts pass, the training-mode adaptation is audited, and the archived environment succeeds. SafeDrug `main` receives no new registry identity or future run lane.

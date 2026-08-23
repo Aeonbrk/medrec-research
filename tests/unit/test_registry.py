@@ -12,6 +12,7 @@ from medrec_research import (
     ProtocolValidationError,
     ReadinessEvidence,
     ReadinessGate,
+    ReproductionProgram,
     ResearchMode,
     SourceIdentity,
     SourceStatus,
@@ -235,29 +236,27 @@ def test_project_registry_makes_no_readiness_claims() -> None:
 
     assert len(registry.baselines) == 5
     assert {baseline.readiness for baseline in registry.baselines} == {BaselineReadiness.REGISTERED}
+    assert len(registry.reproduction_programs) == 1
+    program = registry.reproduction_programs[0]
+    assert isinstance(program, ReproductionProgram)
+    assert program.program_id == "safedrug-archived"
+    assert program.entrypoint == "baselines/safedrug_archived.py"
+    assert not program.is_319_verified
     gamenet = registry.get("gamenet")
     assert gamenet.display_name == "GAMENet (SafeDrug archived)"
     assert gamenet.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-    assert gamenet.adapter_command == ()
-    assert gamenet.adapter_revision is None
-    assert gamenet.environment_sha256 is None
+    assert gamenet.reproduction_program == program.program_id
     safedrug = registry.get("safedrug")
     assert safedrug.display_name == "SafeDrug (archived)"
     assert safedrug.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-    assert safedrug.adapter_command == ()
-    assert safedrug.adapter_revision is None
-    assert safedrug.environment_sha256 is None
+    assert safedrug.reproduction_program == program.program_id
     retain = registry.get("retain")
     assert retain.display_name == "RETAIN (SafeDrug archived)"
     assert retain.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-    assert retain.adapter_command == ()
-    assert retain.adapter_revision is None
-    assert retain.environment_sha256 is None
+    assert retain.reproduction_program == program.program_id
     leap = registry.get("leap-safedrug")
     assert leap.display_name == "LEAP (SafeDrug archived)"
     assert leap.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
-    assert leap.adapter_command == ()
-    assert leap.adapter_revision is None
-    assert leap.environment_sha256 is None
+    assert leap.reproduction_program == program.program_id
     assert leap.source.status is SourceStatus.PINNED
     assert not leap.is_comparable

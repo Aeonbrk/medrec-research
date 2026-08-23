@@ -8,6 +8,8 @@ MedRec Research separates reusable scientific semantics from workflow orchestrat
 flowchart LR
     Mac["MacBook Harness Terminal"] -->|"frozen plan + source revision"| Preflight["Read-only 319 Preflight"]
     Registry["Baseline Registry"] --> Preflight
+    Registry --> Program["Reproduction Program"]
+    Program --> Preflight
     Preflight -->|"verified declaration + capacity"| Remote["319 Execution Plane"]
     Data["319 Local Data Root"] -->|"local snapshot"| Remote
     Remote -->|"aggregate public-safe evidence"| Mac
@@ -32,7 +34,9 @@ The core library exposes a small set of scientific interfaces. Dataset Manifest 
 
 These modules are deep because callers do not reimplement their invariants. Their public interfaces are the test surface.
 
-The process seam has one production implementation and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface should be invented in advance. `RemoteExecutor` is the single remote submission seam: it accepts only approved 319 aliases and declared launchers, performs the read-only preflight immediately before submission, and creates no local execution variant.
+The Comparison Mode process seam has one production Prediction Adapter and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface should be invented in advance.
+
+Reproduction Mode uses a different deep module. A Reproduction Program owns the source-native data gate, mechanical invocation adaptation, training, checkpoint selection, upstream test procedure, and aggregate result finalization for one shared lineage. `RemoteExecutor` consumes the program declaration from the Baseline Registry, generates complete external data and run paths, accepts only approved 319 aliases, and performs the read-only preflight immediately before submission. Dry-run exercises this same interface without SSH; real submission additionally requires an exact clean harness revision and a 319-verified environment identity.
 
 ## Scientific modes
 
@@ -53,7 +57,7 @@ The core package has no baseline-framework dependency. Baseline processes emit t
 ## Repository layout
 
 ```text
-baselines/      Baseline identities; archived integration code lands only after audit
+baselines/      Baseline Registry plus implemented Reproduction Programs
 docs/           Decisions, specifications, plans, and operational playbooks
 environments/   Verified or explicitly provisional 319 environment declarations
 fixtures/       Public synthetic data only
@@ -63,3 +67,11 @@ tests/          Tests through public module interfaces
 ```
 
 Runtime logs, checkpoints, data snapshots, and patient-level outputs are ignored local state, not architecture.
+
+### Baselines
+
+`baselines/registry.toml` is the only authority for baseline identity and Reproduction Program declarations. A program declaration owns its repository-relative entrypoint, external 319 source root, dataset and run subdirectories, Conda environment name, required inputs, import probe, and verified identities. Each model entry points to that declaration instead of duplicating launch configuration.
+
+`baselines/safedrug_archived.py` is the sole active SafeDrug-family Reproduction Program. It contains four internal model profiles for GAMENet, SafeDrug, RETAIN, and LEAP because they share one Pinned Baseline Source and upstream evaluation lineage. Its interface is one lane identifier plus upstream, dataset, run, and Python paths. The profiles are implementation details, not four public runners.
+
+There are no `adapters/`, `audits/`, `programs/`, `runners/`, or `scripts/` subdirectories under `baselines/`. A Prediction Adapter belongs there only after Comparison Mode needs a target-free translation module. Audits are durable evidence under `research/`; operating instructions belong in `docs/playbooks/`; run artifacts remain outside Git. Empty directories do not define modules or seams.

@@ -1,5 +1,22 @@
 schema_version = 1
 
+[[reproduction_programs]]
+program_id = "safedrug-archived"
+entrypoint = "baselines/safedrug_archived.py"
+conda_environment = "medrec-safedrug-archived"
+upstream_root = "/root/zhb/SafeDrug"
+dataset_subdirectory = "snapshots/safedrug-archived-ijcai21"
+run_subdirectory = "runs/safedrug-archived"
+required_inputs = [
+  "records_final.pkl",
+  "voc_final.pkl",
+  "ddi_A_final.pkl",
+  "ddi_mask_H.pkl",
+  "ehr_adj_final.pkl",
+  "idx2drug.pkl",
+]
+import_modules = ["torch", "dnc", "rdkit", "pandas", "dill", "sklearn", "models", "util"]
+
 [[baselines]]
 baseline_id = "reference"
 display_name = "Train-Frequency Control"
@@ -15,6 +32,7 @@ baseline_id = "gamenet"
 display_name = "GAMENet (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+reproduction_program = "safedrug-archived"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -26,6 +44,7 @@ baseline_id = "safedrug"
 display_name = "SafeDrug (archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+reproduction_program = "safedrug-archived"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -37,6 +56,7 @@ baseline_id = "retain"
 display_name = "RETAIN (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+reproduction_program = "safedrug-archived"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -48,6 +68,7 @@ baseline_id = "leap-safedrug"
 display_name = "LEAP (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
+reproduction_program = "safedrug-archived"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"

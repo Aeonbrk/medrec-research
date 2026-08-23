@@ -11,9 +11,9 @@ The MacBook Air is the harness terminal. The 319 remote host is the execution pl
 **Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured  
 **Data Location**: ✅ MIMIC-III and MIMIC-IV datasets at `/root/zhb/Search/dataset` (symlinked)  
 **Conda Environments**: ⛔ No archived environment declaration is registered  
-**Baseline Adapters**: ⚠️ Shared archived adapter implemented locally; no verified 319 declaration is registered  
+**Reproduction Program**: ⚠️ Shared archived program and launch declaration implemented locally; its 319 environment identity remains unverified
 
-**Status Summary**: SafeDrug `main` runs are historical only. Future SafeDrug-family work is pinned to `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. The shared training-mode adapter and synthetic contract tests exist, but launch remains blocked until archived paths, preprocessing counts, adapter digest, and environment are verified on 319.
+**Status Summary**: SafeDrug `main` runs are historical only. Future SafeDrug-family work is pinned to `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. The shared Reproduction Program and synthetic contract tests exist. Dry-run is available; real launch remains blocked until archived preprocessing counts and the environment are verified on 319.
 
 ## Verified snapshot
 
@@ -29,7 +29,7 @@ Do not launch a real run until all conditions hold:
 - The accepted experiment plan fixes mode, Dataset Manifest, patient-disjoint split, features, metrics, controls, Adaptation Budget, seeds, stopping rules, and artifact policy.
 - A verified 319 checkout points to the exact source revision. The intended remote root is configurable and must not reuse the archived `New-Search` checkout.
 - `MEDREC_DATA_ROOT` exists outside the checkout on 319.
-- The declared baseline source revision, Conda environment, adapter, and readiness satisfy the requested mode.
+- The declared baseline source revision, Reproduction Program, Conda environment, and requested scientific mode satisfy the run.
 - GPU memory and disk capacity are adequate without disrupting another job.
 
 The repository has a Git history and an `origin` remote. A 2026-08-12 read-only observation found a clean `/root/zhb/medrec-research` checkout through the fallback profile, but its revision differed from the current local accepted revision and `MEDREC_DATA_ROOT` was not configured. This supersedes the earlier missing-checkout observation without authorizing synchronization or environment changes.
@@ -120,35 +120,41 @@ python -c "import medrec_research; print(medrec_research.__file__)"
 
 ## Submission contract
 
-Submit a frozen run specification from the Mac harness. The remote job records source revision, protocol version, baseline identity and source revision, adapter revision, Dataset Manifest identity, Conda environment identity, seed, GPU assignment, start time, and expected restricted and public-safe outputs.
+Submit a frozen run specification from the Mac harness. A Reproduction Mode job records the clean harness revision, pinned baseline source, Reproduction Program, environment identity, GPU assignment, start time, and expected restricted and public-safe outputs. Comparison Mode separately records Prediction Adapter and Dataset Manifest identities.
 
 A remote job binds declaration, contract, preflight, baseline source revision, and environment lock before submission. Never store real run logs or patient-level output in the Git checkout.
 
 Check GPU state immediately before launch and assign devices explicitly. Do not select a device from the stale snapshot in this document.
 
-The registry currently records archived source identity only. A dry-run is expected to reject every archived lane until its adapter and environment declarations are implemented:
+The registry records the archived source and shared Reproduction Program declaration. Plan one lane without SSH:
 
 ```bash
-rtk proxy /opt/homebrew/bin/uv run medrec-research run \
-  --mode reproduction \
-  --baseline-id gamenet \
+rtk proxy /opt/homebrew/bin/uv run medrec-research reproduce gamenet \
   --gpu 0 \
-  --min-free-gpu-mib 20000 \
-  --min-free-disk-gib 100 \
   --dry-run
 ```
 
-After archived declarations exist, dry-run must validate registry identity, local Git revision, remote paths, thresholds, and the explicit launcher without opening SSH. A non-dry invocation requires a clean local worktree and at least `smoke_ready`, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, adapter, Conda environment checksum, selected idle GPU, and free disk before creating one tmux session. A failed preflight gate creates no tmux state.
+Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, selected idle GPU, and free disk before creating one tmux session. A failed preflight gate creates no tmux state.
 
-The checked-in registry leaves every archived lane at `registered` with no adapter or environment identity. This intentionally blocks both dry and real submission. Do not restore the removed main-oriented declarations; add new identities only after the archived runner and environment are implemented and verified.
+The checked-in registry leaves every archived lane at `registered` and the program environment identity unresolved. This keeps Comparison Mode unqualified and real reproduction blocked while allowing dry-run. Do not restore removed main-oriented declarations or raise readiness without the required evidence.
 
 ### Archived implementation gate
 
 Submission remains blocked. The registered SafeDrug source is `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. This branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`.
 
-`baselines/adapters/safedrug_archived.py` now provides one shared four-model lane. It fails unless the five paper counts match, creates an external run-scoped work tree, performs the sole audited training adaptation in a copied entrypoint, runs the original entrypoint with explicit `--Test`, and validates checkpoint plus ten-round aggregate output. It preserves the archived learning-rate defaults: GAMENet `1e-4`; SafeDrug, RETAIN, and LEAP `5e-4`. The paper's SafeDrug `2e-4` statement is not silently substituted.
+`baselines/safedrug_archived.py` now provides one shared four-model Reproduction Program. It fails unless the five paper counts match, creates an external run-scoped work tree, performs the sole audited training adaptation in a copied entrypoint, runs the original entrypoint with explicit `--Test`, and validates checkpoint plus ten-round aggregate output. It preserves the archived learning-rate defaults: GAMENet `1e-4`; SafeDrug, RETAIN, and LEAP `5e-4`. The paper's SafeDrug `2e-4` statement is not silently substituted.
 
-Before changing readiness, synchronize clean checkouts, regenerate the archived dataset outside Git, pass the five-count B0 gate, create and verify the archived Conda environment, run the no-training adaptation/import smoke on 319, then record the adapter digest, environment digest, explicit launcher, and required inputs. Until those facts exist, keep `registry.toml` at `registered` and keep default `RemoteExecutor` launchers empty.
+The Baseline Registry already owns the program entrypoint, external source/data/run paths, required inputs, environment name, and import probe for all four lanes. The clean exact harness Git revision binds the checked-in program; a second file hash would not change a preflight decision and is not recorded. Before real submission, synchronize clean checkouts, regenerate the archived dataset outside Git, pass the five-count B0 gate, create and verify the archived Conda environment, run the no-training adaptation/import smoke on 319, then record the observed `environment_sha256`. Until that fact exists, keep every baseline at `registered`; dry-run remains usable and real submission remains blocked.
+
+Plan all four independent lanes with:
+
+```bash
+rtk proxy /opt/homebrew/bin/uv run medrec-research reproduce all \
+  --gpus 0,1,2,3 \
+  --dry-run
+```
+
+Without `--dry-run`, each lane performs its own preflight and submission. A blocked lane is reported without cancelling the remaining lanes.
 
 ## Monitoring and failure
 
