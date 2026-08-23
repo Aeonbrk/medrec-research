@@ -11,9 +11,9 @@ The MacBook Air is the harness terminal. The 319 remote host is the execution pl
 **Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured  
 **Data Location**: ✅ MIMIC-III and MIMIC-IV datasets at `/root/zhb/Search/dataset` (symlinked)  
 **Conda Environments**: ⛔ No archived environment declaration is registered  
-**Baseline Adapters**: ⛔ No archived adapter declaration is registered  
+**Baseline Adapters**: ⚠️ Shared archived adapter implemented locally; no verified 319 declaration is registered  
 
-**Status Summary**: SafeDrug `main` runs are historical only. Future SafeDrug-family work is pinned to `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`; launch remains blocked until archived paths, preprocessing counts, training-mode adaptation, adapter digest, and environment are verified.
+**Status Summary**: SafeDrug `main` runs are historical only. Future SafeDrug-family work is pinned to `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. The shared training-mode adapter and synthetic contract tests exist, but launch remains blocked until archived paths, preprocessing counts, adapter digest, and environment are verified on 319.
 
 ## Verified snapshot
 
@@ -144,7 +144,11 @@ The checked-in registry leaves every archived lane at `registered` with no adapt
 
 ### Archived implementation gate
 
-Submission remains blocked. The registered SafeDrug source is `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. This branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`. Before changing readiness, synchronize clean checkouts, regenerate the archived dataset, verify 6,350 patients, 14,995 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures, audit the minimal training-mode adaptation, then record new adapter and environment evidence.
+Submission remains blocked. The registered SafeDrug source is `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. This branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`.
+
+`baselines/adapters/safedrug_archived.py` now provides one shared four-model lane. It fails unless the five paper counts match, creates an external run-scoped work tree, performs the sole audited training adaptation in a copied entrypoint, runs the original entrypoint with explicit `--Test`, and validates checkpoint plus ten-round aggregate output. It preserves the archived learning-rate defaults: GAMENet `1e-4`; SafeDrug, RETAIN, and LEAP `5e-4`. The paper's SafeDrug `2e-4` statement is not silently substituted.
+
+Before changing readiness, synchronize clean checkouts, regenerate the archived dataset outside Git, pass the five-count B0 gate, create and verify the archived Conda environment, run the no-training adaptation/import smoke on 319, then record the adapter digest, environment digest, explicit launcher, and required inputs. Until those facts exist, keep `registry.toml` at `registered` and keep default `RemoteExecutor` launchers empty.
 
 ## Monitoring and failure
 

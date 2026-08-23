@@ -42,6 +42,12 @@ Therefore exact archived source identity and byte-for-byte unmodified execution 
 - Record the patched source or wrapper revision separately from upstream revision.
 - Prove with a no-training smoke check that default archived execution remains Test mode and the adaptation selects training without importing SafeDrug-main code.
 
+Implemented locally on `2026-08-23` in `baselines/adapters/safedrug_archived.py`. One shared adapter covers GAMENet, SafeDrug, RETAIN, and LEAP. It creates a run-scoped source copy and replaces exactly one audited token sequence, `default=True` with `default=False`, in the archived `--Test` declaration. Source drift or any non-reversible change fails before training. Test execution still uses the original archived entrypoint with explicit `--Test`.
+
+The same adapter now enforces B0 counts, keeps checkpoints and logs under the repository-external run root, selects the zero-based best checkpoint, validates ten test rounds against the upstream summary, writes terminal `status.json` before assembling `result.json`, and records the archived source and adapted-entrypoint digests. Local synthetic tests pass without importing Torch, NumPy, or dill.
+
+This implementation does not advance readiness. Archived dataset generation, the 319 environment lock, import smoke, adapter digest, and explicit `RemoteExecutor` launcher remain unverified and therefore unregistered.
+
 ### B2: Four-model archived reproduction
 
 - Launch SafeDrug, GAMENet, RETAIN, and LEAP concurrently, one idle physical GPU per model.
