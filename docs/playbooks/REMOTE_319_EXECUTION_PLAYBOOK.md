@@ -10,10 +10,10 @@ The MacBook Air is the harness terminal. The 319 remote host is the execution pl
 **Repository**: ✅ `/root/zhb/medrec-research` clean checkout on 319  
 **Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured  
 **Data Location**: ✅ MIMIC-III and MIMIC-IV datasets at `/root/zhb/Search/dataset` (symlinked)  
-**Conda Environments**: 🔄 `medrec-gamenet` configured for SafeDrug family reproduction (`safedrug`, `retain`, `leap-safedrug`)  
-**Baseline Adapters**: ✅ SafeDrug family runner (`baselines/scripts/run_safedrug_family_319.sh`) and strict result parser (`baselines/scripts/parse_safedrug_family_results.py`) implemented and tested  
+**Conda Environments**: ⛔ No archived environment declaration is registered  
+**Baseline Adapters**: ⛔ No archived adapter declaration is registered  
 
-**Status Summary**: SafeDrug family reproduction architecture is verified and ready for 3-GPU concurrent reproduction.
+**Status Summary**: SafeDrug `main` runs are historical only. Future SafeDrug-family work is pinned to `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`; launch remains blocked until archived paths, preprocessing counts, training-mode adaptation, adapter digest, and environment are verified.
 
 ## Verified snapshot
 
@@ -135,7 +135,7 @@ A remote job binds declaration, contract, preflight, baseline source revision, a
 
 Check GPU state immediately before launch and assign devices explicitly. Do not select a device from the stale snapshot in this document.
 
-The harness exposes a remote-only Reproduction Mode submission command for the declared GAMENet launcher. Inspect the local command without contacting 319 first:
+The registry currently records archived source identity only. A dry-run is expected to reject every archived lane until its adapter and environment declarations are implemented:
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec-research run \
@@ -147,15 +147,15 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research run \
   --dry-run
 ```
 
-Dry-run validates the registry identity, local Git revision, remote paths, thresholds, and explicit launcher, then reports `preflight: not_run_dry_run`; it does not open SSH or establish readiness. A non-dry invocation first requires a clean local worktree and at least `smoke_ready`, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies the exact clean harness and upstream revisions, external data root, required `mimic-iii` input directory, launcher, Conda environment checksum, selected idle GPU, and free disk before creating one tmux session. The launch binds the verified upstream root and physical GPU through `SAFEDRUG_ROOT` and `CUDA_VISIBLE_DEVICES`; GAMENet addresses that single visible device as logical device `0`. A failed preflight gate creates no tmux state. An ambiguous tmux launch failure triggers best-effort cleanup of the newly generated unique session ID without touching other jobs.
+After archived declarations exist, dry-run must validate registry identity, local Git revision, remote paths, thresholds, and the explicit launcher without opening SSH. A non-dry invocation requires a clean local worktree and at least `smoke_ready`, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, adapter, Conda environment checksum, selected idle GPU, and free disk before creating one tmux session. A failed preflight gate creates no tmux state.
 
-The checked-in registry currently leaves every baseline at `registered`, so the command does not yet authorize a real run. GAMENet records the launcher content digest and the environment digest observed on 319, but it still lacks content-addressed environment-lock and adapter-smoke evidence. The launcher preserves upstream Reproduction Mode behavior and emits legacy aggregate output; it cannot feed `accept-comparison` until separate work produces strict Prediction Records and matching Comparison Qualification evidence. The manual checks above remain the operator-level source of truth and must agree with the automated preflight.
+The checked-in registry leaves every archived lane at `registered` with no adapter or environment identity. This intentionally blocks both dry and real submission. Do not restore the removed main-oriented declarations; add new identities only after the archived runner and environment are implemented and verified.
 
 ### Read-only observation on 2026-08-22
 
 The primary alias did not establish a session; the approved fallback reached the expected `root` account. The observed `medrec-gamenet` explicit-package digest is `971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe`, the declared `mimic-iii` directory exists, and preprocessed GAMENet input is present.
 
-Submission remains blocked. The remote harness revision differs from this branch. The SafeDrug checkout resolves to the registered `88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a` revision only under a one-off read-only Git ownership override, and its worktree is not clean. Do not persist that override or clean the checkout through the harness; the remote operator must resolve ownership and worktree state, synchronize the harness revision, then generate and review the missing environment-lock and adapter-smoke evidence before changing readiness.
+Submission remains blocked. The registered SafeDrug source is now `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. That branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`, so the current main-oriented runners cannot train archived code unchanged. Before changing readiness, the remote operator must synchronize clean checkouts, regenerate the archived dataset, verify 6,350 patients, 14,995 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures, audit the minimal training-mode adaptation, then record new adapter and environment evidence.
 
 ## Monitoring and failure
 

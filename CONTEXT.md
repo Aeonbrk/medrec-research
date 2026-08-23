@@ -49,7 +49,7 @@ The immutable Unified Research Protocol version, Dataset Manifest identity, and 
 _Avoid_: Scope digest, comparison context, loose protocol fields
 
 **Live Benchmark Authority**:
-The current correlated Baseline Program, Baseline Audit, Audit Review, Selection Result, Baseline Registry, and Comparison Scope records from which a Project Status Snapshot can be derived. It owns no scientific fact beyond those source records.
+The current correlated Baseline Registry, Comparison Scope, qualification, and accepted evidence records from which a Project Status Snapshot can be derived. It owns no scientific fact beyond those source records.
 _Avoid_: Status input bundle, mutable status state, controller state
 
 **Active Research Home**:
@@ -124,12 +124,8 @@ _Avoid_: Baseline Environment, Mac core environment
 The protocol-defined medication prediction and evaluation evidence emitted by a method without exposing its internal representation.
 _Avoid_: Model output, result row
 
-**Baseline Audit**:
-针对一个候选的公开安全来源、许可证与四层 lineage 记录。`pass` 声明只有在匹配的 Audit Review 接受后才能通过选择硬门。
-_Avoid_: README 摘要, 可运行证明
-
 **Selection Result**:
-固定 V1 scorecard 对完整 final-five 审计、审核和 diagnostics 的内容寻址投影。优先顺序不能绕过来源或许可证硬门。
+从当前 Baseline Registry、Comparison Scope 和公开安全资格证据派生的内容寻址选择记录。它不能绕过来源、数据、环境或协议硬门。
 _Avoid_: 运行队列, 实验结论
 
 **Selection Acceptance**:

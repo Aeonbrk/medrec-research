@@ -40,7 +40,7 @@ def _run_args(*, dry_run: bool) -> argparse.Namespace:
     )
 
 
-def test_run_cli_dry_run_prints_explicit_plan_without_preflight() -> None:
+def test_run_cli_dry_run_rejects_archived_baselines_without_adapters() -> None:
     for baseline_id in ("gamenet", "safedrug", "retain", "leap-safedrug"):
         completed = _cli(
             "--mode",
@@ -56,20 +56,9 @@ def test_run_cli_dry_run_prints_explicit_plan_without_preflight() -> None:
             "--dry-run",
         )
 
-        assert completed.returncode == 0, completed.stderr
-        payload = json.loads(completed.stdout)
-        assert payload["baseline_id"] == baseline_id
-        assert payload["mode"] == "reproduction"
-        assert payload["host"] is None
-        assert payload["preflight"] == "not_run_dry_run"
-        if baseline_id == "gamenet":
-            assert "bash baselines/scripts/run_gamenet_319.sh gamenet" in payload["command"]
-        else:
-            assert (
-                f"bash baselines/scripts/run_safedrug_family_319.sh {baseline_id}"
-                in payload["command"]
-            )
-        assert "MEDREC_DATA_ROOT=/root/zhb/medrec-data" in payload["command"]
+        assert completed.returncode == 2
+        assert "adapter_command" in completed.stderr
+        assert completed.stdout == ""
 
 
 def test_run_parser_uses_documented_319_data_root() -> None:

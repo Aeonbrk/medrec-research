@@ -22,7 +22,7 @@ from ._validation import (
 from .errors import ProtocolValidationError
 
 SAFE_DRUG_REPOSITORY = "https://github.com/ycq091044/SafeDrug"
-SAFE_DRUG_MAIN_REVISION = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+SAFE_DRUG_ARCHIVED_REVISION = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 MOLEREC_REPOSITORY = "https://github.com/yangnianzu0515/MoleRec"
 MOLEREC_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
 MOLEREC_SAFEDRUG_LINEAGE_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
@@ -242,7 +242,7 @@ class DecoderProfile:
     method_id: str
     decoder_class: DecoderClass | str
     baseline_core_sha256: str
-    data_lineage_revision: str = SAFE_DRUG_MAIN_REVISION
+    data_lineage_revision: str = SAFE_DRUG_ARCHIVED_REVISION
     threshold_rule: ThresholdSelectionRule | None = None
     native_decoder: str = ""
     profile_sha256: str = ""
@@ -300,7 +300,7 @@ class DecoderProfile:
 
     @property
     def is_comparison_profile(self) -> bool:
-        return self.data_lineage_revision == SAFE_DRUG_MAIN_REVISION
+        return self.data_lineage_revision == SAFE_DRUG_ARCHIVED_REVISION
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -406,7 +406,7 @@ class ComparisonProtocolV1_1:
     """Versioned amendment that owns the five-method comparison semantics."""
 
     protocol_version: str = "1.1"
-    data_lineage_revision: str = SAFE_DRUG_MAIN_REVISION
+    data_lineage_revision: str = SAFE_DRUG_ARCHIVED_REVISION
     required_outcomes: tuple[str, ...] = REQUIRED_OUTCOMES
     uncertainty_procedure: object = (
         ("rounds", 10),
@@ -424,9 +424,9 @@ class ComparisonProtocolV1_1:
         if self.protocol_version != "1.1":
             raise ProtocolValidationError("ComparisonProtocolV1_1 protocol_version must be 1.1")
         require_identifier(self.data_lineage_revision, field="protocol.data_lineage_revision")
-        if self.data_lineage_revision != SAFE_DRUG_MAIN_REVISION:
+        if self.data_lineage_revision != SAFE_DRUG_ARCHIVED_REVISION:
             raise ProtocolValidationError(
-                "Comparison Protocol v1.1 must use SafeDrug main processing lineage"
+                "Comparison Protocol v1.1 must use SafeDrug archived processing lineage"
             )
         outcomes = tuple(
             require_identifier(item, field="protocol.required_outcomes")

@@ -12,67 +12,44 @@ status = "needs_pin"
 
 [[baselines]]
 baseline_id = "gamenet"
-display_name = "GAMENet (SafeDrug main)"
+display_name = "GAMENet (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
-adapter_command = ["bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"]
-adapter_revision = "sha256:580f1eebe9bb48c8966d9c616e4f6c65825ee1115f3c4ee30b36676c69136cb1"
-environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 status = "pinned"
 
 [[baselines]]
 baseline_id = "safedrug"
-display_name = "SafeDrug (main)"
+display_name = "SafeDrug (archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
-adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "safedrug"]
-adapter_revision = "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
-environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
-status = "pinned"
-
-[[baselines]]
-baseline_id = "molerec"
-display_name = "MoleRec"
-supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
-
-[baselines.source]
-repository = "https://github.com/yangnianzu0515/MoleRec"
-revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 status = "pinned"
 
 [[baselines]]
 baseline_id = "retain"
-display_name = "RETAIN (SafeDrug main)"
+display_name = "RETAIN (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
-adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "retain"]
-adapter_revision = "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
-environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 status = "pinned"
 
 [[baselines]]
 baseline_id = "leap-safedrug"
-display_name = "LEAP (SafeDrug main)"
+display_name = "LEAP (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
 readiness = "registered"
-adapter_command = ["bash", "baselines/scripts/run_safedrug_family_319.sh", "leap-safedrug"]
-adapter_revision = "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
-environment_sha256 = "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
-revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"
+revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 status = "pinned"

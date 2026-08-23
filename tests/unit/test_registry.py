@@ -233,56 +233,31 @@ def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
 def test_project_registry_makes_no_readiness_claims() -> None:
     registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
 
-    assert len(registry.baselines) == 6
+    assert len(registry.baselines) == 5
     assert {baseline.readiness for baseline in registry.baselines} == {BaselineReadiness.REGISTERED}
     gamenet = registry.get("gamenet")
-    assert gamenet.adapter_command == (
-        "bash",
-        "baselines/scripts/run_gamenet_319.sh",
-        "gamenet",
-    )
-    assert gamenet.adapter_revision == (
-        "sha256:580f1eebe9bb48c8966d9c616e4f6c65825ee1115f3c4ee30b36676c69136cb1"
-    )
-    assert gamenet.environment_sha256 == (
-        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
-    )
+    assert gamenet.display_name == "GAMENet (SafeDrug archived)"
+    assert gamenet.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+    assert gamenet.adapter_command == ()
+    assert gamenet.adapter_revision is None
+    assert gamenet.environment_sha256 is None
     safedrug = registry.get("safedrug")
-    assert safedrug.adapter_command == (
-        "bash",
-        "baselines/scripts/run_safedrug_family_319.sh",
-        "safedrug",
-    )
-    assert safedrug.adapter_revision == (
-        "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
-    )
-    assert safedrug.environment_sha256 == (
-        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
-    )
+    assert safedrug.display_name == "SafeDrug (archived)"
+    assert safedrug.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+    assert safedrug.adapter_command == ()
+    assert safedrug.adapter_revision is None
+    assert safedrug.environment_sha256 is None
     retain = registry.get("retain")
-    assert retain.adapter_command == (
-        "bash",
-        "baselines/scripts/run_safedrug_family_319.sh",
-        "retain",
-    )
-    assert retain.adapter_revision == (
-        "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
-    )
-    assert retain.environment_sha256 == (
-        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
-    )
+    assert retain.display_name == "RETAIN (SafeDrug archived)"
+    assert retain.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+    assert retain.adapter_command == ()
+    assert retain.adapter_revision is None
+    assert retain.environment_sha256 is None
     leap = registry.get("leap-safedrug")
-    assert leap.display_name == "LEAP (SafeDrug main)"
-    assert leap.adapter_command == (
-        "bash",
-        "baselines/scripts/run_safedrug_family_319.sh",
-        "leap-safedrug",
-    )
-    assert leap.adapter_revision == (
-        "sha256:36a6416b821dc2f75e13fbbbefa209ef804d093c434d300186dbea1e5d2ac81a"
-    )
-    assert leap.environment_sha256 == (
-        "971ad2bfd7309cd3d7af4aae26187ad4e00bc806ad3714188e854c657f5b45fe"
-    )
+    assert leap.display_name == "LEAP (SafeDrug archived)"
+    assert leap.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+    assert leap.adapter_command == ()
+    assert leap.adapter_revision is None
+    assert leap.environment_sha256 is None
     assert leap.source.status is SourceStatus.PINNED
     assert not leap.is_comparable

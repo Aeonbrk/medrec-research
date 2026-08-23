@@ -12,6 +12,7 @@ LOCAL_REVISION = "a" * 40
 ENVIRONMENT_SHA256 = "e" * 64
 REMOTE_ROOT = "/root/zhb/medrec-research"
 DATA_ROOT = "/root/zhb/medrec-data"
+TEST_BASELINE_REVISION = "1" * 40
 
 
 ADAPTER_REVISION = "sha256:" + "0" * 64
@@ -25,6 +26,7 @@ def _baseline(
     adapter_revision: str | None = ADAPTER_REVISION,
     environment_sha256: str | None = ENVIRONMENT_SHA256,
     pinned: bool = True,
+    source_revision: str = TEST_BASELINE_REVISION,
 ) -> BaselineDefinition:
     cmd = command or (
         ["bash", "baselines/scripts/run_gamenet_319.sh", "gamenet"]
@@ -33,7 +35,7 @@ def _baseline(
     )
     cmd_toml = str(cmd).replace("'", '"')
     source_status = "pinned" if pinned else "needs_pin"
-    source_rev = 'revision = "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a"' if pinned else ""
+    source_rev = f'revision = "{source_revision}"' if pinned else ""
 
     adapter_rev_line = f'adapter_revision = "{adapter_revision}"' if adapter_revision else ""
     env_line = f'environment_sha256 = "{environment_sha256}"' if environment_sha256 else ""
@@ -85,7 +87,7 @@ class ScriptedExecutor(RemoteExecutor):
             "launcher": "ok",
             "launcher-digest": ADAPTER_REVISION,
             "baseline-source-clean": "",
-            "baseline-source-revision": "88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a",
+            "baseline-source-revision": TEST_BASELINE_REVISION,
             "baseline-inputs": "ok",
             "environment": ENVIRONMENT_SHA256,
             "environment-imports": "ok",
@@ -100,7 +102,10 @@ class ScriptedExecutor(RemoteExecutor):
 
 
 def _run(
-    executor: RemoteExecutor, *, baseline: BaselineDefinition | None = None
+    executor: RemoteExecutor,
+    *,
+    baseline: BaselineDefinition | None = None,
+    dry_run: bool = False,
 ) -> RemoteSubmission:
     return executor.run_baseline(
         baseline or _baseline(),
@@ -110,6 +115,7 @@ def _run(
         data_root=DATA_ROOT,
         min_free_gpu_mib=20000,
         min_free_disk_gib=100,
+        dry_run=dry_run,
     )
 
 

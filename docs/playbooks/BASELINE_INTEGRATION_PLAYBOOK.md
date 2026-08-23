@@ -10,9 +10,9 @@ An archive path identifies historical evidence, not an upstream release. Do not 
 
 ## 2. Audit source, license, and lineage
 
-Complete the public-safe Baseline Audit and matching Audit Review before selecting a reproduction lane. Source is always a hard gate; license status is always recorded. Current V2 final-five selection treats license status as nonblocking without asserting that an unlicensed source is licensed or permitting its distribution in Git. Priority never converts an unresolved active gate into a pass. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
+Complete public-safe source, license, and lineage review before selecting a reproduction lane. Source is always a hard gate; license status is always recorded. Shared preprocessing or evaluation lineage must remain visible and does not count as independent replication evidence.
 
-Validate the exact final-five set with `audit-validate`, then pass the current Registry and explicit Comparison Scope to `selection-publish`. The Selection Result binds both records. Do not edit registry readiness to make a blocked candidate selectable.
+The active Baseline Registry and explicit Comparison Scope own selection. Do not edit registry readiness to make a blocked candidate selectable.
 
 ## 3. Reproduce upstream behavior
 

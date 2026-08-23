@@ -14,7 +14,7 @@ from medrec_research import (
 )
 from medrec_research.comparison_protocol import (
     MOLEREC_SAFEDRUG_LINEAGE_REVISION,
-    SAFE_DRUG_MAIN_REVISION,
+    SAFE_DRUG_ARCHIVED_REVISION,
 )
 
 
@@ -143,5 +143,5 @@ def test_independent_evaluation_requires_complete_target_free_coverage() -> None
         )
 
 
-def test_comparison_protocol_uses_the_safe_drug_main_lineage() -> None:
-    assert _protocol().data_lineage_revision == SAFE_DRUG_MAIN_REVISION
+def test_comparison_protocol_uses_the_safe_drug_archived_lineage() -> None:
+    assert _protocol().data_lineage_revision == SAFE_DRUG_ARCHIVED_REVISION

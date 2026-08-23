@@ -1,3 +1,0 @@
-schema_version = 1
-program_id = "final-five"
-candidate_ids = ["gamenet", "safedrug", "molerec", "retain", "leap-safedrug"]

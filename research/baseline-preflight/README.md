@@ -1,15 +1,14 @@
-# Final-five baseline execution preflight
+# Active baseline execution preflight
 
-Every active candidate remains `registered`. No baseline has executed on 319, and no result is Comparison Mode evidence.
+Every active baseline remains `registered`. No archived result is Comparison Mode evidence.
 
-| Candidate | Pinned source | Source-hosted role |
+| Baseline | Pinned source | Role |
 | --- | --- | --- |
-| GAMENet | `ycq091044/SafeDrug@88ce5c3` | SafeDrug-main implementation |
-| SafeDrug | `ycq091044/SafeDrug@88ce5c3` | SafeDrug-main implementation |
-| MoleRec | `yangnianzu0515/MoleRec@dd5afaf` | Official implementation |
-| RETAIN | `ycq091044/SafeDrug@88ce5c3` | SafeDrug-main implementation |
-| LEAP-SafeDrug | `ycq091044/SafeDrug@88ce5c3` | SafeDrug-main implementation |
+| GAMENet | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
+| SafeDrug | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
+| RETAIN | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
+| LEAP-SafeDrug | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
 
-The four SafeDrug-main entries use one preprocessing, split, and evaluation suite. DMNC is pinned separately at `thaihungle/DMNC@3ce17a9`. MoleRec keeps its own source-native preprocessing and environment.
+The four SafeDrug-family entries use one archived preprocessing, split, and evaluation suite. They are distinct model lanes, not four source authorities. No second external baseline lineage participates in the active registry.
 
 Before a real run, the 319 checkout, restricted data root, source checkouts, isolated Conda environments, GPU capacity, and disk capacity must pass the remote execution playbook. Store all patient data, generated datasets, environments, checkpoints, predictions, and logs outside Git.
