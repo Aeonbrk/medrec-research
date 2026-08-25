@@ -223,23 +223,6 @@ class RemoteExecutor:
         if observed_environment != program.environment_sha256:
             raise ProtocolValidationError("remote environment check failed")
 
-        program_probe_cmd = (
-            "source /root/anaconda3/etc/profile.d/conda.sh && "
-            f"conda activate {shlex.quote(program.conda_environment)} && "
-            f"CUDA_VISIBLE_DEVICES={gpu_index} python {shlex.quote(str(program_path))} "
-            f"{shlex.quote(baseline.baseline_id)} "
-            f"--upstream-root {quoted_upstream_root} "
-            f"--dataset-root {shlex.quote(str(dataset_root))} "
-            "--mode probe --probe-scope full"
-        )
-        probe_raw = self.ssh(host, program_probe_cmd, gate="program-probe")
-        self._validate_program_probe(
-            probe_raw,
-            baseline=baseline,
-            program=program,
-            expected_environment_sha256=observed_environment,
-        )
-
         gpu_output = self.ssh(
             host,
             f"nvidia-smi --id={gpu_index} "
@@ -273,11 +256,28 @@ class RemoteExecutor:
             gate="disk",
         )
         try:
-            free_disk_kib = int(disk_output)
+            free_disk_kib = int(disk_output.strip())
         except ValueError as error:
             raise ProtocolValidationError("remote disk report is invalid") from error
         if free_disk_kib < min_free_disk_gib * 1024 * 1024:
             raise ProtocolValidationError("remote disk capacity is insufficient")
+
+        program_probe_cmd = (
+            "source /root/anaconda3/etc/profile.d/conda.sh && "
+            f"conda activate {shlex.quote(program.conda_environment)} && "
+            f"CUDA_VISIBLE_DEVICES={gpu_index} python {shlex.quote(str(program_path))} "
+            f"{shlex.quote(baseline.baseline_id)} "
+            f"--upstream-root {quoted_upstream_root} "
+            f"--dataset-root {shlex.quote(str(dataset_root))} "
+            "--mode probe --probe-scope full"
+        )
+        probe_raw = self.ssh(host, program_probe_cmd, gate="program-probe")
+        self._validate_program_probe(
+            probe_raw,
+            baseline=baseline,
+            program=program,
+            expected_environment_sha256=observed_environment,
+        )
 
         return PreflightResult(
             host=host,

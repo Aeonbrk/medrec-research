@@ -301,10 +301,10 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "baseline-source-revision",
         "baseline-inputs",
         "environment",
-        "program-probe",
         "gpu",
         "gpu-processes",
         "disk",
+        "program-probe",
         "tmux-launch",
     ]
     clean_commands = {
