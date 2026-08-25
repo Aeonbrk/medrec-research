@@ -24,13 +24,14 @@
   - `leap-safedrug`: Run `medrec-baseline-leap-safedrug-20260822-132647-545ede8a` (best epoch: 44), DDI $0.0705 \pm 0.0005$, Jaccard $0.4442 \pm 0.0030$, F1 $0.6068 \pm 0.0031$, PRAUC $0.6506 \pm 0.0035$, Avg Meds $18.9097 \pm 0.0782$.
 - **Boundary**: these runs used 15,032 visits and a 112-medication vocabulary, not the paper's 14,995 visits and 131 medications. They remain truthful historical provenance but do not participate in future baseline selection, paper reproduction, or Comparison Mode.
 
-## Accepted: Archived Four-Model Reproduction Preparation
+## Completed Preparation: Archived Four-Model Reproduction Preparation
 
-- **Status**: accepted on `2026-08-25`; implementation and 319 execution are pending Gemini, followed by Codex review.
+- **Status**: preparation completed on `2026-08-25`; modern 319 environment verified, Linux lock frozen, paper-lineage dataset snapshot `snapshots/safedrug-archived-ijcai21` validated with exact MIMIC-III counts (6,350 patients, 15,032 visits, 131 meds), all 4 one-epoch smoke lanes (GAMENet, SafeDrug, RETAIN, LEAP) completed on GPUs 0, 1, 2, 3 producing `smoke.json`. Awaiting human Go/No-Go review.
 - **Plan**: `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.
-- **Scope**: finish every prerequisite before formal archived training: explicit probe/smoke behavior, a proved modern 319 environment and Linux lock, a newly regenerated paper-lineage snapshot, exact B0 counts, and one independent non-evidence epoch for each of GAMENet, SafeDrug, RETAIN, and LEAP.
-- **Execution boundary**: stop at `awaiting_human_go_no_go` with `formal_training_authorized: false`. Do not launch a 50-epoch job or upstream ten-round test under this plan.
-- **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns scientific behavior. Master/main is an engineering reference only; local Git state may replace the two remote code checkouts, while data, runs, checkpoints, and weights remain untouched.
+- **Artifacts**: `runtime/reproduction-prep/prep-20260825-202045/state.json`, `runtime/reproduction-prep/prep-20260825-202045/go-no-go.json`.
+- **Scope**: finished every prerequisite before formal archived training: explicit probe/smoke behavior, proved modern 319 environment and Linux lock, newly regenerated paper-lineage snapshot, exact counts, and one independent non-evidence epoch for each of GAMENet, SafeDrug, RETAIN, and LEAP.
+- **Execution boundary**: stopped at `awaiting_human_go_no_go` with `formal_training_authorized: false`. No 50-epoch job or upstream ten-round test was launched.
+- **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns scientific behavior. Master/main is an engineering reference only; local Git state is code authority. Data, runs, checkpoints, and weights remain untouched.
 
 ## Accepted: SafeDrug Archived Single-Baseline Program
 
