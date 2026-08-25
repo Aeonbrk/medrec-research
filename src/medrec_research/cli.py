@@ -303,6 +303,66 @@ def _reproduce_smoke(
     return 2 if failed else 0
 
 
+def _stage_safedrug_c721(args: argparse.Namespace) -> int:
+    """Stage SafeDrug c721 dataset into staging directory."""
+    from .safedrug_c721 import stage_safedrug_c721
+
+    proof = stage_safedrug_c721(
+        preprocessing_checkout=args.preprocessing_checkout,
+        prescriptions_path=args.prescriptions,
+        diagnoses_path=args.diagnoses,
+        procedures_path=args.procedures,
+        ddi_path=args.drug_ddi,
+        staging_directory=args.staging_directory,
+        python=args.python,
+        input_manifest_path=args.input_manifest,
+    )
+    print(
+        json.dumps(
+            {
+                "status": "staged",
+                "source_revision": proof["source_revision"],
+                "outputs": proof["outputs"],
+                "staging_directory": str(args.staging_directory),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
+def _audit_safedrug_table2(args: argparse.Namespace) -> int:
+    """Audit four formal reproduction results against Table 2 and emit public-safe packet."""
+    from .reproduction_audit import audit_safedrug_table2
+
+    result_paths = {
+        "gamenet": args.gamenet_result,
+        "safedrug": args.safedrug_result,
+        "retain": args.retain_result,
+        "leap-safedrug": args.leap_result,
+    }
+    packet = audit_safedrug_table2(
+        ledger_path=args.ledger,
+        result_paths=result_paths,
+        output_path=args.output,
+        reference_path=args.reference,
+    )
+    print(
+        json.dumps(
+            {
+                "verdict": packet["verdict"],
+                "interval_checks_passed": packet["interval_checks_passed"],
+                "relationship_checks_passed": packet["relationship_checks_passed"],
+                "output": str(args.output),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -434,6 +494,109 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     smoke.add_argument("--dry-run", action="store_true")
     smoke.set_defaults(handler=_reproduce_smoke)
+
+    # 7. Stage SafeDrug c721 Dataset
+    stage_c721 = commands.add_parser(
+        "stage-safedrug-c721",
+        help="Stage SafeDrug c7218d0 paper-lineage dataset on 319",
+    )
+    stage_c721.add_argument(
+        "--preprocessing-checkout",
+        type=Path,
+        required=True,
+        help="Path to clean SafeDrug c7218d0 checkout",
+    )
+    stage_c721.add_argument(
+        "--prescriptions",
+        type=Path,
+        required=True,
+        help="Path to PRESCRIPTIONS.csv.gz",
+    )
+    stage_c721.add_argument(
+        "--diagnoses",
+        type=Path,
+        required=True,
+        help="Path to DIAGNOSES_ICD.csv.gz",
+    )
+    stage_c721.add_argument(
+        "--procedures",
+        type=Path,
+        required=True,
+        help="Path to PROCEDURES_ICD.csv.gz",
+    )
+    stage_c721.add_argument(
+        "--drug-ddi",
+        type=Path,
+        required=True,
+        help="Path to drug-DDI.csv",
+    )
+    stage_c721.add_argument(
+        "--staging-directory",
+        type=Path,
+        required=True,
+        help="Path to candidate staging directory (must not exist)",
+    )
+    stage_c721.add_argument(
+        "--python",
+        default=sys.executable,
+        help="Python executable to run preprocessing script",
+    )
+    stage_c721.add_argument(
+        "--input-manifest",
+        type=Path,
+        default=None,
+        help="Optional path to input-manifest.json",
+    )
+    stage_c721.set_defaults(handler=_stage_safedrug_c721)
+
+    # 8. SafeDrug Table 2 Reproduction Audit
+    audit = commands.add_parser(
+        "audit-safedrug-table2",
+        help="Audit four formal reproduction results against IJCAI 2021 Table 2",
+    )
+    audit.add_argument(
+        "--ledger",
+        type=Path,
+        required=True,
+        help="Path to reproduction state ledger JSON",
+    )
+    audit.add_argument(
+        "--gamenet-result",
+        type=Path,
+        required=True,
+        help="Path to gamenet formal result.json",
+    )
+    audit.add_argument(
+        "--safedrug-result",
+        type=Path,
+        required=True,
+        help="Path to safedrug formal result.json",
+    )
+    audit.add_argument(
+        "--retain-result",
+        type=Path,
+        required=True,
+        help="Path to retain formal result.json",
+    )
+    audit.add_argument(
+        "--leap-result",
+        type=Path,
+        required=True,
+        help="Path to leap-safedrug formal result.json",
+    )
+    audit.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Output path for Table 2 audit packet JSON",
+    )
+    audit.add_argument(
+        "--reference",
+        type=Path,
+        default=Path("research/baseline-preflight/safedrug-table2-reference.json"),
+        help="Optional path to Table 2 reference JSON",
+    )
+    audit.set_defaults(handler=_audit_safedrug_table2)
 
     return parser
 

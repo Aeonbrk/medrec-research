@@ -5,7 +5,7 @@ program_id = "safedrug-archived"
 entrypoint = "baselines/safedrug_archived.py"
 conda_environment = "medrec-safedrug-archived"
 upstream_root = "/root/zhb/SafeDrug"
-dataset_subdirectory = "snapshots/safedrug-archived-ijcai21"
+dataset_subdirectory = "snapshots/safedrug-paper-c721-ijcai21"
 run_subdirectory = "runs/safedrug-archived"
 required_inputs = [
   "records_final.pkl",

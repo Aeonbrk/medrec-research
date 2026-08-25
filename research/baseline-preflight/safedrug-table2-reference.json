@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "kind": "safedrug_table2_reference",
+  "paper": "IJCAI 2021 SafeDrug",
+  "baselines": {
+    "retain": {
+      "ddi_rate": { "mean": 0.0835, "std": 0.0020 },
+      "jaccard": { "mean": 0.4887, "std": 0.0028 },
+      "avg_f1": { "mean": 0.6481, "std": 0.0027 },
+      "prauc": { "mean": 0.7556, "std": 0.0033 },
+      "avg_medications": { "mean": 20.4051, "std": 0.2832 }
+    },
+    "leap-safedrug": {
+      "ddi_rate": { "mean": 0.0731, "std": 0.0008 },
+      "jaccard": { "mean": 0.4521, "std": 0.0024 },
+      "avg_f1": { "mean": 0.6138, "std": 0.0026 },
+      "prauc": { "mean": 0.6549, "std": 0.0033 },
+      "avg_medications": { "mean": 18.7138, "std": 0.0666 }
+    },
+    "gamenet": {
+      "ddi_rate": { "mean": 0.0864, "std": 0.0006 },
+      "jaccard": { "mean": 0.5067, "std": 0.0025 },
+      "avg_f1": { "mean": 0.6626, "std": 0.0025 },
+      "prauc": { "mean": 0.7631, "std": 0.0030 },
+      "avg_medications": { "mean": 27.2145, "std": 0.1141 }
+    },
+    "safedrug": {
+      "ddi_rate": { "mean": 0.0589, "std": 0.0005 },
+      "jaccard": { "mean": 0.5213, "std": 0.0030 },
+      "avg_f1": { "mean": 0.6768, "std": 0.0027 },
+      "prauc": { "mean": 0.7647, "std": 0.0025 },
+      "avg_medications": { "mean": 19.9178, "std": 0.1604 }
+    }
+  }
+}

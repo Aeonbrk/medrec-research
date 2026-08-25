@@ -49,7 +49,7 @@ def test_reproduce_dry_run_prints_complete_archived_command() -> None:
     assert "baselines/safedrug_archived.py gamenet" in result["command"]
     assert "--upstream-root /root/zhb/SafeDrug" in result["command"]
     assert (
-        "--dataset-root /root/zhb/medrec-data/snapshots/safedrug-archived-ijcai21"
+        "--dataset-root /root/zhb/medrec-data/snapshots/safedrug-paper-c721-ijcai21"
         in result["command"]
     )
     assert "--mode smoke" not in result["command"]
@@ -246,3 +246,15 @@ def test_project_registry_program_is_shared_by_all_archived_lanes() -> None:
         registry.reproduction_program_for(registry.get(baseline_id)).program_id
         for baseline_id in ("gamenet", "safedrug", "retain", "leap-safedrug")
     } == {"safedrug-archived"}
+
+
+def test_stage_safedrug_c721_cli_missing_arg_fails() -> None:
+    completed = _cli("stage-safedrug-c721")
+    assert completed.returncode == 2
+    assert "required" in completed.stderr
+
+
+def test_audit_safedrug_table2_cli_missing_arg_fails() -> None:
+    completed = _cli("audit-safedrug-table2")
+    assert completed.returncode == 2
+    assert "required" in completed.stderr

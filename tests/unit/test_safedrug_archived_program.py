@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -17,22 +18,40 @@ SPEC.loader.exec_module(adapter)
 
 
 def paper_values() -> tuple[
-    list[list[None]],
+    list[list[list[list[int]]]],
     dict[str, object],
     list[list[int]],
     list[list[int]],
     list[list[int]],
-    dict[int, str],
+    dict[str, object],
 ]:
-    records = [[None] * 2 for _ in range(6_349)] + [[None] * 2_297]
-    vocabulary = {"med_voc": SimpleNamespace(idx2word=list(range(131)))}
+    sample_admission = [[0], [0], [0]]
+    records = [[sample_admission, sample_admission] for _ in range(6_349)] + [
+        [sample_admission for _ in range(2_297)]
+    ]
+    diag_words = [f"D{i}" for i in range(10)]
+    pro_words = [f"P{i}" for i in range(10)]
+    med_words = [f"M{i}" for i in range(131)]
+    vocabulary = {
+        "diag_voc": SimpleNamespace(
+            idx2word=diag_words, word2idx={w: i for i, w in enumerate(diag_words)}
+        ),
+        "pro_voc": SimpleNamespace(
+            idx2word=pro_words, word2idx={w: i for i, w in enumerate(pro_words)}
+        ),
+        "med_voc": SimpleNamespace(
+            idx2word=med_words, word2idx={w: i for i, w in enumerate(med_words)}
+        ),
+    }
     ddi = [[0] * 131 for _ in range(131)]
     pairs = ((row, column) for row in range(131) for column in range(row + 1, 131))
     for row, column in list(pairs)[:448]:
         ddi[row][column] = ddi[column][row] = 1
     ddi_mask = [[0] * 491 for _ in range(131)]
     ehr_adj = [[0] * 131 for _ in range(131)]
-    idx2drug = {idx: "CC(=O)O" for idx in range(131)}
+    idx2drug = {code: "CC(=O)O" for code in med_words}
+    idx2drug["seperator"] = {}
+    idx2drug["decoder_point"] = {}
     return records, vocabulary, ddi, ddi_mask, ehr_adj, idx2drug
 
 
@@ -189,10 +208,19 @@ def test_load_and_validate_canonical_inputs_validates_all_six(
         with (data_dir / name).open("wb") as stream:
             pickle.dump(val, stream)
 
-    results, counts = adapter.load_and_validate_canonical_inputs(data_dir)
+    results, counts, bridge_checks = adapter.load_and_validate_canonical_inputs(data_dir)
     assert len(results) == 6
     assert all(status == "passed" for status in results.values())
     assert counts == adapter.EXPECTED_COUNTS
+    assert set(bridge_checks.keys()) == {
+        "vocabulary_bijections",
+        "records_structure",
+        "idx2drug_contract",
+        "ddi_matrix_properties",
+        "ehr_matrix_properties",
+        "ddi_mask_properties",
+    }
+    assert all(v == "passed" for v in bridge_checks.values())
 
 
 def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
@@ -210,7 +238,6 @@ def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
     data_dir = tmp_path / "data"
     data_dir.mkdir()
 
-    # Wrong ehr_adj shape
     for name, val in [
         ("records_final.pkl", records),
         ("voc_final.pkl", vocabulary),
@@ -224,6 +251,72 @@ def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
 
     with pytest.raises(adapter.ReproductionError, match="ehr_adj_final shape"):
         adapter.load_and_validate_canonical_inputs(data_dir)
+
+
+def test_semantic_bridge_checks_reject_invalid_structures(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import pickle
+
+    monkeypatch.setattr(
+        adapter.importlib,
+        "import_module",
+        lambda name: pickle if name == "dill" else sys.modules.get(name),
+    )
+
+    def write_dataset(overrides: dict[str, Any]) -> Path:
+        data_dir = tmp_path / f"data_{len(list(tmp_path.iterdir()))}"
+        data_dir.mkdir()
+        records, vocabulary, ddi, ddi_mask, ehr_adj, idx2drug = paper_values()
+        vals = {
+            "records_final.pkl": records,
+            "voc_final.pkl": vocabulary,
+            "ddi_A_final.pkl": ddi,
+            "ddi_mask_H.pkl": ddi_mask,
+            "ehr_adj_final.pkl": ehr_adj,
+            "idx2drug.pkl": idx2drug,
+            **overrides,
+        }
+        for name, val in vals.items():
+            with (data_dir / name).open("wb") as stream:
+                pickle.dump(val, stream)
+        return data_dir
+
+    # 1. Non-symmetric matrix
+    _, _, ddi_bad, _, _, _ = paper_values()
+    ddi_bad[0][1] = 1
+    ddi_bad[1][0] = 0
+    d1 = write_dataset({"ddi_A_final.pkl": ddi_bad})
+    with pytest.raises(adapter.ReproductionError, match="symmetric"):
+        adapter.load_and_validate_canonical_inputs(d1)
+
+    # 2. Non-zero diagonal
+    _, _, _, _, ehr_bad, _ = paper_values()
+    ehr_bad[0][0] = 1
+    d2 = write_dataset({"ehr_adj_final.pkl": ehr_bad})
+    with pytest.raises(adapter.ReproductionError, match="zero diagonal"):
+        adapter.load_and_validate_canonical_inputs(d2)
+
+    # 3. idx2drug missing special keys
+    _, _, _, _, _, idx2drug_bad = paper_values()
+    del idx2drug_bad["seperator"]
+    d3 = write_dataset({"idx2drug.pkl": idx2drug_bad})
+    with pytest.raises(adapter.ReproductionError, match="idx2drug keys mismatch"):
+        adapter.load_and_validate_canonical_inputs(d3)
+
+    # 4. records modality duplicate codes
+    records_bad, _, _, _, _, _ = paper_values()
+    records_bad[0][0] = [[0, 0], [0], [0]]
+    d4 = write_dataset({"records_final.pkl": records_bad})
+    with pytest.raises(adapter.ReproductionError, match="duplicate indices"):
+        adapter.load_and_validate_canonical_inputs(d4)
+
+    # 5. records modality out-of-range index
+    records_bad2, _, _, _, _, _ = paper_values()
+    records_bad2[0][0] = [[9999], [0], [0]]
+    d5 = write_dataset({"records_final.pkl": records_bad2})
+    with pytest.raises(adapter.ReproductionError, match="invalid index"):
+        adapter.load_and_validate_canonical_inputs(d5)
 
 
 def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -312,6 +405,7 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         lambda d: (
             {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
             adapter.EXPECTED_COUNTS,
+            {"vocabulary_bijections": "passed", "records_structure": "passed"},
         ),
     )
 
@@ -326,6 +420,10 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     assert probe["scope"] == "full"
     assert len(probe["inputs"]) == 6
     assert probe["dataset_counts"] == adapter.EXPECTED_COUNTS
+    assert probe["bridge_checks"] == {
+        "vocabulary_bijections": "passed",
+        "records_structure": "passed",
+    }
 
 
 def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
@@ -354,6 +452,7 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
         lambda d: (
             {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
             adapter.EXPECTED_COUNTS,
+            {"vocabulary_bijections": "passed"},
         ),
     )
     monkeypatch.setattr(

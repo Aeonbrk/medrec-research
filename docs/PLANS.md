@@ -33,10 +33,18 @@
 - **Execution boundary**: current state is `blocked_data` with `formal_training_authorized: false`. Regenerate a 14,995-visit, 6,350-patient, 131-medication snapshot and rerun all four smokes before any 50-epoch job or upstream ten-round test.
 - **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns model behavior. The SafeDrug and MoleRec paper statistics plus MoleRec's declared SafeDrug-after-`c7218d0976e5ee5588aeaf5bdbc86b338126bba5` preprocessing lineage own the 14,995-visit B0 boundary. Data, runs, checkpoints, and weights remain untouched.
 
+## Accepted: SafeDrug Archived Four-Model Full Reproduction
+
+- **Status**: implementation-ready for Gemini execution on `2026-08-25`; the starting harness fix is commit `86f3108`, and no formal job has been launched. The rejected 15,032-visit snapshot remains a hard data blocker until a new 14,995-visit paper-lineage snapshot passes the full probe.
+- **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
+- **Scope**: rebuild data from SafeDrug `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`, publish it additively, run four fresh non-evidence smokes, and continue directly to one 50-epoch plus ten-test-round archived run for each of GAMENet, SafeDrug, RETAIN, and LEAP when all smoke gates pass.
+- **Authorization**: this plan replaces the preparation-only human GO boundary for this attempt. It authorizes formal continuation only after every data, environment, code, and four-smoke admission gate passes; it does not authorize destructive cleanup, retries, tuning, Comparison Mode, or MoleRec training.
+- **Handoff**: the plan itself authorizes Gemini to implement the frozen staging/probe/audit support, regenerate and publish the paper-lineage data, run four fresh smokes, and proceed directly to four formal 50-epoch plus ten-round lanes when admission passes. Gemini owns execution and the ignored runtime ledger; Codex reviews the public-safe terminal packet after the user returns with the finished reproduction outcome.
+
 ## Accepted: SafeDrug Archived Single-Baseline Program
 
-- **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family source and the common baseline for future innovation. The shared four-model Reproduction Program, registry-driven dry-run, and local synthetic contract tests are implemented; 319 data and environment gates remain blocked.
+- **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family model source and the common baseline for future innovation. The shared four-model Reproduction Program, registry-driven dry-run, local synthetic contract tests, and 319 environment gate are implemented; the paper-lineage data gate remains blocked.
 - **Plan**: `docs/plans/2026-08-23-archived-single-baseline-plan.md`.
 - **Scope**: reuse the existing `gamenet`, `safedrug`, `retain`, and `leap-safedrug` IDs under one archived lineage; regenerate paper-matching preprocessing, add only the mechanical training-mode adaptation required by the archived entrypoints, run four independent GPU lanes, and compare aggregate results with SafeDrug Table 2.
 - **Execution boundary**: no archived run is launchable until the exact paper aggregate counts pass, the training-mode adaptation is audited, and the archived environment succeeds. SafeDrug `main` receives no new registry identity or future run lane.
-- **Follow-on**: the decision history in this plan remains authoritative; the implementation-ready preparation sequence is now owned by `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.
+- **Follow-on**: the decision history in this plan remains authoritative; the implementation-ready full execution is owned by `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
