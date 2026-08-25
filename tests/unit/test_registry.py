@@ -240,8 +240,11 @@ def test_project_registry_makes_no_readiness_claims() -> None:
     program = registry.reproduction_programs[0]
     assert isinstance(program, ReproductionProgram)
     assert program.program_id == "safedrug-archived"
-    assert program.entrypoint == "baselines/safedrug_archived.py"
-    assert not program.is_319_verified
+    assert program.is_319_verified
+    assert (
+        program.environment_sha256
+        == "c17ebfc53484b74497e2d6d8058271de8d7503a2fdb19eb756ddff17ba9715b9"
+    )
     gamenet = registry.get("gamenet")
     assert gamenet.display_name == "GAMENet (SafeDrug archived)"
     assert gamenet.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"

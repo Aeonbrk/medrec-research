@@ -16,6 +16,7 @@ required_inputs = [
   "idx2drug.pkl",
 ]
 import_modules = ["torch", "dnc", "rdkit", "pandas", "dill", "sklearn", "models", "util"]
+environment_sha256 = "c17ebfc53484b74497e2d6d8058271de8d7503a2fdb19eb756ddff17ba9715b9"
 
 [[baselines]]
 baseline_id = "reference"
