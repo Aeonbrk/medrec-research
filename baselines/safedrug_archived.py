@@ -10,6 +10,7 @@ import json
 import math
 import os
 import re
+import shutil
 import subprocess
 import sys
 from collections.abc import Mapping
@@ -663,9 +664,25 @@ def sha256(path: Path) -> str:
 
 
 def environment_summary() -> dict[str, str]:
+    conda_exe = shutil.which("conda")
+    if not conda_exe:
+        for candidate in (
+            Path(sys.prefix).parent.parent / "bin" / "conda",
+            Path(sys.prefix).parent / "bin" / "conda",
+            Path.home() / "anaconda3" / "bin" / "conda",
+            Path.home() / "miniconda3" / "bin" / "conda",
+            Path("/root/anaconda3/bin/conda"),
+            Path("/root/miniconda3/bin/conda"),
+        ):
+            if candidate.is_file():
+                conda_exe = str(candidate)
+                break
+    if not conda_exe:
+        conda_exe = "conda"
+
     try:
         explicit = subprocess.run(
-            ["conda", "list", "--explicit"],
+            [conda_exe, "list", "--explicit"],
             capture_output=True,
             check=True,
         ).stdout
