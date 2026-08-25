@@ -682,7 +682,7 @@ def environment_summary() -> dict[str, str]:
 
     try:
         explicit = subprocess.run(
-            [conda_exe, "list", "--explicit"],
+            [conda_exe, "list", "--explicit", "-p", sys.prefix],
             capture_output=True,
             check=True,
         ).stdout
