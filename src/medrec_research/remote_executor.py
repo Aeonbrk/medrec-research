@@ -565,7 +565,7 @@ class RemoteExecutor:
         counts = data.get("dataset_counts")
         if counts != {
             "patients": 6_350,
-            "visits": 15_032,
+            "visits": 14_995,
             "medications": 131,
             "ddi_pairs": 448,
             "molecular_substructures": 491,

@@ -83,7 +83,7 @@ def _valid_probe_json(baseline_id: str = "gamenet") -> str:
             "inputs": {name: "passed" for name in TEST_INPUTS},
             "dataset_counts": {
                 "patients": 6350,
-                "visits": 15032,
+                "visits": 14995,
                 "medications": 131,
                 "ddi_pairs": 448,
                 "molecular_substructures": 491,
@@ -447,6 +447,23 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
                         "dataset_counts": {
                             "patients": 6349,
                             "visits": 14995,
+                            "medications": 131,
+                            "ddi_pairs": 448,
+                            "molecular_substructures": 491,
+                        },
+                    }
+                )
+            },
+            "dataset counts do not match expected B0",
+        ),
+        (
+            {
+                "program-probe": json.dumps(
+                    {
+                        **json.loads(_valid_probe_json("safedrug")),
+                        "dataset_counts": {
+                            "patients": 6350,
+                            "visits": 15032,
                             "medications": 131,
                             "ddi_pairs": 448,
                             "molecular_substructures": 491,

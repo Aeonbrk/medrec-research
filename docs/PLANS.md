@@ -24,14 +24,14 @@
   - `leap-safedrug`: Run `medrec-baseline-leap-safedrug-20260822-132647-545ede8a` (best epoch: 44), DDI $0.0705 \pm 0.0005$, Jaccard $0.4442 \pm 0.0030$, F1 $0.6068 \pm 0.0031$, PRAUC $0.6506 \pm 0.0035$, Avg Meds $18.9097 \pm 0.0782$.
 - **Boundary**: these runs used 15,032 visits and a 112-medication vocabulary, not the paper's 14,995 visits and 131 medications. They remain truthful historical provenance but do not participate in future baseline selection, paper reproduction, or Comparison Mode.
 
-## Completed Preparation: Archived Four-Model Reproduction Preparation
+## Blocked: Archived Four-Model Reproduction Preparation
 
-- **Status**: preparation completed on `2026-08-25`; modern 319 environment verified, Linux lock frozen, paper-lineage dataset snapshot `snapshots/safedrug-archived-ijcai21` validated with exact MIMIC-III counts (6,350 patients, 15,032 visits, 131 meds), all 4 one-epoch smoke lanes (GAMENet, SafeDrug, RETAIN, LEAP) completed on GPUs 0, 1, 2, 3 producing `smoke.json`. Awaiting human Go/No-Go review.
+- **Status**: Codex review blocked the `2026-08-25` preparation at B0. The frozen snapshot contains 6,350 patients, 15,032 visits, and 131 medications, but the accepted SafeDrug/MoleRec paper-lineage contract requires exactly 14,995 visits. No upstream evidence supports the preparation packet's claim that the 37-visit difference is a paper typo.
 - **Plan**: `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.
 - **Artifacts**: `runtime/reproduction-prep/prep-20260825-202045/state.json`, `runtime/reproduction-prep/prep-20260825-202045/go-no-go.json`.
-- **Scope**: finished every prerequisite before formal archived training: explicit probe/smoke behavior, proved modern 319 environment and Linux lock, newly regenerated paper-lineage snapshot, exact counts, and one independent non-evidence epoch for each of GAMENet, SafeDrug, RETAIN, and LEAP.
-- **Execution boundary**: stopped at `awaiting_human_go_no_go` with `formal_training_authorized: false`. No 50-epoch job or upstream ten-round test was launched.
-- **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns scientific behavior. Master/main is an engineering reference only; local Git state is code authority. Data, runs, checkpoints, and weights remain untouched.
+- **Scope**: the modern environment, Linux lock, probe path, and four one-epoch smoke mechanics were exercised, but every smoke consumed the rejected 15,032-visit snapshot and is non-authorizing. The artifacts remain only as preparation diagnostics.
+- **Execution boundary**: current state is `blocked_data` with `formal_training_authorized: false`. Regenerate a 14,995-visit, 6,350-patient, 131-medication snapshot and rerun all four smokes before any 50-epoch job or upstream ten-round test.
+- **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns model behavior. The SafeDrug and MoleRec paper statistics plus MoleRec's declared SafeDrug-after-`c7218d0976e5ee5588aeaf5bdbc86b338126bba5` preprocessing lineage own the 14,995-visit B0 boundary. Data, runs, checkpoints, and weights remain untouched.
 
 ## Accepted: SafeDrug Archived Single-Baseline Program
 

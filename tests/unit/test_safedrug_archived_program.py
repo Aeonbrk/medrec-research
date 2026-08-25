@@ -24,7 +24,7 @@ def paper_values() -> tuple[
     list[list[int]],
     dict[int, str],
 ]:
-    records = [[None] * 2 for _ in range(6_349)] + [[None] * 2_334]
+    records = [[None] * 2 for _ in range(6_349)] + [[None] * 2_297]
     vocabulary = {"med_voc": SimpleNamespace(idx2word=list(range(131)))}
     ddi = [[0] * 131 for _ in range(131)]
     pairs = ((row, column) for row in range(131) for column in range(row + 1, 131))
@@ -135,6 +135,13 @@ def test_paper_dataset_counts_pass_exact_gate() -> None:
 
     assert counts == adapter.EXPECTED_COUNTS
     adapter.require_paper_counts(counts)
+
+
+def test_dataset_gate_rejects_non_paper_visit_count() -> None:
+    counts = {**adapter.EXPECTED_COUNTS, "visits": 15_032}
+
+    with pytest.raises(adapter.ReproductionError, match="visits"):
+        adapter.require_paper_counts(counts)
 
 
 def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
