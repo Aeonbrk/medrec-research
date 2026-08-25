@@ -2,19 +2,19 @@
 
 The core library does not install external baseline dependencies. Each baseline runs in a named Conda environment and communicates through the process adapter. The separate `medrec-core-evaluator` environment owns restricted Prediction Record validation and aggregate recomputation.
 
-`core-evaluator.yml` is a provisional Linux specification for 319, not a verified lock. Baseline environment declarations are intentionally absent until the SafeDrug archived stack is resolved and verified on 319.
+- `core-evaluator.yml`: Provisional 319 evaluator environment specification.
+- `safedrug-archived.yml`: Candidate 319 baseline environment specification for the SafeDrug archived four-model reproduction (`gamenet`, `safedrug`, `retain`, `leap-safedrug`).
 
-Known unresolved points block `smoke_ready` and `comparison_ready`:
+The candidate baseline environment specifies:
 
-- SafeDrug archived documents Python 3.7 and reference package versions, but the RTX 3090-compatible environment still requires verification.
-- GAMENet imports `dnc`, but archived instructions do not pin its version.
-- CUDA, driver, and hardware compatibility still need verification on the execution host.
-- The core evaluator needs an explicit 319 Linux lock and environment checksum before it can accept evidence.
+- Python 3.11
+- PyTorch 2.2.2 with CUDA 12.1
+- NumPy 1.26.4
+- pandas 2.0.3
+- SciPy 1.11.4
+- scikit-learn 1.3.2
+- RDKit 2023.09.6
+- dill 0.3.7
+- dnc 1.1.0
 
-Create these environments only on 319 after checking disk, GPU, driver, and existing Conda environments. Do not create them on the MacBook or solve them into the Homebrew `uv` core environment.
-
-```bash
-conda env create --file environments/core-evaluator.yml
-```
-
-The Baseline Registry already declares one shared archived environment name. After verification, record its target-platform identity there; split into per-lane declarations only if observed dependency differences require it. Record the core evaluator identity in the experiment plan. Do not advance readiness merely because Conda resolves a file.
+The explicit Linux lock (`environments/safedrug-archived-linux-64.lock`) is exported from the candidate environment only after dependency/runtime checks and staged-data validation succeed on 319. The declared baseline environment is then recreated from that lock, validated against the complete versioned program probe, and its explicit lock hash is recorded in `baselines/registry.toml`.

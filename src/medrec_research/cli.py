@@ -238,6 +238,71 @@ def _reproduce(
     return 2 if failed else 0
 
 
+def _reproduce_smoke(
+    args: argparse.Namespace,
+    *,
+    executor: RemoteExecutor | None = None,
+    git_runner: Runner = subprocess.run,
+) -> int:
+    """Plan or submit one or four independent Reproduction Mode smoke lanes."""
+    try:
+        registry = BaselineRegistry.load(args.registry)
+    except FileNotFoundError as error:
+        raise ProtocolValidationError("baseline registry file not found") from error
+    lanes = _reproduction_lanes(args)
+    source_revision = _local_source_revision(
+        Path.cwd(),
+        require_clean=not args.dry_run,
+        runner=git_runner,
+    )
+    active_executor = executor or RemoteExecutor(registry)
+    results: list[dict[str, object]] = []
+    failed = False
+    for baseline_id, gpu_index in lanes:
+        try:
+            submission = active_executor.run_smoke(
+                baseline_id,
+                source_revision=source_revision,
+                gpu_index=gpu_index,
+                remote_root=args.remote_root,
+                data_root=args.data_root,
+                min_free_gpu_mib=args.min_free_gpu_mib,
+                min_free_disk_gib=args.min_free_disk_gib,
+                dry_run=args.dry_run,
+            )
+            results.append(
+                {
+                    "baseline_id": submission.baseline_id,
+                    "command": submission.command,
+                    "gpu": gpu_index,
+                    "host": submission.host,
+                    "preflight": (
+                        "passed" if submission.preflight_performed else "not_run_dry_run"
+                    ),
+                    "session_id": submission.session_id,
+                    "state": "submitted" if submission.preflight_performed else "planned",
+                }
+            )
+        except ProtocolValidationError as error:
+            failed = True
+            results.append(
+                {
+                    "baseline_id": baseline_id,
+                    "error": str(error),
+                    "gpu": gpu_index,
+                    "state": "blocked",
+                }
+            )
+    print(
+        json.dumps(
+            {"mode": "smoke", "results": results},
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 2 if failed else 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -341,6 +406,34 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     reproduce.add_argument("--dry-run", action="store_true")
     reproduce.set_defaults(handler=_reproduce)
+
+    # 6. Remote Reproduction Smoke Submission
+    smoke = commands.add_parser(
+        "reproduce-smoke", help="Plan or submit archived baseline one-epoch smoke on 319"
+    )
+    smoke.add_argument("baseline_id", choices=(*ARCHIVED_BASELINES, "all"))
+    smoke.add_argument("--gpu", type=_nonnegative_integer)
+    smoke.add_argument("--gpus", type=_gpu_list)
+    smoke.add_argument("--min-free-gpu-mib", type=_positive_integer, default=20000)
+    smoke.add_argument("--min-free-disk-gib", type=_positive_integer, default=100)
+    smoke.add_argument(
+        "--registry",
+        type=Path,
+        default=Path("baselines/registry.toml"),
+        help="Path to registry.toml (default: baselines/registry.toml)",
+    )
+    smoke.add_argument(
+        "--remote-root",
+        default="/root/zhb/medrec-research",
+        help="Verified 319 checkout root",
+    )
+    smoke.add_argument(
+        "--data-root",
+        default="/root/zhb/medrec-data",
+        help="External 319 data root",
+    )
+    smoke.add_argument("--dry-run", action="store_true")
+    smoke.set_defaults(handler=_reproduce_smoke)
 
     return parser
 

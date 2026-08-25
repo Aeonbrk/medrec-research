@@ -24,9 +24,18 @@
   - `leap-safedrug`: Run `medrec-baseline-leap-safedrug-20260822-132647-545ede8a` (best epoch: 44), DDI $0.0705 \pm 0.0005$, Jaccard $0.4442 \pm 0.0030$, F1 $0.6068 \pm 0.0031$, PRAUC $0.6506 \pm 0.0035$, Avg Meds $18.9097 \pm 0.0782$.
 - **Boundary**: these runs used 15,032 visits and a 112-medication vocabulary, not the paper's 14,995 visits and 131 medications. They remain truthful historical provenance but do not participate in future baseline selection, paper reproduction, or Comparison Mode.
 
+## Accepted: Archived Four-Model Reproduction Preparation
+
+- **Status**: accepted on `2026-08-25`; implementation and 319 execution are pending Gemini, followed by Codex review.
+- **Plan**: `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.
+- **Scope**: finish every prerequisite before formal archived training: explicit probe/smoke behavior, a proved modern 319 environment and Linux lock, a newly regenerated paper-lineage snapshot, exact B0 counts, and one independent non-evidence epoch for each of GAMENet, SafeDrug, RETAIN, and LEAP.
+- **Execution boundary**: stop at `awaiting_human_go_no_go` with `formal_training_authorized: false`. Do not launch a 50-epoch job or upstream ten-round test under this plan.
+- **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns scientific behavior. Master/main is an engineering reference only; local Git state may replace the two remote code checkouts, while data, runs, checkpoints, and weights remain untouched.
+
 ## Accepted: SafeDrug Archived Single-Baseline Program
 
 - **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family source and the common baseline for future innovation. The shared four-model Reproduction Program, registry-driven dry-run, and local synthetic contract tests are implemented; 319 data and environment gates remain blocked.
 - **Plan**: `docs/plans/2026-08-23-archived-single-baseline-plan.md`.
 - **Scope**: reuse the existing `gamenet`, `safedrug`, `retain`, and `leap-safedrug` IDs under one archived lineage; regenerate paper-matching preprocessing, add only the mechanical training-mode adaptation required by the archived entrypoints, run four independent GPU lanes, and compare aggregate results with SafeDrug Table 2.
 - **Execution boundary**: no archived run is launchable until the exact paper aggregate counts pass, the training-mode adaptation is audited, and the archived environment succeeds. SafeDrug `main` receives no new registry identity or future run lane.
+- **Follow-on**: the decision history in this plan remains authoritative; the implementation-ready preparation sequence is now owned by `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import secrets
 import shlex
@@ -222,21 +223,22 @@ class RemoteExecutor:
         if observed_environment != program.environment_sha256:
             raise ProtocolValidationError("remote environment check failed")
 
-        imports = ", ".join(program.import_modules)
-        import_probe_cmd = (
+        program_probe_cmd = (
             "source /root/anaconda3/etc/profile.d/conda.sh && "
             f"conda activate {shlex.quote(program.conda_environment)} && "
-            f"CUDA_VISIBLE_DEVICES={gpu_index} python -c "
-            + shlex.quote(
-                f"import sys; sys.path.insert(0, '{program.upstream_root}/src'); "
-                f"import {imports}; "
-                "assert torch.cuda.is_available(), 'CUDA not available'; "
-                "assert torch.cuda.device_count() == 1, 'Expected exactly 1 visible CUDA device'; "
-                "print('ok')"
-            )
+            f"CUDA_VISIBLE_DEVICES={gpu_index} python {shlex.quote(str(program_path))} "
+            f"{shlex.quote(baseline.baseline_id)} "
+            f"--upstream-root {quoted_upstream_root} "
+            f"--dataset-root {shlex.quote(str(dataset_root))} "
+            "--mode probe --probe-scope full"
         )
-        if self.ssh(host, import_probe_cmd, gate="environment-imports") != "ok":
-            raise ProtocolValidationError("remote environment import probe failed")
+        probe_raw = self.ssh(host, program_probe_cmd, gate="program-probe")
+        self._validate_program_probe(
+            probe_raw,
+            baseline=baseline,
+            program=program,
+            expected_environment_sha256=observed_environment,
+        )
 
         gpu_output = self.ssh(
             host,
@@ -297,7 +299,7 @@ class RemoteExecutor:
         min_free_disk_gib: int,
         dry_run: bool = False,
     ) -> RemoteSubmission:
-        """Validate, preflight, and submit one declared Reproduction Mode run."""
+        """Validate, preflight, and submit one declared Reproduction Mode formal run."""
         baseline = self._baseline(baseline_id)
         program, remote_root, data_root = self._validate_launch_inputs(
             baseline,
@@ -319,6 +321,78 @@ class RemoteExecutor:
             data_root=data_root,
             gpu_index=gpu_index,
             run_id=session_id,
+            mode="formal",
+        )
+        if dry_run:
+            return RemoteSubmission(
+                baseline_id=baseline.baseline_id,
+                host=None,
+                session_id=session_id,
+                command=command,
+                preflight_performed=False,
+            )
+
+        result = self.preflight(
+            baseline_id,
+            source_revision=source_revision,
+            gpu_index=gpu_index,
+            remote_root=remote_root,
+            data_root=data_root,
+            min_free_gpu_mib=min_free_gpu_mib,
+            min_free_disk_gib=min_free_disk_gib,
+        )
+        try:
+            self.ssh(
+                result.host,
+                f"tmux new-session -d -s {shlex.quote(session_id)} {shlex.quote(command)}",
+                gate="tmux-launch",
+            )
+        except ProtocolValidationError:
+            self._cleanup_session(session_id, host=result.host)
+            raise
+        return RemoteSubmission(
+            baseline_id=baseline.baseline_id,
+            host=result.host,
+            session_id=session_id,
+            command=command,
+            preflight_performed=True,
+        )
+
+    def run_smoke(
+        self,
+        baseline_id: str,
+        *,
+        source_revision: str,
+        gpu_index: int,
+        remote_root: str,
+        data_root: str,
+        min_free_gpu_mib: int,
+        min_free_disk_gib: int,
+        dry_run: bool = False,
+    ) -> RemoteSubmission:
+        """Validate, preflight, and submit one declared Reproduction Mode smoke run."""
+        baseline = self._baseline(baseline_id)
+        program, remote_root, data_root = self._validate_launch_inputs(
+            baseline,
+            source_revision=source_revision,
+            gpu_index=gpu_index,
+            remote_root=remote_root,
+            data_root=data_root,
+            min_free_gpu_mib=min_free_gpu_mib,
+            min_free_disk_gib=min_free_disk_gib,
+            require_verified=not dry_run,
+        )
+        session_id = (
+            f"medrec-smoke-{baseline.baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
+        )
+        command = self._launch_command(
+            program,
+            baseline_id=baseline.baseline_id,
+            remote_root=remote_root,
+            data_root=data_root,
+            gpu_index=gpu_index,
+            run_id=session_id,
+            mode="smoke",
         )
         if dry_run:
             return RemoteSubmission(
@@ -432,6 +506,75 @@ class RemoteExecutor:
             )
 
     @staticmethod
+    def _validate_program_probe(
+        probe_raw: str,
+        *,
+        baseline: BaselineDefinition,
+        program: ReproductionProgram,
+        expected_environment_sha256: str,
+    ) -> None:
+        try:
+            data = json.loads(probe_raw)
+        except (json.JSONDecodeError, TypeError) as error:
+            raise ProtocolValidationError(
+                "remote program probe output is not valid JSON"
+            ) from error
+        if not isinstance(data, dict):
+            raise ProtocolValidationError("remote program probe output must be a JSON object")
+        if data.get("schema_version") != 1 or data.get("kind") != "safedrug_archived_probe":
+            raise ProtocolValidationError("remote program probe returned invalid schema or kind")
+        if data.get("scope") != "full" or data.get("baseline_id") != baseline.baseline_id:
+            raise ProtocolValidationError(
+                "remote program probe returned mismatched scope or baseline"
+            )
+        if data.get("source_revision") != baseline.source.revision:
+            raise ProtocolValidationError(
+                "remote program probe returned mismatched source revision"
+            )
+        env = data.get("environment")
+        if (
+            not isinstance(env, dict)
+            or env.get("conda_explicit_sha256") != expected_environment_sha256
+        ):
+            raise ProtocolValidationError(
+                "remote program probe returned mismatched environment hash"
+            )
+        if env.get("cuda_visible_device_count") != 1:
+            raise ProtocolValidationError(
+                "remote program probe requires exactly 1 visible CUDA device"
+            )
+        checks = data.get("checks")
+        if not isinstance(checks, dict):
+            raise ProtocolValidationError("remote program probe returned invalid checks structure")
+        if (
+            checks.get("cuda_tensor") != "passed"
+            or checks.get("rdkit_brics") != "passed"
+            or checks.get("dnc_forward") != "passed"
+        ):
+            raise ProtocolValidationError("remote program probe failed runtime checks")
+        imports = checks.get("imports")
+        if not isinstance(imports, dict) or any(
+            imports.get(m) != "passed" for m in program.import_modules
+        ):
+            raise ProtocolValidationError("remote program probe failed module imports")
+        inputs = data.get("inputs")
+        if not isinstance(inputs, dict) or any(
+            inputs.get(name) != "passed" for name in program.required_inputs
+        ):
+            raise ProtocolValidationError("remote program probe failed input verification")
+        counts = data.get("dataset_counts")
+        if counts != {
+            "patients": 6_350,
+            "visits": 14_995,
+            "medications": 131,
+            "ddi_pairs": 448,
+            "molecular_substructures": 491,
+        }:
+            raise ProtocolValidationError(
+                "remote program probe dataset counts do not match expected B0"
+            )
+
+    @staticmethod
     def _remote_path(value: str, *, field: str) -> str:
         if (
             not isinstance(value, str)
@@ -473,34 +616,36 @@ class RemoteExecutor:
         data_root: str,
         gpu_index: int,
         run_id: str,
+        mode: str = "formal",
     ) -> str:
         dataset_root = str(PurePosixPath(data_root) / program.dataset_subdirectory)
         run_root = str(PurePosixPath(data_root) / program.run_subdirectory / run_id)
         program_path = str(PurePosixPath(remote_root) / program.entrypoint)
-        command = shlex.join(
-            (
-                "env",
-                f"MEDREC_RUN_ID={run_id}",
-                f"MEDREC_DATA_ROOT={data_root}",
-                f"SAFEDRUG_ROOT={program.upstream_root}",
-                f"CUDA_VISIBLE_DEVICES={gpu_index}",
-                f"CONDA_ENV={program.conda_environment}",
-                "/root/anaconda3/bin/conda",
-                "run",
-                "--no-capture-output",
-                "-n",
-                program.conda_environment,
-                "python",
-                program_path,
-                baseline_id,
-                "--upstream-root",
-                program.upstream_root,
-                "--dataset-root",
-                dataset_root,
-                "--run-root",
-                run_root,
-            )
-        )
+        argv = [
+            "env",
+            f"MEDREC_RUN_ID={run_id}",
+            f"MEDREC_DATA_ROOT={data_root}",
+            f"SAFEDRUG_ROOT={program.upstream_root}",
+            f"CUDA_VISIBLE_DEVICES={gpu_index}",
+            f"CONDA_ENV={program.conda_environment}",
+            "/root/anaconda3/bin/conda",
+            "run",
+            "--no-capture-output",
+            "-n",
+            program.conda_environment,
+            "python",
+            program_path,
+            baseline_id,
+            "--upstream-root",
+            program.upstream_root,
+            "--dataset-root",
+            dataset_root,
+            "--run-root",
+            run_root,
+        ]
+        if mode == "smoke":
+            argv.extend(["--mode", "smoke"])
+        command = shlex.join(argv)
         return f"cd {shlex.quote(remote_root)} && {command}"
 
     @staticmethod

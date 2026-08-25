@@ -24,6 +24,9 @@ TEST_DECLARATION = (
     "parser.add_argument('--Test', action='store_true', default=True, help=\"test mode\")"
 )
 TRAIN_DECLARATION = TEST_DECLARATION.replace("default=True", "default=False")
+EPOCH_FORMAL = "    EPOCH = 50\n"
+EPOCH_SMOKE = "    EPOCH = 1\n"
+
 EXPECTED_COUNTS = {
     "patients": 6_350,
     "visits": 14_995,
@@ -35,6 +38,25 @@ ROUND_PATTERN = re.compile(
     r"DDI Rate:\s*([0-9.]+),\s*Jaccard:\s*([0-9.]+),\s*PRAUC:\s*([0-9.]+),\s*"
     r"AVG_PRC:\s*([0-9.]+),\s*AVG_RECALL:\s*([0-9.]+),\s*AVG_F1:\s*([0-9.]+),\s*"
     r"AVG_MED:\s*([0-9.]+)"
+)
+
+CANONICAL_SIX_INPUTS = (
+    "records_final.pkl",
+    "voc_final.pkl",
+    "ddi_A_final.pkl",
+    "ddi_mask_H.pkl",
+    "ehr_adj_final.pkl",
+    "idx2drug.pkl",
+)
+REGISTRY_IMPORT_MODULES = (
+    "torch",
+    "dnc",
+    "rdkit",
+    "pandas",
+    "dill",
+    "sklearn",
+    "models",
+    "util",
 )
 
 
@@ -116,6 +138,28 @@ def adapt_training_source(source: str) -> str:
     if adapted.replace(TRAIN_DECLARATION, TEST_DECLARATION) != source:
         raise ReproductionError("training-mode adaptation changed unexpected source bytes")
     return adapted
+
+
+def adapt_epoch_source(source: str) -> str:
+    """Select one training epoch for non-evidence smoke testing."""
+    if source.count(EPOCH_FORMAL) != 1 or EPOCH_SMOKE in source:
+        raise ReproductionError("archived EPOCH declaration drifted from audited source")
+    adapted = source.replace(EPOCH_FORMAL, EPOCH_SMOKE, 1)
+    if adapted.replace(EPOCH_SMOKE, EPOCH_FORMAL, 1) != source:
+        raise ReproductionError("epoch adaptation changed unexpected source bytes")
+    return adapted
+
+
+def adapt_smoke_source(source: str) -> str:
+    """Compose training-mode and 1-epoch adaptations with joint reversibility."""
+    train_adapted = adapt_training_source(source)
+    smoke_adapted = adapt_epoch_source(train_adapted)
+    reversed_source = smoke_adapted.replace(EPOCH_SMOKE, EPOCH_FORMAL, 1).replace(
+        TRAIN_DECLARATION, TEST_DECLARATION
+    )
+    if reversed_source != source:
+        raise ReproductionError("smoke adaptation composition is not reversible to original bytes")
+    return smoke_adapted
 
 
 def test_mode_default(source: str) -> bool:
@@ -300,6 +344,52 @@ def load_archived_values(data_dir: Path) -> tuple[Any, Any, Any, Any]:
     return tuple(values)  # type: ignore[return-value]
 
 
+def load_and_validate_canonical_inputs(
+    data_dir: Path,
+) -> tuple[dict[str, str], dict[str, int]]:
+    dill = importlib.import_module("dill")
+    missing = [name for name in CANONICAL_SIX_INPUTS if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"archived dataset is missing canonical inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in CANONICAL_SIX_INPUTS):
+        raise ReproductionError("archived dataset inputs must be regular files, not symlinks")
+
+    loaded: dict[str, Any] = {}
+    for name in CANONICAL_SIX_INPUTS:
+        with (data_dir / name).open("rb") as stream:
+            try:
+                loaded[name] = dill.load(stream)
+            except Exception as error:
+                raise ReproductionError(
+                    f"failed to load canonical input '{name}': {error}"
+                ) from error
+
+    records = loaded["records_final.pkl"]
+    voc = loaded["voc_final.pkl"]
+    ddi_A = loaded["ddi_A_final.pkl"]
+    ddi_mask = loaded["ddi_mask_H.pkl"]
+    ehr_adj = loaded["ehr_adj_final.pkl"]
+    idx2drug = loaded["idx2drug.pkl"]
+
+    counts = count_dataset(records, voc, ddi_A, ddi_mask)
+    require_paper_counts(counts)
+
+    medications = counts["medications"]
+    ehr_rows, ehr_cols = matrix_shape(ehr_adj)
+    if (ehr_rows, ehr_cols) != (medications, medications):
+        raise ReproductionError(
+            f"ehr_adj_final shape must be {medications} x {medications}, observed "
+            f"{ehr_rows} x {ehr_cols}"
+        )
+    if len(idx2drug) != medications:
+        raise ReproductionError(
+            f"idx2drug length must equal medication count {medications}, observed {len(idx2drug)}"
+        )
+
+    input_results = {name: "passed" for name in CANONICAL_SIX_INPUTS}
+    return input_results, counts
+
+
 def sha256(path: Path) -> str:
     hasher = hashlib.sha256()
     with path.open("rb") as stream:
@@ -320,6 +410,235 @@ def environment_summary() -> dict[str, str]:
     return {
         "conda_explicit_sha256": hashlib.sha256(explicit).hexdigest(),
         "python": sys.version.split()[0],
+    }
+
+
+def _nvidia_driver_version() -> str:
+    proc_path = Path("/proc/driver/nvidia/version")
+    if proc_path.is_file():
+        try:
+            content = proc_path.read_text(encoding="utf-8")
+            match = re.search(r"NVRM version:\s*([^\s]+)", content)
+            if match:
+                return match.group(1)
+        except OSError:
+            pass
+    try:
+        completed = subprocess.run(
+            ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if completed.returncode == 0 and completed.stdout.strip():
+            return completed.stdout.strip().splitlines()[0]
+    except OSError:
+        pass
+    return "unknown"
+
+
+def _package_version(module_name: str) -> str:
+    try:
+        mod = importlib.import_module(module_name)
+        ver = getattr(mod, "__version__", None)
+        if ver is not None:
+            return str(ver)
+    except Exception:
+        pass
+    try:
+        metadata_mod = importlib.import_module("importlib.metadata")
+        return metadata_mod.version(module_name)
+    except Exception:
+        pass
+    return "unknown"
+
+
+def probe_environment_details() -> dict[str, Any]:
+    summary = environment_summary()
+    torch_mod = sys.modules.get("torch") or importlib.import_module("torch")
+
+    torch_cuda = getattr(getattr(torch_mod, "version", None), "cuda", None) or "unknown"
+    cuda_count = torch_mod.cuda.device_count() if torch_mod.cuda.is_available() else 0
+    gpu_name = torch_mod.cuda.get_device_name(0) if cuda_count > 0 else "unknown"
+    if cuda_count > 0:
+        cap = torch_mod.cuda.get_device_capability(0)
+        gpu_cap = f"{cap[0]}.{cap[1]}"
+    else:
+        gpu_cap = "unknown"
+
+    return {
+        "conda_explicit_sha256": summary["conda_explicit_sha256"],
+        "python": summary["python"],
+        "pytorch": getattr(torch_mod, "__version__", "unknown"),
+        "torch_cuda": str(torch_cuda),
+        "nvidia_driver": _nvidia_driver_version(),
+        "numpy": _package_version("numpy"),
+        "pandas": _package_version("pandas"),
+        "scipy": _package_version("scipy"),
+        "scikit_learn": _package_version("sklearn"),
+        "rdkit": _package_version("rdkit"),
+        "dill": _package_version("dill"),
+        "dnc": _package_version("dnc"),
+        "cuda_visible_device_count": cuda_count,
+        "gpu_name": gpu_name,
+        "gpu_capability": gpu_cap,
+    }
+
+
+def check_cuda_tensor() -> str:
+    try:
+        torch_mod = sys.modules.get("torch") or importlib.import_module("torch")
+        if not torch_mod.cuda.is_available():
+            raise ReproductionError("CUDA is not available")
+        if torch_mod.cuda.device_count() != 1:
+            raise ReproductionError(
+                f"expected exactly 1 visible CUDA device, observed {torch_mod.cuda.device_count()}"
+            )
+        tensor_sum = (torch_mod.ones(1, device="cuda") + 1.0).sum().item()
+        if tensor_sum != 2.0:
+            raise ReproductionError(
+                f"CUDA tensor calculation error: expected 2.0, observed {tensor_sum}"
+            )
+        return "passed"
+    except Exception as error:
+        raise ReproductionError(f"CUDA tensor check failed: {error}") from error
+
+
+def check_rdkit_brics() -> str:
+    try:
+        chem_mod = importlib.import_module("rdkit.Chem")
+        brics_mod = importlib.import_module("rdkit.Chem.BRICS")
+        mol = chem_mod.MolFromSmiles("CC(=O)OC1=CC=CC=C1C(=O)O")
+        if mol is None:
+            raise ReproductionError("RDKit failed to parse test SMILES")
+        frags = list(brics_mod.BRICSDecompose(mol))
+        if not frags:
+            raise ReproductionError("RDKit BRICSDecompose returned empty fragments")
+        return "passed"
+    except Exception as error:
+        raise ReproductionError(f"RDKit BRICS check failed: {error}") from error
+
+
+def check_dnc_forward() -> str:
+    try:
+        dnc_mod = importlib.import_module("dnc")
+        dnc_cls = dnc_mod.DNC
+        torch_mod = sys.modules.get("torch") or importlib.import_module("torch")
+        use_cuda = torch_mod.cuda.is_available()
+        gpu_id = 0 if use_cuda else -1
+        rnn = dnc_cls(
+            input_size=10,
+            hidden_size=20,
+            rnn_type="lstm",
+            num_layers=1,
+            num_hidden=1,
+            nr_cells=5,
+            cell_size=10,
+            read_heads=2,
+            batch_first=True,
+            gpu_id=gpu_id,
+        )
+        x = torch_mod.randn(1, 4, 10)
+        if use_cuda:
+            x = x.cuda()
+        out, _ = rnn(x)
+        if out is None or out.shape[0] != 1:
+            raise ReproductionError("dnc forward produced invalid output shape")
+        return "passed"
+    except Exception as error:
+        raise ReproductionError(f"dnc forward check failed: {error}") from error
+
+
+def check_imports(upstream_root: Path) -> dict[str, str]:
+    src_dir = str(upstream_root / "src")
+    if src_dir not in sys.path:
+        sys.path.insert(0, src_dir)
+    results = {}
+    for module_name in REGISTRY_IMPORT_MODULES:
+        try:
+            importlib.import_module(module_name)
+            results[module_name] = "passed"
+        except Exception as error:
+            raise ReproductionError(f"failed to import '{module_name}': {error}") from error
+    return results
+
+
+def verify_upstream_source(upstream_root: Path) -> None:
+    try:
+        observed_revision = subprocess.run(
+            ["git", "-C", str(upstream_root), "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ReproductionError("unable to verify archived upstream source") from error
+    if observed_revision != ARCHIVED_REVISION:
+        raise ReproductionError(f"upstream source must be archived@{ARCHIVED_REVISION}")
+    try:
+        tracked_changes = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(upstream_root),
+                "status",
+                "--porcelain",
+                "--untracked-files=no",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ReproductionError("unable to verify archived upstream cleanliness") from error
+    if tracked_changes:
+        raise ReproductionError("archived upstream source has tracked modifications")
+
+
+def run_probe(
+    *,
+    baseline_id: str,
+    upstream_root: Path,
+    data_dir: Path | None,
+    scope: str,
+) -> dict[str, Any]:
+    if scope not in ("environment", "full"):
+        raise ReproductionError(f"unknown probe scope '{scope}'")
+    profile_for(baseline_id)
+    verify_upstream_source(upstream_root)
+
+    import_checks = check_imports(upstream_root)
+    cuda_status = check_cuda_tensor()
+    rdkit_status = check_rdkit_brics()
+    dnc_status = check_dnc_forward()
+    env_details = probe_environment_details()
+
+    if env_details["cuda_visible_device_count"] != 1:
+        raise ReproductionError("probe requires exactly 1 visible CUDA device")
+
+    inputs_result: dict[str, str] | None = None
+    dataset_counts: dict[str, int] | None = None
+
+    if scope == "full":
+        if data_dir is None:
+            raise ReproductionError("full probe scope requires --dataset-root")
+        inputs_result, dataset_counts = load_and_validate_canonical_inputs(data_dir)
+
+    return {
+        "schema_version": 1,
+        "kind": "safedrug_archived_probe",
+        "scope": scope,
+        "baseline_id": baseline_id,
+        "source_revision": ARCHIVED_REVISION,
+        "environment": env_details,
+        "checks": {
+            "imports": import_checks,
+            "cuda_tensor": cuda_status,
+            "rdkit_brics": rdkit_status,
+            "dnc_forward": dnc_status,
+        },
+        "inputs": inputs_result,
+        "dataset_counts": dataset_counts,
     }
 
 
@@ -351,6 +670,168 @@ def run_logged(command: list[str], *, cwd: Path, env: dict[str, str], log_path: 
         )
 
 
+def run_smoke_lane(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+) -> None:
+    if run_root.exists():
+        raise ReproductionError(f"run root already exists: {run_root}")
+    if (
+        upstream_root == data_dir
+        or upstream_root in data_dir.parents
+        or data_dir in upstream_root.parents
+    ):
+        raise ReproductionError("dataset root must be outside archived upstream source")
+    if (
+        upstream_root == run_root
+        or upstream_root in run_root.parents
+        or run_root in upstream_root.parents
+    ):
+        raise ReproductionError("run root must be outside archived upstream source")
+
+    verify_upstream_source(upstream_root)
+
+    required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
+    missing = [name for name in required_inputs if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"archived dataset is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in required_inputs):
+        raise ReproductionError("archived dataset inputs must be regular files, not symlinks")
+
+    _, counts = load_and_validate_canonical_inputs(data_dir)
+    environment_identity = environment_summary()
+
+    source_dir = upstream_root / "src"
+    original_entrypoint = source_dir / profile.entrypoint
+    original_source = original_entrypoint.read_text(encoding="utf-8")
+    adapted_source = adapt_smoke_source(original_source)
+
+    run_root.mkdir(parents=True)
+    work_src = run_root / "work" / "src"
+    work_src.mkdir(parents=True, exist_ok=False)
+    adapted_entrypoint = work_src / profile.entrypoint
+    adapted_entrypoint.write_text(adapted_source, encoding="utf-8")
+    data_link = work_src.parent / "data"
+    data_link.symlink_to(data_dir, target_is_directory=True)
+
+    model_name = f"{profile.model_name}_{run_root.name}"
+    checkpoint_dir = work_src / "saved" / model_name
+    checkpoint_dir.mkdir(parents=True)
+    started_at = datetime.now(UTC).isoformat()
+
+    adaptation = {
+        "archived_revision": ARCHIVED_REVISION,
+        "entrypoint": profile.entrypoint,
+        "original_sha256": sha256(original_entrypoint),
+        "adapted_sha256": sha256(adapted_entrypoint),
+        "reverse_verification": "byte-identical",
+        "training_default": {
+            "from": TEST_DECLARATION,
+            "to": TRAIN_DECLARATION,
+            "occurrences": 1,
+            "reverse_verification": "byte-identical",
+        },
+        "epoch_limit": {
+            "from": EPOCH_FORMAL,
+            "to": EPOCH_SMOKE,
+            "occurrences": 1,
+            "reverse_verification": "byte-identical",
+        },
+    }
+    write_json(run_root / "adaptation.json", adaptation)
+    write_json(
+        run_root / "status.json",
+        {
+            "schema_version": 1,
+            "kind": "safedrug_archived_smoke_status",
+            "state": "running",
+            "stage": "training",
+            "started_at": started_at,
+            "finished_at": None,
+            "failure_code": None,
+        },
+    )
+
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(source_dir), environment.get("PYTHONPATH", "")))
+    )
+    try:
+        run_logged(
+            training_command(python, adapted_entrypoint, model_name),
+            cwd=work_src,
+            env=environment,
+            log_path=run_root / "train.log",
+        )
+        best_epoch = parse_training_log(
+            (run_root / "train.log").read_text(errors="replace"), expected_epochs=1
+        )
+        if best_epoch != 0:
+            raise ReproductionError(f"smoke mode requires best_epoch 0, observed {best_epoch}")
+        checkpoint = select_checkpoint(checkpoint_dir, profile, best_epoch=0)
+        finished_at = datetime.now(UTC).isoformat()
+        terminal_status = {
+            "schema_version": 1,
+            "kind": "safedrug_archived_smoke_status",
+            "state": "completed",
+            "stage": "terminal",
+            "started_at": started_at,
+            "finished_at": finished_at,
+            "failure_code": None,
+        }
+        write_json(run_root / "status.json", terminal_status)
+        smoke_record = {
+            "schema_version": 1,
+            "kind": "safedrug_archived_smoke",
+            "non_evidence": True,
+            "baseline_id": profile.baseline_id,
+            "source_revision": ARCHIVED_REVISION,
+            "environment_sha256": environment_identity["conda_explicit_sha256"],
+            "dataset_counts": counts,
+            "epochs_requested": 1,
+            "epochs_observed": 1,
+            "best_epoch": 0,
+            "adaptation": {
+                "training_default": {
+                    "from": TEST_DECLARATION,
+                    "to": TRAIN_DECLARATION,
+                    "occurrences": 1,
+                    "reverse_verification": "byte-identical",
+                },
+                "epoch_limit": {
+                    "from": EPOCH_FORMAL,
+                    "to": EPOCH_SMOKE,
+                    "occurrences": 1,
+                    "reverse_verification": "byte-identical",
+                },
+            },
+            "checkpoint": {
+                "epoch": 0,
+                "artifact_id": str(checkpoint.relative_to(run_root)),
+                "size_bytes": checkpoint.stat().st_size,
+            },
+        }
+        write_json(run_root / "smoke.json", smoke_record)
+    except Exception:
+        write_json(
+            run_root / "status.json",
+            {
+                "schema_version": 1,
+                "kind": "safedrug_archived_smoke_status",
+                "state": "failed",
+                "stage": "terminal",
+                "started_at": started_at,
+                "finished_at": datetime.now(UTC).isoformat(),
+                "failure_code": "smoke_failed",
+            },
+        )
+        raise
+
+
 def run_lane(
     *,
     profile: Profile,
@@ -373,35 +854,7 @@ def run_lane(
         or run_root in upstream_root.parents
     ):
         raise ReproductionError("run root must be outside archived upstream source")
-    try:
-        observed_revision = subprocess.run(
-            ["git", "-C", str(upstream_root), "rev-parse", "HEAD"],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as error:
-        raise ReproductionError("unable to verify archived upstream source") from error
-    if observed_revision != ARCHIVED_REVISION:
-        raise ReproductionError(f"upstream source must be archived@{ARCHIVED_REVISION}")
-    try:
-        tracked_changes = subprocess.run(
-            [
-                "git",
-                "-C",
-                str(upstream_root),
-                "status",
-                "--porcelain",
-                "--untracked-files=no",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as error:
-        raise ReproductionError("unable to verify archived upstream cleanliness") from error
-    if tracked_changes:
-        raise ReproductionError("archived upstream source has tracked modifications")
+    verify_upstream_source(upstream_root)
 
     required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
     missing = [name for name in required_inputs if not (data_dir / name).is_file()]
@@ -510,17 +963,57 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("baseline_id", choices=tuple(PROFILES))
     parser.add_argument("--upstream-root", type=Path, required=True)
-    parser.add_argument("--dataset-root", type=Path, required=True)
-    parser.add_argument("--run-root", type=Path, required=True)
+    parser.add_argument("--dataset-root", type=Path)
+    parser.add_argument("--run-root", type=Path)
     parser.add_argument("--python", default=sys.executable)
-    args = parser.parse_args()
-    run_lane(
-        profile=profile_for(args.baseline_id),
-        upstream_root=args.upstream_root.resolve(),
-        data_dir=args.dataset_root.resolve(),
-        run_root=args.run_root.resolve(),
-        python=args.python,
+    parser.add_argument(
+        "--mode",
+        choices=("formal", "smoke", "probe"),
+        default="formal",
+        help="Reproduction execution mode (default: formal)",
     )
+    parser.add_argument(
+        "--probe-scope",
+        choices=("environment", "full"),
+        default="full",
+        help="Probe scope when --mode probe (default: full)",
+    )
+    args = parser.parse_args()
+
+    if args.mode != "probe" and "--probe-scope" in sys.argv:
+        parser.error("--probe-scope is only supported when --mode probe")
+
+    if args.mode == "probe":
+        probe_result = run_probe(
+            baseline_id=args.baseline_id,
+            upstream_root=args.upstream_root.resolve(),
+            data_dir=args.dataset_root.resolve() if args.dataset_root else None,
+            scope=args.probe_scope,
+        )
+        print(json.dumps(probe_result, indent=None, separators=(",", ":")))
+        return
+
+    if args.dataset_root is None:
+        parser.error("--dataset-root is required for smoke and formal modes")
+    if args.run_root is None:
+        parser.error("--run-root is required for smoke and formal modes")
+
+    if args.mode == "smoke":
+        run_smoke_lane(
+            profile=profile_for(args.baseline_id),
+            upstream_root=args.upstream_root.resolve(),
+            data_dir=args.dataset_root.resolve(),
+            run_root=args.run_root.resolve(),
+            python=args.python,
+        )
+    else:
+        run_lane(
+            profile=profile_for(args.baseline_id),
+            upstream_root=args.upstream_root.resolve(),
+            data_dir=args.dataset_root.resolve(),
+            run_root=args.run_root.resolve(),
+            python=args.python,
+        )
 
 
 if __name__ == "__main__":

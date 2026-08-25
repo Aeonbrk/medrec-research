@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shlex
 import subprocess
 
@@ -14,12 +15,14 @@ REMOTE_ROOT = "/root/zhb/medrec-research"
 DATA_ROOT = "/root/zhb/medrec-data"
 TEST_BASELINE_REVISION = "1" * 40
 
-
 TEST_PROGRAM = "baselines/safedrug_archived.py"
 TEST_INPUTS = (
     "records_final.pkl",
     "voc_final.pkl",
     "ddi_A_final.pkl",
+    "ddi_mask_H.pkl",
+    "ehr_adj_final.pkl",
+    "idx2drug.pkl",
 )
 
 
@@ -59,6 +62,36 @@ import_modules = ["torch", "models", "util"]
     )
 
 
+def _valid_probe_json(baseline_id: str = "gamenet") -> str:
+    return json.dumps(
+        {
+            "schema_version": 1,
+            "kind": "safedrug_archived_probe",
+            "scope": "full",
+            "baseline_id": baseline_id,
+            "source_revision": TEST_BASELINE_REVISION,
+            "environment": {
+                "conda_explicit_sha256": ENVIRONMENT_SHA256,
+                "cuda_visible_device_count": 1,
+            },
+            "checks": {
+                "cuda_tensor": "passed",
+                "rdkit_brics": "passed",
+                "dnc_forward": "passed",
+                "imports": {"torch": "passed", "models": "passed", "util": "passed"},
+            },
+            "inputs": {name: "passed" for name in TEST_INPUTS},
+            "dataset_counts": {
+                "patients": 6350,
+                "visits": 14995,
+                "medications": 131,
+                "ddi_pairs": 448,
+                "molecular_substructures": 491,
+            },
+        }
+    )
+
+
 class ScriptedExecutor(RemoteExecutor):
     def __init__(
         self,
@@ -77,6 +110,12 @@ class ScriptedExecutor(RemoteExecutor):
         self.calls.append((host, command, gate))
         if gate == self.fail_gate:
             raise ProtocolValidationError(f"remote {gate} check failed")
+        parts = command.split()
+        baseline_match = "gamenet"
+        for name in ("gamenet", "safedrug", "retain", "leap-safedrug"):
+            if name in parts:
+                baseline_match = name
+                break
         outputs = {
             "identity": "root",
             "source-clean": "",
@@ -88,7 +127,7 @@ class ScriptedExecutor(RemoteExecutor):
             "baseline-source-revision": TEST_BASELINE_REVISION,
             "baseline-inputs": "ok",
             "environment": ENVIRONMENT_SHA256,
-            "environment-imports": "ok",
+            "program-probe": _valid_probe_json(baseline_match),
             "gpu": self.gpu_output,
             "gpu-processes": "",
             "disk": str(200 * 1024 * 1024),
@@ -106,6 +145,24 @@ def _run(
     dry_run: bool = False,
 ) -> RemoteSubmission:
     return executor.run_baseline(
+        baseline_id,
+        source_revision=LOCAL_REVISION,
+        gpu_index=0,
+        remote_root=REMOTE_ROOT,
+        data_root=DATA_ROOT,
+        min_free_gpu_mib=20000,
+        min_free_disk_gib=100,
+        dry_run=dry_run,
+    )
+
+
+def _run_smoke(
+    executor: RemoteExecutor,
+    *,
+    baseline_id: str = "gamenet",
+    dry_run: bool = False,
+) -> RemoteSubmission:
+    return executor.run_smoke(
         baseline_id,
         source_revision=LOCAL_REVISION,
         gpu_index=0,
@@ -168,6 +225,27 @@ def test_remote_executor_dry_run_uses_registry_program_without_ssh() -> None:
     assert f"MEDREC_RUN_ID={submission.session_id}" in submission.command
 
 
+def test_remote_executor_smoke_dry_run_adds_smoke_mode_and_smoke_session_id() -> None:
+    executor = RemoteExecutor(_registry(verified=False))
+
+    submission = executor.run_smoke(
+        "safedrug",
+        source_revision=LOCAL_REVISION,
+        gpu_index=1,
+        remote_root=REMOTE_ROOT,
+        data_root=DATA_ROOT,
+        min_free_gpu_mib=20000,
+        min_free_disk_gib=100,
+        dry_run=True,
+    )
+
+    assert not submission.preflight_performed
+    assert submission.host is None
+    assert submission.session_id.startswith("medrec-smoke-safedrug-")
+    assert "--mode smoke" in submission.command
+    assert "CUDA_VISIBLE_DEVICES=1" in submission.command
+
+
 def test_primary_connection_failure_uses_only_approved_fallback() -> None:
     class PrimaryUnavailableExecutor(ScriptedExecutor):
         def ssh(self, host: str, command: str, *, gate: str) -> str:
@@ -223,7 +301,7 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "baseline-source-revision",
         "baseline-inputs",
         "environment",
-        "environment-imports",
+        "program-probe",
         "gpu",
         "gpu-processes",
         "disk",
@@ -250,6 +328,19 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
     assert f"python {REMOTE_ROOT}/{TEST_PROGRAM} gamenet" in launch
 
 
+def test_smoke_submission_executes_smoke_tmux_launch() -> None:
+    executor = ScriptedExecutor()
+
+    submission = _run_smoke(executor, baseline_id="safedrug")
+
+    assert submission.preflight_performed
+    assert submission.session_id.startswith("medrec-smoke-safedrug-")
+    assert "--mode smoke" in submission.command
+    launch = executor.calls[-1][1]
+    assert f"tmux new-session -d -s {shlex.quote(submission.session_id)}" in launch
+    assert "--mode smoke" in launch
+
+
 def test_safedrug_family_profiles_launch_and_preflight() -> None:
     for profile in ["safedrug", "retain", "leap-safedrug"]:
         executor = ScriptedExecutor()
@@ -273,7 +364,7 @@ def test_safedrug_family_profiles_launch_and_preflight() -> None:
         "baseline-source-revision",
         "baseline-inputs",
         "environment",
-        "environment-imports",
+        "program-probe",
         "gpu",
         "gpu-processes",
         "disk",
@@ -300,7 +391,71 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
         ({"baseline-source-revision": "b" * 40}, "baseline-source-revision"),
         ({"baseline-inputs": "missing"}, "baseline required input"),
         ({"environment": "f" * 64}, "environment"),
-        ({"environment-imports": "failed"}, "environment import probe"),
+        ({"program-probe": "invalid json"}, "program probe output is not valid JSON"),
+        (
+            {
+                "program-probe": json.dumps(
+                    {
+                        "schema_version": 1,
+                        "kind": "safedrug_archived_probe",
+                        "scope": "full",
+                        "baseline_id": "safedrug",
+                        "source_revision": TEST_BASELINE_REVISION,
+                        "environment": {
+                            "conda_explicit_sha256": ENVIRONMENT_SHA256,
+                            "cuda_visible_device_count": 1,
+                        },
+                        "checks": {
+                            "cuda_tensor": "failed",
+                            "rdkit_brics": "passed",
+                            "dnc_forward": "passed",
+                            "imports": {"torch": "passed", "models": "passed", "util": "passed"},
+                        },
+                        "inputs": {name: "passed" for name in TEST_INPUTS},
+                        "dataset_counts": {
+                            "patients": 6350,
+                            "visits": 14995,
+                            "medications": 131,
+                            "ddi_pairs": 448,
+                            "molecular_substructures": 491,
+                        },
+                    }
+                )
+            },
+            "program probe failed runtime checks",
+        ),
+        (
+            {
+                "program-probe": json.dumps(
+                    {
+                        "schema_version": 1,
+                        "kind": "safedrug_archived_probe",
+                        "scope": "full",
+                        "baseline_id": "safedrug",
+                        "source_revision": TEST_BASELINE_REVISION,
+                        "environment": {
+                            "conda_explicit_sha256": ENVIRONMENT_SHA256,
+                            "cuda_visible_device_count": 1,
+                        },
+                        "checks": {
+                            "cuda_tensor": "passed",
+                            "rdkit_brics": "passed",
+                            "dnc_forward": "passed",
+                            "imports": {"torch": "passed", "models": "passed", "util": "passed"},
+                        },
+                        "inputs": {name: "passed" for name in TEST_INPUTS},
+                        "dataset_counts": {
+                            "patients": 6349,
+                            "visits": 14995,
+                            "medications": 131,
+                            "ddi_pairs": 448,
+                            "molecular_substructures": 491,
+                        },
+                    }
+                )
+            },
+            "dataset counts do not match expected B0",
+        ),
         ({"gpu": "not,a,valid,report,shape"}, "GPU report is invalid"),
         ({"gpu": "1, GPU-0, 24000, 0"}, "GPU report is invalid"),
         ({"gpu": "0, GPU-0, 24000, 1"}, "GPU is busy"),

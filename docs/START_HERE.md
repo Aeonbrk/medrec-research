@@ -13,7 +13,7 @@ Use this page to find the source of truth for the question in front of you.
 
 - [`PLANS.md`](PLANS.md) lists accepted multi-step work and its current outcome.
 - [`plans/`](plans/) contains implementation-ready plans and their decision history.
-- [`playbooks/index.md`](playbooks/index.md) routes operational work to the relevant playbook.
+- [`playbooks/index.md`](playbooks/index.md) routes operational work to the relevant playbook (including [`SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md`](playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md)).
 
 ## Inspect research state
 

@@ -9,16 +9,16 @@ from pathlib import Path
 import pytest
 
 from medrec_research import BaselineRegistry, ProtocolValidationError
-from medrec_research.cli import _build_parser, _local_source_revision, _reproduce
+from medrec_research.cli import _build_parser, _local_source_revision, _reproduce, _reproduce_smoke
 from medrec_research.remote_executor import RemoteSubmission
 
 PROJECT_ROOT = Path(__file__).parents[2]
 REGISTRY_PATH = PROJECT_ROOT / "baselines" / "registry.toml"
 
 
-def _cli(*args: str) -> subprocess.CompletedProcess[str]:
+def _cli(subcommand: str, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        (sys.executable, "-m", "medrec_research.cli", "reproduce", *args),
+        (sys.executable, "-m", "medrec_research.cli", subcommand, *args),
         cwd=PROJECT_ROOT,
         capture_output=True,
         text=True,
@@ -41,7 +41,7 @@ def _args(*, baseline_id: str = "gamenet", dry_run: bool = True) -> argparse.Nam
 
 
 def test_reproduce_dry_run_prints_complete_archived_command() -> None:
-    completed = _cli("gamenet", "--gpu", "0", "--dry-run")
+    completed = _cli("reproduce", "gamenet", "--gpu", "0", "--dry-run")
 
     assert completed.returncode == 0
     result = json.loads(completed.stdout)["results"][0]
@@ -52,11 +52,26 @@ def test_reproduce_dry_run_prints_complete_archived_command() -> None:
         "--dataset-root /root/zhb/medrec-data/snapshots/safedrug-archived-ijcai21"
         in result["command"]
     )
+    assert "--mode smoke" not in result["command"]
+    assert completed.stderr == ""
+
+
+def test_reproduce_smoke_dry_run_prints_complete_smoke_command() -> None:
+    completed = _cli("reproduce-smoke", "safedrug", "--gpu", "1", "--dry-run")
+
+    assert completed.returncode == 0
+    parsed = json.loads(completed.stdout)
+    assert parsed["mode"] == "smoke"
+    result = parsed["results"][0]
+    assert result["state"] == "planned"
+    assert result["session_id"].startswith("medrec-smoke-safedrug-")
+    assert "--mode smoke" in result["command"]
+    assert "CUDA_VISIBLE_DEVICES=1" in result["command"]
     assert completed.stderr == ""
 
 
 def test_reproduce_all_dry_run_maps_four_independent_lanes() -> None:
-    completed = _cli("all", "--gpus", "2,3,4,5", "--dry-run")
+    completed = _cli("reproduce", "all", "--gpus", "2,3,4,5", "--dry-run")
 
     assert completed.returncode == 0
     results = json.loads(completed.stdout)["results"]
@@ -69,6 +84,23 @@ def test_reproduce_all_dry_run_maps_four_independent_lanes() -> None:
     assert all(item["state"] == "planned" for item in results)
 
 
+def test_reproduce_smoke_all_dry_run_maps_four_independent_lanes() -> None:
+    completed = _cli("reproduce-smoke", "all", "--gpus", "0,1,2,3", "--dry-run")
+
+    assert completed.returncode == 0
+    parsed = json.loads(completed.stdout)
+    assert parsed["mode"] == "smoke"
+    results = parsed["results"]
+    assert [(item["baseline_id"], item["gpu"]) for item in results] == [
+        ("gamenet", 0),
+        ("safedrug", 1),
+        ("retain", 2),
+        ("leap-safedrug", 3),
+    ]
+    assert all(item["state"] == "planned" for item in results)
+    assert all("--mode smoke" in item["command"] for item in results)
+
+
 @pytest.mark.parametrize(
     ("arguments", "message"),
     [
@@ -79,7 +111,7 @@ def test_reproduce_all_dry_run_maps_four_independent_lanes() -> None:
 def test_reproduce_rejects_incoherent_gpu_selection(
     arguments: tuple[str, ...], message: str
 ) -> None:
-    completed = _cli(*arguments)
+    completed = _cli("reproduce", *arguments)
 
     assert completed.returncode == 2
     assert message in completed.stderr
@@ -87,6 +119,13 @@ def test_reproduce_rejects_incoherent_gpu_selection(
 
 def test_reproduce_parser_uses_documented_319_roots() -> None:
     args = _build_parser().parse_args(["reproduce", "gamenet", "--gpu", "0"])
+
+    assert args.data_root == "/root/zhb/medrec-data"
+    assert args.remote_root == "/root/zhb/medrec-research"
+
+
+def test_reproduce_smoke_parser_uses_documented_319_roots() -> None:
+    args = _build_parser().parse_args(["reproduce-smoke", "gamenet", "--gpu", "0"])
 
     assert args.data_root == "/root/zhb/medrec-data"
     assert args.remote_root == "/root/zhb/medrec-research"
@@ -113,6 +152,38 @@ def test_batch_continues_after_one_lane_is_blocked(
 
     executor = RecordingExecutor()
     assert _reproduce(_args(baseline_id="all"), executor=executor) == 2
+
+    assert executor.baseline_ids == ["gamenet", "safedrug", "retain", "leap-safedrug"]
+    results = json.loads(capsys.readouterr().out)["results"]
+    assert [item["state"] for item in results] == [
+        "planned",
+        "blocked",
+        "planned",
+        "planned",
+    ]
+
+
+def test_smoke_batch_continues_after_one_lane_is_blocked(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    class RecordingExecutor:
+        def __init__(self) -> None:
+            self.baseline_ids: list[str] = []
+
+        def run_smoke(self, baseline_id, **kwargs):
+            self.baseline_ids.append(baseline_id)
+            if baseline_id == "safedrug":
+                raise ProtocolValidationError("synthetic lane failure")
+            return RemoteSubmission(
+                baseline_id=baseline_id,
+                host=None,
+                session_id=f"medrec-smoke-{baseline_id}-test",
+                command=f"command {baseline_id} --mode smoke",
+                preflight_performed=False,
+            )
+
+    executor = RecordingExecutor()
+    assert _reproduce_smoke(_args(baseline_id="all"), executor=executor) == 2
 
     assert executor.baseline_ids == ["gamenet", "safedrug", "retain", "leap-safedrug"]
     results = json.loads(capsys.readouterr().out)["results"]

@@ -16,7 +16,14 @@ sys.modules[SPEC.name] = adapter
 SPEC.loader.exec_module(adapter)
 
 
-def paper_values() -> tuple[list[list[None]], dict[str, object], list[list[int]], list[list[int]]]:
+def paper_values() -> tuple[
+    list[list[None]],
+    dict[str, object],
+    list[list[int]],
+    list[list[int]],
+    list[list[int]],
+    dict[int, str],
+]:
     records = [[None] * 2 for _ in range(6_349)] + [[None] * 2_297]
     vocabulary = {"med_voc": SimpleNamespace(idx2word=list(range(131)))}
     ddi = [[0] * 131 for _ in range(131)]
@@ -24,7 +31,9 @@ def paper_values() -> tuple[list[list[None]], dict[str, object], list[list[int]]
     for row, column in list(pairs)[:448]:
         ddi[row][column] = ddi[column][row] = 1
     ddi_mask = [[0] * 491 for _ in range(131)]
-    return records, vocabulary, ddi, ddi_mask
+    ehr_adj = [[0] * 131 for _ in range(131)]
+    idx2drug = {idx: "CC(=O)O" for idx in range(131)}
+    return records, vocabulary, ddi, ddi_mask, ehr_adj, idx2drug
 
 
 def test_profiles_match_archived_entrypoints_and_defaults() -> None:
@@ -57,6 +66,38 @@ def test_training_mode_adaptation_is_exact_and_reversible() -> None:
     assert adapter.test_mode_default(f"{adapted}\n# --Test") is False
 
 
+def test_epoch_adaptation_is_exact_and_reversible() -> None:
+    source = f"def main():\n{adapter.EPOCH_FORMAL}    pass\n"
+    adapted = adapter.adapt_epoch_source(source)
+
+    assert adapter.EPOCH_FORMAL not in adapted
+    assert adapted.count(adapter.EPOCH_SMOKE) == 1
+    assert adapted.replace(adapter.EPOCH_SMOKE, adapter.EPOCH_FORMAL, 1) == source
+
+
+def test_smoke_adaptation_composition_and_leap_fine_tune_preservation() -> None:
+    leap_source = (
+        "def fine_tune():\n"
+        "    EPOCH = 100\n"
+        "def main():\n"
+        f"{adapter.TEST_DECLARATION}\n"
+        f"{adapter.EPOCH_FORMAL}"
+        "    pass\n"
+    )
+    smoke_adapted = adapter.adapt_smoke_source(leap_source)
+
+    assert adapter.TEST_DECLARATION not in smoke_adapted
+    assert adapter.TRAIN_DECLARATION in smoke_adapted
+    assert adapter.EPOCH_FORMAL not in smoke_adapted
+    assert adapter.EPOCH_SMOKE in smoke_adapted
+    assert "    EPOCH = 100\n" in smoke_adapted
+
+    reversed_source = smoke_adapted.replace(adapter.EPOCH_SMOKE, adapter.EPOCH_FORMAL, 1).replace(
+        adapter.TRAIN_DECLARATION, adapter.TEST_DECLARATION
+    )
+    assert reversed_source == leap_source
+
+
 @pytest.mark.parametrize(
     "source",
     [
@@ -70,20 +111,34 @@ def test_training_mode_adaptation_rejects_source_drift(source: str) -> None:
         adapter.adapt_training_source(source)
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        "no epoch declaration",
+        f"{adapter.EPOCH_FORMAL}{adapter.EPOCH_FORMAL}",
+        adapter.EPOCH_SMOKE,
+    ],
+)
+def test_epoch_adaptation_rejects_source_drift(source: str) -> None:
+    with pytest.raises(adapter.ReproductionError, match="drifted"):
+        adapter.adapt_epoch_source(source)
+
+
 def test_test_mode_default_rejects_ambiguous_source() -> None:
     with pytest.raises(adapter.ReproductionError, match="determine"):
         adapter.test_mode_default("no declaration")
 
 
 def test_paper_dataset_counts_pass_exact_gate() -> None:
-    counts = adapter.count_dataset(*paper_values())
+    records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
+    counts = adapter.count_dataset(records, vocabulary, ddi, ddi_mask)
 
     assert counts == adapter.EXPECTED_COUNTS
     adapter.require_paper_counts(counts)
 
 
 def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
-    records, vocabulary, ddi, ddi_mask = paper_values()
+    records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
     ddi[0][1] = ddi[1][0] = 0
     counts = adapter.count_dataset(records, vocabulary, ddi, ddi_mask)
 
@@ -93,12 +148,248 @@ def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
 
 
 def test_dataset_gate_rejects_matrix_shape_drift() -> None:
-    records, vocabulary, ddi, ddi_mask = paper_values()
+    records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
 
     with pytest.raises(adapter.ReproductionError, match="ddi_A_final shape"):
         adapter.count_dataset(records, vocabulary, ddi[:-1], ddi_mask)
     with pytest.raises(adapter.ReproductionError, match="ddi_mask_H rows"):
         adapter.count_dataset(records, vocabulary, ddi, ddi_mask[:-1])
+
+
+def test_load_and_validate_canonical_inputs_validates_all_six(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import pickle
+
+    monkeypatch.setattr(
+        adapter.importlib,
+        "import_module",
+        lambda name: pickle if name == "dill" else sys.modules.get(name),
+    )
+
+    records, vocabulary, ddi, ddi_mask, ehr_adj, idx2drug = paper_values()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+
+    for name, val in [
+        ("records_final.pkl", records),
+        ("voc_final.pkl", vocabulary),
+        ("ddi_A_final.pkl", ddi),
+        ("ddi_mask_H.pkl", ddi_mask),
+        ("ehr_adj_final.pkl", ehr_adj),
+        ("idx2drug.pkl", idx2drug),
+    ]:
+        with (data_dir / name).open("wb") as stream:
+            pickle.dump(val, stream)
+
+    results, counts = adapter.load_and_validate_canonical_inputs(data_dir)
+    assert len(results) == 6
+    assert all(status == "passed" for status in results.values())
+    assert counts == adapter.EXPECTED_COUNTS
+
+
+def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import pickle
+
+    monkeypatch.setattr(
+        adapter.importlib,
+        "import_module",
+        lambda name: pickle if name == "dill" else sys.modules.get(name),
+    )
+
+    records, vocabulary, ddi, ddi_mask, ehr_adj, idx2drug = paper_values()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+
+    # Wrong ehr_adj shape
+    for name, val in [
+        ("records_final.pkl", records),
+        ("voc_final.pkl", vocabulary),
+        ("ddi_A_final.pkl", ddi),
+        ("ddi_mask_H.pkl", ddi_mask),
+        ("ehr_adj_final.pkl", ehr_adj[:-1]),
+        ("idx2drug.pkl", idx2drug),
+    ]:
+        with (data_dir / name).open("wb") as stream:
+            pickle.dump(val, stream)
+
+    with pytest.raises(adapter.ReproductionError, match="ehr_adj_final shape"):
+        adapter.load_and_validate_canonical_inputs(data_dir)
+
+
+def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(adapter, "verify_upstream_source", lambda upstream: None)
+    monkeypatch.setattr(
+        adapter,
+        "check_imports",
+        lambda upstream: {m: "passed" for m in adapter.REGISTRY_IMPORT_MODULES},
+    )
+    monkeypatch.setattr(adapter, "check_cuda_tensor", lambda: "passed")
+    monkeypatch.setattr(adapter, "check_rdkit_brics", lambda: "passed")
+    monkeypatch.setattr(adapter, "check_dnc_forward", lambda: "passed")
+    monkeypatch.setattr(
+        adapter,
+        "probe_environment_details",
+        lambda: {
+            "conda_explicit_sha256": "f" * 64,
+            "python": "3.11.9",
+            "pytorch": "2.2.2",
+            "torch_cuda": "12.1",
+            "nvidia_driver": "535.183.01",
+            "numpy": "1.26.4",
+            "pandas": "2.0.3",
+            "scipy": "1.11.4",
+            "scikit_learn": "1.3.2",
+            "rdkit": "2023.09.6",
+            "dill": "0.3.7",
+            "dnc": "1.1.0",
+            "cuda_visible_device_count": 1,
+            "gpu_name": "NVIDIA GeForce RTX 3090",
+            "gpu_capability": "8.6",
+        },
+    )
+
+    probe = adapter.run_probe(
+        baseline_id="gamenet",
+        upstream_root=tmp_path / "upstream",
+        data_dir=None,
+        scope="environment",
+    )
+
+    assert probe["schema_version"] == 1
+    assert probe["kind"] == "safedrug_archived_probe"
+    assert probe["scope"] == "environment"
+    assert probe["baseline_id"] == "gamenet"
+    assert probe["source_revision"] == adapter.ARCHIVED_REVISION
+    assert probe["checks"]["cuda_tensor"] == "passed"
+    assert probe["inputs"] is None
+    assert probe["dataset_counts"] is None
+
+
+def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(adapter, "verify_upstream_source", lambda upstream: None)
+    monkeypatch.setattr(
+        adapter,
+        "check_imports",
+        lambda upstream: {m: "passed" for m in adapter.REGISTRY_IMPORT_MODULES},
+    )
+    monkeypatch.setattr(adapter, "check_cuda_tensor", lambda: "passed")
+    monkeypatch.setattr(adapter, "check_rdkit_brics", lambda: "passed")
+    monkeypatch.setattr(adapter, "check_dnc_forward", lambda: "passed")
+    monkeypatch.setattr(
+        adapter,
+        "probe_environment_details",
+        lambda: {
+            "conda_explicit_sha256": "f" * 64,
+            "python": "3.11.9",
+            "pytorch": "2.2.2",
+            "torch_cuda": "12.1",
+            "nvidia_driver": "535.183.01",
+            "numpy": "1.26.4",
+            "pandas": "2.0.3",
+            "scipy": "1.11.4",
+            "scikit_learn": "1.3.2",
+            "rdkit": "2023.09.6",
+            "dill": "0.3.7",
+            "dnc": "1.1.0",
+            "cuda_visible_device_count": 1,
+            "gpu_name": "NVIDIA GeForce RTX 3090",
+            "gpu_capability": "8.6",
+        },
+    )
+    monkeypatch.setattr(
+        adapter,
+        "load_and_validate_canonical_inputs",
+        lambda d: (
+            {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
+            adapter.EXPECTED_COUNTS,
+        ),
+    )
+
+    probe = adapter.run_probe(
+        baseline_id="safedrug",
+        upstream_root=tmp_path / "upstream",
+        data_dir=tmp_path / "data",
+        scope="full",
+    )
+
+    assert probe["schema_version"] == 1
+    assert probe["scope"] == "full"
+    assert len(probe["inputs"]) == 6
+    assert probe["dataset_counts"] == adapter.EXPECTED_COUNTS
+
+
+def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    upstream = tmp_path / "upstream"
+    upstream_src = upstream / "src"
+    upstream_src.mkdir(parents=True)
+    entrypoint = upstream_src / "SafeDrug.py"
+    entrypoint.write_text(
+        f"import sys\n{adapter.TEST_DECLARATION}\ndef main():\n{adapter.EPOCH_FORMAL}    pass\n",
+        encoding="utf-8",
+    )
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    for name in adapter.CANONICAL_SIX_INPUTS:
+        (data_dir / name).touch()
+
+    run_root = tmp_path / "runs" / "smoke_run"
+
+    monkeypatch.setattr(adapter, "verify_upstream_source", lambda root: None)
+    monkeypatch.setattr(
+        adapter,
+        "load_and_validate_canonical_inputs",
+        lambda d: (
+            {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
+            adapter.EXPECTED_COUNTS,
+        ),
+    )
+    monkeypatch.setattr(
+        adapter,
+        "environment_summary",
+        lambda: {"conda_explicit_sha256": "f" * 64, "python": "3.11.9"},
+    )
+
+    def mock_run_logged(cmd: list[str], *, cwd: Path, env: dict[str, str], log_path: Path) -> None:
+        log_path.write_text("epoch 1 -------------------\nbest_epoch: 0\n", encoding="utf-8")
+        checkpoint_dir = cwd / "saved" / f"SafeDrug_{run_root.name}"
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        (checkpoint_dir / "Epoch_0_TARGET_0.0_JA_0.5000_DDI_0.0800.model").touch()
+
+    monkeypatch.setattr(adapter, "run_logged", mock_run_logged)
+
+    adapter.run_smoke_lane(
+        profile=adapter.PROFILES["safedrug"],
+        upstream_root=upstream,
+        data_dir=data_dir,
+        run_root=run_root,
+        python="python",
+    )
+
+    assert not (run_root / "test.log").exists()
+    assert not (run_root / "result.json").exists()
+
+    status = json.loads((run_root / "status.json").read_text())
+    assert status["schema_version"] == 1
+    assert status["kind"] == "safedrug_archived_smoke_status"
+    assert status["state"] == "completed"
+    assert status["stage"] == "terminal"
+
+    smoke = json.loads((run_root / "smoke.json").read_text())
+    assert smoke["schema_version"] == 1
+    assert smoke["kind"] == "safedrug_archived_smoke"
+    assert smoke["non_evidence"] is True
+    assert smoke["baseline_id"] == "safedrug"
+    assert smoke["epochs_requested"] == 1
+    assert smoke["epochs_observed"] == 1
+    assert smoke["best_epoch"] == 0
+    assert smoke["checkpoint"]["epoch"] == 0
+    assert "Epoch_0" in smoke["checkpoint"]["artifact_id"]
 
 
 def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Path) -> None:

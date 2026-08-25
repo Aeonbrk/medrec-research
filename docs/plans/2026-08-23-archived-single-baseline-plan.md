@@ -8,6 +8,10 @@ execution: remote
 
 # SafeDrug Archived Single-Baseline Program
 
+## Follow-on execution plan
+
+This document remains the accepted scientific decision history. The implementation-ready sequence for the modern environment, archived data regeneration, four one-epoch non-evidence smokes, and the stop-before-formal-training boundary is `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.
+
 ## Decision
 
 SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the sole active SafeDrug-family source. Existing IDs `gamenet`, `safedrug`, `retain`, and `leap-safedrug` remain because they name distinct models, but they share one source lineage, preprocessing contract, split, and evaluation authority. No parallel SafeDrug-main identities or future main-branch lanes will be maintained.
