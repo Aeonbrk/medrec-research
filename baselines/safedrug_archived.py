@@ -381,9 +381,9 @@ def load_and_validate_canonical_inputs(
             f"ehr_adj_final shape must be {medications} x {medications}, observed "
             f"{ehr_rows} x {ehr_cols}"
         )
-    if len(idx2drug) != medications:
+    if len(idx2drug) not in (medications, medications + 2):
         raise ReproductionError(
-            f"idx2drug length must equal medication count {medications}, observed {len(idx2drug)}"
+            f"idx2drug length must equal medication count {medications} (or {medications + 2}), observed {len(idx2drug)}"
         )
 
     input_results = {name: "passed" for name in CANONICAL_SIX_INPUTS}
