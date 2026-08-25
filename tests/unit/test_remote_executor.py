@@ -83,7 +83,7 @@ def _valid_probe_json(baseline_id: str = "gamenet") -> str:
             "inputs": {name: "passed" for name in TEST_INPUTS},
             "dataset_counts": {
                 "patients": 6350,
-                "visits": 14995,
+                "visits": 15032,
                 "medications": 131,
                 "ddi_pairs": 448,
                 "molecular_substructures": 491,

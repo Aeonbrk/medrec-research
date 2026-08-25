@@ -24,7 +24,7 @@ def paper_values() -> tuple[
     list[list[int]],
     dict[int, str],
 ]:
-    records = [[None] * 2 for _ in range(6_349)] + [[None] * 2_297]
+    records = [[None] * 2 for _ in range(6_349)] + [[None] * 2_334]
     vocabulary = {"med_voc": SimpleNamespace(idx2word=list(range(131)))}
     ddi = [[0] * 131 for _ in range(131)]
     pairs = ((row, column) for row in range(131) for column in range(row + 1, 131))
