@@ -33,13 +33,17 @@
 - **Execution boundary**: current state is `blocked_data` with `formal_training_authorized: false`. Regenerate a 14,995-visit, 6,350-patient, 131-medication snapshot and rerun all four smokes before any 50-epoch job or upstream ten-round test.
 - **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns model behavior. The SafeDrug and MoleRec paper statistics plus MoleRec's declared SafeDrug-after-`c7218d0976e5ee5588aeaf5bdbc86b338126bba5` preprocessing lineage own the 14,995-visit B0 boundary. Data, runs, checkpoints, and weights remain untouched.
 
-## Accepted: SafeDrug Archived Four-Model Full Reproduction
+## Terminated: SafeDrug Archived Four-Model Full Reproduction
 
-- **Status**: implementation-ready for Gemini execution on `2026-08-25`; the starting harness fix is commit `86f3108`, and no formal job has been launched. The rejected 15,032-visit snapshot remains a hard data blocker until a new 14,995-visit paper-lineage snapshot passes the full probe.
+- **Status**: terminated on `2026-08-25` at the B0 Data Gate during attempt `formal-20260825-231500`.
 - **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
-- **Scope**: rebuild data from SafeDrug `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`, publish it additively, run four fresh non-evidence smokes, and continue directly to one 50-epoch plus ten-test-round archived run for each of GAMENet, SafeDrug, RETAIN, and LEAP when all smoke gates pass.
-- **Authorization**: this plan replaces the preparation-only human GO boundary for this attempt. It authorizes formal continuation only after every data, environment, code, and four-smoke admission gate passes; it does not authorize destructive cleanup, retries, tuning, Comparison Mode, or MoleRec training.
-- **Handoff**: the plan itself authorizes Gemini to implement the frozen staging/probe/audit support, regenerate and publish the paper-lineage data, run four fresh smokes, and proceed directly to four formal 50-epoch plus ten-round lanes when admission passes. Gemini owns execution and the ignored runtime ledger; Codex reviews the public-safe terminal packet after the user returns with the finished reproduction outcome.
+- **Failure Record**: `research/failures/safedrug-reproduction-b0-failure-2026-08-25.md`.
+- **Outcome**:
+  - Remote environment preflight, 319 Input Contract validation, and `stage-safedrug-c721` execution completed cleanly.
+  - Preprocessing script execution from upstream `c7218d0` generated 6,350 patients, 131 medications, 448 DDI pairs, and 491 substructures, but 15,032 visits (expected: 14,995 visits, difference: +37 visits).
+  - All 6 semantic bridge checks passed (bijections, structure, SMILES map, symmetry, zero diagonal, DDI mask).
+  - Under the fail-closed protocol, snapshot `snapshots/safedrug-paper-c721-ijcai21` was **not published**, the staging candidate was rejected, no formal/smoke lanes were admitted, and no retry or parameter tuning was conducted.
+- **State**: `runtime/reproduction-formal/formal-20260825-231500/state.json` is marked `terminated_b0_failure`.
 
 ## Accepted: SafeDrug Archived Single-Baseline Program
 
