@@ -531,7 +531,7 @@ def check_dnc_forward() -> str:
             hidden_size=20,
             rnn_type="lstm",
             num_layers=1,
-            num_hidden=1,
+            num_hidden_layers=1,
             nr_cells=5,
             cell_size=10,
             read_heads=2,
