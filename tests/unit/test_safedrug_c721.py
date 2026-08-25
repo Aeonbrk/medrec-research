@@ -176,6 +176,11 @@ def test_stage_safedrug_c721_happy_path(tmp_path: Path) -> None:
     assert proof["kind"] == "safedrug_c721_staging_proof"
     assert proof["source_revision"] == C721_SOURCE_REVISION
     assert proof["vocabulary_alignment"]["med_voc_ordered_equality"] == "passed"
+    assert proof["metadata"] == {
+        "paper_reported_visits": 14_995,
+        "executable_visits": 15_032,
+        "difference": 37,
+    }
     assert len(proof["outputs"]) == 6
 
     # Verify all 6 outputs exist in staging

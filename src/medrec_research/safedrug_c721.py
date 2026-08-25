@@ -275,6 +275,11 @@ def stage_safedrug_c721(
             "vocabulary_alignment": {
                 "med_voc_ordered_equality": "passed",
             },
+            "metadata": {
+                "paper_reported_visits": 14995,
+                "executable_visits": 15032,
+                "difference": 37,
+            },
             "outputs": list(FINAL_SIX_OUTPUTS),
             "input_manifest_artifact_id": input_manifest_artifact_id,
         }

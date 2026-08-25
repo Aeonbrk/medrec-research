@@ -81,7 +81,13 @@ def make_valid_result(
         "test_rounds": rounds,
         "harness_summary": summary,
         "upstream_summary": summary,
-        "status": {"state": status_state, "stage": "terminal"},
+        "status": {
+            "schema_version": 1,
+            "kind": "safedrug_archived_formal_status",
+            "baseline_id": baseline_id,
+            "state": status_state,
+            "stage": "terminal",
+        },
     }
 
 
@@ -117,7 +123,46 @@ def test_audit_happy_path_all_match(tmp_path: Path) -> None:
     assert packet["verdict"] == "completed_match"
     assert packet["interval_checks_passed"] == 20
     assert packet["relationship_checks_passed"] == 3
+    assert packet["metadata"] == {
+        "paper_reported_visits": 14_995,
+        "executable_visits": 15_032,
+        "difference": 37,
+    }
     assert out_file.exists()
+
+
+def test_audit_with_data_root_and_formal_lanes(tmp_path: Path) -> None:
+    data_root = tmp_path / "data_root"
+    data_root.mkdir()
+    formal_id = "formal-20260825-test"
+
+    result_paths: dict[str, Path] = {}
+    formal_lanes: dict[str, Any] = {}
+    for b in REQUIRED_BASELINES:
+        run_dir = data_root / "runs" / "safedrug-archived" / formal_id / b
+        run_dir.mkdir(parents=True)
+        res_file = run_dir / "result.json"
+        res_file.write_text(json.dumps(make_valid_result(b)))
+        result_paths[b] = res_file
+        formal_lanes[b] = {
+            "state": "completed",
+            "terminal_artifact_id": f"runs/safedrug-archived/{formal_id}/{b}/result.json",
+        }
+
+    ledger_data = make_valid_ledger()
+    ledger_data["formal_lanes"] = formal_lanes
+    ledger_file = tmp_path / "state.json"
+    ledger_file.write_text(json.dumps(ledger_data))
+
+    out_file = tmp_path / "table2-audit.json"
+    packet = audit_safedrug_table2(
+        ledger_path=ledger_file,
+        result_paths=result_paths,
+        output_path=out_file,
+        reference_path=REFERENCE_PATH,
+        data_root=data_root,
+    )
+    assert packet["verdict"] == "completed_match"
 
 
 def test_audit_boundary_inclusive_pass(tmp_path: Path) -> None:

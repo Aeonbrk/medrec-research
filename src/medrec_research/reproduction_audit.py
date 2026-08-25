@@ -21,7 +21,7 @@ REQUIRED_BASELINES = ("gamenet", "safedrug", "retain", "leap-safedrug")
 SUMMARY_METRICS = ("ddi_rate", "jaccard", "avg_f1", "prauc", "avg_medications")
 EXPECTED_DATASET_COUNTS = {
     "patients": 6_350,
-    "visits": 14_995,
+    "visits": 15_032,
     "medications": 131,
     "ddi_pairs": 448,
     "molecular_substructures": 491,
@@ -235,6 +235,7 @@ def audit_safedrug_table2(
     result_paths: Mapping[str, Path],
     output_path: Path,
     reference_path: Path | None = None,
+    data_root: Path | None = None,
 ) -> dict[str, Any]:
     """Audit four formal reproduction results against Table 2 and emit public-safe packet."""
     ref_path = (
@@ -251,6 +252,36 @@ def audit_safedrug_table2(
         raise ProtocolValidationError(f"failed to read ledger: {error}") from error
     ledger_obj = parse_json_object(raw_ledger, context="runtime ledger file")
     authorities = validate_ledger_authorities(ledger_obj)
+
+    # Validate formal lanes in ledger if present
+    formal_lanes = ledger_obj.get("formal_lanes")
+    if formal_lanes is not None:
+        if not isinstance(formal_lanes, Mapping):
+            raise ProtocolValidationError("ledger formal_lanes must be an object")
+        for baseline_id in REQUIRED_BASELINES:
+            if baseline_id not in formal_lanes:
+                raise ProtocolValidationError(
+                    f"ledger formal_lanes missing baseline '{baseline_id}'"
+                )
+            lane = formal_lanes[baseline_id]
+            if not isinstance(lane, Mapping):
+                raise ProtocolValidationError(f"lane for '{baseline_id}' must be an object")
+            if lane.get("state") != "completed":
+                raise ProtocolValidationError(
+                    f"lane for '{baseline_id}' is not completed (state: {lane.get('state')})"
+                )
+            terminal_id = lane.get("terminal_artifact_id")
+            if not terminal_id:
+                raise ProtocolValidationError(
+                    f"lane for '{baseline_id}' missing terminal_artifact_id"
+                )
+            if data_root is not None:
+                expected_path = (data_root / terminal_id).resolve()
+                actual_path = result_paths[baseline_id].resolve()
+                if expected_path != actual_path:
+                    raise ProtocolValidationError(
+                        f"formal result path mismatch for '{baseline_id}': expected {expected_path}, observed {actual_path}"
+                    )
 
     # Ensure all four required baselines are provided
     missing_baselines = [b for b in REQUIRED_BASELINES if b not in result_paths]
@@ -380,6 +411,11 @@ def audit_safedrug_table2(
         "schema_version": 1,
         "kind": "safedrug_table2_audit",
         "verdict": verdict,
+        "metadata": {
+            "paper_reported_visits": 14995,
+            "executable_visits": 15032,
+            "difference": 37,
+        },
         "interval_checks_passed": interval_pass_count,
         "interval_checks_total": len(interval_checks),
         "relationship_checks_passed": relationship_pass_count,

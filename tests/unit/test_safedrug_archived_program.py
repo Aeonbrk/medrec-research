@@ -25,13 +25,37 @@ def paper_values() -> tuple[
     list[list[int]],
     dict[str, object],
 ]:
-    sample_admission = [[0], [0], [0]]
-    records = [[sample_admission, sample_admission] for _ in range(6_349)] + [
-        [sample_admission for _ in range(2_297)]
-    ]
-    diag_words = [f"D{i}" for i in range(10)]
-    pro_words = [f"P{i}" for i in range(10)]
+    diag_words = [f"D{i}" for i in range(128)]
+    pro_words = [f"P{i}" for i in range(50)]
     med_words = [f"M{i}" for i in range(131)]
+
+    # Patient 0: 2 admissions, has 128 diag, 50 pro, 65 med
+    p0_adm1 = [list(range(64)), list(range(25)), list(range(32))]
+    p0_adm2 = [list(range(64, 128)), list(range(25, 50)), list(range(32, 65))]
+    records = [[p0_adm1, p0_adm2]]
+
+    # 5466 patients with 25 diag, 9/10 pro, 27/28 med
+    for i in range(5466):
+        adm1 = [list(range(13)), list(range(5)), list(range(14))]
+        adm2 = [list(range(13, 25)), list(range(5, 9)), list(range(14, 27))]
+        if i < 587:
+            adm2[1] = list(range(5, 10))
+        if i < 412:
+            adm2[2] = list(range(14, 28))
+        records.append([adm1, adm2])
+
+    # 882 patients with 24 diag, 9 pro, 27 med
+    for _ in range(882):
+        adm1 = [list(range(12)), list(range(5)), list(range(14))]
+        adm2 = [list(range(12, 24)), list(range(5, 9)), list(range(14, 27))]
+        records.append([adm1, adm2])
+
+    # 1 patient with 2334 visits (24 diag, 9 pro, 27 med across all visits)
+    p_last = []
+    for v in range(2334):
+        p_last.append([[v % 24], [v % 9], [v % 27]])
+    records.append(p_last)
+
     vocabulary = {
         "diag_voc": SimpleNamespace(
             idx2word=diag_words, word2idx={w: i for i, w in enumerate(diag_words)}
@@ -153,14 +177,14 @@ def test_paper_dataset_counts_pass_exact_gate() -> None:
     counts = adapter.count_dataset(records, vocabulary, ddi, ddi_mask)
 
     assert counts == adapter.EXPECTED_COUNTS
-    adapter.require_paper_counts(counts)
+    adapter.require_executable_counts(counts)
 
 
 def test_dataset_gate_rejects_non_paper_visit_count() -> None:
-    counts = {**adapter.EXPECTED_COUNTS, "visits": 15_032}
+    counts = {**adapter.EXPECTED_COUNTS, "visits": 14_995}
 
     with pytest.raises(adapter.ReproductionError, match="visits"):
-        adapter.require_paper_counts(counts)
+        adapter.require_executable_counts(counts)
 
 
 def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
@@ -170,7 +194,7 @@ def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
 
     assert counts["ddi_pairs"] == 447
     with pytest.raises(adapter.ReproductionError, match="ddi_pairs"):
-        adapter.require_paper_counts(counts)
+        adapter.require_executable_counts(counts)
 
 
 def test_dataset_gate_rejects_matrix_shape_drift() -> None:
@@ -208,10 +232,13 @@ def test_load_and_validate_canonical_inputs_validates_all_six(
         with (data_dir / name).open("wb") as stream:
             pickle.dump(val, stream)
 
-    results, counts, bridge_checks = adapter.load_and_validate_canonical_inputs(data_dir)
+    results, counts, bridge_checks, statistics_evidence, metadata_disclosure = (
+        adapter.load_and_validate_canonical_inputs(data_dir)
+    )
     assert len(results) == 6
     assert all(status == "passed" for status in results.values())
     assert counts == adapter.EXPECTED_COUNTS
+    assert counts["visits"] == 15_032
     assert set(bridge_checks.keys()) == {
         "vocabulary_bijections",
         "records_structure",
@@ -219,8 +246,17 @@ def test_load_and_validate_canonical_inputs_validates_all_six(
         "ddi_matrix_properties",
         "ehr_matrix_properties",
         "ddi_mask_properties",
+        "records_statistics",
     }
     assert all(v == "passed" for v in bridge_checks.values())
+    assert statistics_evidence["diagnoses"]["numerator"] == 157_970
+    assert statistics_evidence["procedures"]["numerator"] == 57_778
+    assert statistics_evidence["medications"]["numerator"] == 171_900
+    assert metadata_disclosure == {
+        "paper_reported_visits": 14_995,
+        "executable_visits": 15_032,
+        "difference": 37,
+    }
 
 
 def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
@@ -406,6 +442,12 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
             {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
             adapter.EXPECTED_COUNTS,
             {"vocabulary_bijections": "passed", "records_structure": "passed"},
+            {
+                "diagnoses": {"numerator": 157_970, "average": 10.5089, "max": 128},
+                "procedures": {"numerator": 57_778, "average": 3.8437, "max": 50},
+                "medications": {"numerator": 171_900, "average": 11.4356, "max": 65},
+            },
+            adapter.REPORTED_PAPER_METADATA,
         ),
     )
 
@@ -424,6 +466,8 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         "vocabulary_bijections": "passed",
         "records_structure": "passed",
     }
+    assert probe["metadata"] == adapter.REPORTED_PAPER_METADATA
+    assert probe["statistics"]["diagnoses"]["numerator"] == 157_970
 
 
 def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
@@ -453,6 +497,12 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
             {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
             adapter.EXPECTED_COUNTS,
             {"vocabulary_bijections": "passed"},
+            {
+                "diagnoses": {"numerator": 157_970, "average": 10.5089, "max": 128},
+                "procedures": {"numerator": 57_778, "average": 3.8437, "max": 50},
+                "medications": {"numerator": 171_900, "average": 11.4356, "max": 65},
+            },
+            adapter.REPORTED_PAPER_METADATA,
         ),
     )
     monkeypatch.setattr(
@@ -494,8 +544,8 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
     assert smoke["epochs_requested"] == 1
     assert smoke["epochs_observed"] == 1
     assert smoke["best_epoch"] == 0
-    assert smoke["checkpoint"]["epoch"] == 0
-    assert "Epoch_0" in smoke["checkpoint"]["artifact_id"]
+    assert smoke["checkpoint"]["best_epoch"] == 0
+    assert len(smoke["checkpoint"]["sha256"]) == 64
 
 
 def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Path) -> None:

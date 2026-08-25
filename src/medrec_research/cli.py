@@ -347,6 +347,7 @@ def _audit_safedrug_table2(args: argparse.Namespace) -> int:
         result_paths=result_paths,
         output_path=args.output,
         reference_path=args.reference,
+        data_root=args.data_root,
     )
     print(
         json.dumps(
@@ -595,6 +596,12 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("research/baseline-preflight/safedrug-table2-reference.json"),
         help="Optional path to Table 2 reference JSON",
+    )
+    audit.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="Optional external data root to verify result artifact IDs",
     )
     audit.set_defaults(handler=_audit_safedrug_table2)
 

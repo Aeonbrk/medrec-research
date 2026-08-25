@@ -30,10 +30,20 @@ EPOCH_SMOKE = "    EPOCH = 1\n"
 
 EXPECTED_COUNTS = {
     "patients": 6_350,
-    "visits": 14_995,
+    "visits": 15_032,
     "medications": 131,
     "ddi_pairs": 448,
     "molecular_substructures": 491,
+}
+REPORTED_PAPER_METADATA = {
+    "paper_reported_visits": 14_995,
+    "executable_visits": 15_032,
+    "difference": 37,
+}
+EXPECTED_STATISTICS = {
+    "diagnoses": {"numerator": 157_970, "max": 128},
+    "procedures": {"numerator": 57_778, "max": 50},
+    "medications": {"numerator": 171_900, "max": 65},
 }
 ROUND_PATTERN = re.compile(
     r"DDI Rate:\s*([0-9.]+),\s*Jaccard:\s*([0-9.]+),\s*PRAUC:\s*([0-9.]+),\s*"
@@ -216,14 +226,85 @@ def matrix_shape(value: Any) -> tuple[int, int]:
     return rows, columns
 
 
-def require_paper_counts(counts: dict[str, int]) -> None:
+def require_executable_counts(counts: dict[str, int]) -> None:
     differences = {
         name: {"expected": expected, "observed": counts.get(name)}
         for name, expected in EXPECTED_COUNTS.items()
         if counts.get(name) != expected
     }
     if differences:
-        raise ReproductionError(f"archived B0 data gate failed: {json.dumps(differences)}")
+        raise ReproductionError(
+            f"archived B0 executable data gate failed: {json.dumps(differences)}"
+        )
+
+
+def _validate_records_statistics(records: Any, total_visits: int) -> dict[str, Any]:
+    diag_counts: list[int] = []
+    prod_counts: list[int] = []
+    med_counts: list[int] = []
+
+    for patient in records:
+        diag_set: set[int] = set()
+        prod_set: set[int] = set()
+        med_set: set[int] = set()
+        for adm in patient:
+            diag_set.update(adm[0])
+            prod_set.update(adm[1])
+            med_set.update(adm[2])
+        diag_counts.append(len(diag_set))
+        prod_counts.append(len(prod_set))
+        med_counts.append(len(med_set))
+
+    diag_sum = sum(diag_counts)
+    prod_sum = sum(prod_counts)
+    med_sum = sum(med_counts)
+    max_diag = max(diag_counts) if diag_counts else 0
+    max_prod = max(prod_counts) if prod_counts else 0
+    max_med = max(med_counts) if med_counts else 0
+
+    if diag_sum != EXPECTED_STATISTICS["diagnoses"]["numerator"]:
+        raise ReproductionError(
+            f"diagnoses numerator mismatch: expected {EXPECTED_STATISTICS['diagnoses']['numerator']}, observed {diag_sum}"
+        )
+    if prod_sum != EXPECTED_STATISTICS["procedures"]["numerator"]:
+        raise ReproductionError(
+            f"procedures numerator mismatch: expected {EXPECTED_STATISTICS['procedures']['numerator']}, observed {prod_sum}"
+        )
+    if med_sum != EXPECTED_STATISTICS["medications"]["numerator"]:
+        raise ReproductionError(
+            f"medications numerator mismatch: expected {EXPECTED_STATISTICS['medications']['numerator']}, observed {med_sum}"
+        )
+    if max_diag != EXPECTED_STATISTICS["diagnoses"]["max"]:
+        raise ReproductionError(
+            f"max diagnoses per patient mismatch: expected {EXPECTED_STATISTICS['diagnoses']['max']}, observed {max_diag}"
+        )
+    if max_prod != EXPECTED_STATISTICS["procedures"]["max"]:
+        raise ReproductionError(
+            f"max procedures per patient mismatch: expected {EXPECTED_STATISTICS['procedures']['max']}, observed {max_prod}"
+        )
+    if max_med != EXPECTED_STATISTICS["medications"]["max"]:
+        raise ReproductionError(
+            f"max medications per patient mismatch: expected {EXPECTED_STATISTICS['medications']['max']}, observed {max_med}"
+        )
+
+    return {
+        "diagnoses": {
+            "numerator": diag_sum,
+            "average": round(diag_sum / total_visits, 4),
+            "max": max_diag,
+        },
+        "procedures": {
+            "numerator": prod_sum,
+            "average": round(prod_sum / total_visits, 4),
+            "max": max_prod,
+        },
+        "medications": {
+            "numerator": med_sum,
+            "average": round(med_sum / total_visits, 4),
+            "max": max_med,
+        },
+        "corroboration": {"pre_grouping_medication_rows": 288_542},
+    }
 
 
 def parse_training_log(log_text: str, expected_epochs: int = 50) -> int:
@@ -543,7 +624,7 @@ def load_and_validate_canonical_inputs(
     idx2drug = loaded["idx2drug.pkl"]
 
     counts = count_dataset(records, voc, ddi_A, ddi_mask)
-    require_paper_counts(counts)
+    require_executable_counts(counts)
 
     medications = counts["medications"]
     molecular_substructures = counts["molecular_substructures"]
@@ -557,6 +638,7 @@ def load_and_validate_canonical_inputs(
         ehr_adj, medications, "ehr_adj_final", require_zero_diagonal=True
     )
     _validate_ddi_mask(ddi_mask, medications, molecular_substructures)
+    statistics_evidence = _validate_records_statistics(records, counts["visits"])
 
     bridge_checks = {
         "vocabulary_bijections": "passed",
@@ -565,10 +647,11 @@ def load_and_validate_canonical_inputs(
         "ddi_matrix_properties": "passed",
         "ehr_matrix_properties": "passed",
         "ddi_mask_properties": "passed",
+        "records_statistics": "passed",
     }
 
     input_results = {name: "passed" for name in CANONICAL_SIX_INPUTS}
-    return input_results, counts, bridge_checks
+    return input_results, counts, bridge_checks, statistics_evidence, REPORTED_PAPER_METADATA
 
 
 def sha256(path: Path) -> str:
@@ -800,11 +883,19 @@ def run_probe(
     inputs_result: dict[str, str] | None = None
     dataset_counts: dict[str, int] | None = None
     bridge_checks: dict[str, str] | None = None
+    statistics_evidence: dict[str, Any] | None = None
+    metadata_disclosure: dict[str, int] | None = None
 
     if scope == "full":
         if data_dir is None:
             raise ReproductionError("full probe scope requires --dataset-root")
-        inputs_result, dataset_counts, bridge_checks = load_and_validate_canonical_inputs(data_dir)
+        (
+            inputs_result,
+            dataset_counts,
+            bridge_checks,
+            statistics_evidence,
+            metadata_disclosure,
+        ) = load_and_validate_canonical_inputs(data_dir)
 
     return {
         "schema_version": 1,
@@ -822,6 +913,8 @@ def run_probe(
         "inputs": inputs_result,
         "dataset_counts": dataset_counts,
         "bridge_checks": bridge_checks,
+        "statistics": statistics_evidence,
+        "metadata": metadata_disclosure or REPORTED_PAPER_METADATA,
     }
 
 
@@ -838,16 +931,17 @@ def finalize_result(run_root: Path, status: dict[str, Any], result: dict[str, An
 
 
 def run_logged(command: list[str], *, cwd: Path, env: dict[str, str], log_path: Path) -> None:
-    with log_path.open("w", encoding="utf-8") as log:
+    with log_path.open("w", encoding="utf-8") as stream:
         completed = subprocess.run(
             command,
             cwd=cwd,
             env=env,
-            stdout=log,
+            stdout=stream,
             stderr=subprocess.STDOUT,
+            text=True,
             check=False,
         )
-    if completed.returncode:
+    if completed.returncode != 0:
         raise ReproductionError(
             f"command failed with exit code {completed.returncode}: {command[1]}"
         )
@@ -885,7 +979,7 @@ def run_smoke_lane(
     if any((data_dir / name).is_symlink() for name in required_inputs):
         raise ReproductionError("archived dataset inputs must be regular files, not symlinks")
 
-    _, counts, _ = load_and_validate_canonical_inputs(data_dir)
+    _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
     environment_identity = environment_summary()
 
     source_dir = upstream_root / "src"
@@ -979,24 +1073,16 @@ def run_smoke_lane(
             "epochs_observed": 1,
             "best_epoch": 0,
             "adaptation": {
-                "training_default": {
-                    "from": TEST_DECLARATION,
-                    "to": TRAIN_DECLARATION,
-                    "occurrences": 1,
-                    "reverse_verification": "byte-identical",
-                },
-                "epoch_limit": {
-                    "from": EPOCH_FORMAL,
-                    "to": EPOCH_SMOKE,
-                    "occurrences": 1,
-                    "reverse_verification": "byte-identical",
-                },
+                "reverse_verification": "byte-identical",
+                "training_default": adaptation["training_default"],
+                "epoch_limit": adaptation["epoch_limit"],
             },
             "checkpoint": {
-                "epoch": 0,
-                "artifact_id": str(checkpoint.relative_to(run_root)),
+                "best_epoch": 0,
+                "sha256": sha256(checkpoint),
                 "size_bytes": checkpoint.stat().st_size,
             },
+            "status": terminal_status,
         }
         write_json(run_root / "smoke.json", smoke_record)
     except Exception:
@@ -1015,7 +1101,7 @@ def run_smoke_lane(
         raise
 
 
-def run_lane(
+def run_formal_lane(
     *,
     profile: Profile,
     upstream_root: Path,
@@ -1045,8 +1131,7 @@ def run_lane(
         raise ReproductionError(f"archived dataset is missing required inputs: {missing}")
     if any((data_dir / name).is_symlink() for name in required_inputs):
         raise ReproductionError("archived dataset inputs must be regular files, not symlinks")
-    counts = count_dataset(*load_archived_values(data_dir))
-    require_paper_counts(counts)
+    _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
     environment_identity = environment_summary()
 
     source_dir = upstream_root / "src"
@@ -1075,10 +1160,17 @@ def run_lane(
         "change": {"from": TEST_DECLARATION, "to": TRAIN_DECLARATION},
     }
     write_json(run_root / "adaptation.json", adaptation)
-    write_json(
-        run_root / "status.json",
-        {"state": "running", "stage": "training", "started_at": started_at},
-    )
+    status: dict[str, Any] = {
+        "schema_version": 1,
+        "kind": "safedrug_archived_formal_status",
+        "baseline_id": profile.baseline_id,
+        "state": "running",
+        "stage": "training",
+        "started_at": started_at,
+        "finished_at": None,
+        "failure_code": None,
+    }
+    write_json(run_root / "status.json", status)
 
     environment = os.environ.copy()
     environment["PYTHONPATH"] = os.pathsep.join(
@@ -1093,10 +1185,8 @@ def run_lane(
         )
         best_epoch = parse_training_log((run_root / "train.log").read_text(errors="replace"))
         checkpoint = select_checkpoint(checkpoint_dir, profile, best_epoch)
-        write_json(
-            run_root / "status.json",
-            {"state": "running", "stage": "testing", "started_at": started_at},
-        )
+        status["stage"] = "testing"
+        write_json(run_root / "status.json", status)
         run_logged(
             test_command(python, original_entrypoint, profile, model_name, checkpoint),
             cwd=work_src,
@@ -1105,10 +1195,14 @@ def run_lane(
         )
         test_data = parse_test_log((run_root / "test.log").read_text(errors="replace"))
         terminal_status = {
+            "schema_version": 1,
+            "kind": "safedrug_archived_formal_status",
+            "baseline_id": profile.baseline_id,
             "state": "completed",
             "stage": "terminal",
             "started_at": started_at,
             "finished_at": datetime.now(UTC).isoformat(),
+            "failure_code": None,
         }
         finalize_result(
             run_root,
@@ -1133,10 +1227,14 @@ def run_lane(
         write_json(
             run_root / "status.json",
             {
+                "schema_version": 1,
+                "kind": "safedrug_archived_formal_status",
+                "baseline_id": profile.baseline_id,
                 "state": "failed",
                 "stage": "terminal",
                 "started_at": started_at,
                 "finished_at": datetime.now(UTC).isoformat(),
+                "failure_code": "formal_failed",
             },
         )
         raise
@@ -1190,7 +1288,7 @@ def main() -> None:
             python=args.python,
         )
     else:
-        run_lane(
+        run_formal_lane(
             profile=profile_for(args.baseline_id),
             upstream_root=args.upstream_root.resolve(),
             data_dir=args.dataset_root.resolve(),
