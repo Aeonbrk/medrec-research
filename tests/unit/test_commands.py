@@ -181,4 +181,5 @@ def test_format_baseline_table_preserves_registry_order() -> None:
         "safedrug",
         "retain",
         "leap-safedrug",
+        "molerec",
     ]

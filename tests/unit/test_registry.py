@@ -234,10 +234,14 @@ def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
 def test_project_registry_makes_no_readiness_claims() -> None:
     registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
 
-    assert len(registry.baselines) == 5
+    assert len(registry.baselines) == 6
     assert {baseline.readiness for baseline in registry.baselines} == {BaselineReadiness.REGISTERED}
-    assert len(registry.reproduction_programs) == 1
-    program = registry.reproduction_programs[0]
+    assert len(registry.reproduction_programs) == 2
+    assert {p.program_id for p in registry.reproduction_programs} == {
+        "safedrug-archived",
+        "molerec",
+    }
+    program = registry.get_program("safedrug-archived")
     assert isinstance(program, ReproductionProgram)
     assert program.program_id == "safedrug-archived"
     assert program.is_319_verified
@@ -263,3 +267,95 @@ def test_project_registry_makes_no_readiness_claims() -> None:
     assert leap.reproduction_program == program.program_id
     assert leap.source.status is SourceStatus.PINNED
     assert not leap.is_comparable
+
+    molerec = registry.get("molerec")
+    assert molerec.display_name == "MoleRec (Table 1)"
+    assert molerec.reproduction_program == "molerec"
+
+    assert len(registry.reproduction_lanes) == 7
+    lane_ids = [lane.lane_id for lane in registry.reproduction_lanes]
+    assert lane_ids == [
+        "molerec-retain",
+        "molerec-leap",
+        "molerec-gamenet",
+        "molerec-safedrug-lr-1e-5",
+        "molerec-safedrug-lr-1e-4",
+        "molerec-safedrug-lr-5e-4",
+        "molerec-embedding",
+    ]
+    assert registry.get_lane("molerec-retain").profile_id == "retain"
+    assert registry.get_lane("molerec-safedrug-lr-1e-5").learning_rate == 1e-5
+
+
+def test_reproduction_lane_validation_rejects_duplicates_and_dangling_references() -> None:
+    from medrec_research import ReproductionLane
+
+    with pytest.raises(ProtocolValidationError, match="lane_id"):
+        BaselineRegistry(
+            baselines=(registered_baseline(baseline_id="gamenet"),),
+            reproduction_programs=(
+                ReproductionProgram(
+                    program_id="safedrug-archived",
+                    entrypoint="baselines/safedrug_archived.py",
+                    conda_environment="env",
+                    upstream_root="/root/SafeDrug",
+                    dataset_subdirectory="snapshots",
+                    run_subdirectory="runs",
+                    required_inputs=("a.pkl",),
+                    import_modules=("torch",),
+                ),
+            ),
+            reproduction_lanes=(
+                ReproductionLane(
+                    lane_id="lane-1",
+                    scientific_baseline_id="gamenet",
+                    program_id="safedrug-archived",
+                    profile_id="gamenet",
+                ),
+                ReproductionLane(
+                    lane_id="lane-1",
+                    scientific_baseline_id="gamenet",
+                    program_id="safedrug-archived",
+                    profile_id="gamenet",
+                ),
+            ),
+        )
+
+    with pytest.raises(ProtocolValidationError, match="unknown Reproduction Program"):
+        BaselineRegistry(
+            baselines=(registered_baseline(baseline_id="gamenet"),),
+            reproduction_programs=(),
+            reproduction_lanes=(
+                ReproductionLane(
+                    lane_id="lane-1",
+                    scientific_baseline_id="gamenet",
+                    program_id="missing-program",
+                    profile_id="gamenet",
+                ),
+            ),
+        )
+
+    with pytest.raises(ProtocolValidationError, match="unknown scientific baseline"):
+        BaselineRegistry(
+            baselines=(),
+            reproduction_programs=(
+                ReproductionProgram(
+                    program_id="prog-1",
+                    entrypoint="baselines/prog.py",
+                    conda_environment="env",
+                    upstream_root="/root/prog",
+                    dataset_subdirectory="snapshots",
+                    run_subdirectory="runs",
+                    required_inputs=("a.pkl",),
+                    import_modules=("torch",),
+                ),
+            ),
+            reproduction_lanes=(
+                ReproductionLane(
+                    lane_id="lane-1",
+                    scientific_baseline_id="missing-baseline",
+                    program_id="prog-1",
+                    profile_id="gamenet",
+                ),
+            ),
+        )

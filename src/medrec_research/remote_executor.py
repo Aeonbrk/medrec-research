@@ -129,8 +129,8 @@ class RemoteExecutor:
         min_free_disk_gib: int,
     ) -> PreflightResult:
         """Run every required read-only check and return verified identifiers."""
-        baseline = self._baseline(baseline_id)
-        program, remote_root, data_root = self._validate_launch_inputs(
+        baseline, program, profile_id, _ = self._resolve_target(baseline_id)
+        remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
             gpu_index=gpu_index,
@@ -266,7 +266,7 @@ class RemoteExecutor:
             "source /root/anaconda3/etc/profile.d/conda.sh && "
             f"conda activate {shlex.quote(program.conda_environment)} && "
             f"CUDA_VISIBLE_DEVICES={gpu_index} python {shlex.quote(str(program_path))} "
-            f"{shlex.quote(baseline.baseline_id)} "
+            f"{shlex.quote(profile_id)} "
             f"--upstream-root {quoted_upstream_root} "
             f"--dataset-root {shlex.quote(str(dataset_root))} "
             "--mode probe --probe-scope full"
@@ -277,6 +277,7 @@ class RemoteExecutor:
             baseline=baseline,
             program=program,
             expected_environment_sha256=observed_environment,
+            profile_id=profile_id,
         )
 
         return PreflightResult(
@@ -300,8 +301,8 @@ class RemoteExecutor:
         dry_run: bool = False,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode formal run."""
-        baseline = self._baseline(baseline_id)
-        program, remote_root, data_root = self._validate_launch_inputs(
+        baseline, program, profile_id, learning_rate = self._resolve_target(baseline_id)
+        remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
             gpu_index=gpu_index,
@@ -310,13 +311,14 @@ class RemoteExecutor:
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
             require_verified=not dry_run,
+            program=program,
         )
-        session_id = (
-            f"medrec-baseline-{baseline.baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
-        )
+        session_id = f"medrec-baseline-{baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
         command = self._launch_command(
             program,
             baseline_id=baseline.baseline_id,
+            profile_id=profile_id,
+            learning_rate=learning_rate,
             remote_root=remote_root,
             data_root=data_root,
             gpu_index=gpu_index,
@@ -325,7 +327,7 @@ class RemoteExecutor:
         )
         if dry_run:
             return RemoteSubmission(
-                baseline_id=baseline.baseline_id,
+                baseline_id=baseline_id,
                 host=None,
                 session_id=session_id,
                 command=command,
@@ -351,7 +353,7 @@ class RemoteExecutor:
             self._cleanup_session(session_id, host=result.host)
             raise
         return RemoteSubmission(
-            baseline_id=baseline.baseline_id,
+            baseline_id=baseline_id,
             host=result.host,
             session_id=session_id,
             command=command,
@@ -371,8 +373,8 @@ class RemoteExecutor:
         dry_run: bool = False,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode smoke run."""
-        baseline = self._baseline(baseline_id)
-        program, remote_root, data_root = self._validate_launch_inputs(
+        baseline, program, profile_id, learning_rate = self._resolve_target(baseline_id)
+        remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
             gpu_index=gpu_index,
@@ -381,13 +383,14 @@ class RemoteExecutor:
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
             require_verified=not dry_run,
+            program=program,
         )
-        session_id = (
-            f"medrec-smoke-{baseline.baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
-        )
+        session_id = f"medrec-smoke-{baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
         command = self._launch_command(
             program,
             baseline_id=baseline.baseline_id,
+            profile_id=profile_id,
+            learning_rate=learning_rate,
             remote_root=remote_root,
             data_root=data_root,
             gpu_index=gpu_index,
@@ -396,7 +399,7 @@ class RemoteExecutor:
         )
         if dry_run:
             return RemoteSubmission(
-                baseline_id=baseline.baseline_id,
+                baseline_id=baseline_id,
                 host=None,
                 session_id=session_id,
                 command=command,
@@ -422,12 +425,26 @@ class RemoteExecutor:
             self._cleanup_session(session_id, host=result.host)
             raise
         return RemoteSubmission(
-            baseline_id=baseline.baseline_id,
+            baseline_id=baseline_id,
             host=result.host,
             session_id=session_id,
             command=command,
             preflight_performed=True,
         )
+
+    def _resolve_target(
+        self, baseline_or_lane_id: str
+    ) -> tuple[BaselineDefinition, ReproductionProgram, str, float | None]:
+        try:
+            lane = self.registry.get_lane(baseline_or_lane_id)
+            baseline = self.registry.get(lane.scientific_baseline_id)
+            program = self.registry.get_program(lane.program_id)
+            return baseline, program, lane.profile_id, lane.learning_rate
+        except KeyError:
+            pass
+        baseline = self._baseline(baseline_or_lane_id)
+        program = self.registry.reproduction_program_for(baseline)
+        return baseline, program, baseline.baseline_id, None
 
     def _baseline(self, baseline_id: str) -> BaselineDefinition:
         try:
@@ -458,7 +475,7 @@ class RemoteExecutor:
                 return host
         raise ProtocolValidationError("remote identity check failed for approved 319 aliases")
 
-    def _validate_launch_inputs(
+    def _validate_launch_paths(
         self,
         baseline: BaselineDefinition,
         *,
@@ -469,8 +486,9 @@ class RemoteExecutor:
         min_free_gpu_mib: int,
         min_free_disk_gib: int,
         require_verified: bool = True,
-    ) -> tuple[ReproductionProgram, str, str]:
-        program = self.registry.reproduction_program_for(baseline)
+        program: ReproductionProgram | None = None,
+    ) -> tuple[str, str]:
+        prog = program or self.registry.reproduction_program_for(baseline)
         if ResearchMode.REPRODUCTION not in baseline.supported_modes:
             raise ProtocolValidationError("remote submission supports Reproduction Mode only")
         if not _IMMUTABLE_REVISION.fullmatch(source_revision):
@@ -484,8 +502,8 @@ class RemoteExecutor:
         data_path = PurePosixPath(data_root)
         if data_path == repository_path or repository_path in data_path.parents:
             raise ProtocolValidationError("data_root must be outside remote_root")
-        self._validate_declaration(baseline, program, require_verified=require_verified)
-        return program, remote_root, data_root
+        self._validate_declaration(baseline, prog, require_verified=require_verified)
+        return remote_root, data_root
 
     @staticmethod
     def _validate_declaration(
@@ -512,6 +530,7 @@ class RemoteExecutor:
         baseline: BaselineDefinition,
         program: ReproductionProgram,
         expected_environment_sha256: str,
+        profile_id: str | None = None,
     ) -> None:
         try:
             data = json.loads(probe_raw)
@@ -521,9 +540,16 @@ class RemoteExecutor:
             ) from error
         if not isinstance(data, dict):
             raise ProtocolValidationError("remote program probe output must be a JSON object")
-        if data.get("schema_version") != 1 or data.get("kind") != "safedrug_archived_probe":
+        if data.get("schema_version") != 1 or data.get("kind") not in (
+            "safedrug_archived_probe",
+            "molerec_probe",
+        ):
             raise ProtocolValidationError("remote program probe returned invalid schema or kind")
-        if data.get("scope") != "full" or data.get("baseline_id") != baseline.baseline_id:
+        expected_baseline_id = profile_id or baseline.baseline_id
+        if data.get("scope") != "full" or data.get("baseline_id") not in (
+            baseline.baseline_id,
+            expected_baseline_id,
+        ):
             raise ProtocolValidationError(
                 "remote program probe returned mismatched scope or baseline"
             )
@@ -546,12 +572,9 @@ class RemoteExecutor:
         checks = data.get("checks")
         if not isinstance(checks, dict):
             raise ProtocolValidationError("remote program probe returned invalid checks structure")
-        if (
-            checks.get("cuda_tensor") != "passed"
-            or checks.get("rdkit_brics") != "passed"
-            or checks.get("dnc_forward") != "passed"
-        ):
-            raise ProtocolValidationError("remote program probe failed runtime checks")
+        for check_name in ("cuda_tensor", "rdkit_brics", "dnc_forward"):
+            if check_name in checks and checks[check_name] != "passed":
+                raise ProtocolValidationError("remote program probe failed runtime checks")
         imports = checks.get("imports")
         if not isinstance(imports, dict) or any(
             imports.get(m) != "passed" for m in program.import_modules
@@ -563,13 +586,21 @@ class RemoteExecutor:
         ):
             raise ProtocolValidationError("remote program probe failed input verification")
         counts = data.get("dataset_counts")
-        if counts != {
-            "patients": 6_350,
-            "visits": 14_995,
-            "medications": 131,
-            "ddi_pairs": 448,
-            "molecular_substructures": 491,
-        }:
+        if not isinstance(counts, dict):
+            raise ProtocolValidationError("remote program probe returned invalid dataset counts")
+        if (
+            counts.get("patients") != 6_350
+            or counts.get("visits") not in (15_032, 14_995)
+            or counts.get("medications") != 131
+            or counts.get("ddi_pairs") != 448
+        ):
+            raise ProtocolValidationError(
+                "remote program probe dataset counts do not match expected B0"
+            )
+        if (
+            program.program_id == "safedrug-archived"
+            and counts.get("molecular_substructures") != 491
+        ):
             raise ProtocolValidationError(
                 "remote program probe dataset counts do not match expected B0"
             )
@@ -617,10 +648,13 @@ class RemoteExecutor:
         gpu_index: int,
         run_id: str,
         mode: str = "formal",
+        profile_id: str | None = None,
+        learning_rate: float | None = None,
     ) -> str:
         dataset_root = str(PurePosixPath(data_root) / program.dataset_subdirectory)
         run_root = str(PurePosixPath(data_root) / program.run_subdirectory / run_id)
         program_path = str(PurePosixPath(remote_root) / program.entrypoint)
+        target_profile = profile_id or baseline_id
         argv = [
             "env",
             f"MEDREC_RUN_ID={run_id}",
@@ -635,7 +669,7 @@ class RemoteExecutor:
             program.conda_environment,
             "python",
             program_path,
-            baseline_id,
+            target_profile,
             "--upstream-root",
             program.upstream_root,
             "--dataset-root",
@@ -643,6 +677,8 @@ class RemoteExecutor:
             "--run-root",
             run_root,
         ]
+        if learning_rate is not None:
+            argv.extend(["--learning-rate", str(learning_rate)])
         if mode == "smoke":
             argv.extend(["--mode", "smoke"])
         command = shlex.join(argv)

@@ -163,11 +163,24 @@ def _gpu_list(value: str) -> tuple[int, ...]:
     return parsed
 
 
-def _reproduction_lanes(args: argparse.Namespace) -> tuple[tuple[str, int], ...]:
+def _reproduction_lanes(
+    args: argparse.Namespace, registry: BaselineRegistry | None = None
+) -> tuple[tuple[str, int], ...]:
     if args.baseline_id == "all":
-        if args.gpu is not None or args.gpus is None or len(args.gpus) != len(ARCHIVED_BASELINES):
+        if args.gpu is not None or args.gpus is None:
             raise ProtocolValidationError("'all' requires exactly four unique --gpus and no --gpu")
-        return tuple(zip(ARCHIVED_BASELINES, args.gpus, strict=True))
+        if len(args.gpus) == len(ARCHIVED_BASELINES):
+            return tuple(zip(ARCHIVED_BASELINES, args.gpus, strict=True))
+        if (
+            registry
+            and registry.reproduction_lanes
+            and len(args.gpus) == len(registry.reproduction_lanes)
+        ):
+            lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
+            return tuple(zip(lane_ids, args.gpus, strict=True))
+        raise ProtocolValidationError(
+            f"'all' requires unique --gpus matching either the {len(ARCHIVED_BASELINES)} archived baselines or {len(registry.reproduction_lanes) if registry else 'declared'} reproduction lanes"
+        )
     if args.gpu is None or args.gpus is not None:
         raise ProtocolValidationError("one baseline requires --gpu and no --gpus")
     return ((args.baseline_id, args.gpu),)
@@ -184,7 +197,7 @@ def _reproduce(
         registry = BaselineRegistry.load(args.registry)
     except FileNotFoundError as error:
         raise ProtocolValidationError("baseline registry file not found") from error
-    lanes = _reproduction_lanes(args)
+    lanes = _reproduction_lanes(args, registry)
     source_revision = _local_source_revision(
         Path.cwd(),
         require_clean=not args.dry_run,
@@ -249,7 +262,8 @@ def _reproduce_smoke(
         registry = BaselineRegistry.load(args.registry)
     except FileNotFoundError as error:
         raise ProtocolValidationError("baseline registry file not found") from error
-    lanes = _reproduction_lanes(args)
+    lanes = _reproduction_lanes(args, registry)
+
     source_revision = _local_source_revision(
         Path.cwd(),
         require_clean=not args.dry_run,
@@ -444,7 +458,7 @@ def _build_parser() -> argparse.ArgumentParser:
     reproduce = commands.add_parser(
         "reproduce", help="Plan or submit archived baseline reproduction on 319"
     )
-    reproduce.add_argument("baseline_id", choices=(*ARCHIVED_BASELINES, "all"))
+    reproduce.add_argument("baseline_id", type=str, help="Baseline ID, lane ID, or 'all'")
     reproduce.add_argument("--gpu", type=_nonnegative_integer)
     reproduce.add_argument("--gpus", type=_gpu_list)
     reproduce.add_argument("--min-free-gpu-mib", type=_positive_integer, default=20000)
@@ -472,9 +486,10 @@ def _build_parser() -> argparse.ArgumentParser:
     smoke = commands.add_parser(
         "reproduce-smoke", help="Plan or submit archived baseline one-epoch smoke on 319"
     )
-    smoke.add_argument("baseline_id", choices=(*ARCHIVED_BASELINES, "all"))
+    smoke.add_argument("baseline_id", type=str, help="Baseline ID, lane ID, or 'all'")
     smoke.add_argument("--gpu", type=_nonnegative_integer)
     smoke.add_argument("--gpus", type=_gpu_list)
+
     smoke.add_argument("--min-free-gpu-mib", type=_positive_integer, default=20000)
     smoke.add_argument("--min-free-disk-gib", type=_positive_integer, default=100)
     smoke.add_argument(

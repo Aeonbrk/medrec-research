@@ -258,3 +258,31 @@ def test_audit_safedrug_table2_cli_missing_arg_fails() -> None:
     completed = _cli("audit-safedrug-table2")
     assert completed.returncode == 2
     assert "required" in completed.stderr
+
+
+def test_reproduce_all_seven_lanes_dry_run_maps_all_seven_gpus() -> None:
+    completed = _cli("reproduce", "all", "--gpus", "0,1,2,3,4,5,6", "--dry-run")
+    assert completed.returncode == 0
+    results = json.loads(completed.stdout)["results"]
+    assert len(results) == 7
+    assert [(item["baseline_id"], item["gpu"]) for item in results] == [
+        ("molerec-retain", 0),
+        ("molerec-leap", 1),
+        ("molerec-gamenet", 2),
+        ("molerec-safedrug-lr-1e-5", 3),
+        ("molerec-safedrug-lr-1e-4", 4),
+        ("molerec-safedrug-lr-5e-4", 5),
+        ("molerec-embedding", 6),
+    ]
+
+
+def test_reproduce_single_lane_id_dry_run() -> None:
+    completed = _cli("reproduce", "molerec-safedrug-lr-1e-5", "--gpu", "3", "--dry-run")
+    assert completed.returncode == 0
+    result = json.loads(completed.stdout)["results"][0]
+    assert result["state"] == "planned"
+    assert (
+        "SafeDrug.py safedrug" in result["command"]
+        or "safedrug_archived.py safedrug" in result["command"]
+    )
+    assert "--learning-rate 1e-05" in result["command"]

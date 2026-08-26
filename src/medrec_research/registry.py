@@ -366,6 +366,68 @@ class ReproductionProgram:
 
 
 @dataclass(frozen=True, slots=True)
+class ReproductionLane:
+    """One declared reproduction execution lane mapping a profile to a program."""
+
+    lane_id: str
+    scientific_baseline_id: str
+    program_id: str
+    profile_id: str
+    formal_test: str = "yes"
+    learning_rate: float | None = None
+    default_gpu_index: int | None = None
+
+    def __post_init__(self) -> None:
+        require_identifier(self.lane_id, field="lane_id")
+        require_identifier(self.scientific_baseline_id, field="scientific_baseline_id")
+        require_identifier(self.program_id, field="program_id")
+        require_string(self.profile_id, field="profile_id")
+        if self.formal_test not in ("yes", "only_if_selected", "no"):
+            raise ProtocolValidationError("formal_test must be 'yes', 'only_if_selected', or 'no'")
+        if self.learning_rate is not None and self.learning_rate <= 0:
+            raise ProtocolValidationError("learning_rate must be a positive float")
+        if self.default_gpu_index is not None and self.default_gpu_index < 0:
+            raise ProtocolValidationError("default_gpu_index must be a non-negative integer")
+
+    def to_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "formal_test": self.formal_test,
+            "lane_id": self.lane_id,
+            "profile_id": self.profile_id,
+            "program_id": self.program_id,
+            "scientific_baseline_id": self.scientific_baseline_id,
+        }
+        if self.learning_rate is not None:
+            payload["learning_rate"] = self.learning_rate
+        if self.default_gpu_index is not None:
+            payload["default_gpu_index"] = self.default_gpu_index
+        return payload
+
+    @classmethod
+    def from_dict(cls, value: object) -> ReproductionLane:
+        payload = strict_fields(
+            value,
+            required=(
+                "lane_id",
+                "scientific_baseline_id",
+                "program_id",
+                "profile_id",
+            ),
+            optional=("formal_test", "learning_rate", "default_gpu_index"),
+            context="Reproduction Lane",
+        )
+        return cls(
+            lane_id=payload["lane_id"],
+            scientific_baseline_id=payload["scientific_baseline_id"],
+            program_id=payload["program_id"],
+            profile_id=payload["profile_id"],
+            formal_test=payload.get("formal_test", "yes"),
+            learning_rate=payload.get("learning_rate"),
+            default_gpu_index=payload.get("default_gpu_index"),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class BaselineDefinition:
     """One baseline's source, modes, adapter, and verified readiness."""
 
@@ -657,6 +719,7 @@ class BaselineRegistry:
 
     baselines: tuple[BaselineDefinition, ...]
     reproduction_programs: tuple[ReproductionProgram, ...] = ()
+    reproduction_lanes: tuple[ReproductionLane, ...] = ()
 
     def __post_init__(self) -> None:
         baselines = tuple(
@@ -676,6 +739,7 @@ class BaselineRegistry:
         if len({program.program_id for program in programs}) != len(programs):
             raise ProtocolValidationError("program_id values must be unique")
         program_ids = {program.program_id for program in programs}
+        baseline_ids = {baseline.baseline_id for baseline in baselines}
         missing = sorted(
             {
                 baseline.reproduction_program
@@ -688,14 +752,53 @@ class BaselineRegistry:
             raise ProtocolValidationError(
                 "baseline references unknown Reproduction Program(s): " + ", ".join(missing)
             )
+        lanes = tuple(
+            lane if isinstance(lane, ReproductionLane) else ReproductionLane.from_dict(lane)
+            for lane in self.reproduction_lanes
+        )
+        if len({lane.lane_id for lane in lanes}) != len(lanes):
+            raise ProtocolValidationError("lane_id values must be unique")
+        missing_lane_programs = sorted(
+            {lane.program_id for lane in lanes if lane.program_id not in program_ids}
+        )
+        if missing_lane_programs:
+            raise ProtocolValidationError(
+                "reproduction lane references unknown Reproduction Program(s): "
+                + ", ".join(missing_lane_programs)
+            )
+        missing_lane_baselines = sorted(
+            {
+                lane.scientific_baseline_id
+                for lane in lanes
+                if lane.scientific_baseline_id not in baseline_ids
+            }
+        )
+        if missing_lane_baselines:
+            raise ProtocolValidationError(
+                "reproduction lane references unknown scientific baseline(s): "
+                + ", ".join(missing_lane_baselines)
+            )
         object.__setattr__(self, "baselines", baselines)
         object.__setattr__(self, "reproduction_programs", programs)
+        object.__setattr__(self, "reproduction_lanes", lanes)
 
     def get(self, baseline_id: str) -> BaselineDefinition:
         for baseline in self.baselines:
             if baseline.baseline_id == baseline_id:
                 return baseline
         raise KeyError(baseline_id)
+
+    def get_program(self, program_id: str) -> ReproductionProgram:
+        for program in self.reproduction_programs:
+            if program.program_id == program_id:
+                return program
+        raise KeyError(program_id)
+
+    def get_lane(self, lane_id: str) -> ReproductionLane:
+        for lane in self.reproduction_lanes:
+            if lane.lane_id == lane_id:
+                return lane
+        raise KeyError(lane_id)
 
     def reproduction_program_for(self, baseline: BaselineDefinition) -> ReproductionProgram:
         if baseline.reproduction_program is None:
@@ -712,6 +815,7 @@ class BaselineRegistry:
     def to_dict(self) -> dict[str, object]:
         return {
             "baselines": [baseline.to_dict() for baseline in self.baselines],
+            "reproduction_lanes": [lane.to_dict() for lane in self.reproduction_lanes],
             "reproduction_programs": [program.to_dict() for program in self.reproduction_programs],
             "schema_version": self.SCHEMA_VERSION,
         }
@@ -721,7 +825,7 @@ class BaselineRegistry:
         payload = strict_fields(
             value,
             required=("schema_version", "baselines"),
-            optional=("reproduction_programs",),
+            optional=("reproduction_lanes", "reproduction_programs"),
             context="BaselineRegistry",
         )
         if payload["schema_version"] != cls.SCHEMA_VERSION:
@@ -734,9 +838,13 @@ class BaselineRegistry:
         programs = payload.get("reproduction_programs", [])
         if not isinstance(programs, list):
             raise ProtocolValidationError("BaselineRegistry.reproduction_programs must be a list")
+        lanes = payload.get("reproduction_lanes", [])
+        if not isinstance(lanes, list):
+            raise ProtocolValidationError("BaselineRegistry.reproduction_lanes must be a list")
         return cls(
             tuple(BaselineDefinition.from_dict(item) for item in baselines),
             tuple(ReproductionProgram.from_dict(item) for item in programs),
+            tuple(ReproductionLane.from_dict(item) for item in lanes),
         )
 
     @classmethod
@@ -762,6 +870,7 @@ __all__ = (
     "ComparisonQualification",
     "ReadinessEvidence",
     "ReadinessGate",
+    "ReproductionLane",
     "ReproductionProgram",
     "ResearchMode",
     "SourceIdentity",

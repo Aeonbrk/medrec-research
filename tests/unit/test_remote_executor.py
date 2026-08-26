@@ -463,7 +463,7 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
                         **json.loads(_valid_probe_json("safedrug")),
                         "dataset_counts": {
                             "patients": 6350,
-                            "visits": 15032,
+                            "visits": 14000,
                             "medications": 131,
                             "ddi_pairs": 448,
                             "molecular_substructures": 491,

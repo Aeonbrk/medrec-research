@@ -18,6 +18,25 @@ required_inputs = [
 import_modules = ["torch", "dnc", "rdkit", "pandas", "dill", "sklearn", "models", "util"]
 environment_sha256 = "c17ebfc53484b74497e2d6d8058271de8d7503a2fdb19eb756ddff17ba9715b9"
 
+[[reproduction_programs]]
+program_id = "molerec"
+entrypoint = "baselines/molerec.py"
+conda_environment = "medrec-molerec-table1"
+upstream_root = "/root/zhb/MoleRec"
+dataset_subdirectory = "snapshots/molerec-table1-c721-www23"
+run_subdirectory = "runs/molerec"
+required_inputs = [
+  "records_final.pkl",
+  "voc_final.pkl",
+  "ddi_A_final.pkl",
+  "ehr_adj_final.pkl",
+  "ddi_mask_H.pkl",
+  "substructure_smiles.pkl",
+  "idx2SMILES.pkl",
+  "idx2drug.pkl",
+]
+import_modules = ["torch", "torch_geometric", "rdkit", "pandas", "dill", "sklearn"]
+
 [[baselines]]
 baseline_id = "reference"
 display_name = "Train-Frequency Control"
@@ -75,3 +94,67 @@ reproduction_program = "safedrug-archived"
 repository = "https://github.com/ycq091044/SafeDrug"
 revision = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 status = "pinned"
+
+[[baselines]]
+baseline_id = "molerec"
+display_name = "MoleRec (Table 1)"
+supported_modes = ["reproduction", "comparison"]
+readiness = "registered"
+reproduction_program = "molerec"
+
+[baselines.source]
+repository = "https://github.com/ycq091044/MoleRec"
+revision = "f4e555800d9841804f866412b1d6199859f71ddb"
+status = "pinned"
+
+[[reproduction_lanes]]
+lane_id = "molerec-retain"
+scientific_baseline_id = "retain"
+program_id = "safedrug-archived"
+profile_id = "retain"
+formal_test = "yes"
+
+[[reproduction_lanes]]
+lane_id = "molerec-leap"
+scientific_baseline_id = "leap-safedrug"
+program_id = "safedrug-archived"
+profile_id = "leap-safedrug"
+formal_test = "yes"
+
+[[reproduction_lanes]]
+lane_id = "molerec-gamenet"
+scientific_baseline_id = "gamenet"
+program_id = "safedrug-archived"
+profile_id = "gamenet"
+formal_test = "yes"
+
+[[reproduction_lanes]]
+lane_id = "molerec-safedrug-lr-1e-5"
+scientific_baseline_id = "safedrug"
+program_id = "safedrug-archived"
+profile_id = "safedrug"
+learning_rate = 0.00001
+formal_test = "only_if_selected"
+
+[[reproduction_lanes]]
+lane_id = "molerec-safedrug-lr-1e-4"
+scientific_baseline_id = "safedrug"
+program_id = "safedrug-archived"
+profile_id = "safedrug"
+learning_rate = 0.0001
+formal_test = "only_if_selected"
+
+[[reproduction_lanes]]
+lane_id = "molerec-safedrug-lr-5e-4"
+scientific_baseline_id = "safedrug"
+program_id = "safedrug-archived"
+profile_id = "safedrug"
+learning_rate = 0.0005
+formal_test = "only_if_selected"
+
+[[reproduction_lanes]]
+lane_id = "molerec-embedding"
+scientific_baseline_id = "molerec"
+program_id = "molerec"
+profile_id = "molerec-embedding"
+formal_test = "yes"
