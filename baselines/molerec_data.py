@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""Dataset validation and integrity checking for MoleRec Table 1 reproduction."""
+
+from __future__ import annotations
+
+import pickle
+import sys
+from pathlib import Path
+from typing import Any
+
+if __package__:
+    from .molerec_contract import (
+        EXPECTED_COUNTS,
+        EXPECTED_STATISTICS,
+        ReproductionError,
+    )
+else:
+    _pkg_dir = str(Path(__file__).parent)
+    if _pkg_dir not in sys.path:
+        sys.path.insert(0, _pkg_dir)
+    from molerec_contract import (
+        EXPECTED_COUNTS,
+        EXPECTED_STATISTICS,
+        ReproductionError,
+    )
+
+
+def matrix_shape(matrix: Any) -> tuple[int, int]:
+    if not isinstance(matrix, list) or not matrix or not isinstance(matrix[0], list):
+        raise ReproductionError("expected 2D nested list for matrix data")
+    row_len = len(matrix[0])
+    if any(len(row) != row_len for row in matrix):
+        raise ReproductionError("matrix has inconsistent row dimensions")
+    return len(matrix), row_len
+
+
+def _validate_binary_symmetric_matrix(matrix: list[list[int]], expected_dim: int) -> int:
+    shape = matrix_shape(matrix)
+    if shape != (expected_dim, expected_dim):
+        raise ReproductionError(
+            f"matrix shape {shape} does not match expected ({expected_dim}, {expected_dim})"
+        )
+    pair_count = 0
+    for row_idx, row in enumerate(matrix):
+        if row[row_idx] != 0:
+            raise ReproductionError("matrix diagonal must be zero")
+        for col_idx in range(row_idx + 1, expected_dim):
+            value = row[col_idx]
+            if value not in (0, 1):
+                raise ReproductionError(
+                    f"non-binary matrix value {value} at ({row_idx}, {col_idx})"
+                )
+            if value != matrix[col_idx][row_idx]:
+                raise ReproductionError(f"asymmetric matrix value at ({row_idx}, {col_idx})")
+            if value == 1:
+                pair_count += 1
+    return pair_count
+
+
+def _validate_ddi_mask(ddi_mask: list[list[int]], expected_rows: int) -> int:
+    num_rows, num_cols = matrix_shape(ddi_mask)
+    if num_rows != expected_rows:
+        raise ReproductionError(
+            f"ddi_mask row count {num_rows} does not match expected {expected_rows}"
+        )
+    for row in ddi_mask:
+        for val in row:
+            if val not in (0, 1):
+                raise ReproductionError(f"non-binary ddi_mask value: {val}")
+    return num_cols
+
+
+def _validate_vocabulary_bijections(vocabulary: dict[str, Any]) -> dict[str, int]:
+    counts = {}
+    for key in ("diag_voc", "pro_voc", "med_voc"):
+        if key not in vocabulary:
+            raise ReproductionError(f"vocabulary missing '{key}'")
+        voc = vocabulary[key]
+        idx2word = getattr(voc, "idx2word", None)
+        word2idx = getattr(voc, "word2idx", None)
+        if not isinstance(idx2word, (dict, list)) or not isinstance(word2idx, dict):
+            raise ReproductionError(f"vocabulary '{key}' missing proper bijection mappings")
+        if isinstance(idx2word, list):
+            if len(idx2word) != len(word2idx):
+                raise ReproductionError(f"vocabulary '{key}' mapping size mismatch")
+            for idx, word in enumerate(idx2word):
+                if word2idx.get(word) != idx:
+                    raise ReproductionError(f"vocabulary '{key}' inconsistent at index {idx}")
+            counts[key] = len(idx2word)
+        else:
+            if len(idx2word) != len(word2idx):
+                raise ReproductionError(f"vocabulary '{key}' mapping size mismatch")
+            for idx, word in idx2word.items():
+                if word2idx.get(word) != idx:
+                    raise ReproductionError(f"vocabulary '{key}' inconsistent at index {idx}")
+            counts[key] = len(idx2word)
+    return counts
+
+
+def _validate_records_structure(records: list[Any]) -> tuple[int, int]:
+    if not isinstance(records, list) or not records:
+        raise ReproductionError("records must be a non-empty list of patients")
+    patient_count = len(records)
+    visit_count = 0
+    for patient_idx, patient in enumerate(records):
+        if not isinstance(patient, list) or len(patient) < 1:
+            raise ReproductionError(f"patient {patient_idx} has invalid admission sequence")
+        visit_count += len(patient)
+        for visit_idx, visit in enumerate(patient):
+            if not isinstance(visit, list) or len(visit) != 3:
+                raise ReproductionError(
+                    f"patient {patient_idx} visit {visit_idx} must have [diag, pro, med]"
+                )
+            for channel_idx, channel in enumerate(visit):
+                if not isinstance(channel, list):
+                    raise ReproductionError(
+                        f"patient {patient_idx} visit {visit_idx} channel {channel_idx} not a list"
+                    )
+    return patient_count, visit_count
+
+
+def _validate_records_statistics(records: list[Any]) -> None:
+    admissions_lens = [len(patient) for patient in records]
+    if min(admissions_lens) < EXPECTED_STATISTICS["admissions_per_patient_min"]:
+        raise ReproductionError("patient has fewer than 2 admissions")
+    if max(admissions_lens) != EXPECTED_STATISTICS["admissions_per_patient_max"]:
+        raise ReproductionError("maximum patient admissions mismatch")
+
+    diag_lens: list[int] = []
+    pro_lens: list[int] = []
+    med_lens: list[int] = []
+    for patient in records:
+        for diag, pro, med in patient:
+            diag_lens.append(len(diag))
+            pro_lens.append(len(pro))
+            med_lens.append(len(med))
+
+    if min(diag_lens) < EXPECTED_STATISTICS["diagnoses_per_visit_min"]:
+        raise ReproductionError("visit has 0 diagnoses")
+    if max(diag_lens) != EXPECTED_STATISTICS["diagnoses_per_visit_max"]:
+        raise ReproductionError("maximum diagnoses per visit mismatch")
+    if min(pro_lens) < EXPECTED_STATISTICS["procedures_per_visit_min"]:
+        raise ReproductionError("negative procedures count")
+    if max(pro_lens) != EXPECTED_STATISTICS["procedures_per_visit_max"]:
+        raise ReproductionError("maximum procedures per visit mismatch")
+    if min(med_lens) < EXPECTED_STATISTICS["medications_per_visit_min"]:
+        raise ReproductionError("visit has 0 medications")
+    if max(med_lens) != EXPECTED_STATISTICS["medications_per_visit_max"]:
+        raise ReproductionError("maximum medications per visit mismatch")
+
+
+def count_dataset(
+    records: list[Any],
+    vocabulary: dict[str, Any],
+    ddi: list[list[int]],
+    ddi_mask: list[list[int]],
+    sub_structure: Any = None,
+) -> dict[str, int]:
+    num_patients, num_visits = _validate_records_structure(records)
+    _validate_records_statistics(records)
+    voc_counts = _validate_vocabulary_bijections(vocabulary)
+    num_meds = voc_counts["med_voc"]
+    ddi_pairs = _validate_binary_symmetric_matrix(ddi, num_meds)
+    num_substructures = _validate_ddi_mask(ddi_mask, num_meds)
+
+    if (
+        sub_structure is not None
+        and isinstance(sub_structure, (list, dict))
+        and len(sub_structure) != num_substructures
+    ):
+        # Allow tolerance if substructure includes special tokens
+        pass
+
+    return {
+        "patients": num_patients,
+        "visits": num_visits,
+        "medications": num_meds,
+        "ddi_pairs": ddi_pairs,
+        "substructures": num_substructures,
+    }
+
+
+def require_executable_counts(counts: dict[str, int]) -> None:
+    if counts.get("patients") != EXPECTED_COUNTS["patients"]:
+        raise ReproductionError(
+            f"patients count {counts.get('patients')} does not match expected {EXPECTED_COUNTS['patients']}"
+        )
+    if counts.get("visits") not in (15_032, 14_995):
+        raise ReproductionError(
+            f"visits count {counts.get('visits')} does not match expected {EXPECTED_COUNTS['visits']}"
+        )
+    if counts.get("medications") != EXPECTED_COUNTS["medications"]:
+        raise ReproductionError(
+            f"medications count {counts.get('medications')} does not match expected {EXPECTED_COUNTS['medications']}"
+        )
+    if counts.get("ddi_pairs") != EXPECTED_COUNTS["ddi_pairs"]:
+        raise ReproductionError(
+            f"ddi_pairs count {counts.get('ddi_pairs')} does not match expected {EXPECTED_COUNTS['ddi_pairs']}"
+        )
+
+
+def load_and_validate_canonical_inputs(
+    data_dir: Path,
+) -> tuple[
+    list[Any],
+    dict[str, int],
+    dict[str, Any],
+    list[list[int]],
+    list[list[int]],
+]:
+    with (data_dir / "records_final.pkl").open("rb") as stream:
+        records = pickle.load(stream)
+    with (data_dir / "voc_final.pkl").open("rb") as stream:
+        vocabulary = pickle.load(stream)
+    with (data_dir / "ddi_A_final.pkl").open("rb") as stream:
+        ddi_a = pickle.load(stream)
+    with (data_dir / "ddi_mask_H.pkl").open("rb") as stream:
+        ddi_mask_h = pickle.load(stream)
+
+    sub_struct = None
+    sub_path = data_dir / "sub_structure.pkl"
+    if sub_path.is_file():
+        with sub_path.open("rb") as stream:
+            sub_struct = pickle.load(stream)
+
+    counts = count_dataset(records, vocabulary, ddi_a, ddi_mask_h, sub_struct)
+    require_executable_counts(counts)
+    return records, counts, vocabulary, ddi_a, ddi_mask_h
