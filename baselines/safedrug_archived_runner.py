@@ -86,6 +86,7 @@ def run_smoke_lane(
     data_dir: Path,
     run_root: Path,
     python: str,
+    learning_rate: float | None = None,
     dispatch_module: Any = None,
 ) -> None:
     if run_root.exists():
@@ -102,6 +103,8 @@ def run_smoke_lane(
         or run_root in upstream_root.parents
     ):
         raise ReproductionError("run root must be outside archived upstream source")
+
+    active_lr = learning_rate if learning_rate is not None else profile.learning_rate
 
     mod = (
         dispatch_module
@@ -134,7 +137,7 @@ def run_smoke_lane(
     original_source = original_entrypoint.read_text(encoding="utf-8")
 
     adapt_smoke = getattr(mod, "adapt_smoke_source", adapt_smoke_source)
-    adapted_source = adapt_smoke(original_source)
+    adapted_source = adapt_smoke(original_source, target_lr=active_lr)
 
     run_root.mkdir(parents=True)
     work_src = run_root / "work" / "src"
@@ -150,9 +153,10 @@ def run_smoke_lane(
     started_at = datetime.now(UTC).isoformat()
 
     calc_sha256 = getattr(mod, "sha256", sha256)
-    adaptation = {
+    adaptation: dict[str, Any] = {
         "archived_revision": ARCHIVED_REVISION,
         "entrypoint": profile.entrypoint,
+        "learning_rate": active_lr,
         "original_sha256": calc_sha256(original_entrypoint),
         "adapted_sha256": calc_sha256(adapted_entrypoint),
         "reverse_verification": "byte-identical",
@@ -178,6 +182,7 @@ def run_smoke_lane(
             "kind": "safedrug_archived_smoke_status",
             "state": "running",
             "stage": "training",
+            "learning_rate": active_lr,
             "started_at": started_at,
             "finished_at": None,
             "failure_code": None,
@@ -212,6 +217,7 @@ def run_smoke_lane(
             "kind": "safedrug_archived_smoke_status",
             "state": "completed",
             "stage": "terminal",
+            "learning_rate": active_lr,
             "started_at": started_at,
             "finished_at": finished_at,
             "failure_code": None,
@@ -222,6 +228,7 @@ def run_smoke_lane(
             "kind": "safedrug_archived_smoke",
             "non_evidence": True,
             "baseline_id": profile.baseline_id,
+            "learning_rate": active_lr,
             "source_revision": ARCHIVED_REVISION,
             "environment_sha256": environment_identity["conda_explicit_sha256"],
             "dataset_counts": counts,
@@ -249,6 +256,7 @@ def run_smoke_lane(
                 "kind": "safedrug_archived_smoke_status",
                 "state": "failed",
                 "stage": "terminal",
+                "learning_rate": active_lr,
                 "started_at": started_at,
                 "finished_at": datetime.now(UTC).isoformat(),
                 "failure_code": "smoke_failed",
@@ -264,6 +272,7 @@ def run_formal_lane(
     data_dir: Path,
     run_root: Path,
     python: str,
+    learning_rate: float | None = None,
     dispatch_module: Any = None,
 ) -> None:
     if run_root.exists():
@@ -280,6 +289,8 @@ def run_formal_lane(
         or run_root in upstream_root.parents
     ):
         raise ReproductionError("run root must be outside archived upstream source")
+
+    active_lr = learning_rate if learning_rate is not None else profile.learning_rate
 
     mod = (
         dispatch_module
@@ -312,7 +323,7 @@ def run_formal_lane(
     original_source = original_entrypoint.read_text(encoding="utf-8")
 
     adapt_training = getattr(mod, "adapt_training_source", adapt_training_source)
-    adapted_source = adapt_training(original_source)
+    adapted_source = adapt_training(original_source, target_lr=active_lr)
 
     run_root.mkdir(parents=True)
     work_src = run_root / "work" / "src"
@@ -328,9 +339,10 @@ def run_formal_lane(
     started_at = datetime.now(UTC).isoformat()
 
     calc_sha256 = getattr(mod, "sha256", sha256)
-    adaptation = {
+    adaptation: dict[str, Any] = {
         "archived_revision": ARCHIVED_REVISION,
         "entrypoint": profile.entrypoint,
+        "learning_rate": active_lr,
         "original_sha256": calc_sha256(original_entrypoint),
         "adapted_sha256": calc_sha256(adapted_entrypoint),
         "reverse_verification": "byte-identical",
@@ -343,6 +355,7 @@ def run_formal_lane(
         "schema_version": 1,
         "kind": "safedrug_archived_formal_status",
         "baseline_id": profile.baseline_id,
+        "learning_rate": active_lr,
         "state": "running",
         "stage": "training",
         "started_at": started_at,
@@ -386,6 +399,7 @@ def run_formal_lane(
             "schema_version": 1,
             "kind": "safedrug_archived_formal_status",
             "baseline_id": profile.baseline_id,
+            "learning_rate": active_lr,
             "state": "completed",
             "stage": "terminal",
             "started_at": started_at,
@@ -399,7 +413,7 @@ def run_formal_lane(
                 "schema_version": 1,
                 "baseline_id": profile.baseline_id,
                 "source_revision": ARCHIVED_REVISION,
-                "archived_learning_rate": profile.learning_rate,
+                "archived_learning_rate": active_lr,
                 "dataset_counts": counts,
                 "environment": environment_identity,
                 "adaptation": adaptation,
@@ -418,6 +432,7 @@ def run_formal_lane(
                 "schema_version": 1,
                 "kind": "safedrug_archived_formal_status",
                 "baseline_id": profile.baseline_id,
+                "learning_rate": active_lr,
                 "state": "failed",
                 "stage": "terminal",
                 "started_at": started_at,

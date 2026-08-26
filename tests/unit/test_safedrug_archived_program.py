@@ -87,9 +87,13 @@ def test_profiles_match_archived_entrypoints_and_defaults() -> None:
     assert observed == {
         "gamenet": ("GAMENet.py", "GAMENet", 1e-4),
         "safedrug": ("SafeDrug.py", "SafeDrug", 5e-4),
+        "safedrug-lr-1e-5": ("SafeDrug.py", "SafeDrug", 1e-5),
+        "safedrug-lr-1e-4": ("SafeDrug.py", "SafeDrug", 1e-4),
+        "safedrug-lr-5e-4": ("SafeDrug.py", "SafeDrug", 5e-4),
         "retain": ("Retain.py", "Retain", 5e-4),
         "leap-safedrug": ("Leap.py", "Leap", 5e-4),
     }
+
     assert adapter.PROFILES["safedrug"].required_inputs[-3:] == (
         "ehr_adj_final.pkl",
         "ddi_mask_H.pkl",
@@ -682,3 +686,22 @@ def test_checkpoint_regexes_match_expected_patterns(
         assert int(match.group(1)) == expected_epoch
     else:
         assert match is None
+
+
+@pytest.mark.parametrize("lr", [1e-5, 1e-4, 5e-4])
+def test_learning_rate_adaptation_is_exact_and_reversible(lr: float) -> None:
+    source = "optimizer = Adam(model.parameters(), lr=5e-4)\n"
+    adapted = adapter.adapt_learning_rate_source(source, lr)
+    if lr == 5e-4:
+        assert adapted == source
+    else:
+        lr_str = adapter._format_lr(lr)
+        assert f"lr={lr_str}" in adapted
+        reverted = adapter.adapt_learning_rate_source(adapted, 5e-4, original_lr=lr)
+        assert reverted == source
+
+
+def test_profiles_include_candidate_learning_rates() -> None:
+    assert adapter.PROFILES["safedrug-lr-1e-5"].learning_rate == 1e-5
+    assert adapter.PROFILES["safedrug-lr-1e-4"].learning_rate == 1e-4
+    assert adapter.PROFILES["safedrug-lr-5e-4"].learning_rate == 5e-4

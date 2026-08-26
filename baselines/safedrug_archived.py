@@ -41,7 +41,9 @@ if __package__:
         TRAIN_DECLARATION,
         Profile,
         ReproductionError,
+        _format_lr,
         adapt_epoch_source,
+        adapt_learning_rate_source,
         adapt_smoke_source,
         adapt_training_source,
         finalize_result,
@@ -107,7 +109,9 @@ else:
         TRAIN_DECLARATION,
         Profile,
         ReproductionError,
+        _format_lr,
         adapt_epoch_source,
+        adapt_learning_rate_source,
         adapt_smoke_source,
         adapt_training_source,
         finalize_result,
@@ -171,6 +175,7 @@ __all__ = [
     "UTC",
     "Profile",
     "ReproductionError",
+    "_format_lr",
     "_nvidia_driver_version",
     "_package_version",
     "_validate_binary_symmetric_matrix",
@@ -180,6 +185,7 @@ __all__ = [
     "_validate_records_structure",
     "_validate_vocabulary_bijections",
     "adapt_epoch_source",
+    "adapt_learning_rate_source",
     "adapt_smoke_source",
     "adapt_training_source",
     "check_cuda_tensor",
@@ -221,6 +227,12 @@ def main() -> None:
     parser.add_argument("--run-root", type=Path)
     parser.add_argument("--python", default=sys.executable)
     parser.add_argument(
+        "--learning-rate",
+        type=float,
+        default=None,
+        help="Override learning rate for SafeDrug candidate selection",
+    )
+    parser.add_argument(
         "--mode",
         choices=("formal", "smoke", "probe"),
         default="formal",
@@ -259,6 +271,7 @@ def main() -> None:
             data_dir=args.dataset_root.resolve(),
             run_root=args.run_root.resolve(),
             python=args.python,
+            learning_rate=args.learning_rate,
         )
     else:
         run_formal_lane(
@@ -267,6 +280,7 @@ def main() -> None:
             data_dir=args.dataset_root.resolve(),
             run_root=args.run_root.resolve(),
             python=args.python,
+            learning_rate=args.learning_rate,
         )
 
 

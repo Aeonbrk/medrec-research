@@ -106,6 +106,45 @@ PROFILES = {
         ),
         re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
     ),
+    "safedrug-lr-1e-5": Profile(
+        "safedrug-lr-1e-5",
+        "SafeDrug.py",
+        "SafeDrug",
+        1e-5,
+        (
+            *COMMON_INPUTS,
+            "ehr_adj_final.pkl",
+            "ddi_mask_H.pkl",
+            "idx2drug.pkl",
+        ),
+        re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
+    ),
+    "safedrug-lr-1e-4": Profile(
+        "safedrug-lr-1e-4",
+        "SafeDrug.py",
+        "SafeDrug",
+        1e-4,
+        (
+            *COMMON_INPUTS,
+            "ehr_adj_final.pkl",
+            "ddi_mask_H.pkl",
+            "idx2drug.pkl",
+        ),
+        re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
+    ),
+    "safedrug-lr-5e-4": Profile(
+        "safedrug-lr-5e-4",
+        "SafeDrug.py",
+        "SafeDrug",
+        5e-4,
+        (
+            *COMMON_INPUTS,
+            "ehr_adj_final.pkl",
+            "ddi_mask_H.pkl",
+            "idx2drug.pkl",
+        ),
+        re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
+    ),
     "retain": Profile(
         "retain",
         "Retain.py",
@@ -133,13 +172,47 @@ def profile_for(baseline_id: str) -> Profile:
         raise ReproductionError(f"unknown archived baseline '{baseline_id}'") from error
 
 
-def adapt_training_source(source: str) -> str:
-    """Select archived training mode through the only necessary source change."""
+def _format_lr(lr: float) -> str:
+    if lr == 5e-4:
+        return "5e-4"
+    if lr == 1e-4:
+        return "1e-4"
+    if lr == 1e-5:
+        return "1e-5"
+    return f"{lr:g}"
+
+
+def adapt_learning_rate_source(source: str, target_lr: float, original_lr: float = 5e-4) -> str:
+    """Adapt the learning rate in training source code with byte-reversibility check."""
+    if target_lr == original_lr:
+        return source
+    target_lr_str = _format_lr(target_lr)
+    orig_lr_str = _format_lr(original_lr)
+    pattern = re.compile(rf"lr\s*=\s*(?:{re.escape(orig_lr_str)}|5e-4|{original_lr})")
+    match = pattern.search(source)
+    if not match:
+        raise ReproductionError("archived learning rate declaration drifted from audited source")
+    match_str = match.group(0)
+    replaced_str = re.sub(
+        r"(?:5e-4|" + re.escape(orig_lr_str) + r"|" + re.escape(str(original_lr)) + r")",
+        target_lr_str,
+        match_str,
+    )
+    adapted = source.replace(match_str, replaced_str, 1)
+    if match_str in adapted or adapted.replace(replaced_str, match_str, 1) != source:
+        raise ReproductionError("learning rate adaptation is not byte-reversible")
+    return adapted
+
+
+def adapt_training_source(source: str, target_lr: float | None = None) -> str:
+    """Select archived training mode and optionally adapt learning rate through audited changes."""
     if source.count(TEST_DECLARATION) != 1 or TRAIN_DECLARATION in source:
         raise ReproductionError("archived --Test declaration drifted from audited source")
     adapted = source.replace(TEST_DECLARATION, TRAIN_DECLARATION)
     if adapted.replace(TRAIN_DECLARATION, TEST_DECLARATION) != source:
         raise ReproductionError("training-mode adaptation changed unexpected source bytes")
+    if target_lr is not None and target_lr != 5e-4:
+        adapted = adapt_learning_rate_source(adapted, target_lr)
     return adapted
 
 
@@ -153,15 +226,18 @@ def adapt_epoch_source(source: str) -> str:
     return adapted
 
 
-def adapt_smoke_source(source: str) -> str:
+def adapt_smoke_source(source: str, target_lr: float | None = None) -> str:
     """Compose training-mode and 1-epoch adaptations with joint reversibility."""
-    train_adapted = adapt_training_source(source)
+    train_adapted = adapt_training_source(source, target_lr=target_lr)
     smoke_adapted = adapt_epoch_source(train_adapted)
-    reversed_source = smoke_adapted.replace(EPOCH_SMOKE, EPOCH_FORMAL, 1).replace(
-        TRAIN_DECLARATION, TEST_DECLARATION
-    )
+    reversed_epoch = smoke_adapted.replace(EPOCH_SMOKE, EPOCH_FORMAL, 1)
+    if target_lr is not None and target_lr != 5e-4:
+        reversed_lr = adapt_learning_rate_source(reversed_epoch, 5e-4)  # revert back
+    else:
+        reversed_lr = reversed_epoch
+    reversed_source = reversed_lr.replace(TRAIN_DECLARATION, TEST_DECLARATION)
     if reversed_source != source:
-        raise ReproductionError("smoke adaptation composition is not reversible to original bytes")
+        raise ReproductionError("smoke adaptation is not byte-reversible")
     return smoke_adapted
 
 
