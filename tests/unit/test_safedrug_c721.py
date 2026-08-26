@@ -268,3 +268,20 @@ def test_stage_safedrug_c721_rejects_vocabulary_order_mismatch(tmp_path: Path) -
             staging_directory=staging_dir,
             runner=mock_runner,
         )
+
+
+def test_safedrug_environment_pinned_hash_and_tls_invariant() -> None:
+    from medrec_research import BaselineRegistry
+
+    registry_path = Path(__file__).parents[2] / "baselines" / "registry.toml"
+    registry = BaselineRegistry.load(registry_path)
+    program = registry.get_program("safedrug-archived")
+    assert (
+        program.environment_sha256
+        == "c17ebfc53484b74497e2d6d8058271de8d7503a2fdb19eb756ddff17ba9715b9"
+    )
+
+    readme_text = (Path(__file__).parents[2] / "environments" / "README.md").read_text(
+        encoding="utf-8"
+    )
+    assert "ssl_verify: true" in readme_text
