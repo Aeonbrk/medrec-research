@@ -6,11 +6,12 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-UTC = UTC
+UTC = timezone.utc  # noqa: UP017 -- archived environments may use Python 3.8.
+
 
 if __package__:
     from .molerec_contract import (
