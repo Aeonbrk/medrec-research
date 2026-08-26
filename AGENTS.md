@@ -14,6 +14,7 @@ This repository is the active research home for general medication-recommendatio
 - Reproduction Mode preserves recorded upstream behavior. Comparison Mode uses the shared protocol.
 - A Baseline Core remains unchanged in Comparison Mode. Prediction Adapters may translate representations but must not change scientific behavior.
 - Core development uses Python 3.11 and Homebrew `/opt/homebrew/bin/uv`. Each external baseline runs in an isolated Conda environment and process.
+- Conda, pip, and uv package resolution prioritizes China mirrors through repository-scoped or command-scoped configuration; unavailable exact version-specific artifacts fall back to official HTTPS authorities (e.g., PyTorch, PyG) with TLS verification strictly enabled. Never disable TLS verification (`ssl_verify: false`, `--trusted-host`) or mutate machine/user-global package-manager configuration.
 - The local MacBook Air is the harness terminal. Run only core tests, synthetic fixtures, protocol checks, submission, monitoring, and public-safe audits locally.
 - Run real-data experiments, model training, GPU inference, and baseline Conda environments only on the `319-wild` server after the remote-execution preflight passes.
 - Patient data, split membership, patient-level predictions, model weights, and private traces never enter Git.

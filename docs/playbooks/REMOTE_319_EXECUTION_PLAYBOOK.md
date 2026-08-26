@@ -100,7 +100,7 @@ df -h /root/anaconda3 /root/zhb
 '
 ```
 
-Create a new environment from a registered declaration only when no verified environment matches. Record Python, Conda package export, CUDA, driver, GPU model, and an environment checksum in restricted run provenance. Advancing readiness requires a smoke test through the process adapter, not successful dependency resolution alone.
+Create a new environment from a registered declaration only when no verified environment matches. Resolve Conda and pip packages using China mirrors first via repository-scoped or command-scoped configuration; fall back to official HTTPS channels (e.g., PyTorch, PyG) only when exact version-specific artifacts are unavailable. TLS verification must remain strictly enabled (`ssl_verify: true`, no `--trusted-host`), and global machine/user Conda/pip configurations must never be modified. Record Python, Conda package export, CUDA, driver, GPU model, and an environment checksum in restricted run provenance. Advancing readiness requires a smoke test through the process adapter, not successful dependency resolution alone.
 
 Create the provisional core evaluator only after the checkout revision is fixed:
 

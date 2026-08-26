@@ -43,3 +43,19 @@ Portable operational lessons are limited to the current repository's remote-exec
 ## Keep clinical language narrower than proxy evidence
 
 Retrospective labels, DDI proxies, contraindication rules, and synthetic or adversarial cases can falsify a method story or test software logic. They cannot by themselves establish patient benefit, prescribing safety, or therapeutic equivalence. Archive evidence: `docs/PROJECT_SENSE.md`, `research-wiki/claims/eg_ter_metric_validity.md`, and `research-wiki/claims/crc_ps_bounded_loss_only.md`.
+
+## Separate point-estimate fidelity from directional relationships
+
+In Reproduction Mode, validating directional advantages (e.g. Model A > Model B) does not establish reproduction of the published point estimates when observed means fall outside the reported $2\sigma$ statistical bounds. A directional pass with point interval misses must be honestly classified as `completed_mismatch`, not full reproduction. See `research/failures/safedrug-four-model-table2-mismatch-2026-08-26.md`.
+
+## Distinguish percentage-point differences from relative percentages
+
+Report metric shifts explicitly: an absolute change in Jaccard from $0.5017$ to $0.5148$ is a $+1.312$ percentage-point change ($+0.01312$ absolute), which represents a $+2.62\%$ relative increase. Never report $+1.312$ percentage points as "$+1.31\%$ improvement" without clarifying whether the metric is points or relative.
+
+## Use validation-only selection for candidate model lanes
+
+When upstream literature explores multiple candidate hyperparameters (such as learning rates) without pre-declaring one canonical configuration, train all disclosed candidate lanes and select the final model using validation metrics only (e.g. max validation Jaccard, min validation DDI). Never evaluate non-selected candidates on the test set or leak test metrics into model selection.
+
+## Document minimal hardware compatibility deviations explicitly
+
+When running archived scientific baselines on newer hardware (such as RTX 3090 / Ampere requiring CUDA 11+ instead of recorded CUDA 10.2), keep scientific package versions identical and record the necessary CUDA/driver runtime deviation as an environment compatibility deviation, not exact historical reproduction.
