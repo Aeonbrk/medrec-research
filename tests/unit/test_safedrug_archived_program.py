@@ -641,3 +641,44 @@ def test_terminal_status_is_written_before_result(
     assert [path.name for path in calls] == ["status.json", "result.json"]
     result = json.loads((tmp_path / "result.json").read_text())
     assert result["status"] == status
+
+
+def test_split_responsibility_modules_importable_and_consistent() -> None:
+    from baselines import (
+        safedrug_archived_contract,
+        safedrug_archived_data,
+        safedrug_archived_logs,
+        safedrug_archived_probe,
+        safedrug_archived_runner,
+    )
+
+    assert safedrug_archived_contract.ARCHIVED_REVISION == adapter.ARCHIVED_REVISION
+    assert hasattr(safedrug_archived_data, "load_and_validate_canonical_inputs")
+    assert not hasattr(safedrug_archived_data, "load_archived_values")
+    assert not hasattr(adapter, "load_archived_values")
+    assert hasattr(safedrug_archived_logs, "parse_training_log")
+    assert hasattr(safedrug_archived_probe, "run_probe")
+    assert hasattr(safedrug_archived_runner, "run_formal_lane")
+
+
+@pytest.mark.parametrize(
+    ("baseline_id", "filename", "expected_match", "expected_epoch"),
+    [
+        ("gamenet", "Epoch_12_JA_0.5100_DDI_0.0850.model", True, 12),
+        ("gamenet", "Epoch_12_TARGET_0.4000_JA_0.5100_DDI_0.0850.model", False, None),
+        ("safedrug", "Epoch_45_TARGET_0.3500_JA_0.5200_DDI_0.0600.model", True, 45),
+        ("safedrug", "Epoch_45_JA_0.5200_DDI_0.0600.model", False, None),
+        ("retain", "Epoch_30_JA_0.4900_DDI_0.0830.model", True, 30),
+        ("leap-safedrug", "Epoch_15_JA_0.4500_DDI_0.0730.model", True, 15),
+    ],
+)
+def test_checkpoint_regexes_match_expected_patterns(
+    baseline_id: str, filename: str, expected_match: bool, expected_epoch: int | None
+) -> None:
+    profile = adapter.PROFILES[baseline_id]
+    match = profile.checkpoint_pattern.fullmatch(filename)
+    if expected_match:
+        assert match is not None
+        assert int(match.group(1)) == expected_epoch
+    else:
+        assert match is None
