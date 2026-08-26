@@ -123,33 +123,54 @@ def _validate_records_structure(records: list[Any]) -> tuple[int, int]:
 
 
 def _validate_records_statistics(records: list[Any]) -> None:
-    admissions_lens = [len(patient) for patient in records]
-    if min(admissions_lens) < EXPECTED_STATISTICS["admissions_per_patient_min"]:
-        raise ReproductionError("patient has fewer than 2 admissions")
-    if max(admissions_lens) != EXPECTED_STATISTICS["admissions_per_patient_max"]:
-        raise ReproductionError("maximum patient admissions mismatch")
+    diag_counts: list[int] = []
+    prod_counts: list[int] = []
+    med_counts: list[int] = []
 
-    diag_lens: list[int] = []
-    pro_lens: list[int] = []
-    med_lens: list[int] = []
     for patient in records:
-        for diag, pro, med in patient:
-            diag_lens.append(len(diag))
-            pro_lens.append(len(pro))
-            med_lens.append(len(med))
+        diag_set: set[int] = set()
+        prod_set: set[int] = set()
+        med_set: set[int] = set()
+        for adm in patient:
+            diag_set.update(adm[0])
+            prod_set.update(adm[1])
+            med_set.update(adm[2])
+        diag_counts.append(len(diag_set))
+        prod_counts.append(len(prod_set))
+        med_counts.append(len(med_set))
 
-    if min(diag_lens) < EXPECTED_STATISTICS["diagnoses_per_visit_min"]:
-        raise ReproductionError("visit has 0 diagnoses")
-    if max(diag_lens) != EXPECTED_STATISTICS["diagnoses_per_visit_max"]:
-        raise ReproductionError("maximum diagnoses per visit mismatch")
-    if min(pro_lens) < EXPECTED_STATISTICS["procedures_per_visit_min"]:
-        raise ReproductionError("negative procedures count")
-    if max(pro_lens) != EXPECTED_STATISTICS["procedures_per_visit_max"]:
-        raise ReproductionError("maximum procedures per visit mismatch")
-    if min(med_lens) < EXPECTED_STATISTICS["medications_per_visit_min"]:
-        raise ReproductionError("visit has 0 medications")
-    if max(med_lens) != EXPECTED_STATISTICS["medications_per_visit_max"]:
-        raise ReproductionError("maximum medications per visit mismatch")
+    diag_sum = sum(diag_counts)
+    prod_sum = sum(prod_counts)
+    med_sum = sum(med_counts)
+    max_diag = max(diag_counts) if diag_counts else 0
+    max_prod = max(prod_counts) if prod_counts else 0
+    max_med = max(med_counts) if med_counts else 0
+
+    if diag_sum != EXPECTED_STATISTICS["diagnoses"]["numerator"]:
+        raise ReproductionError(
+            f"diagnoses numerator mismatch: expected {EXPECTED_STATISTICS['diagnoses']['numerator']}, observed {diag_sum}"
+        )
+    if prod_sum != EXPECTED_STATISTICS["procedures"]["numerator"]:
+        raise ReproductionError(
+            f"procedures numerator mismatch: expected {EXPECTED_STATISTICS['procedures']['numerator']}, observed {prod_sum}"
+        )
+    if med_sum != EXPECTED_STATISTICS["medications"]["numerator"]:
+        raise ReproductionError(
+            f"medications numerator mismatch: expected {EXPECTED_STATISTICS['medications']['numerator']}, observed {med_sum}"
+        )
+    if max_diag != EXPECTED_STATISTICS["diagnoses"]["max"]:
+        raise ReproductionError(
+            f"max diagnoses per patient mismatch: expected {EXPECTED_STATISTICS['diagnoses']['max']}, observed {max_diag}"
+        )
+    if max_prod != EXPECTED_STATISTICS["procedures"]["max"]:
+        raise ReproductionError(
+            f"max procedures per patient mismatch: expected {EXPECTED_STATISTICS['procedures']['max']}, observed {max_prod}"
+        )
+    if max_med != EXPECTED_STATISTICS["medications"]["max"]:
+        raise ReproductionError(
+            f"max medications per patient mismatch: expected {EXPECTED_STATISTICS['medications']['max']}, observed {max_med}"
+        )
+
 
 
 def count_dataset(

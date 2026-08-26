@@ -27,15 +27,11 @@ EXPECTED_COUNTS = {
     "substructures": 491,
 }
 EXPECTED_STATISTICS = {
-    "admissions_per_patient_min": 2,
-    "admissions_per_patient_max": 2334,
-    "diagnoses_per_visit_min": 1,
-    "diagnoses_per_visit_max": 128,
-    "procedures_per_visit_min": 0,
-    "procedures_per_visit_max": 50,
-    "medications_per_visit_min": 1,
-    "medications_per_visit_max": 65,
+    "diagnoses": {"numerator": 157_970, "max": 128},
+    "procedures": {"numerator": 57_778, "max": 50},
+    "medications": {"numerator": 171_900, "max": 65},
 }
+
 
 TEST_DECLARATION = (
     "    parser.add_argument('--Test', action='store_true', default=True, help=\"test mode\")\n"

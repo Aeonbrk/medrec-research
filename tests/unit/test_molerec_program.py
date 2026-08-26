@@ -148,11 +148,12 @@ def test_validate_binary_symmetric_matrix_rejects_asymmetry() -> None:
         adapter._validate_binary_symmetric_matrix(ddi, 131)
 
 
-def test_validate_records_structure_rejects_single_admission_patient() -> None:
+def test_validate_records_statistics_rejects_invalid_counts() -> None:
     records = [[[list(range(5)), list(range(5)), list(range(5))]]]
 
-    with pytest.raises(adapter.ReproductionError, match="admissions"):
+    with pytest.raises(adapter.ReproductionError, match="mismatch"):
         adapter._validate_records_statistics(records)
+
 
 
 def test_parse_training_log_extracts_best_epoch() -> None:
