@@ -1,16 +1,17 @@
 # Plans
 
-## Planned: MoleRec Table 1 Five-Model Full Reproduction
+## Implemented: MoleRec Table 1 Five-Model Full Reproduction
 
-- **Status**: implementation-ready on `2026-08-26`; not executed. Gemini owns implementation/execution and Codex owns the terminal evidence review.
+- **Status**: codebase and reproduction harness implementation completed on `2026-08-26` across Units U1–U9; ready for 7-lane execution on `319-wild` with audit packet emission.
 - **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`.
-- **Scientific scope**: reproduce the MoleRec Table 1 subset RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec under frozen two-source model authority and shared `c7218d0` data lineage. Five scientific models map to seven 50-epoch training lanes because SafeDrug uses three disclosed learning-rate candidates and validation-only selection; five selected systems receive ten-round upstream testing.
-- **Engineering scope**: first preserve lessons and mirror/TLS policy, then perform targeted SafeDrug adapter decomposition, add a separate static MoleRec program, build one Python 3.8/PyTorch 1.9/CUDA 11.1 compatibility environment, publish a dual-consumer additive snapshot, profile the real eight-GPU/NUMA topology, execute once, audit four independent verdict axes, and only then consider removal of the exact superseded experiment-owned Conda environment.
-- **Boundary**: attempt `formal-20260826-025500` remains immutable pilot evidence and cannot satisfy successor training/test gates. Its accepted c721 data product may be reused only after the new bridge proves ordered vocabulary and paired molecular-asset alignment. No formal run is authorized until U1-U7 pass and a final clean harness revision is frozen.
+- **Scientific scope**: reproduces the MoleRec Table 1 subset RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec under frozen two-source model authority and shared `c7218d0` data lineage. Five scientific models map to seven 50-epoch training lanes because SafeDrug uses three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection; five selected systems receive ten-round upstream testing.
+- **Engineering scope**: decomposed single-responsibility submodules (`*_contract.py`, `*_data.py`, `*_logs.py`, `*_probe.py`, `*_runner.py`) for both `safedrug-archived` and `molerec`, static `ReproductionLane` registry declarations, 7-lane GPU mapping, Table 1 reference targets and deterministic audit (`audit-molerec-table1`), and comprehensive unit/integration test suite.
+- **Boundary**: attempt `formal-20260826-025500` remains immutable pilot evidence. The successor 7-lane execution runs concurrently on `319-wild` GPUs 0–6 under `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`.
 
 ## Completed: Baseline Program Architecture
 
 - **Status**: completed locally on `2026-08-23`; the repository now exposes one registry-driven SafeDrug archived Reproduction Program and no empty baseline directory skeleton.
+
 - **Plan**: `docs/plans/2026-08-23-baseline-program-architecture-plan.md`.
 - **Interface**: `medrec reproduce gamenet --gpu 0 --dry-run` plans one lane; `medrec reproduce all --gpus 0,1,2,3 --dry-run` plans four independent lanes.
 - **Boundary**: dry-run is executable now. Real submission remains blocked until the 319 dataset and environment identity pass their declared gates; the clean exact harness revision binds the program.

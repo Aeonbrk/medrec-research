@@ -10,6 +10,11 @@ The Unified Research Protocol defines when medication-recommendation methods are
 
 Reproduction Mode preserves the pinned upstream source, data preparation, split, feature access, training, prediction, and evaluation semantics. Its records must name those semantics and may not be presented as Comparison Mode evidence.
 
+Reproduction execution is organized around two decoupled concepts:
+
+- **Reproduction Program**: Declares the upstream codebase revision, isolated Conda execution environment, dataset snapshot subdirectory, run root, required input assets, and audited entrypoints.
+- **Reproduction Lane**: Binds a specific scientific baseline to a reproduction program, profile ID, and candidate hyperparameter configuration (e.g., candidate learning rates for model selection). Lanes allow parallel execution across isolated GPU workers while maintaining strict provenance.
+
 Comparison Mode fixes the dataset snapshot, eligible cohort, patient-disjoint split, medication vocabulary, feature availability, prediction task, evaluation functions, adaptation budget, and provenance requirements before test evaluation. All compared methods cross the Prediction Record seam.
 
 ## Comparison contract

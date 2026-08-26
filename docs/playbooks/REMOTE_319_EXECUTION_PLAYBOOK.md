@@ -205,7 +205,12 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research evidence-intake \
   --output /path/to/public-decision-packet.json
 ```
 
-These commands do not run remote preflight or submit work. They accept only the existing strict monitor/evidence schemas, bind the input to the durable request and declaration, and reject patient rows, predictions, weights, paths inside the payload, credentials, raw logs, and unknown fields. The browser never supplies the input or output paths.
+## Reproduction Execution Playbooks
+
+Detailed, step-by-step reproduction preparation and execution playbooks govern remote reproduction runs on `319-wild`:
+
+- **SafeDrug Table 2 Four-Model Reproduction**: [SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md](file:///Users/oian/Codes/master/medrec-research/docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md)
+- **MoleRec Table 1 Five-Model Reproduction**: [MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md](file:///Users/oian/Codes/master/medrec-research/docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md)
 
 ## Destructive operations
 

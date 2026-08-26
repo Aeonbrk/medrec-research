@@ -70,8 +70,13 @@ Runtime logs, checkpoints, data snapshots, and patient-level outputs are ignored
 
 ### Baselines
 
-`baselines/registry.toml` is the only authority for baseline identity and Reproduction Program declarations. A program declaration owns its repository-relative entrypoint, external 319 source root, dataset and run subdirectories, Conda environment name, required inputs, import probe, and verified identities. Each model entry points to that declaration instead of duplicating launch configuration.
+`baselines/registry.toml` is the only authority for baseline identity, Reproduction Program declarations, and Reproduction Lanes. A program declaration owns its repository-relative entrypoint, external 319 source root, dataset and run subdirectories, Conda environment name, required inputs, import probe, and verified identities. Each baseline and reproduction lane points to its declared program and profile rather than duplicating launch configuration.
 
-`baselines/safedrug_archived.py` is the sole active SafeDrug-family Reproduction Program. It contains four internal model profiles for GAMENet, SafeDrug, RETAIN, and LEAP because they share one Pinned Baseline Source and upstream evaluation lineage. Its interface is one lane identifier plus upstream, dataset, run, and Python paths. The profiles are implementation details, not four public runners.
+Two standalone Reproduction Programs are provided:
+
+1. `baselines/safedrug_archived.py`: The SafeDrug archived reproduction program (covering `gamenet`, `safedrug`, `retain`, `leap-safedrug`).
+2. `baselines/molerec.py`: The MoleRec Table 1 reproduction program (covering `molerec`, `molerec-embedding`).
+
+Both programs are decomposed into clear single-responsibility submodules (`*_contract.py`, `*_data.py`, `*_logs.py`, `*_probe.py`, `*_runner.py`) behind clean CLI façades.
 
 There are no `adapters/`, `audits/`, `programs/`, `runners/`, or `scripts/` subdirectories under `baselines/`. A Prediction Adapter belongs there only after Comparison Mode needs a target-free translation module. Audits are durable evidence under `research/`; operating instructions belong in `docs/playbooks/`; run artifacts remain outside Git. Empty directories do not define modules or seams.

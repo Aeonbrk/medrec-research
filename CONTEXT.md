@@ -127,3 +127,11 @@ _Avoid_: Model output, result row
 **Remote Preflight**:
 The read-only revision, environment, data, GPU, and disk checks performed immediately before a declared 319 submission.
 _Avoid_: Readiness evidence, successful training, remote cleanup
+
+**Reproduction Lane**:
+The binding of one scientific baseline to a Reproduction Program, profile ID, and candidate configuration (such as learning rate) for isolated multi-worker execution.
+_Avoid_: Dynamic run config, ad-hoc runner script
+
+**Candidate Learning Rate Selection**:
+The protocol-compliant procedure where candidate hyperparameter configurations are trained on isolated lanes and selected using validation set metrics alone before any test set evaluation.
+_Avoid_: Test set cherry-picking, post-hoc metric tuning
