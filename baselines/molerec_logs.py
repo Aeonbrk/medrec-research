@@ -140,8 +140,8 @@ def parse_formal_test_log(log_text: str) -> dict[str, Any]:
             "std": math.sqrt(sum((value - mean) ** 2 for value in values) / len(values)),
         }
     upstream_summary = {
-        name: {"mean": float(mean), "std": float(std)}
-        for name, (mean, std) in zip(summary_names, summary_pairs, strict=True)
+        summary_names[index]: {"mean": float(mean), "std": float(std)}
+        for index, (mean, std) in enumerate(summary_pairs)
     }
     for name, upstream_value in upstream_summary.items():
         harness_value = summary[name]

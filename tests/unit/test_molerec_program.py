@@ -189,6 +189,38 @@ def test_parse_test_log_extracts_metrics() -> None:
     assert metrics["med"] == 19.45
 
 
+def test_parse_formal_test_log_recomputes_ten_round_population_summary() -> None:
+    rounds = "\n".join(
+        (
+            f"DDI Rate: {0.10 + index / 100:.2f}, "
+            f"Jaccard: {0.40 + index / 100:.2f}, "
+            f"PRAUC: {0.60 + index / 100:.2f}, "
+            f"AVG_PRC: {0.20 + index / 100:.2f}, "
+            f"AVG_RECALL: {0.30 + index / 100:.2f}, "
+            f"AVG_F1: {0.50 + index / 100:.2f}, "
+            f"AVG_MED: {20 + index:.2f}"
+        )
+        for index in range(10)
+    )
+    log_text = (
+        f"{rounds}\n"
+        "0.1450 $\\pm$ 0.0287 & 0.4450 $\\pm$ 0.0287 & "
+        "0.5450 $\\pm$ 0.0287 & 0.6450 $\\pm$ 0.0287 & "
+        "24.5000 $\\pm$ 2.8723 &\n"
+    )
+
+    parsed = adapter.parse_formal_test_log(log_text)
+
+    assert len(parsed["rounds"]) == 10
+    assert parsed["harness_summary"]["jaccard"] == pytest.approx(
+        {"mean": 0.445, "std": 0.028722813232690143}
+    )
+    assert parsed["upstream_summary"]["avg_medications"] == {
+        "mean": 24.5,
+        "std": 2.8723,
+    }
+
+
 def test_select_checkpoint_finds_exact_epoch(tmp_path: Path) -> None:
     profile = adapter.PROFILES["molerec"]
     (tmp_path / "Epoch_10_TARGET_0.30_JA_0.50_DDI_0.07.model").touch()
