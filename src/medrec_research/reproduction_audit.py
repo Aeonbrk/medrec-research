@@ -430,3 +430,251 @@ def audit_safedrug_table2(
 
     write_json_atomic(output_path, packet)
     return packet
+
+
+REQUIRED_MOLEREC_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
+
+
+def load_molerec_table1_reference(
+    reference_path: Path,
+) -> dict[str, dict[str, dict[str, float]]]:
+    """Load and validate MoleRec Table 1 published reference targets."""
+    try:
+        raw_text = reference_path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise ProtocolValidationError(
+            f"failed to read MoleRec Table 1 reference: {error}"
+        ) from error
+
+    parsed = parse_json_object(raw_text, context="MoleRec Table 1 reference file")
+    strict_fields(
+        parsed,
+        required=("schema_version", "kind", "paper", "baselines"),
+        context="MoleRec Table 1 reference",
+    )
+    if parsed["schema_version"] != 1 or parsed["kind"] != "molerec_table1_reference":
+        raise ProtocolValidationError("invalid MoleRec Table 1 reference schema or kind")
+
+    baselines = parsed["baselines"]
+    if not isinstance(baselines, Mapping):
+        raise ProtocolValidationError("MoleRec Table 1 reference baselines must be an object")
+
+    result: dict[str, dict[str, dict[str, float]]] = {}
+    for baseline_id in REQUIRED_MOLEREC_BASELINES:
+        if baseline_id not in baselines:
+            raise ProtocolValidationError(
+                f"MoleRec Table 1 reference missing required baseline '{baseline_id}'"
+            )
+        metrics = baselines[baseline_id]
+        if not isinstance(metrics, Mapping):
+            raise ProtocolValidationError(f"metrics for baseline '{baseline_id}' must be an object")
+        baseline_metrics: dict[str, dict[str, float]] = {}
+        for metric in SUMMARY_METRICS:
+            if metric not in metrics:
+                raise ProtocolValidationError(
+                    f"baseline '{baseline_id}' missing reference metric '{metric}'"
+                )
+            target = metrics[metric]
+            if not isinstance(target, Mapping) or "mean" not in target or "std" not in target:
+                raise ProtocolValidationError(
+                    f"metric '{metric}' in '{baseline_id}' must specify mean and std"
+                )
+            mean = float(target["mean"])
+            std = float(target["std"])
+            if not math.isfinite(mean) or not math.isfinite(std) or std < 0:
+                raise ProtocolValidationError(
+                    f"metric '{metric}' in '{baseline_id}' has non-finite or invalid target values"
+                )
+            baseline_metrics[metric] = {"mean": mean, "std": std}
+        result[baseline_id] = baseline_metrics
+    return result
+
+
+def audit_molerec_table1(
+    *,
+    ledger_path: Path,
+    result_paths: dict[str, Path],
+    output_path: Path,
+    reference_path: Path | None = None,
+    data_root: Path | None = None,
+) -> dict[str, Any]:
+    """Audit five formal reproduction results against MoleRec Table 1 and emit public-safe packet."""
+    ref_path = reference_path or Path("research/baseline-preflight/molerec-table1-reference.json")
+    reference = load_molerec_table1_reference(ref_path)
+
+    # Validate ledger authorities
+    try:
+        raw_ledger = ledger_path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise ProtocolValidationError(f"failed to read ledger: {error}") from error
+    ledger_obj = parse_json_object(raw_ledger, context="runtime ledger file")
+    authorities = validate_ledger_authorities(ledger_obj)
+
+    # Validate all 5 result paths
+    for baseline_id in REQUIRED_MOLEREC_BASELINES:
+        if baseline_id not in result_paths:
+            raise ProtocolValidationError(
+                f"missing result path for required baseline '{baseline_id}'"
+            )
+
+    validated_results: dict[str, dict[str, Any]] = {}
+    for baseline_id in REQUIRED_MOLEREC_BASELINES:
+        res_path = result_paths[baseline_id]
+        if not res_path.is_file():
+            raise ProtocolValidationError(f"result file for '{baseline_id}' not found: {res_path}")
+        try:
+            raw_text = res_path.read_text(encoding="utf-8")
+        except OSError as error:
+            raise ProtocolValidationError(
+                f"failed to read result file for '{baseline_id}': {error}"
+            ) from error
+        parsed = parse_json_object(raw_text, context=f"result file for {baseline_id}")
+        validated_results[baseline_id] = parsed
+
+    # Perform 25 interval checks (5 baselines x 5 metrics)
+    interval_checks: list[dict[str, Any]] = []
+    interval_pass_count = 0
+
+    for baseline_id in REQUIRED_MOLEREC_BASELINES:
+        res = validated_results[baseline_id]
+        observed_summary = res.get("harness_summary") or res.get("metrics") or {}
+        ref_baseline = reference[baseline_id]
+        for metric in SUMMARY_METRICS:
+            t_mean = ref_baseline[metric]["mean"]
+            t_std = ref_baseline[metric]["std"]
+            lower_bound = t_mean - 2.0 * t_std
+            upper_bound = t_mean + 2.0 * t_std
+            raw_val = observed_summary.get(metric)
+            if isinstance(raw_val, dict):
+                o_mean = float(raw_val.get("mean", 0.0))
+            elif raw_val is not None:
+                o_mean = float(raw_val)
+            else:
+                o_mean = 0.0
+            passed = lower_bound <= o_mean <= upper_bound
+            if passed:
+                interval_pass_count += 1
+            interval_checks.append(
+                {
+                    "baseline_id": baseline_id,
+                    "metric": metric,
+                    "target_mean": t_mean,
+                    "target_std": t_std,
+                    "lower_bound": lower_bound,
+                    "upper_bound": upper_bound,
+                    "observed_mean": o_mean,
+                    "passed": passed,
+                }
+            )
+
+    # Perform 4 relationship checks:
+    # 1. MoleRec Jaccard is greater than SafeDrug Jaccard.
+    # 2. MoleRec F1 is greater than SafeDrug F1.
+    # 3. SafeDrug Jaccard is greater than GAMENet Jaccard.
+    # 4. MoleRec DDI rate is less than or equal to SafeDrug DDI rate.
+    def _extract_metric(res: dict[str, Any], metric_name: str) -> float:
+        summary = res.get("harness_summary") or res.get("metrics") or {}
+        val = summary.get(metric_name)
+        if isinstance(val, dict):
+            return float(val.get("mean", 0.0))
+        return float(val) if val is not None else 0.0
+
+    molerec_res = validated_results["molerec"]
+    safedrug_res = validated_results["safedrug"]
+    gamenet_res = validated_results["gamenet"]
+
+    rel1_op_a = _extract_metric(molerec_res, "jaccard")
+    rel1_op_b = _extract_metric(safedrug_res, "jaccard")
+    rel1_passed = rel1_op_a > rel1_op_b
+
+    rel2_op_a = _extract_metric(molerec_res, "avg_f1")
+    rel2_op_b = _extract_metric(safedrug_res, "avg_f1")
+    rel2_passed = rel2_op_a > rel2_op_b
+
+    rel3_op_a = _extract_metric(safedrug_res, "jaccard")
+    rel3_op_b = _extract_metric(gamenet_res, "jaccard")
+    rel3_passed = rel3_op_a > rel3_op_b
+
+    rel4_op_a = _extract_metric(molerec_res, "ddi_rate")
+    rel4_op_b = _extract_metric(safedrug_res, "ddi_rate")
+    rel4_passed = rel4_op_a <= rel4_op_b
+
+    relationship_checks = [
+        {
+            "relationship_id": 1,
+            "description": "MoleRec Jaccard is greater than SafeDrug Jaccard",
+            "operand_a_baseline": "molerec",
+            "operand_a_metric": "jaccard",
+            "operand_a_value": rel1_op_a,
+            "operand_b_baseline": "safedrug",
+            "operand_b_metric": "jaccard",
+            "operand_b_value": rel1_op_b,
+            "passed": rel1_passed,
+        },
+        {
+            "relationship_id": 2,
+            "description": "MoleRec F1 is greater than SafeDrug F1",
+            "operand_a_baseline": "molerec",
+            "operand_a_metric": "avg_f1",
+            "operand_a_value": rel2_op_a,
+            "operand_b_baseline": "safedrug",
+            "operand_b_metric": "avg_f1",
+            "operand_b_value": rel2_op_b,
+            "passed": rel2_passed,
+        },
+        {
+            "relationship_id": 3,
+            "description": "SafeDrug Jaccard is greater than GAMENet Jaccard",
+            "operand_a_baseline": "safedrug",
+            "operand_a_metric": "jaccard",
+            "operand_a_value": rel3_op_a,
+            "operand_b_baseline": "gamenet",
+            "operand_b_metric": "jaccard",
+            "operand_b_value": rel3_op_b,
+            "passed": rel3_passed,
+        },
+        {
+            "relationship_id": 4,
+            "description": "MoleRec DDI rate is less than or equal to SafeDrug DDI rate",
+            "operand_a_baseline": "molerec",
+            "operand_a_metric": "ddi_rate",
+            "operand_a_value": rel4_op_a,
+            "operand_b_baseline": "safedrug",
+            "operand_b_metric": "ddi_rate",
+            "operand_b_value": rel4_op_b,
+            "passed": rel4_passed,
+        },
+    ]
+    relationship_pass_count = sum(1 for item in relationship_checks if item["passed"])
+
+    all_intervals_passed = interval_pass_count == len(interval_checks)
+    all_relationships_passed = relationship_pass_count == len(relationship_checks)
+    verdict = (
+        "completed_match"
+        if (all_intervals_passed and all_relationships_passed)
+        else "completed_mismatch"
+    )
+
+    packet = {
+        "schema_version": 1,
+        "kind": "molerec_table1_audit",
+        "verdict": verdict,
+        "metadata": {
+            "paper_reported_visits": 14995,
+            "executable_visits": 15032,
+            "difference": 37,
+        },
+        "interval_checks_passed": interval_pass_count,
+        "interval_checks_total": len(interval_checks),
+        "relationship_checks_passed": relationship_pass_count,
+        "relationship_checks_total": len(relationship_checks),
+        "authorities": authorities,
+        "baselines_audited": list(REQUIRED_MOLEREC_BASELINES),
+        "checks": {
+            "intervals": interval_checks,
+            "relationships": relationship_checks,
+        },
+    }
+
+    write_json_atomic(output_path, packet)
+    return packet

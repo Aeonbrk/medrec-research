@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "molerec_table1_reference",
+  "paper": "KDD 2023 MoleRec",
+  "baselines": {
+    "retain": {
+      "ddi_rate": { "mean": 0.0860, "std": 0.0020 },
+      "jaccard": { "mean": 0.4900, "std": 0.0028 },
+      "avg_f1": { "mean": 0.6510, "std": 0.0027 },
+      "prauc": { "mean": 0.7560, "std": 0.0033 },
+      "avg_medications": { "mean": 20.3500, "std": 0.2800 }
+    },
+    "leap": {
+      "ddi_rate": { "mean": 0.0730, "std": 0.0015 },
+      "jaccard": { "mean": 0.4520, "std": 0.0024 },
+      "avg_f1": { "mean": 0.6140, "std": 0.0026 },
+      "prauc": { "mean": 0.6550, "std": 0.0033 },
+      "avg_medications": { "mean": 18.7000, "std": 0.1500 }
+    },
+    "gamenet": {
+      "ddi_rate": { "mean": 0.0865, "std": 0.0015 },
+      "jaccard": { "mean": 0.5070, "std": 0.0025 },
+      "avg_f1": { "mean": 0.6630, "std": 0.0025 },
+      "prauc": { "mean": 0.7635, "std": 0.0030 },
+      "avg_medications": { "mean": 27.2000, "std": 0.2000 }
+    },
+    "safedrug": {
+      "ddi_rate": { "mean": 0.0590, "std": 0.0010 },
+      "jaccard": { "mean": 0.5215, "std": 0.0030 },
+      "avg_f1": { "mean": 0.6770, "std": 0.0027 },
+      "prauc": { "mean": 0.7650, "std": 0.0025 },
+      "avg_medications": { "mean": 19.9000, "std": 0.2000 }
+    },
+    "molerec": {
+      "ddi_rate": { "mean": 0.0575, "std": 0.0010 },
+      "jaccard": { "mean": 0.5312, "std": 0.0030 },
+      "avg_f1": { "mean": 0.6875, "std": 0.0027 },
+      "prauc": { "mean": 0.7780, "std": 0.0025 },
+      "avg_medications": { "mean": 19.2500, "std": 0.2000 }
+    }
+  }
+}

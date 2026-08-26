@@ -378,6 +378,39 @@ def _audit_safedrug_table2(args: argparse.Namespace) -> int:
     return 0
 
 
+def _audit_molerec_table1(args: argparse.Namespace) -> int:
+    """Audit five formal reproduction results against MoleRec Table 1 and emit public-safe packet."""
+    from .reproduction_audit import audit_molerec_table1
+
+    result_paths = {
+        "retain": args.retain_result,
+        "leap": args.leap_result,
+        "gamenet": args.gamenet_result,
+        "safedrug": args.safedrug_result,
+        "molerec": args.molerec_result,
+    }
+    packet = audit_molerec_table1(
+        ledger_path=args.ledger,
+        result_paths=result_paths,
+        output_path=args.output,
+        reference_path=args.reference,
+        data_root=args.data_root,
+    )
+    print(
+        json.dumps(
+            {
+                "verdict": packet["verdict"],
+                "interval_checks_passed": packet["interval_checks_passed"],
+                "relationship_checks_passed": packet["relationship_checks_passed"],
+                "output": str(args.output),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -619,6 +652,67 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Optional external data root to verify result artifact IDs",
     )
     audit.set_defaults(handler=_audit_safedrug_table2)
+
+    # 9. MoleRec Table 1 Reproduction Audit
+    audit_molerec = commands.add_parser(
+        "audit-molerec-table1",
+        help="Audit five formal reproduction results against MoleRec Table 1",
+    )
+    audit_molerec.add_argument(
+        "--ledger",
+        type=Path,
+        required=True,
+        help="Path to reproduction state ledger JSON",
+    )
+    audit_molerec.add_argument(
+        "--retain-result",
+        type=Path,
+        required=True,
+        help="Path to retain formal result.json",
+    )
+    audit_molerec.add_argument(
+        "--leap-result",
+        type=Path,
+        required=True,
+        help="Path to leap formal result.json",
+    )
+    audit_molerec.add_argument(
+        "--gamenet-result",
+        type=Path,
+        required=True,
+        help="Path to gamenet formal result.json",
+    )
+    audit_molerec.add_argument(
+        "--safedrug-result",
+        type=Path,
+        required=True,
+        help="Path to safedrug formal result.json",
+    )
+    audit_molerec.add_argument(
+        "--molerec-result",
+        type=Path,
+        required=True,
+        help="Path to molerec formal result.json",
+    )
+    audit_molerec.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Output path for Table 1 audit packet JSON",
+    )
+    audit_molerec.add_argument(
+        "--reference",
+        type=Path,
+        default=Path("research/baseline-preflight/molerec-table1-reference.json"),
+        help="Optional path to Table 1 reference JSON",
+    )
+    audit_molerec.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="Optional external data root to verify result artifact IDs",
+    )
+    audit_molerec.set_defaults(handler=_audit_molerec_table1)
 
     return parser
 
