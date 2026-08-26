@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "kind": "safedrug_table2_audit",
+  "verdict": "completed_mismatch",
+  "metadata": {
+    "paper_reported_visits": 14995,
+    "executable_visits": 15032,
+    "difference": 37
+  },
+  "interval_checks_passed": 12,
+  "interval_checks_total": 20,
+  "relationship_checks_passed": 3,
+  "relationship_checks_total": 3,
+  "authorities": {
+    "harness_revision": "dc4781edc3ffa707042817cee7c29eed1aeb7a3c",
+    "preprocessing_revision": "c7218d0976e5ee5588aeaf5bdbc86b338126bba5",
+    "archived_model_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+    "environment_sha256": "c17ebfc53484b74497e2d6d8058271de8d7503a2fdb19eb756ddff17ba9715b9",
+    "snapshot_subdirectory": "snapshots/safedrug-paper-c721-ijcai21"
+  },
+  "baselines_audited": [
+    "gamenet",
+    "safedrug",
+    "retain",
+    "leap-safedrug"
+  ],
+  "checks": {
+    "intervals": [
+      {
+        "baseline_id": "gamenet",
+        "metric": "ddi_rate",
+        "target_mean": 0.0864,
+        "target_std": 0.0006,
+        "lower_bound": 0.0852,
+        "upper_bound": 0.0876,
+        "observed_mean": 0.086686,
+        "passed": true
+      },
+      {
+        "baseline_id": "gamenet",
+        "metric": "jaccard",
+        "target_mean": 0.5067,
+        "target_std": 0.0025,
+        "lower_bound": 0.5017,
+        "upper_bound": 0.5117,
+        "observed_mean": 0.50171,
+        "passed": true
+      },
+      {
+        "baseline_id": "gamenet",
+        "metric": "avg_f1",
+        "target_mean": 0.6626,
+        "target_std": 0.0025,
+        "lower_bound": 0.6576,
+        "upper_bound": 0.6676,
+        "observed_mean": 0.65845,
+        "passed": true
+      },
+      {
+        "baseline_id": "gamenet",
+        "metric": "prauc",
+        "target_mean": 0.7631,
+        "target_std": 0.003,
+        "lower_bound": 0.7571,
+        "upper_bound": 0.7691,
+        "observed_mean": 0.76707,
+        "passed": true
+      },
+      {
+        "baseline_id": "gamenet",
+        "metric": "avg_medications",
+        "target_mean": 27.2145,
+        "target_std": 0.1141,
+        "lower_bound": 26.9863,
+        "upper_bound": 27.4427,
+        "observed_mean": 27.579,
+        "passed": false
+      },
+      {
+        "baseline_id": "safedrug",
+        "metric": "ddi_rate",
+        "target_mean": 0.0589,
+        "target_std": 0.0005,
+        "lower_bound": 0.0579,
+        "upper_bound": 0.0599,
+        "observed_mean": 0.061182,
+        "passed": false
+      },
+      {
+        "baseline_id": "safedrug",
+        "metric": "jaccard",
+        "target_mean": 0.5213,
+        "target_std": 0.003,
+        "lower_bound": 0.5153,
+        "upper_bound": 0.5273,
+        "observed_mean": 0.51483,
+        "passed": false
+      },
+      {
+        "baseline_id": "safedrug",
+        "metric": "avg_f1",
+        "target_mean": 0.6768,
+        "target_std": 0.0027,
+        "lower_bound": 0.6714,
+        "upper_bound": 0.6822,
+        "observed_mean": 0.67173,
+        "passed": true
+      },
+      {
+        "baseline_id": "safedrug",
+        "metric": "prauc",
+        "target_mean": 0.7647,
+        "target_std": 0.0025,
+        "lower_bound": 0.7597,
+        "upper_bound": 0.7697,
+        "observed_mean": 0.7645,
+        "passed": true
+      },
+      {
+        "baseline_id": "safedrug",
+        "metric": "avg_medications",
+        "target_mean": 19.9178,
+        "target_std": 0.1604,
+        "lower_bound": 19.597,
+        "upper_bound": 20.2386,
+        "observed_mean": 19.685,
+        "passed": true
+      },
+      {
+        "baseline_id": "retain",
+        "metric": "ddi_rate",
+        "target_mean": 0.0835,
+        "target_std": 0.002,
+        "lower_bound": 0.0795,
+        "upper_bound": 0.0875,
+        "observed_mean": 0.089261,
+        "passed": false
+      },
+      {
+        "baseline_id": "retain",
+        "metric": "jaccard",
+        "target_mean": 0.4887,
+        "target_std": 0.0028,
+        "lower_bound": 0.4831,
+        "upper_bound": 0.4943,
+        "observed_mean": 0.48994,
+        "passed": true
+      },
+      {
+        "baseline_id": "retain",
+        "metric": "avg_f1",
+        "target_mean": 0.6481,
+        "target_std": 0.0027,
+        "lower_bound": 0.6427,
+        "upper_bound": 0.6535,
+        "observed_mean": 0.64993,
+        "passed": true
+      },
+      {
+        "baseline_id": "retain",
+        "metric": "prauc",
+        "target_mean": 0.7556,
+        "target_std": 0.0033,
+        "lower_bound": 0.749,
+        "upper_bound": 0.7622,
+        "observed_mean": 0.75934,
+        "passed": true
+      },
+      {
+        "baseline_id": "retain",
+        "metric": "avg_medications",
+        "target_mean": 20.4051,
+        "target_std": 0.2832,
+        "lower_bound": 19.8387,
+        "upper_bound": 20.9715,
+        "observed_mean": 19.788,
+        "passed": false
+      },
+      {
+        "baseline_id": "leap-safedrug",
+        "metric": "ddi_rate",
+        "target_mean": 0.0731,
+        "target_std": 0.0008,
+        "lower_bound": 0.0715,
+        "upper_bound": 0.0747,
+        "observed_mean": 0.076007,
+        "passed": false
+      },
+      {
+        "baseline_id": "leap-safedrug",
+        "metric": "jaccard",
+        "target_mean": 0.4521,
+        "target_std": 0.0024,
+        "lower_bound": 0.4473,
+        "upper_bound": 0.4569,
+        "observed_mean": 0.45763,
+        "passed": false
+      },
+      {
+        "baseline_id": "leap-safedrug",
+        "metric": "avg_f1",
+        "target_mean": 0.6138,
+        "target_std": 0.0026,
+        "lower_bound": 0.6086,
+        "upper_bound": 0.619,
+        "observed_mean": 0.61927,
+        "passed": false
+      },
+      {
+        "baseline_id": "leap-safedrug",
+        "metric": "prauc",
+        "target_mean": 0.6549,
+        "target_std": 0.0033,
+        "lower_bound": 0.6483,
+        "upper_bound": 0.6615,
+        "observed_mean": 0.65811,
+        "passed": true
+      },
+      {
+        "baseline_id": "leap-safedrug",
+        "metric": "avg_medications",
+        "target_mean": 18.7138,
+        "target_std": 0.0666,
+        "lower_bound": 18.5806,
+        "upper_bound": 18.847,
+        "observed_mean": 18.71,
+        "passed": true
+      }
+    ],
+    "relationships": [
+      {
+        "relationship_id": 1,
+        "description": "SafeDrug Jaccard is greater than GAMENet Jaccard",
+        "operand_a_baseline": "safedrug",
+        "operand_a_metric": "jaccard",
+        "operand_a_value": 0.51483,
+        "operand_b_baseline": "gamenet",
+        "operand_b_metric": "jaccard",
+        "operand_b_value": 0.50171,
+        "passed": true
+      },
+      {
+        "relationship_id": 2,
+        "description": "SafeDrug F1 is greater than GAMENet F1",
+        "operand_a_baseline": "safedrug",
+        "operand_a_metric": "avg_f1",
+        "operand_a_value": 0.67173,
+        "operand_b_baseline": "gamenet",
+        "operand_b_metric": "avg_f1",
+        "operand_b_value": 0.65845,
+        "passed": true
+      },
+      {
+        "relationship_id": 3,
+        "description": "SafeDrug DDI rate is lower than LEAP DDI rate",
+        "operand_a_baseline": "safedrug",
+        "operand_a_metric": "ddi_rate",
+        "operand_a_value": 0.061182,
+        "operand_b_baseline": "leap-safedrug",
+        "operand_b_metric": "ddi_rate",
+        "operand_b_value": 0.076007,
+        "passed": true
+      }
+    ]
+  }
+}

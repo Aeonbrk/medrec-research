@@ -45,6 +45,20 @@
   - Under the fail-closed protocol, snapshot `snapshots/safedrug-paper-c721-ijcai21` was **not published**, the staging candidate was rejected, no formal/smoke lanes were admitted, and no retry or parameter tuning was conducted.
 - **State**: `runtime/reproduction-formal/formal-20260825-231500/state.json` is marked `terminated_b0_failure`.
 
+## Completed: SafeDrug Archived Four-Model Full Reproduction (Attempt formal-20260826-025500)
+
+- **Status**: completed on `2026-08-26`; executed full end-to-end Reproduction Mode for GAMENet, SafeDrug, RETAIN, and LEAP on 319 under attempt `formal-20260826-025500`.
+- **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
+- **Audit Artifact**: `research/baseline-preflight/safedrug-table2-audit-packet.json`.
+- **Detailed Report**: `research/baseline-preflight/safedrug-four-model-reproduction-report.md`.
+- **Summary**:
+  - Validated 15,032 executable visits with 14,995 paper metadata disclosure (R17) and verified all R18 Table 1 average statistics (157,970 diag, 57,778 pro, 171,900 med) and 6 semantic bridge checks.
+  - Published verified snapshot `snapshots/safedrug-paper-c721-ijcai21`.
+  - Executed 4 1-epoch fresh smokes (all passed).
+  - Executed 4 50-epoch formal lanes with 10-round upstream testing (GAMENet: GPU 0, SafeDrug: GPU 1, RETAIN: GPU 2, LEAP: GPU 3).
+  - Validated all 3/3 core publication scientific claims/relationships (SafeDrug Jaccard > GAMENet Jaccard, SafeDrug F1 > GAMENet F1, SafeDrug DDI < LEAP DDI).
+  - Generated deterministic Table 2 audit packet (`completed_mismatch`, 12/20 point intervals within $2\sigma$, 3/3 relationships passed).
+
 ## Accepted: SafeDrug Archived Single-Baseline Program
 
 - **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family model source and the common baseline for future innovation. The shared four-model Reproduction Program, registry-driven dry-run, local synthetic contract tests, and 319 environment gate are implemented; the paper-lineage data gate remains blocked.
