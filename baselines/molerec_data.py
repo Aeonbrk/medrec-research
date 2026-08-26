@@ -3,10 +3,13 @@
 
 from __future__ import annotations
 
+import importlib
 import pickle
 import sys
 from pathlib import Path
 from typing import Any
+
+
 
 if __package__:
     from .molerec_contract import (
@@ -208,20 +211,25 @@ def load_and_validate_canonical_inputs(
     list[list[int]],
     list[list[int]],
 ]:
+    dill = importlib.import_module("dill")
     with (data_dir / "records_final.pkl").open("rb") as stream:
-        records = pickle.load(stream)
+
+        records = dill.load(stream)
     with (data_dir / "voc_final.pkl").open("rb") as stream:
-        vocabulary = pickle.load(stream)
+        vocabulary = dill.load(stream)
     with (data_dir / "ddi_A_final.pkl").open("rb") as stream:
-        ddi_a = pickle.load(stream)
+        ddi_a = dill.load(stream)
     with (data_dir / "ddi_mask_H.pkl").open("rb") as stream:
-        ddi_mask_h = pickle.load(stream)
+        ddi_mask_h = dill.load(stream)
 
     sub_struct = None
-    sub_path = data_dir / "sub_structure.pkl"
+    sub_path = data_dir / "substructure_smiles.pkl"
+    if not sub_path.is_file():
+        sub_path = data_dir / "sub_structure.pkl"
     if sub_path.is_file():
         with sub_path.open("rb") as stream:
-            sub_struct = pickle.load(stream)
+            sub_struct = dill.load(stream)
+
 
     counts = count_dataset(records, vocabulary, ddi_a, ddi_mask_h, sub_struct)
     require_executable_counts(counts)
