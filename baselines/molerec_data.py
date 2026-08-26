@@ -28,49 +28,55 @@ else:
     )
 
 
-def matrix_shape(matrix: Any) -> tuple[int, int]:
-    if not isinstance(matrix, list) or not matrix or not isinstance(matrix[0], list):
-        raise ReproductionError("expected 2D nested list for matrix data")
-    row_len = len(matrix[0])
-    if any(len(row) != row_len for row in matrix):
+def matrix_shape(value: Any) -> tuple[int, int]:
+    shape = getattr(value, "shape", None)
+    if shape is not None and len(shape) == 2:
+        return int(shape[0]), int(shape[1])
+    if not isinstance(value, (list, tuple)) or not value:
+        raise ReproductionError("expected 2D matrix data")
+    rows = len(value)
+    columns = len(value[0]) if rows and isinstance(value[0], (list, tuple)) else 0
+    if any(len(row) != columns for row in value):
         raise ReproductionError("matrix has inconsistent row dimensions")
-    return len(matrix), row_len
+    return rows, columns
 
 
-def _validate_binary_symmetric_matrix(matrix: list[list[int]], expected_dim: int) -> int:
+def _validate_binary_symmetric_matrix(matrix: Any, expected_dim: int) -> int:
     shape = matrix_shape(matrix)
     if shape != (expected_dim, expected_dim):
         raise ReproductionError(
             f"matrix shape {shape} does not match expected ({expected_dim}, {expected_dim})"
         )
     pair_count = 0
-    for row_idx, row in enumerate(matrix):
-        if row[row_idx] != 0:
+    for row_idx in range(expected_dim):
+        if matrix[row_idx][row_idx] != 0:
             raise ReproductionError("matrix diagonal must be zero")
         for col_idx in range(row_idx + 1, expected_dim):
-            value = row[col_idx]
-            if value not in (0, 1):
+            value = matrix[row_idx][col_idx]
+            if value not in (0, 1, 0.0, 1.0):
                 raise ReproductionError(
                     f"non-binary matrix value {value} at ({row_idx}, {col_idx})"
                 )
-            if value != matrix[col_idx][row_idx]:
+            if matrix[row_idx][col_idx] != matrix[col_idx][row_idx]:
                 raise ReproductionError(f"asymmetric matrix value at ({row_idx}, {col_idx})")
             if value == 1:
                 pair_count += 1
     return pair_count
 
 
-def _validate_ddi_mask(ddi_mask: list[list[int]], expected_rows: int) -> int:
+def _validate_ddi_mask(ddi_mask: Any, expected_rows: int) -> int:
     num_rows, num_cols = matrix_shape(ddi_mask)
     if num_rows != expected_rows:
         raise ReproductionError(
             f"ddi_mask row count {num_rows} does not match expected {expected_rows}"
         )
-    for row in ddi_mask:
-        for val in row:
-            if val not in (0, 1):
+    for r in range(num_rows):
+        for c in range(num_cols):
+            val = ddi_mask[r][c]
+            if val not in (0, 1, 0.0, 1.0):
                 raise ReproductionError(f"non-binary ddi_mask value: {val}")
     return num_cols
+
 
 
 def _validate_vocabulary_bijections(vocabulary: dict[str, Any]) -> dict[str, int]:
