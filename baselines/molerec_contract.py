@@ -10,7 +10,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-ARCHIVED_REVISION = "0e46123049280d829910d6fc48bc953a99264c1b"
+ARCHIVED_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+
 REPORTED_PAPER_METADATA = {
     "patients": 6350,
     "visits": 14995,

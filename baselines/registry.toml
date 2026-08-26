@@ -103,9 +103,10 @@ readiness = "registered"
 reproduction_program = "molerec"
 
 [baselines.source]
-repository = "https://github.com/ycq091044/MoleRec"
-revision = "f4e555800d9841804f866412b1d6199859f71ddb"
+repository = "https://github.com/yangnianzu0515/MoleRec"
+revision = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
 status = "pinned"
+
 
 [[reproduction_lanes]]
 lane_id = "molerec-retain"
