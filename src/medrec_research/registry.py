@@ -283,6 +283,7 @@ class ReproductionProgram:
     required_inputs: tuple[str, ...]
     import_modules: tuple[str, ...]
     environment_sha256: str | None = None
+    probe_contract: str = "generic"
 
     def __post_init__(self) -> None:
         require_identifier(self.program_id, field="program_id")
@@ -311,6 +312,7 @@ class ReproductionProgram:
             object.__setattr__(self, field, values)
         if self.environment_sha256 is not None:
             require_sha256(self.environment_sha256, field="environment_sha256")
+        require_identifier(self.probe_contract, field="probe_contract")
 
     @property
     def is_319_verified(self) -> bool:
@@ -329,6 +331,7 @@ class ReproductionProgram:
         }
         if self.environment_sha256 is not None:
             payload["environment_sha256"] = self.environment_sha256
+        payload["probe_contract"] = self.probe_contract
         return payload
 
     @classmethod
@@ -345,7 +348,7 @@ class ReproductionProgram:
                 "required_inputs",
                 "import_modules",
             ),
-            optional=("environment_sha256",),
+            optional=("environment_sha256", "probe_contract"),
             context="Reproduction Program",
         )
         required_inputs = payload["required_inputs"]
@@ -362,6 +365,7 @@ class ReproductionProgram:
             required_inputs=tuple(required_inputs),
             import_modules=tuple(import_modules),
             environment_sha256=payload.get("environment_sha256"),
+            probe_contract=payload.get("probe_contract", "generic"),
         )
 
 

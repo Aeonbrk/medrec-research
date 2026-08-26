@@ -3,10 +3,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import importlib.util
 import os
 import platform
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -16,8 +18,9 @@ if __package__:
     from .molerec_contract import (
         ARCHIVED_REVISION,
         REGISTRY_IMPORT_MODULES,
+        REPORTED_PAPER_METADATA,
+        ReproductionError,
         profile_for,
-        sha256,
         verify_upstream_source,
     )
     from .molerec_data import load_and_validate_canonical_inputs
@@ -28,8 +31,9 @@ else:
     from molerec_contract import (
         ARCHIVED_REVISION,
         REGISTRY_IMPORT_MODULES,
+        REPORTED_PAPER_METADATA,
+        ReproductionError,
         profile_for,
-        sha256,
         verify_upstream_source,
     )
     from molerec_data import load_and_validate_canonical_inputs
@@ -60,6 +64,21 @@ def _nvidia_driver_version() -> str | None:
 
 def check_imports() -> dict[str, str | None]:
     return {module: _package_version(module) for module in REGISTRY_IMPORT_MODULES}
+
+
+def _conda_explicit_sha256() -> str:
+    conda = os.environ.get("CONDA_EXE") or shutil.which("conda")
+    if not conda:
+        return "unpinned"
+    try:
+        completed = subprocess.run(
+            [conda, "list", "--explicit", "-p", sys.prefix],
+            capture_output=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return "unpinned"
+    return hashlib.sha256(completed.stdout).hexdigest()
 
 
 def check_cuda_tensor() -> bool:
@@ -100,8 +119,6 @@ def check_gensim() -> bool:
 
 
 def environment_summary() -> dict[str, Any]:
-    env_file = Path(os.environ.get("CONDA_PREFIX", "")) / "conda-meta" / "pinned"
-    conda_sha = sha256(env_file) if env_file.is_file() else "unpinned"
     return {
         "python_version": platform.python_version(),
         "platform": platform.platform(),
@@ -110,7 +127,7 @@ def environment_summary() -> dict[str, Any]:
         "rdkit_working": check_rdkit(),
         "gensim_working": check_gensim(),
         "driver_version": _nvidia_driver_version(),
-        "conda_explicit_sha256": conda_sha,
+        "conda_explicit_sha256": _conda_explicit_sha256(),
     }
 
 
@@ -126,7 +143,23 @@ def run_probe(
     scope: str = "full",
 ) -> dict[str, Any]:
     profile = profile_for(baseline_id)
+    verify_upstream_source(upstream_root)
     env_info = environment_summary()
+    package_versions = env_info["packages"]
+    import_checks = {
+        module: "passed" if package_versions.get(module) is not None else "failed"
+        for module in REGISTRY_IMPORT_MODULES
+    }
+    checks = {
+        "imports": import_checks,
+        "cuda_tensor": "passed" if env_info["cuda_available"] else "failed",
+        "rdkit_brics": "passed" if env_info["rdkit_working"] else "failed",
+        "gensim": "passed" if env_info["gensim_working"] else "failed",
+    }
+    if any(status != "passed" for status in import_checks.values()) or any(
+        checks[name] != "passed" for name in ("cuda_tensor", "rdkit_brics", "gensim")
+    ):
+        raise ReproductionError("MoleRec environment probe failed runtime checks")
 
     report: dict[str, Any] = {
         "schema_version": 1,
@@ -134,17 +167,19 @@ def run_probe(
         "baseline_id": profile.baseline_id,
         "source_revision": ARCHIVED_REVISION,
         "environment": env_info,
+        "checks": checks,
     }
 
     if scope == "environment":
+        report["inputs"] = None
+        report["dataset_counts"] = None
         return report
 
-    verify_upstream_source(upstream_root)
-
-    if data_dir is not None and data_dir.is_dir():
-        _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
-        report["dataset_counts"] = counts
-    else:
-        report["dataset_counts"] = None
+    if data_dir is None or not data_dir.is_dir():
+        raise ReproductionError("full probe scope requires --dataset-root")
+    _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
+    report["inputs"] = {name: "passed" for name in profile.required_inputs}
+    report["dataset_counts"] = counts
+    report["metadata"] = REPORTED_PAPER_METADATA
 
     return report

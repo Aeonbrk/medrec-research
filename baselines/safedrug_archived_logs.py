@@ -19,6 +19,14 @@ else:
     from safedrug_archived_contract import ROUND_PATTERN, Profile, ReproductionError
 
 
+_VALIDATION_JACCARD_PATTERN = re.compile(
+    r"(?i)(?:validation|valid|val)[^\n]{0,100}?(?:jaccard|ja)\s*[:=]\s*([0-9.eE+-]+)"
+)
+_VALIDATION_DDI_PATTERN = re.compile(
+    r"(?i)(?:validation|valid|val)[^\n]{0,100}?(?:ddi(?:[ _-]*(?:rate|ratio))?)\s*[:=]\s*([0-9.eE+-]+)"
+)
+
+
 def parse_training_log(log_text: str, expected_epochs: int = 50) -> int:
     observed = [int(value) for value in re.findall(r"(?:^|\n)epoch\s+(\d+)\s*-+", log_text)]
     if observed != list(range(1, expected_epochs + 1)):
@@ -29,6 +37,21 @@ def parse_training_log(log_text: str, expected_epochs: int = 50) -> int:
     if len(best_epochs) != expected_epochs or not 0 <= best_epochs[-1] < expected_epochs:
         raise ReproductionError("training log has invalid best_epoch evidence")
     return best_epochs[-1]
+
+
+def parse_validation_metrics(log_text: str) -> dict[str, float]:
+    """Extract full-precision validation values for administrative selection."""
+    jaccard = _VALIDATION_JACCARD_PATTERN.findall(log_text)
+    ddi_rate = _VALIDATION_DDI_PATTERN.findall(log_text)
+    if not jaccard or not ddi_rate:
+        raise ReproductionError("training log must contain validation Jaccard and DDI metrics")
+    values = {
+        "validation_jaccard": float(jaccard[-1]),
+        "validation_ddi_rate": float(ddi_rate[-1]),
+    }
+    if any(not math.isfinite(value) or not 0 <= value <= 1 for value in values.values()):
+        raise ReproductionError("validation metrics must be finite proportions")
+    return values
 
 
 def select_checkpoint(checkpoint_dir: Path, profile: Profile, best_epoch: int) -> Path:

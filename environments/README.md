@@ -3,22 +3,10 @@
 The core library does not install external baseline dependencies. Each baseline runs in a named Conda environment and communicates through the process adapter. The separate `medrec-core-evaluator` environment owns restricted Prediction Record validation and aggregate recomputation.
 
 - `core-evaluator.yml`: Provisional 319 evaluator environment specification.
-- `safedrug-archived.yml`: Candidate 319 baseline environment specification for the SafeDrug archived four-model reproduction (`gamenet`, `safedrug`, `retain`, `leap-safedrug`).
-- `molerec-table1.yml`: 319 baseline environment specification for the MoleRec Table 1 five-model reproduction (`molerec`, `gamenet`, `safedrug`, `retain`, `leap`).
+- `safedrug-archived.yml`: Historical recovery declaration for the prior SafeDrug archived four-model attempt. It is not the runtime for the current seven-lane attempt.
+- `molerec-table1.yml`: Frozen compatibility environment declaration for all seven lanes of the MoleRec Table 1 five-model attempt.
 
-The SafeDrug archived baseline environment specifies:
-
-- Python 3.11
-- PyTorch 2.2.2 with CUDA 12.1
-- NumPy 1.26.4
-- pandas 2.0.3
-- SciPy 1.11.4
-- scikit-learn 1.3.2
-- RDKit 2023.09.6
-- dill 0.3.7
-- dnc 1.1.0
-
-The explicit Linux lock (`environments/safedrug-archived-linux-64.lock`) is exported from the candidate environment only after dependency/runtime checks and staged-data validation succeed on 319.
+The historical SafeDrug declaration and explicit Linux lock are retained for recovery and U10 ownership checks. They must not be used to admit a current formal lane.
 
 The MoleRec Table 1 compatibility baseline environment specifies:
 
@@ -32,6 +20,8 @@ The MoleRec Table 1 compatibility baseline environment specifies:
 - RDKit 2022.09.1
 - dill 0.3.7
 - dnc 1.1.0
+
+Both `safedrug-archived` and `molerec` Reproduction Programs declare this compatibility environment for the current attempt. The Linux lock and environment identity remain provisional until U5 completes on 319; no formal lane is admissible before that proof.
 
 > [!NOTE]
 > **Hardware Compatibility Deviation**: Official MoleRec records CUDA 10.2, which predates NVIDIA Ampere (RTX 3090 / SM86) architecture support. `CUDA 11.1` (`torch==1.9.0+cu111`) is the minimal necessary deviation to support RTX 3090 hardware while preserving Python 3.8, PyTorch 1.9, and PyG 2.0.3 package versions.

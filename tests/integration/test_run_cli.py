@@ -46,10 +46,11 @@ def test_reproduce_dry_run_prints_complete_archived_command() -> None:
     assert completed.returncode == 0
     result = json.loads(completed.stdout)["results"][0]
     assert result["state"] == "planned"
+    assert result["attempt_id"].startswith("attempt-")
     assert "baselines/safedrug_archived.py gamenet" in result["command"]
     assert "--upstream-root /root/zhb/SafeDrug" in result["command"]
     assert (
-        "--dataset-root /root/zhb/medrec-data/snapshots/safedrug-paper-c721-ijcai21"
+        "--dataset-root /root/zhb/medrec-data/snapshots/molerec-table1-c721-www23"
         in result["command"]
     )
     assert "--mode smoke" not in result["command"]

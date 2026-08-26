@@ -1,6 +1,8 @@
-# SafeDrug Archived Four-Model Reproduction Preparation Playbook
+# Historical: SafeDrug Archived Four-Model Reproduction Preparation
 
-This playbook defines the exact operator sequence and verification protocol for preparing the SafeDrug archived four-model reproduction (`gamenet`, `safedrug`, `retain`, `leap-safedrug`) on `319-wild`.
+> **Do not execute this playbook.** It is retained as the historical preparation record for the terminated four-model attempt. The current authoritative procedure is [MoleRec Table 1 Five-Model Reproduction Playbook](MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md).
+
+The preparation described below terminated at the B0 data gate because the frozen preprocessing produced 15,032 executable visits while the paper metadata reported 14,995. Its environment, snapshot, smoke, and formal instructions are not admission criteria for the current seven-lane MoleRec Table 1 attempt.
 
 ## Scope and Invariants
 

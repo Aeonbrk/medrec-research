@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 import sys
 from pathlib import Path
@@ -15,6 +16,19 @@ else:
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
     from molerec_contract import Profile, ReproductionError
+
+
+_FORMAL_ROUND_PATTERN = re.compile(
+    r"DDI Rate:\s*([0-9.]+),\s*Jaccard:\s*([0-9.]+),\s*PRAUC:\s*([0-9.]+),\s*"
+    r"AVG_PRC:\s*([0-9.]+),\s*AVG_RECALL:\s*([0-9.]+),\s*AVG_F1:\s*([0-9.]+),\s*"
+    r"AVG_MED:\s*([0-9.]+)"
+)
+_VALIDATION_JACCARD_PATTERN = re.compile(
+    r"(?i)(?:validation|valid|val)[^\n]{0,100}?(?:jaccard|ja)\s*[:=]\s*([0-9.eE+-]+)"
+)
+_VALIDATION_DDI_PATTERN = re.compile(
+    r"(?i)(?:validation|valid|val)[^\n]{0,100}?(?:ddi(?:[ _-]*(?:rate|ratio))?)\s*[:=]\s*([0-9.eE+-]+)"
+)
 
 
 def parse_training_log(log_text: str, expected_epochs: int = 50) -> int:
@@ -33,6 +47,21 @@ def parse_training_log(log_text: str, expected_epochs: int = 50) -> int:
         # Fallback: if no explicit best_epoch line, use maximum epoch or 0
         return 0
     return best_epochs[-1]
+
+
+def parse_validation_metrics(log_text: str) -> dict[str, float]:
+    """Extract full-precision validation values for administrative selection."""
+    jaccard = _VALIDATION_JACCARD_PATTERN.findall(log_text)
+    ddi_rate = _VALIDATION_DDI_PATTERN.findall(log_text)
+    if not jaccard or not ddi_rate:
+        raise ReproductionError("training log must contain validation Jaccard and DDI metrics")
+    values = {
+        "validation_jaccard": float(jaccard[-1]),
+        "validation_ddi_rate": float(ddi_rate[-1]),
+    }
+    if any(not math.isfinite(value) or not 0 <= value <= 1 for value in values.values()):
+        raise ReproductionError("validation metrics must be finite proportions")
+    return values
 
 
 def parse_test_log(log_text: str) -> dict[str, Any]:
@@ -72,6 +101,66 @@ def parse_test_log(log_text: str) -> dict[str, Any]:
     return {
         "metrics": metrics,
         "raw_test_log_length": len(log_text),
+    }
+
+
+def parse_formal_test_log(log_text: str) -> dict[str, Any]:
+    """Parse ten upstream aggregate rounds and recompute population summaries."""
+    rounds: list[dict[str, float]] = []
+    for match in _FORMAL_ROUND_PATTERN.finditer(log_text):
+        values = [float(value) for value in match.groups()]
+        if not all(math.isfinite(value) for value in values):
+            raise ReproductionError("test log contains a non-finite metric")
+        rounds.append(
+            {
+                "ddi_rate": values[0],
+                "jaccard": values[1],
+                "prauc": values[2],
+                "avg_precision": values[3],
+                "avg_recall": values[4],
+                "avg_f1": values[5],
+                "avg_medications": values[6],
+            }
+        )
+    if len(rounds) != 10:
+        raise ReproductionError(f"expected exactly 10 test rounds, observed {len(rounds)}")
+
+    summary_pairs = re.findall(r"([0-9.]+)\s*\$\\pm\$\s*([0-9.]+)\s*&", log_text)
+    if len(summary_pairs) != 5:
+        raise ReproductionError(
+            f"expected one upstream 5-metric summary, observed {len(summary_pairs)} pairs"
+        )
+    summary: dict[str, dict[str, float]] = {}
+    summary_names = ("ddi_rate", "jaccard", "avg_f1", "prauc", "avg_medications")
+    for name in summary_names:
+        values = [row[name] for row in rounds]
+        mean = sum(values) / len(values)
+        summary[name] = {
+            "mean": mean,
+            "std": math.sqrt(sum((value - mean) ** 2 for value in values) / len(values)),
+        }
+    upstream_summary = {
+        name: {"mean": float(mean), "std": float(std)}
+        for name, (mean, std) in zip(summary_names, summary_pairs, strict=True)
+    }
+    for name, upstream_value in upstream_summary.items():
+        harness_value = summary[name]
+        maximum_round_value = max(abs(row[name]) for row in rounds)
+        round_precision = (
+            5e-5
+            if maximum_round_value == 0
+            else 0.5 * 10 ** (math.floor(math.log10(maximum_round_value)) - 3)
+        )
+        tolerance = round_precision + 5e-5 + 1e-12
+        if (
+            abs(upstream_value["mean"] - harness_value["mean"]) > tolerance
+            or abs(upstream_value["std"] - harness_value["std"]) > tolerance
+        ):
+            raise ReproductionError(f"upstream summary disagrees with parsed rounds for {name}")
+    return {
+        "rounds": rounds,
+        "harness_summary": summary,
+        "upstream_summary": upstream_summary,
     }
 
 

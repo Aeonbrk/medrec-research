@@ -4,15 +4,13 @@
 from __future__ import annotations
 
 import importlib
-import pickle
 import sys
 from pathlib import Path
 from typing import Any
 
-
-
 if __package__:
     from .molerec_contract import (
+        COMMON_INPUTS,
         EXPECTED_COUNTS,
         EXPECTED_STATISTICS,
         ReproductionError,
@@ -22,6 +20,7 @@ else:
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
     from molerec_contract import (
+        COMMON_INPUTS,
         EXPECTED_COUNTS,
         EXPECTED_STATISTICS,
         ReproductionError,
@@ -76,7 +75,6 @@ def _validate_ddi_mask(ddi_mask: Any, expected_rows: int) -> int:
             if val not in (0, 1, 0.0, 1.0):
                 raise ReproductionError(f"non-binary ddi_mask value: {val}")
     return num_cols
-
 
 
 def _validate_vocabulary_bijections(vocabulary: dict[str, Any]) -> dict[str, int]:
@@ -178,7 +176,6 @@ def _validate_records_statistics(records: list[Any]) -> None:
         )
 
 
-
 def count_dataset(
     records: list[Any],
     vocabulary: dict[str, Any],
@@ -206,7 +203,7 @@ def count_dataset(
         "visits": num_visits,
         "medications": num_meds,
         "ddi_pairs": ddi_pairs,
-        "substructures": num_substructures,
+        "molecular_substructures": num_substructures,
     }
 
 
@@ -239,8 +236,13 @@ def load_and_validate_canonical_inputs(
     list[list[int]],
 ]:
     dill = importlib.import_module("dill")
-    with (data_dir / "records_final.pkl").open("rb") as stream:
+    missing = [name for name in COMMON_INPUTS if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"MoleRec snapshot is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in COMMON_INPUTS):
+        raise ReproductionError("MoleRec snapshot inputs must be regular files, not symlinks")
 
+    with (data_dir / "records_final.pkl").open("rb") as stream:
         records = dill.load(stream)
     with (data_dir / "voc_final.pkl").open("rb") as stream:
         vocabulary = dill.load(stream)
@@ -249,14 +251,8 @@ def load_and_validate_canonical_inputs(
     with (data_dir / "ddi_mask_H.pkl").open("rb") as stream:
         ddi_mask_h = dill.load(stream)
 
-    sub_struct = None
-    sub_path = data_dir / "substructure_smiles.pkl"
-    if not sub_path.is_file():
-        sub_path = data_dir / "sub_structure.pkl"
-    if sub_path.is_file():
-        with sub_path.open("rb") as stream:
-            sub_struct = dill.load(stream)
-
+    with (data_dir / "substructure_smiles.pkl").open("rb") as stream:
+        sub_struct = dill.load(stream)
 
     counts = count_dataset(records, vocabulary, ddi_a, ddi_mask_h, sub_struct)
     require_executable_counts(counts)

@@ -150,14 +150,9 @@ def test_audit_molerec_table1_mismatch_on_interval_failure(tmp_path: Path) -> No
 
 
 def test_audit_molerec_table1_cli_invocation(tmp_path: Path) -> None:
-    ledger_file = tmp_path / "ledger.json"
-    ledger_file.write_text(json.dumps(make_valid_ledger()), encoding="utf-8")
+    from tests.unit.test_molerec_reproduction_audit import _write_artifacts
 
-    result_files: dict[str, Path] = {}
-    for b in REQUIRED_MOLEREC_BASELINES:
-        res_file = tmp_path / f"{b}_result.json"
-        res_file.write_text(json.dumps(make_valid_result(b)), encoding="utf-8")
-        result_files[b] = res_file
+    ledger_file, result_files, selection_file = _write_artifacts(tmp_path)
 
     output_file = tmp_path / "audit_packet.json"
     argv = [
@@ -174,6 +169,8 @@ def test_audit_molerec_table1_cli_invocation(tmp_path: Path) -> None:
         str(result_files["safedrug"]),
         "--molerec-result",
         str(result_files["molerec"]),
+        "--selection",
+        str(selection_file),
         "--output",
         str(output_file),
         "--reference",

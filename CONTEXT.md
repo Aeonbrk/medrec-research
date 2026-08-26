@@ -113,8 +113,8 @@ Local operational detail produced while performing research work. It is diagnost
 _Avoid_: Research record, provenance
 
 **Baseline Environment**:
-An isolated Conda environment that makes one Pinned Baseline Source runnable without constraining the core research environment.
-_Avoid_: Shared environment, project environment
+A declared Conda environment that makes one or more Pinned Baseline Sources runnable without constraining the core research environment.
+_Avoid_: Undeclared environment, core evaluator environment
 
 **Core Evaluator Environment**:
 The separate Python 3.11 Conda environment on 319 that validates restricted Prediction Records, recomputes aggregate metrics, and emits candidate Run Records. It does not contain Baseline Core dependencies.

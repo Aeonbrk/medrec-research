@@ -12,6 +12,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+try:
+    from .reproduction_artifacts import require_selected_safedrug_selection
+except ImportError:  # Direct execution keeps the baselines directory on sys.path.
+    from reproduction_artifacts import require_selected_safedrug_selection
+
 ARCHIVED_REVISION = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 TEST_DECLARATION = (
     "parser.add_argument('--Test', action='store_true', default=True, help=\"test mode\")"
@@ -262,7 +267,18 @@ def test_command(
     profile: Profile,
     model_name: str,
     checkpoint: Path,
+    *,
+    lane_id: str | None = None,
+    selection_path: Path | None = None,
 ) -> list[str]:
+    if profile.baseline_id.startswith("safedrug"):
+        if lane_id is None:
+            raise ReproductionError("SafeDrug test command requires an active lane identity")
+        require_selected_safedrug_selection(
+            selection_path,
+            lane_id=lane_id,
+            error_type=ReproductionError,
+        )
     resume_path = checkpoint.name if profile.test_uses_basename else str(checkpoint.resolve())
     return [
         python,

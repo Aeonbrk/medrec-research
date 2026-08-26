@@ -14,6 +14,12 @@ UTC = timezone.utc  # noqa: UP017 -- archived environments may use Python 3.8.
 
 # Support both relative import and path-based import
 if __package__:
+    from .reproduction_artifacts import identity_from_environment
+    from .reproduction_runner import (
+        run_smoke_lane_v2,
+        run_test_lane_v2,
+        run_training_lane_v2,
+    )
     from .safedrug_archived_contract import (
         ARCHIVED_REVISION,
         EPOCH_FORMAL,
@@ -33,12 +39,22 @@ if __package__:
         write_json,
     )
     from .safedrug_archived_data import load_and_validate_canonical_inputs
-    from .safedrug_archived_logs import parse_test_log, parse_training_log, select_checkpoint
+    from .safedrug_archived_logs import (
+        parse_test_log,
+        parse_training_log,
+        select_checkpoint,
+    )
     from .safedrug_archived_probe import environment_summary
 else:
     _pkg_dir = str(Path(__file__).parent)
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
+    from reproduction_artifacts import identity_from_environment
+    from reproduction_runner import (
+        run_smoke_lane_v2,
+        run_test_lane_v2,
+        run_training_lane_v2,
+    )
     from safedrug_archived_contract import (
         ARCHIVED_REVISION,
         EPOCH_FORMAL,
@@ -58,7 +74,11 @@ else:
         write_json,
     )
     from safedrug_archived_data import load_and_validate_canonical_inputs
-    from safedrug_archived_logs import parse_test_log, parse_training_log, select_checkpoint
+    from safedrug_archived_logs import (
+        parse_test_log,
+        parse_training_log,
+        select_checkpoint,
+    )
     from safedrug_archived_probe import environment_summary
 
 
@@ -79,7 +99,7 @@ def run_logged(command: list[str], *, cwd: Path, env: dict[str, str], log_path: 
         )
 
 
-def run_smoke_lane(
+def _run_legacy_smoke_lane(
     *,
     profile: Profile,
     upstream_root: Path,
@@ -265,7 +285,7 @@ def run_smoke_lane(
         raise
 
 
-def run_formal_lane(
+def _run_legacy_formal_lane(
     *,
     profile: Profile,
     upstream_root: Path,
@@ -441,3 +461,134 @@ def run_formal_lane(
             },
         )
         raise
+
+
+def _dispatch_module(dispatch_module: Any) -> Any:
+    return (
+        dispatch_module
+        or sys.modules.get("safedrug_archived_program")
+        or sys.modules.get("baselines.safedrug_archived")
+        or sys.modules.get("safedrug_archived")
+        or sys.modules.get("__main__")
+        or sys.modules[__name__]
+    )
+
+
+def run_formal_lane(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+    learning_rate: float | None = None,
+    dispatch_module: Any = None,
+    phase: str = "training",
+    selection_path: Path | None = None,
+) -> None:
+    """Run the controller-identified training or serial test phase."""
+    if phase not in ("training", "test"):
+        raise ReproductionError("formal phase must be 'training' or 'test'")
+    identity = identity_from_environment(mode="formal", error_type=ReproductionError)
+    if identity is None:
+        raise ReproductionError("formal execution requires a controller-issued v2 identity")
+    module = _dispatch_module(dispatch_module)
+    if phase == "training":
+        run_training_lane_v2(
+            module=module,
+            profile=profile,
+            upstream_root=upstream_root,
+            data_dir=data_dir,
+            run_root=run_root,
+            python=python,
+            learning_rate=learning_rate,
+            identity=identity,
+            program_id="safedrug-archived",
+            source_revision=ARCHIVED_REVISION,
+            gate_inputs=GATE_INPUTS,
+            error_type=ReproductionError,
+        )
+    else:
+        run_test_lane_v2(
+            module=module,
+            profile=profile,
+            upstream_root=upstream_root,
+            data_dir=data_dir,
+            run_root=run_root,
+            python=python,
+            identity=identity,
+            program_id="safedrug-archived",
+            source_revision=ARCHIVED_REVISION,
+            gate_inputs=GATE_INPUTS,
+            error_type=ReproductionError,
+            selection_path=selection_path,
+        )
+
+
+def run_test_lane(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+    dispatch_module: Any = None,
+    selection_path: Path | None = None,
+) -> None:
+    """Run the test phase against a finalized training lane."""
+    run_formal_lane(
+        profile=profile,
+        upstream_root=upstream_root,
+        data_dir=data_dir,
+        run_root=run_root,
+        python=python,
+        dispatch_module=dispatch_module,
+        phase="test",
+        selection_path=selection_path,
+    )
+
+
+def run_smoke_lane(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+    learning_rate: float | None = None,
+    dispatch_module: Any = None,
+) -> None:
+    """Run a v2 controller-identified smoke or the preserved local legacy smoke."""
+    identity = identity_from_environment(mode="smoke", error_type=ReproductionError)
+    if identity is None:
+        return _run_legacy_smoke_lane(
+            profile=profile,
+            upstream_root=upstream_root,
+            data_dir=data_dir,
+            run_root=run_root,
+            python=python,
+            learning_rate=learning_rate,
+            dispatch_module=dispatch_module,
+        )
+    run_smoke_lane_v2(
+        module=_dispatch_module(dispatch_module),
+        profile=profile,
+        upstream_root=upstream_root,
+        data_dir=data_dir,
+        run_root=run_root,
+        python=python,
+        learning_rate=learning_rate,
+        identity=identity,
+        program_id="safedrug-archived",
+        source_revision=ARCHIVED_REVISION,
+        gate_inputs=GATE_INPUTS,
+        error_type=ReproductionError,
+    )
+
+
+__all__ = (
+    "run_formal_lane",
+    "run_logged",
+    "run_smoke_lane",
+    "run_test_lane",
+)

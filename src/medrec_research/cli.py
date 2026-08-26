@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import secrets
 import subprocess
 import sys
 from collections.abc import Callable, Sequence
@@ -24,7 +25,6 @@ from .registry import BaselineRegistry
 from .remote_executor import RemoteExecutor
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
-ARCHIVED_BASELINES = ("gamenet", "safedrug", "retain", "leap-safedrug")
 
 
 def _positive_integer(value: str) -> int:
@@ -163,23 +163,40 @@ def _gpu_list(value: str) -> tuple[int, ...]:
     return parsed
 
 
+def _legacy_archived_baselines(registry: BaselineRegistry) -> tuple[str, ...]:
+    """Derive the preserved four-baseline selector from the registry."""
+    baseline_ids = tuple(
+        baseline.baseline_id
+        for baseline in registry.baselines
+        if baseline.reproduction_program == "safedrug-archived"
+    )
+    if len(baseline_ids) != 4:
+        raise ProtocolValidationError(
+            "registry must declare exactly four archived baselines for the legacy selector"
+        )
+    return baseline_ids
+
+
 def _reproduction_lanes(
     args: argparse.Namespace, registry: BaselineRegistry | None = None
 ) -> tuple[tuple[str, int], ...]:
     if args.baseline_id == "all":
         if args.gpu is not None or args.gpus is None:
-            raise ProtocolValidationError("'all' requires exactly four unique --gpus and no --gpu")
-        if len(args.gpus) == len(ARCHIVED_BASELINES):
-            return tuple(zip(ARCHIVED_BASELINES, args.gpus, strict=True))
-        if (
-            registry
-            and registry.reproduction_lanes
-            and len(args.gpus) == len(registry.reproduction_lanes)
-        ):
-            lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
+            raise ProtocolValidationError(
+                "'all' requires four unique --gpus for the legacy batch or seven for "
+                "successor lanes, and no --gpu"
+            )
+        if registry is None:
+            raise ProtocolValidationError("'all' requires a loaded baseline registry")
+        legacy_baselines = _legacy_archived_baselines(registry)
+        if len(args.gpus) == len(legacy_baselines):
+            return tuple(zip(legacy_baselines, args.gpus, strict=True))
+        successor_lanes = registry.reproduction_lanes
+        if successor_lanes and len(args.gpus) == len(successor_lanes):
+            lane_ids = tuple(lane.lane_id for lane in successor_lanes)
             return tuple(zip(lane_ids, args.gpus, strict=True))
         raise ProtocolValidationError(
-            f"'all' requires unique --gpus matching either the {len(ARCHIVED_BASELINES)} archived baselines or {len(registry.reproduction_lanes) if registry else 'declared'} reproduction lanes"
+            f"'all' requires unique --gpus matching either the {len(legacy_baselines)} archived baselines or {len(successor_lanes)} reproduction lanes"
         )
     if args.gpu is None or args.gpus is not None:
         raise ProtocolValidationError("one baseline requires --gpu and no --gpus")
@@ -192,7 +209,7 @@ def _reproduce(
     executor: RemoteExecutor | None = None,
     git_runner: Runner = subprocess.run,
 ) -> int:
-    """Plan or submit one or four independent Reproduction Mode lanes."""
+    """Plan or submit one or a declared batch of Reproduction Mode lanes."""
     try:
         registry = BaselineRegistry.load(args.registry)
     except FileNotFoundError as error:
@@ -202,6 +219,9 @@ def _reproduce(
         Path.cwd(),
         require_clean=not args.dry_run,
         runner=git_runner,
+    )
+    attempt_id = getattr(args, "attempt_id", None) or (
+        f"attempt-{source_revision[:12]}-{secrets.token_hex(4)}"
     )
     active_executor = executor or RemoteExecutor(registry)
     results: list[dict[str, object]] = []
@@ -217,10 +237,12 @@ def _reproduce(
                 min_free_gpu_mib=args.min_free_gpu_mib,
                 min_free_disk_gib=args.min_free_disk_gib,
                 dry_run=args.dry_run,
+                attempt_id=attempt_id,
             )
             results.append(
                 {
                     "baseline_id": submission.baseline_id,
+                    "attempt_id": submission.attempt_id or attempt_id,
                     "command": submission.command,
                     "gpu": gpu_index,
                     "host": submission.host,
@@ -257,7 +279,7 @@ def _reproduce_smoke(
     executor: RemoteExecutor | None = None,
     git_runner: Runner = subprocess.run,
 ) -> int:
-    """Plan or submit one or four independent Reproduction Mode smoke lanes."""
+    """Plan or submit one or a declared batch of Reproduction Mode smoke lanes."""
     try:
         registry = BaselineRegistry.load(args.registry)
     except FileNotFoundError as error:
@@ -268,6 +290,9 @@ def _reproduce_smoke(
         Path.cwd(),
         require_clean=not args.dry_run,
         runner=git_runner,
+    )
+    attempt_id = getattr(args, "attempt_id", None) or (
+        f"attempt-{source_revision[:12]}-{secrets.token_hex(4)}"
     )
     active_executor = executor or RemoteExecutor(registry)
     results: list[dict[str, object]] = []
@@ -283,10 +308,12 @@ def _reproduce_smoke(
                 min_free_gpu_mib=args.min_free_gpu_mib,
                 min_free_disk_gib=args.min_free_disk_gib,
                 dry_run=args.dry_run,
+                attempt_id=attempt_id,
             )
             results.append(
                 {
                     "baseline_id": submission.baseline_id,
+                    "attempt_id": submission.attempt_id or attempt_id,
                     "command": submission.command,
                     "gpu": gpu_index,
                     "host": submission.host,
@@ -346,6 +373,34 @@ def _stage_safedrug_c721(args: argparse.Namespace) -> int:
     return 0
 
 
+def _stage_molerec_snapshot(args: argparse.Namespace) -> int:
+    """Build and atomically publish the additive MoleRec eight-file snapshot."""
+    from .molerec_snapshot import build_molerec_snapshot, publish_molerec_snapshot
+
+    build_molerec_snapshot(
+        common_snapshot=args.common_snapshot,
+        molerec_data_directory=args.molerec_data_directory,
+        staging_directory=args.staging_directory,
+    )
+    proof = publish_molerec_snapshot(
+        staging_directory=args.staging_directory,
+        snapshot_directory=args.snapshot_directory,
+        proof_path=args.proof,
+    )
+    print(
+        json.dumps(
+            {
+                "status": "published",
+                "proof": proof,
+                "snapshot_directory": str(args.snapshot_directory),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def _audit_safedrug_table2(args: argparse.Namespace) -> int:
     """Audit four formal reproduction results against Table 2 and emit public-safe packet."""
     from .reproduction_audit import audit_safedrug_table2
@@ -380,7 +435,7 @@ def _audit_safedrug_table2(args: argparse.Namespace) -> int:
 
 def _audit_molerec_table1(args: argparse.Namespace) -> int:
     """Audit five formal reproduction results against MoleRec Table 1 and emit public-safe packet."""
-    from .reproduction_audit import audit_molerec_table1
+    from .molerec_reproduction_audit import audit_molerec_table1
 
     result_paths = {
         "retain": args.retain_result,
@@ -394,6 +449,7 @@ def _audit_molerec_table1(args: argparse.Namespace) -> int:
         result_paths=result_paths,
         output_path=args.output,
         reference_path=args.reference,
+        selection_path=args.selection,
         data_root=args.data_root,
     )
     print(
@@ -513,6 +569,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="External 319 data root",
     )
     reproduce.add_argument("--dry-run", action="store_true")
+    reproduce.add_argument(
+        "--attempt-id",
+        default=None,
+        help="Optional stable attempt identity shared by a batch",
+    )
     reproduce.set_defaults(handler=_reproduce)
 
     # 6. Remote Reproduction Smoke Submission
@@ -542,6 +603,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="External 319 data root",
     )
     smoke.add_argument("--dry-run", action="store_true")
+    smoke.add_argument(
+        "--attempt-id",
+        default=None,
+        help="Optional stable attempt identity shared by a batch",
+    )
     smoke.set_defaults(handler=_reproduce_smoke)
 
     # 7. Stage SafeDrug c721 Dataset
@@ -598,7 +664,44 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     stage_c721.set_defaults(handler=_stage_safedrug_c721)
 
-    # 8. SafeDrug Table 2 Reproduction Audit
+    # 8. Stage MoleRec Table 1 Dataset
+    stage_molerec = commands.add_parser(
+        "stage-molerec-snapshot",
+        help="Build and publish the additive MoleRec eight-file snapshot",
+    )
+    stage_molerec.add_argument(
+        "--common-snapshot",
+        type=Path,
+        required=True,
+        help="Accepted c721 snapshot containing the four common inputs",
+    )
+    stage_molerec.add_argument(
+        "--molerec-data-directory",
+        type=Path,
+        required=True,
+        help="Frozen MoleRec data directory containing paired molecular assets",
+    )
+    stage_molerec.add_argument(
+        "--staging-directory",
+        type=Path,
+        required=True,
+        help="Candidate staging directory (must not exist)",
+    )
+    stage_molerec.add_argument(
+        "--snapshot-directory",
+        type=Path,
+        required=True,
+        help="Published snapshot directory (must not exist)",
+    )
+    stage_molerec.add_argument(
+        "--proof",
+        type=Path,
+        default=None,
+        help="Optional proof JSON path outside the eight-file snapshot",
+    )
+    stage_molerec.set_defaults(handler=_stage_molerec_snapshot)
+
+    # 9. SafeDrug Table 2 Reproduction Audit
     audit = commands.add_parser(
         "audit-safedrug-table2",
         help="Audit four formal reproduction results against IJCAI 2021 Table 2",
@@ -653,7 +756,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     audit.set_defaults(handler=_audit_safedrug_table2)
 
-    # 9. MoleRec Table 1 Reproduction Audit
+    # 10. MoleRec Table 1 Reproduction Audit
     audit_molerec = commands.add_parser(
         "audit-molerec-table1",
         help="Audit five formal reproduction results against MoleRec Table 1",
@@ -693,6 +796,12 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         required=True,
         help="Path to molerec formal result.json",
+    )
+    audit_molerec.add_argument(
+        "--selection",
+        type=Path,
+        required=True,
+        help="Path to validation-only SafeDrug selection.json",
     )
     audit_molerec.add_argument(
         "--output",

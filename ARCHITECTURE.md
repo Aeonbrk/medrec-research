@@ -72,6 +72,8 @@ Runtime logs, checkpoints, data snapshots, and patient-level outputs are ignored
 
 `baselines/registry.toml` is the only authority for baseline identity, Reproduction Program declarations, and Reproduction Lanes. A program declaration owns its repository-relative entrypoint, external 319 source root, dataset and run subdirectories, Conda environment name, required inputs, import probe, and verified identities. Each baseline and reproduction lane points to its declared program and profile rather than duplicating launch configuration.
 
+For the MoleRec Table 1 attempt, the two programs intentionally bind to the same `medrec-molerec-table1` compatibility environment so all seven lanes share one frozen runtime contract. `environments/safedrug-archived.yml` and its lock remain historical recovery declarations until the authorized post-attempt cleanup decision.
+
 Two standalone Reproduction Programs are provided:
 
 1. `baselines/safedrug_archived.py`: The SafeDrug archived reproduction program (covering `gamenet`, `safedrug`, `retain`, `leap-safedrug`).

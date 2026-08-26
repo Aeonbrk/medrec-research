@@ -558,6 +558,55 @@ def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Pat
     checkpoint = tmp_path / "work" / "saved" / "SafeDrug_run" / "Epoch_49.model"
     checkpoint.parent.mkdir(parents=True)
     checkpoint.touch()
+    selection_path = tmp_path / "selection.json"
+    selection_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "kind": "safedrug_selection",
+                "state": "selection_ready",
+                "candidate_lane_ids": [
+                    "molerec-safedrug-lr-1e-5",
+                    "molerec-safedrug-lr-1e-4",
+                    "molerec-safedrug-lr-5e-4",
+                ],
+                "candidates": [
+                    {
+                        "lane_id": "molerec-safedrug-lr-1e-5",
+                        "learning_rate": 1e-5,
+                        "checkpoint_identity": "checkpoint-1e-5",
+                        "validation_jaccard": 0.50,
+                        "validation_ddi_rate": 0.08,
+                    },
+                    {
+                        "lane_id": "molerec-safedrug-lr-1e-4",
+                        "learning_rate": 1e-4,
+                        "checkpoint_identity": "checkpoint-1e-4",
+                        "validation_jaccard": 0.51,
+                        "validation_ddi_rate": 0.07,
+                    },
+                    {
+                        "lane_id": "molerec-safedrug-lr-5e-4",
+                        "learning_rate": 5e-4,
+                        "checkpoint_identity": "checkpoint-5e-4",
+                        "validation_jaccard": 0.52,
+                        "validation_ddi_rate": 0.06,
+                    },
+                ],
+                "selection_rule": [
+                    "maximize validation_jaccard",
+                    "minimize validation_ddi_rate",
+                    "minimize learning_rate",
+                    "minimize lane_id",
+                ],
+                "comparison_decisions": [],
+                "selected_lane_id": "molerec-safedrug-lr-5e-4",
+                "test_metrics_available": False,
+                "errors": [],
+            }
+        ),
+        encoding="utf-8",
+    )
 
     assert adapter.training_command("python", entrypoint, "SafeDrug_run") == [
         "python",
@@ -566,7 +615,13 @@ def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Pat
         "SafeDrug_run",
     ]
     assert adapter.test_command(
-        "python", original, adapter.PROFILES["safedrug"], "SafeDrug_run", checkpoint
+        "python",
+        original,
+        adapter.PROFILES["safedrug"],
+        "SafeDrug_run",
+        checkpoint,
+        lane_id="molerec-safedrug-lr-5e-4",
+        selection_path=selection_path,
     )[-3:] == ["--Test", "--resume_path", str(checkpoint.resolve())]
     assert (
         adapter.test_command(

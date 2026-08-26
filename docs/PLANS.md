@@ -1,12 +1,13 @@
 # Plans
 
-## Implemented: MoleRec Table 1 Five-Model Full Reproduction
+## In Progress: MoleRec Table 1 Five-Model Full Reproduction
 
-- **Status**: codebase and reproduction harness implementation completed on `2026-08-26` across Units U1–U9; ready for 7-lane execution on `319-wild` with audit packet emission.
-- **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`.
-- **Scientific scope**: reproduces the MoleRec Table 1 subset RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec under frozen two-source model authority and shared `c7218d0` data lineage. Five scientific models map to seven 50-epoch training lanes because SafeDrug uses three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection; five selected systems receive ten-round upstream testing.
-- **Engineering scope**: decomposed single-responsibility submodules (`*_contract.py`, `*_data.py`, `*_logs.py`, `*_probe.py`, `*_runner.py`) for both `safedrug-archived` and `molerec`, static `ReproductionLane` registry declarations, 7-lane GPU mapping, Table 1 reference targets and deterministic audit (`audit-molerec-table1`), and comprehensive unit/integration test suite.
-- **Boundary**: attempt `formal-20260826-025500` remains immutable pilot evidence. The successor 7-lane execution runs concurrently on `319-wild` GPUs 0–6 under `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`.
+- **Status**: U1–U4 contracts and the local U6 snapshot-builder mechanics are implemented and covered by synthetic tests. U5–U9 still require the 319 remote environment, exact snapshot publication, fresh smokes, measured scheduling, formal execution, selection, testing, and audit; no successor scientific evidence exists yet.
+- **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md` is authoritative for this work.
+- **Scientific scope**: RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec use the frozen SafeDrug archived revision `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, MoleRec revision `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, and preprocessing revision `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`. Five scientific models map to seven 50-epoch training lanes because SafeDrug has three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection.
+- **Current contract**: all seven lanes use `medrec-molerec-table1` (Python 3.8.16, PyTorch 1.9.0+cu111, PyG 2.0.3) and the additive `snapshots/molerec-table1-c721-www23` declaration. The executable dataset contract is 6,350 patients, 15,032 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures; 14,995 remains paper-reported metadata only.
+- **Evidence boundary**: attempt `formal-20260826-025500` is immutable historical SafeDrug-family evidence and is not successor evidence. The current worktree is not a clean frozen submission revision; do not launch remote formal work until U5 and the final clean-code gate pass.
+- **Next gates**: generate the Linux environment lock and hash on 319, publish/prove the eight-file snapshot, run seven fresh non-evidence smokes, freeze the measured schedule with GPU 7 reserved, then execute U8/U9 exactly once. U10 cleanup is not part of the current authorization.
 
 ## Completed: Baseline Program Architecture
 

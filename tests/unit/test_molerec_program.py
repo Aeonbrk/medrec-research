@@ -81,6 +81,16 @@ def test_molerec_profiles_match_entrypoints_and_defaults() -> None:
         "molerec-embedding": ("main.py", "MoleRec", 5e-4),
     }
     assert adapter.PROFILES["molerec"].required_inputs == adapter.COMMON_INPUTS
+    assert adapter.COMMON_INPUTS == (
+        "records_final.pkl",
+        "voc_final.pkl",
+        "ddi_A_final.pkl",
+        "ehr_adj_final.pkl",
+        "ddi_mask_H.pkl",
+        "substructure_smiles.pkl",
+        "idx2SMILES.pkl",
+        "idx2drug.pkl",
+    )
 
 
 def test_training_mode_adaptation_is_exact_and_reversible() -> None:
@@ -135,7 +145,7 @@ def test_count_dataset_returns_expected_canonical_counts() -> None:
         "visits": 15032,
         "medications": 131,
         "ddi_pairs": 448,
-        "substructures": 491,
+        "molecular_substructures": 491,
     }
 
 
@@ -153,7 +163,6 @@ def test_validate_records_statistics_rejects_invalid_counts() -> None:
 
     with pytest.raises(adapter.ReproductionError, match="mismatch"):
         adapter._validate_records_statistics(records)
-
 
 
 def test_parse_training_log_extracts_best_epoch() -> None:

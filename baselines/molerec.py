@@ -53,8 +53,10 @@ if __package__:
         require_executable_counts,
     )
     from .molerec_logs import (
+        parse_formal_test_log,
         parse_test_log,
         parse_training_log,
+        parse_validation_metrics,
         select_checkpoint,
     )
     from .molerec_probe import (
@@ -73,6 +75,7 @@ if __package__:
         run_formal_lane,
         run_logged,
         run_smoke_lane,
+        run_test_lane,
     )
 else:
     _pkg_dir = str(Path(__file__).parent)
@@ -120,8 +123,10 @@ else:
         require_executable_counts,
     )
     from molerec_logs import (
+        parse_formal_test_log,
         parse_test_log,
         parse_training_log,
+        parse_validation_metrics,
         select_checkpoint,
     )
     from molerec_probe import (
@@ -140,6 +145,7 @@ else:
         run_formal_lane,
         run_logged,
         run_smoke_lane,
+        run_test_lane,
     )
 
 __all__ = [
@@ -182,8 +188,10 @@ __all__ = [
     "load_and_validate_canonical_inputs",
     "main",
     "matrix_shape",
+    "parse_formal_test_log",
     "parse_test_log",
     "parse_training_log",
+    "parse_validation_metrics",
     "probe_environment_details",
     "profile_for",
     "require_executable_counts",
@@ -191,6 +199,7 @@ __all__ = [
     "run_logged",
     "run_probe",
     "run_smoke_lane",
+    "run_test_lane",
     "select_checkpoint",
     "sha256",
     "subprocess",
@@ -222,6 +231,18 @@ def main() -> None:
         help="Reproduction execution mode (default: formal)",
     )
     parser.add_argument(
+        "--phase",
+        choices=("training", "test"),
+        default="training",
+        help="Formal phase; training is the only default admission phase",
+    )
+    parser.add_argument(
+        "--selection",
+        type=Path,
+        default=None,
+        help="Validation-only SafeDrug selection.json for a test phase",
+    )
+    parser.add_argument(
         "--probe-scope",
         choices=("environment", "full"),
         default="full",
@@ -231,6 +252,8 @@ def main() -> None:
 
     if args.mode != "probe" and "--probe-scope" in sys.argv:
         parser.error("--probe-scope is only supported when --mode probe")
+    if args.mode != "formal" and args.phase != "training":
+        parser.error("--phase test is only supported when --mode formal")
 
     if args.mode == "probe":
         probe_result = run_probe(
@@ -264,6 +287,8 @@ def main() -> None:
             run_root=args.run_root.resolve(),
             python=args.python,
             learning_rate=args.learning_rate,
+            phase=args.phase,
+            selection_path=args.selection,
         )
 
 

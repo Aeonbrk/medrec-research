@@ -50,17 +50,20 @@ Remove AI artifacts from any external-facing text:
 
 Medical AI research codebase focused on:
 
-- GAMENet model execution and evaluation
-- ARIS workflow pattern refactoring (active branch: `refactor/strip-workflow-layer`)
-- 319-wild baseline dataset experiments
+- General medication recommendation research library and Unified Research Protocol
+- Registry-driven Reproduction Programs (SafeDrug archived lineage: GAMENet, SafeDrug, RETAIN, LEAP)
+- Remote 319 execution plane and public-safe evidence intake
 
 ### Quick Navigation
 
 - Documentation: `docs/START_HERE.md`
 - Active plans: `docs/PLANS.md`
+- Implementation plans: `docs/plans/`
 - Playbooks: `docs/playbooks/index.md`
-- Solutions: `docs/solutions/`
-- Brainstorms: `docs/brainstorms/`
+- Architecture: `ARCHITECTURE.md`
+- Domain vocabulary: `CONTEXT.md`
+- Baseline registry: `baselines/registry.toml`
+- Research memory: `research/README.md`
 
 Import additional rules:
 
@@ -99,16 +102,18 @@ Before completion, run the repository gates listed below.
 
 ## Domain Context
 
-### GAMENet Models
+### Baseline Programs
 
-- Plans: `docs/playbooks/gemini-gamenet-plan.md`
-- Baseline scripts: `*-wild.py` in root
-- Known issues: PyTorch MKL symbol conflicts
+- Registry: `baselines/registry.toml`
+- Reproduction entrypoint: `baselines/safedrug_archived.py`
+- CLI commands: `rtk proxy /opt/homebrew/bin/uv run medrec reproduce <baseline-id> --gpu <id> --dry-run`
+- Remote execution: Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`
 
 ### Dataset Conventions
 
-- Primary: 319-wild dataset
-- Preprocessing: See `docs/playbooks/`
+- Local Data Root: Repository-independent data root on 319, see `docs/playbooks/LOCAL_DATA_ROOT_PLAYBOOK.md`
+- Preparation & Preprocessing: See `docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md`
+- Verification: Pinned SHA-256 and semantic bridge checks prior to snapshot publication
 
 ---
 

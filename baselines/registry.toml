@@ -3,9 +3,9 @@ schema_version = 1
 [[reproduction_programs]]
 program_id = "safedrug-archived"
 entrypoint = "baselines/safedrug_archived.py"
-conda_environment = "medrec-safedrug-archived"
+conda_environment = "medrec-molerec-table1"
 upstream_root = "/root/zhb/SafeDrug"
-dataset_subdirectory = "snapshots/safedrug-paper-c721-ijcai21"
+dataset_subdirectory = "snapshots/molerec-table1-c721-www23"
 run_subdirectory = "runs/safedrug-archived"
 required_inputs = [
   "records_final.pkl",
@@ -16,7 +16,7 @@ required_inputs = [
   "idx2drug.pkl",
 ]
 import_modules = ["torch", "dnc", "rdkit", "pandas", "dill", "sklearn", "models", "util"]
-environment_sha256 = "c17ebfc53484b74497e2d6d8058271de8d7503a2fdb19eb756ddff17ba9715b9"
+probe_contract = "safedrug_archived"
 
 [[reproduction_programs]]
 program_id = "molerec"
@@ -36,6 +36,7 @@ required_inputs = [
   "idx2drug.pkl",
 ]
 import_modules = ["torch", "torch_geometric", "rdkit", "pandas", "dill", "sklearn"]
+probe_contract = "molerec"
 
 [[baselines]]
 baseline_id = "reference"

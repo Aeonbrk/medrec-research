@@ -17,14 +17,14 @@ REPORTED_PAPER_METADATA = {
     "visits": 14995,
     "medications": 131,
     "ddi_pairs": 448,
-    "substructures": 491,
+    "molecular_substructures": 491,
 }
 EXPECTED_COUNTS = {
     "patients": 6350,
     "visits": 15032,
     "medications": 131,
     "ddi_pairs": 448,
-    "substructures": 491,
+    "molecular_substructures": 491,
 }
 EXPECTED_STATISTICS = {
     "diagnoses": {"numerator": 157_970, "max": 128},
@@ -72,9 +72,9 @@ COMMON_INPUTS = (
     "ddi_A_final.pkl",
     "ehr_adj_final.pkl",
     "ddi_mask_H.pkl",
-    "sub_structure.pkl",
-    "word2vec_300.model",
-    "sub_structure_mask.pkl",
+    "substructure_smiles.pkl",
+    "idx2SMILES.pkl",
+    "idx2drug.pkl",
 )
 GATE_INPUTS = COMMON_INPUTS
 

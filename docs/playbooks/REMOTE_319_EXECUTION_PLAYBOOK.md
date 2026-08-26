@@ -209,8 +209,8 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research evidence-intake \
 
 Detailed, step-by-step reproduction preparation and execution playbooks govern remote reproduction runs on `319-wild`:
 
-- **SafeDrug Table 2 Four-Model Reproduction**: [SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md](file:///Users/oian/Codes/master/medrec-research/docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md)
-- **MoleRec Table 1 Five-Model Reproduction**: [MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md](file:///Users/oian/Codes/master/medrec-research/docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md)
+- **Historical SafeDrug Table 2 Four-Model Reproduction**: [SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md](SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md) (do not execute)
+- **Current MoleRec Table 1 Five-Model Reproduction**: [MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md](MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md)
 
 ## Destructive operations
 

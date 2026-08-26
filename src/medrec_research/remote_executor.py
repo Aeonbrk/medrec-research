@@ -23,6 +23,7 @@ from .registry import (
 )
 
 APPROVED_319_HOSTS = ("319-lab", "319-lab-via-server")
+PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40,64}")
 _GPU_UUID = re.compile(r"GPU-[A-Za-z0-9-]+")
 
@@ -72,6 +73,9 @@ class RemoteSubmission:
     session_id: str
     command: str
     preflight_performed: bool
+    attempt_id: str | None = None
+    lane_id: str | None = None
+    submission_id: str | None = None
 
 
 class RemoteExecutor:
@@ -129,7 +133,7 @@ class RemoteExecutor:
         min_free_disk_gib: int,
     ) -> PreflightResult:
         """Run every required read-only check and return verified identifiers."""
-        baseline, program, profile_id, _ = self._resolve_target(baseline_id)
+        baseline, program, profile_id, _, _ = self._resolve_target(baseline_id)
         remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
@@ -299,9 +303,10 @@ class RemoteExecutor:
         min_free_gpu_mib: int,
         min_free_disk_gib: int,
         dry_run: bool = False,
+        attempt_id: str | None = None,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode formal run."""
-        baseline, program, profile_id, learning_rate = self._resolve_target(baseline_id)
+        baseline, program, profile_id, learning_rate, lane_id = self._resolve_target(baseline_id)
         remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
@@ -313,6 +318,8 @@ class RemoteExecutor:
             require_verified=not dry_run,
             program=program,
         )
+        active_attempt_id = attempt_id or f"attempt-{self._timestamp()}-{secrets.token_hex(4)}"
+        self._validate_job_id(active_attempt_id)
         session_id = f"medrec-baseline-{baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
         command = self._launch_command(
             program,
@@ -324,6 +331,11 @@ class RemoteExecutor:
             gpu_index=gpu_index,
             run_id=session_id,
             mode="formal",
+            attempt_id=active_attempt_id,
+            lane_id=lane_id,
+            harness_revision=source_revision,
+            model_source_revision=baseline.source.revision,
+            environment_sha256=program.environment_sha256 or "unverified",
         )
         if dry_run:
             return RemoteSubmission(
@@ -332,6 +344,9 @@ class RemoteExecutor:
                 session_id=session_id,
                 command=command,
                 preflight_performed=False,
+                attempt_id=active_attempt_id,
+                lane_id=lane_id,
+                submission_id=session_id,
             )
 
         result = self.preflight(
@@ -342,6 +357,22 @@ class RemoteExecutor:
             data_root=data_root,
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
+        )
+        command = self._launch_command(
+            program,
+            baseline_id=baseline.baseline_id,
+            profile_id=profile_id,
+            learning_rate=learning_rate,
+            remote_root=remote_root,
+            data_root=data_root,
+            gpu_index=gpu_index,
+            run_id=session_id,
+            mode="formal",
+            attempt_id=active_attempt_id,
+            lane_id=lane_id,
+            harness_revision=source_revision,
+            model_source_revision=baseline.source.revision,
+            environment_sha256=result.environment_sha256,
         )
         try:
             self.ssh(
@@ -358,6 +389,9 @@ class RemoteExecutor:
             session_id=session_id,
             command=command,
             preflight_performed=True,
+            attempt_id=active_attempt_id,
+            lane_id=lane_id,
+            submission_id=session_id,
         )
 
     def run_smoke(
@@ -371,9 +405,10 @@ class RemoteExecutor:
         min_free_gpu_mib: int,
         min_free_disk_gib: int,
         dry_run: bool = False,
+        attempt_id: str | None = None,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode smoke run."""
-        baseline, program, profile_id, learning_rate = self._resolve_target(baseline_id)
+        baseline, program, profile_id, learning_rate, lane_id = self._resolve_target(baseline_id)
         remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
@@ -385,6 +420,8 @@ class RemoteExecutor:
             require_verified=not dry_run,
             program=program,
         )
+        active_attempt_id = attempt_id or f"attempt-{self._timestamp()}-{secrets.token_hex(4)}"
+        self._validate_job_id(active_attempt_id)
         session_id = f"medrec-smoke-{baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
         command = self._launch_command(
             program,
@@ -396,6 +433,11 @@ class RemoteExecutor:
             gpu_index=gpu_index,
             run_id=session_id,
             mode="smoke",
+            attempt_id=active_attempt_id,
+            lane_id=lane_id,
+            harness_revision=source_revision,
+            model_source_revision=baseline.source.revision,
+            environment_sha256=program.environment_sha256 or "unverified",
         )
         if dry_run:
             return RemoteSubmission(
@@ -404,6 +446,9 @@ class RemoteExecutor:
                 session_id=session_id,
                 command=command,
                 preflight_performed=False,
+                attempt_id=active_attempt_id,
+                lane_id=lane_id,
+                submission_id=session_id,
             )
 
         result = self.preflight(
@@ -414,6 +459,22 @@ class RemoteExecutor:
             data_root=data_root,
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
+        )
+        command = self._launch_command(
+            program,
+            baseline_id=baseline.baseline_id,
+            profile_id=profile_id,
+            learning_rate=learning_rate,
+            remote_root=remote_root,
+            data_root=data_root,
+            gpu_index=gpu_index,
+            run_id=session_id,
+            mode="smoke",
+            attempt_id=active_attempt_id,
+            lane_id=lane_id,
+            harness_revision=source_revision,
+            model_source_revision=baseline.source.revision,
+            environment_sha256=result.environment_sha256,
         )
         try:
             self.ssh(
@@ -430,21 +491,24 @@ class RemoteExecutor:
             session_id=session_id,
             command=command,
             preflight_performed=True,
+            attempt_id=active_attempt_id,
+            lane_id=lane_id,
+            submission_id=session_id,
         )
 
     def _resolve_target(
         self, baseline_or_lane_id: str
-    ) -> tuple[BaselineDefinition, ReproductionProgram, str, float | None]:
+    ) -> tuple[BaselineDefinition, ReproductionProgram, str, float | None, str]:
         try:
             lane = self.registry.get_lane(baseline_or_lane_id)
             baseline = self.registry.get(lane.scientific_baseline_id)
             program = self.registry.get_program(lane.program_id)
-            return baseline, program, lane.profile_id, lane.learning_rate
+            return baseline, program, lane.profile_id, lane.learning_rate, lane.lane_id
         except KeyError:
             pass
         baseline = self._baseline(baseline_or_lane_id)
         program = self.registry.reproduction_program_for(baseline)
-        return baseline, program, baseline.baseline_id, None
+        return baseline, program, baseline.baseline_id, None, baseline.baseline_id
 
     def _baseline(self, baseline_id: str) -> BaselineDefinition:
         try:
@@ -540,9 +604,13 @@ class RemoteExecutor:
             ) from error
         if not isinstance(data, dict):
             raise ProtocolValidationError("remote program probe output must be a JSON object")
-        if data.get("schema_version") != 1 or data.get("kind") not in (
-            "safedrug_archived_probe",
-            "molerec_probe",
+        expected_kinds = {
+            "safedrug_archived": "safedrug_archived_probe",
+            "molerec": "molerec_probe",
+        }
+        expected_kind = expected_kinds.get(program.probe_contract)
+        if data.get("schema_version") != 1 or (
+            expected_kind is not None and data.get("kind") != expected_kind
         ):
             raise ProtocolValidationError("remote program probe returned invalid schema or kind")
         expected_baseline_id = profile_id or baseline.baseline_id
@@ -588,9 +656,10 @@ class RemoteExecutor:
         counts = data.get("dataset_counts")
         if not isinstance(counts, dict):
             raise ProtocolValidationError("remote program probe returned invalid dataset counts")
+        expected_visits = (15_032,) if program.probe_contract == "molerec" else (15_032, 14_995)
         if (
             counts.get("patients") != 6_350
-            or counts.get("visits") not in (15_032, 14_995)
+            or counts.get("visits") not in expected_visits
             or counts.get("medications") != 131
             or counts.get("ddi_pairs") != 448
         ):
@@ -598,7 +667,7 @@ class RemoteExecutor:
                 "remote program probe dataset counts do not match expected B0"
             )
         if (
-            program.program_id == "safedrug-archived"
+            program.probe_contract in ("safedrug_archived", "molerec")
             and counts.get("molecular_substructures") != 491
         ):
             raise ProtocolValidationError(
@@ -650,6 +719,12 @@ class RemoteExecutor:
         mode: str = "formal",
         profile_id: str | None = None,
         learning_rate: float | None = None,
+        attempt_id: str | None = None,
+        lane_id: str | None = None,
+        harness_revision: str | None = None,
+        model_source_revision: str | None = None,
+        environment_sha256: str | None = None,
+        preprocessing_revision: str = PREPROCESSING_REVISION,
     ) -> str:
         dataset_root = str(PurePosixPath(data_root) / program.dataset_subdirectory)
         run_root = str(PurePosixPath(data_root) / program.run_subdirectory / run_id)
@@ -658,6 +733,18 @@ class RemoteExecutor:
         argv = [
             "env",
             f"MEDREC_RUN_ID={run_id}",
+            f"MEDREC_ATTEMPT_ID={attempt_id or run_id}",
+            f"MEDREC_LANE_ID={lane_id or baseline_id}",
+            f"MEDREC_BASELINE_ID={baseline_id}",
+            f"MEDREC_PROGRAM_ID={program.program_id}",
+            f"MEDREC_PROFILE_ID={target_profile}",
+            f"MEDREC_HARNESS_REVISION={harness_revision or 'unverified'}",
+            f"MEDREC_MODEL_SOURCE_REVISION={model_source_revision or 'unverified'}",
+            f"MEDREC_PREPROCESSING_REVISION={preprocessing_revision}",
+            f"MEDREC_SNAPSHOT_ID={program.dataset_subdirectory}",
+            f"MEDREC_ENVIRONMENT_SHA256={environment_sha256 or 'unverified'}",
+            f"MEDREC_SUBMISSION_ID={run_id}",
+            "MEDREC_MODE=" + mode,
             f"MEDREC_DATA_ROOT={data_root}",
             f"SAFEDRUG_ROOT={program.upstream_root}",
             f"CUDA_VISIBLE_DEVICES={gpu_index}",
@@ -679,6 +766,8 @@ class RemoteExecutor:
         ]
         if learning_rate is not None:
             argv.extend(["--learning-rate", str(learning_rate)])
+        if mode == "formal":
+            argv.extend(["--phase", "training"])
         if mode == "smoke":
             argv.extend(["--mode", "smoke"])
         command = shlex.join(argv)
@@ -696,6 +785,7 @@ class RemoteExecutor:
 
 __all__ = (
     "APPROVED_319_HOSTS",
+    "PREPROCESSING_REVISION",
     "PreflightResult",
     "RemoteExecutor",
     "RemoteSubmission",
