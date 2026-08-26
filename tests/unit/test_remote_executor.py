@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import shlex
 import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -96,11 +97,12 @@ class ScriptedExecutor(RemoteExecutor):
     def __init__(
         self,
         *,
+        registry: BaselineRegistry | None = None,
         fail_gate: str | None = None,
         gpu_output: str | None = None,
         responses: dict[str, str] | None = None,
     ):
-        super().__init__(_registry())
+        super().__init__(registry or _registry())
         self.calls: list[tuple[str, str, str]] = []
         self.fail_gate = fail_gate
         self.gpu_output = gpu_output or "0, GPU-0, 24000, 0"
@@ -537,3 +539,58 @@ def test_remote_paths_must_be_absolute_normalized_values(unsafe_path: str) -> No
         )
 
     assert executor.calls == []
+
+
+def test_run_baseline_with_reproduction_lane_id_and_learning_rate_override() -> None:
+    project_registry = BaselineRegistry.load(
+        Path(__file__).parents[2] / "baselines" / "registry.toml"
+    )
+    executor = ScriptedExecutor(registry=project_registry)
+    submission = executor.run_baseline(
+        "molerec-safedrug-lr-1e-5",
+        source_revision=LOCAL_REVISION,
+        gpu_index=3,
+        remote_root=REMOTE_ROOT,
+        data_root=DATA_ROOT,
+        min_free_gpu_mib=20000,
+        min_free_disk_gib=100,
+        dry_run=True,
+    )
+
+    assert submission.baseline_id == "molerec-safedrug-lr-1e-5"
+    assert (
+        "SafeDrug.py safedrug" in submission.command
+        or "safedrug_archived.py safedrug" in submission.command
+    )
+    assert "--learning-rate 1e-05" in submission.command
+
+
+def test_seven_lane_reproduction_all_lanes_dry_run() -> None:
+    project_registry = BaselineRegistry.load(
+        Path(__file__).parents[2] / "baselines" / "registry.toml"
+    )
+    executor = ScriptedExecutor(registry=project_registry)
+    lanes = [
+        ("molerec-retain", 0),
+        ("molerec-leap", 1),
+        ("molerec-gamenet", 2),
+        ("molerec-safedrug-lr-1e-5", 3),
+        ("molerec-safedrug-lr-1e-4", 4),
+        ("molerec-safedrug-lr-5e-4", 5),
+        ("molerec-embedding", 6),
+    ]
+    submissions = [
+        executor.run_baseline(
+            lane_id,
+            source_revision=LOCAL_REVISION,
+            gpu_index=gpu,
+            remote_root=REMOTE_ROOT,
+            data_root=DATA_ROOT,
+            min_free_gpu_mib=20000,
+            min_free_disk_gib=100,
+            dry_run=True,
+        )
+        for lane_id, gpu in lanes
+    ]
+    assert len(submissions) == 7
+    assert [s.baseline_id for s in submissions] == [lane[0] for lane in lanes]
