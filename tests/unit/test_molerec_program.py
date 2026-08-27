@@ -253,3 +253,31 @@ def test_split_responsibility_modules_importable() -> None:
     assert hasattr(molerec_logs, "parse_training_log")
     assert hasattr(molerec_probe, "run_probe")
     assert hasattr(molerec_runner, "run_formal_lane")
+
+
+def test_probe_report_declares_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from baselines import molerec_probe
+
+    source_dir = tmp_path / "src"
+    source_dir.mkdir()
+    (source_dir / "main.py").write_text("# probe fixture\n", encoding="utf-8")
+    monkeypatch.setattr(
+        molerec_probe,
+        "environment_summary",
+        lambda: {
+            "packages": {module: "available" for module in molerec_probe.REGISTRY_IMPORT_MODULES},
+            "cuda_available": True,
+            "rdkit_working": True,
+            "pyg_extensions_working": True,
+            "conda_explicit_sha256": "a" * 64,
+        },
+    )
+
+    report = molerec_probe.run_probe(
+        baseline_id="molerec-embedding",
+        upstream_root=tmp_path,
+        data_dir=None,
+        scope="environment",
+    )
+
+    assert report["scope"] == "environment"

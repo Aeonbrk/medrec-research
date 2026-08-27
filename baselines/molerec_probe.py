@@ -164,6 +164,7 @@ def run_probe(
     report: dict[str, Any] = {
         "schema_version": 1,
         "kind": "molerec_probe",
+        "scope": scope,
         "baseline_id": profile.baseline_id,
         "source_revision": ARCHIVED_REVISION,
         "environment": env_info,
