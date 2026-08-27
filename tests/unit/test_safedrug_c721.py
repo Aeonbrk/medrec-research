@@ -270,14 +270,18 @@ def test_stage_safedrug_c721_rejects_vocabulary_order_mismatch(tmp_path: Path) -
         )
 
 
-def test_molerec_environment_hash_waits_for_u5_and_tls_stays_enabled() -> None:
+def test_molerec_environment_hash_is_frozen_after_u5_and_tls_stays_enabled() -> None:
     from medrec_research import BaselineRegistry
 
     registry_path = Path(__file__).parents[2] / "baselines" / "registry.toml"
     registry = BaselineRegistry.load(registry_path)
     program = registry.get_program("safedrug-archived")
     assert program.conda_environment == "medrec-molerec-table1"
-    assert program.environment_sha256 is None
+    assert program.environment_sha256 == (
+        "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+    )
+    lock_path = Path(__file__).parents[2] / "environments" / "molerec-table1-linux-64.lock"
+    assert lock_path.is_file()
 
     readme_text = (Path(__file__).parents[2] / "environments" / "README.md").read_text(
         encoding="utf-8"

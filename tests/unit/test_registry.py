@@ -245,7 +245,10 @@ def test_project_registry_makes_no_readiness_claims() -> None:
     assert isinstance(program, ReproductionProgram)
     assert program.program_id == "safedrug-archived"
     assert program.conda_environment == "medrec-molerec-table1"
-    assert not program.is_319_verified
+    assert program.is_319_verified
+    assert program.environment_sha256 == (
+        "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+    )
     gamenet = registry.get("gamenet")
     assert gamenet.display_name == "GAMENet (SafeDrug archived)"
     assert gamenet.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"

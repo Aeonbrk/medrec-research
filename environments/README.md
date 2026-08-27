@@ -21,7 +21,7 @@ The MoleRec Table 1 compatibility baseline environment specifies:
 - dill 0.3.7
 - dnc 1.1.0
 
-Both `safedrug-archived` and `molerec` Reproduction Programs declare this compatibility environment for the current attempt. The Linux lock and environment identity remain provisional until U5 completes on 319; no formal lane is admissible before that proof.
+Both `safedrug-archived` and `molerec` Reproduction Programs declare this compatibility environment for the current attempt. U5 froze the Linux lock at SHA-256 `6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda` after a clean rebuild and canonical probe on 319; formal lanes still require the later snapshot, smoke, and schedule gates.
 
 > [!NOTE]
 > **Hardware Compatibility Deviation**: Official MoleRec records CUDA 10.2, which predates NVIDIA Ampere (RTX 3090 / SM86) architecture support. `CUDA 11.1` (`torch==1.9.0+cu111`) is the minimal necessary deviation to support RTX 3090 hardware while preserving Python 3.8, PyTorch 1.9, and PyG 2.0.3 package versions.
