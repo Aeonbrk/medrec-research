@@ -44,6 +44,7 @@ ROUND_PATTERN = re.compile(r"^\s*([A-Za-z0-9_]+)\s*:\s*([0-9.]+)\s*$")
 REGISTRY_IMPORT_MODULES = (
     "torch",
     "torch_geometric",
+    "ogb",
     "rdkit",
     "pandas",
     "dill",

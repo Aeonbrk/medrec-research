@@ -13,6 +13,7 @@ The MoleRec Table 1 compatibility baseline environment specifies:
 - Python 3.8.16
 - PyTorch 1.9.0 with CUDA 11.1 (`torch==1.9.0+cu111`)
 - PyTorch Geometric 2.0.3 with native extensions (`torch-scatter`, `torch-sparse`, `torch-cluster`, `torch-spline-conv`)
+- OGB 1.3.5
 - NumPy 1.23.5
 - pandas 1.5.3
 - SciPy 1.10.0

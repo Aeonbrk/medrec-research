@@ -94,6 +94,7 @@ def test_molerec_profiles_match_entrypoints_and_defaults() -> None:
     assert adapter.REGISTRY_IMPORT_MODULES == (
         "torch",
         "torch_geometric",
+        "ogb",
         "rdkit",
         "pandas",
         "dill",
