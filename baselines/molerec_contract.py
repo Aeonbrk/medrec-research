@@ -37,8 +37,8 @@ TEST_DECLARATION = (
     "    parser.add_argument('--Test', action='store_true', help=\"evaluating mode\")\n"
 )
 TRAIN_DECLARATION = TEST_DECLARATION
-EPOCH_FORMAL = "    for epoch in range(EPOCH):\n"
-EPOCH_SMOKE = "    for epoch in range(1):\n"
+EPOCH_FORMAL = "        '--epochs', default=50, type=int,\n"
+EPOCH_SMOKE = "        '--epochs', default=1, type=int,\n"
 ROUND_PATTERN = re.compile(r"^\s*([A-Za-z0-9_]+)\s*:\s*([0-9.]+)\s*$")
 
 REGISTRY_IMPORT_MODULES = (
