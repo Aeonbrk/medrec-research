@@ -145,6 +145,36 @@ def test_smoke_adaptation_composition_and_leap_fine_tune_preservation() -> None:
     assert reversed_source == leap_source
 
 
+def test_smoke_adaptation_handles_parser_rates_and_already_aligned_rate() -> None:
+    safedrug_source = (
+        "parser.add_argument('--lr', type=float, default=5e-4, help='learning rate')\n"
+        f"{adapter.TEST_DECLARATION}\n"
+        f"{adapter.EPOCH_FORMAL}"
+    )
+    adapted = adapter.adapt_smoke_source(safedrug_source, target_lr=1e-4)
+    assert "default=1e-4" in adapted
+    assert (
+        adapted.replace(adapter.EPOCH_SMOKE, adapter.EPOCH_FORMAL, 1)
+        .replace(adapter.TRAIN_DECLARATION, adapter.TEST_DECLARATION)
+        .replace("default=1e-4", "default=5e-4")
+        == safedrug_source
+    )
+
+    gamenet_source = (
+        "parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')\n"
+        f"{adapter.TEST_DECLARATION}\n"
+        f"{adapter.EPOCH_FORMAL}"
+    )
+    gamenet_adapted = adapter.adapt_smoke_source(gamenet_source, target_lr=1e-4)
+    assert "default=1e-4" in gamenet_adapted
+    assert (
+        gamenet_adapted.replace(adapter.EPOCH_SMOKE, adapter.EPOCH_FORMAL, 1).replace(
+            adapter.TRAIN_DECLARATION, adapter.TEST_DECLARATION
+        )
+        == gamenet_source
+    )
+
+
 @pytest.mark.parametrize(
     "source",
     [

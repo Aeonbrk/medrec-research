@@ -131,6 +131,22 @@ def test_smoke_adaptation_composes_cleanly_and_reversibly() -> None:
     assert adapter.EPOCH_SMOKE in adapted
 
 
+def test_smoke_adaptation_accepts_parser_declared_learning_rate() -> None:
+    source = (
+        "parser.add_argument('--lr', type=float, default=5e-4, help='learning rate')\n"
+        f"{adapter.TEST_DECLARATION}\n"
+        f"{adapter.EPOCH_FORMAL}"
+    )
+    adapted = adapter.adapt_smoke_source(source, target_lr=1e-4)
+    assert "default=1e-4" in adapted
+    assert (
+        adapted.replace(adapter.EPOCH_SMOKE, adapter.EPOCH_FORMAL, 1)
+        .replace(adapter.TRAIN_DECLARATION, adapter.TEST_DECLARATION)
+        .replace("default=1e-4", "default=5e-4")
+        == source
+    )
+
+
 @pytest.mark.parametrize("lr", [1e-5, 1e-4, 5e-4])
 def test_learning_rate_adaptation_is_exact_and_reversible(lr: float) -> None:
     source = "optimizer = Adam(model.parameters(), lr=5e-4)\n"

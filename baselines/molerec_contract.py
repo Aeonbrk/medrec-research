@@ -123,24 +123,36 @@ def _format_lr(lr: float) -> str:
     return f"{lr:g}"
 
 
+def _lr_literals(lr: float) -> tuple[str, ...]:
+    return tuple(dict.fromkeys((_format_lr(lr), str(lr))))
+
+
+def _find_lr_declaration(source: str, literals: tuple[str, ...]) -> re.Match[str] | None:
+    value_pattern = "|".join(re.escape(literal) for literal in literals)
+    patterns = (
+        re.compile(
+            rf"(?m)(?P<prefix>parser\.add_argument\(\s*['\"]--lr['\"][^\n]*?"
+            rf"\bdefault\s*=\s*)(?P<value>{value_pattern})"
+        ),
+        re.compile(rf"(?P<prefix>\blr\s*=\s*)(?P<value>{value_pattern})"),
+    )
+    matches = [match for pattern in patterns for match in pattern.finditer(source)]
+    return matches[0] if len(matches) == 1 else None
+
+
 def adapt_learning_rate_source(source: str, target_lr: float, original_lr: float = 5e-4) -> str:
     """Adapt the learning rate in training source code with byte-reversibility check."""
     if target_lr == original_lr:
         return source
     target_lr_str = _format_lr(target_lr)
-    orig_lr_str = _format_lr(original_lr)
-    pattern = re.compile(rf"lr\s*=\s*(?:{re.escape(orig_lr_str)}|5e-4|{original_lr})")
-    match = pattern.search(source)
+    match = _find_lr_declaration(source, _lr_literals(original_lr))
     if not match:
+        if _find_lr_declaration(source, _lr_literals(target_lr)) is not None:
+            return source
         raise ReproductionError("learning rate declaration drifted from audited source")
-    match_str = match.group(0)
-    replaced_str = re.sub(
-        r"(?:5e-4|" + re.escape(orig_lr_str) + r"|" + re.escape(str(original_lr)) + r")",
-        target_lr_str,
-        match_str,
-    )
-    adapted = source.replace(match_str, replaced_str, 1)
-    if match_str in adapted or adapted.replace(replaced_str, match_str, 1) != source:
+    original_literal = match.group("value")
+    adapted = source[: match.start("value")] + target_lr_str + source[match.end("value") :]
+    if original_literal in adapted or adapted.replace(target_lr_str, original_literal, 1) != source:
         raise ReproductionError("learning rate adaptation is not byte-reversible")
     return adapted
 
@@ -170,10 +182,12 @@ def adapt_epoch_source(source: str) -> str:
 def adapt_smoke_source(source: str, target_lr: float | None = None) -> str:
     """Compose training-mode and 1-epoch adaptations with joint reversibility."""
     train_adapted = adapt_training_source(source, target_lr=target_lr)
+    training_only = source.replace(TEST_DECLARATION, TRAIN_DECLARATION, 1)
+    rate_was_adapted = train_adapted != training_only
     smoke_adapted = adapt_epoch_source(train_adapted)
     reversed_epoch = smoke_adapted.replace(EPOCH_SMOKE, EPOCH_FORMAL, 1)
-    if target_lr is not None and target_lr != 5e-4:
-        reversed_lr = adapt_learning_rate_source(reversed_epoch, 5e-4)
+    if rate_was_adapted and target_lr is not None:
+        reversed_lr = adapt_learning_rate_source(reversed_epoch, 5e-4, original_lr=target_lr)
     else:
         reversed_lr = reversed_epoch
     reversed_source = reversed_lr.replace(TRAIN_DECLARATION, TEST_DECLARATION)
