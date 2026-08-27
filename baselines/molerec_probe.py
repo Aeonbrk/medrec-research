@@ -94,6 +94,37 @@ def check_cuda_tensor() -> bool:
         return False
 
 
+def _cuda_device_details() -> dict[str, Any]:
+    try:
+        import torch
+
+        if not torch.cuda.is_available():
+            return {
+                "cuda_visible_device_count": 0,
+                "gpu_name": "unknown",
+                "gpu_capability": "unknown",
+            }
+        device_count = int(torch.cuda.device_count())
+        if device_count == 0:
+            return {
+                "cuda_visible_device_count": 0,
+                "gpu_name": "unknown",
+                "gpu_capability": "unknown",
+            }
+        capability = torch.cuda.get_device_capability(0)
+        return {
+            "cuda_visible_device_count": device_count,
+            "gpu_name": torch.cuda.get_device_name(0),
+            "gpu_capability": f"{capability[0]}.{capability[1]}",
+        }
+    except Exception:
+        return {
+            "cuda_visible_device_count": 0,
+            "gpu_name": "unknown",
+            "gpu_capability": "unknown",
+        }
+
+
 def check_rdkit() -> bool:
     try:
         from rdkit import Chem
@@ -119,11 +150,13 @@ def check_pyg_extensions() -> bool:
 
 
 def environment_summary() -> dict[str, Any]:
+    cuda_details = _cuda_device_details()
     return {
         "python_version": platform.python_version(),
         "platform": platform.platform(),
         "packages": check_imports(),
         "cuda_available": check_cuda_tensor(),
+        **cuda_details,
         "rdkit_working": check_rdkit(),
         "pyg_extensions_working": check_pyg_extensions(),
         "driver_version": _nvidia_driver_version(),

@@ -267,6 +267,9 @@ def test_probe_report_declares_scope(tmp_path: Path, monkeypatch: pytest.MonkeyP
         lambda: {
             "packages": {module: "available" for module in molerec_probe.REGISTRY_IMPORT_MODULES},
             "cuda_available": True,
+            "cuda_visible_device_count": 1,
+            "gpu_name": "fixture-gpu",
+            "gpu_capability": "8.6",
             "rdkit_working": True,
             "pyg_extensions_working": True,
             "conda_explicit_sha256": "a" * 64,
@@ -281,3 +284,4 @@ def test_probe_report_declares_scope(tmp_path: Path, monkeypatch: pytest.MonkeyP
     )
 
     assert report["scope"] == "environment"
+    assert report["environment"]["cuda_visible_device_count"] == 1
