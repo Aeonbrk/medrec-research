@@ -91,6 +91,14 @@ def test_molerec_profiles_match_entrypoints_and_defaults() -> None:
         "idx2SMILES.pkl",
         "idx2drug.pkl",
     )
+    assert adapter.REGISTRY_IMPORT_MODULES == (
+        "torch",
+        "torch_geometric",
+        "rdkit",
+        "pandas",
+        "dill",
+        "sklearn",
+    )
 
 
 def test_training_mode_adaptation_is_exact_and_reversible() -> None:

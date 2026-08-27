@@ -45,9 +45,17 @@ ROUND_PATTERN = re.compile(r"^\s*([A-Za-z0-9_]+)\s*:\s*([0-9.]+)\s*$")
 
 REGISTRY_IMPORT_MODULES = (
     "torch",
+    "torch_geometric",
     "rdkit",
-    "gensim",
+    "pandas",
+    "dill",
     "sklearn",
+)
+PYG_EXTENSION_MODULES = (
+    "torch_scatter",
+    "torch_sparse",
+    "torch_cluster",
+    "torch_spline_conv",
 )
 
 

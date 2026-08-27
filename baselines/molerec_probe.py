@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import hashlib
 import importlib
-import importlib.util
 import os
 import platform
 import shutil
@@ -17,6 +16,7 @@ from typing import Any
 if __package__:
     from .molerec_contract import (
         ARCHIVED_REVISION,
+        PYG_EXTENSION_MODULES,
         REGISTRY_IMPORT_MODULES,
         REPORTED_PAPER_METADATA,
         ReproductionError,
@@ -30,6 +30,7 @@ else:
         sys.path.insert(0, _pkg_dir)
     from molerec_contract import (
         ARCHIVED_REVISION,
+        PYG_EXTENSION_MODULES,
         REGISTRY_IMPORT_MODULES,
         REPORTED_PAPER_METADATA,
         ReproductionError,
@@ -107,13 +108,12 @@ def check_rdkit() -> bool:
         return False
 
 
-def check_gensim() -> bool:
+def check_pyg_extensions() -> bool:
     try:
-        import gensim
-        from gensim.models import Word2Vec
-
-        # Quick check that Word2Vec class is accessible
-        return hasattr(gensim.models, "Word2Vec") or hasattr(Word2Vec, "load")
+        importlib.import_module("torch_geometric")
+        for module_name in PYG_EXTENSION_MODULES:
+            importlib.import_module(module_name)
+        return True
     except Exception:
         return False
 
@@ -125,7 +125,7 @@ def environment_summary() -> dict[str, Any]:
         "packages": check_imports(),
         "cuda_available": check_cuda_tensor(),
         "rdkit_working": check_rdkit(),
-        "gensim_working": check_gensim(),
+        "pyg_extensions_working": check_pyg_extensions(),
         "driver_version": _nvidia_driver_version(),
         "conda_explicit_sha256": _conda_explicit_sha256(),
     }
@@ -154,10 +154,10 @@ def run_probe(
         "imports": import_checks,
         "cuda_tensor": "passed" if env_info["cuda_available"] else "failed",
         "rdkit_brics": "passed" if env_info["rdkit_working"] else "failed",
-        "gensim": "passed" if env_info["gensim_working"] else "failed",
+        "pyg_extensions": ("passed" if env_info["pyg_extensions_working"] else "failed"),
     }
     if any(status != "passed" for status in import_checks.values()) or any(
-        checks[name] != "passed" for name in ("cuda_tensor", "rdkit_brics", "gensim")
+        checks[name] != "passed" for name in ("cuda_tensor", "rdkit_brics", "pyg_extensions")
     ):
         raise ReproductionError("MoleRec environment probe failed runtime checks")
 
