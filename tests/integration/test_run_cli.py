@@ -102,6 +102,34 @@ def test_reproduce_smoke_all_dry_run_maps_four_independent_lanes() -> None:
     assert all("--mode smoke" in item["command"] for item in results)
 
 
+def test_reproduce_smoke_all_dry_run_maps_cpu_sets_to_successor_lanes() -> None:
+    cpu_sets = ";".join(
+        (
+            "0-3,32-35",
+            "4-7,36-39",
+            "8-11,40-43",
+            "12-15,44-47",
+            "16-19,48-51",
+            "20-23,52-55",
+            "24-27,56-59",
+        )
+    )
+    completed = _cli(
+        "reproduce-smoke",
+        "all",
+        "--gpus",
+        "0,1,2,3,4,5,6",
+        "--cpu-sets",
+        cpu_sets,
+        "--dry-run",
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    results = json.loads(completed.stdout)["results"]
+    assert [item["cpu_set"] for item in results] == cpu_sets.split(";")
+    assert all("taskset --cpu-list" in item["command"] for item in results)
+
+
 @pytest.mark.parametrize(
     ("arguments", "message"),
     [

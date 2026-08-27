@@ -343,6 +343,25 @@ def test_smoke_submission_executes_smoke_tmux_launch() -> None:
     assert "--mode smoke" in launch
 
 
+def test_smoke_submission_binds_requested_cpu_set() -> None:
+    executor = ScriptedExecutor()
+
+    submission = executor.run_smoke(
+        "safedrug",
+        source_revision=LOCAL_REVISION,
+        gpu_index=1,
+        cpu_set="0-3,32-35",
+        remote_root=REMOTE_ROOT,
+        data_root=DATA_ROOT,
+        min_free_gpu_mib=20000,
+        min_free_disk_gib=100,
+        dry_run=True,
+    )
+
+    assert submission.cpu_set == "0-3,32-35"
+    assert "taskset --cpu-list 0-3,32-35 env" in submission.command
+
+
 def test_safedrug_family_profiles_launch_and_preflight() -> None:
     for profile in ["safedrug", "retain", "leap-safedrug"]:
         executor = ScriptedExecutor()
@@ -594,3 +613,23 @@ def test_seven_lane_reproduction_all_lanes_dry_run() -> None:
     ]
     assert len(submissions) == 7
     assert [s.baseline_id for s in submissions] == [lane[0] for lane in lanes]
+
+
+def test_successor_formal_lane_requires_cpu_set() -> None:
+    project_registry = BaselineRegistry.load(
+        Path(__file__).parents[2] / "baselines" / "registry.toml"
+    )
+    executor = ScriptedExecutor(registry=project_registry)
+
+    with pytest.raises(ProtocolValidationError, match="measured cpu_set"):
+        executor.run_baseline(
+            "molerec-retain",
+            source_revision=LOCAL_REVISION,
+            gpu_index=0,
+            remote_root=REMOTE_ROOT,
+            data_root=DATA_ROOT,
+            min_free_gpu_mib=20000,
+            min_free_disk_gib=100,
+        )
+
+    assert executor.calls == []

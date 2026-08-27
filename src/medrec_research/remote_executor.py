@@ -26,6 +26,7 @@ APPROVED_319_HOSTS = ("319-lab", "319-lab-via-server")
 PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40,64}")
 _GPU_UUID = re.compile(r"GPU-[A-Za-z0-9-]+")
+_CPU_SET = re.compile(r"(?:[0-9]+(?:-[0-9]+)?)(?:,(?:[0-9]+(?:-[0-9]+)?))*")
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
@@ -62,6 +63,7 @@ class PreflightResult:
     source_revision: str
     environment_sha256: str
     gpu_index: int
+    cpu_set: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,6 +78,7 @@ class RemoteSubmission:
     attempt_id: str | None = None
     lane_id: str | None = None
     submission_id: str | None = None
+    cpu_set: str | None = None
 
 
 class RemoteExecutor:
@@ -131,8 +134,10 @@ class RemoteExecutor:
         data_root: str,
         min_free_gpu_mib: int,
         min_free_disk_gib: int,
+        cpu_set: str | None = None,
     ) -> PreflightResult:
         """Run every required read-only check and return verified identifiers."""
+        cpu_set = self._validate_cpu_set(cpu_set)
         baseline, program, profile_id, _, _ = self._resolve_target(baseline_id)
         remote_root, data_root = self._validate_launch_paths(
             baseline,
@@ -266,10 +271,13 @@ class RemoteExecutor:
         if free_disk_kib < min_free_disk_gib * 1024 * 1024:
             raise ProtocolValidationError("remote disk capacity is insufficient")
 
+        program_invocation = (
+            f"taskset --cpu-list {shlex.quote(cpu_set)} env " if cpu_set is not None else ""
+        )
         program_probe_cmd = (
             "source /root/anaconda3/etc/profile.d/conda.sh && "
             f"conda activate {shlex.quote(program.conda_environment)} && "
-            f"CUDA_VISIBLE_DEVICES={gpu_index} python {shlex.quote(str(program_path))} "
+            f"{program_invocation}CUDA_VISIBLE_DEVICES={gpu_index} python {shlex.quote(str(program_path))} "
             f"{shlex.quote(profile_id)} "
             f"--upstream-root {quoted_upstream_root} "
             f"--dataset-root {shlex.quote(str(dataset_root))} "
@@ -290,6 +298,7 @@ class RemoteExecutor:
             source_revision=source_revision,
             environment_sha256=observed_environment,
             gpu_index=gpu_index,
+            cpu_set=cpu_set,
         )
 
     def run_baseline(
@@ -304,9 +313,15 @@ class RemoteExecutor:
         min_free_disk_gib: int,
         dry_run: bool = False,
         attempt_id: str | None = None,
+        cpu_set: str | None = None,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode formal run."""
+        cpu_set = self._validate_cpu_set(cpu_set)
         baseline, program, profile_id, learning_rate, lane_id = self._resolve_target(baseline_id)
+        if not dry_run and lane_id != baseline.baseline_id and cpu_set is None:
+            raise ProtocolValidationError(
+                "formal successor reproduction lanes require a measured cpu_set"
+            )
         remote_root, data_root = self._validate_launch_paths(
             baseline,
             source_revision=source_revision,
@@ -336,6 +351,7 @@ class RemoteExecutor:
             harness_revision=source_revision,
             model_source_revision=baseline.source.revision,
             environment_sha256=program.environment_sha256 or "unverified",
+            cpu_set=cpu_set,
         )
         if dry_run:
             return RemoteSubmission(
@@ -347,6 +363,7 @@ class RemoteExecutor:
                 attempt_id=active_attempt_id,
                 lane_id=lane_id,
                 submission_id=session_id,
+                cpu_set=cpu_set,
             )
 
         result = self.preflight(
@@ -357,6 +374,7 @@ class RemoteExecutor:
             data_root=data_root,
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
+            cpu_set=cpu_set,
         )
         command = self._launch_command(
             program,
@@ -373,6 +391,7 @@ class RemoteExecutor:
             harness_revision=source_revision,
             model_source_revision=baseline.source.revision,
             environment_sha256=result.environment_sha256,
+            cpu_set=cpu_set,
         )
         try:
             self.ssh(
@@ -392,6 +411,7 @@ class RemoteExecutor:
             attempt_id=active_attempt_id,
             lane_id=lane_id,
             submission_id=session_id,
+            cpu_set=cpu_set,
         )
 
     def run_smoke(
@@ -406,8 +426,10 @@ class RemoteExecutor:
         min_free_disk_gib: int,
         dry_run: bool = False,
         attempt_id: str | None = None,
+        cpu_set: str | None = None,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode smoke run."""
+        cpu_set = self._validate_cpu_set(cpu_set)
         baseline, program, profile_id, learning_rate, lane_id = self._resolve_target(baseline_id)
         remote_root, data_root = self._validate_launch_paths(
             baseline,
@@ -438,6 +460,7 @@ class RemoteExecutor:
             harness_revision=source_revision,
             model_source_revision=baseline.source.revision,
             environment_sha256=program.environment_sha256 or "unverified",
+            cpu_set=cpu_set,
         )
         if dry_run:
             return RemoteSubmission(
@@ -449,6 +472,7 @@ class RemoteExecutor:
                 attempt_id=active_attempt_id,
                 lane_id=lane_id,
                 submission_id=session_id,
+                cpu_set=cpu_set,
             )
 
         result = self.preflight(
@@ -459,6 +483,7 @@ class RemoteExecutor:
             data_root=data_root,
             min_free_gpu_mib=min_free_gpu_mib,
             min_free_disk_gib=min_free_disk_gib,
+            cpu_set=cpu_set,
         )
         command = self._launch_command(
             program,
@@ -475,6 +500,7 @@ class RemoteExecutor:
             harness_revision=source_revision,
             model_source_revision=baseline.source.revision,
             environment_sha256=result.environment_sha256,
+            cpu_set=cpu_set,
         )
         try:
             self.ssh(
@@ -494,6 +520,7 @@ class RemoteExecutor:
             attempt_id=active_attempt_id,
             lane_id=lane_id,
             submission_id=session_id,
+            cpu_set=cpu_set,
         )
 
     def _resolve_target(
@@ -725,12 +752,15 @@ class RemoteExecutor:
         model_source_revision: str | None = None,
         environment_sha256: str | None = None,
         preprocessing_revision: str = PREPROCESSING_REVISION,
+        cpu_set: str | None = None,
     ) -> str:
+        cpu_set = RemoteExecutor._validate_cpu_set(cpu_set)
         dataset_root = str(PurePosixPath(data_root) / program.dataset_subdirectory)
         run_root = str(PurePosixPath(data_root) / program.run_subdirectory / run_id)
         program_path = str(PurePosixPath(remote_root) / program.entrypoint)
         target_profile = profile_id or baseline_id
         argv = [
+            *(["taskset", "--cpu-list", cpu_set] if cpu_set is not None else []),
             "env",
             f"MEDREC_RUN_ID={run_id}",
             f"MEDREC_ATTEMPT_ID={attempt_id or run_id}",
@@ -772,6 +802,18 @@ class RemoteExecutor:
             argv.extend(["--mode", "smoke"])
         command = shlex.join(argv)
         return f"cd {shlex.quote(remote_root)} && {command}"
+
+    @staticmethod
+    def _validate_cpu_set(value: str | None) -> str | None:
+        if value is None:
+            return None
+        if not isinstance(value, str) or not _CPU_SET.fullmatch(value):
+            raise ProtocolValidationError("cpu_set must be a comma-separated CPU list or range")
+        for item in value.split(","):
+            bounds = [int(bound) for bound in item.split("-")]
+            if len(bounds) == 2 and bounds[0] > bounds[1]:
+                raise ProtocolValidationError("cpu_set ranges must be ascending")
+        return value
 
     @staticmethod
     def _validate_job_id(job_id: str) -> None:

@@ -163,6 +163,36 @@ def _gpu_list(value: str) -> tuple[int, ...]:
     return parsed
 
 
+def _cpu_set_list(value: str) -> tuple[str, ...]:
+    parsed = tuple(item.strip() for item in value.split(";"))
+    if not parsed or any(not item for item in parsed):
+        raise argparse.ArgumentTypeError("must be semicolon-separated CPU lists or ranges")
+    return parsed
+
+
+def _reproduction_cpu_sets(
+    args: argparse.Namespace,
+    lanes: tuple[tuple[str, int], ...],
+) -> tuple[str | None, ...]:
+    cpu_set = getattr(args, "cpu_set", None)
+    cpu_sets = getattr(args, "cpu_sets", None)
+    if cpu_set is not None and cpu_sets is not None:
+        raise ProtocolValidationError("use only one of --cpu-set and --cpu-sets")
+    if len(lanes) == 1:
+        if cpu_sets is not None:
+            raise ProtocolValidationError("one baseline requires --cpu-set")
+        return (cpu_set,)
+    if cpu_set is not None:
+        raise ProtocolValidationError("a batch requires --cpu-sets")
+    if cpu_sets is None:
+        return (None,) * len(lanes)
+    if len(cpu_sets) != len(lanes):
+        raise ProtocolValidationError(
+            f"--cpu-sets requires one CPU set per lane ({len(lanes)} expected)"
+        )
+    return tuple(cpu_sets)
+
+
 def _legacy_archived_baselines(registry: BaselineRegistry) -> tuple[str, ...]:
     """Derive the preserved four-baseline selector from the registry."""
     baseline_ids = tuple(
@@ -215,6 +245,7 @@ def _reproduce(
     except FileNotFoundError as error:
         raise ProtocolValidationError("baseline registry file not found") from error
     lanes = _reproduction_lanes(args, registry)
+    cpu_sets = _reproduction_cpu_sets(args, lanes)
     source_revision = _local_source_revision(
         Path.cwd(),
         require_clean=not args.dry_run,
@@ -226,7 +257,7 @@ def _reproduce(
     active_executor = executor or RemoteExecutor(registry)
     results: list[dict[str, object]] = []
     failed = False
-    for baseline_id, gpu_index in lanes:
+    for (baseline_id, gpu_index), cpu_set in zip(lanes, cpu_sets, strict=True):
         try:
             submission = active_executor.run_baseline(
                 baseline_id,
@@ -236,6 +267,7 @@ def _reproduce(
                 data_root=args.data_root,
                 min_free_gpu_mib=args.min_free_gpu_mib,
                 min_free_disk_gib=args.min_free_disk_gib,
+                cpu_set=cpu_set,
                 dry_run=args.dry_run,
                 attempt_id=attempt_id,
             )
@@ -245,6 +277,7 @@ def _reproduce(
                     "attempt_id": submission.attempt_id or attempt_id,
                     "command": submission.command,
                     "gpu": gpu_index,
+                    "cpu_set": cpu_set,
                     "host": submission.host,
                     "preflight": (
                         "passed" if submission.preflight_performed else "not_run_dry_run"
@@ -285,6 +318,7 @@ def _reproduce_smoke(
     except FileNotFoundError as error:
         raise ProtocolValidationError("baseline registry file not found") from error
     lanes = _reproduction_lanes(args, registry)
+    cpu_sets = _reproduction_cpu_sets(args, lanes)
 
     source_revision = _local_source_revision(
         Path.cwd(),
@@ -297,7 +331,7 @@ def _reproduce_smoke(
     active_executor = executor or RemoteExecutor(registry)
     results: list[dict[str, object]] = []
     failed = False
-    for baseline_id, gpu_index in lanes:
+    for (baseline_id, gpu_index), cpu_set in zip(lanes, cpu_sets, strict=True):
         try:
             submission = active_executor.run_smoke(
                 baseline_id,
@@ -307,6 +341,7 @@ def _reproduce_smoke(
                 data_root=args.data_root,
                 min_free_gpu_mib=args.min_free_gpu_mib,
                 min_free_disk_gib=args.min_free_disk_gib,
+                cpu_set=cpu_set,
                 dry_run=args.dry_run,
                 attempt_id=attempt_id,
             )
@@ -316,6 +351,7 @@ def _reproduce_smoke(
                     "attempt_id": submission.attempt_id or attempt_id,
                     "command": submission.command,
                     "gpu": gpu_index,
+                    "cpu_set": cpu_set,
                     "host": submission.host,
                     "preflight": (
                         "passed" if submission.preflight_performed else "not_run_dry_run"
@@ -550,6 +586,8 @@ def _build_parser() -> argparse.ArgumentParser:
     reproduce.add_argument("baseline_id", type=str, help="Baseline ID, lane ID, or 'all'")
     reproduce.add_argument("--gpu", type=_nonnegative_integer)
     reproduce.add_argument("--gpus", type=_gpu_list)
+    reproduce.add_argument("--cpu-set", type=str)
+    reproduce.add_argument("--cpu-sets", type=_cpu_set_list)
     reproduce.add_argument("--min-free-gpu-mib", type=_positive_integer, default=20000)
     reproduce.add_argument("--min-free-disk-gib", type=_positive_integer, default=100)
     reproduce.add_argument(
@@ -583,6 +621,8 @@ def _build_parser() -> argparse.ArgumentParser:
     smoke.add_argument("baseline_id", type=str, help="Baseline ID, lane ID, or 'all'")
     smoke.add_argument("--gpu", type=_nonnegative_integer)
     smoke.add_argument("--gpus", type=_gpu_list)
+    smoke.add_argument("--cpu-set", type=str)
+    smoke.add_argument("--cpu-sets", type=_cpu_set_list)
 
     smoke.add_argument("--min-free-gpu-mib", type=_positive_integer, default=20000)
     smoke.add_argument("--min-free-disk-gib", type=_positive_integer, default=100)
