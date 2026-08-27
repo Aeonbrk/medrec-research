@@ -105,10 +105,10 @@ def test_training_mode_adaptation_is_exact_and_reversible() -> None:
     source = f"before\n{adapter.TEST_DECLARATION}\nafter\n"
     adapted = adapter.adapt_training_source(source)
 
-    assert adapter.TEST_DECLARATION not in adapted
-    assert adapted.count(adapter.TRAIN_DECLARATION) == 1
+    assert adapted == source
+    assert adapted.count(adapter.TEST_DECLARATION) == 1
     assert adapted.replace(adapter.TRAIN_DECLARATION, adapter.TEST_DECLARATION) == source
-    assert adapter.test_mode_default(source) is True
+    assert adapter.test_mode_default(source) is False
     assert adapter.test_mode_default(adapted) is False
 
 
@@ -125,9 +125,8 @@ def test_smoke_adaptation_composes_cleanly_and_reversibly() -> None:
     source = f"{adapter.TEST_DECLARATION}\ndef main():\n{adapter.EPOCH_FORMAL}    pass\n"
     adapted = adapter.adapt_smoke_source(source)
 
-    assert adapter.TEST_DECLARATION not in adapted
+    assert adapter.TEST_DECLARATION in adapted
     assert adapter.EPOCH_FORMAL not in adapted
-    assert adapter.TRAIN_DECLARATION in adapted
     assert adapter.EPOCH_SMOKE in adapted
 
 

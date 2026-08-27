@@ -34,11 +34,9 @@ EXPECTED_STATISTICS = {
 
 
 TEST_DECLARATION = (
-    "    parser.add_argument('--Test', action='store_true', default=True, help=\"test mode\")\n"
+    "    parser.add_argument('--Test', action='store_true', help=\"evaluating mode\")\n"
 )
-TRAIN_DECLARATION = (
-    "    parser.add_argument('--Test', action='store_true', default=False, help=\"test mode\")\n"
-)
+TRAIN_DECLARATION = TEST_DECLARATION
 EPOCH_FORMAL = "    for epoch in range(EPOCH):\n"
 EPOCH_SMOKE = "    for epoch in range(1):\n"
 ROUND_PATTERN = re.compile(r"^\s*([A-Za-z0-9_]+)\s*:\s*([0-9.]+)\s*$")
@@ -158,12 +156,10 @@ def adapt_learning_rate_source(source: str, target_lr: float, original_lr: float
 
 
 def adapt_training_source(source: str, target_lr: float | None = None) -> str:
-    """Select training mode and optionally adapt learning rate through audited changes."""
-    if source.count(TEST_DECLARATION) != 1 or TRAIN_DECLARATION in source:
+    """Validate MoleRec's source-default training mode and adapt its rate."""
+    if source.count(TEST_DECLARATION) != 1:
         raise ReproductionError("archived --Test declaration drifted from audited source")
-    adapted = source.replace(TEST_DECLARATION, TRAIN_DECLARATION)
-    if adapted.replace(TRAIN_DECLARATION, TEST_DECLARATION) != source:
-        raise ReproductionError("training-mode adaptation changed unexpected source bytes")
+    adapted = source
     if target_lr is not None and target_lr != 5e-4:
         adapted = adapt_learning_rate_source(adapted, target_lr)
     return adapted
@@ -197,14 +193,9 @@ def adapt_smoke_source(source: str, target_lr: float | None = None) -> str:
 
 
 def test_mode_default(source: str) -> bool:
-    declarations = {
-        TEST_DECLARATION: True,
-        TRAIN_DECLARATION: False,
-    }
-    matches = [value for declaration, value in declarations.items() if declaration in source]
-    if len(matches) != 1:
+    if source.count(TEST_DECLARATION) != 1:
         raise ReproductionError("source does not match exactly one test-mode declaration")
-    return matches[0]
+    return False
 
 
 def sha256(path: Path) -> str:
