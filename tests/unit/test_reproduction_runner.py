@@ -45,12 +45,14 @@ def _module(tmp_path: Path, *, mode: str = "formal") -> SimpleNamespace:
         checkpoint_pattern=None,
         test_uses_basename=False,
     )
+    commands: list[list[str]] = []
 
     def write_json(path: Path, value: dict[str, object]) -> None:
         path.write_text(json.dumps(value, sort_keys=True), encoding="utf-8")
 
     def run_logged(command: list[str], *, cwd: Path, env: dict[str, str], log_path: Path) -> None:
-        del command, env
+        del env
+        commands.append(list(command))
         epoch_count = 1 if mode == "smoke" else 50
         log_path.write_text(
             "\n".join(f"epoch {index}" for index in range(epoch_count)),
@@ -77,6 +79,7 @@ def _module(tmp_path: Path, *, mode: str = "formal") -> SimpleNamespace:
 
     return SimpleNamespace(
         profile=profile,
+        commands=commands,
         verify_upstream_source=lambda root: None,
         load_and_validate_canonical_inputs=lambda root: ([], COUNTS, {}, [], []),
         environment_summary=environment_summary,
@@ -182,3 +185,27 @@ def test_smoke_lane_finalizes_non_evidence_without_test_artifact(tmp_path: Path)
     assert result["non_evidence"] is True
     assert result["artifact_type"] == "smoke"
     assert not (run_root / "test.log").exists()
+
+
+def test_profile_training_args_are_appended_to_smoke_command(tmp_path: Path) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path, mode="smoke")
+    module.profile.training_args = ("--embedding",)
+    identity = {**IDENTITY, "mode": "smoke"}
+
+    run_smoke_lane_v2(
+        module=module,
+        profile=module.profile,
+        upstream_root=upstream,
+        data_dir=data,
+        run_root=tmp_path / "smoke-with-args",
+        python="python",
+        learning_rate=1e-4,
+        identity=identity,
+        program_id="safedrug-archived",
+        source_revision="b" * 40,
+        gate_inputs=(),
+        error_type=ValueError,
+    )
+
+    assert module.commands[0][-1] == "--embedding"

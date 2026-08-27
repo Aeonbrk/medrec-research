@@ -218,7 +218,10 @@ def run_training_lane_v2(
     run_logged = _module_value(module, "run_logged")
     try:
         run_logged(
-            _module_value(module, "training_command")(python, adapted_entrypoint, model_name),
+            [
+                *_module_value(module, "training_command")(python, adapted_entrypoint, model_name),
+                *getattr(profile, "training_args", ()),
+            ],
             cwd=work_src,
             env=environment,
             log_path=run_root / "train.log",
@@ -364,7 +367,10 @@ def run_smoke_lane_v2(
     )
     try:
         _module_value(module, "run_logged")(
-            _module_value(module, "training_command")(python, adapted_entrypoint, model_name),
+            [
+                *_module_value(module, "training_command")(python, adapted_entrypoint, model_name),
+                *getattr(profile, "training_args", ()),
+            ],
             cwd=work_src,
             env=environment,
             log_path=run_root / "train.log",
@@ -522,6 +528,7 @@ def run_test_lane_v2(
             )
         else:
             command = test_builder(python, original_entrypoint, profile, model_name, checkpoint)
+        command = [*command, *getattr(profile, "training_args", ())]
         _module_value(module, "run_logged")(
             command,
             cwd=work_src,

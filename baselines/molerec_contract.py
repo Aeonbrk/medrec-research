@@ -70,6 +70,7 @@ class Profile:
     required_inputs: tuple[str, ...]
     checkpoint_pattern: re.Pattern[str]
     test_uses_basename: bool = False
+    training_args: tuple[str, ...] = ()
 
 
 COMMON_INPUTS = (
@@ -100,6 +101,7 @@ PROFILES = {
         5e-4,
         COMMON_INPUTS,
         re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
+        training_args=("--embedding",),
     ),
 }
 

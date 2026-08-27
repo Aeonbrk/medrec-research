@@ -172,6 +172,11 @@ def test_count_dataset_returns_expected_canonical_counts() -> None:
     }
 
 
+def test_embedding_profile_declares_embedding_training_argument() -> None:
+    assert adapter.PROFILES["molerec"].training_args == ()
+    assert adapter.PROFILES["molerec-embedding"].training_args == ("--embedding",)
+
+
 def test_validate_binary_symmetric_matrix_rejects_asymmetry() -> None:
     ddi = [[0] * 131 for _ in range(131)]
     ddi[0][1] = 1
