@@ -181,7 +181,11 @@ def run_training_lane_v2(
     (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
 
     model_name = f"{profile.model_name}_{run_root.name}"
-    checkpoint_dir = work_src / "saved" / model_name
+    checkpoint_dir = (
+        work_src.parent / "saved" / model_name
+        if profile.baseline_id.startswith("molerec")
+        else work_src / "saved" / model_name
+    )
     checkpoint_dir.mkdir(parents=True)
     started_at = _now()
     calc_sha256 = _module_value(module, "sha256")
@@ -332,7 +336,11 @@ def run_smoke_lane_v2(
     adapted_entrypoint.write_text(adapted_source, encoding="utf-8")
     (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
     model_name = f"{profile.model_name}_{run_root.name}"
-    checkpoint_dir = work_src / "saved" / model_name
+    checkpoint_dir = (
+        work_src.parent / "saved" / model_name
+        if profile.baseline_id.startswith("molerec")
+        else work_src / "saved" / model_name
+    )
     checkpoint_dir.mkdir(parents=True)
     started_at = _now()
     calc_sha256 = _module_value(module, "sha256")

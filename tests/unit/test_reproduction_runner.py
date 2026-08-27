@@ -58,7 +58,10 @@ def _module(tmp_path: Path, *, mode: str = "formal") -> SimpleNamespace:
             "\n".join(f"epoch {index}" for index in range(epoch_count)),
             encoding="utf-8",
         )
-        checkpoint_dir = cwd / "saved" / f"SafeDrug_{log_path.parent.name}"
+        checkpoint_parent = cwd.parent if profile.baseline_id.startswith("molerec") else cwd
+        checkpoint_dir = (
+            checkpoint_parent / "saved" / f"{profile.model_name}_{log_path.parent.name}"
+        )
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
         (checkpoint_dir / "checkpoint.model").write_bytes(b"checkpoint")
 
@@ -209,3 +212,39 @@ def test_profile_training_args_are_appended_to_smoke_command(tmp_path: Path) -> 
     )
 
     assert module.commands[0][-1] == "--embedding"
+
+
+def test_molerec_smoke_admits_checkpoint_from_archived_parent_saved_layout(
+    tmp_path: Path,
+) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path, mode="smoke")
+    module.profile.baseline_id = "molerec"
+    module.profile.model_name = "MoleRec"
+    identity = {
+        **IDENTITY,
+        "lane_id": "molerec-embedding",
+        "scientific_baseline_id": "molerec",
+        "program_id": "molerec",
+        "profile_id": "molerec-embedding",
+        "mode": "smoke",
+    }
+    run_root = tmp_path / "molerec-smoke"
+
+    run_smoke_lane_v2(
+        module=module,
+        profile=module.profile,
+        upstream_root=upstream,
+        data_dir=data,
+        run_root=run_root,
+        python="python",
+        learning_rate=1e-4,
+        identity=identity,
+        program_id="molerec",
+        source_revision="b" * 40,
+        gate_inputs=(),
+        error_type=ValueError,
+    )
+
+    assert (run_root / "work" / "saved" / f"MoleRec_{run_root.name}").is_dir()
+    assert not (run_root / "work" / "src" / "saved").exists()
