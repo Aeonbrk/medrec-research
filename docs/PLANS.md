@@ -1,5 +1,13 @@
 # Plans
 
+## In Progress: MoleRec Finalization Recovery and Conformance
+
+- **Status**: U1–U4 are implemented and locally verified. The formal attempt `formal-20260828-a09fcab-u8-b` remains read-only: no lane was terminated, duplicated, retrained, tested, or recovered remotely.
+- **Plan amendment**: `docs/plans/2026-08-28-1718-fix-molerec-finalization-recovery-plan.md` permits immutable same-attempt finalization from preserved histories and checkpoints. It does not permit retraining, test-based selection, Baseline Core changes, or source-artifact overwrite.
+- **Local hard slice**: The shared native-history authority, explicit `recover-reproduction` command, immutable recovery siblings, and source-aware consumer validation pass the complete local test and Python quality gates.
+- **Delegated follow-up**: U5 applies recovery only after all seven source lanes are terminal. U6–U10 cover SafeDrug selection admission, probe authority, frozen-schedule binding, evaluation-queue orchestration, progress evidence, and operator-document synchronization.
+- **Remote boundary**: Do not terminate or duplicate live lanes. Do not apply recovery remotely until U1–U4 pass review and the source-lane terminal gate holds.
+
 ## In Progress: MoleRec Table 1 Five-Model Full Reproduction
 
 - **Status**: U1–U4 contracts and the local U6 snapshot-builder mechanics are implemented and covered by synthetic tests. U5–U9 still require the 319 remote environment, exact snapshot publication, fresh smokes, measured scheduling, formal execution, selection, testing, and audit; no successor scientific evidence exists yet.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -9,8 +10,13 @@ from types import SimpleNamespace
 import pytest
 
 from baselines import molerec_runner, safedrug_archived_runner
-from baselines.reproduction_artifacts import reopen_v2_pair
-from baselines.reproduction_runner import run_smoke_lane_v2, run_training_lane_v2
+from baselines.reproduction_artifacts import reopen_recovered_v2_pair, reopen_v2_pair
+from baselines.reproduction_runner import (
+    recover_training_lane_v2,
+    run_smoke_lane_v2,
+    run_training_lane_v2,
+)
+from medrec_research.reproduction_evidence import reopen_recovered_finalized_pair
 
 IDENTITY = {
     "attempt_id": "attempt-1",
@@ -63,11 +69,29 @@ def _module(tmp_path: Path, *, mode: str = "formal") -> SimpleNamespace:
             checkpoint_parent / "saved" / f"{profile.model_name}_{log_path.parent.name}"
         )
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        (checkpoint_dir / "checkpoint.model").write_bytes(b"checkpoint")
+        (checkpoint_dir / "Epoch_0_TARGET_0.0_JA_0.5200_DDI_0.0600.model").write_bytes(
+            b"checkpoint"
+        )
+        history = {
+            "ja": [0.52, *([0.1] * (epoch_count - 1))],
+            "ddi_rate": [0.06] * epoch_count,
+            "avg_p": [0.1] * epoch_count,
+            "avg_r": [0.1] * epoch_count,
+            "avg_f1": [0.1] * epoch_count,
+            "prauc": [0.1] * epoch_count,
+            "med": [10.0] * epoch_count,
+        }
+        history_name = (
+            "history.pkl"
+            if profile.baseline_id.startswith("molerec")
+            else f"history_{checkpoint_dir.name}.pkl"
+        )
+        with (checkpoint_dir / history_name).open("wb") as stream:
+            pickle.dump(history, stream)
 
     def select_checkpoint(checkpoint_dir: Path, selected_profile: object, best_epoch: int) -> Path:
-        del selected_profile, best_epoch
-        return checkpoint_dir / "checkpoint.model"
+        del selected_profile
+        return next(checkpoint_dir.glob(f"Epoch_{best_epoch}_*.model"))
 
     def adapt(source: str, *, target_lr: float | None = None) -> str:
         del target_lr
@@ -102,6 +126,9 @@ def _module(tmp_path: Path, *, mode: str = "formal") -> SimpleNamespace:
             "validation_ddi_rate": 0.06,
         },
         select_checkpoint=select_checkpoint,
+        native_history_path=lambda checkpoint_dir, model_name: (
+            checkpoint_dir / f"history_{model_name}.pkl"
+        ),
         test_command=lambda *args, **kwargs: ["test"],
     )
 
@@ -160,6 +187,310 @@ def test_training_lane_finalizes_v2_training_artifact(tmp_path: Path) -> None:
     assert result["artifact_type"] == "training"
     assert result["validation_jaccard"] == 0.52
     assert not (run_root / "test.log").exists()
+
+
+def test_complete_unlabeled_training_is_preserved_as_terminal_failure(tmp_path: Path) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path)
+
+    def reject_unlabeled_metrics(text: str) -> dict[str, float]:
+        del text
+        raise ValueError("training log must contain validation Jaccard and DDI metrics")
+
+    module.parse_validation_metrics = reject_unlabeled_metrics
+    run_root = tmp_path / "unlabeled-training"
+
+    with pytest.raises(ValueError, match="validation Jaccard"):
+        run_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=run_root,
+            python="python",
+            learning_rate=1e-4,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+
+    status, result = reopen_v2_pair(run_root, expected_identity=IDENTITY, error_type=ValueError)
+    assert status["state"] == "failed"
+    assert status["failure_code"] == "training_failed"
+    assert result == {
+        "schema_version": 2,
+        "kind": "reproduction_result_v2",
+        "identity": IDENTITY,
+        "mode": "formal",
+        "state": "failed",
+        "non_evidence": False,
+        "artifact_type": "training",
+        "failure_code": "training_failed",
+    }
+    assert (run_root / "train.log").is_file()
+    assert not (run_root / "test.log").exists()
+
+
+def test_recovery_finalizes_immutable_sibling_without_scientific_command(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path)
+
+    def reject_unlabeled_metrics(text: str) -> dict[str, float]:
+        del text
+        raise ValueError("training log must contain validation Jaccard and DDI metrics")
+
+    module.parse_validation_metrics = reject_unlabeled_metrics
+    run_root = tmp_path / "recoverable-training"
+    with pytest.raises(ValueError, match="validation Jaccard"):
+        run_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=run_root,
+            python="python",
+            learning_rate=1e-4,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+
+    source_files = {
+        path.relative_to(run_root): path.read_bytes()
+        for path in run_root.rglob("*")
+        if path.is_file()
+    }
+    commands_before = list(module.commands)
+    monkeypatch.setitem(sys.modules, "dill", pickle)
+
+    recovery_root = recover_training_lane_v2(
+        module=module,
+        profile=module.profile,
+        data_dir=data,
+        run_root=run_root,
+        recovery_id="finalizer-1",
+        finalizer_revision="e" * 40,
+        identity=IDENTITY,
+        program_id="safedrug-archived",
+        source_revision="b" * 40,
+        gate_inputs=(),
+        error_type=ValueError,
+    )
+
+    status, result = reopen_recovered_v2_pair(
+        run_root,
+        recovery_root,
+        expected_identity=IDENTITY,
+        error_type=ValueError,
+    )
+    assert status["state"] == "completed"
+    assert result["artifact_type"] == "training"
+    assert result["best_epoch"] == 0
+    assert result["validation_jaccard"] == 0.52
+    assert result["recovery"]["finalizer_revision"] == "e" * 40
+    assert result["identity"]["harness_revision"] == "a" * 40
+    public_status, public_result = reopen_recovered_finalized_pair(
+        run_root,
+        recovery_root,
+        expected_identity=IDENTITY,
+    )
+    assert public_status == status
+    assert public_result == result
+    assert module.commands == commands_before
+    assert not (run_root / "test.log").exists()
+    assert {path: (run_root / path).read_bytes() for path in source_files} == source_files
+
+    checkpoint_path = run_root / result["checkpoint"]["relative_path"]
+    checkpoint_path.write_bytes(b"substitute")
+    with pytest.raises(ValueError, match="checkpoint identity"):
+        reopen_recovered_v2_pair(
+            run_root,
+            recovery_root,
+            expected_identity=IDENTITY,
+            error_type=ValueError,
+        )
+
+    with pytest.raises(ValueError, match="already exists"):
+        recover_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            data_dir=data,
+            run_root=run_root,
+            recovery_id="finalizer-1",
+            finalizer_revision="e" * 40,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+
+
+def test_recovery_rejects_near_miss_parser_failure_without_creating_sibling(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path)
+    module.parse_validation_metrics = lambda text: (_ for _ in ()).throw(
+        ValueError("training log must contain validation Jaccard and DDI metrics")
+    )
+    run_root = tmp_path / "near-miss-training"
+    with pytest.raises(ValueError, match="validation Jaccard"):
+        run_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=run_root,
+            python="python",
+            learning_rate=1e-4,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    module.parse_validation_metrics = lambda text: (_ for _ in ()).throw(
+        ValueError("training log contains no validation labels")
+    )
+    monkeypatch.setitem(sys.modules, "dill", pickle)
+
+    with pytest.raises(ValueError, match="not recoverable"):
+        recover_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            data_dir=data,
+            run_root=run_root,
+            recovery_id="near-miss",
+            finalizer_revision="e" * 40,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    assert not (run_root / "recoveries").exists()
+
+
+def test_molerec_recovery_uses_archived_saved_history_layout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path)
+    module.profile.baseline_id = "molerec"
+    module.profile.model_name = "MoleRec"
+    module.native_history_path = lambda checkpoint_dir, model_name: checkpoint_dir / "history.pkl"
+    module.parse_validation_metrics = lambda text: (_ for _ in ()).throw(
+        ValueError("training log must contain validation Jaccard and DDI metrics")
+    )
+    identity = {
+        **IDENTITY,
+        "lane_id": "molerec-embedding",
+        "scientific_baseline_id": "molerec",
+        "program_id": "molerec",
+        "profile_id": "molerec-embedding",
+    }
+    run_root = tmp_path / "molerec-recoverable"
+    with pytest.raises(ValueError, match="validation Jaccard"):
+        run_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=run_root,
+            python="python",
+            learning_rate=1e-4,
+            identity=identity,
+            program_id="molerec",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    commands_before = list(module.commands)
+    monkeypatch.setitem(sys.modules, "dill", pickle)
+
+    recovery_root = recover_training_lane_v2(
+        module=module,
+        profile=module.profile,
+        data_dir=data,
+        run_root=run_root,
+        recovery_id="molerec-finalizer-1",
+        finalizer_revision="e" * 40,
+        identity=identity,
+        program_id="molerec",
+        source_revision="b" * 40,
+        gate_inputs=(),
+        error_type=ValueError,
+    )
+
+    _, result = reopen_recovered_v2_pair(
+        run_root,
+        recovery_root,
+        expected_identity=identity,
+        error_type=ValueError,
+    )
+    checkpoint_dir = run_root / "work" / "saved" / f"MoleRec_{run_root.name}"
+    assert (checkpoint_dir / "history.pkl").is_file()
+    assert result["checkpoint"]["relative_path"].startswith("work/saved/MoleRec_")
+    assert module.commands == commands_before
+    assert not (run_root / "test.log").exists()
+
+
+def test_recovery_rejects_adaptation_identity_tampering(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path)
+    module.parse_validation_metrics = lambda text: (_ for _ in ()).throw(
+        ValueError("training log must contain validation Jaccard and DDI metrics")
+    )
+    run_root = tmp_path / "tampered-adaptation"
+    with pytest.raises(ValueError, match="validation Jaccard"):
+        run_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=run_root,
+            python="python",
+            learning_rate=1e-4,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    adaptation_path = run_root / "adaptation.json"
+    adaptation = json.loads(adaptation_path.read_text(encoding="utf-8"))
+    adaptation["adapted_sha256"] = "0" * 64
+    adaptation_path.write_text(json.dumps(adaptation), encoding="utf-8")
+    monkeypatch.setitem(sys.modules, "dill", pickle)
+
+    with pytest.raises(ValueError, match="does not match the adapted entrypoint"):
+        recover_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            data_dir=data,
+            run_root=run_root,
+            recovery_id="tampered-adaptation",
+            finalizer_revision="e" * 40,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    assert not (run_root / "recoveries").exists()
 
 
 def test_smoke_lane_finalizes_non_evidence_without_test_artifact(tmp_path: Path) -> None:

@@ -275,6 +275,11 @@ def training_command(python: str, adapted_entrypoint: Path, model_name: str) -> 
     return [python, str(adapted_entrypoint), "--model_name", model_name]
 
 
+def native_history_path(checkpoint_dir: Path, model_name: str) -> Path:
+    """Return the frozen SafeDrug-family history written beside checkpoints."""
+    return checkpoint_dir / f"history_{model_name}.pkl"
+
+
 def test_command(
     python: str,
     original_entrypoint: Path,

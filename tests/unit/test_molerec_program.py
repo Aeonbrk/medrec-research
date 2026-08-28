@@ -260,6 +260,10 @@ def test_select_checkpoint_finds_exact_epoch(tmp_path: Path) -> None:
     assert selected.name == "Epoch_25_TARGET_0.28_JA_0.53_DDI_0.06.model"
 
 
+def test_native_history_path_uses_fixed_molerec_filename(tmp_path: Path) -> None:
+    assert adapter.native_history_path(tmp_path, "MoleRec_attempt-1") == tmp_path / "history.pkl"
+
+
 def test_split_responsibility_modules_importable() -> None:
     from baselines import (
         molerec_contract,

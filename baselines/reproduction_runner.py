@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import json
+import math
 import os
+import re
 from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +14,7 @@ from typing import Any
 try:
     from .reproduction_artifacts import (
         finalize_v2_pair,
+        reopen_recovered_v2_pair,
         reopen_v2_pair,
         terminal_result,
         terminal_status,
@@ -18,10 +22,37 @@ try:
 except ImportError:  # Direct execution keeps the baselines directory on sys.path.
     from reproduction_artifacts import (
         finalize_v2_pair,
+        reopen_recovered_v2_pair,
         reopen_v2_pair,
         terminal_result,
         terminal_status,
     )
+
+try:
+    from .reproduction_history import (
+        load_native_validation_history,
+        reconcile_history_checkpoint,
+    )
+except ImportError:  # Direct execution keeps the baselines directory on sys.path.
+    from reproduction_history import (
+        load_native_validation_history,
+        reconcile_history_checkpoint,
+    )
+
+
+_MISSING_VALIDATION_METRICS = "training log must contain validation Jaccard and DDI metrics"
+_RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
+_IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
+_SHA256 = re.compile(r"[0-9a-f]{64}")
+_ADAPTATION_FIELDS = {
+    "archived_revision",
+    "entrypoint",
+    "learning_rate",
+    "original_sha256",
+    "adapted_sha256",
+    "reverse_verification",
+    "phase",
+}
 
 
 def _now() -> str:
@@ -277,6 +308,206 @@ def run_training_lane_v2(
             error_type=error_type,
         )
         raise
+
+
+def _read_adaptation(
+    run_root: Path,
+    *,
+    profile: Any,
+    source_revision: str,
+    calc_sha256: Any,
+    error_type: type[Exception],
+) -> dict[str, Any]:
+    try:
+        adaptation = json.loads((run_root / "adaptation.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise error_type("source adaptation artifact cannot be read") from error
+    if not isinstance(adaptation, Mapping) or set(adaptation) != _ADAPTATION_FIELDS:
+        raise error_type("source adaptation artifact has an invalid training schema")
+    normalized = dict(adaptation)
+    if (
+        normalized["archived_revision"] != source_revision
+        or normalized["entrypoint"] != profile.entrypoint
+        or normalized["reverse_verification"] != "byte-identical"
+        or normalized["phase"] != "training"
+    ):
+        raise error_type("source adaptation artifact does not match the training lane")
+    for field in ("original_sha256", "adapted_sha256"):
+        value = normalized[field]
+        if not isinstance(value, str) or not _SHA256.fullmatch(value):
+            raise error_type("source adaptation artifact has an invalid source identity")
+    learning_rate = normalized["learning_rate"]
+    if (
+        isinstance(learning_rate, bool)
+        or not isinstance(learning_rate, (int, float))
+        or not math.isfinite(float(learning_rate))
+        or float(learning_rate) <= 0
+    ):
+        raise error_type("source adaptation learning rate is invalid")
+    adapted_entrypoint = run_root / "work" / "src" / profile.entrypoint
+    if not adapted_entrypoint.is_file() or adapted_entrypoint.is_symlink():
+        raise error_type("source adapted entrypoint is missing or is not a regular file")
+    if calc_sha256(adapted_entrypoint) != normalized["adapted_sha256"]:
+        raise error_type("source adaptation identity does not match the adapted entrypoint")
+    return normalized
+
+
+def recover_training_lane_v2(
+    *,
+    module: Any,
+    profile: Any,
+    data_dir: Path,
+    run_root: Path,
+    recovery_id: str,
+    finalizer_revision: str,
+    identity: Mapping[str, str],
+    program_id: str,
+    source_revision: str,
+    gate_inputs: tuple[str, ...],
+    error_type: type[Exception],
+) -> Path:
+    """Finalize one eligible administrative failure without invoking scientific work."""
+    if not _RECOVERY_ID.fullmatch(recovery_id) or recovery_id in (".", ".."):
+        raise error_type("recovery ID is invalid")
+    if not _IMMUTABLE_REVISION.fullmatch(finalizer_revision):
+        raise error_type("finalizer revision must be an immutable Git revision")
+    _validate_identity_binding(
+        identity,
+        program_id=program_id,
+        source_revision=source_revision,
+        profile=profile,
+        error_type=error_type,
+    )
+    recovery_root = run_root / "recoveries" / recovery_id
+    if recovery_root.exists():
+        raise error_type(f"recovery root already exists: {recovery_root}")
+
+    source_status, source_result = reopen_v2_pair(
+        run_root,
+        expected_identity=identity,
+        error_type=error_type,
+    )
+    if (
+        source_status.get("state") != "failed"
+        or source_status.get("failure_code") != "training_failed"
+        or source_result.get("artifact_type") != "training"
+        or source_result.get("failure_code") != "training_failed"
+    ):
+        raise error_type("source pair is not an eligible terminal training failure")
+
+    try:
+        train_log = (run_root / "train.log").read_text(errors="replace")
+    except OSError as error:
+        raise error_type("source training log cannot be read") from error
+    _module_value(module, "parse_training_log")(train_log, expected_epochs=50)
+    try:
+        _module_value(module, "parse_validation_metrics")(train_log)
+    except error_type as error:
+        if str(error) != _MISSING_VALIDATION_METRICS:
+            raise error_type("source parser failure is not recoverable") from error
+    else:
+        raise error_type("source validation parser does not reproduce the recoverable failure")
+
+    required_inputs = _required_inputs(profile, gate_inputs)
+    missing = [name for name in required_inputs if not (data_dir / name).is_file()]
+    if missing:
+        raise error_type(f"dataset is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in required_inputs):
+        raise error_type("dataset inputs must be regular files, not symlinks")
+    records, counts, _, _, _ = _module_value(module, "load_and_validate_canonical_inputs")(data_dir)
+    del records
+    environment_identity = _module_value(module, "environment_summary")()
+    if environment_identity.get("conda_explicit_sha256") != identity["environment_sha256"]:
+        raise error_type("runtime environment identity does not match controller identity")
+
+    calc_sha256 = _module_value(module, "sha256")
+    adaptation = _read_adaptation(
+        run_root,
+        profile=profile,
+        source_revision=source_revision,
+        calc_sha256=calc_sha256,
+        error_type=error_type,
+    )
+    learning_rate = adaptation["learning_rate"]
+
+    model_name = f"{profile.model_name}_{run_root.name}"
+    work_src = run_root / "work" / "src"
+    checkpoint_dir = (
+        work_src.parent / "saved" / model_name
+        if profile.baseline_id.startswith("molerec")
+        else work_src / "saved" / model_name
+    )
+    history_path = _module_value(module, "native_history_path")(checkpoint_dir, model_name)
+    validation = load_native_validation_history(
+        history_path,
+        expected_epochs=50,
+        error_type=error_type,
+    )
+    best_epoch = int(validation["best_epoch"])
+    checkpoint = _module_value(module, "select_checkpoint")(
+        checkpoint_dir,
+        profile,
+        best_epoch,
+    )
+    reconcile_history_checkpoint(checkpoint, validation, error_type=error_type)
+    checkpoint_relative_path = str(checkpoint.relative_to(run_root))
+    recovery = {
+        "schema_version": 1,
+        "kind": "training_finalization_recovery",
+        "recovery_id": recovery_id,
+        "finalizer_revision": finalizer_revision,
+        "source_relative_path": Path(os.path.relpath(run_root, recovery_root)).as_posix(),
+        "source_terminal_state": source_status["state"],
+        "source_failure_code": source_status["failure_code"],
+        "parser_classification": "validation_metrics_unlabeled",
+        "selected_epoch": best_epoch,
+        "checkpoint_relative_path": checkpoint_relative_path,
+        "validation_jaccard": validation["validation_jaccard"],
+        "validation_ddi_rate": validation["validation_ddi_rate"],
+    }
+    started_at = _now()
+    status = terminal_status(
+        identity,
+        state="completed",
+        started_at=started_at,
+        finished_at=_now(),
+        non_evidence=False,
+    )
+    status["recovery"] = recovery
+    result = terminal_result(
+        identity,
+        state="completed",
+        non_evidence=False,
+        payload={
+            "artifact_type": "training",
+            "scientific_baseline_id": identity["scientific_baseline_id"],
+            "profile_id": identity["profile_id"],
+            "learning_rate": float(learning_rate),
+            "dataset_counts": counts,
+            "environment": environment_identity,
+            "adaptation": adaptation,
+            "epochs_requested": 50,
+            "epochs_observed": validation["epochs_observed"],
+            "best_epoch": best_epoch,
+            "validation_jaccard": validation["validation_jaccard"],
+            "validation_ddi_rate": validation["validation_ddi_rate"],
+            "checkpoint": {
+                "best_epoch": best_epoch,
+                "sha256": calc_sha256(checkpoint),
+                "size_bytes": checkpoint.stat().st_size,
+                "relative_path": checkpoint_relative_path,
+            },
+            "recovery": recovery,
+        },
+    )
+    finalize_v2_pair(recovery_root, status=status, result=result, error_type=error_type)
+    reopen_recovered_v2_pair(
+        run_root,
+        recovery_root,
+        expected_identity=identity,
+        error_type=error_type,
+    )
+    return recovery_root
 
 
 def run_smoke_lane_v2(
@@ -598,4 +829,9 @@ def run_test_lane_v2(
         raise
 
 
-__all__ = ("run_smoke_lane_v2", "run_test_lane_v2", "run_training_lane_v2")
+__all__ = (
+    "recover_training_lane_v2",
+    "run_smoke_lane_v2",
+    "run_test_lane_v2",
+    "run_training_lane_v2",
+)

@@ -228,6 +228,12 @@ def training_command(python: str, entrypoint: Path, model_name: str) -> list[str
     ]
 
 
+def native_history_path(checkpoint_dir: Path, model_name: str) -> Path:
+    """Return the frozen MoleRec history written beside checkpoints."""
+    del model_name
+    return checkpoint_dir / "history.pkl"
+
+
 def test_command(
     python: str,
     entrypoint: Path,

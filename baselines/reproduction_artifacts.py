@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -51,13 +52,36 @@ SAFE_DRUG_SELECTION_RULE = (
     "minimize learning_rate",
     "minimize lane_id",
 )
+RECOVERY_FIELDS = (
+    "schema_version",
+    "kind",
+    "recovery_id",
+    "finalizer_revision",
+    "source_relative_path",
+    "source_terminal_state",
+    "source_failure_code",
+    "parser_classification",
+    "selected_epoch",
+    "checkpoint_relative_path",
+    "validation_jaccard",
+    "validation_ddi_rate",
+)
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 _SAFE_VALUE = re.compile(r"[^\x00-\x1f\x7f\s]+")
+_RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 
 
 def _fail(message: str, error_type: type[Exception]) -> None:
     raise error_type(message)
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _validate_identity(
@@ -333,6 +357,147 @@ def reopen_v2_pair(
     return dict(status), dict(result)
 
 
+def _validate_recovery(
+    value: object,
+    *,
+    error_type: type[Exception],
+) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != set(RECOVERY_FIELDS):
+        _fail("recovery provenance has an invalid schema", error_type)
+    recovery = dict(value)
+    if recovery["schema_version"] != 1 or recovery["kind"] != "training_finalization_recovery":
+        _fail("recovery provenance has an invalid contract", error_type)
+    recovery_id = recovery["recovery_id"]
+    if (
+        not isinstance(recovery_id, str)
+        or not _RECOVERY_ID.fullmatch(recovery_id)
+        or recovery_id in (".", "..")
+    ):
+        _fail("recovery ID is invalid", error_type)
+    if not isinstance(recovery["finalizer_revision"], str) or not _IMMUTABLE_REVISION.fullmatch(
+        recovery["finalizer_revision"]
+    ):
+        _fail("recovery finalizer revision is invalid", error_type)
+    if (
+        recovery["source_terminal_state"] != "failed"
+        or recovery["source_failure_code"] != "training_failed"
+        or recovery["parser_classification"] != "validation_metrics_unlabeled"
+    ):
+        _fail("recovery source classification is invalid", error_type)
+    source_relative_path = recovery["source_relative_path"]
+    if not isinstance(source_relative_path, str) or not source_relative_path:
+        _fail("recovery source path is invalid", error_type)
+    checkpoint_relative_path = recovery["checkpoint_relative_path"]
+    if not isinstance(checkpoint_relative_path, str) or not checkpoint_relative_path:
+        _fail("recovery checkpoint path is invalid", error_type)
+    checkpoint_path = Path(checkpoint_relative_path)
+    if checkpoint_path.is_absolute() or ".." in checkpoint_path.parts:
+        _fail("recovery checkpoint path is invalid", error_type)
+    selected_epoch = recovery["selected_epoch"]
+    if (
+        isinstance(selected_epoch, bool)
+        or not isinstance(selected_epoch, int)
+        or selected_epoch < 0
+    ):
+        _fail("recovery selected epoch is invalid", error_type)
+    for field in ("validation_jaccard", "validation_ddi_rate"):
+        metric = recovery[field]
+        if (
+            isinstance(metric, bool)
+            or not isinstance(metric, (int, float))
+            or not math.isfinite(float(metric))
+            or not 0 <= float(metric) <= 1
+        ):
+            _fail("recovery validation metrics are invalid", error_type)
+    return recovery
+
+
+def reopen_recovered_v2_pair(
+    source_run_root: str | Path,
+    recovery_run_root: str | Path,
+    *,
+    expected_identity: Mapping[str, Any] | None = None,
+    error_type: type[Exception] = RuntimeError,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Reopen a recovery sibling together with its unchanged failed source pair."""
+    source_root = Path(source_run_root)
+    recovery_root = Path(recovery_run_root)
+    source_status, source_result = reopen_v2_pair(
+        source_root,
+        expected_identity=expected_identity,
+        error_type=error_type,
+    )
+    recovered_status, recovered_result = reopen_v2_pair(
+        recovery_root,
+        expected_identity=expected_identity,
+        error_type=error_type,
+    )
+    if source_status["identity"] != recovered_status["identity"]:
+        _fail("source and recovery identities do not match", error_type)
+    if (
+        source_status.get("state") != "failed"
+        or source_status.get("failure_code") != "training_failed"
+        or source_result.get("artifact_type") != "training"
+        or source_result.get("failure_code") != "training_failed"
+    ):
+        _fail("recovery source is not the eligible terminal training failure", error_type)
+    if (
+        recovered_status.get("state") != "completed"
+        or recovered_result.get("artifact_type") != "training"
+    ):
+        _fail("recovery sibling is not completed training evidence", error_type)
+
+    status_recovery = _validate_recovery(
+        recovered_status.get("recovery"),
+        error_type=error_type,
+    )
+    result_recovery = _validate_recovery(
+        recovered_result.get("recovery"),
+        error_type=error_type,
+    )
+    if status_recovery != result_recovery:
+        _fail("status and result recovery provenance do not match", error_type)
+    expected_root = source_root / "recoveries" / status_recovery["recovery_id"]
+    if recovery_root.absolute() != expected_root.absolute():
+        _fail("recovery sibling is outside its source attempt namespace", error_type)
+    expected_source_path = Path(os.path.relpath(source_root, recovery_root)).as_posix()
+    if status_recovery["source_relative_path"] != expected_source_path:
+        _fail("recovery source path does not match its sibling layout", error_type)
+
+    checkpoint = recovered_result.get("checkpoint")
+    checkpoint_relative_path = (
+        checkpoint.get("relative_path") if isinstance(checkpoint, Mapping) else None
+    )
+    if checkpoint_relative_path != status_recovery["checkpoint_relative_path"]:
+        _fail("recovery checkpoint provenance does not match its result", error_type)
+    checkpoint_path = source_root / checkpoint_relative_path
+    if not checkpoint_path.is_file() or checkpoint_path.is_symlink():
+        _fail("recovery checkpoint is missing or is not a regular file", error_type)
+    checkpoint_size = checkpoint.get("size_bytes")
+    if (
+        isinstance(checkpoint_size, bool)
+        or not isinstance(checkpoint_size, int)
+        or checkpoint_size < 0
+        or checkpoint_path.stat().st_size != checkpoint_size
+    ):
+        _fail("recovery checkpoint size does not match its result", error_type)
+    checkpoint_sha256 = checkpoint.get("sha256")
+    if (
+        not isinstance(checkpoint_sha256, str)
+        or not _SHA256.fullmatch(checkpoint_sha256)
+        or _file_sha256(checkpoint_path) != checkpoint_sha256
+    ):
+        _fail("recovery checkpoint identity does not match its result", error_type)
+    if (
+        recovered_result.get("best_epoch") != status_recovery["selected_epoch"]
+        or checkpoint.get("best_epoch") != status_recovery["selected_epoch"]
+        or recovered_result.get("validation_jaccard") != status_recovery["validation_jaccard"]
+        or recovered_result.get("validation_ddi_rate") != status_recovery["validation_ddi_rate"]
+    ):
+        _fail("recovery metric provenance does not match its result", error_type)
+    return recovered_status, recovered_result
+
+
 def terminal_status(
     identity: Mapping[str, Any],
     *,
@@ -379,11 +544,13 @@ def terminal_result(
 __all__ = (
     "IDENTITY_ENVIRONMENT_FIELDS",
     "IDENTITY_FIELDS",
+    "RECOVERY_FIELDS",
     "SAFE_DRUG_LANE_IDS",
     "SAFE_DRUG_SELECTION_RULE",
     "TERMINAL_STATES",
     "finalize_v2_pair",
     "identity_from_environment",
+    "reopen_recovered_v2_pair",
     "reopen_v2_pair",
     "require_selected_safedrug_selection",
     "terminal_result",

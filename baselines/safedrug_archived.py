@@ -47,6 +47,7 @@ if __package__:
         adapt_smoke_source,
         adapt_training_source,
         finalize_result,
+        native_history_path,
         profile_for,
         sha256,
         test_command,
@@ -85,6 +86,7 @@ if __package__:
         run_probe,
     )
     from .safedrug_archived_runner import (
+        recover_formal_lane,
         run_formal_lane,
         run_logged,
         run_smoke_lane,
@@ -117,6 +119,7 @@ else:
         adapt_smoke_source,
         adapt_training_source,
         finalize_result,
+        native_history_path,
         profile_for,
         sha256,
         test_command,
@@ -155,6 +158,7 @@ else:
         run_probe,
     )
     from safedrug_archived_runner import (
+        recover_formal_lane,
         run_formal_lane,
         run_logged,
         run_smoke_lane,
@@ -203,11 +207,13 @@ __all__ = [
     "load_and_validate_canonical_inputs",
     "main",
     "matrix_shape",
+    "native_history_path",
     "parse_test_log",
     "parse_training_log",
     "parse_validation_metrics",
     "probe_environment_details",
     "profile_for",
+    "recover_formal_lane",
     "require_executable_counts",
     "run_formal_lane",
     "run_logged",

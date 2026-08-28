@@ -503,6 +503,27 @@ def _audit_molerec_table1(args: argparse.Namespace) -> int:
     return 0
 
 
+def _recover_reproduction(args: argparse.Namespace) -> int:
+    """Recover an eligible training finalization failure without scientific execution."""
+    if args.program_id == "safedrug-archived":
+        from baselines import safedrug_archived as program
+    else:
+        from baselines import molerec as program
+
+    try:
+        recovery_root = program.recover_formal_lane(
+            profile=program.profile_for(args.profile_id),
+            data_dir=args.dataset_root.resolve(),
+            run_root=args.run_root.resolve(),
+            recovery_id=args.recovery_id,
+            finalizer_revision=args.finalizer_revision,
+        )
+    except program.ReproductionError as error:
+        raise ProtocolValidationError(str(error)) from error
+    print(json.dumps({"recovery_root": str(recovery_root)}, sort_keys=True))
+    return 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -649,6 +670,22 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Optional stable attempt identity shared by a batch",
     )
     smoke.set_defaults(handler=_reproduce_smoke)
+
+    recovery = commands.add_parser(
+        "recover-reproduction",
+        help="Finalize one eligible preserved training output without rerunning it",
+    )
+    recovery.add_argument(
+        "program_id",
+        choices=("safedrug-archived", "molerec"),
+        help="Frozen Reproduction Program that produced the source lane",
+    )
+    recovery.add_argument("profile_id", help="Program profile used by the source lane")
+    recovery.add_argument("--dataset-root", type=Path, required=True)
+    recovery.add_argument("--run-root", type=Path, required=True)
+    recovery.add_argument("--recovery-id", required=True)
+    recovery.add_argument("--finalizer-revision", required=True)
+    recovery.set_defaults(handler=_recover_reproduction)
 
     # 7. Stage SafeDrug c721 Dataset
     stage_c721 = commands.add_parser(

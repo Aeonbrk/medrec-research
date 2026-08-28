@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 import re
 import tempfile
@@ -12,6 +13,8 @@ from typing import Any
 from ._validation import (
     canonical_json,
     parse_json_object,
+    require_int,
+    require_probability,
     require_sha256,
     require_string,
     strict_fields,
@@ -37,6 +40,29 @@ IDENTITY_FIELDS = (
     "submission_id",
 )
 TERMINAL_STATES = ("completed", "failed", "blocked", "stale_rejected")
+RECOVERY_FIELDS = (
+    "schema_version",
+    "kind",
+    "recovery_id",
+    "finalizer_revision",
+    "source_relative_path",
+    "source_terminal_state",
+    "source_failure_code",
+    "parser_classification",
+    "selected_epoch",
+    "checkpoint_relative_path",
+    "validation_jaccard",
+    "validation_ddi_rate",
+)
+RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _require_revision(value: object, *, field: str) -> str:
@@ -220,13 +246,140 @@ def reopen_finalized_pair(
     return status, result
 
 
+def _validate_recovery(value: object) -> dict[str, Any]:
+    recovery = strict_fields(value, required=RECOVERY_FIELDS, context="recovery provenance")
+    if recovery["schema_version"] != 1 or recovery["kind"] != "training_finalization_recovery":
+        raise ProtocolValidationError("recovery provenance has an invalid contract")
+    recovery_id = require_string(recovery["recovery_id"], field="recovery ID")
+    if not RECOVERY_ID.fullmatch(recovery_id) or recovery_id in (".", ".."):
+        raise ProtocolValidationError("recovery ID is invalid")
+    finalizer_revision = _require_revision(
+        recovery["finalizer_revision"],
+        field="recovery finalizer revision",
+    )
+    source_relative_path = require_string(
+        recovery["source_relative_path"],
+        field="recovery source_relative_path",
+    )
+    checkpoint_relative_path = require_string(
+        recovery["checkpoint_relative_path"],
+        field="recovery checkpoint_relative_path",
+    )
+    checkpoint_path = Path(checkpoint_relative_path)
+    if checkpoint_path.is_absolute() or ".." in checkpoint_path.parts:
+        raise ProtocolValidationError("recovery checkpoint_relative_path is invalid")
+    if (
+        recovery["source_terminal_state"] != "failed"
+        or recovery["source_failure_code"] != "training_failed"
+        or recovery["parser_classification"] != "validation_metrics_unlabeled"
+    ):
+        raise ProtocolValidationError("recovery source classification is invalid")
+    return {
+        **recovery,
+        "recovery_id": recovery_id,
+        "finalizer_revision": finalizer_revision,
+        "source_relative_path": source_relative_path,
+        "selected_epoch": require_int(
+            recovery["selected_epoch"],
+            field="recovery selected_epoch",
+        ),
+        "checkpoint_relative_path": checkpoint_relative_path,
+        "validation_jaccard": require_probability(
+            recovery["validation_jaccard"],
+            field="recovery validation_jaccard",
+        ),
+        "validation_ddi_rate": require_probability(
+            recovery["validation_ddi_rate"],
+            field="recovery validation_ddi_rate",
+        ),
+    }
+
+
+def reopen_recovered_finalized_pair(
+    source_run_root: str | Path,
+    recovery_run_root: str | Path,
+    *,
+    expected_identity: Mapping[str, Any] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate recovered training evidence together with its failed source pair."""
+    source_root = Path(source_run_root)
+    recovery_root = Path(recovery_run_root)
+    source_status, source_result = reopen_finalized_pair(
+        source_root,
+        expected_identity=expected_identity,
+    )
+    recovered_status, recovered_result = reopen_finalized_pair(
+        recovery_root,
+        expected_identity=expected_identity,
+    )
+    if source_status["identity"] != recovered_status["identity"]:
+        raise ProtocolValidationError("source and recovery identities do not match")
+    if (
+        source_status.get("state") != "failed"
+        or source_status.get("failure_code") != "training_failed"
+        or source_result.get("artifact_type") != "training"
+        or source_result.get("failure_code") != "training_failed"
+    ):
+        raise ProtocolValidationError(
+            "recovery source is not the eligible terminal training failure"
+        )
+    if (
+        recovered_status.get("state") != "completed"
+        or recovered_result.get("artifact_type") != "training"
+    ):
+        raise ProtocolValidationError("recovery sibling is not completed training evidence")
+
+    status_recovery = _validate_recovery(recovered_status.get("recovery"))
+    result_recovery = _validate_recovery(recovered_result.get("recovery"))
+    if status_recovery != result_recovery:
+        raise ProtocolValidationError("status and result recovery provenance do not match")
+    expected_recovery_root = source_root / "recoveries" / status_recovery["recovery_id"]
+    if recovery_root.absolute() != expected_recovery_root.absolute():
+        raise ProtocolValidationError("recovery sibling is outside its source attempt namespace")
+    expected_source_path = Path(os.path.relpath(source_root, recovery_root)).as_posix()
+    if status_recovery["source_relative_path"] != expected_source_path:
+        raise ProtocolValidationError("recovery source path does not match its sibling layout")
+
+    checkpoint = recovered_result.get("checkpoint")
+    checkpoint_relative_path = (
+        checkpoint.get("relative_path") if isinstance(checkpoint, Mapping) else None
+    )
+    if checkpoint_relative_path != status_recovery["checkpoint_relative_path"]:
+        raise ProtocolValidationError("recovery checkpoint provenance does not match its result")
+    checkpoint_path = source_root / checkpoint_relative_path
+    if not checkpoint_path.is_file() or checkpoint_path.is_symlink():
+        raise ProtocolValidationError("recovery checkpoint is missing or is not a regular file")
+    checkpoint_size = require_int(
+        checkpoint.get("size_bytes"),
+        field="recovery checkpoint size_bytes",
+    )
+    if checkpoint_path.stat().st_size != checkpoint_size:
+        raise ProtocolValidationError("recovery checkpoint size does not match its result")
+    checkpoint_sha256 = require_sha256(
+        checkpoint.get("sha256"),
+        field="recovery checkpoint sha256",
+    )
+    if _file_sha256(checkpoint_path) != checkpoint_sha256:
+        raise ProtocolValidationError("recovery checkpoint identity does not match its result")
+    if (
+        recovered_result.get("best_epoch") != status_recovery["selected_epoch"]
+        or checkpoint.get("best_epoch") != status_recovery["selected_epoch"]
+        or recovered_result.get("validation_jaccard") != status_recovery["validation_jaccard"]
+        or recovered_result.get("validation_ddi_rate") != status_recovery["validation_ddi_rate"]
+    ):
+        raise ProtocolValidationError("recovery metric provenance does not match its result")
+    return recovered_status, recovered_result
+
+
 __all__ = (
     "EVIDENCE_SCHEMA_VERSION",
     "FINALIZATION_SCHEMA_VERSION",
     "IDENTITY_FIELDS",
+    "RECOVERY_FIELDS",
     "TERMINAL_STATES",
     "finalize_evidence_pair",
     "reopen_finalized_pair",
+    "reopen_recovered_finalized_pair",
     "validate_identity",
     "validate_status_result_pair",
 )

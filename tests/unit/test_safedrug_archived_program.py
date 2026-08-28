@@ -668,6 +668,12 @@ def test_checkpoint_selection_uses_zero_based_best_epoch(tmp_path: Path) -> None
     assert adapter.select_checkpoint(tmp_path, adapter.PROFILES["gamenet"], 49) == checkpoint
 
 
+def test_native_history_path_is_model_specific(tmp_path: Path) -> None:
+    assert adapter.native_history_path(tmp_path, "Retain_attempt-1") == (
+        tmp_path / "history_Retain_attempt-1.pkl"
+    )
+
+
 def test_environment_summary_records_conda_and_python(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

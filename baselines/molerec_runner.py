@@ -41,6 +41,7 @@ if __package__:
     from .molerec_probe import environment_summary
     from .reproduction_artifacts import identity_from_environment
     from .reproduction_runner import (
+        recover_training_lane_v2,
         run_smoke_lane_v2,
         run_test_lane_v2,
         run_training_lane_v2,
@@ -76,6 +77,7 @@ else:
     from molerec_probe import environment_summary
     from reproduction_artifacts import identity_from_environment
     from reproduction_runner import (
+        recover_training_lane_v2,
         run_smoke_lane_v2,
         run_test_lane_v2,
         run_training_lane_v2,
@@ -548,6 +550,34 @@ def run_test_lane(
     )
 
 
+def recover_formal_lane(
+    *,
+    profile: Profile,
+    data_dir: Path,
+    run_root: Path,
+    recovery_id: str,
+    finalizer_revision: str,
+    dispatch_module: Any = None,
+) -> Path:
+    """Recover one controller-identified terminal training finalization failure."""
+    identity = identity_from_environment(mode="formal", error_type=ReproductionError)
+    if identity is None:
+        raise ReproductionError("recovery requires a controller-issued v2 identity")
+    return recover_training_lane_v2(
+        module=_dispatch_module(dispatch_module),
+        profile=profile,
+        data_dir=data_dir,
+        run_root=run_root,
+        recovery_id=recovery_id,
+        finalizer_revision=finalizer_revision,
+        identity=identity,
+        program_id="molerec",
+        source_revision=ARCHIVED_REVISION,
+        gate_inputs=GATE_INPUTS,
+        error_type=ReproductionError,
+    )
+
+
 def run_smoke_lane(
     *,
     profile: Profile,
@@ -587,6 +617,7 @@ def run_smoke_lane(
 
 
 __all__ = (
+    "recover_formal_lane",
     "run_formal_lane",
     "run_logged",
     "run_smoke_lane",
