@@ -17,7 +17,9 @@ required_inputs = [
   "idx2drug.pkl",
 ]
 import_modules = ["torch", "dnc", "rdkit", "pandas", "dill", "sklearn", "models", "util"]
-probe_contract = "safedrug_archived"
+probe_contract = "safedrug_archived_probe"
+required_probe_checks = ["cuda_tensor", "rdkit_brics", "dnc_forward"]
+expected_dataset_counts = { patients = [6350], visits = [14995, 15032], medications = [131], ddi_pairs = [448], molecular_substructures = [491] }
 
 [[reproduction_programs]]
 program_id = "molerec"
@@ -38,7 +40,9 @@ required_inputs = [
   "idx2drug.pkl",
 ]
 import_modules = ["torch", "torch_geometric", "rdkit", "pandas", "dill", "sklearn"]
-probe_contract = "molerec"
+probe_contract = "molerec_probe"
+required_probe_checks = ["cuda_tensor", "rdkit_brics", "pyg_extensions"]
+expected_dataset_counts = { patients = [6350], visits = [15032], medications = [131], ddi_pairs = [448], molecular_substructures = [491] }
 
 [[baselines]]
 baseline_id = "reference"

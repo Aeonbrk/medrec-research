@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -143,31 +144,76 @@ def _write_artifacts(
     selection_path = tmp_path / "selection.json"
     selection = select_safedrug_candidate(
         [
-            {
-                "lane_id": "molerec-safedrug-lr-1e-5",
-                "learning_rate": 1e-5,
-                "checkpoint_identity": "checkpoint-1e-5",
-                "validation_jaccard": 0.51,
-                "validation_ddi_rate": 0.07,
-            },
-            {
-                "lane_id": "molerec-safedrug-lr-1e-4",
-                "learning_rate": 1e-4,
-                "checkpoint_identity": "checkpoint-1e-4",
-                "validation_jaccard": 0.52,
-                "validation_ddi_rate": 0.06,
-            },
-            {
-                "lane_id": "molerec-safedrug-lr-5e-4",
-                "learning_rate": 5e-4,
-                "checkpoint_identity": "checkpoint-5e-4",
-                "validation_jaccard": 0.50,
-                "validation_ddi_rate": 0.08,
-            },
+            _selection_candidate(
+                "molerec-safedrug-lr-1e-5",
+                learning_rate=1e-5,
+                jaccard=0.51,
+                ddi_rate=0.07,
+            ),
+            _selection_candidate(
+                "molerec-safedrug-lr-1e-4",
+                learning_rate=1e-4,
+                jaccard=0.52,
+                ddi_rate=0.06,
+            ),
+            _selection_candidate(
+                "molerec-safedrug-lr-5e-4",
+                learning_rate=5e-4,
+                jaccard=0.50,
+                ddi_rate=0.08,
+            ),
         ]
     )
     write_selection(str(selection_path), selection)
     return ledger_path, result_paths, selection_path
+
+
+def _selection_candidate(
+    lane_id: str,
+    *,
+    learning_rate: float,
+    jaccard: float,
+    ddi_rate: float,
+) -> dict[str, object]:
+    checkpoint_bytes = f"{lane_id}-checkpoint".encode()
+    checkpoint_identity = hashlib.sha256(checkpoint_bytes).hexdigest()
+    identity = {
+        "attempt_id": "attempt-1",
+        "lane_id": lane_id,
+        "scientific_baseline_id": "safedrug",
+        "program_id": "safedrug-archived",
+        "profile_id": "safedrug",
+        "harness_revision": HARNESS_REVISION,
+        "model_source_revision": "b" * 40,
+        "preprocessing_revision": PREPROCESSING_REVISION,
+        "snapshot_id": "snapshots/molerec-table1-c721-www23",
+        "environment_sha256": ENVIRONMENT_SHA,
+        "mode": "formal",
+        "submission_id": f"submission-{lane_id}",
+    }
+    return {
+        "lane_id": lane_id,
+        "learning_rate": learning_rate,
+        "checkpoint_identity": checkpoint_identity,
+        "validation_jaccard": jaccard,
+        "validation_ddi_rate": ddi_rate,
+        "training_evidence": {
+            "state": "completed",
+            "artifact_type": "training",
+            "identity": identity,
+            "learning_rate": learning_rate,
+            "best_epoch": 0,
+            "validation_jaccard": jaccard,
+            "validation_ddi_rate": ddi_rate,
+            "checkpoint": {
+                "best_epoch": 0,
+                "relative_path": "work/checkpoint.model",
+                "sha256": checkpoint_identity,
+                "size_bytes": len(checkpoint_bytes),
+            },
+            "recovery": None,
+        },
+    }
 
 
 def test_reference_has_exact_plan_targets_and_coverage() -> None:

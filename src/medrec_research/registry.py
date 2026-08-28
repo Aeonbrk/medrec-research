@@ -12,6 +12,7 @@ from ._validation import (
     content_sha256,
     enum_member,
     require_identifier,
+    require_int,
     require_public_string,
     require_sha256,
     require_string,
@@ -284,6 +285,8 @@ class ReproductionProgram:
     import_modules: tuple[str, ...]
     environment_sha256: str | None = None
     probe_contract: str = "generic"
+    required_probe_checks: tuple[str, ...] = ()
+    expected_dataset_counts: tuple[tuple[str, tuple[int, ...]], ...] = ()
 
     def __post_init__(self) -> None:
         require_identifier(self.program_id, field="program_id")
@@ -313,6 +316,48 @@ class ReproductionProgram:
         if self.environment_sha256 is not None:
             require_sha256(self.environment_sha256, field="environment_sha256")
         require_identifier(self.probe_contract, field="probe_contract")
+        probe_checks = tuple(
+            require_identifier(value, field="required_probe_checks")
+            for value in self.required_probe_checks
+        )
+        if len(probe_checks) != len(set(probe_checks)):
+            raise ProtocolValidationError("required_probe_checks must contain unique values")
+        object.__setattr__(self, "required_probe_checks", probe_checks)
+
+        count_constraints: list[tuple[str, tuple[int, ...]]] = []
+        for constraint in self.expected_dataset_counts:
+            if not isinstance(constraint, tuple) or len(constraint) != 2:
+                raise ProtocolValidationError(
+                    "expected_dataset_counts must contain (name, allowed_values) pairs"
+                )
+            name, allowed_values = constraint
+            require_identifier(name, field="expected_dataset_counts name")
+            if not isinstance(allowed_values, tuple) or not allowed_values:
+                raise ProtocolValidationError(
+                    "expected_dataset_counts allowed_values must be a non-empty tuple"
+                )
+            values = tuple(
+                require_int(
+                    value,
+                    field=f"expected_dataset_counts.{name}",
+                    minimum=0,
+                )
+                for value in allowed_values
+            )
+            if len(values) != len(set(values)):
+                raise ProtocolValidationError(
+                    f"expected_dataset_counts.{name} must contain unique values"
+                )
+            count_constraints.append((name, values))
+        if len({name for name, _ in count_constraints}) != len(count_constraints):
+            raise ProtocolValidationError("expected_dataset_counts names must be unique")
+        object.__setattr__(self, "expected_dataset_counts", tuple(count_constraints))
+        if self.probe_contract != "generic" and (
+            not self.required_probe_checks or not self.expected_dataset_counts
+        ):
+            raise ProtocolValidationError(
+                "non-generic probe contracts must declare runtime checks and dataset counts"
+            )
 
     @property
     def is_319_verified(self) -> bool:
@@ -332,6 +377,10 @@ class ReproductionProgram:
         if self.environment_sha256 is not None:
             payload["environment_sha256"] = self.environment_sha256
         payload["probe_contract"] = self.probe_contract
+        payload["required_probe_checks"] = list(self.required_probe_checks)
+        payload["expected_dataset_counts"] = {
+            name: list(values) for name, values in self.expected_dataset_counts
+        }
         return payload
 
     @classmethod
@@ -348,13 +397,35 @@ class ReproductionProgram:
                 "required_inputs",
                 "import_modules",
             ),
-            optional=("environment_sha256", "probe_contract"),
+            optional=(
+                "environment_sha256",
+                "expected_dataset_counts",
+                "probe_contract",
+                "required_probe_checks",
+            ),
             context="Reproduction Program",
         )
         required_inputs = payload["required_inputs"]
         import_modules = payload["import_modules"]
         if not isinstance(required_inputs, list) or not isinstance(import_modules, list):
             raise ProtocolValidationError("Reproduction Program inputs and imports must be lists")
+        required_probe_checks = payload.get("required_probe_checks", [])
+        expected_dataset_counts = payload.get("expected_dataset_counts", {})
+        if not isinstance(required_probe_checks, list):
+            raise ProtocolValidationError(
+                "Reproduction Program required_probe_checks must be a list"
+            )
+        if not isinstance(expected_dataset_counts, dict):
+            raise ProtocolValidationError(
+                "Reproduction Program expected_dataset_counts must be a table"
+            )
+        count_constraints = []
+        for name, values in expected_dataset_counts.items():
+            if not isinstance(values, list):
+                raise ProtocolValidationError(
+                    f"Reproduction Program expected_dataset_counts.{name} must be a list"
+                )
+            count_constraints.append((name, tuple(values)))
         return cls(
             program_id=payload["program_id"],
             entrypoint=payload["entrypoint"],
@@ -366,6 +437,8 @@ class ReproductionProgram:
             import_modules=tuple(import_modules),
             environment_sha256=payload.get("environment_sha256"),
             probe_contract=payload.get("probe_contract", "generic"),
+            required_probe_checks=tuple(required_probe_checks),
+            expected_dataset_counts=tuple(count_constraints),
         )
 
 

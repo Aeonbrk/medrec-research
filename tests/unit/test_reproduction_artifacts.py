@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -37,29 +38,65 @@ def _identity(*, mode: str = "formal", submission_id: str = "submission-1") -> d
 def _selection() -> dict[str, object]:
     return select_safedrug_candidate(
         [
-            {
-                "lane_id": SAFE_DRUG_LANE_IDS[0],
-                "learning_rate": 1e-5,
-                "checkpoint_identity": "checkpoint-1",
-                "validation_jaccard": 0.50,
-                "validation_ddi_rate": 0.08,
-            },
-            {
-                "lane_id": SAFE_DRUG_LANE_IDS[1],
-                "learning_rate": 1e-4,
-                "checkpoint_identity": "checkpoint-2",
-                "validation_jaccard": 0.52,
-                "validation_ddi_rate": 0.07,
-            },
-            {
-                "lane_id": SAFE_DRUG_LANE_IDS[2],
-                "learning_rate": 5e-4,
-                "checkpoint_identity": "checkpoint-3",
-                "validation_jaccard": 0.52,
-                "validation_ddi_rate": 0.06,
-            },
+            _selection_candidate(
+                SAFE_DRUG_LANE_IDS[0], learning_rate=1e-5, jaccard=0.50, ddi_rate=0.08
+            ),
+            _selection_candidate(
+                SAFE_DRUG_LANE_IDS[1], learning_rate=1e-4, jaccard=0.52, ddi_rate=0.07
+            ),
+            _selection_candidate(
+                SAFE_DRUG_LANE_IDS[2], learning_rate=5e-4, jaccard=0.52, ddi_rate=0.06
+            ),
         ]
     )
+
+
+def _selection_candidate(
+    lane_id: str,
+    *,
+    learning_rate: float,
+    jaccard: float,
+    ddi_rate: float,
+) -> dict[str, object]:
+    checkpoint_bytes = f"{lane_id}-checkpoint".encode()
+    checkpoint_identity = hashlib.sha256(checkpoint_bytes).hexdigest()
+    identity = {
+        "attempt_id": "attempt-1",
+        "lane_id": lane_id,
+        "scientific_baseline_id": "safedrug",
+        "program_id": "safedrug-archived",
+        "profile_id": "safedrug",
+        "harness_revision": "a" * 40,
+        "model_source_revision": "b" * 40,
+        "preprocessing_revision": "c" * 40,
+        "snapshot_id": "snapshots/molerec-table1-c721-www23",
+        "environment_sha256": "d" * 64,
+        "mode": "formal",
+        "submission_id": f"submission-{lane_id}",
+    }
+    return {
+        "lane_id": lane_id,
+        "learning_rate": learning_rate,
+        "checkpoint_identity": checkpoint_identity,
+        "validation_jaccard": jaccard,
+        "validation_ddi_rate": ddi_rate,
+        "training_evidence": {
+            "state": "completed",
+            "artifact_type": "training",
+            "identity": identity,
+            "learning_rate": learning_rate,
+            "best_epoch": 0,
+            "validation_jaccard": jaccard,
+            "validation_ddi_rate": ddi_rate,
+            "checkpoint": {
+                "best_epoch": 0,
+                "relative_path": "work/checkpoint.model",
+                "sha256": checkpoint_identity,
+                "size_bytes": len(checkpoint_bytes),
+            },
+            "recovery": None,
+        },
+    }
 
 
 def test_controller_identity_rejects_partial_and_wrong_mode() -> None:

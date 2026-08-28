@@ -299,7 +299,7 @@ U1–U4 are the hard local slice and run in order. U5 waits for all seven remote
 - **Goal:** Make live status truthful and remove stale execution guidance.
 - **Requirements:** R18–R19.
 - **Dependencies:** U4.
-- **Files:** `baselines/reproduction_runner.py`, `docs/PLANS.md`, `docs/playbooks/MOLEREC_TABLE1_REPRODUCTION_PLAYBOOK.md`, `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`, `Handoff.md`, focused runner tests.
+- **Files:** `baselines/reproduction_runner.py`, `docs/PLANS.md`, `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`, `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`, `Handoff.md`, focused runner tests.
 - **Approach:** Atomically update one bounded epoch or heartbeat field. Rewrite only stale status snapshots and recovery instructions; do not claim U5–U9 complete before evidence exists.
 - **Test scenarios:**
   - Progress advances during a synthetic multi-epoch log and preserves immutable terminal artifacts.

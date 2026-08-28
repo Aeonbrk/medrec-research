@@ -7,7 +7,7 @@ import os
 import re
 import tempfile
 from collections.abc import Mapping
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from ._validation import (
@@ -371,15 +371,142 @@ def reopen_recovered_finalized_pair(
     return recovered_status, recovered_result
 
 
+def reopen_training_evidence(
+    training_run_root: str | Path,
+    *,
+    source_run_root: str | Path | None = None,
+    expected_identity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Reopen terminal formal training evidence and verify its checkpoint bytes."""
+    training_root = Path(training_run_root)
+    if source_run_root is None:
+        status, result = reopen_finalized_pair(
+            training_root,
+            expected_identity=expected_identity,
+        )
+        checkpoint_root = training_root
+        if result.get("recovery") is not None:
+            raise ProtocolValidationError(
+                "recovered training evidence requires its source run root"
+            )
+    else:
+        checkpoint_root = Path(source_run_root)
+        status, result = reopen_recovered_finalized_pair(
+            checkpoint_root,
+            training_root,
+            expected_identity=expected_identity,
+        )
+        if result.get("recovery") is None:
+            raise ProtocolValidationError("recovery training evidence is missing provenance")
+
+    identity = validate_identity(result.get("identity"), context="training evidence identity")
+    if (
+        identity["mode"] != "formal"
+        or status.get("state") != "completed"
+        or status.get("failure_code") is not None
+        or result.get("state") != "completed"
+        or result.get("artifact_type") != "training"
+    ):
+        raise ProtocolValidationError("training evidence is not completed formal training")
+    if "test_metrics" in result or "rounds" in result:
+        raise ProtocolValidationError("training evidence must not contain test metrics")
+    if result.get("epochs_requested") != 50 or result.get("epochs_observed") != 50:
+        raise ProtocolValidationError("training evidence must record all 50 epochs")
+
+    checkpoint = strict_fields(
+        result.get("checkpoint"),
+        required=("best_epoch", "relative_path", "sha256", "size_bytes"),
+        context="training checkpoint",
+    )
+    best_epoch = require_int(result.get("best_epoch"), field="training best_epoch")
+    checkpoint_best_epoch = require_int(
+        checkpoint["best_epoch"],
+        field="training checkpoint best_epoch",
+    )
+    if checkpoint_best_epoch != best_epoch:
+        raise ProtocolValidationError("training checkpoint epoch disagrees with evidence")
+    checkpoint_relative_path = require_string(
+        checkpoint["relative_path"],
+        field="training checkpoint relative_path",
+    )
+    checkpoint_path = Path(checkpoint_relative_path)
+    if (
+        checkpoint_path.is_absolute()
+        or ".." in checkpoint_path.parts
+        or str(checkpoint_path) != checkpoint_relative_path
+    ):
+        raise ProtocolValidationError("training checkpoint path is invalid")
+    checkpoint_path = checkpoint_root / checkpoint_path
+    try:
+        checkpoint_path.resolve().relative_to(checkpoint_root.resolve())
+    except ValueError as error:
+        raise ProtocolValidationError("training checkpoint escapes its run root") from error
+    if not checkpoint_path.is_file() or checkpoint_path.is_symlink():
+        raise ProtocolValidationError("training checkpoint is missing or is not a regular file")
+    checkpoint_size = require_int(
+        checkpoint["size_bytes"],
+        field="training checkpoint size_bytes",
+    )
+    if checkpoint_path.stat().st_size != checkpoint_size:
+        raise ProtocolValidationError("training checkpoint size does not match its result")
+    checkpoint_sha256 = require_sha256(
+        checkpoint["sha256"],
+        field="training checkpoint sha256",
+    )
+    if _file_sha256(checkpoint_path) != checkpoint_sha256:
+        raise ProtocolValidationError("training checkpoint identity does not match its result")
+    validation_jaccard = require_probability(
+        result.get("validation_jaccard"),
+        field="training validation_jaccard",
+    )
+    validation_ddi_rate = require_probability(
+        result.get("validation_ddi_rate"),
+        field="training validation_ddi_rate",
+    )
+    return {
+        "identity": identity,
+        "status": status,
+        "result": result,
+        "checkpoint": {
+            "best_epoch": best_epoch,
+            "relative_path": checkpoint_relative_path,
+            "sha256": checkpoint_sha256,
+            "size_bytes": checkpoint_size,
+        },
+        "checkpoint_path": checkpoint_path,
+        "validation_jaccard": validation_jaccard,
+        "validation_ddi_rate": validation_ddi_rate,
+    }
+
+
+def canonical_training_artifact_id(
+    attempt_root: str | Path,
+    training_run_root: str | Path,
+) -> str:
+    """Return the canonical attempt-relative ID of a validated training result."""
+    root = Path(attempt_root).resolve()
+    run_root = Path(training_run_root).resolve()
+    artifact = run_root / "result.json"
+    try:
+        relative = artifact.relative_to(root)
+    except ValueError as error:
+        raise ProtocolValidationError("training artifact is outside its attempt root") from error
+    if relative.name != "result.json" or any(part in ("", ".", "..") for part in relative.parts):
+        raise ProtocolValidationError("training artifact ID is not canonical")
+    return PurePosixPath(*relative.parts).as_posix()
+
+
 __all__ = (
     "EVIDENCE_SCHEMA_VERSION",
     "FINALIZATION_SCHEMA_VERSION",
     "IDENTITY_FIELDS",
     "RECOVERY_FIELDS",
     "TERMINAL_STATES",
+    "canonical_training_artifact_id",
     "finalize_evidence_pair",
     "reopen_finalized_pair",
     "reopen_recovered_finalized_pair",
+    "reopen_training_evidence",
     "validate_identity",
     "validate_status_result_pair",
 )

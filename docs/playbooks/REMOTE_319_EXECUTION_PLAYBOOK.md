@@ -2,18 +2,17 @@
 
 The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
 
-## Current snapshot (2026-08-22)
+## Current snapshot (2026-08-29)
 
-**SSH Connection**: ✅ Fallback `319-lab-via-server` profile authenticated and verified (root access)  
-**GPU Status**: ✅ 8× NVIDIA GeForce RTX 3090 (24 GiB each), all idle (0% utilization, ~24 GiB free each)  
-**Disk**: ✅ `/root/zhb` filesystem has >2.6 TiB free capacity  
-**Repository**: ✅ `/root/zhb/medrec-research` clean checkout on 319  
-**Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured  
-**Data Location**: ✅ MIMIC-III and MIMIC-IV datasets at `/root/zhb/Search/dataset` (symlinked)  
-**Conda Environments**: ⛔ No archived environment declaration is registered  
-**Reproduction Program**: ⚠️ Shared archived program and launch declaration implemented locally; its 319 environment identity remains unverified
+**SSH Connection**: ⚠️ Primary `319-lab` failed its preflight; approved fallback `319-lab-via-server` authenticated and was used for read-only checks and additive recovery work  
+**GPU Status**: ✅ 8× NVIDIA GeForce RTX 3090 (24 GiB each) were idle during the recovery preflight  
+**Disk**: ✅ `/root/zhb` filesystem had >2.5 TiB free capacity during the recovery preflight  
+**Repository**: ✅ `/root/zhb/medrec-research` remains a clean checkout at `a09fcab8c3760a5caa14ec3ab475ddf4152a3665`; the additive recovery worktree did not alter it  
+**Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured outside the checkout  
+**Conda Environment**: ✅ `medrec-molerec-table1` exists with the declared Python 3.8.16 runtime and was used for program-native recovery validation  
+**Reproduction Program**: ✅ SafeDrug archived and MoleRec program façades validated the seven recovery lanes without training or testing hooks
 
-**Status Summary**: SafeDrug `main` runs are historical only. Future SafeDrug-family work is pinned to `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. The shared Reproduction Program and synthetic contract tests exist. Dry-run is available; real launch remains blocked until archived preprocessing counts and the environment are verified on 319.
+**Status Summary**: SafeDrug `main` runs are historical only. The current attempt is `formal-20260828-a09fcab-u8-b`; all seven source lanes are terminal `training_failed` pairs with one validated immutable recovery sibling each. No test result exists. The frozen schedule is bound to the old harness revision above and must be re-accepted against the final clean revision before any formal submission.
 
 ## Verified snapshot
 
@@ -134,7 +133,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research reproduce gamenet \
   --dry-run
 ```
 
-Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, selected idle GPU, and free disk before creating one tmux session. A failed preflight gate creates no tmux state.
+Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. Successor formal lanes additionally require an attempt-owned frozen schedule supplied with `--schedule`; the requested GPU order and CPU sets must match that artifact exactly, with GPU 7 reserved. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, scheduled idle GPUs, and free disk before creating one tmux session. A failed preflight or schedule gate creates no tmux state.
 
 The checked-in registry leaves every archived lane at `registered` and the program environment identity unresolved. This keeps Comparison Mode unqualified and real reproduction blocked while allowing dry-run. Do not restore removed main-oriented declarations or raise readiness without the required evidence.
 

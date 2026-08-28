@@ -589,6 +589,62 @@ def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Pat
     checkpoint.parent.mkdir(parents=True)
     checkpoint.touch()
     selection_path = tmp_path / "selection.json"
+    candidate_specs = (
+        ("molerec-safedrug-lr-1e-4", 1e-4, "2" * 64, 0.51, 0.07),
+        ("molerec-safedrug-lr-1e-5", 1e-5, "1" * 64, 0.50, 0.08),
+        ("molerec-safedrug-lr-5e-4", 5e-4, "3" * 64, 0.52, 0.06),
+    )
+    candidates = []
+    for lane_id, learning_rate, checkpoint_identity, jaccard, ddi_rate in candidate_specs:
+        identity = {
+            "attempt_id": "attempt-1",
+            "lane_id": lane_id,
+            "scientific_baseline_id": "safedrug",
+            "program_id": "safedrug-archived",
+            "profile_id": "safedrug",
+            "harness_revision": "a" * 40,
+            "model_source_revision": "b" * 40,
+            "preprocessing_revision": "c" * 40,
+            "snapshot_id": "snapshots/molerec-table1-c721-www23",
+            "environment_sha256": "d" * 64,
+            "mode": "formal",
+            "submission_id": f"submission-{lane_id}",
+        }
+        checkpoint_evidence = {
+            "best_epoch": 49,
+            "relative_path": f"work/saved/SafeDrug_{lane_id}/Epoch_49.model",
+            "sha256": checkpoint_identity,
+            "size_bytes": 0,
+        }
+        candidates.append(
+            {
+                "lane_id": lane_id,
+                "learning_rate": learning_rate,
+                "checkpoint_identity": checkpoint_identity,
+                "validation_jaccard": jaccard,
+                "validation_ddi_rate": ddi_rate,
+                "training_evidence": {
+                    "state": "completed",
+                    "artifact_type": "training",
+                    "identity": identity,
+                    "learning_rate": learning_rate,
+                    "best_epoch": 49,
+                    "validation_jaccard": jaccard,
+                    "validation_ddi_rate": ddi_rate,
+                    "checkpoint": checkpoint_evidence,
+                    "recovery": None,
+                },
+            }
+        )
+    ranked = sorted(
+        candidates,
+        key=lambda candidate: (
+            -candidate["validation_jaccard"],
+            candidate["validation_ddi_rate"],
+            candidate["learning_rate"],
+            candidate["lane_id"],
+        ),
+    )
     selection_path.write_text(
         json.dumps(
             {
@@ -600,36 +656,23 @@ def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Pat
                     "molerec-safedrug-lr-1e-4",
                     "molerec-safedrug-lr-5e-4",
                 ],
-                "candidates": [
-                    {
-                        "lane_id": "molerec-safedrug-lr-1e-5",
-                        "learning_rate": 1e-5,
-                        "checkpoint_identity": "checkpoint-1e-5",
-                        "validation_jaccard": 0.50,
-                        "validation_ddi_rate": 0.08,
-                    },
-                    {
-                        "lane_id": "molerec-safedrug-lr-1e-4",
-                        "learning_rate": 1e-4,
-                        "checkpoint_identity": "checkpoint-1e-4",
-                        "validation_jaccard": 0.51,
-                        "validation_ddi_rate": 0.07,
-                    },
-                    {
-                        "lane_id": "molerec-safedrug-lr-5e-4",
-                        "learning_rate": 5e-4,
-                        "checkpoint_identity": "checkpoint-5e-4",
-                        "validation_jaccard": 0.52,
-                        "validation_ddi_rate": 0.06,
-                    },
-                ],
+                "candidates": candidates,
                 "selection_rule": [
                     "maximize validation_jaccard",
                     "minimize validation_ddi_rate",
                     "minimize learning_rate",
                     "minimize lane_id",
                 ],
-                "comparison_decisions": [],
+                "comparison_decisions": [
+                    {
+                        "rank": rank,
+                        "lane_id": candidate["lane_id"],
+                        "validation_jaccard": candidate["validation_jaccard"],
+                        "validation_ddi_rate": candidate["validation_ddi_rate"],
+                        "learning_rate": candidate["learning_rate"],
+                    }
+                    for rank, candidate in enumerate(ranked, start=1)
+                ],
                 "selected_lane_id": "molerec-safedrug-lr-5e-4",
                 "test_metrics_available": False,
                 "errors": [],

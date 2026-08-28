@@ -6,6 +6,7 @@ import json
 import math
 import os
 import re
+import threading
 from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
@@ -44,6 +45,8 @@ _MISSING_VALIDATION_METRICS = "training log must contain validation Jaccard and 
 _RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
+_PROGRESS_MAX_HEARTBEAT = 50
+_PROGRESS_POLL_SECONDS = 0.25
 _ADAPTATION_FIELDS = {
     "archived_revision",
     "entrypoint",
@@ -114,6 +117,118 @@ def _validate_identity_binding(
 
 def _required_inputs(profile: Any, gate_inputs: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(dict.fromkeys((*profile.required_inputs, *gate_inputs)))
+
+
+def _write_json_atomic(path: Path, value: Mapping[str, Any]) -> None:
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+    try:
+        temporary.write_text(
+            json.dumps(value, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def _load_progress_status(status_path: Path) -> dict[str, Any] | None:
+    try:
+        status = json.loads(status_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(status, dict):
+        return None
+    heartbeat = status.get("heartbeat", 0)
+    if (
+        isinstance(heartbeat, bool)
+        or not isinstance(heartbeat, int)
+        or not 0 <= heartbeat <= _PROGRESS_MAX_HEARTBEAT
+    ):
+        return None
+    return status
+
+
+def _advance_progress_heartbeat(status_path: Path, heartbeat: int) -> None:
+    if not 0 <= heartbeat <= _PROGRESS_MAX_HEARTBEAT:
+        return
+    status = _load_progress_status(status_path)
+    if status is None or heartbeat <= status["heartbeat"]:
+        return
+    status["heartbeat"] = heartbeat
+    try:
+        _write_json_atomic(status_path, status)
+    except OSError:
+        return
+
+
+def _heartbeat_from_log_text(log_text: str) -> int:
+    line_count = log_text.count("\n")
+    if log_text and not log_text.endswith("\n"):
+        line_count += 1
+    return min(line_count, _PROGRESS_MAX_HEARTBEAT)
+
+
+def _monitor_progress(
+    *,
+    status_path: Path,
+    log_path: Path,
+    stop_event: threading.Event,
+) -> None:
+    status = _load_progress_status(status_path)
+    if status is None:
+        return
+    last_size = -1
+    heartbeat = status["heartbeat"]
+    while not stop_event.is_set():
+        try:
+            size = log_path.stat().st_size
+        except OSError:
+            size = -1
+        if size > last_size:
+            last_size = size
+            if heartbeat < _PROGRESS_MAX_HEARTBEAT:
+                heartbeat += 1
+                status["heartbeat"] = heartbeat
+                try:
+                    _write_json_atomic(status_path, status)
+                except OSError:
+                    return
+        if stop_event.wait(_PROGRESS_POLL_SECONDS):
+            return
+
+
+def _run_logged_with_progress(
+    *,
+    run_logged: Any,
+    command: list[str],
+    cwd: Path,
+    env: dict[str, str],
+    log_path: Path,
+) -> str:
+    stop_event = threading.Event()
+    monitor = threading.Thread(
+        target=_monitor_progress,
+        kwargs={
+            "status_path": log_path.parent / "status.running.json",
+            "log_path": log_path,
+            "stop_event": stop_event,
+        },
+        name="reproduction-progress",
+        daemon=True,
+    )
+    monitor.start()
+    try:
+        run_logged(command, cwd=cwd, env=env, log_path=log_path)
+    finally:
+        stop_event.set()
+        monitor.join()
+    train_log = log_path.read_text(errors="replace")
+    _advance_progress_heartbeat(
+        log_path.parent / "status.running.json",
+        _heartbeat_from_log_text(train_log),
+    )
+    return train_log
 
 
 def _failure_pair(
@@ -231,7 +346,7 @@ def run_training_lane_v2(
     }
     write_json = _module_value(module, "write_json")
     write_json(run_root / "adaptation.json", adaptation)
-    write_json(
+    _write_json_atomic(
         run_root / "status.running.json",
         {
             "schema_version": 2,
@@ -243,6 +358,7 @@ def run_training_lane_v2(
             "started_at": started_at,
             "finished_at": None,
             "non_evidence": False,
+            "heartbeat": 0,
         },
     )
 
@@ -252,8 +368,9 @@ def run_training_lane_v2(
     )
     run_logged = _module_value(module, "run_logged")
     try:
-        run_logged(
-            [
+        train_log = _run_logged_with_progress(
+            run_logged=run_logged,
+            command=[
                 *_module_value(module, "training_command")(python, adapted_entrypoint, model_name),
                 *getattr(profile, "training_args", ()),
             ],
@@ -261,7 +378,6 @@ def run_training_lane_v2(
             env=environment,
             log_path=run_root / "train.log",
         )
-        train_log = (run_root / "train.log").read_text(errors="replace")
         best_epoch = _module_value(module, "parse_training_log")(train_log, expected_epochs=50)
         checkpoint = _module_value(module, "select_checkpoint")(checkpoint_dir, profile, best_epoch)
         validation = _module_value(module, "parse_validation_metrics")(train_log)
@@ -586,7 +702,7 @@ def run_smoke_lane_v2(
     }
     write_json = _module_value(module, "write_json")
     write_json(run_root / "adaptation.json", adaptation)
-    write_json(
+    _write_json_atomic(
         run_root / "status.running.json",
         {
             "schema_version": 2,
@@ -598,6 +714,7 @@ def run_smoke_lane_v2(
             "started_at": started_at,
             "finished_at": None,
             "non_evidence": True,
+            "heartbeat": 0,
         },
     )
     environment = os.environ.copy()
@@ -605,8 +722,9 @@ def run_smoke_lane_v2(
         filter(None, (str(source_dir), environment.get("PYTHONPATH", "")))
     )
     try:
-        _module_value(module, "run_logged")(
-            [
+        train_log = _run_logged_with_progress(
+            run_logged=_module_value(module, "run_logged"),
+            command=[
                 *_module_value(module, "training_command")(python, adapted_entrypoint, model_name),
                 *getattr(profile, "training_args", ()),
             ],
@@ -614,7 +732,6 @@ def run_smoke_lane_v2(
             env=environment,
             log_path=run_root / "train.log",
         )
-        train_log = (run_root / "train.log").read_text(errors="replace")
         best_epoch = _module_value(module, "parse_training_log")(train_log, expected_epochs=1)
         if best_epoch != 0:
             raise error_type(f"smoke mode requires best_epoch 0, observed {best_epoch}")

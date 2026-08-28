@@ -4,6 +4,8 @@ import hashlib
 import json
 import pickle
 import sys
+import threading
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,6 +14,7 @@ import pytest
 from baselines import molerec_runner, safedrug_archived_runner
 from baselines.reproduction_artifacts import reopen_recovered_v2_pair, reopen_v2_pair
 from baselines.reproduction_runner import (
+    _run_logged_with_progress,
     recover_training_lane_v2,
     run_smoke_lane_v2,
     run_training_lane_v2,
@@ -186,7 +189,61 @@ def test_training_lane_finalizes_v2_training_artifact(tmp_path: Path) -> None:
     assert status["state"] == "completed"
     assert result["artifact_type"] == "training"
     assert result["validation_jaccard"] == 0.52
+    assert json.loads((run_root / "status.running.json").read_text())["heartbeat"] == 50
+    assert "heartbeat" not in status
+    assert "heartbeat" not in result
     assert not (run_root / "test.log").exists()
+
+
+def test_progress_heartbeat_advances_then_stalls_without_terminal_mutation(
+    tmp_path: Path,
+) -> None:
+    status_path = tmp_path / "status.running.json"
+    status_path.write_text(json.dumps({"heartbeat": 0}), encoding="utf-8")
+    log_path = tmp_path / "train.log"
+    started = threading.Event()
+    release = threading.Event()
+
+    def stalled_run_logged(
+        command: list[str], *, cwd: Path, env: dict[str, str], log_path: Path
+    ) -> None:
+        del command, cwd, env
+        with log_path.open("w", encoding="utf-8") as stream:
+            stream.write("epoch 0\n")
+            stream.flush()
+            started.set()
+            release.wait(timeout=5)
+
+    worker = threading.Thread(
+        target=_run_logged_with_progress,
+        kwargs={
+            "run_logged": stalled_run_logged,
+            "command": ["python", "train.py"],
+            "cwd": tmp_path,
+            "env": {},
+            "log_path": log_path,
+        },
+    )
+    worker.start()
+    assert started.wait(timeout=2)
+
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        heartbeat = json.loads(status_path.read_text(encoding="utf-8"))["heartbeat"]
+        if heartbeat >= 1:
+            break
+        time.sleep(0.02)
+    else:
+        pytest.fail("progress heartbeat did not advance while the log was written")
+
+    time.sleep(0.35)
+    stalled_heartbeat = json.loads(status_path.read_text(encoding="utf-8"))["heartbeat"]
+    time.sleep(0.35)
+    assert json.loads(status_path.read_text(encoding="utf-8"))["heartbeat"] == stalled_heartbeat
+
+    release.set()
+    worker.join(timeout=2)
+    assert not worker.is_alive()
 
 
 def test_complete_unlabeled_training_is_preserved_as_terminal_failure(tmp_path: Path) -> None:

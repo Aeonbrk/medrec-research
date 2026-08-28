@@ -70,6 +70,26 @@ _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 _SAFE_VALUE = re.compile(r"[^\x00-\x1f\x7f\s]+")
 _RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
+_SELECTION_CANDIDATE_FIELDS = {
+    "lane_id",
+    "learning_rate",
+    "checkpoint_identity",
+    "validation_jaccard",
+    "validation_ddi_rate",
+    "training_evidence",
+}
+_SELECTION_EVIDENCE_FIELDS = {
+    "state",
+    "artifact_type",
+    "identity",
+    "learning_rate",
+    "best_epoch",
+    "validation_jaccard",
+    "validation_ddi_rate",
+    "checkpoint",
+    "recovery",
+}
+_SELECTION_CHECKPOINT_FIELDS = {"best_epoch", "relative_path", "sha256", "size_bytes"}
 
 
 def _fail(message: str, error_type: type[Exception]) -> None:
@@ -135,6 +155,138 @@ def identity_from_environment(
     return normalized
 
 
+def _selection_candidate_for_admission(
+    candidate: Mapping[str, Any],
+    *,
+    error_type: type[Exception],
+) -> dict[str, Any]:
+    if set(candidate) != _SELECTION_CANDIDATE_FIELDS:
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    lane_id = candidate.get("lane_id")
+    if lane_id not in SAFE_DRUG_LANE_IDS:
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    expected_learning_rate = {
+        SAFE_DRUG_LANE_IDS[0]: 1e-5,
+        SAFE_DRUG_LANE_IDS[1]: 1e-4,
+        SAFE_DRUG_LANE_IDS[2]: 5e-4,
+    }[lane_id]
+    learning_rate = candidate["learning_rate"]
+    checkpoint_identity = candidate["checkpoint_identity"]
+    if (
+        not isinstance(learning_rate, (int, float))
+        or isinstance(learning_rate, bool)
+        or not math.isfinite(float(learning_rate))
+        or float(learning_rate) != expected_learning_rate
+        or not isinstance(checkpoint_identity, str)
+        or not _SHA256.fullmatch(checkpoint_identity)
+    ):
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    normalized_metrics: dict[str, float] = {}
+    for metric in ("validation_jaccard", "validation_ddi_rate"):
+        value = candidate[metric]
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or not math.isfinite(float(value))
+            or not 0 <= float(value) <= 1
+        ):
+            _fail("SafeDrug selection.json contains invalid validation evidence", error_type)
+        normalized_metrics[metric] = float(value)
+
+    evidence = candidate["training_evidence"]
+    if not isinstance(evidence, Mapping) or set(evidence) != _SELECTION_EVIDENCE_FIELDS:
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    if evidence["state"] != "completed" or evidence["artifact_type"] != "training":
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    identity = _validate_identity(evidence.get("identity"), error_type=error_type)
+    if (
+        identity["lane_id"] != lane_id
+        or identity["scientific_baseline_id"] != "safedrug"
+        or identity["program_id"] != "safedrug-archived"
+        or identity["profile_id"] != "safedrug"
+        or identity["mode"] != "formal"
+    ):
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    evidence_learning_rate = evidence["learning_rate"]
+    if (
+        not isinstance(evidence_learning_rate, (int, float))
+        or isinstance(evidence_learning_rate, bool)
+        or not math.isfinite(float(evidence_learning_rate))
+        or float(evidence_learning_rate) != float(learning_rate)
+    ):
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    best_epoch = evidence["best_epoch"]
+    if type(best_epoch) is not int or best_epoch < 0:
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    checkpoint = evidence["checkpoint"]
+    if not isinstance(checkpoint, Mapping) or set(checkpoint) != _SELECTION_CHECKPOINT_FIELDS:
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    checkpoint_relative_path = checkpoint["relative_path"]
+    checkpoint_path = (
+        Path(checkpoint_relative_path) if isinstance(checkpoint_relative_path, str) else None
+    )
+    if (
+        type(checkpoint["best_epoch"]) is not int
+        or checkpoint["best_epoch"] != best_epoch
+        or checkpoint_path is None
+        or not checkpoint_relative_path
+        or checkpoint_path.is_absolute()
+        or ".." in checkpoint_path.parts
+        or not isinstance(checkpoint["sha256"], str)
+        or not _SHA256.fullmatch(checkpoint["sha256"])
+        or checkpoint["sha256"] != checkpoint_identity
+        or type(checkpoint["size_bytes"]) is not int
+        or checkpoint["size_bytes"] < 0
+    ):
+        _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    for metric in ("validation_jaccard", "validation_ddi_rate"):
+        value = evidence[metric]
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or not math.isfinite(float(value))
+            or not 0 <= float(value) <= 1
+            or float(value) != normalized_metrics[metric]
+        ):
+            _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    recovery = evidence["recovery"]
+    if recovery is not None:
+        if not isinstance(recovery, Mapping) or set(recovery) != set(RECOVERY_FIELDS):
+            _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+        recovery_checkpoint_path = recovery["checkpoint_relative_path"]
+        recovery_path = (
+            Path(recovery_checkpoint_path) if isinstance(recovery_checkpoint_path, str) else None
+        )
+        if (
+            recovery["schema_version"] != 1
+            or recovery["kind"] != "training_finalization_recovery"
+            or not isinstance(recovery["recovery_id"], str)
+            or not _RECOVERY_ID.fullmatch(recovery["recovery_id"])
+            or not isinstance(recovery["finalizer_revision"], str)
+            or not _IMMUTABLE_REVISION.fullmatch(recovery["finalizer_revision"])
+            or recovery["source_terminal_state"] != "failed"
+            or recovery["source_failure_code"] != "training_failed"
+            or recovery["parser_classification"] != "validation_metrics_unlabeled"
+            or not isinstance(recovery["source_relative_path"], str)
+            or not recovery["source_relative_path"]
+            or type(recovery["selected_epoch"]) is not int
+            or recovery["selected_epoch"] != best_epoch
+            or recovery_path is None
+            or recovery_path.is_absolute()
+            or ".." in recovery_path.parts
+            or recovery_checkpoint_path != checkpoint_relative_path
+            or recovery["validation_jaccard"] != normalized_metrics["validation_jaccard"]
+            or recovery["validation_ddi_rate"] != normalized_metrics["validation_ddi_rate"]
+        ):
+            _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
+    return {
+        "lane_id": lane_id,
+        "learning_rate": float(learning_rate),
+        "validation_jaccard": normalized_metrics["validation_jaccard"],
+        "validation_ddi_rate": normalized_metrics["validation_ddi_rate"],
+    }
+
+
 def require_selected_safedrug_selection(
     selection_path: str | Path | None,
     *,
@@ -171,52 +323,50 @@ def require_selected_safedrug_selection(
         or selection["state"] != "selection_ready"
         or selection["selected_lane_id"] != lane_id
         or selection["test_metrics_available"] is not False
-        or selection["errors"]
+        or selection["errors"] != []
         or selection["candidate_lane_ids"] != list(SAFE_DRUG_LANE_IDS)
         or selection["selection_rule"] != list(SAFE_DRUG_SELECTION_RULE)
     ):
         _fail("SafeDrug selection.json does not authorize this lane", error_type)
-    candidate_lane_ids = selection["candidate_lane_ids"]
     candidates = selection["candidates"]
-    if (
-        not isinstance(candidate_lane_ids, list)
-        or not isinstance(candidates, list)
-        or len(candidates) != len(SAFE_DRUG_LANE_IDS)
-        or set(
-            candidate.get("lane_id") for candidate in candidates if isinstance(candidate, Mapping)
-        )
-        != set(SAFE_DRUG_LANE_IDS)
-    ):
+    if not isinstance(candidates, list) or len(candidates) != len(SAFE_DRUG_LANE_IDS):
         _fail("SafeDrug selection.json has no evidence for the selected lane", error_type)
+    normalized_candidates = []
     for candidate in candidates:
-        if not isinstance(candidate, Mapping) or set(candidate) != {
-            "lane_id",
-            "learning_rate",
-            "checkpoint_identity",
-            "validation_jaccard",
-            "validation_ddi_rate",
-        }:
+        if not isinstance(candidate, Mapping):
             _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
-        learning_rate = candidate["learning_rate"]
-        checkpoint_identity = candidate["checkpoint_identity"]
-        if (
-            not isinstance(learning_rate, (int, float))
-            or isinstance(learning_rate, bool)
-            or not math.isfinite(float(learning_rate))
-            or float(learning_rate) <= 0
-            or not isinstance(checkpoint_identity, str)
-            or not checkpoint_identity
-        ):
-            _fail("SafeDrug selection.json contains invalid candidate evidence", error_type)
-        for metric in ("validation_jaccard", "validation_ddi_rate"):
-            value = candidate[metric]
-            if (
-                not isinstance(value, (int, float))
-                or isinstance(value, bool)
-                or not math.isfinite(float(value))
-                or not 0 <= float(value) <= 1
-            ):
-                _fail("SafeDrug selection.json contains invalid validation evidence", error_type)
+        normalized_candidates.append(
+            _selection_candidate_for_admission(candidate, error_type=error_type)
+        )
+    if [candidate["lane_id"] for candidate in normalized_candidates] != sorted(SAFE_DRUG_LANE_IDS):
+        _fail("SafeDrug selection.json has non-canonical candidate order", error_type)
+    if len({candidate["lane_id"] for candidate in normalized_candidates}) != len(
+        SAFE_DRUG_LANE_IDS
+    ):
+        _fail("SafeDrug selection.json has duplicate candidate lanes", error_type)
+    ranked = sorted(
+        normalized_candidates,
+        key=lambda candidate: (
+            -candidate["validation_jaccard"],
+            candidate["validation_ddi_rate"],
+            candidate["learning_rate"],
+            candidate["lane_id"],
+        ),
+    )
+    expected_comparison = [
+        {
+            "rank": rank,
+            "lane_id": candidate["lane_id"],
+            "validation_jaccard": candidate["validation_jaccard"],
+            "validation_ddi_rate": candidate["validation_ddi_rate"],
+            "learning_rate": candidate["learning_rate"],
+        }
+        for rank, candidate in enumerate(ranked, start=1)
+    ]
+    if selection["comparison_decisions"] != expected_comparison:
+        _fail("SafeDrug selection.json contains inconsistent comparison decisions", error_type)
+    if selection["selected_lane_id"] != expected_comparison[0]["lane_id"]:
+        _fail("SafeDrug selection.json contains an inconsistent winner", error_type)
     return dict(selection)
 
 

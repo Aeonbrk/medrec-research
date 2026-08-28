@@ -14,6 +14,72 @@ from medrec_research.remote_executor import RemoteSubmission
 
 PROJECT_ROOT = Path(__file__).parents[2]
 REGISTRY_PATH = PROJECT_ROOT / "baselines" / "registry.toml"
+SUCCESSOR_LANES = (
+    "molerec-retain",
+    "molerec-leap",
+    "molerec-gamenet",
+    "molerec-safedrug-lr-1e-5",
+    "molerec-safedrug-lr-1e-4",
+    "molerec-safedrug-lr-5e-4",
+    "molerec-embedding",
+)
+SUCCESSOR_MAPPING = {
+    "molerec-retain": (3, "12-15,44-47", 0),
+    "molerec-leap": (4, "16-19,48-51", 1),
+    "molerec-gamenet": (5, "20-23,52-55", 1),
+    "molerec-safedrug-lr-1e-5": (6, "24-27,56-59", 1),
+    "molerec-safedrug-lr-1e-4": (1, "4-7,36-39", 0),
+    "molerec-safedrug-lr-5e-4": (2, "8-11,40-43", 0),
+    "molerec-embedding": (0, "0-3,32-35", 0),
+}
+
+
+def _write_schedule(path: Path) -> Path:
+    revision = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "stage": "u7-measured-gpu-schedule",
+                "schedule_state": "frozen",
+                "harness_revision": revision,
+                "environment_sha256": (
+                    "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+                ),
+                "preprocessing_revision": ("c7218d0976e5ee5588aeaf5bdbc86b338126bba5"),
+                "snapshot_id": "snapshots/molerec-table1-c721-www23",
+                "model_source_revisions": {
+                    "safedrug_archived": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+                    "molerec": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+                },
+                "selected_mapping": "B",
+                "gpu7_reserved": True,
+                "formal_execution": {
+                    "mode": "formal",
+                    "reserved_gpu": 7,
+                    "gpu_order": [SUCCESSOR_MAPPING[lane][0] for lane in SUCCESSOR_LANES],
+                    "cpu_set_order": [SUCCESSOR_MAPPING[lane][1] for lane in SUCCESSOR_LANES],
+                },
+                "mapping": {
+                    lane: {
+                        "gpu": gpu,
+                        "cpu_set": cpu_set,
+                        "numa": numa,
+                    }
+                    for lane, (gpu, cpu_set, numa) in SUCCESSOR_MAPPING.items()
+                },
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    return path
 
 
 def _cli(subcommand: str, *args: str) -> subprocess.CompletedProcess[str]:
@@ -289,24 +355,42 @@ def test_audit_safedrug_table2_cli_missing_arg_fails() -> None:
     assert "required" in completed.stderr
 
 
-def test_reproduce_all_seven_lanes_dry_run_maps_all_seven_gpus() -> None:
-    completed = _cli("reproduce", "all", "--gpus", "0,1,2,3,4,5,6", "--dry-run")
+def test_reproduce_all_seven_lanes_dry_run_maps_frozen_schedule(tmp_path: Path) -> None:
+    schedule = _write_schedule(tmp_path / "u7-schedule.json")
+    completed = _cli(
+        "reproduce",
+        "all",
+        "--gpus",
+        "3,4,5,6,1,2,0",
+        "--schedule",
+        str(schedule),
+        "--dry-run",
+    )
     assert completed.returncode == 0
     results = json.loads(completed.stdout)["results"]
     assert len(results) == 7
     assert [(item["baseline_id"], item["gpu"]) for item in results] == [
-        ("molerec-retain", 0),
-        ("molerec-leap", 1),
-        ("molerec-gamenet", 2),
-        ("molerec-safedrug-lr-1e-5", 3),
-        ("molerec-safedrug-lr-1e-4", 4),
-        ("molerec-safedrug-lr-5e-4", 5),
-        ("molerec-embedding", 6),
+        ("molerec-retain", 3),
+        ("molerec-leap", 4),
+        ("molerec-gamenet", 5),
+        ("molerec-safedrug-lr-1e-5", 6),
+        ("molerec-safedrug-lr-1e-4", 1),
+        ("molerec-safedrug-lr-5e-4", 2),
+        ("molerec-embedding", 0),
     ]
 
 
-def test_reproduce_single_lane_id_dry_run() -> None:
-    completed = _cli("reproduce", "molerec-safedrug-lr-1e-5", "--gpu", "3", "--dry-run")
+def test_reproduce_single_lane_id_dry_run(tmp_path: Path) -> None:
+    schedule = _write_schedule(tmp_path / "u7-schedule.json")
+    completed = _cli(
+        "reproduce",
+        "molerec-safedrug-lr-1e-5",
+        "--gpu",
+        "6",
+        "--schedule",
+        str(schedule),
+        "--dry-run",
+    )
     assert completed.returncode == 0
     result = json.loads(completed.stdout)["results"][0]
     assert result["state"] == "planned"

@@ -1,6 +1,6 @@
 # MoleRec Table 1 Five-Model Reproduction Playbook
 
-This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. As of 2026-08-26, the local contracts and synthetic tests are ready, but the replacement environment has not been built or proved on `319-wild`; stop before any evidence-producing command.
+This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. As of 2026-08-29, the seven source lanes in attempt `formal-20260828-a09fcab-u8-b` have one validated immutable recovery sibling each. No test result or final five-model audit exists; stop before any new evidence-producing command until the final harness revision and frozen schedule are re-accepted.
 
 ## Scope and Invariants
 
@@ -39,9 +39,9 @@ This playbook is the operator gate for the reproduction defined by `docs/plans/2
 
 ## Current Gate State
 
-The following local contracts are implemented and synthetic-tested: registry lanes and program-declared probes, v2 status/result identity, atomic finalization, SafeDrug selection, the eight-file snapshot builder, the four-axis audit, and the persisted GPU 7 queue contract.
+The following local contracts are implemented and synthetic-tested: registry lanes and program-declared probes, v2 status/result identity, atomic finalization, immutable source-aware recovery, validation-only SafeDrug selection, the eight-file snapshot builder, the four-axis audit, the frozen-schedule admission contract, the persisted GPU 7 queue, and bounded running-status heartbeats.
 
-The following gates remain open and block formal work: the Linux environment lock and hash, full environment and architecture probes, additive snapshot publication, seven fresh non-evidence smokes, measured P1/P2 scheduling, a clean frozen harness revision, seven formal trainings, SafeDrug selection, five ten-round tests, and the final audit. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
+The following gates remain open and block a successor formal submission: a clean reviewed harness revision, re-acceptance of the measured schedule against that revision, and the normal preflight checks immediately before submission. The current attempt has seven recovered training results and remains test-free; its pending downstream gates are SafeDrug selection, five serial ten-round tests, and the final audit. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
 
 ## Operator Sequence
 
@@ -53,7 +53,7 @@ Run these checks on the Mac harness. They detect broken contracts, formatting re
 rtk proxy /opt/homebrew/bin/uv run pytest
 rtk proxy /opt/homebrew/bin/uv run ruff check .
 rtk proxy /opt/homebrew/bin/uv run ruff format --check .
-markdownlint '**/*.md' --ignore '.agents/**'
+rtk markdownlint '**/*.md' --ignore '.agents/**'
 git status --short
 ```
 
@@ -68,7 +68,7 @@ Use only the approved 319 alias and verify the following locations with read-onl
 - MoleRec checkout: `/root/zhb/MoleRec` at `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`
 - External data root: `/root/zhb/medrec-data`
 
-The harness checkout must match the clean local revision. The external data root must resolve outside the harness checkout. The model checkouts must be clean at their declared revisions. If any identity differs, stop; do not substitute a nearby checkout or snapshot.
+The harness checkout must match the clean local revision. The external data root must resolve outside the harness checkout. The model checkouts must be clean at their declared revisions. The primary `319-lab` alias must be tried first; use `319-lab-via-server` only after that preflight fails. If any identity differs, stop; do not substitute a nearby checkout or snapshot.
 
 ### 3. Build and prove `medrec-molerec-table1`
 
@@ -117,7 +117,7 @@ The builder must prove ordered vocabulary equality, mask and substructure-column
 
 ### 5. Run seven fresh non-evidence smokes
 
-After U5 and U6 pass, run the seven registry lanes once with a shared new attempt ID and the provisional mapping chosen for the smoke gate:
+For a new successor attempt, run the seven registry lanes once with a shared new attempt ID and the provisional mapping chosen for the smoke gate:
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec reproduce-smoke all \
@@ -133,11 +133,12 @@ Run P1 isolated one-epoch architecture profiles and P2 seven-lane concurrency pr
 
 ### 7. Train seven lanes once
 
-After the final clean harness revision, environment identity, snapshot proof, smoke gate, and schedule are frozen, submit the seven lanes in registry order with the selected mapping:
+After the final clean harness revision, environment identity, snapshot proof, smoke gate, and schedule are frozen, submit the seven lanes in registry order with the selected mapping. The current read-only schedule artifact is `/root/zhb/medrec-data/runtime/reproduction-prep/u7-schedule.json`; it is bound to the old harness revision and cannot authorize this code revision until re-accepted. The accepted mapping recorded there is schedule B: GPU order `3,4,5,6,1,2,0`, with GPU 7 reserved and CPU sets `12-15,44-47`, `16-19,48-51`, `20-23,52-55`, `24-27,56-59`, `4-7,36-39`, `8-11,40-43`, and `0-3,32-35` in registry order.
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec reproduce all \
-  --gpus <seven-gpu-mapping> \
+  --gpus 3,4,5,6,1,2,0 \
+  --schedule /path/to/reaccepted-u7-schedule.json \
   --attempt-id <attempt-id>
 ```
 
@@ -145,7 +146,20 @@ The controller-issued identity must bind attempt, lane, scientific baseline, pro
 
 ### 8. Admit the GPU 7 evaluation queue
 
-Create the persisted queue with GPU 7 reserved. Admit non-SafeDrug tests only after their finalized training pair is identity-valid. Admit a SafeDrug test only after all three SafeDrug training candidates are terminal and a valid `selection.json` selects that lane. The queue must reject duplicate lanes/submissions, preserve FIFO order, and leave terminal entries untouched across restart or recovery.
+Create the persisted queue with GPU 7 reserved. Admit non-SafeDrug tests only after their finalized training pair is identity-valid. Admit a SafeDrug test only after all three SafeDrug training candidates are terminal and a valid `selection.json` selects that lane. The production admission command resolves the attempt-owned training artifact and reopens normal or recovered evidence before appending one queue entry:
+
+```bash
+rtk proxy /opt/homebrew/bin/uv run medrec admit-evaluation \
+  --queue runtime/reproduction/<attempt-id>/evaluation-queue.json \
+  --attempt-root runtime/reproduction/<attempt-id> \
+  --lane-id <lane-id> \
+  --scientific-baseline-id <scientific-baseline-id> \
+  --training-artifact-id <attempt-relative-result.json> \
+  --test-submission-id <test-submission-id> \
+  [--selection runtime/reproduction/<attempt-id>/selection.json]
+```
+
+The queue must reject duplicate lanes/submissions, preserve FIFO order, serialize GPU 7, and leave terminal entries untouched across restart or recovery.
 
 Mark the two non-selected SafeDrug candidates `not_tested_by_design`. A running queue entry may be requeued only after the operator proves its process is dead; never replay a completed, failed, or blocked entry.
 
@@ -171,4 +185,4 @@ The audit reopens finalized sibling artifacts, checks all 25 inclusive mean ± 2
 
 Stop before formal training or testing when any of these occurs: source/environment/snapshot identity mismatch, dirty or changed code after freeze, failed program probe, missing or mismatched input, failed bridge check, incomplete smoke pair, missing SafeDrug candidate, invalid selection, queue collision, invalid recovery premise, or any attempt to use the old attempt's checkpoints/logs/metrics.
 
-Do not perform U10 cleanup from this playbook. Removing the historical `medrec-safedrug-archived` environment requires the separate terminal authorization and exact-prefix checks in the plan.
+Do not treat local synthetic checks or recovered training artifacts as a completed five-model reproduction. U10 progress is limited to the bounded running-status heartbeat and truthful documentation. Removing the historical `medrec-safedrug-archived` environment requires the separate terminal authorization and exact-prefix checks in the plan.

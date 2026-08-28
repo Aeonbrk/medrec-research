@@ -2,20 +2,19 @@
 
 ## In Progress: MoleRec Finalization Recovery and Conformance
 
-- **Status**: U1–U4 are implemented and locally verified. The formal attempt `formal-20260828-a09fcab-u8-b` remains read-only: no lane was terminated, duplicated, retrained, tested, or recovered remotely.
+- **Status**: U1–U5 are complete for formal attempt `formal-20260828-a09fcab-u8-b`: all seven source lanes are terminal failures and each has one validated immutable recovery sibling. No lane was terminated, duplicated, retrained, or tested during recovery.
 - **Plan amendment**: `docs/plans/2026-08-28-1718-fix-molerec-finalization-recovery-plan.md` permits immutable same-attempt finalization from preserved histories and checkpoints. It does not permit retraining, test-based selection, Baseline Core changes, or source-artifact overwrite.
-- **Local hard slice**: The shared native-history authority, explicit `recover-reproduction` command, immutable recovery siblings, and source-aware consumer validation pass the complete local test and Python quality gates.
-- **Delegated follow-up**: U5 applies recovery only after all seven source lanes are terminal. U6–U10 cover SafeDrug selection admission, probe authority, frozen-schedule binding, evaluation-queue orchestration, progress evidence, and operator-document synchronization.
-- **Remote boundary**: Do not terminate or duplicate live lanes. Do not apply recovery remotely until U1–U4 pass review and the source-lane terminal gate holds.
+- **Local conformance**: U6–U10 are implemented and synthetic-tested, including validation-only SafeDrug selection, declaration-owned probes, frozen-schedule admission, source-aware GPU 7 queue admission, and bounded running-status heartbeat updates. These checks are not scientific evidence.
+- **Remote boundary**: The original source artifacts and the seven recovery siblings remain on 319. No test submission or five-model result exists. The accepted schedule is bound to the earlier harness revision `a09fcab8c3760a5caa14ec3ab475ddf4152a3665`; re-accept it against the final clean revision before any formal submission.
 
 ## In Progress: MoleRec Table 1 Five-Model Full Reproduction
 
-- **Status**: U1–U4 contracts and the local U6 snapshot-builder mechanics are implemented and covered by synthetic tests. U5–U9 still require the 319 remote environment, exact snapshot publication, fresh smokes, measured scheduling, formal execution, selection, testing, and audit; no successor scientific evidence exists yet.
+- **Status**: The recovery slice for `formal-20260828-a09fcab-u8-b` is complete, but the five-model reproduction is not. Recovered training artifacts are available for the seven source lanes; no successor test result or final audit exists.
 - **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md` is authoritative for this work.
 - **Scientific scope**: RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec use the frozen SafeDrug archived revision `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, MoleRec revision `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, and preprocessing revision `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`. Five scientific models map to seven 50-epoch training lanes because SafeDrug has three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection.
 - **Current contract**: all seven lanes use `medrec-molerec-table1` (Python 3.8.16, PyTorch 1.9.0+cu111, PyG 2.0.3) and the additive `snapshots/molerec-table1-c721-www23` declaration. The executable dataset contract is 6,350 patients, 15,032 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures; 14,995 remains paper-reported metadata only.
-- **Evidence boundary**: attempt `formal-20260826-025500` is immutable historical SafeDrug-family evidence and is not successor evidence. The current worktree is not a clean frozen submission revision; do not launch remote formal work until U5 and the final clean-code gate pass.
-- **Next gates**: generate the Linux environment lock and hash on 319, publish/prove the eight-file snapshot, run seven fresh non-evidence smokes, freeze the measured schedule with GPU 7 reserved, then execute U8/U9 exactly once. U10 cleanup is not part of the current authorization.
+- **Evidence boundary**: attempt `formal-20260826-025500` is immutable historical SafeDrug-family evidence and is not successor evidence. The recovered artifacts are training evidence only; test metrics remain unread and no test is authorized until queue admission succeeds.
+- **Next gates**: commit and review the final local conformance slice, re-accept the measured schedule against that clean harness revision, then use the frozen schedule for any authorized formal submission and admit exactly five serial tests: RETAIN, LEAP, GAMENet, the selected SafeDrug lane, and MoleRec. Keep non-selected SafeDrug lanes `not_tested_by_design`.
 
 ## Completed: Baseline Program Architecture
 

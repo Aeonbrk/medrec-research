@@ -22,7 +22,7 @@ from .errors import ProtocolValidationError
 from .evaluation import evaluate_predictions
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
-from .remote_executor import RemoteExecutor
+from .remote_executor import FrozenSchedule, RemoteExecutor
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
@@ -255,6 +255,26 @@ def _reproduce(
         f"attempt-{source_revision[:12]}-{secrets.token_hex(4)}"
     )
     active_executor = executor or RemoteExecutor(registry)
+    successor_lane_ids = {lane.lane_id for lane in registry.reproduction_lanes}
+    schedule: FrozenSchedule | None = None
+    if any(baseline_id in successor_lane_ids for baseline_id, _ in lanes):
+        schedule_path = getattr(args, "schedule", None)
+        if schedule_path is None:
+            raise ProtocolValidationError(
+                "successor formal reproduction requires an accepted frozen schedule artifact"
+            )
+        schedule = FrozenSchedule.from_json(
+            schedule_path,
+            expected_lane_ids=tuple(lane.lane_id for lane in registry.reproduction_lanes),
+        )
+        cpu_sets = active_executor.validate_frozen_schedule(
+            schedule,
+            source_revision=source_revision,
+            attempt_id=attempt_id,
+            requested_lanes=lanes,
+            requested_cpu_sets=cpu_sets,
+            require_complete=args.baseline_id == "all",
+        )
     results: list[dict[str, object]] = []
     failed = False
     for (baseline_id, gpu_index), cpu_set in zip(lanes, cpu_sets, strict=True):
@@ -270,6 +290,7 @@ def _reproduce(
                 cpu_set=cpu_set,
                 dry_run=args.dry_run,
                 attempt_id=attempt_id,
+                schedule=schedule,
             )
             results.append(
                 {
@@ -524,6 +545,36 @@ def _recover_reproduction(args: argparse.Namespace) -> int:
     return 0
 
 
+def _admit_evaluation(args: argparse.Namespace) -> int:
+    """Validate terminal training evidence before queueing one GPU 7 evaluation."""
+    from .evaluation_queue import admit_validated_training_evaluation
+
+    selection = None
+    if args.selection is not None:
+        selection = parse_json_object(
+            args.selection.read_text(encoding="utf-8"),
+            context="SafeDrug selection",
+        )
+    expected_identity = None
+    if args.expected_identity is not None:
+        expected_identity = parse_json_object(
+            args.expected_identity.read_text(encoding="utf-8"),
+            context="expected training identity",
+        )
+    entry = admit_validated_training_evaluation(
+        args.queue,
+        attempt_root=args.attempt_root,
+        lane_id=args.lane_id,
+        scientific_baseline_id=args.scientific_baseline_id,
+        training_artifact_id=args.training_artifact_id,
+        test_submission_id=args.test_submission_id,
+        expected_identity=expected_identity,
+        selection=selection,
+    )
+    print(json.dumps(entry, indent=2, sort_keys=True))
+    return 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -627,6 +678,12 @@ def _build_parser() -> argparse.ArgumentParser:
         default="/root/zhb/medrec-data",
         help="External 319 data root",
     )
+    reproduce.add_argument(
+        "--schedule",
+        type=Path,
+        default=None,
+        help="Accepted frozen seven-lane schedule artifact",
+    )
     reproduce.add_argument("--dry-run", action="store_true")
     reproduce.add_argument(
         "--attempt-id",
@@ -686,6 +743,30 @@ def _build_parser() -> argparse.ArgumentParser:
     recovery.add_argument("--recovery-id", required=True)
     recovery.add_argument("--finalizer-revision", required=True)
     recovery.set_defaults(handler=_recover_reproduction)
+
+    admission = commands.add_parser(
+        "admit-evaluation",
+        help="Validate terminal training evidence before queueing a serial GPU 7 test",
+    )
+    admission.add_argument("--queue", type=Path, required=True)
+    admission.add_argument("--attempt-root", type=Path, required=True)
+    admission.add_argument("--lane-id", required=True)
+    admission.add_argument("--scientific-baseline-id", required=True)
+    admission.add_argument("--training-artifact-id", required=True)
+    admission.add_argument("--test-submission-id", required=True)
+    admission.add_argument(
+        "--selection",
+        type=Path,
+        default=None,
+        help="Required for the selected SafeDrug lane",
+    )
+    admission.add_argument(
+        "--expected-identity",
+        type=Path,
+        default=None,
+        help="Optional full v2 identity JSON to bind the training artifact",
+    )
+    admission.set_defaults(handler=_admit_evaluation)
 
     # 7. Stage SafeDrug c721 Dataset
     stage_c721 = commands.add_parser(
