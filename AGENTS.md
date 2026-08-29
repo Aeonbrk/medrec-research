@@ -32,6 +32,7 @@ This repository is the active research home for general medication-recommendatio
 - `baselines/registry.toml`: baseline identity and readiness.
 - `research/`: curated Research Memory and Failure Records.
 - `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`: Mac harness and 319 execution contract.
+- `Handoff.md`: a note one coding agent (or session) leaves behind for the next one, like a shift-change note at a job.
 
 ## Work rules
 
