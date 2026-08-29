@@ -7,13 +7,14 @@ import re
 import secrets
 import shlex
 import subprocess
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 
 from ._validation import require_int
 from .errors import ProtocolValidationError
+from .evaluation_queue import resolve_training_artifact
 from .registry import (
     BaselineDefinition,
     BaselineRegistry,
@@ -21,10 +22,12 @@ from .registry import (
     ResearchMode,
     SourceStatus,
 )
+from .reproduction_evidence import reopen_training_evidence
 
 APPROVED_319_HOSTS = ("319-lab", "319-lab-via-server")
 PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40,64}")
+_PUBLIC_ID = re.compile(r"[A-Za-z0-9._-]{1,128}")
 _GPU_UUID = re.compile(r"GPU-[A-Za-z0-9-]+")
 _CPU_SET = re.compile(r"(?:[0-9]+(?:-[0-9]+)?)(?:,(?:[0-9]+(?:-[0-9]+)?))*")
 
@@ -104,10 +107,24 @@ class FrozenSchedule:
     reserved_gpu: int
     selected_mapping: str
     owner_attempt_id: str | None = None
+    source_schedule_id: str | None = None
+    source_harness_revision: str | None = None
 
     def __post_init__(self) -> None:
         if self.reserved_gpu != 7:
             raise ProtocolValidationError("frozen schedule must reserve GPU 7")
+        lineage = (self.source_schedule_id, self.source_harness_revision)
+        if any(value is not None for value in lineage) and (
+            self.owner_attempt_id is None
+            or not _PUBLIC_ID.fullmatch(self.owner_attempt_id)
+            or self.source_schedule_id is None
+            or not _PUBLIC_ID.fullmatch(self.source_schedule_id)
+            or self.source_harness_revision is None
+            or not _IMMUTABLE_REVISION.fullmatch(self.source_harness_revision)
+        ):
+            raise ProtocolValidationError(
+                "reaccepted frozen schedule requires valid attempt and source identity"
+            )
 
     @classmethod
     def from_json(
@@ -131,8 +148,9 @@ class FrozenSchedule:
     ) -> FrozenSchedule:
         if not isinstance(value, dict):
             raise ProtocolValidationError("frozen schedule artifact must be a JSON object")
-        if value.get("schema_version") != 1:
-            raise ProtocolValidationError("frozen schedule schema_version must be 1")
+        schema_version = value.get("schema_version")
+        if schema_version not in (1, 2):
+            raise ProtocolValidationError("frozen schedule schema_version must be 1 or 2")
         if value.get("stage") != "u7-measured-gpu-schedule":
             raise ProtocolValidationError("frozen schedule stage is invalid")
         if value.get("schedule_state") != "frozen":
@@ -173,10 +191,21 @@ class FrozenSchedule:
 
         owner_attempt_id = value.get("attempt_id")
         if owner_attempt_id is not None and (
-            not isinstance(owner_attempt_id, str)
-            or not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", owner_attempt_id)
+            not isinstance(owner_attempt_id, str) or not _PUBLIC_ID.fullmatch(owner_attempt_id)
         ):
             raise ProtocolValidationError("frozen schedule attempt_id is invalid")
+        source_schedule_id = value.get("source_schedule_id")
+        source_harness_revision = value.get("source_harness_revision")
+        if schema_version == 2 and (
+            owner_attempt_id is None
+            or not isinstance(source_schedule_id, str)
+            or not _PUBLIC_ID.fullmatch(source_schedule_id)
+            or not isinstance(source_harness_revision, str)
+            or not _IMMUTABLE_REVISION.fullmatch(source_harness_revision)
+        ):
+            raise ProtocolValidationError(
+                "reaccepted frozen schedule requires valid attempt and source identity"
+            )
 
         formal_execution = value.get("formal_execution")
         if not isinstance(formal_execution, dict):
@@ -250,13 +279,176 @@ class FrozenSchedule:
             reserved_gpu=reserved_gpu,
             selected_mapping=selected_mapping,
             owner_attempt_id=owner_attempt_id,
+            source_schedule_id=source_schedule_id,
+            source_harness_revision=source_harness_revision,
         )
+
+    def reaccept(
+        self,
+        *,
+        source_schedule_id: str,
+        harness_revision: str,
+        attempt_id: str,
+    ) -> FrozenSchedule:
+        """Bind an unchanged frozen schedule to a clean harness and attempt."""
+        if not _IMMUTABLE_REVISION.fullmatch(harness_revision):
+            raise ProtocolValidationError("reaccepted harness revision is invalid")
+        return FrozenSchedule(
+            harness_revision=harness_revision,
+            environment_sha256=self.environment_sha256,
+            preprocessing_revision=self.preprocessing_revision,
+            snapshot_id=self.snapshot_id,
+            model_source_revisions=self.model_source_revisions,
+            allocations=self.allocations,
+            reserved_gpu=self.reserved_gpu,
+            selected_mapping=self.selected_mapping,
+            owner_attempt_id=attempt_id,
+            source_schedule_id=source_schedule_id,
+            source_harness_revision=self.harness_revision,
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        """Return the canonical public-safe schedule representation."""
+        payload: dict[str, object] = {
+            "schema_version": 2 if self.source_schedule_id is not None else 1,
+            "stage": "u7-measured-gpu-schedule",
+            "schedule_state": "frozen",
+            "harness_revision": self.harness_revision,
+            "environment_sha256": self.environment_sha256,
+            "preprocessing_revision": self.preprocessing_revision,
+            "snapshot_id": self.snapshot_id,
+            "model_source_revisions": dict(self.model_source_revisions),
+            "selected_mapping": self.selected_mapping,
+            "gpu7_reserved": True,
+            "reserved_gpu": self.reserved_gpu,
+            "formal_execution": {
+                "mode": "formal",
+                "reserved_gpu": self.reserved_gpu,
+                "gpu_order": [allocation.gpu_index for allocation in self.allocations],
+                "cpu_set_order": [allocation.cpu_set for allocation in self.allocations],
+            },
+            "mapping": {
+                allocation.lane_id: {
+                    "gpu": allocation.gpu_index,
+                    "cpu_set": allocation.cpu_set,
+                    "numa": allocation.numa_node,
+                }
+                for allocation in self.allocations
+            },
+        }
+        if self.owner_attempt_id is not None:
+            payload["attempt_id"] = self.owner_attempt_id
+        if self.source_schedule_id is not None:
+            payload["source_schedule_id"] = self.source_schedule_id
+            payload["source_harness_revision"] = self.source_harness_revision
+        return payload
 
     def allocation_for(self, lane_id: str) -> ScheduleAllocation:
         for allocation in self.allocations:
             if allocation.lane_id == lane_id:
                 return allocation
         raise ProtocolValidationError(f"frozen schedule omits lane '{lane_id}'")
+
+
+def validate_reproduction_continuation(
+    *,
+    registry: BaselineRegistry,
+    source_schedule: FrozenSchedule,
+    source_schedule_id: str,
+    attempt_root: str | Path,
+    attempt_id: str,
+    training_artifact_ids: Mapping[str, str],
+    harness_revision: str,
+) -> FrozenSchedule:
+    """Prove recovered training evidence before reaccepting one frozen schedule."""
+    executor = RemoteExecutor(registry)
+    lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
+    if set(training_artifact_ids) != set(lane_ids):
+        raise ProtocolValidationError(
+            "continuation admission requires exactly the seven declared training artifacts"
+        )
+    if len(set(training_artifact_ids.values())) != len(lane_ids):
+        raise ProtocolValidationError("continuation training artifacts must be unique")
+
+    requested_lanes = tuple(
+        (allocation.lane_id, allocation.gpu_index) for allocation in source_schedule.allocations
+    )
+    executor.validate_frozen_schedule(
+        source_schedule,
+        source_revision=source_schedule.harness_revision,
+        attempt_id=attempt_id,
+        requested_lanes=requested_lanes,
+        requested_cpu_sets=tuple(allocation.cpu_set for allocation in source_schedule.allocations),
+        require_complete=True,
+    )
+
+    submission_ids: set[str] = set()
+    for lane in registry.reproduction_lanes:
+        training_root, source_root, _ = resolve_training_artifact(
+            attempt_root,
+            training_artifact_ids[lane.lane_id],
+        )
+        if source_root is None:
+            raise ProtocolValidationError(
+                f"continuation lane '{lane.lane_id}' must use recovered training evidence"
+            )
+        try:
+            recovery_roots = tuple(
+                child.resolve()
+                for child in source_root.joinpath("recoveries").iterdir()
+                if child.is_dir()
+            )
+        except OSError as error:
+            raise ProtocolValidationError(
+                f"continuation lane '{lane.lane_id}' recovery namespace cannot be read"
+            ) from error
+        if recovery_roots != (training_root.resolve(),):
+            raise ProtocolValidationError(
+                f"continuation lane '{lane.lane_id}' must have exactly its declared recovery"
+            )
+
+        evidence = reopen_training_evidence(
+            training_root,
+            source_run_root=source_root,
+        )
+        identity = evidence["identity"]
+        baseline = registry.get(lane.scientific_baseline_id)
+        expected = {
+            "attempt_id": attempt_id,
+            "lane_id": lane.lane_id,
+            "scientific_baseline_id": lane.scientific_baseline_id,
+            "program_id": lane.program_id,
+            "profile_id": lane.profile_id,
+            "harness_revision": source_schedule.harness_revision,
+            "model_source_revision": baseline.source.revision,
+            "preprocessing_revision": source_schedule.preprocessing_revision,
+            "snapshot_id": source_schedule.snapshot_id,
+            "environment_sha256": source_schedule.environment_sha256,
+            "mode": "formal",
+        }
+        if any(identity.get(field) != value for field, value in expected.items()):
+            raise ProtocolValidationError(
+                f"continuation lane '{lane.lane_id}' evidence identity is not authoritative"
+            )
+        submission_id = identity["submission_id"]
+        if submission_id in submission_ids:
+            raise ProtocolValidationError("continuation training submissions must be unique")
+        submission_ids.add(submission_id)
+
+    continuation = source_schedule.reaccept(
+        source_schedule_id=source_schedule_id,
+        harness_revision=harness_revision,
+        attempt_id=attempt_id,
+    )
+    executor.validate_frozen_schedule(
+        continuation,
+        source_revision=harness_revision,
+        attempt_id=attempt_id,
+        requested_lanes=requested_lanes,
+        requested_cpu_sets=tuple(allocation.cpu_set for allocation in continuation.allocations),
+        require_complete=True,
+    )
+    return continuation
 
 
 class RemoteExecutor:
@@ -604,6 +796,66 @@ class RemoteExecutor:
             lane_id=lane_id,
             submission_id=session_id,
             cpu_set=cpu_set,
+        )
+
+    def test_launch_command(
+        self,
+        lane_id: str,
+        *,
+        attempt_id: str,
+        submission_id: str,
+        harness_revision: str,
+        remote_root: str,
+        data_root: str,
+        recovery_run_root: str,
+        training_source_root: str,
+        selection_path: str | None = None,
+    ) -> str:
+        """Build one source-native GPU 7 test command for a recovered lane."""
+        declared_lanes = {lane.lane_id for lane in self.registry.reproduction_lanes}
+        if lane_id not in declared_lanes:
+            raise ProtocolValidationError("formal test requires a declared successor lane")
+        baseline, program, profile_id, learning_rate, _ = self._resolve_target(lane_id)
+        self._validate_job_id(attempt_id)
+        self._validate_job_id(submission_id)
+        if not _IMMUTABLE_REVISION.fullmatch(harness_revision):
+            raise ProtocolValidationError("formal test harness revision is invalid")
+        remote_root = self._remote_path(remote_root, field="remote_root")
+        data_root = self._remote_path(data_root, field="data_root")
+        recovery_run_root = self._remote_path(
+            recovery_run_root,
+            field="recovery_run_root",
+        )
+        training_source_root = self._remote_path(
+            training_source_root,
+            field="training_source_root",
+        )
+        if lane_id.startswith("molerec-safedrug"):
+            if selection_path is None:
+                raise ProtocolValidationError("SafeDrug formal test requires selection.json")
+            selection_path = self._remote_path(selection_path, field="selection_path")
+        elif selection_path is not None:
+            raise ProtocolValidationError("only SafeDrug formal test accepts selection.json")
+        return self._launch_command(
+            program,
+            baseline_id=baseline.baseline_id,
+            profile_id=profile_id,
+            learning_rate=learning_rate,
+            remote_root=remote_root,
+            data_root=data_root,
+            gpu_index=7,
+            run_id=submission_id,
+            mode="formal",
+            phase="test",
+            attempt_id=attempt_id,
+            lane_id=lane_id,
+            harness_revision=harness_revision,
+            model_source_revision=baseline.source.revision,
+            environment_sha256=program.environment_sha256 or "unverified",
+            cpu_set="28-31,60-63",
+            run_root_override=recovery_run_root,
+            training_source_root=training_source_root,
+            selection_path=selection_path,
         )
 
     def validate_frozen_schedule(
@@ -1034,6 +1286,7 @@ class RemoteExecutor:
         gpu_index: int,
         run_id: str,
         mode: str = "formal",
+        phase: str = "training",
         profile_id: str | None = None,
         learning_rate: float | None = None,
         attempt_id: str | None = None,
@@ -1043,10 +1296,15 @@ class RemoteExecutor:
         environment_sha256: str | None = None,
         preprocessing_revision: str = PREPROCESSING_REVISION,
         cpu_set: str | None = None,
+        run_root_override: str | None = None,
+        training_source_root: str | None = None,
+        selection_path: str | None = None,
     ) -> str:
         cpu_set = RemoteExecutor._validate_cpu_set(cpu_set)
         dataset_root = str(PurePosixPath(data_root) / program.dataset_subdirectory)
-        run_root = str(PurePosixPath(data_root) / program.run_subdirectory / run_id)
+        run_root = run_root_override or str(
+            PurePosixPath(data_root) / program.run_subdirectory / run_id
+        )
         program_path = str(PurePosixPath(remote_root) / program.entrypoint)
         target_profile = profile_id or baseline_id
         argv = [
@@ -1087,7 +1345,22 @@ class RemoteExecutor:
         if learning_rate is not None:
             argv.extend(["--learning-rate", str(learning_rate)])
         if mode == "formal":
-            argv.extend(["--phase", "training"])
+            if phase not in ("training", "test"):
+                raise ProtocolValidationError("formal reproduction phase is invalid")
+            argv.extend(["--phase", phase])
+            if phase == "test":
+                if run_root_override is None or training_source_root is None:
+                    raise ProtocolValidationError(
+                        "formal test requires recovered and source training roots"
+                    )
+                argv.extend(["--training-source-root", training_source_root])
+                if selection_path is not None:
+                    argv.extend(["--selection", selection_path])
+            elif any(
+                value is not None
+                for value in (run_root_override, training_source_root, selection_path)
+            ):
+                raise ProtocolValidationError("formal training cannot use test continuation paths")
         if mode == "smoke":
             argv.extend(["--mode", "smoke"])
         command = shlex.join(argv)

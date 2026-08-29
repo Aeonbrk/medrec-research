@@ -47,7 +47,7 @@ class _LaneMetadata:
 
 _LANE_METADATA = {
     "molerec-retain": _LaneMetadata("retain", "safedrug-archived", "retain"),
-    "molerec-leap": _LaneMetadata("leap", "safedrug-archived", "leap"),
+    "molerec-leap": _LaneMetadata("leap-safedrug", "safedrug-archived", "leap-safedrug"),
     "molerec-gamenet": _LaneMetadata("gamenet", "safedrug-archived", "gamenet"),
     "molerec-safedrug-lr-1e-5": _LaneMetadata("safedrug", "safedrug-archived", "safedrug"),
     "molerec-safedrug-lr-1e-4": _LaneMetadata("safedrug", "safedrug-archived", "safedrug"),
@@ -265,7 +265,7 @@ def admit_evaluation(
     return entry
 
 
-def _resolve_training_artifact(
+def resolve_training_artifact(
     attempt_root: str | Path,
     training_artifact_id: str,
 ) -> tuple[Path, Path | None, str]:
@@ -324,7 +324,7 @@ def admit_validated_training_evaluation(
     if any(entry["state"] == "running" for entry in queue["entries"]):
         raise ProtocolValidationError("GPU 7 evaluation is already active")
 
-    training_root, source_root, _ = _resolve_training_artifact(
+    training_root, source_root, _ = resolve_training_artifact(
         attempt_root,
         training_artifact_id,
     )
@@ -456,6 +456,7 @@ __all__ = (
     "load_evaluation_queue",
     "new_evaluation_queue",
     "requeue_interrupted_evaluations",
+    "resolve_training_artifact",
     "validate_evaluation_queue",
     "write_evaluation_queue",
 )

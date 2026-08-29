@@ -11,7 +11,7 @@ from collections.abc import Callable, Sequence
 from hashlib import sha256
 from pathlib import Path
 
-from ._validation import parse_json_object
+from ._validation import parse_json_object, write_json_atomic
 from .commands import (
     accept_comparison_command,
     format_baseline_table,
@@ -20,9 +20,19 @@ from .commands import (
 from .dataset import DatasetManifest
 from .errors import ProtocolValidationError
 from .evaluation import evaluate_predictions
+from .molerec_evaluation import (
+    audit_prepared_table1_evaluation,
+    claim_table1_evaluation,
+    finalize_table1_evaluation,
+    prepare_table1_evaluation,
+)
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
-from .remote_executor import FrozenSchedule, RemoteExecutor
+from .remote_executor import (
+    FrozenSchedule,
+    RemoteExecutor,
+    validate_reproduction_continuation,
+)
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
@@ -168,6 +178,13 @@ def _cpu_set_list(value: str) -> tuple[str, ...]:
     if not parsed or any(not item for item in parsed):
         raise argparse.ArgumentTypeError("must be semicolon-separated CPU lists or ranges")
     return parsed
+
+
+def _lane_artifact(value: str) -> tuple[str, str]:
+    lane_id, separator, artifact_id = value.partition("=")
+    if not separator or not lane_id or not artifact_id:
+        raise argparse.ArgumentTypeError("must be LANE_ID=RELATIVE_RESULT_JSON")
+    return lane_id, artifact_id
 
 
 def _reproduction_cpu_sets(
@@ -575,6 +592,146 @@ def _admit_evaluation(args: argparse.Namespace) -> int:
     return 0
 
 
+def _admit_reproduction_continuation(
+    args: argparse.Namespace,
+    *,
+    git_runner: Runner = subprocess.run,
+) -> int:
+    """Validate recovered lanes and publish one additive continuation schedule."""
+    if args.output.exists():
+        raise ProtocolValidationError(f"continuation schedule already exists: {args.output}")
+    artifacts: dict[str, str] = {}
+    for lane_id, artifact_id in args.training_artifact:
+        if lane_id in artifacts:
+            raise ProtocolValidationError(
+                f"continuation training artifact repeats lane '{lane_id}'"
+            )
+        artifacts[lane_id] = artifact_id
+
+    registry = BaselineRegistry.load(args.registry)
+    lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
+    source_schedule = FrozenSchedule.from_json(
+        args.source_schedule,
+        expected_lane_ids=lane_ids,
+    )
+    harness_revision = _local_source_revision(
+        Path.cwd(),
+        require_clean=not args.dry_run,
+        runner=git_runner,
+    )
+    continuation = validate_reproduction_continuation(
+        registry=registry,
+        source_schedule=source_schedule,
+        source_schedule_id=args.source_schedule_id,
+        attempt_root=args.attempt_root,
+        attempt_id=args.attempt_id,
+        training_artifact_ids=artifacts,
+        harness_revision=harness_revision,
+    )
+    if not args.dry_run:
+        write_json_atomic(args.output, continuation.to_dict())
+    print(
+        json.dumps(
+            {
+                "attempt_id": args.attempt_id,
+                "harness_revision": harness_revision,
+                "source_schedule_id": args.source_schedule_id,
+                "state": "validated" if args.dry_run else "admitted",
+                "training_lanes_validated": len(artifacts),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
+def _prepare_molerec_evaluation(args: argparse.Namespace) -> int:
+    """Select SafeDrug and publish the immutable five-test controller state."""
+    registry = BaselineRegistry.load(args.registry)
+    lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
+    schedule = FrozenSchedule.from_json(args.schedule, expected_lane_ids=lane_ids)
+    if schedule.owner_attempt_id != args.attempt_id or schedule.source_harness_revision is None:
+        raise ProtocolValidationError(
+            "evaluation preparation requires the exact attempt-owned continuation schedule"
+        )
+    artifacts: dict[str, str] = {}
+    for lane_id, artifact_id in args.training_artifact:
+        if lane_id in artifacts:
+            raise ProtocolValidationError(f"evaluation training artifact repeats lane '{lane_id}'")
+        artifacts[lane_id] = artifact_id
+    prepared = prepare_table1_evaluation(
+        state_root=args.state_root,
+        registry=registry,
+        attempt_root=args.attempt_root,
+        attempt_id=args.attempt_id,
+        training_artifact_ids=artifacts,
+        training_harness_revision=schedule.source_harness_revision,
+        harness_revision=schedule.harness_revision,
+        preprocessing_revision=schedule.preprocessing_revision,
+        snapshot_id=schedule.snapshot_id,
+        environment_sha256=schedule.environment_sha256,
+    )
+    print(
+        json.dumps(
+            {
+                "attempt_id": prepared["attempt_id"],
+                "selected_safedrug_lane": prepared["selected_safedrug_lane"],
+                "state": "evaluation_prepared",
+                "test_lane_ids": prepared["test_lane_ids"],
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
+def _claim_molerec_evaluation(args: argparse.Namespace) -> int:
+    """Claim one test and print its exact GPU 7 launch command."""
+    claimed = claim_table1_evaluation(
+        state_root=args.state_root,
+        registry=BaselineRegistry.load(args.registry),
+        attempt_root=args.attempt_root,
+        remote_root=args.remote_root,
+        data_root=args.data_root,
+    )
+    print(json.dumps(claimed or {"state": "no_queued_evaluation"}, indent=2, sort_keys=True))
+    return 0
+
+
+def _finalize_molerec_evaluation(args: argparse.Namespace) -> int:
+    """Validate one terminal test pair and advance its queue entry."""
+    finalized = finalize_table1_evaluation(
+        state_root=args.state_root,
+        attempt_root=args.attempt_root,
+    )
+    print(json.dumps(finalized, indent=2, sort_keys=True))
+    return 0
+
+
+def _audit_prepared_molerec_evaluation(args: argparse.Namespace) -> int:
+    """Audit the prepared attempt after all five queue entries validate."""
+    packet = audit_prepared_table1_evaluation(
+        state_root=args.state_root,
+        attempt_root=args.attempt_root,
+        output_path=args.output,
+        reference_path=args.reference,
+    )
+    print(
+        json.dumps(
+            {
+                "axes": packet["axes"],
+                "output": str(args.output),
+                "verdict": packet["verdict"],
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 # -----------------------------------------------------------------------------
 # Parser Construction
 # -----------------------------------------------------------------------------
@@ -767,6 +924,85 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Optional full v2 identity JSON to bind the training artifact",
     )
     admission.set_defaults(handler=_admit_evaluation)
+
+    continuation = commands.add_parser(
+        "admit-reproduction-continuation",
+        help="Validate seven recovered lanes and reaccept the frozen schedule",
+    )
+    continuation.add_argument(
+        "--registry",
+        type=Path,
+        default=Path("baselines/registry.toml"),
+    )
+    continuation.add_argument("--source-schedule", type=Path, required=True)
+    continuation.add_argument("--source-schedule-id", required=True)
+    continuation.add_argument("--attempt-root", type=Path, required=True)
+    continuation.add_argument("--attempt-id", required=True)
+    continuation.add_argument(
+        "--training-artifact",
+        type=_lane_artifact,
+        action="append",
+        required=True,
+        help="Repeat exactly once per lane as LANE_ID=RELATIVE_RESULT_JSON",
+    )
+    continuation.add_argument("--output", type=Path, required=True)
+    continuation.add_argument("--dry-run", action="store_true")
+    continuation.set_defaults(handler=_admit_reproduction_continuation)
+
+    prepare_evaluation = commands.add_parser(
+        "prepare-molerec-table1-evaluation",
+        help="Select SafeDrug and publish the exact five-test queue",
+    )
+    prepare_evaluation.add_argument(
+        "--registry",
+        type=Path,
+        default=Path("baselines/registry.toml"),
+    )
+    prepare_evaluation.add_argument("--schedule", type=Path, required=True)
+    prepare_evaluation.add_argument("--attempt-root", type=Path, required=True)
+    prepare_evaluation.add_argument("--attempt-id", required=True)
+    prepare_evaluation.add_argument(
+        "--training-artifact",
+        type=_lane_artifact,
+        action="append",
+        required=True,
+        help="Repeat exactly once per lane as LANE_ID=RELATIVE_RESULT_JSON",
+    )
+    prepare_evaluation.add_argument("--state-root", type=Path, required=True)
+    prepare_evaluation.set_defaults(handler=_prepare_molerec_evaluation)
+
+    claim_evaluation = commands.add_parser(
+        "claim-molerec-table1-evaluation",
+        help="Claim the next queued test and print its exact GPU 7 command",
+    )
+    claim_evaluation.add_argument("--registry", type=Path, default=Path("baselines/registry.toml"))
+    claim_evaluation.add_argument("--state-root", type=Path, required=True)
+    claim_evaluation.add_argument("--attempt-root", type=Path, required=True)
+    claim_evaluation.add_argument("--remote-root", default="/root/zhb/medrec-research")
+    claim_evaluation.add_argument("--data-root", default="/root/zhb/medrec-data")
+    claim_evaluation.set_defaults(handler=_claim_molerec_evaluation)
+
+    finalize_evaluation_parser = commands.add_parser(
+        "finalize-molerec-table1-evaluation",
+        help="Validate the running terminal pair and advance the queue",
+    )
+    finalize_evaluation_parser.add_argument("--state-root", type=Path, required=True)
+    finalize_evaluation_parser.add_argument("--attempt-root", type=Path, required=True)
+    finalize_evaluation_parser.set_defaults(handler=_finalize_molerec_evaluation)
+
+    prepared_audit = commands.add_parser(
+        "audit-prepared-molerec-table1",
+        help="Run the four-axis audit after five completed queue entries",
+    )
+    prepared_audit.add_argument("--state-root", type=Path, required=True)
+    prepared_audit.add_argument("--attempt-root", type=Path, required=True)
+    prepared_audit.add_argument("--output", type=Path, required=True)
+    prepared_audit.add_argument(
+        "--reference",
+        type=Path,
+        default=Path("research/baseline-preflight/molerec-table1-reference.json"),
+    )
+    prepared_audit.set_defaults(handler=_audit_prepared_molerec_evaluation)
 
     # 7. Stage SafeDrug c721 Dataset
     stage_c721 = commands.add_parser(

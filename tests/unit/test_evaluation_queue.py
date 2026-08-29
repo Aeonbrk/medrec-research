@@ -451,7 +451,7 @@ def test_interrupted_running_entry_can_be_explicitly_requeued(tmp_path: Path) ->
     admit_evaluation(
         path,
         lane_id="molerec-leap",
-        scientific_baseline_id="leap",
+        scientific_baseline_id="leap-safedrug",
         training_artifact_id="runs/leap/result.json",
         test_submission_id="test-leap",
     )

@@ -17,6 +17,7 @@ from baselines.reproduction_runner import (
     _run_logged_with_progress,
     recover_training_lane_v2,
     run_smoke_lane_v2,
+    run_test_lane_v2,
     run_training_lane_v2,
 )
 from medrec_research.reproduction_evidence import reopen_recovered_finalized_pair
@@ -388,6 +389,97 @@ def test_recovery_finalizes_immutable_sibling_without_scientific_command(
             gate_inputs=(),
             error_type=ValueError,
         )
+
+
+def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    upstream, data = _roots(tmp_path)
+    module = _module(tmp_path)
+    module.parse_validation_metrics = lambda text: (_ for _ in ()).throw(
+        ValueError("training log must contain validation Jaccard and DDI metrics")
+    )
+    source_root = tmp_path / "recoverable-test"
+    with pytest.raises(ValueError, match="validation Jaccard"):
+        run_training_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=source_root,
+            python="python",
+            learning_rate=1e-4,
+            identity=IDENTITY,
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    monkeypatch.setitem(sys.modules, "dill", pickle)
+    recovery_root = recover_training_lane_v2(
+        module=module,
+        profile=module.profile,
+        data_dir=data,
+        run_root=source_root,
+        recovery_id="finalizer-test",
+        finalizer_revision="e" * 40,
+        identity=IDENTITY,
+        program_id="safedrug-archived",
+        source_revision="b" * 40,
+        gate_inputs=(),
+        error_type=ValueError,
+    )
+    checkpoint = (
+        source_root
+        / json.loads((recovery_root / "result.json").read_text(encoding="utf-8"))["checkpoint"][
+            "relative_path"
+        ]
+    )
+    checkpoint_bytes = checkpoint.read_bytes()
+    module.run_logged = lambda command, cwd, env, log_path: log_path.write_text(
+        "test", encoding="utf-8"
+    )
+    module.parse_test_log = lambda text: {
+        "rounds": [{"jaccard": 0.5}] * 10,
+        "harness_summary": {
+            "ddi_rate": {"mean": 0.06, "std": 0.0},
+            "jaccard": {"mean": 0.5, "std": 0.0},
+            "avg_f1": {"mean": 0.5, "std": 0.0},
+            "prauc": {"mean": 0.5, "std": 0.0},
+            "avg_medications": {"mean": 10.0, "std": 0.0},
+        },
+    }
+    test_identity = {
+        **IDENTITY,
+        "harness_revision": "f" * 40,
+        "submission_id": "test-submission-1",
+    }
+
+    run_test_lane_v2(
+        module=module,
+        profile=module.profile,
+        upstream_root=upstream,
+        data_dir=data,
+        run_root=recovery_root,
+        training_source_root=source_root,
+        python="python",
+        identity=test_identity,
+        program_id="safedrug-archived",
+        source_revision="b" * 40,
+        gate_inputs=(),
+        error_type=ValueError,
+    )
+
+    status, result = reopen_v2_pair(
+        recovery_root / "test",
+        expected_identity=test_identity,
+        error_type=ValueError,
+    )
+    assert status["state"] == "completed"
+    assert result["artifact_type"] == "test"
+    assert len(result["rounds"]) == 10
+    assert checkpoint.read_bytes() == checkpoint_bytes
 
 
 def test_recovery_rejects_near_miss_parser_failure_without_creating_sibling(

@@ -249,6 +249,12 @@ def main() -> None:
         help="Validation-only SafeDrug selection.json for a test phase",
     )
     parser.add_argument(
+        "--training-source-root",
+        type=Path,
+        default=None,
+        help="Failed source run that owns a recovered training checkpoint",
+    )
+    parser.add_argument(
         "--probe-scope",
         choices=("environment", "full"),
         default="full",
@@ -260,6 +266,8 @@ def main() -> None:
         parser.error("--probe-scope is only supported when --mode probe")
     if args.mode != "formal" and args.phase != "training":
         parser.error("--phase test is only supported when --mode formal")
+    if args.training_source_root is not None and args.phase != "test":
+        parser.error("--training-source-root is only supported for --phase test")
 
     if args.mode == "probe":
         probe_result = run_probe(
@@ -295,6 +303,9 @@ def main() -> None:
             learning_rate=args.learning_rate,
             phase=args.phase,
             selection_path=args.selection,
+            training_source_root=(
+                args.training_source_root.resolve() if args.training_source_root else None
+            ),
         )
 
 

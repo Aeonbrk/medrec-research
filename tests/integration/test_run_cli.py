@@ -9,7 +9,13 @@ from pathlib import Path
 import pytest
 
 from medrec_research import BaselineRegistry, ProtocolValidationError
-from medrec_research.cli import _build_parser, _local_source_revision, _reproduce, _reproduce_smoke
+from medrec_research.cli import (
+    _admit_reproduction_continuation,
+    _build_parser,
+    _local_source_revision,
+    _reproduce,
+    _reproduce_smoke,
+)
 from medrec_research.remote_executor import RemoteSubmission
 
 PROJECT_ROOT = Path(__file__).parents[2]
@@ -399,3 +405,55 @@ def test_reproduce_single_lane_id_dry_run(tmp_path: Path) -> None:
         or "safedrug_archived.py safedrug" in result["command"]
     )
     assert "--learning-rate 1e-05" in result["command"]
+
+
+def test_continuation_command_writes_only_reaccepted_schedule(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    source_path = _write_schedule(tmp_path / "u7-schedule.json")
+    output = tmp_path / "continuation.json"
+    parser = _build_parser()
+    arguments = [
+        "admit-reproduction-continuation",
+        "--source-schedule",
+        str(source_path),
+        "--source-schedule-id",
+        "u7-schedule",
+        "--attempt-root",
+        str(tmp_path),
+        "--attempt-id",
+        "formal-20260828-a09fcab-u8-b",
+        "--output",
+        str(output),
+    ]
+    for lane_id in SUCCESSOR_LANES:
+        arguments.extend(
+            [
+                "--training-artifact",
+                f"{lane_id}=runs/{lane_id}/recoveries/recovery-{lane_id}/result.json",
+            ]
+        )
+    args = parser.parse_args(arguments)
+
+    def admit(**kwargs: object):
+        return kwargs["source_schedule"].reaccept(
+            source_schedule_id=kwargs["source_schedule_id"],
+            harness_revision=kwargs["harness_revision"],
+            attempt_id=kwargs["attempt_id"],
+        )
+
+    def git_runner(argv: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+        stdout = "" if "status" in argv else "b" * 40 + "\n"
+        return subprocess.CompletedProcess(argv, 0, stdout, "")
+
+    monkeypatch.setattr("medrec_research.cli.validate_reproduction_continuation", admit)
+    assert _admit_reproduction_continuation(args, git_runner=git_runner) == 0
+
+    persisted = json.loads(output.read_text(encoding="utf-8"))
+    assert persisted["schema_version"] == 2
+    assert persisted["attempt_id"] == "formal-20260828-a09fcab-u8-b"
+    assert persisted["source_schedule_id"] == "u7-schedule"
+    assert "command" not in json.loads(capsys.readouterr().out)
+    assert not any(hasattr(args, field) for field in ("phase", "recovery_id", "checkpoint"))

@@ -787,6 +787,7 @@ def run_test_lane_v2(
     upstream_root: Path,
     data_dir: Path,
     run_root: Path,
+    training_source_root: Path | None = None,
     python: str,
     identity: Mapping[str, str],
     program_id: str,
@@ -805,11 +806,42 @@ def run_test_lane_v2(
         profile=profile,
         error_type=error_type,
     )
-    training_status, training_result = reopen_v2_pair(
-        run_root,
-        expected_identity=identity,
-        error_type=error_type,
-    )
+    if training_source_root is None:
+        checkpoint_root = run_root
+        training_status, training_result = reopen_v2_pair(
+            run_root,
+            expected_identity=identity,
+            error_type=error_type,
+        )
+    else:
+        checkpoint_root = training_source_root
+        training_status, training_result = reopen_recovered_v2_pair(
+            training_source_root,
+            run_root,
+            error_type=error_type,
+        )
+        training_identity = training_result["identity"]
+        _validate_identity_binding(
+            training_identity,
+            program_id=program_id,
+            source_revision=source_revision,
+            profile=profile,
+            error_type=error_type,
+        )
+        shared_fields = (
+            "attempt_id",
+            "lane_id",
+            "scientific_baseline_id",
+            "program_id",
+            "profile_id",
+            "model_source_revision",
+            "preprocessing_revision",
+            "snapshot_id",
+            "environment_sha256",
+            "mode",
+        )
+        if any(training_identity[field] != identity[field] for field in shared_fields):
+            raise error_type("test identity does not continue the recovered training lane")
     if (
         training_status["state"] != "completed"
         or training_result.get("artifact_type") != "training"
@@ -833,7 +865,7 @@ def run_test_lane_v2(
         or ".." in Path(relative_path).parts
     ):
         raise error_type("training artifact has an invalid checkpoint path")
-    checkpoint = run_root / relative_path
+    checkpoint = checkpoint_root / relative_path
     if not checkpoint.is_file() or checkpoint.is_symlink():
         raise error_type("training checkpoint is missing or is not a regular file")
     calc_sha256 = _module_value(module, "sha256")

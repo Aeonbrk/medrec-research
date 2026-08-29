@@ -28,7 +28,12 @@ PREPROCESSING_REVISION = "c" * 40
 def _ledger() -> dict[str, Any]:
     lane_specs = {
         "molerec-retain": ("retain", "safedrug-archived", "retain", "b" * 40),
-        "molerec-leap": ("leap", "safedrug-archived", "leap-safedrug", "b" * 40),
+        "molerec-leap": (
+            "leap-safedrug",
+            "safedrug-archived",
+            "leap-safedrug",
+            "b" * 40,
+        ),
         "molerec-gamenet": ("gamenet", "safedrug-archived", "gamenet", "b" * 40),
         "molerec-safedrug-lr-1e-5": ("safedrug", "safedrug-archived", "safedrug", "b" * 40),
         "molerec-safedrug-lr-1e-4": ("safedrug", "safedrug-archived", "safedrug", "b" * 40),

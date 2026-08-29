@@ -21,6 +21,13 @@ from .reproduction_evidence import reopen_finalized_pair
 from .safedrug_selection import require_selected_safedrug_lane
 
 REQUIRED_MOLEREC_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
+SCIENTIFIC_IDENTITY_IDS = {
+    "retain": "retain",
+    "leap": "leap-safedrug",
+    "gamenet": "gamenet",
+    "safedrug": "safedrug",
+    "molerec": "molerec",
+}
 REQUIRED_LANE_IDS = (
     "molerec-retain",
     "molerec-leap",
@@ -445,7 +452,7 @@ def audit_molerec_table1(
             )
             if status["state"] != "completed" or result.get("state") != "completed":
                 raise ProtocolValidationError(f"{baseline_id} result pair is not completed")
-            if result["identity"]["scientific_baseline_id"] != baseline_id:
+            if result["identity"]["scientific_baseline_id"] != SCIENTIFIC_IDENTITY_IDS[baseline_id]:
                 raise ProtocolValidationError(
                     f"{baseline_id} result has the wrong scientific baseline"
                 )
