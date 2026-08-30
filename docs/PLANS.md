@@ -1,15 +1,16 @@
 # Plans
 
-## Blocked: Five-Model Baseline Readiness
+## Completed: Five-Model Baseline Readiness
 
 - **Plan**: `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`.
-- **Phase A state**: attempt `formal-20260828-a09fcab-u8-b` is `formal_incomplete`. The exact schedule was reaccepted at clean harness revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`, validation-only SafeDrug selection chose `molerec-safedrug-lr-5e-4`, and the five-entry serial queue was published before testing.
-- **Terminal event**: RETAIN, the first and only claimed test, finalized as `failed` / `test_failed` before upstream ten-round evaluation because the recovered-test invocation used the recovery directory basename instead of the original training-run basename. The failed evidence was preserved; no later lane was claimed and no test metric was inferred.
-- **Axes**: `execution_integrity = failed`, `paper_point_fidelity = not_evaluated`, `directional_relationships = not_evaluated`, and `artifact_completeness = failed`. No final audit packet exists because the five-pair barrier correctly rejected admission.
-- **Phase B state**: not started. The five baselines remain `registered`, with no current-scope Comparison Qualification. The first shared blocker is the missing legal Phase A five-pair audit required before Comparison execution.
-- **Suite conclusions**: `engineering_ready = false`, `reproduction_complete = false`, and `research_baseline_ready = false`.
+- **Phase A state**: attempt `formal-20260828-a09fcab-u8-b` completed through continuation `continuation-20260830-pathfix-1`. All five frozen upstream ten-round tests finalized legally; no training lane, recovery ID, checkpoint, threshold, or test selection changed.
+- **Axes**: `execution_integrity = passed`, `paper_point_fidelity = failed` (16/25), `directional_relationships = failed` (3/4), and `artifact_completeness = passed`. The terminal verdict is `completed_mismatch`.
+- **Phase B state**: RETAIN, LEAP, GAMENet, selected SafeDrug, and MoleRec each passed all seven qualification gates under one Unified Research Protocol v1.1 Comparison Scope at harness revision `9fa239269f5a9ac0c394263ebe0ba3c02fbdafc5`.
+- **Shared scope**: Dataset Manifest `82d4efc2…`, 1,058 patient-disjoint test patients, 1,206 eligible visits, 131 medications, feature identity `9e403591…`, DDI asset `dcb20789…`, and equal Adaptation Budget `180fd7e4…`.
+- **Suite conclusions**: `engineering_ready = true`, `reproduction_complete = true`, and `research_baseline_ready = true`.
+- **Execution note**: the user explicitly authorized SafeDrug and MoleRec Phase B qualification on shared GPU 0 after 0% utilization and sufficient free memory were verified; the resident external process was not stopped. The exclusivity exception is public and did not change scientific behavior or qualification semantics.
 - **Reports**: `research/baseline-preflight/molerec-five-model-reproduction-report.md` and `research/baseline-preflight/five-model-baseline-readiness-report.md`.
-- **Authorized continuation**: on `2026-08-30`, the user authorized one additive continuation identity that reuses the seven immutable training/recovery pairs without retraining. It must create new submission IDs and independent test roots, preserve the failed queue, and wait for a clean committed harness plus an idle reserved GPU 7 before launch.
+- **Qualification artifact**: `research/baseline-preflight/five-model-comparison-qualification.json`.
 
 ## Completed: MoleRec Finalization Recovery and Conformance
 
@@ -18,14 +19,14 @@
 - **Local conformance**: validation-only SafeDrug selection, declaration-owned probes, additive frozen-schedule continuation admission, recovered-test invocation, exact five-entry queue admission, failed-entry terminalization, and the five-pair audit barrier are synthetic-tested. These checks are not scientific evidence.
 - **Remote boundary**: The original source artifacts and seven recovery siblings remain immutable. The accepted schedule was additively rebound to clean revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`; the source schedule was not overwritten. The first formal RETAIN test then failed as recorded above, closing the current attempt without a five-model result.
 
-## Blocked: MoleRec Table 1 Five-Model Full Reproduction
+## Completed: MoleRec Table 1 Five-Model Full Reproduction
 
-- **Status**: The recovery slice for `formal-20260828-a09fcab-u8-b` is complete, but the five-model reproduction is `formal_incomplete`. One finalized failed RETAIN test pair exists; four canonical tests and the final audit do not.
+- **Status**: The original failed queue remains preserved, and the authorized continuation completed all five canonical test pairs plus the terminal audit without retraining.
 - **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md` is authoritative for this work.
 - **Scientific scope**: RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec use the frozen SafeDrug archived revision `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, MoleRec revision `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, and preprocessing revision `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`. Five scientific models map to seven 50-epoch training lanes because SafeDrug has three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection.
 - **Current contract**: all seven lanes use `medrec-molerec-table1` (Python 3.8.16, PyTorch 1.9.0+cu111, PyG 2.0.3) and the additive `snapshots/molerec-table1-c721-www23` declaration. The executable dataset contract is 6,350 patients, 15,032 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures; 14,995 remains paper-reported metadata only.
-- **Evidence boundary**: attempt `formal-20260826-025500` remains immutable historical SafeDrug-family evidence and is not successor evidence. The seven recovered artifacts are training evidence only. The failed RETAIN pair contains no test metrics; neither training artifacts nor logs may substitute for the four absent pairs.
-- **Next gate**: the current queue cannot be continued or audited. The authorized additive continuation must preserve it, reuse the existing training/recovery evidence without mutation, and create a new five-entry controller state with distinct test submissions and test roots.
+- **Evidence boundary**: attempt `formal-20260826-025500` remains immutable historical SafeDrug-family evidence and is not successor evidence. The original failed RETAIN pair still contains no test metrics. Only the five finalized continuation test pairs feed the terminal audit.
+- **Outcome**: `completed_mismatch`; execution integrity and artifact completeness passed, while paper point fidelity and one directional relationship missed.
 
 ## Completed: Baseline Program Architecture
 

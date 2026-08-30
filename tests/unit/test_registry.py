@@ -241,11 +241,43 @@ def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
     assert baseline.archive_evidence
 
 
-def test_project_registry_makes_no_readiness_claims() -> None:
+def test_project_registry_qualifies_exactly_the_five_target_baselines() -> None:
     registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
 
     assert len(registry.baselines) == 6
-    assert {baseline.readiness for baseline in registry.baselines} == {BaselineReadiness.REGISTERED}
+    assert registry.get("reference").readiness is BaselineReadiness.REGISTERED
+    target_ids = {"retain", "leap-safedrug", "gamenet", "safedrug", "molerec"}
+    targets = tuple(registry.get(baseline_id) for baseline_id in target_ids)
+    assert {baseline.readiness for baseline in targets} == {BaselineReadiness.COMPARISON_READY}
+    assert all(baseline.is_comparable for baseline in targets)
+    shared_scopes = {
+        (
+            qualification.protocol_version,
+            qualification.dataset_manifest_sha256,
+            qualification.adaptation_budget_sha256,
+            qualification.protocol_amendment_sha256,
+        )
+        for baseline in targets
+        for qualification in baseline.comparison_qualifications
+    }
+    assert shared_scopes == {
+        (
+            "1.1",
+            "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+            "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+            "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929",
+        )
+    }
+    assert (
+        len(
+            {
+                qualification.method_profile_sha256
+                for baseline in targets
+                for qualification in baseline.comparison_qualifications
+            }
+        )
+        == 5
+    )
     assert len(registry.reproduction_programs) == 2
     assert {p.program_id for p in registry.reproduction_programs} == {
         "safedrug-archived",
@@ -276,7 +308,7 @@ def test_project_registry_makes_no_readiness_claims() -> None:
     assert leap.source.revision == "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
     assert leap.reproduction_program == program.program_id
     assert leap.source.status is SourceStatus.PINNED
-    assert not leap.is_comparable
+    assert leap.is_comparable
 
     molerec = registry.get("molerec")
     assert molerec.display_name == "MoleRec (Table 1)"

@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "kind": "five_model_comparison_qualification",
+  "harness_revision": "9fa239269f5a9ac0c394263ebe0ba3c02fbdafc5",
+  "shared_scope": {
+    "protocol_version": "1.1",
+    "protocol_amendment_sha256": "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929",
+    "adaptation_budget_sha256": "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "comparison_lineage_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "eligible_test_visits": 1206,
+    "test_patients": 1058,
+    "medication_vocabulary_size": 131
+  },
+  "environments": {
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "core_environment_sha256": "ae1eccdc957228efc20c60fa477355614d59ccf0a336302f08cd9692bc992108"
+  },
+  "execution": {
+    "gpu_index": 0,
+    "cpu_set": "0-3,32-35",
+    "shared_gpu_authorized_by_user": true,
+    "external_processes_untouched": true,
+    "prelaunch_utilization_percent": 0,
+    "prelaunch_free_memory_mib": 22359
+  },
+  "methods": [
+    {
+      "method_id": "retain",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "profile_id": "retain",
+      "adapter_revision": "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c",
+      "method_profile_sha256": "7060e7ba6a522e45284afe49034adcc0d7213ff9eb8b0c5115be39d47cbb1f47",
+      "attempt_sha256": "f55528dc47c5448f89728e5cda7450b31b6ab72225511d00abfa951b843bd04c",
+      "qualification_sha256": "b14f12ae7ea64df239a7b8a51eb939287e74ee84b04bbf473473bd77b6f131c8",
+      "evaluation_sha256": "09c22212d3cbb80cc4d9b186413356f404b8bdf00946da349ad05ad4e4b26afb",
+      "outcomes_sha256": "290145534924bca7d724a34dbc073821885262701db7d1d04fdf950eddc0404b",
+      "uncertainty_sha256": "5878e8c759c2b90ed0c4c1c82946a4edc6b85abe00c530a523af1df237b9d2e3",
+      "gates": {
+        "environment_lock": "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc",
+        "adapter_smoke": "56de4b3c2e34c6cafb42e4954f498715cad80d56dcdf31d622c44659400918a7",
+        "cohort_identity": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+        "adaptation_budget": "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+        "core_integrity": "09852a7fd5938a6ffd5a5bb4bfaa227e249c367558b867929ed7772581c92c1e",
+        "deterministic_adapter": "327d732c0f20fb2517df4a8b5e47b78744a85a50ba659ab097ee467e30e21aef",
+        "independent_evaluation": "09c22212d3cbb80cc4d9b186413356f404b8bdf00946da349ad05ad4e4b26afb"
+      },
+      "point": {
+        "ddi_rate": 0.08909054719166185,
+        "jaccard": 0.4871779917477049,
+        "f1": 0.6477292179281825,
+        "prauc": 0.7577593568753614,
+        "average_medication_count": 19.11111111111111
+      }
+    },
+    {
+      "method_id": "leap-safedrug",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "profile_id": "leap-safedrug",
+      "adapter_revision": "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c",
+      "method_profile_sha256": "4996aee1f6a1c2a4849cbdf6308136dfbfb402d89a0e1fd2ee373d25e45294c7",
+      "attempt_sha256": "8113f8f0cc82e748516b35eedd3f9b0071c819b5b15e99283a392d2ece4ff356",
+      "qualification_sha256": "c2d258d24aaadfc775f2b6b36ad450a094e06657d8aa3352902a6604eb10d7b6",
+      "evaluation_sha256": "5c6d84ca2af2049d03a46c2e566e6bde3ffc9f4b2da88f8ec879e57ccdf9399f",
+      "outcomes_sha256": "22d54f8add442e66e525cbb257f3b805b7d83794ab7c7221802f73a96057c8e5",
+      "uncertainty_sha256": "4ebcdda17758649addcd09222ffd76b81e0e99de3813ddcca7ee28622bfb1d36",
+      "gates": {
+        "environment_lock": "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc",
+        "adapter_smoke": "87894a338188a26228971011914e71d56fed34e0be03ea338a6bd8db07acfd3c",
+        "cohort_identity": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+        "adaptation_budget": "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+        "core_integrity": "9dd4edbe5edfd8addf03f3bb708a3eb1a7a09713f55fe4d3f6be80e280d1fb5a",
+        "deterministic_adapter": "a72a34e36176945bc985e2bef8a722aadc46e4bd24740f99b2dfc1f0312ded37",
+        "independent_evaluation": "5c6d84ca2af2049d03a46c2e566e6bde3ffc9f4b2da88f8ec879e57ccdf9399f"
+      },
+      "point": {
+        "ddi_rate": 0.07233211233211233,
+        "jaccard": 0.4565115538738306,
+        "f1": 0.6185788050824941,
+        "prauc": 0.6572854910980945,
+        "average_medication_count": 18.766169154228855
+      }
+    },
+    {
+      "method_id": "gamenet",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "profile_id": "gamenet",
+      "adapter_revision": "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c",
+      "method_profile_sha256": "102f13d38387f79b9f1403403bb7a8c62edfbef4ff3dfddd9980876cd6f591be",
+      "attempt_sha256": "1b09d613df2ee775a10d2af68aa48f8896d03e6999b33f79104b6ca20cf5a7eb",
+      "qualification_sha256": "79891870af4ca45db46c0d11d87a58e3e21efde5244c80da02fdbc0fb75f8cca",
+      "evaluation_sha256": "8609fda14004b6c45df1b7280c61479685e76a091194071e4588bae7031d145c",
+      "outcomes_sha256": "b731f2e7ec3a81be5b27f847b25c4b77e98e2917684848a9323297f054b06574",
+      "uncertainty_sha256": "6305c6b6d12c020eb48d62f34c514145b01cdcb59b0e2cb25018ce2a236a6041",
+      "gates": {
+        "environment_lock": "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc",
+        "adapter_smoke": "ab1a3d5224548e356db81fa35ea78595a1b19086ad58651c1ff0eb41b81f8ae8",
+        "cohort_identity": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+        "adaptation_budget": "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+        "core_integrity": "12374924b3803ad2b0858e21b1088c2b113b804db9e9acdd1d6b4efd8ca7941e",
+        "deterministic_adapter": "b9ff5906437071761deb3bd355e694f9c5dbbb862a94706a3e669f69465ad624",
+        "independent_evaluation": "8609fda14004b6c45df1b7280c61479685e76a091194071e4588bae7031d145c"
+      },
+      "point": {
+        "ddi_rate": 0.08572288687399872,
+        "jaccard": 0.5034039828349219,
+        "f1": 0.6607672240910322,
+        "prauc": 0.7690416288367263,
+        "average_medication_count": 28.069651741293534
+      }
+    },
+    {
+      "method_id": "safedrug",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "profile_id": "safedrug",
+      "adapter_revision": "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c",
+      "method_profile_sha256": "22030de3acc62fc51d2884883f61b97f2d3b251c74b08f27a6926a60ec4d34fb",
+      "attempt_sha256": "058653d18f34b8ca9a7c7291eea6a0980da3dca77d527cffe23c52a992563d06",
+      "qualification_sha256": "5280019b273053f030b9d636ef302eefcea76abaacf0891db2b9df2be3632c92",
+      "evaluation_sha256": "79a1be50dc1d16d2e4baf06c98489e59ca783395a25cf2fb21fea40e48f1f8d5",
+      "outcomes_sha256": "0b011e2dec9080e844597a6d7492273899735196168d9f0ea1757a39a9374375",
+      "uncertainty_sha256": "2cc56076f1b1236e3d2fda1838cecaaa737a5724acabc91387c4fdd02cedf633",
+      "gates": {
+        "environment_lock": "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc",
+        "adapter_smoke": "4962beef320fecd1e12151827c8f221acdc5b94a5ca83aa951d8ba7ee3d65df0",
+        "cohort_identity": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+        "adaptation_budget": "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+        "core_integrity": "57749f6834b5333611beb1501d47004567504ffd09589b19dc698da6c42116fe",
+        "deterministic_adapter": "bd690181760bab3716f09f2da3471d6c7bdfd80fe41be2a1505d3b5add3acec4",
+        "independent_evaluation": "79a1be50dc1d16d2e4baf06c98489e59ca783395a25cf2fb21fea40e48f1f8d5"
+      },
+      "point": {
+        "ddi_rate": 0.06006978049236725,
+        "jaccard": 0.5141825460443046,
+        "f1": 0.6716212647691427,
+        "prauc": 0.7649832109384972,
+        "average_medication_count": 19.995854063018243
+      }
+    },
+    {
+      "method_id": "molerec",
+      "source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+      "profile_id": "molerec-embedding",
+      "adapter_revision": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+      "method_profile_sha256": "dcbdc5f53e47063ec7f9c745aafc5b314404419a84fa3e8986cbcc742563103a",
+      "attempt_sha256": "d057a0add3f471d212dcbbb9f3fbcbead251947c3ddb5f33a4117906d41da12e",
+      "qualification_sha256": "f3a00ae82a493e9372074a3ebb82ec0c1407d5fb945345c50de56818719ec220",
+      "evaluation_sha256": "9423208d74bae5388a854a9f4dec53241c29ee3167a04dada9ac49cf20ba0b47",
+      "outcomes_sha256": "9c0b3d4d964cc803ef305639068caef0acd6c450beed3bf73b5ce37f441b7723",
+      "uncertainty_sha256": "918ee8e3a44bbcd946cf238c1b1cbe5610fb6621394d737c0fca96db8148c41b",
+      "gates": {
+        "environment_lock": "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc",
+        "adapter_smoke": "4fa4ab567bb71692d2f3ab43ea7d9e265230a61f3ea71f1209173e94b5aa44c2",
+        "cohort_identity": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+        "adaptation_budget": "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5",
+        "core_integrity": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+        "deterministic_adapter": "aee7657c5e0cf50dbaf211441fadfd4a43fe369d7355b01b335f59c388158c1a",
+        "independent_evaluation": "9423208d74bae5388a854a9f4dec53241c29ee3167a04dada9ac49cf20ba0b47"
+      },
+      "point": {
+        "ddi_rate": 0.07365416578839157,
+        "jaccard": 0.5268900123861414,
+        "f1": 0.6821680555989535,
+        "prauc": 0.7730634612715569,
+        "average_medication_count": 21.66169154228856
+      }
+    }
+  ]
+}

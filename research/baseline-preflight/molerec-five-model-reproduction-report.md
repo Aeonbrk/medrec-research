@@ -2,16 +2,16 @@
 
 ## Verdict
 
-Attempt `formal-20260828-a09fcab-u8-b` is `formal_incomplete`.
+Attempt `formal-20260828-a09fcab-u8-b`, completed through continuation `continuation-20260830-pathfix-1`, is `completed_mismatch`.
 
-This is an execution failure, not a paper mismatch. No five-model aggregate, paper-point comparison, or directional relationship can be inferred from the available evidence.
+The execution is legal and complete. The mismatch means that some paper point intervals and one directional relationship were not reproduced; it is not permission to retrain, tune, select a different checkpoint, change a threshold, or replay a test.
 
-| Axis | Result | Evidence boundary |
+| Axis | Result | Evidence |
 | --- | --- | --- |
-| `execution_integrity` | failed | The first formal RETAIN test finalized `failed` / `test_failed` before upstream ten-round evaluation. |
-| `paper_point_fidelity` | not evaluated | No valid RETAIN test metrics and no five-model test set exist. |
-| `directional_relationships` | not evaluated | The required five current-attempt test pairs do not exist. |
-| `artifact_completeness` | failed | One failed test pair exists; four canonical test pairs and the final audit packet are absent. |
+| `execution_integrity` | passed | All five continuation test pairs reopen with the frozen source, environment, checkpoint, schedule, and ten-round semantics. |
+| `paper_point_fidelity` | failed | 16 of 25 paper point checks passed. |
+| `directional_relationships` | failed | 3 of 4 declared directional checks passed. |
+| `artifact_completeness` | passed | Five finalized test pairs and the terminal audit packet exist. |
 
 ## Frozen scientific identity
 
@@ -19,21 +19,20 @@ This is an execution failure, not a paper mismatch. No five-model aggregate, pap
 - MoleRec uses `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`.
 - The shared preprocessing revision is `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`.
 - All seven 50-epoch training lanes reuse their validated immutable recovery siblings. No lane was retrained and no recovery identity changed.
+- Validation-only selection chose `molerec-safedrug-lr-5e-4`; the `1e-5` and `1e-4` lanes remain `not_tested_by_design`.
 
-## Admitted continuation
+## Upstream ten-round results
 
-The attempt-owned frozen schedule was additively rebound to clean harness revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`. The seven-lane order, measured GPU and CPU allocation, lane isolation, and GPU 7 reservation were unchanged.
+| Model | DDI | Jaccard | F1 | PRAUC | Avg medications |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RETAIN | 0.0885 ± 0.0014 | 0.4872 ± 0.0026 | 0.6475 ± 0.0025 | 0.7598 ± 0.0045 | 19.1019 ± 0.2296 |
+| LEAP | 0.0720 ± 0.0005 | 0.4581 ± 0.0024 | 0.6191 ± 0.0023 | 0.6541 ± 0.0039 | 18.6645 ± 0.0893 |
+| GAMENet | 0.0856 ± 0.0004 | 0.4985 ± 0.0020 | 0.6553 ± 0.0020 | 0.7655 ± 0.0022 | 27.8810 ± 0.1553 |
+| SafeDrug | 0.0601 ± 0.0005 | 0.5149 ± 0.0025 | 0.6715 ± 0.0022 | 0.7659 ± 0.0023 | 19.9595 ± 0.1518 |
+| MoleRec | 0.0724 ± 0.0008 | 0.5292 ± 0.0031 | 0.6834 ± 0.0028 | 0.7728 ± 0.0024 | 21.5314 ± 0.1653 |
 
-Validation-only SafeDrug selection consumed the three recovered candidates and selected `molerec-safedrug-lr-5e-4`. The `1e-5` and `1e-4` candidates remain `not_tested_by_design`. The frozen serial test order was RETAIN, LEAP, GAMENet, selected SafeDrug, and MoleRec.
+These are Reproduction Mode aggregates only. They do not create Comparison Mode readiness and were not used to choose the later Comparison configuration.
 
-## Terminal event
+## Evidence boundary
 
-RETAIN was the only claimed formal test. Its status/result pair finalized as `failed` / `test_failed`, with artifact type `test` and no test metrics. The recovered-test controller formed the upstream model name from the recovery directory basename, while the source checkpoint namespace had been formed from the original training-run basename. Upstream therefore could not resolve the checkpoint name before evaluation began.
-
-The failed pair was retained. The controller did not claim LEAP, GAMENet, selected SafeDrug, or MoleRec. It did not retry RETAIN, read a training artifact as a test result, use historical four-model metrics, or bypass the five-pair audit barrier.
-
-## Engineering correction and evidence boundary
-
-The local runner now derives the recovered test model name from the original training source root and exposes the validated source checkpoint through the basename-only upstream namespace. The queue also refuses later claims after any failed or blocked entry, while finalization leaves a queue-write interruption safely retryable without replaying the test. Focused tests cover these behaviors and reject a mismatched test identity.
-
-These changes are prospective engineering corrections only. They do not repair, relabel, or authorize a replay of this attempt. A future execution requires an explicit new attempt or continuation contract.
+The original failed RETAIN queue and evidence remain immutable. The authorized continuation used new test submission identities and independent test roots while reusing only the admitted seven training/recovery pairs. No historical four-model test metric, training artifact, log inference, seed sweep, test-driven selection, or mismatch-driven retry entered the audit.

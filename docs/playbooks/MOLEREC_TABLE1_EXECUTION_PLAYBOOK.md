@@ -1,6 +1,6 @@
 # MoleRec Table 1 Five-Model Reproduction Playbook
 
-This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. As of 2026-08-29, attempt `formal-20260828-a09fcab-u8-b` is `formal_incomplete`: its seven source lanes retain one validated immutable recovery sibling each, but its first formal RETAIN test finalized `failed` / `test_failed`. Do not claim another test, retry RETAIN, or run the final audit for this attempt.
+This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. Attempt `formal-20260828-a09fcab-u8-b` completed through authorized continuation `continuation-20260830-pathfix-1` with verdict `completed_mismatch`. The original failed queue and all continuation evidence are terminal; do not replay, relabel, or tune them.
 
 ## Scope and Invariants
 
@@ -41,9 +41,9 @@ This playbook is the operator gate for the reproduction defined by `docs/plans/2
 
 The following local contracts are implemented and synthetic-tested: registry lanes and program-declared probes, v2 status/result identity, atomic finalization, immutable source-aware recovery, validation-only SafeDrug selection, the eight-file snapshot builder, the four-axis audit, the frozen-schedule admission contract, the persisted GPU 7 queue, and bounded running-status heartbeats.
 
-The clean continuation gate passed at revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`. Validation-only SafeDrug selection chose `molerec-safedrug-lr-5e-4`, the exact five-entry queue was published, and RETAIN was the only claimed test. That test failed before ten-round evaluation because the recovered invocation used the recovery directory basename rather than the original training-run basename.
+The original failed RETAIN pair, queue, ledger, selection, preregistration, schedules, and seven recovered training results remain immutable evidence. The failed queue is closed to further claims. The authorized additive continuation `continuation-20260830-pathfix-1` reused the same seven training/recovery pairs without retraining, created distinct test submissions and roots, and completed RETAIN, LEAP, GAMENet, selected SafeDrug, and MoleRec with the frozen upstream ten-round semantics.
 
-The failed pair, queue, ledger, selection, preregistration, schedules, and seven recovered training results are immutable evidence. The failed queue is closed to further claims. On 2026-08-30, the user authorized one additive continuation identity that reuses the same seven training/recovery pairs without retraining. It must create distinct test submissions and write test evidence under `continuations/<continuation-id>/tests/<lane-id>`; it must not replay, overwrite, or relabel the failed pair. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
+The terminal audit verdict is `completed_mismatch`: execution integrity and artifact completeness passed, paper point fidelity passed 16 of 25 checks, and directional relationships passed 3 of 4 checks. This is the final Reproduction Mode result; do not replay or tune it. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
 
 ## Operator Sequence
 

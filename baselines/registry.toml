@@ -58,8 +58,46 @@ status = "needs_pin"
 baseline_id = "gamenet"
 display_name = "GAMENet (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
+readiness = "comparison_ready"
 reproduction_program = "safedrug-archived"
+adapter_command = ["python", "baselines/safedrug_comparison.py", "gamenet"]
+adapter_revision = "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c"
+environment_sha256 = "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+
+[[baselines.readiness_evidence]]
+gate = "adapter_smoke"
+artifact_sha256 = "ab1a3d5224548e356db81fa35ea78595a1b19086ad58651c1ff0eb41b81f8ae8"
+
+[[baselines.readiness_evidence]]
+gate = "environment_lock"
+artifact_sha256 = "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc"
+
+[[baselines.comparison_qualifications]]
+protocol_version = "1.1"
+dataset_manifest_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+adaptation_budget_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+protocol_amendment_sha256 = "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929"
+method_profile_sha256 = "102f13d38387f79b9f1403403bb7a8c62edfbef4ff3dfddd9980876cd6f591be"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "cohort_identity"
+artifact_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "adaptation_budget"
+artifact_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "core_integrity"
+artifact_sha256 = "12374924b3803ad2b0858e21b1088c2b113b804db9e9acdd1d6b4efd8ca7941e"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "deterministic_adapter"
+artifact_sha256 = "b9ff5906437071761deb3bd355e694f9c5dbbb862a94706a3e669f69465ad624"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "independent_evaluation"
+artifact_sha256 = "8609fda14004b6c45df1b7280c61479685e76a091194071e4588bae7031d145c"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -70,8 +108,46 @@ status = "pinned"
 baseline_id = "safedrug"
 display_name = "SafeDrug (archived)"
 supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
+readiness = "comparison_ready"
 reproduction_program = "safedrug-archived"
+adapter_command = ["python", "baselines/safedrug_comparison.py", "safedrug"]
+adapter_revision = "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c"
+environment_sha256 = "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+
+[[baselines.readiness_evidence]]
+gate = "adapter_smoke"
+artifact_sha256 = "4962beef320fecd1e12151827c8f221acdc5b94a5ca83aa951d8ba7ee3d65df0"
+
+[[baselines.readiness_evidence]]
+gate = "environment_lock"
+artifact_sha256 = "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc"
+
+[[baselines.comparison_qualifications]]
+protocol_version = "1.1"
+dataset_manifest_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+adaptation_budget_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+protocol_amendment_sha256 = "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929"
+method_profile_sha256 = "22030de3acc62fc51d2884883f61b97f2d3b251c74b08f27a6926a60ec4d34fb"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "cohort_identity"
+artifact_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "adaptation_budget"
+artifact_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "core_integrity"
+artifact_sha256 = "57749f6834b5333611beb1501d47004567504ffd09589b19dc698da6c42116fe"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "deterministic_adapter"
+artifact_sha256 = "bd690181760bab3716f09f2da3471d6c7bdfd80fe41be2a1505d3b5add3acec4"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "independent_evaluation"
+artifact_sha256 = "79a1be50dc1d16d2e4baf06c98489e59ca783395a25cf2fb21fea40e48f1f8d5"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -82,8 +158,46 @@ status = "pinned"
 baseline_id = "retain"
 display_name = "RETAIN (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
+readiness = "comparison_ready"
 reproduction_program = "safedrug-archived"
+adapter_command = ["python", "baselines/safedrug_comparison.py", "retain"]
+adapter_revision = "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c"
+environment_sha256 = "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+
+[[baselines.readiness_evidence]]
+gate = "adapter_smoke"
+artifact_sha256 = "56de4b3c2e34c6cafb42e4954f498715cad80d56dcdf31d622c44659400918a7"
+
+[[baselines.readiness_evidence]]
+gate = "environment_lock"
+artifact_sha256 = "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc"
+
+[[baselines.comparison_qualifications]]
+protocol_version = "1.1"
+dataset_manifest_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+adaptation_budget_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+protocol_amendment_sha256 = "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929"
+method_profile_sha256 = "7060e7ba6a522e45284afe49034adcc0d7213ff9eb8b0c5115be39d47cbb1f47"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "cohort_identity"
+artifact_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "adaptation_budget"
+artifact_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "core_integrity"
+artifact_sha256 = "09852a7fd5938a6ffd5a5bb4bfaa227e249c367558b867929ed7772581c92c1e"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "deterministic_adapter"
+artifact_sha256 = "327d732c0f20fb2517df4a8b5e47b78744a85a50ba659ab097ee467e30e21aef"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "independent_evaluation"
+artifact_sha256 = "09c22212d3cbb80cc4d9b186413356f404b8bdf00946da349ad05ad4e4b26afb"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -94,8 +208,46 @@ status = "pinned"
 baseline_id = "leap-safedrug"
 display_name = "LEAP (SafeDrug archived)"
 supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
+readiness = "comparison_ready"
 reproduction_program = "safedrug-archived"
+adapter_command = ["python", "baselines/safedrug_comparison.py", "leap-safedrug"]
+adapter_revision = "b4b854d56561a77448d3523651cb2dcec43d268fd5590f02298602976fb3625c"
+environment_sha256 = "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+
+[[baselines.readiness_evidence]]
+gate = "adapter_smoke"
+artifact_sha256 = "87894a338188a26228971011914e71d56fed34e0be03ea338a6bd8db07acfd3c"
+
+[[baselines.readiness_evidence]]
+gate = "environment_lock"
+artifact_sha256 = "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc"
+
+[[baselines.comparison_qualifications]]
+protocol_version = "1.1"
+dataset_manifest_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+adaptation_budget_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+protocol_amendment_sha256 = "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929"
+method_profile_sha256 = "4996aee1f6a1c2a4849cbdf6308136dfbfb402d89a0e1fd2ee373d25e45294c7"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "cohort_identity"
+artifact_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "adaptation_budget"
+artifact_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "core_integrity"
+artifact_sha256 = "9dd4edbe5edfd8addf03f3bb708a3eb1a7a09713f55fe4d3f6be80e280d1fb5a"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "deterministic_adapter"
+artifact_sha256 = "a72a34e36176945bc985e2bef8a722aadc46e4bd24740f99b2dfc1f0312ded37"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "independent_evaluation"
+artifact_sha256 = "5c6d84ca2af2049d03a46c2e566e6bde3ffc9f4b2da88f8ec879e57ccdf9399f"
 
 [baselines.source]
 repository = "https://github.com/ycq091044/SafeDrug"
@@ -106,8 +258,46 @@ status = "pinned"
 baseline_id = "molerec"
 display_name = "MoleRec (Table 1)"
 supported_modes = ["reproduction", "comparison"]
-readiness = "registered"
+readiness = "comparison_ready"
 reproduction_program = "molerec"
+adapter_command = ["python", "baselines/molerec_comparison.py"]
+adapter_revision = "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531"
+environment_sha256 = "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+
+[[baselines.readiness_evidence]]
+gate = "adapter_smoke"
+artifact_sha256 = "4fa4ab567bb71692d2f3ab43ea7d9e265230a61f3ea71f1209173e94b5aa44c2"
+
+[[baselines.readiness_evidence]]
+gate = "environment_lock"
+artifact_sha256 = "91b8ef01b32d4ff7cb6887f1a4ef68bc0a1c95159687e425d350806f23d0eccc"
+
+[[baselines.comparison_qualifications]]
+protocol_version = "1.1"
+dataset_manifest_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+adaptation_budget_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+protocol_amendment_sha256 = "c5b8ac4ad6696b3293a711fd65aa194263877b26b6a7557d1d874e6adc8be929"
+method_profile_sha256 = "dcbdc5f53e47063ec7f9c745aafc5b314404419a84fa3e8986cbcc742563103a"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "cohort_identity"
+artifact_sha256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "adaptation_budget"
+artifact_sha256 = "180fd7e4f813a7e803facaf6c89f66c27f93843f1b3aea429aab501b5bfd8bb5"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "core_integrity"
+artifact_sha256 = "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "deterministic_adapter"
+artifact_sha256 = "aee7657c5e0cf50dbaf211441fadfd4a43fe369d7355b01b335f59c388158c1a"
+
+[[baselines.comparison_qualifications.evidence]]
+gate = "independent_evaluation"
+artifact_sha256 = "9423208d74bae5388a854a9f4dec53241c29ee3167a04dada9ac49cf20ba0b47"
 
 [baselines.source]
 repository = "https://github.com/yangnianzu0515/MoleRec"

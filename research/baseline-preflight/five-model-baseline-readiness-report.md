@@ -2,37 +2,47 @@
 
 ## Overall conclusion
 
-- `engineering_ready = false`
-- `reproduction_complete = false`
-- `research_baseline_ready = false`
+- `engineering_ready = true`
+- `reproduction_complete = true`
+- `research_baseline_ready = true`
 
-The suite has reusable, identity-pinned training evidence and a locally corrected continuation controller, but it does not have a complete Reproduction Mode audit or any Unified Research Protocol v1.1 Comparison Qualification. Paper fidelity and Comparison qualification remain separate axes; neither may be inferred from the other.
+All five unchanged Baseline Cores have a legal terminal Reproduction Mode result and an accepted Unified Research Protocol v1.1 Comparison Qualification under one shared scope. Reproduction remains `completed_mismatch`; Comparison qualification does not relabel that result.
 
 ## Per-model readiness
 
 | Model | Pinned source / scientific identity | Reproduction Mode | Comparison Mode | Mechanism experiments | Sole current blocking gate |
 | --- | --- | --- | --- | --- | --- |
-| RETAIN | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, profile `retain` | `formal_incomplete`: finalized `failed` / `test_failed`; no test metrics | Not qualified; registry state `registered` | No | `phase_a_legal_five_pair_audit` |
-| LEAP | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, profile `leap-safedrug` | `formal_incomplete`: not claimed after RETAIN terminal failure | Not qualified; registry state `registered` | No | `phase_a_legal_five_pair_audit` |
-| GAMENet | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, profile `gamenet` | `formal_incomplete`: not claimed after RETAIN terminal failure | Not qualified; registry state `registered` | No | `phase_a_legal_five_pair_audit` |
-| SafeDrug | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, validation-selected `5e-4` lane | `formal_incomplete`: selected lane not claimed; `1e-5` and `1e-4` remain `not_tested_by_design` | Not qualified; registry state `registered` | No | `phase_a_legal_five_pair_audit` |
-| MoleRec | MoleRec `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, profile `molerec-embedding` | `formal_incomplete`: not claimed after RETAIN terminal failure | Not qualified; registry state `registered` | No | `phase_a_legal_five_pair_audit` |
+| RETAIN | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, profile `retain` | `completed_mismatch`; legal ten-round result | `comparison_ready`; qualification `b14f12ae…` | Yes | None |
+| LEAP | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, structural profile `leap-safedrug` | `completed_mismatch`; legal ten-round result | `comparison_ready`; qualification `c2d258d2…` | Yes | None |
+| GAMENet | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, profile `gamenet` | `completed_mismatch`; legal ten-round result | `comparison_ready`; qualification `79891870…` | Yes | None |
+| SafeDrug | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, validation-selected `5e-4` lane | `completed_mismatch`; legal ten-round result; other LR candidates not tested | `comparison_ready`; qualification `5280019b…` | Yes | None |
+| MoleRec | MoleRec `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, profile `molerec-embedding` | `completed_mismatch`; legal ten-round result | `comparison_ready`; qualification `f3a00ae8…` | Yes | None |
 
-The named gate is the deterministic first blocker shared by all five models: the readiness plan requires a legal five-pair Phase A audit with execution integrity and artifact completeness before Phase B may start. It is not a claim that all later Comparison gates would pass.
+## Shared Comparison Scope
 
-## Comparison Mode assessment
+- Protocol: Unified Research Protocol v1.1, amendment `c5b8ac4a…`.
+- Dataset Manifest: `82d4efc2…`; 1,058 patient-disjoint test patients and 1,206 eligible test visits.
+- Vocabulary: 131 medications.
+- Feature availability: `9e403591…`.
+- DDI evaluation asset: `dcb20789…`.
+- Equal Adaptation Budget: `180fd7e4…`; no Comparison search or test-driven model selection was used.
+- Execution path: `Baseline Core -> target-free predictions -> core-owned target join -> core evaluator`.
+- All five qualification attempts passed `environment_lock`, `adapter_smoke`, `cohort_identity`, `adaptation_budget`, `core_integrity`, `deterministic_adapter`, and `independent_evaluation`.
 
-The repository currently contains identity and validation skeletons for Comparison Mode, but no five-model qualification evidence:
+## Core-recomputed Comparison outcomes
 
-- all five target baselines are still `registered` and have no current-scope `ComparisonQualification`;
-- no shared five-model v1.1 scope/protocol packet or five method-profile packet has been admitted;
-- the existing process adapter validates target-free requests and visit coverage, but has no admitted five-model full-vocabulary score-surface path;
-- the existing evaluator does not yet provide the required target-free core-owned join, DDI rate, PRAUC, and declared ten-round uncertainty path for qualification.
+| Model | DDI | Jaccard | F1 | PRAUC | Avg medications |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| RETAIN | 0.0891 | 0.4872 | 0.6477 | 0.7578 | 19.1111 |
+| LEAP | 0.0723 | 0.4565 | 0.6186 | 0.6573 | 18.7662 |
+| GAMENet | 0.0857 | 0.5034 | 0.6608 | 0.7690 | 28.0697 |
+| SafeDrug | 0.0601 | 0.5142 | 0.6716 | 0.7650 | 19.9959 |
+| MoleRec | 0.0737 | 0.5269 | 0.6822 | 0.7731 | 21.6617 |
 
-These are known future engineering units, not evidence-based per-model failures, because Phase B admission was never reached. They must be implemented and qualified under one exact Comparison Scope after a legal Phase A terminal audit exists.
+These values are descriptive Comparison evidence, not clinical claims and not a new leaderboard. The five models are mechanism carriers from two pinned source lineages, not five independent research lineages.
 
-## Interpretation
+## Execution note
 
-`completed_mismatch` would remain a valid scientific outcome and would not mechanically block Comparison qualification. It is not the outcome here: incomplete execution prevents both paper-point interpretation and Phase B admission.
+The first three qualifications ran under the original remote execution admission. For SafeDrug and MoleRec, all server GPUs had resident external processes. The user explicitly authorized Phase B to share GPU 0 after it showed 0% utilization and 22,359 MiB free; the external process was not stopped. The GPU exclusivity check was therefore recorded as an operator-authorized Phase B exception rather than falsely reported as passed. Source, environment, checkpoint, features, decoder, threshold, prediction set, target ownership, and evaluation semantics were unchanged, and both formal qualifications completed without OOM or retry.
 
-No model is ready for downstream mechanism experiments under the common Comparison Scope. The suite must not be labeled `research_baseline_ready` until all five current-scope qualification packets exist and agree on the shared protocol, manifest, cohort, eligible visits, vocabulary, features, DDI asset, lineage, and Adaptation Budget identities.
+The complete public-safe scope, gate, attempt, qualification, evaluation, outcome, and uncertainty identities are recorded in `five-model-comparison-qualification.json`. Restricted predictions, memberships, checkpoints, weights, private paths, and raw traces remain outside Git.
