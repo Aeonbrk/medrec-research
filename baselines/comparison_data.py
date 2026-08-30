@@ -98,17 +98,19 @@ def _write_pickle(path: Path, value: object) -> None:
     temporary.replace(path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset-root", type=Path, required=True)
-    parser.add_argument("--output-root", type=Path, required=True)
-    parser.add_argument("--dataset-id", default="molerec-table1-comparison-v1-1")
-    args = parser.parse_args()
+def _content_sha256(value: object) -> str:
+    serialized = json.dumps(
+        value,
+        allow_nan=False,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(serialized.encode("ascii")).hexdigest()
 
+
+def _extract(args: argparse.Namespace) -> None:
     import dill
-
-    from medrec_research import DatasetManifest
-    from medrec_research._validation import content_sha256
 
     dataset_root = args.dataset_root.resolve()
     output_root = args.output_root.resolve()
@@ -141,23 +143,12 @@ def main() -> None:
         for right in range(left + 1, len(medication_vocabulary))
         if ddi_matrix[left][right] == 1
     )
-    snapshot_sha256 = content_sha256(
+    snapshot_sha256 = _content_sha256(
         {
             "ddi_A_final.pkl": _file_sha256(ddi_path),
             "records_final.pkl": _file_sha256(records_path),
             "voc_final.pkl": _file_sha256(vocabulary_path),
         }
-    )
-    manifest = DatasetManifest.from_memberships(
-        dataset_id=args.dataset_id,
-        snapshot_id="molerec-table1-c721-www23",
-        provenance="SafeDrug archived processing lineage c7218d0976e5ee5588aeaf5bdbc86b338126bba5",
-        checksum_sha256=snapshot_sha256,
-        medication_vocabulary=medication_vocabulary,
-        privacy="restricted",
-        patients_by_split=patients,
-        visits_by_split=visits,
-        membership_hmac_key=membership_key,
     )
     feature_rule = {
         "current_diagnoses": True,
@@ -183,23 +174,74 @@ def main() -> None:
     _write_pickle(output_root / "features.pkl", feature_bundle)
     _write_pickle(output_root / "targets.pkl", target_bundle)
     _write_pickle(output_root / "ddi-pairs.pkl", ddi_pairs)
-    (output_root / "dataset-manifest.json").write_text(
-        manifest.to_json(indent=2) + "\n", encoding="utf-8"
+    _write_pickle(
+        output_root / "manifest-memberships.pkl",
+        {
+            "medication_vocabulary": medication_vocabulary,
+            "patients_by_split": patients,
+            "visits_by_split": visits,
+        },
     )
-    summary = {
-        "dataset_manifest_sha256": manifest.manifest_sha256,
-        "ddi_asset_sha256": content_sha256(list(ddi_pairs)),
+    staging_input = {
+        "dataset_id": args.dataset_id,
+        "ddi_asset_sha256": _content_sha256(list(ddi_pairs)),
         "eligible_test_visit_count": len(contexts),
-        "feature_availability_sha256": content_sha256(feature_rule),
+        "feature_availability_sha256": _content_sha256(feature_rule),
         "medication_count": len(medication_vocabulary),
         "patient_counts": {split: len(values) for split, values in patients.items()},
         "schema_version": 1,
         "snapshot_sha256": snapshot_sha256,
     }
+    (output_root / "staging-input.json").write_text(
+        json.dumps(staging_input, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    print(json.dumps(staging_input, separators=(",", ":"), sort_keys=True))
+
+
+def _finalize(args: argparse.Namespace) -> None:
+    from medrec_research import DatasetManifest
+
+    output_root = args.output_root.resolve()
+    staging_input = json.loads((output_root / "staging-input.json").read_text(encoding="utf-8"))
+    memberships = pickle.load((output_root / "manifest-memberships.pkl").open("rb"))
+    manifest = DatasetManifest.from_memberships(
+        dataset_id=staging_input["dataset_id"],
+        snapshot_id="molerec-table1-c721-www23",
+        provenance="SafeDrug archived processing lineage c7218d0976e5ee5588aeaf5bdbc86b338126bba5",
+        checksum_sha256=staging_input["snapshot_sha256"],
+        medication_vocabulary=memberships["medication_vocabulary"],
+        privacy="restricted",
+        patients_by_split=memberships["patients_by_split"],
+        visits_by_split=memberships["visits_by_split"],
+        membership_hmac_key=(output_root / "membership-hmac.key").read_bytes(),
+    )
+    (output_root / "dataset-manifest.json").write_text(
+        manifest.to_json(indent=2) + "\n", encoding="utf-8"
+    )
+    summary = {
+        **staging_input,
+        "dataset_manifest_sha256": manifest.manifest_sha256,
+    }
     (output_root / "public-summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     print(json.dumps(summary, separators=(",", ":"), sort_keys=True))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="phase", required=True)
+    extract = subparsers.add_parser("extract")
+    extract.add_argument("--dataset-root", type=Path, required=True)
+    extract.add_argument("--output-root", type=Path, required=True)
+    extract.add_argument("--dataset-id", default="molerec-table1-comparison-v1-1")
+    finalize = subparsers.add_parser("finalize")
+    finalize.add_argument("--output-root", type=Path, required=True)
+    args = parser.parse_args()
+    if args.phase == "extract":
+        _extract(args)
+    else:
+        _finalize(args)
 
 
 if __name__ == "__main__":

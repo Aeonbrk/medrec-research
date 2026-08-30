@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from baselines.comparison_data import _eligible_memberships
+from baselines.comparison_data import _content_sha256, _eligible_memberships
 from baselines.molerec_comparison import _threshold_indices as molerec_threshold_indices
 from baselines.safedrug_comparison import THRESHOLDS, _wire_scores
 from baselines.safedrug_comparison import _threshold_indices as safedrug_threshold_indices
+from medrec_research._validation import content_sha256
 
 
 def _records() -> list[list[list[list[int]]]]:
@@ -44,3 +45,9 @@ def test_score_translation_preserves_declared_vocabulary_order() -> None:
         {"medication_code": "RX_B", "score": 0.2},
         {"medication_code": "RX_A", "score": 0.8},
     ]
+
+
+def test_python38_staging_uses_the_core_canonical_digest() -> None:
+    payload = {"b": [2, 1], "a": True}
+
+    assert _content_sha256(payload) == content_sha256(payload)

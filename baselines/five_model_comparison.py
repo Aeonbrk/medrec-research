@@ -8,7 +8,6 @@ import hashlib
 import json
 import pickle
 import subprocess
-import sys
 from pathlib import Path
 
 from medrec_research import (
@@ -233,7 +232,12 @@ def _adapter_command(
     smoke: bool,
 ) -> tuple[str, ...]:
     common = (
-        sys.executable,
+        str(args.conda_executable),
+        "run",
+        "--no-capture-output",
+        "-n",
+        args.baseline_environment,
+        "python",
         str(
             args.harness_root
             / "baselines"
@@ -349,6 +353,9 @@ def main() -> None:
     parser.add_argument("--checkpoint-spec", type=Path, required=True)
     parser.add_argument("--preregistration", type=Path, required=True)
     parser.add_argument("--environment-sha256", required=True)
+    parser.add_argument("--core-environment-sha256", required=True)
+    parser.add_argument("--conda-executable", type=Path, required=True)
+    parser.add_argument("--baseline-environment", default="medrec-molerec-table1")
     parser.add_argument("--bootstrap-seed", type=int, default=1203)
     args = parser.parse_args()
     for field in (
@@ -360,6 +367,7 @@ def main() -> None:
         "molerec_root",
         "checkpoint_spec",
         "preregistration",
+        "conda_executable",
     ):
         setattr(args, field, getattr(args, field).resolve())
     args.output_root.mkdir(parents=True, exist_ok=False)
@@ -367,7 +375,12 @@ def main() -> None:
     evidence: dict[str, str] = {}
     failed_gate = QUALIFICATION_GATE_ORDER[0]
     try:
-        evidence["environment_lock"] = args.environment_sha256
+        evidence["environment_lock"] = content_sha256(
+            {
+                "baseline_environment_sha256": args.environment_sha256,
+                "core_environment_sha256": args.core_environment_sha256,
+            }
+        )
         failed_gate = "adapter_smoke"
         raw_checkpoint_specs = json.loads(args.checkpoint_spec.read_text(encoding="utf-8"))
         checkpoint = Path(raw_checkpoint_specs[args.method_id]["path"])
@@ -480,6 +493,7 @@ def main() -> None:
             args.output_root / "readiness-evidence.json",
             {
                 "adapter_revision": profile.adapter_sha256,
+                "core_environment_sha256": args.core_environment_sha256,
                 "environment_sha256": args.environment_sha256,
                 "evidence": [
                     ReadinessEvidence(
