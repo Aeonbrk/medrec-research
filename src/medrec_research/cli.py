@@ -665,6 +665,7 @@ def _prepare_molerec_evaluation(args: argparse.Namespace) -> int:
         registry=registry,
         attempt_root=args.attempt_root,
         attempt_id=args.attempt_id,
+        continuation_id=args.continuation_id,
         training_artifact_ids=artifacts,
         training_harness_revision=schedule.source_harness_revision,
         harness_revision=schedule.harness_revision,

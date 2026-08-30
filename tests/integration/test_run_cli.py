@@ -13,10 +13,11 @@ from medrec_research.cli import (
     _admit_reproduction_continuation,
     _build_parser,
     _local_source_revision,
+    _prepare_molerec_evaluation,
     _reproduce,
     _reproduce_smoke,
 )
-from medrec_research.remote_executor import RemoteSubmission
+from medrec_research.remote_executor import FrozenSchedule, RemoteSubmission
 
 PROJECT_ROOT = Path(__file__).parents[2]
 REGISTRY_PATH = PROJECT_ROOT / "baselines" / "registry.toml"
@@ -457,3 +458,53 @@ def test_continuation_command_writes_only_reaccepted_schedule(
     assert persisted["source_schedule_id"] == "u7-schedule"
     assert "command" not in json.loads(capsys.readouterr().out)
     assert not any(hasattr(args, field) for field in ("phase", "recovery_id", "checkpoint"))
+
+
+def test_prepare_evaluation_forwards_continuation_id(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_path = _write_schedule(tmp_path / "u7-schedule.json")
+    source = FrozenSchedule.from_json(source_path, expected_lane_ids=SUCCESSOR_LANES)
+    schedule_path = tmp_path / "continuation.json"
+    schedule_path.write_text(
+        json.dumps(
+            source.reaccept(
+                source_schedule_id="u7-schedule",
+                harness_revision="b" * 40,
+                attempt_id="formal-20260828-a09fcab-u8-b",
+            ).to_dict()
+        ),
+        encoding="utf-8",
+    )
+    arguments = [
+        "prepare-molerec-table1-evaluation",
+        "--schedule",
+        str(schedule_path),
+        "--attempt-root",
+        str(tmp_path),
+        "--attempt-id",
+        "formal-20260828-a09fcab-u8-b",
+        "--continuation-id",
+        "continuation-20260830-pathfix-1",
+        "--state-root",
+        str(tmp_path / "state"),
+    ]
+    for lane_id in SUCCESSOR_LANES:
+        arguments.extend(["--training-artifact", f"{lane_id}=runs/{lane_id}/result.json"])
+    args = _build_parser().parse_args(arguments)
+    captured: dict[str, object] = {}
+
+    def prepare(**kwargs: object) -> dict[str, object]:
+        captured.update(kwargs)
+        return {
+            "attempt_id": kwargs["attempt_id"],
+            "continuation_id": kwargs["continuation_id"],
+            "selected_safedrug_lane": "molerec-safedrug-lr-5e-4",
+            "test_lane_ids": {},
+        }
+
+    monkeypatch.setattr("medrec_research.cli.prepare_table1_evaluation", prepare)
+
+    assert _prepare_molerec_evaluation(args) == 0
+    assert captured["continuation_id"] == "continuation-20260830-pathfix-1"
