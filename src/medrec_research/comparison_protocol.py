@@ -19,6 +19,7 @@ from ._validation import (
     require_single_line_public_string,
     strict_fields,
 )
+from .comparison_scope import ComparisonScope
 from .errors import ProtocolValidationError
 
 SAFE_DRUG_REPOSITORY = "https://github.com/ycq091044/SafeDrug"
@@ -258,6 +259,12 @@ class DecoderProfile:
     data_lineage_revision: str = SAFE_DRUG_ARCHIVED_REVISION
     threshold_rule: ThresholdSelectionRule | None = None
     native_decoder: str = ""
+    adapter_sha256: str = ""
+    environment_sha256: str = ""
+    feature_availability_sha256: str = ""
+    ddi_asset_sha256: str = ""
+    configuration_sha256: str = ""
+    preregistration_sha256: str = ""
     profile_sha256: str = ""
 
     SCHEMA_VERSION: ClassVar[int] = 1
@@ -291,6 +298,17 @@ class DecoderProfile:
                 "decoder.native_decoder must describe the unchanged decoder"
             )
         require_single_line_public_string(self.native_decoder, field="decoder.native_decoder")
+        for field in (
+            "adapter_sha256",
+            "environment_sha256",
+            "feature_availability_sha256",
+            "ddi_asset_sha256",
+            "configuration_sha256",
+            "preregistration_sha256",
+        ):
+            value = getattr(self, field)
+            if value:
+                require_sha256(value, field=f"decoder.{field}")
         expected = content_sha256(self._protected_payload())
         if self.profile_sha256:
             require_sha256(self.profile_sha256, field="decoder.profile_sha256")
@@ -302,7 +320,7 @@ class DecoderProfile:
             object.__setattr__(self, "profile_sha256", expected)
 
     def _protected_payload(self) -> dict[str, object]:
-        return {
+        payload: dict[str, object] = {
             "baseline_core_sha256": self.baseline_core_sha256,
             "data_lineage_revision": self.data_lineage_revision,
             "decoder_class": self.decoder_class.value,
@@ -310,10 +328,36 @@ class DecoderProfile:
             "native_decoder": self.native_decoder,
             "threshold_rule": self.threshold_rule.to_dict() if self.threshold_rule else None,
         }
+        for field in (
+            "adapter_sha256",
+            "configuration_sha256",
+            "ddi_asset_sha256",
+            "environment_sha256",
+            "feature_availability_sha256",
+            "preregistration_sha256",
+        ):
+            value = getattr(self, field)
+            if value:
+                payload[field] = value
+        return payload
 
     @property
     def is_comparison_profile(self) -> bool:
         return self.data_lineage_revision == SAFE_DRUG_ARCHIVED_REVISION
+
+    @property
+    def is_qualification_bound(self) -> bool:
+        return all(
+            getattr(self, field)
+            for field in (
+                "adapter_sha256",
+                "configuration_sha256",
+                "ddi_asset_sha256",
+                "environment_sha256",
+                "feature_availability_sha256",
+                "preregistration_sha256",
+            )
+        )
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -337,6 +381,14 @@ class DecoderProfile:
                 "profile_sha256",
                 "schema_version",
                 "threshold_rule",
+            ),
+            optional=(
+                "adapter_sha256",
+                "configuration_sha256",
+                "ddi_asset_sha256",
+                "environment_sha256",
+                "feature_availability_sha256",
+                "preregistration_sha256",
             ),
             context="DecoderProfile",
         )
@@ -673,6 +725,10 @@ class ComparisonProtocolV1_1:
             raise ProtocolValidationError(
                 "comparison qualification requires independent evaluation"
             )
+        if not profile.is_qualification_bound:
+            raise ProtocolValidationError(
+                "comparison qualification requires a fully bound method profile"
+            )
         if not self.adaptation_budget.is_within_budget:
             raise ProtocolValidationError("comparison qualification exceeds the adaptation budget")
 
@@ -721,8 +777,124 @@ class ComparisonProtocolV1_1:
         return cls.from_dict(parse_json_object(text, context="ComparisonProtocolV1_1"))
 
 
+@dataclass(frozen=True, slots=True)
+class ComparisonProtocolPacket:
+    """One manifest-scoped protocol amendment and its method-specific scopes."""
+
+    dataset_manifest_sha256: str
+    preregistration_sha256: str
+    protocol: ComparisonProtocolV1_1
+    method_scopes: tuple[tuple[str, ComparisonScope], ...]
+
+    SCHEMA_VERSION: ClassVar[int] = 1
+
+    def __post_init__(self) -> None:
+        require_sha256(self.dataset_manifest_sha256, field="packet.dataset_manifest_sha256")
+        require_sha256(self.preregistration_sha256, field="packet.preregistration_sha256")
+        if not isinstance(self.protocol, ComparisonProtocolV1_1):
+            raise ProtocolValidationError("packet.protocol must be ComparisonProtocolV1_1")
+        scopes = tuple(self.method_scopes)
+        if not scopes or len({method_id for method_id, _ in scopes}) != len(scopes):
+            raise ProtocolValidationError("packet method scopes must use unique method IDs")
+        profiles = {profile.method_id: profile for profile in self.protocol.decoder_profiles}
+        if set(method_id for method_id, _ in scopes) != set(profiles):
+            raise ProtocolValidationError("packet method scopes must cover every decoder profile")
+        shared_features = {profile.feature_availability_sha256 for profile in profiles.values()}
+        shared_ddi = {profile.ddi_asset_sha256 for profile in profiles.values()}
+        shared_preregistration = {profile.preregistration_sha256 for profile in profiles.values()}
+        if (
+            len(shared_features) != 1
+            or len(shared_ddi) != 1
+            or shared_preregistration != {self.preregistration_sha256}
+            or any(not profile.is_qualification_bound for profile in profiles.values())
+        ):
+            raise ProtocolValidationError(
+                "packet profiles must share feature, DDI, preregistration, and bound identities"
+            )
+        for method_id, scope in scopes:
+            if not isinstance(scope, ComparisonScope):
+                raise ProtocolValidationError("packet method scope must be a ComparisonScope")
+            profile = profiles[method_id]
+            if not scope.matches(
+                protocol_version=self.protocol.protocol_version,
+                dataset_manifest_sha256=self.dataset_manifest_sha256,
+                adaptation_budget_sha256=self.protocol.adaptation_budget.budget_sha256,
+                protocol_amendment_sha256=self.protocol.protocol_sha256,
+                method_profile_sha256=profile.profile_sha256,
+            ):
+                raise ProtocolValidationError(
+                    "packet method scope does not match its bound profile"
+                )
+        object.__setattr__(self, "method_scopes", tuple(sorted(scopes)))
+
+    @property
+    def packet_sha256(self) -> str:
+        return content_sha256(self.to_dict())
+
+    def scope_for(self, method_id: str) -> ComparisonScope:
+        for candidate, scope in self.method_scopes:
+            if candidate == method_id:
+                return scope
+        raise KeyError(method_id)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "dataset_manifest_sha256": self.dataset_manifest_sha256,
+            "kind": "comparison_protocol_packet",
+            "method_scopes": [
+                {"method_id": method_id, "scope": scope.to_dict()}
+                for method_id, scope in self.method_scopes
+            ],
+            "preregistration_sha256": self.preregistration_sha256,
+            "protocol": self.protocol.to_dict(),
+            "schema_version": self.SCHEMA_VERSION,
+        }
+
+    def to_json(self, *, indent: int | None = None) -> str:
+        return canonical_json(self.to_dict(), indent=indent)
+
+    @classmethod
+    def from_dict(cls, value: object) -> ComparisonProtocolPacket:
+        payload = strict_fields(
+            value,
+            required=(
+                "dataset_manifest_sha256",
+                "kind",
+                "method_scopes",
+                "preregistration_sha256",
+                "protocol",
+                "schema_version",
+            ),
+            context="ComparisonProtocolPacket",
+        )
+        if (
+            payload.pop("schema_version") != cls.SCHEMA_VERSION
+            or payload.pop("kind") != "comparison_protocol_packet"
+        ):
+            raise ProtocolValidationError("ComparisonProtocolPacket schema or kind is invalid")
+        raw_scopes = payload.pop("method_scopes")
+        if not isinstance(raw_scopes, list):
+            raise ProtocolValidationError("ComparisonProtocolPacket method_scopes must be a list")
+        scopes = []
+        for item in raw_scopes:
+            entry = strict_fields(
+                item,
+                required=("method_id", "scope"),
+                context="ComparisonProtocolPacket method scope",
+            )
+            scopes.append((entry["method_id"], ComparisonScope.from_dict(entry["scope"])))
+        payload["method_scopes"] = tuple(scopes)
+        payload["protocol"] = ComparisonProtocolV1_1.from_dict(payload["protocol"])
+        return cls(**payload)
+
+    @classmethod
+    def from_json(cls, text: str) -> ComparisonProtocolPacket:
+        return cls.from_dict(parse_json_object(text, context="ComparisonProtocolPacket"))
+
+
 __all__ = (
     "AdaptationBudget",
+    "ComparisonProtocolPacket",
     "ComparisonProtocolV1_1",
     "ComparisonQualificationAttempt",
     "DecoderClass",

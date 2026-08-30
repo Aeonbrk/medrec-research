@@ -4,6 +4,7 @@ import pytest
 
 from medrec_research import (
     AdaptationBudget,
+    ComparisonProtocolPacket,
     ComparisonProtocolV1_1,
     ComparisonQualificationAttempt,
     ComparisonScope,
@@ -40,6 +41,12 @@ def _score_profile() -> DecoderProfile:
             max_trials=2,
             trials_used=1,
         ),
+        adapter_sha256="1" * 64,
+        environment_sha256="2" * 64,
+        feature_availability_sha256="3" * 64,
+        ddi_asset_sha256="4" * 64,
+        configuration_sha256="5" * 64,
+        preregistration_sha256="6" * 64,
     )
 
 
@@ -49,6 +56,12 @@ def _structural_profile() -> DecoderProfile:
         decoder_class=DecoderClass.STRUCTURAL_SEQUENCE,
         baseline_core_sha256="b" * 64,
         native_decoder="stop-token",
+        adapter_sha256="7" * 64,
+        environment_sha256="2" * 64,
+        feature_availability_sha256="3" * 64,
+        ddi_asset_sha256="4" * 64,
+        configuration_sha256="8" * 64,
+        preregistration_sha256="6" * 64,
     )
 
 
@@ -87,6 +100,31 @@ def test_v1_1_protocol_and_profiles_round_trip() -> None:
         dataset_manifest_sha256="d" * 64,
         adaptation_budget_sha256=protocol.adaptation_budget.budget_sha256,
     )
+
+
+def test_protocol_packet_binds_shared_scope_and_method_profiles() -> None:
+    protocol = _protocol()
+    packet = ComparisonProtocolPacket(
+        dataset_manifest_sha256="d" * 64,
+        preregistration_sha256="6" * 64,
+        protocol=protocol,
+        method_scopes=tuple(
+            (
+                profile.method_id,
+                ComparisonScope(
+                    protocol_version="1.1",
+                    dataset_manifest_sha256="d" * 64,
+                    adaptation_budget_sha256=protocol.adaptation_budget.budget_sha256,
+                    protocol_amendment_sha256=protocol.protocol_sha256,
+                    method_profile_sha256=profile.profile_sha256,
+                ),
+            )
+            for profile in protocol.decoder_profiles
+        ),
+    )
+
+    assert ComparisonProtocolPacket.from_json(packet.to_json()) == packet
+    assert packet.scope_for("retain").method_profile_sha256 == _score_profile().profile_sha256
 
 
 def test_score_threshold_selection_is_validation_only_and_bounded() -> None:

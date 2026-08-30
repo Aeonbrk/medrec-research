@@ -11,6 +11,7 @@ from .adapters import (
 )
 from .comparison_protocol import (
     AdaptationBudget,
+    ComparisonProtocolPacket,
     ComparisonProtocolV1_1,
     ComparisonQualificationAttempt,
     DecoderClass,
@@ -78,6 +79,7 @@ __all__ = (
     "ComparisonEvaluationResult",
     "ComparisonOutcomes",
     "ComparisonPredictionBatch",
+    "ComparisonProtocolPacket",
     "ComparisonProtocolV1_1",
     "ComparisonQualification",
     "ComparisonQualificationAttempt",
