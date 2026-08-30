@@ -21,6 +21,16 @@ product_contract_source: ce-plan-bootstrap
 - **Stop conditions:** Stop on identity drift, dirty scientific code after freeze, missing or invalid recovered training evidence, schedule divergence, test leakage, incomplete target-free coverage, Baseline Core behavior change, or any need for mismatch-driven tuning or retry.
 - **Tail ownership:** The implementing agent may create local commits needed to establish clean execution revisions. It must not push or create a PR. Public-safe evidence enters Git only after its gate passes.
 
+## Execution Outcome: 2026-08-29
+
+- U1 completed. The seven immutable recovered training pairs and exact frozen schedule were reopened, and an additive continuation schedule was admitted at clean harness revision `c4fc4d8408ce3119a02813525e17435a9ba102ec` without training or source-artifact mutation.
+- U2 completed. Validation-only selection chose `molerec-safedrug-lr-5e-4`; the other two SafeDrug candidates remain `not_tested_by_design`. The prospective Comparison preregistration and exact RETAIN, LEAP, GAMENet, selected SafeDrug, MoleRec queue existed before the first test claim.
+- U3 reached the specific legal incomplete state required by R10. RETAIN, the first and only claimed test, finalized as `failed` / `test_failed` before ten-round evaluation because recovered invocation used the recovery directory basename where upstream expected the original training-run basename. The failed pair and controller state were preserved, no later lane was claimed, and the five-pair audit was not run.
+- The Phase A axes are `execution_integrity = failed`, `paper_point_fidelity = not_evaluated`, `directional_relationships = not_evaluated`, and `artifact_completeness = failed`. The verdict is `formal_incomplete`, not `completed_mismatch`.
+- U4–U7 did not start. R11 and the U4 dependency require a legal five-pair Phase A audit with execution integrity and artifact completeness; that admission gate is not satisfied. Current registry state is therefore not Comparison evidence.
+- The recovered-test model-name binding and basename-only checkpoint namespace are corrected locally for a future authorized attempt. The queue now rejects every claim after a failed or blocked entry, and ledger-first finalization keeps a queue-write interruption reconcilable without replaying a test. None of these corrections changes the current attempt's terminal evidence.
+- U8 records this blocked state in public-safe reports, the tracker, handoff, and playbook. The plan remains blocked pending explicit authority for a new attempt or continuation identity.
+
 ---
 
 ## Product Contract

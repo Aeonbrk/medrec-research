@@ -30,13 +30,13 @@ from .safedrug_selection import (
     write_selection,
 )
 
-_PAPER_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
 _FIXED_TEST_LANES = (
     "molerec-retain",
     "molerec-leap",
     "molerec-gamenet",
     "molerec-embedding",
 )
+_PAPER_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
 
 
 def _test_submission_id(attempt_id: str, lane_id: str) -> str:
@@ -118,16 +118,7 @@ def prepare_table1_evaluation(
     selected_candidate = require_selected_safedrug_lane(selection, selected_lane)
     test_lanes = (*_FIXED_TEST_LANES[:3], selected_lane, _FIXED_TEST_LANES[3])
     lane_by_id = {lane.lane_id: lane for lane in lanes}
-    test_lane_ids = {
-        "retain": "molerec-retain",
-        "leap": "molerec-leap",
-        "gamenet": "molerec-gamenet",
-        "safedrug": selected_lane,
-        "molerec": "molerec-embedding",
-    }
-    if tuple(test_lane_ids) != _PAPER_BASELINES:
-        raise ProtocolValidationError("five-model test lane order is invalid")
-
+    test_lane_ids = dict(zip(_PAPER_BASELINES, test_lanes, strict=True))
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(
         dir=destination.parent,
@@ -257,6 +248,10 @@ def claim_table1_evaluation(
         raise ProtocolValidationError("Comparison preregistration must exist before test claim")
     queue_path = state / "evaluation-queue.json"
     queue = load_evaluation_queue(queue_path)
+    if any(entry["state"] in ("failed", "blocked") for entry in queue["entries"]):
+        raise ProtocolValidationError(
+            "evaluation attempt is terminal after a failed or blocked lane"
+        )
     if any(entry["state"] == "running" for entry in queue["entries"]):
         return None
     entry = next((item for item in queue["entries"] if item["state"] == "queued"), None)
@@ -343,15 +338,14 @@ def finalize_table1_evaluation(
         )
     except ValueError as error:
         raise ProtocolValidationError("test result is outside the attempt root") from error
-    finalized = finalize_evaluation(
+    ledger["lanes"][entry["lane_id"]]["state"] = state_value
+    write_json_atomic(ledger_path, ledger)
+    return finalize_evaluation(
         queue_path,
         lane_id=entry["lane_id"],
         state=state_value,
         result_artifact_id=result_artifact_id,
     )
-    ledger["lanes"][entry["lane_id"]]["state"] = state_value
-    write_json_atomic(ledger_path, ledger)
-    return finalized
 
 
 def audit_prepared_table1_evaluation(

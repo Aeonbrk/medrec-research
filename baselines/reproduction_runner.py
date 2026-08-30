@@ -877,11 +877,16 @@ def run_test_lane_v2(
         raise error_type(f"test run root already exists: {test_root}")
     source_dir = upstream_root / "src"
     original_entrypoint = source_dir / profile.entrypoint
-    model_name = f"{profile.model_name}_{run_root.name}"
+    model_root = training_source_root or run_root
+    model_name = f"{profile.model_name}_{model_root.name}"
     test_root.mkdir()
     work_src = test_root / "work" / "src"
     work_src.mkdir(parents=True, exist_ok=False)
     (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
+    if profile.test_uses_basename:
+        staged_checkpoint = work_src / "saved" / model_name / checkpoint.name
+        staged_checkpoint.parent.mkdir(parents=True)
+        staged_checkpoint.symlink_to(checkpoint.resolve())
     started_at = _now()
     write_json = _module_value(module, "write_json")
     write_json(

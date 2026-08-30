@@ -1,6 +1,6 @@
 # MoleRec Table 1 Five-Model Reproduction Playbook
 
-This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. As of 2026-08-29, the seven source lanes in attempt `formal-20260828-a09fcab-u8-b` have one validated immutable recovery sibling each. No test result or final five-model audit exists; stop before any new evidence-producing command until the final harness revision and frozen schedule are re-accepted.
+This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. As of 2026-08-29, attempt `formal-20260828-a09fcab-u8-b` is `formal_incomplete`: its seven source lanes retain one validated immutable recovery sibling each, but its first formal RETAIN test finalized `failed` / `test_failed`. Do not claim another test, retry RETAIN, or run the final audit for this attempt.
 
 ## Scope and Invariants
 
@@ -41,7 +41,9 @@ This playbook is the operator gate for the reproduction defined by `docs/plans/2
 
 The following local contracts are implemented and synthetic-tested: registry lanes and program-declared probes, v2 status/result identity, atomic finalization, immutable source-aware recovery, validation-only SafeDrug selection, the eight-file snapshot builder, the four-axis audit, the frozen-schedule admission contract, the persisted GPU 7 queue, and bounded running-status heartbeats.
 
-The following gates remain open and block a successor formal submission: a clean reviewed harness revision, re-acceptance of the measured schedule against that revision, and the normal preflight checks immediately before submission. The current attempt has seven recovered training results and remains test-free; its pending downstream gates are SafeDrug selection, five serial ten-round tests, and the final audit. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
+The clean continuation gate passed at revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`. Validation-only SafeDrug selection chose `molerec-safedrug-lr-5e-4`, the exact five-entry queue was published, and RETAIN was the only claimed test. That test failed before ten-round evaluation because the recovered invocation used the recovery directory basename rather than the original training-run basename.
+
+The failed pair, queue, ledger, selection, preregistration, schedules, and seven recovered training results are immutable evidence. The current attempt is closed to further claims. The local invocation correction binds the original training-run model name and exposes its validated checkpoint through the basename-only upstream namespace; it is for a separately authorized future attempt and does not authorize replay or relabel this one. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
 
 ## Operator Sequence
 
@@ -133,7 +135,7 @@ Run P1 isolated one-epoch architecture profiles and P2 seven-lane concurrency pr
 
 ### 7. Train seven lanes once
 
-After the final clean harness revision, environment identity, snapshot proof, smoke gate, and schedule are frozen, submit the seven lanes in registry order with the selected mapping. The current read-only schedule artifact is `/root/zhb/medrec-data/runtime/reproduction-prep/u7-schedule.json`; it is bound to the old harness revision and cannot authorize this code revision until re-accepted. The accepted mapping recorded there is schedule B: GPU order `3,4,5,6,1,2,0`, with GPU 7 reserved and CPU sets `12-15,44-47`, `16-19,48-51`, `20-23,52-55`, `24-27,56-59`, `4-7,36-39`, `8-11,40-43`, and `0-3,32-35` in registry order.
+Do not run this section for attempt `formal-20260828-a09fcab-u8-b`; its seven training lanes and recovery siblings are already frozen. The exact schedule B allocation was additively reaccepted without training. The following command is retained only for a separately authorized fresh attempt after all preceding gates pass.
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec reproduce all \
@@ -146,40 +148,56 @@ The controller-issued identity must bind attempt, lane, scientific baseline, pro
 
 ### 8. Admit the GPU 7 evaluation queue
 
-Create the persisted queue with GPU 7 reserved. Admit non-SafeDrug tests only after their finalized training pair is identity-valid. Admit a SafeDrug test only after all three SafeDrug training candidates are terminal and a valid `selection.json` selects that lane. The production admission command resolves the attempt-owned training artifact and reopens normal or recovered evidence before appending one queue entry:
+For a separately authorized attempt, first use `admit-reproduction-continuation` to reopen all seven immutable training pairs and publish an additive schedule. Then use `prepare-molerec-table1-evaluation` to perform validation-only SafeDrug selection, publish the prospective Comparison preregistration, mark both non-selected candidates `not_tested_by_design`, and create the exact five-entry queue. Both commands require all seven `--training-artifact LANE_ID=RELATIVE_RESULT_JSON` arguments.
 
 ```bash
-rtk proxy /opt/homebrew/bin/uv run medrec admit-evaluation \
-  --queue runtime/reproduction/<attempt-id>/evaluation-queue.json \
+rtk proxy /opt/homebrew/bin/uv run medrec admit-reproduction-continuation \
+  --source-schedule <frozen-schedule.json> \
+  --source-schedule-id <immutable-source-schedule-id> \
   --attempt-root runtime/reproduction/<attempt-id> \
-  --lane-id <lane-id> \
-  --scientific-baseline-id <scientific-baseline-id> \
-  --training-artifact-id <attempt-relative-result.json> \
-  --test-submission-id <test-submission-id> \
-  [--selection runtime/reproduction/<attempt-id>/selection.json]
+  --attempt-id <attempt-id> \
+  --training-artifact <lane-id>=<attempt-relative-result.json> \
+  --output <continuation-schedule.json> \
+  --dry-run
+
+rtk proxy /opt/homebrew/bin/uv run medrec prepare-molerec-table1-evaluation \
+  --schedule <continuation-schedule.json> \
+  --attempt-root runtime/reproduction/<attempt-id> \
+  --attempt-id <attempt-id> \
+  --training-artifact <lane-id>=<attempt-relative-result.json> \
+  --state-root runtime/reproduction/<attempt-id>/evaluation-state
 ```
 
-The queue must reject duplicate lanes/submissions, preserve FIFO order, serialize GPU 7, and leave terminal entries untouched across restart or recovery.
+The continuation dry-run detects schedule, attempt, or evidence drift; if it fails, publish nothing and do not construct a test. Repeat both `--training-artifact` options exactly seven times in registry order. Run the continuation command without `--dry-run` only after reviewing the summary.
+
+Claim exactly one queue entry, execute only the returned frozen command, and finalize its pair before another claim:
+
+```bash
+rtk proxy /opt/homebrew/bin/uv run medrec claim-molerec-table1-evaluation \
+  --state-root runtime/reproduction/<attempt-id>/evaluation-state \
+  --attempt-root runtime/reproduction/<attempt-id>
+
+rtk proxy /opt/homebrew/bin/uv run medrec finalize-molerec-table1-evaluation \
+  --state-root runtime/reproduction/<attempt-id>/evaluation-state \
+  --attempt-root runtime/reproduction/<attempt-id>
+```
+
+The queue rejects duplicate lanes/submissions, preserves FIFO order, serializes GPU 7, and leaves terminal entries untouched. A failed or blocked entry closes the attempt to every later claim.
 
 Mark the two non-selected SafeDrug candidates `not_tested_by_design`. A running queue entry may be requeued only after the operator proves its process is dead; never replay a completed, failed, or blocked entry.
 
 ### 9. Run five serial tests and audit
 
-Run the exact upstream ten-round test procedure serially on GPU 7 for RETAIN, LEAP, GAMENet, the selected SafeDrug lane, and MoleRec. Recompute each summary from ten raw aggregate rounds using population standard deviation. Then run the additive Table 1 audit:
+Run the exact upstream ten-round test procedure serially on GPU 7 for RETAIN, LEAP, GAMENet, the selected SafeDrug lane, and MoleRec. Recompute each summary from ten raw aggregate rounds using population standard deviation. Only after all five finalized pairs validate may the prepared-state audit run:
 
 ```bash
-rtk proxy /opt/homebrew/bin/uv run medrec audit-molerec-table1 \
-  --ledger runtime/reproduction/<attempt-id>/molerec-table1-ledger.json \
-  --retain-result runtime/reproduction/<attempt-id>/molerec-retain/test/result.json \
-  --leap-result runtime/reproduction/<attempt-id>/molerec-leap/test/result.json \
-  --gamenet-result runtime/reproduction/<attempt-id>/molerec-gamenet/test/result.json \
-  --safedrug-result runtime/reproduction/<attempt-id>/molerec-safedrug-selected/test/result.json \
-  --molerec-result runtime/reproduction/<attempt-id>/molerec-embedding/test/result.json \
-  --selection runtime/reproduction/<attempt-id>/selection.json \
+rtk proxy /opt/homebrew/bin/uv run medrec audit-prepared-molerec-table1 \
+  --state-root runtime/reproduction/<attempt-id>/evaluation-state \
+  --attempt-root runtime/reproduction/<attempt-id> \
   --output runtime/reproduction/<attempt-id>/molerec-table1-audit-packet.json
 ```
 
-The audit reopens finalized sibling artifacts, checks all 25 inclusive mean ± 2 standard-deviation intervals, checks the four MoleRec/SafeDrug directions, and reports all four axes. Do not promote the packet to Git until Codex reviews its public-safe contents.
+The audit reopens finalized sibling artifacts, checks all 25 inclusive mean ± 2 standard-deviation intervals, checks the four MoleRec/SafeDrug directions, and reports all four axes. It must reject the current attempt because its RETAIN entry failed and four pairs are absent. Do not promote any packet to Git until Codex reviews its public-safe contents.
 
 ## Stop Conditions
 

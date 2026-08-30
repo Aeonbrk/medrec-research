@@ -1,20 +1,31 @@
 # Plans
 
-## In Progress: MoleRec Finalization Recovery and Conformance
+## Blocked: Five-Model Baseline Readiness
 
-- **Status**: U1–U5 are complete for formal attempt `formal-20260828-a09fcab-u8-b`: all seven source lanes are terminal failures and each has one validated immutable recovery sibling. No lane was terminated, duplicated, retrained, or tested during recovery.
+- **Plan**: `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`.
+- **Phase A state**: attempt `formal-20260828-a09fcab-u8-b` is `formal_incomplete`. The exact schedule was reaccepted at clean harness revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`, validation-only SafeDrug selection chose `molerec-safedrug-lr-5e-4`, and the five-entry serial queue was published before testing.
+- **Terminal event**: RETAIN, the first and only claimed test, finalized as `failed` / `test_failed` before upstream ten-round evaluation because the recovered-test invocation used the recovery directory basename instead of the original training-run basename. The failed evidence was preserved; no later lane was claimed and no test metric was inferred.
+- **Axes**: `execution_integrity = failed`, `paper_point_fidelity = not_evaluated`, `directional_relationships = not_evaluated`, and `artifact_completeness = failed`. No final audit packet exists because the five-pair barrier correctly rejected admission.
+- **Phase B state**: not started. The five baselines remain `registered`, with no current-scope Comparison Qualification. The first shared blocker is the missing legal Phase A five-pair audit required before Comparison execution.
+- **Suite conclusions**: `engineering_ready = false`, `reproduction_complete = false`, and `research_baseline_ready = false`.
+- **Reports**: `research/baseline-preflight/molerec-five-model-reproduction-report.md` and `research/baseline-preflight/five-model-baseline-readiness-report.md`.
+- **Next authority needed**: an explicit contract for a new attempt or continuation identity. The local invocation correction must not be used to replay the failed submission or continue the current queue.
+
+## Completed: MoleRec Finalization Recovery and Conformance
+
+- **Status**: U1–U5 recovery and the later continuation-admission conformance are complete for formal attempt `formal-20260828-a09fcab-u8-b`: all seven source lanes retain one validated immutable recovery sibling. No lane was terminated, duplicated, retrained, or tested during recovery.
 - **Plan amendment**: `docs/plans/2026-08-28-1718-fix-molerec-finalization-recovery-plan.md` permits immutable same-attempt finalization from preserved histories and checkpoints. It does not permit retraining, test-based selection, Baseline Core changes, or source-artifact overwrite.
-- **Local conformance**: U6–U10 are implemented and synthetic-tested, including validation-only SafeDrug selection, declaration-owned probes, frozen-schedule admission, source-aware GPU 7 queue admission, and bounded running-status heartbeat updates. These checks are not scientific evidence.
-- **Remote boundary**: The original source artifacts and the seven recovery siblings remain on 319. No test submission or five-model result exists. The accepted schedule is bound to the earlier harness revision `a09fcab8c3760a5caa14ec3ab475ddf4152a3665`; re-accept it against the final clean revision before any formal submission.
+- **Local conformance**: validation-only SafeDrug selection, declaration-owned probes, additive frozen-schedule continuation admission, recovered-test invocation, exact five-entry queue admission, failed-entry terminalization, and the five-pair audit barrier are synthetic-tested. These checks are not scientific evidence.
+- **Remote boundary**: The original source artifacts and seven recovery siblings remain immutable. The accepted schedule was additively rebound to clean revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`; the source schedule was not overwritten. The first formal RETAIN test then failed as recorded above, closing the current attempt without a five-model result.
 
-## In Progress: MoleRec Table 1 Five-Model Full Reproduction
+## Blocked: MoleRec Table 1 Five-Model Full Reproduction
 
-- **Status**: The recovery slice for `formal-20260828-a09fcab-u8-b` is complete, but the five-model reproduction is not. Recovered training artifacts are available for the seven source lanes; no successor test result or final audit exists.
+- **Status**: The recovery slice for `formal-20260828-a09fcab-u8-b` is complete, but the five-model reproduction is `formal_incomplete`. One finalized failed RETAIN test pair exists; four canonical tests and the final audit do not.
 - **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md` is authoritative for this work.
 - **Scientific scope**: RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec use the frozen SafeDrug archived revision `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, MoleRec revision `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, and preprocessing revision `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`. Five scientific models map to seven 50-epoch training lanes because SafeDrug has three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection.
 - **Current contract**: all seven lanes use `medrec-molerec-table1` (Python 3.8.16, PyTorch 1.9.0+cu111, PyG 2.0.3) and the additive `snapshots/molerec-table1-c721-www23` declaration. The executable dataset contract is 6,350 patients, 15,032 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures; 14,995 remains paper-reported metadata only.
-- **Evidence boundary**: attempt `formal-20260826-025500` is immutable historical SafeDrug-family evidence and is not successor evidence. The recovered artifacts are training evidence only; test metrics remain unread and no test is authorized until queue admission succeeds.
-- **Next gates**: commit and review the final local conformance slice, re-accept the measured schedule against that clean harness revision, then use the frozen schedule for any authorized formal submission and admit exactly five serial tests: RETAIN, LEAP, GAMENet, the selected SafeDrug lane, and MoleRec. Keep non-selected SafeDrug lanes `not_tested_by_design`.
+- **Evidence boundary**: attempt `formal-20260826-025500` remains immutable historical SafeDrug-family evidence and is not successor evidence. The seven recovered artifacts are training evidence only. The failed RETAIN pair contains no test metrics; neither training artifacts nor logs may substitute for the four absent pairs.
+- **Next gate**: stop. The current queue cannot be continued or audited. A separately authorized attempt identity is required before any further formal test; the existing training/recovery evidence must not be mutated or repeated.
 
 ## Completed: Baseline Program Architecture
 

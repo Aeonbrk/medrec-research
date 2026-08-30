@@ -3,9 +3,22 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
+import pytest
+
+import medrec_research.molerec_evaluation as molerec_evaluation
 from medrec_research import BaselineRegistry
-from medrec_research.molerec_evaluation import prepare_table1_evaluation
+from medrec_research.errors import ProtocolValidationError
+from medrec_research.evaluation_queue import (
+    load_evaluation_queue,
+    write_evaluation_queue,
+)
+from medrec_research.molerec_evaluation import (
+    claim_table1_evaluation,
+    finalize_table1_evaluation,
+    prepare_table1_evaluation,
+)
 from medrec_research.reproduction_evidence import finalize_evidence_pair
 
 PROJECT_ROOT = Path(__file__).parents[2]
@@ -65,9 +78,7 @@ def _write_training(
     finalize_evidence_pair(root, status=status, result=result)
 
 
-def test_prepare_table1_evaluation_selects_and_publishes_exact_five_lane_state(
-    tmp_path: Path,
-) -> None:
+def _prepare_state(tmp_path: Path) -> tuple[BaselineRegistry, Path, Path]:
     registry = BaselineRegistry.load(PROJECT_ROOT / "baselines" / "registry.toml")
     attempt_root = tmp_path / "attempt"
     artifact_ids: dict[str, str] = {}
@@ -114,8 +125,75 @@ def test_prepare_table1_evaluation_selects_and_publishes_exact_five_lane_state(
         snapshot_id=SNAPSHOT_ID,
         environment_sha256=ENVIRONMENT_SHA256,
     )
-
     assert prepared["selected_safedrug_lane"] == "molerec-safedrug-lr-1e-4"
+    return registry, attempt_root, state_root
+
+
+def _running_test_context(
+    tmp_path: Path,
+) -> tuple[Path, Path, Path, Path, dict[str, Any], dict[str, str]]:
+    _, attempt_root, state_root = _prepare_state(tmp_path)
+    queue_path = state_root / "evaluation-queue.json"
+    queue = load_evaluation_queue(queue_path)
+    entry = queue["entries"][0]
+    entry["state"] = "running"
+    write_evaluation_queue(queue_path, queue)
+
+    ledger_path = state_root / "ledger.json"
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    lane = ledger["lanes"][entry["lane_id"]]
+    identity = {
+        "attempt_id": ledger["attempt_id"],
+        "lane_id": entry["lane_id"],
+        "scientific_baseline_id": lane["scientific_baseline_id"],
+        "program_id": lane["program_id"],
+        "profile_id": lane["profile_id"],
+        "harness_revision": ledger["harness_revision"],
+        "model_source_revision": lane["model_source_revision"],
+        "preprocessing_revision": ledger["preprocessing_revision"],
+        "snapshot_id": ledger["snapshot_id"],
+        "environment_sha256": ledger["environment_sha256"],
+        "mode": "formal",
+        "submission_id": entry["test_submission_id"],
+    }
+    return attempt_root, state_root, queue_path, ledger_path, entry, identity
+
+
+def _write_completed_test_pair(
+    attempt_root: Path,
+    entry: dict[str, Any],
+    identity: dict[str, str],
+) -> None:
+    common = {
+        "schema_version": 2,
+        "identity": identity,
+        "mode": "formal",
+        "state": "completed",
+        "non_evidence": False,
+    }
+    finalize_evidence_pair(
+        attempt_root / "lanes" / entry["lane_id"] / "test",
+        status={
+            **common,
+            "kind": "reproduction_status_v2",
+            "stage": "terminal",
+            "started_at": "2026-08-29T00:00:00+00:00",
+            "finished_at": "2026-08-29T00:01:00+00:00",
+            "failure_code": None,
+        },
+        result={
+            **common,
+            "kind": "reproduction_result_v2",
+            "artifact_type": "test",
+        },
+    )
+
+
+def test_prepare_table1_evaluation_selects_and_publishes_exact_five_lane_state(
+    tmp_path: Path,
+) -> None:
+    registry, attempt_root, state_root = _prepare_state(tmp_path)
+
     queue = json.loads((state_root / "evaluation-queue.json").read_text(encoding="utf-8"))
     assert [entry["lane_id"] for entry in queue["entries"]] == [
         "molerec-retain",
@@ -132,3 +210,61 @@ def test_prepare_table1_evaluation_selects_and_publishes_exact_five_lane_state(
     )
     assert preregistration["selected_safedrug_lane"] == "molerec-safedrug-lr-1e-4"
     assert not any(attempt_root.rglob("test"))
+
+    queue["entries"][0]["state"] = "failed"
+    (state_root / "evaluation-queue.json").write_text(json.dumps(queue), encoding="utf-8")
+    with pytest.raises(ProtocolValidationError, match="terminal after a failed"):
+        claim_table1_evaluation(
+            state_root=state_root,
+            registry=registry,
+            attempt_root=attempt_root,
+            remote_root="/root/zhb/medrec-research",
+            data_root="/root/zhb/medrec-data",
+        )
+
+
+def test_finalize_table1_evaluation_recovers_after_queue_write_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    attempt_root, state_root, queue_path, ledger_path, entry, identity = _running_test_context(
+        tmp_path
+    )
+    _write_completed_test_pair(attempt_root, entry, identity)
+
+    original_finalize = molerec_evaluation.finalize_evaluation
+
+    def fail_queue_write(*args: object, **kwargs: object) -> dict[str, object]:
+        del args, kwargs
+        raise OSError("simulated queue write failure")
+
+    monkeypatch.setattr(molerec_evaluation, "finalize_evaluation", fail_queue_write)
+    with pytest.raises(OSError, match="simulated queue write failure"):
+        finalize_table1_evaluation(state_root=state_root, attempt_root=attempt_root)
+
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    assert ledger["lanes"][entry["lane_id"]]["state"] == "completed"
+    assert load_evaluation_queue(queue_path)["entries"][0]["state"] == "running"
+
+    monkeypatch.setattr(molerec_evaluation, "finalize_evaluation", original_finalize)
+    finalized = finalize_table1_evaluation(state_root=state_root, attempt_root=attempt_root)
+    assert finalized["state"] == "completed"
+    assert load_evaluation_queue(queue_path)["entries"][0]["state"] == "completed"
+
+
+def test_finalize_table1_evaluation_rejects_wrong_test_identity(tmp_path: Path) -> None:
+    attempt_root, state_root, queue_path, ledger_path, entry, identity = _running_test_context(
+        tmp_path
+    )
+    _write_completed_test_pair(
+        attempt_root,
+        entry,
+        {**identity, "submission_id": "wrong-test-submission"},
+    )
+
+    with pytest.raises(ProtocolValidationError, match="active submission"):
+        finalize_table1_evaluation(state_root=state_root, attempt_root=attempt_root)
+
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    assert ledger["lanes"][entry["lane_id"]]["state"] == "queued"
+    assert load_evaluation_queue(queue_path)["entries"][0]["state"] == "running"

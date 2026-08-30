@@ -437,9 +437,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
         ]
     )
     checkpoint_bytes = checkpoint.read_bytes()
-    module.run_logged = lambda command, cwd, env, log_path: log_path.write_text(
-        "test", encoding="utf-8"
-    )
+    module.profile.test_uses_basename = True
     module.parse_test_log = lambda text: {
         "rounds": [{"jaccard": 0.5}] * 10,
         "harness_summary": {
@@ -450,11 +448,52 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
             "avg_medications": {"mean": 10.0, "std": 0.0},
         },
     }
+    model_names: list[str] = []
+
+    def test_command(
+        python: str,
+        entrypoint: Path,
+        profile: object,
+        model_name: str,
+        checkpoint_path: Path,
+        **kwargs: object,
+    ) -> list[str]:
+        del python, entrypoint, profile, checkpoint_path, kwargs
+        model_names.append(model_name)
+        return ["test"]
+
+    module.test_command = test_command
+
+    def run_logged(command: list[str], cwd: Path, env: object, log_path: Path) -> None:
+        del command, env
+        staged_checkpoint = cwd / "saved" / f"SafeDrug_{source_root.name}" / checkpoint.name
+        assert staged_checkpoint.is_symlink()
+        assert staged_checkpoint.resolve() == checkpoint.resolve()
+        log_path.write_text("test", encoding="utf-8")
+
+    module.run_logged = run_logged
     test_identity = {
         **IDENTITY,
         "harness_revision": "f" * 40,
         "submission_id": "test-submission-1",
     }
+
+    with pytest.raises(ValueError, match="does not continue the recovered training lane"):
+        run_test_lane_v2(
+            module=module,
+            profile=module.profile,
+            upstream_root=upstream,
+            data_dir=data,
+            run_root=recovery_root,
+            training_source_root=source_root,
+            python="python",
+            identity={**test_identity, "attempt_id": "wrong-attempt"},
+            program_id="safedrug-archived",
+            source_revision="b" * 40,
+            gate_inputs=(),
+            error_type=ValueError,
+        )
+    assert not (recovery_root / "test").exists()
 
     run_test_lane_v2(
         module=module,
@@ -480,6 +519,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
     assert result["artifact_type"] == "test"
     assert len(result["rounds"]) == 10
     assert checkpoint.read_bytes() == checkpoint_bytes
+    assert model_names == [f"SafeDrug_{source_root.name}"]
 
 
 def test_recovery_rejects_near_miss_parser_failure_without_creating_sibling(
