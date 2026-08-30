@@ -43,7 +43,7 @@ The following local contracts are implemented and synthetic-tested: registry lan
 
 The clean continuation gate passed at revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`. Validation-only SafeDrug selection chose `molerec-safedrug-lr-5e-4`, the exact five-entry queue was published, and RETAIN was the only claimed test. That test failed before ten-round evaluation because the recovered invocation used the recovery directory basename rather than the original training-run basename.
 
-The failed pair, queue, ledger, selection, preregistration, schedules, and seven recovered training results are immutable evidence. The current attempt is closed to further claims. The local invocation correction binds the original training-run model name and exposes its validated checkpoint through the basename-only upstream namespace; it is for a separately authorized future attempt and does not authorize replay or relabel this one. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
+The failed pair, queue, ledger, selection, preregistration, schedules, and seven recovered training results are immutable evidence. The failed queue is closed to further claims. On 2026-08-30, the user authorized one additive continuation identity that reuses the same seven training/recovery pairs without retraining. It must create distinct test submissions and write test evidence under `continuations/<continuation-id>/tests/<lane-id>`; it must not replay, overwrite, or relabel the failed pair. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
 
 ## Operator Sequence
 
@@ -148,7 +148,7 @@ The controller-issued identity must bind attempt, lane, scientific baseline, pro
 
 ### 8. Admit the GPU 7 evaluation queue
 
-For a separately authorized attempt, first use `admit-reproduction-continuation` to reopen all seven immutable training pairs and publish an additive schedule. Then use `prepare-molerec-table1-evaluation` to perform validation-only SafeDrug selection, publish the prospective Comparison preregistration, mark both non-selected candidates `not_tested_by_design`, and create the exact five-entry queue. Both commands require all seven `--training-artifact LANE_ID=RELATIVE_RESULT_JSON` arguments.
+For the authorized additive continuation, first use `admit-reproduction-continuation` to reopen all seven immutable training pairs and publish an additive schedule. Then use `prepare-molerec-table1-evaluation` with a new `--continuation-id` to perform validation-only SafeDrug selection, publish the prospective Comparison preregistration, mark both non-selected candidates `not_tested_by_design`, and create the exact five-entry queue. Both commands require all seven `--training-artifact LANE_ID=RELATIVE_RESULT_JSON` arguments.
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec admit-reproduction-continuation \
@@ -164,8 +164,9 @@ rtk proxy /opt/homebrew/bin/uv run medrec prepare-molerec-table1-evaluation \
   --schedule <continuation-schedule.json> \
   --attempt-root runtime/reproduction/<attempt-id> \
   --attempt-id <attempt-id> \
+  --continuation-id <new-continuation-id> \
   --training-artifact <lane-id>=<attempt-relative-result.json> \
-  --state-root runtime/reproduction/<attempt-id>/evaluation-state
+  --state-root runtime/reproduction/<attempt-id>/continuations/<new-continuation-id>/state
 ```
 
 The continuation dry-run detects schedule, attempt, or evidence drift; if it fails, publish nothing and do not construct a test. Repeat both `--training-artifact` options exactly seven times in registry order. Run the continuation command without `--dry-run` only after reviewing the summary.
@@ -174,11 +175,11 @@ Claim exactly one queue entry, execute only the returned frozen command, and fin
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec claim-molerec-table1-evaluation \
-  --state-root runtime/reproduction/<attempt-id>/evaluation-state \
+  --state-root runtime/reproduction/<attempt-id>/continuations/<new-continuation-id>/state \
   --attempt-root runtime/reproduction/<attempt-id>
 
 rtk proxy /opt/homebrew/bin/uv run medrec finalize-molerec-table1-evaluation \
-  --state-root runtime/reproduction/<attempt-id>/evaluation-state \
+  --state-root runtime/reproduction/<attempt-id>/continuations/<new-continuation-id>/state \
   --attempt-root runtime/reproduction/<attempt-id>
 ```
 
@@ -192,7 +193,7 @@ Run the exact upstream ten-round test procedure serially on GPU 7 for RETAIN, LE
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec audit-prepared-molerec-table1 \
-  --state-root runtime/reproduction/<attempt-id>/evaluation-state \
+  --state-root runtime/reproduction/<attempt-id>/continuations/<new-continuation-id>/state \
   --attempt-root runtime/reproduction/<attempt-id> \
   --output runtime/reproduction/<attempt-id>/molerec-table1-audit-packet.json
 ```

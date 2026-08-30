@@ -29,7 +29,7 @@ product_contract_source: ce-plan-bootstrap
 - The Phase A axes are `execution_integrity = failed`, `paper_point_fidelity = not_evaluated`, `directional_relationships = not_evaluated`, and `artifact_completeness = failed`. The verdict is `formal_incomplete`, not `completed_mismatch`.
 - U4–U7 did not start. R11 and the U4 dependency require a legal five-pair Phase A audit with execution integrity and artifact completeness; that admission gate is not satisfied. Current registry state is therefore not Comparison evidence.
 - The recovered-test model-name binding and basename-only checkpoint namespace are corrected locally for a future authorized attempt. The queue now rejects every claim after a failed or blocked entry, and ledger-first finalization keeps a queue-write interruption reconcilable without replaying a test. None of these corrections changes the current attempt's terminal evidence.
-- U8 records this blocked state in public-safe reports, the tracker, handoff, and playbook. The plan remains blocked pending explicit authority for a new attempt or continuation identity.
+- U8 records this blocked state in public-safe reports, the tracker, handoff, and playbook. On 2026-08-30, the user authorized one additive continuation identity that reuses the seven immutable training/recovery pairs without retraining. The failed queue remains frozen; the continuation must use new submission IDs and independent test roots before U3 can resume.
 
 ---
 

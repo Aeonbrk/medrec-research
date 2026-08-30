@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from ._validation import parse_json_object, write_json_atomic
+from ._validation import parse_json_object, require_identifier, write_json_atomic
 from .errors import ProtocolValidationError
 from .evaluation_queue import (
     admit_validated_training_evaluation,
@@ -39,8 +39,8 @@ _FIXED_TEST_LANES = (
 _PAPER_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
 
 
-def _test_submission_id(attempt_id: str, lane_id: str) -> str:
-    return f"{attempt_id}-test-{lane_id}"
+def _test_submission_id(continuation_id: str, lane_id: str) -> str:
+    return f"{continuation_id}-test-{lane_id}"
 
 
 def prepare_table1_evaluation(
@@ -49,6 +49,7 @@ def prepare_table1_evaluation(
     registry: BaselineRegistry,
     attempt_root: str | Path,
     attempt_id: str,
+    continuation_id: str,
     training_artifact_ids: Mapping[str, str],
     training_harness_revision: str,
     harness_revision: str,
@@ -60,6 +61,7 @@ def prepare_table1_evaluation(
     destination = Path(state_root)
     if destination.exists():
         raise ProtocolValidationError(f"evaluation state already exists: {destination}")
+    continuation_id = require_identifier(continuation_id, field="continuation_id")
     lanes = tuple(registry.reproduction_lanes)
     lane_ids = tuple(lane.lane_id for lane in lanes)
     if set(training_artifact_ids) != set(lane_ids):
@@ -138,7 +140,7 @@ def prepare_table1_evaluation(
                 lane_id=lane_id,
                 scientific_baseline_id=lane.scientific_baseline_id,
                 training_artifact_id=training_artifact_ids[lane_id],
-                test_submission_id=_test_submission_id(attempt_id, lane_id),
+                test_submission_id=_test_submission_id(continuation_id, lane_id),
                 expected_identity=evidence_by_lane[lane_id]["identity"],
                 selection=selection if lane_id == selected_lane else None,
             )
@@ -153,7 +155,7 @@ def prepare_table1_evaluation(
                 "profile_id": lane.profile_id,
                 "model_source_revision": baseline.source.revision,
                 "active_submission_id": (
-                    _test_submission_id(attempt_id, lane.lane_id)
+                    _test_submission_id(continuation_id, lane.lane_id)
                     if is_test_lane
                     else evidence_by_lane[lane.lane_id]["identity"]["submission_id"]
                 ),
@@ -165,6 +167,7 @@ def prepare_table1_evaluation(
                 "schema_version": 2,
                 "kind": "molerec_table1_attempt_ledger_v2",
                 "attempt_id": attempt_id,
+                "continuation_id": continuation_id,
                 "harness_revision": harness_revision,
                 "preprocessing_revision": preprocessing_revision,
                 "snapshot_id": snapshot_id,
@@ -179,6 +182,7 @@ def prepare_table1_evaluation(
                 "schema_version": 1,
                 "kind": "five_model_comparison_preregistration",
                 "attempt_id": attempt_id,
+                "continuation_id": continuation_id,
                 "harness_revision": harness_revision,
                 "protocol_version": "1.1",
                 "selected_safedrug_lane": selected_lane,
@@ -201,7 +205,7 @@ def prepare_table1_evaluation(
                             lane_by_id[lane_id].scientific_baseline_id
                         ).source.revision,
                         "training_artifact_id": training_artifact_ids[lane_id],
-                        "test_submission_id": _test_submission_id(attempt_id, lane_id),
+                        "test_submission_id": _test_submission_id(continuation_id, lane_id),
                         "seed_declaration": "upstream source default; no controller override",
                         "decoder_declaration": (
                             "source-native prediction and frozen upstream ten-round evaluation"
@@ -215,6 +219,7 @@ def prepare_table1_evaluation(
 
     return {
         "attempt_id": attempt_id,
+        "continuation_id": continuation_id,
         "selected_safedrug_lane": selected_lane,
         "test_lane_ids": test_lane_ids,
         "state_root": destination,
@@ -232,6 +237,18 @@ def _load_ledger(state_root: str | Path) -> tuple[Path, dict[str, Any]]:
     ):
         raise ProtocolValidationError("attempt ledger contract is invalid")
     return path, ledger
+
+
+def _continuation_test_root(
+    attempt_root: str | Path,
+    ledger: Mapping[str, Any],
+    lane_id: str,
+) -> Path:
+    continuation_id = require_identifier(
+        ledger.get("continuation_id"),
+        field="ledger.continuation_id",
+    )
+    return Path(attempt_root) / "continuations" / continuation_id / "tests" / lane_id
 
 
 def claim_table1_evaluation(
@@ -266,6 +283,7 @@ def claim_table1_evaluation(
     )
     if source_root is None:
         raise ProtocolValidationError("formal continuation test requires recovered evidence")
+    test_root = _continuation_test_root(attempt_root, ledger, entry["lane_id"])
     selection_path = (
         str((state / "selection.json").resolve())
         if entry["lane_id"].startswith("molerec-safedrug")
@@ -280,6 +298,7 @@ def claim_table1_evaluation(
         data_root=data_root,
         recovery_run_root=str(training_root.resolve()),
         training_source_root=str(source_root.resolve()),
+        test_root=str(test_root.resolve()),
         selection_path=selection_path,
     )
     claimed = claim_next_evaluation(queue_path)
@@ -317,11 +336,11 @@ def finalize_table1_evaluation(
         "mode": "formal",
         "submission_id": entry["test_submission_id"],
     }
-    training_root, _, _ = resolve_training_artifact(
+    resolve_training_artifact(
         attempt_root,
         entry["training_artifact_id"],
     )
-    test_root = training_root / "test"
+    test_root = _continuation_test_root(attempt_root, ledger, entry["lane_id"])
     status, result = reopen_finalized_pair(
         test_root,
         expected_identity=expected_identity,

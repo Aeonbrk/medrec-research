@@ -676,6 +676,7 @@ def _prepare_molerec_evaluation(args: argparse.Namespace) -> int:
         json.dumps(
             {
                 "attempt_id": prepared["attempt_id"],
+                "continuation_id": prepared["continuation_id"],
                 "selected_safedrug_lane": prepared["selected_safedrug_lane"],
                 "state": "evaluation_prepared",
                 "test_lane_ids": prepared["test_lane_ids"],
@@ -961,6 +962,7 @@ def _build_parser() -> argparse.ArgumentParser:
     prepare_evaluation.add_argument("--schedule", type=Path, required=True)
     prepare_evaluation.add_argument("--attempt-root", type=Path, required=True)
     prepare_evaluation.add_argument("--attempt-id", required=True)
+    prepare_evaluation.add_argument("--continuation-id", required=True)
     prepare_evaluation.add_argument(
         "--training-artifact",
         type=_lane_artifact,

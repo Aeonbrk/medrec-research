@@ -255,6 +255,12 @@ def main() -> None:
         help="Failed source run that owns a recovered training checkpoint",
     )
     parser.add_argument(
+        "--test-root",
+        type=Path,
+        default=None,
+        help="Additive continuation directory for test evidence",
+    )
+    parser.add_argument(
         "--probe-scope",
         choices=("environment", "full"),
         default="full",
@@ -268,6 +274,8 @@ def main() -> None:
         parser.error("--phase test is only supported when --mode formal")
     if args.training_source_root is not None and args.phase != "test":
         parser.error("--training-source-root is only supported for --phase test")
+    if args.test_root is not None and args.phase != "test":
+        parser.error("--test-root is only supported for --phase test")
 
     if args.mode == "probe":
         probe_result = run_probe(
@@ -306,6 +314,7 @@ def main() -> None:
             training_source_root=(
                 args.training_source_root.resolve() if args.training_source_root else None
             ),
+            test_root=args.test_root.resolve() if args.test_root else None,
         )
 
 

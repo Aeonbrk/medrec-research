@@ -11,7 +11,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from baselines import molerec_runner, safedrug_archived_runner
+from baselines import (
+    molerec as molerec_program,
+)
+from baselines import (
+    molerec_runner,
+    safedrug_archived_runner,
+)
+from baselines import (
+    safedrug_archived as safedrug_archived_program,
+)
 from baselines.reproduction_artifacts import reopen_recovered_v2_pair, reopen_v2_pair
 from baselines.reproduction_runner import (
     _run_logged_with_progress,
@@ -477,6 +486,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
         "harness_revision": "f" * 40,
         "submission_id": "test-submission-1",
     }
+    continuation_test_root = tmp_path / "continuation-test"
 
     with pytest.raises(ValueError, match="does not continue the recovered training lane"):
         run_test_lane_v2(
@@ -486,6 +496,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
             data_dir=data,
             run_root=recovery_root,
             training_source_root=source_root,
+            test_root=continuation_test_root,
             python="python",
             identity={**test_identity, "attempt_id": "wrong-attempt"},
             program_id="safedrug-archived",
@@ -493,7 +504,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
             gate_inputs=(),
             error_type=ValueError,
         )
-    assert not (recovery_root / "test").exists()
+    assert not continuation_test_root.exists()
 
     run_test_lane_v2(
         module=module,
@@ -502,6 +513,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
         data_dir=data,
         run_root=recovery_root,
         training_source_root=source_root,
+        test_root=continuation_test_root,
         python="python",
         identity=test_identity,
         program_id="safedrug-archived",
@@ -511,7 +523,7 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
     )
 
     status, result = reopen_v2_pair(
-        recovery_root / "test",
+        continuation_test_root,
         expected_identity=test_identity,
         error_type=ValueError,
     )
@@ -520,6 +532,49 @@ def test_recovered_training_uses_source_checkpoint_and_new_test_identity(
     assert len(result["rounds"]) == 10
     assert checkpoint.read_bytes() == checkpoint_bytes
     assert model_names == [f"SafeDrug_{source_root.name}"]
+    assert not (recovery_root / "test").exists()
+
+
+@pytest.mark.parametrize(
+    ("program", "baseline_id"),
+    (
+        (safedrug_archived_program, "retain"),
+        (molerec_program, "molerec-embedding"),
+    ),
+)
+def test_program_main_forwards_continuation_test_root(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    program: object,
+    baseline_id: str,
+) -> None:
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(program, "run_formal_lane", lambda **kwargs: captured.update(kwargs))
+    test_root = tmp_path / "continuation-test"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "program",
+            baseline_id,
+            "--upstream-root",
+            str(tmp_path / "upstream"),
+            "--dataset-root",
+            str(tmp_path / "data"),
+            "--run-root",
+            str(tmp_path / "recovery"),
+            "--phase",
+            "test",
+            "--training-source-root",
+            str(tmp_path / "source"),
+            "--test-root",
+            str(test_root),
+        ],
+    )
+
+    program.main()
+
+    assert captured["test_root"] == test_root.resolve()
 
 
 def test_recovery_rejects_near_miss_parser_failure_without_creating_sibling(

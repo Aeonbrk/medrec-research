@@ -809,6 +809,7 @@ class RemoteExecutor:
         data_root: str,
         recovery_run_root: str,
         training_source_root: str,
+        test_root: str,
         selection_path: str | None = None,
     ) -> str:
         """Build one source-native GPU 7 test command for a recovered lane."""
@@ -830,6 +831,7 @@ class RemoteExecutor:
             training_source_root,
             field="training_source_root",
         )
+        test_root = self._remote_path(test_root, field="test_root")
         if lane_id.startswith("molerec-safedrug"):
             if selection_path is None:
                 raise ProtocolValidationError("SafeDrug formal test requires selection.json")
@@ -855,6 +857,7 @@ class RemoteExecutor:
             cpu_set="28-31,60-63",
             run_root_override=recovery_run_root,
             training_source_root=training_source_root,
+            test_root=test_root,
             selection_path=selection_path,
         )
 
@@ -1298,6 +1301,7 @@ class RemoteExecutor:
         cpu_set: str | None = None,
         run_root_override: str | None = None,
         training_source_root: str | None = None,
+        test_root: str | None = None,
         selection_path: str | None = None,
     ) -> str:
         cpu_set = RemoteExecutor._validate_cpu_set(cpu_set)
@@ -1349,16 +1353,18 @@ class RemoteExecutor:
                 raise ProtocolValidationError("formal reproduction phase is invalid")
             argv.extend(["--phase", phase])
             if phase == "test":
-                if run_root_override is None or training_source_root is None:
+                if run_root_override is None or training_source_root is None or test_root is None:
                     raise ProtocolValidationError(
-                        "formal test requires recovered and source training roots"
+                        "formal test requires recovered, source, and continuation test roots"
                     )
-                argv.extend(["--training-source-root", training_source_root])
+                argv.extend(
+                    ["--training-source-root", training_source_root, "--test-root", test_root]
+                )
                 if selection_path is not None:
                     argv.extend(["--selection", selection_path])
             elif any(
                 value is not None
-                for value in (run_root_override, training_source_root, selection_path)
+                for value in (run_root_override, training_source_root, test_root, selection_path)
             ):
                 raise ProtocolValidationError("formal training cannot use test continuation paths")
         if mode == "smoke":

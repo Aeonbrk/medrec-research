@@ -23,6 +23,7 @@ from medrec_research.reproduction_evidence import finalize_evidence_pair
 
 PROJECT_ROOT = Path(__file__).parents[2]
 ATTEMPT_ID = "formal-20260828-a09fcab-u8-b"
+CONTINUATION_ID = "continuation-20260830-pathfix-1"
 SOURCE_HARNESS = "a" * 40
 CONTINUATION_HARNESS = "b" * 40
 PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
@@ -118,6 +119,7 @@ def _prepare_state(tmp_path: Path) -> tuple[BaselineRegistry, Path, Path]:
         registry=registry,
         attempt_root=attempt_root,
         attempt_id=ATTEMPT_ID,
+        continuation_id=CONTINUATION_ID,
         training_artifact_ids=artifact_ids,
         training_harness_revision=SOURCE_HARNESS,
         harness_revision=CONTINUATION_HARNESS,
@@ -126,6 +128,7 @@ def _prepare_state(tmp_path: Path) -> tuple[BaselineRegistry, Path, Path]:
         environment_sha256=ENVIRONMENT_SHA256,
     )
     assert prepared["selected_safedrug_lane"] == "molerec-safedrug-lr-1e-4"
+    assert prepared["continuation_id"] == CONTINUATION_ID
     return registry, attempt_root, state_root
 
 
@@ -172,7 +175,7 @@ def _write_completed_test_pair(
         "non_evidence": False,
     }
     finalize_evidence_pair(
-        attempt_root / "lanes" / entry["lane_id"] / "test",
+        attempt_root / "continuations" / CONTINUATION_ID / "tests" / entry["lane_id"],
         status={
             **common,
             "kind": "reproduction_status_v2",
@@ -203,11 +206,13 @@ def test_prepare_table1_evaluation_selects_and_publishes_exact_five_lane_state(
         "molerec-embedding",
     ]
     ledger = json.loads((state_root / "ledger.json").read_text(encoding="utf-8"))
+    assert ledger["continuation_id"] == CONTINUATION_ID
     assert ledger["lanes"]["molerec-safedrug-lr-1e-5"]["state"] == ("not_tested_by_design")
     assert ledger["lanes"]["molerec-safedrug-lr-5e-4"]["state"] == ("not_tested_by_design")
     preregistration = json.loads(
         (state_root / "five-model-comparison-preregistration.json").read_text(encoding="utf-8")
     )
+    assert preregistration["continuation_id"] == CONTINUATION_ID
     assert preregistration["selected_safedrug_lane"] == "molerec-safedrug-lr-1e-4"
     assert not any(attempt_root.rglob("test"))
 

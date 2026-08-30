@@ -488,6 +488,7 @@ def run_formal_lane(
     phase: str = "training",
     selection_path: Path | None = None,
     training_source_root: Path | None = None,
+    test_root: Path | None = None,
 ) -> None:
     """Run the controller-identified training or serial test phase."""
     if phase not in ("training", "test"):
@@ -526,6 +527,7 @@ def run_formal_lane(
             error_type=ReproductionError,
             selection_path=selection_path,
             training_source_root=training_source_root,
+            test_root=test_root,
         )
 
 

@@ -9,7 +9,7 @@
 - **Phase B state**: not started. The five baselines remain `registered`, with no current-scope Comparison Qualification. The first shared blocker is the missing legal Phase A five-pair audit required before Comparison execution.
 - **Suite conclusions**: `engineering_ready = false`, `reproduction_complete = false`, and `research_baseline_ready = false`.
 - **Reports**: `research/baseline-preflight/molerec-five-model-reproduction-report.md` and `research/baseline-preflight/five-model-baseline-readiness-report.md`.
-- **Next authority needed**: an explicit contract for a new attempt or continuation identity. The local invocation correction must not be used to replay the failed submission or continue the current queue.
+- **Authorized continuation**: on `2026-08-30`, the user authorized one additive continuation identity that reuses the seven immutable training/recovery pairs without retraining. It must create new submission IDs and independent test roots, preserve the failed queue, and wait for a clean committed harness plus an idle reserved GPU 7 before launch.
 
 ## Completed: MoleRec Finalization Recovery and Conformance
 
@@ -25,7 +25,7 @@
 - **Scientific scope**: RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec use the frozen SafeDrug archived revision `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, MoleRec revision `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, and preprocessing revision `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`. Five scientific models map to seven 50-epoch training lanes because SafeDrug has three disclosed learning-rate candidates (`1e-5`, `1e-4`, `5e-4`) and validation-only selection.
 - **Current contract**: all seven lanes use `medrec-molerec-table1` (Python 3.8.16, PyTorch 1.9.0+cu111, PyG 2.0.3) and the additive `snapshots/molerec-table1-c721-www23` declaration. The executable dataset contract is 6,350 patients, 15,032 visits, 131 medications, 448 DDI pairs, and 491 molecular substructures; 14,995 remains paper-reported metadata only.
 - **Evidence boundary**: attempt `formal-20260826-025500` remains immutable historical SafeDrug-family evidence and is not successor evidence. The seven recovered artifacts are training evidence only. The failed RETAIN pair contains no test metrics; neither training artifacts nor logs may substitute for the four absent pairs.
-- **Next gate**: stop. The current queue cannot be continued or audited. A separately authorized attempt identity is required before any further formal test; the existing training/recovery evidence must not be mutated or repeated.
+- **Next gate**: the current queue cannot be continued or audited. The authorized additive continuation must preserve it, reuse the existing training/recovery evidence without mutation, and create a new five-entry controller state with distinct test submissions and test roots.
 
 ## Completed: Baseline Program Architecture
 

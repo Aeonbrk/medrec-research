@@ -148,6 +148,7 @@ def _load_ledger(path: Path) -> dict[str, Any]:
             "test_lane_ids",
             "lanes",
         ),
+        optional=("continuation_id",),
         context="MoleRec attempt ledger",
     )
     if root["schema_version"] != 2 or root["kind"] != "molerec_table1_attempt_ledger_v2":

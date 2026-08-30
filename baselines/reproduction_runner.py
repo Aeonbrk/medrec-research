@@ -788,6 +788,7 @@ def run_test_lane_v2(
     data_dir: Path,
     run_root: Path,
     training_source_root: Path | None = None,
+    test_root: Path | None = None,
     python: str,
     identity: Mapping[str, str],
     program_id: str,
@@ -872,15 +873,15 @@ def run_test_lane_v2(
     if calc_sha256(checkpoint) != checkpoint_data.get("sha256"):
         raise error_type("training checkpoint identity does not match its artifact")
 
-    test_root = run_root / "test"
-    if test_root.exists():
-        raise error_type(f"test run root already exists: {test_root}")
+    test_destination = test_root or run_root / "test"
+    if test_destination.exists():
+        raise error_type(f"test run root already exists: {test_destination}")
     source_dir = upstream_root / "src"
     original_entrypoint = source_dir / profile.entrypoint
     model_root = training_source_root or run_root
     model_name = f"{profile.model_name}_{model_root.name}"
-    test_root.mkdir()
-    work_src = test_root / "work" / "src"
+    test_destination.mkdir(parents=True)
+    work_src = test_destination / "work" / "src"
     work_src.mkdir(parents=True, exist_ok=False)
     (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
     if profile.test_uses_basename:
@@ -890,7 +891,7 @@ def run_test_lane_v2(
     started_at = _now()
     write_json = _module_value(module, "write_json")
     write_json(
-        test_root / "status.running.json",
+        test_destination / "status.running.json",
         {
             "schema_version": 2,
             "kind": "reproduction_progress_v2",
@@ -926,15 +927,15 @@ def run_test_lane_v2(
             command,
             cwd=work_src,
             env=environment,
-            log_path=test_root / "test.log",
+            log_path=test_destination / "test.log",
         )
         if profile.baseline_id.startswith("molerec"):
             parsed = _module_value(module, "parse_formal_test_log")(
-                (test_root / "test.log").read_text(errors="replace")
+                (test_destination / "test.log").read_text(errors="replace")
             )
         else:
             parsed = _module_value(module, "parse_test_log")(
-                (test_root / "test.log").read_text(errors="replace")
+                (test_destination / "test.log").read_text(errors="replace")
             )
         rounds = parsed.get("rounds", parsed.get("test_rounds"))
         summary = parsed.get("harness_summary")
@@ -971,10 +972,10 @@ def run_test_lane_v2(
                 "upstream_summary": parsed.get("upstream_summary"),
             },
         )
-        finalize_v2_pair(test_root, status=status, result=result, error_type=error_type)
+        finalize_v2_pair(test_destination, status=status, result=result, error_type=error_type)
     except Exception:
         _failure_pair(
-            root=test_root,
+            root=test_destination,
             identity=identity,
             started_at=started_at,
             artifact_type="test",

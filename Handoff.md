@@ -4,7 +4,7 @@
 
 Do not resume test claims for attempt `formal-20260828-a09fcab-u8-b`. Its first formal RETAIN test has a finalized `failed` / `test_failed` evidence pair, so the attempt is `formal_incomplete`. The queue and ledger intentionally preserve that failure, and the remaining four test entries have not been claimed.
 
-Any future scientific execution now needs an explicit authoritative decision about a new attempt or continuation identity. Do not infer that authority from the local invocation fix, reuse the failed submission, rerun training, allocate a recovery ID, or continue into Comparison Mode.
+On 2026-08-30, the user authorized one additive continuation identity that reuses the seven immutable training/recovery pairs without retraining. The old failed queue and submission remain closed. The authorized continuation must use new test submission IDs and independent test roots; it still may not allocate a recovery ID or enter Comparison Mode before a legal five-pair audit exists.
 
 ## Current state
 
@@ -41,4 +41,4 @@ Any future scientific execution now needs an explicit authoritative decision abo
 1. Preserve the failed RETAIN pair, queue, ledger, selection, preregistration, source schedule, continuation schedule, and seven recovery siblings.
 2. Do not claim another test or run the final audit for the current attempt.
 3. Do not start U4–U7 Comparison qualification work until Phase A has the legal five-pair audit required by the Unified Research Protocol plan.
-4. If a new execution is authorized, freeze its identity and review the recovered-test invocation fix before touching remote evidence.
+4. Freeze the authorized continuation identity against a new clean harness revision, wait for GPU 7 to become idle, and write every new test pair under its independent continuation root.

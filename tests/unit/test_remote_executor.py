@@ -941,6 +941,7 @@ def test_recovered_test_command_targets_reserved_gpu_without_training() -> None:
         data_root="/root/zhb/medrec-data",
         recovery_run_root="/root/zhb/medrec-data/runs/source/recoveries/recovery-safedrug",
         training_source_root="/root/zhb/medrec-data/runs/source",
+        test_root="/root/zhb/medrec-data/runtime/continuation/tests/molerec-safedrug",
         selection_path="/root/zhb/medrec-data/runtime/attempt/selection.json",
     )
 
@@ -949,3 +950,6 @@ def test_recovered_test_command_targets_reserved_gpu_without_training() -> None:
     assert "--phase training" not in command
     assert "--training-source-root /root/zhb/medrec-data/runs/source" in command
     assert "--run-root /root/zhb/medrec-data/runs/source/recoveries/recovery-safedrug" in command
+    assert (
+        "--test-root /root/zhb/medrec-data/runtime/continuation/tests/molerec-safedrug" in command
+    )
