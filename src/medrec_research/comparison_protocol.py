@@ -32,6 +32,16 @@ REQUIRED_OUTCOMES = (
     "average_medication_count",
 )
 
+QUALIFICATION_GATE_ORDER = (
+    "environment_lock",
+    "adapter_smoke",
+    "cohort_identity",
+    "adaptation_budget",
+    "core_integrity",
+    "deterministic_adapter",
+    "independent_evaluation",
+)
+
 
 class DecoderClass(StrEnum):
     SCORE_THRESHOLD = "score_threshold"
@@ -41,6 +51,12 @@ class DecoderClass(StrEnum):
 class SelectionSplit(StrEnum):
     VALIDATION = "validation"
     TEST = "test"
+
+
+class QualificationGateState(StrEnum):
+    PASSED = "passed"
+    FAILED = "failed"
+    NOT_EVALUATED_AFTER_BLOCKER = "not_evaluated_after_blocker"
 
 
 def _finite(value: object, *, field: str) -> float:
@@ -399,6 +415,153 @@ class IndependentEvaluationInput:
 
 
 @dataclass(frozen=True, slots=True)
+class QualificationGateResult:
+    """Terminal state and evidence for one ordered qualification gate."""
+
+    gate: str
+    state: QualificationGateState | str
+    artifact_sha256: str | None = None
+
+    def __post_init__(self) -> None:
+        require_identifier(self.gate, field="qualification_gate.gate")
+        if self.gate not in QUALIFICATION_GATE_ORDER:
+            raise ProtocolValidationError("qualification gate is not registered")
+        state = enum_member(QualificationGateState, self.state, field="qualification_gate.state")
+        object.__setattr__(self, "state", state)
+        if state is QualificationGateState.NOT_EVALUATED_AFTER_BLOCKER:
+            if self.artifact_sha256 is not None:
+                raise ProtocolValidationError("unevaluated qualification gates have no artifact")
+        elif self.artifact_sha256 is None:
+            raise ProtocolValidationError("evaluated qualification gates require an artifact")
+        else:
+            require_sha256(self.artifact_sha256, field="qualification_gate.artifact_sha256")
+
+    def to_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {"gate": self.gate, "state": self.state.value}
+        if self.artifact_sha256 is not None:
+            payload["artifact_sha256"] = self.artifact_sha256
+        return payload
+
+
+@dataclass(frozen=True, slots=True)
+class ComparisonQualificationAttempt:
+    """One honest, terminal pass or blocker across the frozen gate order."""
+
+    method_id: str
+    gates: tuple[QualificationGateResult, ...]
+    qualification_sha256: str | None = None
+    evaluation_sha256: str | None = None
+    outcomes_sha256: str | None = None
+    uncertainty_sha256: str | None = None
+
+    def __post_init__(self) -> None:
+        require_identifier(self.method_id, field="qualification_attempt.method_id")
+        gates = tuple(
+            gate if isinstance(gate, QualificationGateResult) else QualificationGateResult(**gate)
+            for gate in self.gates
+        )
+        if tuple(gate.gate for gate in gates) != QUALIFICATION_GATE_ORDER:
+            raise ProtocolValidationError("qualification gates must use the frozen gate order")
+        failed = [
+            index for index, gate in enumerate(gates) if gate.state is QualificationGateState.FAILED
+        ]
+        if failed:
+            if len(failed) != 1:
+                raise ProtocolValidationError("blocked qualification has exactly one failed gate")
+            blocker = failed[0]
+            if any(
+                gate.state is not QualificationGateState.PASSED for gate in gates[:blocker]
+            ) or any(
+                gate.state is not QualificationGateState.NOT_EVALUATED_AFTER_BLOCKER
+                for gate in gates[blocker + 1 :]
+            ):
+                raise ProtocolValidationError("qualification must stop after its first failed gate")
+        elif any(gate.state is not QualificationGateState.PASSED for gate in gates):
+            raise ProtocolValidationError(
+                "terminal qualification gates must pass or stop at a blocker"
+            )
+        artifact_fields = (
+            "qualification_sha256",
+            "evaluation_sha256",
+            "outcomes_sha256",
+            "uncertainty_sha256",
+        )
+        for field in artifact_fields:
+            value = getattr(self, field)
+            if value is not None:
+                require_sha256(value, field=f"qualification_attempt.{field}")
+        if not failed and any(getattr(self, field) is None for field in artifact_fields):
+            raise ProtocolValidationError(
+                "qualified attempts require all terminal artifact digests"
+            )
+        if failed and self.qualification_sha256 is not None:
+            raise ProtocolValidationError("blocked attempts must not claim a qualification digest")
+        object.__setattr__(self, "gates", gates)
+
+    @property
+    def qualified(self) -> bool:
+        return all(gate.state is QualificationGateState.PASSED for gate in self.gates)
+
+    @property
+    def attempt_sha256(self) -> str:
+        return content_sha256(self.to_dict())
+
+    def to_dict(self) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "gates": [gate.to_dict() for gate in self.gates],
+            "method_id": self.method_id,
+            "qualified": self.qualified,
+        }
+        for field in (
+            "qualification_sha256",
+            "evaluation_sha256",
+            "outcomes_sha256",
+            "uncertainty_sha256",
+        ):
+            value = getattr(self, field)
+            if value is not None:
+                payload[field] = value
+        return payload
+
+    @classmethod
+    def blocked(
+        cls,
+        *,
+        method_id: str,
+        failed_gate: str,
+        evidence_sha256_by_gate: Mapping[str, str],
+        failure_artifact_sha256: str,
+    ) -> ComparisonQualificationAttempt:
+        if failed_gate not in QUALIFICATION_GATE_ORDER:
+            raise ProtocolValidationError("failed qualification gate is not registered")
+        blocker = QUALIFICATION_GATE_ORDER.index(failed_gate)
+        expected_passed = set(QUALIFICATION_GATE_ORDER[:blocker])
+        if set(evidence_sha256_by_gate) != expected_passed:
+            raise ProtocolValidationError("blocked attempt requires evidence for every prior gate")
+        gates = tuple(
+            QualificationGateResult(
+                gate=gate,
+                state=(
+                    QualificationGateState.PASSED
+                    if index < blocker
+                    else QualificationGateState.FAILED
+                    if index == blocker
+                    else QualificationGateState.NOT_EVALUATED_AFTER_BLOCKER
+                ),
+                artifact_sha256=(
+                    evidence_sha256_by_gate[gate]
+                    if index < blocker
+                    else failure_artifact_sha256
+                    if index == blocker
+                    else None
+                ),
+            )
+            for index, gate in enumerate(QUALIFICATION_GATE_ORDER)
+        )
+        return cls(method_id=method_id, gates=gates)
+
+
+@dataclass(frozen=True, slots=True)
 class ComparisonProtocolV1_1:
     """Versioned amendment that owns shared comparison semantics."""
 
@@ -561,9 +724,12 @@ class ComparisonProtocolV1_1:
 __all__ = (
     "AdaptationBudget",
     "ComparisonProtocolV1_1",
+    "ComparisonQualificationAttempt",
     "DecoderClass",
     "DecoderProfile",
     "IndependentEvaluationInput",
+    "QualificationGateResult",
+    "QualificationGateState",
     "SelectionSplit",
     "ThresholdSelectionRule",
 )

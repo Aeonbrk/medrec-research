@@ -211,6 +211,16 @@ def test_comparison_qualification_does_not_transfer_to_another_dataset() -> None
     )
 
 
+def test_v1_1_qualification_requires_amendment_and_method_profile() -> None:
+    with pytest.raises(ProtocolValidationError, match=r"v1.1.*amendment.*profile"):
+        ComparisonQualification(
+            protocol_version="1.1",
+            dataset_manifest_sha256="d" * 64,
+            adaptation_budget_sha256="3" * 64,
+            evidence=comparison_qualification().evidence,
+        )
+
+
 def test_archive_evidence_does_not_impersonate_upstream_source() -> None:
     baseline = BaselineDefinition(
         baseline_id="archive-example",

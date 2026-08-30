@@ -12,9 +12,12 @@ from .adapters import (
 from .comparison_protocol import (
     AdaptationBudget,
     ComparisonProtocolV1_1,
+    ComparisonQualificationAttempt,
     DecoderClass,
     DecoderProfile,
     IndependentEvaluationInput,
+    QualificationGateResult,
+    QualificationGateState,
     SelectionSplit,
     ThresholdSelectionRule,
 )
@@ -27,8 +30,22 @@ from .dataset import (
     SplitName,
 )
 from .errors import ProtocolValidationError
-from .evaluation import EvaluationResult, evaluate_predictions
-from .prediction import MedicationScore, PredictionRecord
+from .evaluation import (
+    ComparisonEvaluationResult,
+    ComparisonOutcomes,
+    EvaluationResult,
+    JoinedComparisonBatch,
+    OutcomeInterval,
+    evaluate_comparison_predictions,
+    evaluate_predictions,
+    join_comparison_targets,
+)
+from .prediction import (
+    ComparisonPredictionBatch,
+    MedicationScore,
+    PredictionRecord,
+    TargetFreePrediction,
+)
 from .protocol_check import ProtocolCheckRecord
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import (
@@ -58,8 +75,12 @@ __all__ = (
     "BaselineDefinition",
     "BaselineReadiness",
     "BaselineRegistry",
+    "ComparisonEvaluationResult",
+    "ComparisonOutcomes",
+    "ComparisonPredictionBatch",
     "ComparisonProtocolV1_1",
     "ComparisonQualification",
+    "ComparisonQualificationAttempt",
     "ComparisonScope",
     "DatasetManifest",
     "DatasetPrivacy",
@@ -69,13 +90,17 @@ __all__ = (
     "EvaluationResult",
     "FrozenSchedule",
     "IndependentEvaluationInput",
+    "JoinedComparisonBatch",
     "MedicationScore",
     "MembershipDigestMethod",
+    "OutcomeInterval",
     "PredictionAdapter",
     "PredictionRecord",
     "ProcessPredictionAdapter",
     "ProtocolCheckRecord",
     "ProtocolValidationError",
+    "QualificationGateResult",
+    "QualificationGateState",
     "ReadinessEvidence",
     "ReadinessGate",
     "ReferenceConfig",
@@ -91,7 +116,10 @@ __all__ = (
     "SourceIdentity",
     "SourceStatus",
     "SplitName",
+    "TargetFreePrediction",
     "ThresholdSelectionRule",
+    "evaluate_comparison_predictions",
     "evaluate_predictions",
+    "join_comparison_targets",
     "run_reference_slice",
 )

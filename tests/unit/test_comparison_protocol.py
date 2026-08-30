@@ -5,11 +5,14 @@ import pytest
 from medrec_research import (
     AdaptationBudget,
     ComparisonProtocolV1_1,
+    ComparisonQualificationAttempt,
     ComparisonScope,
     DecoderClass,
     DecoderProfile,
     IndependentEvaluationInput,
     ProtocolValidationError,
+    QualificationGateResult,
+    QualificationGateState,
     ThresholdSelectionRule,
 )
 from medrec_research.comparison_protocol import SAFE_DRUG_ARCHIVED_REVISION
@@ -142,3 +145,29 @@ def test_independent_evaluation_requires_complete_target_free_coverage() -> None
 
 def test_comparison_protocol_uses_the_safe_drug_archived_lineage() -> None:
     assert _protocol().data_lineage_revision == SAFE_DRUG_ARCHIVED_REVISION
+
+
+def test_blocked_qualification_attempt_preserves_gate_order_and_stops() -> None:
+    attempt = ComparisonQualificationAttempt.blocked(
+        method_id="retain",
+        failed_gate="core_integrity",
+        evidence_sha256_by_gate={
+            "environment_lock": "1" * 64,
+            "adapter_smoke": "2" * 64,
+            "cohort_identity": "3" * 64,
+            "adaptation_budget": "4" * 64,
+        },
+        failure_artifact_sha256="5" * 64,
+    )
+
+    assert [gate.state for gate in attempt.gates] == [
+        QualificationGateState.PASSED,
+        QualificationGateState.PASSED,
+        QualificationGateState.PASSED,
+        QualificationGateState.PASSED,
+        QualificationGateState.FAILED,
+        QualificationGateState.NOT_EVALUATED_AFTER_BLOCKER,
+        QualificationGateState.NOT_EVALUATED_AFTER_BLOCKER,
+    ]
+    assert isinstance(attempt.gates[0], QualificationGateResult)
+    assert not attempt.qualified

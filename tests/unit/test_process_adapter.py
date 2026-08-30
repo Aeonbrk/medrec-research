@@ -207,3 +207,60 @@ def test_process_adapter_times_out() -> None:
 def test_process_adapter_rejects_nonfinite_timeout(timeout: float) -> None:
     with pytest.raises(ProtocolValidationError, match="greater than zero"):
         ProcessPredictionAdapter(_command("pass"), timeout_seconds=timeout)
+
+
+def test_process_adapter_parses_target_free_comparison_scores() -> None:
+    response = {
+        "schema_version": 2,
+        "method_id": "retain",
+        "predictions": [
+            {
+                **_wire_prediction_payload(),
+                "vocabulary_scores": [
+                    {"medication_code": "RX_A", "score": 0.9},
+                    {"medication_code": "RX_B", "score": 0.1},
+                ],
+            }
+        ],
+    }
+    source = (
+        "import json, sys; request = json.load(sys.stdin); "
+        "assert request['schema_version'] == 2; "
+        "assert 'RX_A' not in json.dumps(request); "
+        f"json.dump({response!r}, sys.stdout)"
+    )
+
+    batch = ProcessPredictionAdapter(_command(source)).predict_comparison(
+        {"dataset_id": "synthetic-medrec"},
+        method_id="retain",
+        expected_visits=(("synthetic-patient", "visit-1"),),
+        medication_vocabulary=("RX_A", "RX_B"),
+    )
+
+    assert batch.predictions[0].predicted_medications == ("RX_A",)
+    assert tuple(item.score for item in batch.predictions[0].vocabulary_scores) == (0.9, 0.1)
+
+
+def test_process_adapter_rejects_comparison_score_order_drift() -> None:
+    response = {
+        "schema_version": 2,
+        "method_id": "retain",
+        "predictions": [
+            {
+                **_wire_prediction_payload(),
+                "vocabulary_scores": [
+                    {"medication_code": "RX_B", "score": 0.1},
+                    {"medication_code": "RX_A", "score": 0.9},
+                ],
+            }
+        ],
+    }
+    source = f"import json, sys; json.load(sys.stdin); json.dump({response!r}, sys.stdout)"
+
+    with pytest.raises(AdapterProtocolError, match="declared medication vocabulary order"):
+        ProcessPredictionAdapter(_command(source)).predict_comparison(
+            {},
+            method_id="retain",
+            expected_visits=(("synthetic-patient", "visit-1"),),
+            medication_vocabulary=("RX_A", "RX_B"),
+        )

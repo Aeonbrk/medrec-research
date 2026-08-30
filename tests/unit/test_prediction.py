@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from medrec_research import PredictionRecord, ProtocolValidationError
+from medrec_research import (
+    ComparisonPredictionBatch,
+    MedicationScore,
+    PredictionRecord,
+    ProtocolValidationError,
+    TargetFreePrediction,
+)
 
 
 def test_prediction_record_round_trip_uses_canonical_targets() -> None:
@@ -76,3 +82,35 @@ def test_score_factory_breaks_ties_by_medication_code() -> None:
 
     assert record.predicted_medications == ("RX_A", "RX_B")
     assert tuple(score.medication_code for score in record.scores) == ("RX_A", "RX_B")
+
+
+def test_comparison_batch_requires_full_vocabulary_scores_in_declared_order() -> None:
+    prediction = TargetFreePrediction(
+        patient_id="synthetic-patient",
+        visit_id="visit-1",
+        predicted_medications=("RX_A",),
+        vocabulary_scores=(MedicationScore("RX_B", 0.1), MedicationScore("RX_A", 0.9)),
+    )
+
+    with pytest.raises(ProtocolValidationError, match="declared medication vocabulary order"):
+        ComparisonPredictionBatch(
+            method_id="retain",
+            medication_vocabulary=("RX_A", "RX_B"),
+            predictions=(prediction,),
+        )
+
+
+def test_comparison_batch_requires_unique_visit_coverage() -> None:
+    prediction = TargetFreePrediction(
+        patient_id="synthetic-patient",
+        visit_id="visit-1",
+        predicted_medications=("RX_A",),
+        vocabulary_scores=(MedicationScore("RX_A", 0.9), MedicationScore("RX_B", 0.1)),
+    )
+
+    with pytest.raises(ProtocolValidationError, match="unique visits"):
+        ComparisonPredictionBatch(
+            method_id="retain",
+            medication_vocabulary=("RX_A", "RX_B"),
+            predictions=(prediction, prediction),
+        )

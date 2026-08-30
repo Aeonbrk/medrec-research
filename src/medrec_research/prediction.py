@@ -11,6 +11,7 @@ from ._validation import (
     canonical_json,
     enum_member,
     parse_json_object,
+    require_identifier,
     require_int,
     require_public_string,
     require_single_line_public_string,
@@ -197,4 +198,111 @@ class PredictionRecord:
         return cls.from_dict(parse_json_object(text, context="PredictionRecord"))
 
 
-__all__ = ("MedicationScore", "PredictionRecord")
+@dataclass(frozen=True, slots=True)
+class TargetFreePrediction:
+    """One adapter prediction that contains no split or target data."""
+
+    patient_id: str
+    visit_id: str
+    predicted_medications: tuple[str, ...]
+    vocabulary_scores: tuple[MedicationScore, ...]
+
+    def __post_init__(self) -> None:
+        require_public_string(self.patient_id, field="patient_id")
+        require_public_string(self.visit_id, field="visit_id")
+        object.__setattr__(
+            self,
+            "predicted_medications",
+            _medication_codes(
+                self.predicted_medications,
+                field="predicted_medications",
+                sort=False,
+            ),
+        )
+        scores = tuple(
+            score if isinstance(score, MedicationScore) else MedicationScore.from_dict(score)
+            for score in self.vocabulary_scores
+        )
+        if not scores:
+            raise ProtocolValidationError("vocabulary_scores must cover the medication vocabulary")
+        score_codes = tuple(score.medication_code for score in scores)
+        if len(score_codes) != len(set(score_codes)):
+            raise ProtocolValidationError("vocabulary_scores medication codes must be unique")
+        object.__setattr__(self, "vocabulary_scores", scores)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "patient_id": self.patient_id,
+            "predicted_medications": list(self.predicted_medications),
+            "visit_id": self.visit_id,
+            "vocabulary_scores": [score.to_dict() for score in self.vocabulary_scores],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class ComparisonPredictionBatch:
+    """Complete target-free predictions for one method and one vocabulary."""
+
+    SCHEMA_VERSION: ClassVar[int] = 2
+
+    method_id: str
+    medication_vocabulary: tuple[str, ...]
+    predictions: tuple[TargetFreePrediction, ...]
+
+    def __post_init__(self) -> None:
+        require_identifier(self.method_id, field="method_id")
+        vocabulary = _medication_codes(
+            self.medication_vocabulary,
+            field="medication_vocabulary",
+            sort=False,
+        )
+        if not vocabulary:
+            raise ProtocolValidationError("medication_vocabulary must not be empty")
+        predictions = tuple(
+            prediction
+            if isinstance(prediction, TargetFreePrediction)
+            else TargetFreePrediction(**prediction)
+            for prediction in self.predictions
+        )
+        if not predictions:
+            raise ProtocolValidationError("comparison predictions must not be empty")
+        visit_keys = {(item.patient_id, item.visit_id) for item in predictions}
+        if len(visit_keys) != len(predictions):
+            raise ProtocolValidationError("comparison predictions must contain unique visits")
+        vocabulary_set = set(vocabulary)
+        for prediction in predictions:
+            score_codes = tuple(item.medication_code for item in prediction.vocabulary_scores)
+            if score_codes != vocabulary:
+                raise ProtocolValidationError(
+                    "vocabulary_scores must use declared medication vocabulary order"
+                )
+            if not set(prediction.predicted_medications) <= vocabulary_set:
+                raise ProtocolValidationError(
+                    "predicted_medications must belong to the declared medication vocabulary"
+                )
+        object.__setattr__(self, "medication_vocabulary", vocabulary)
+        object.__setattr__(
+            self,
+            "predictions",
+            tuple(sorted(predictions, key=lambda item: (item.patient_id, item.visit_id))),
+        )
+
+    @property
+    def visit_keys(self) -> tuple[tuple[str, str], ...]:
+        return tuple((item.patient_id, item.visit_id) for item in self.predictions)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "medication_vocabulary": list(self.medication_vocabulary),
+            "method_id": self.method_id,
+            "predictions": [item.to_dict() for item in self.predictions],
+            "schema_version": self.SCHEMA_VERSION,
+        }
+
+
+__all__ = (
+    "ComparisonPredictionBatch",
+    "MedicationScore",
+    "PredictionRecord",
+    "TargetFreePrediction",
+)

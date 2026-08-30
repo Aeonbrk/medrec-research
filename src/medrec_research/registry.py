@@ -128,6 +128,12 @@ class ComparisonQualification:
             value = getattr(self, field)
             if value is not None:
                 require_sha256(value, field=field)
+        if self.protocol_version == "1.1" and (
+            self.protocol_amendment_sha256 is None or self.method_profile_sha256 is None
+        ):
+            raise ProtocolValidationError(
+                "Comparison Protocol v1.1 requires amendment and method profile digests"
+            )
         evidence = tuple(
             item if isinstance(item, ReadinessEvidence) else ReadinessEvidence.from_dict(item)
             for item in self.evidence
