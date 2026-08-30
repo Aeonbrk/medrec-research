@@ -107,8 +107,8 @@ def main() -> None:
                     "predicted_medications": [vocabulary[index] for index in indices],
                     "visit_id": context["visit_id"],
                     "vocabulary_scores": [
-                        {"medication_code": code, "score": float(score)}
-                        for code, score in zip(vocabulary, probabilities, strict=True)
+                        {"medication_code": code, "score": float(probabilities[index])}
+                        for index, code in enumerate(vocabulary)
                     ],
                 }
             )

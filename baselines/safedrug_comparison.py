@@ -16,8 +16,8 @@ THRESHOLDS = {"gamenet": 0.5, "retain": 0.4, "safedrug": 0.5}
 
 def _wire_scores(vocabulary: tuple[str, ...], scores: object) -> list[dict[str, object]]:
     return [
-        {"medication_code": code, "score": float(score)}
-        for code, score in zip(vocabulary, scores, strict=True)
+        {"medication_code": code, "score": float(scores[index])}
+        for index, code in enumerate(vocabulary)
     ]
 
 
