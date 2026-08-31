@@ -36,7 +36,7 @@ The five-model baseline preparation is complete.
 ## Operational snapshot
 
 - **Branch**: `refactor/reproduction-architecture`
-- **Suite health**: 318 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; 16/16 baseline modules pass Python 3.8 AST parse.
+- **Suite health**: Local verification passed: 318 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
 - **Architecture**:
   - Unidirectional dependency: `Concrete Reproduction Program -> shared mechanical primitives`.
   - Callback cycle (`Program -> runner -> getattr/module hooks -> Program`) 100% eliminated.
@@ -44,7 +44,7 @@ The five-model baseline preparation is complete.
   - MoleRec Table 1 schedule, recovery, and continuation validation isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
   - Queue authority strictly bound to immutable `attempt_declaration.json` (`src/medrec_research/reproduction/evaluation_queue.py`); historical legacy queues supported for read-only audit.
   - Concrete Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) directly own execution and expose uniform `probe(request)` and `execute(request)` program boundaries.
-  - Python 3.8.16 runtime closure verified across all baseline execution files.
+  - Python 3.8 syntax compatibility verified across baseline execution files using AST parsing; this architecture refactor did not require scientific runtime execution.
   - Shared reproduction runner (`baselines/reproduction_runner.py`) reduced strictly to mechanical primitives (process execution, progress streaming, atomic writing, failure pair recording, layout validation).
 
 ## Next focus

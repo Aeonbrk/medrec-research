@@ -533,7 +533,7 @@ Global completion requires all of the following:
 - MoleRec Table-1 attempt policy has one owning module and one frozen declaration source derived from Registry.
 - `evaluation_queue.py` no longer duplicates lane scientific metadata.
 - SafeDrug and MoleRec each expose a deep Program behavior surface and internally own their scientific lifecycle.
-- MoleRec runtime closure is verified strictly compatible with Python 3.8.16, SafeDrug with Python 3.11.9, and concrete baseline Programs do not inversely import Python 3.11 core runtime modules.
+- MoleRec Python 3.8 syntax compatibility is verified across baseline execution files via AST parsing, SafeDrug with Python 3.11.9, and concrete baseline Programs do not inversely import Python 3.11 core runtime modules.
 - Characterization migration was executed as a hard gate: new Program interface tests proved observable parity before legacy hook-bag/runner tests were deleted, and no dual-contract compatibility cruft remains.
 - Historical artifact schemas are untouched by default, historical v1/v2 fixtures remain readable and auditable without declaration sidecars, and no batch-rewrite or migration framework was introduced.
 - `baselines/reproduction_artifacts.py` is stripped of all SafeDrug/MoleRec lane IDs, selection rules, and baseline-specific constants, keeping only generic artifact mechanics.
