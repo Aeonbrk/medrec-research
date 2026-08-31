@@ -35,7 +35,7 @@ The five-model baseline preparation is complete.
 
 ## Operational snapshot
 
-- **Branch**: `refactor/reproduction-architecture`
+- **Branch**: `main`
 - **Suite health**: Local verification passed: 318 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
 - **Architecture**:
   - Unidirectional dependency: `Concrete Reproduction Program -> shared mechanical primitives`.
