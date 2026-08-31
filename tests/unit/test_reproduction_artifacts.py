@@ -8,11 +8,13 @@ import pytest
 
 from baselines.reproduction_artifacts import (
     IDENTITY_ENVIRONMENT_FIELDS,
-    SAFE_DRUG_LANE_IDS,
-    SAFE_DRUG_SELECTION_RULE,
     finalize_v2_pair,
     identity_from_environment,
     reopen_v2_pair,
+)
+from baselines.safedrug_archived_contract import (
+    SAFE_DRUG_LANE_IDS,
+    SAFE_DRUG_SELECTION_RULE,
     require_selected_safedrug_selection,
 )
 from medrec_research.reproduction.safedrug_selection import select_safedrug_candidate

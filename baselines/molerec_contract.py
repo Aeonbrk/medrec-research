@@ -70,6 +70,7 @@ class Profile:
     learning_rate: float
     required_inputs: tuple[str, ...]
     checkpoint_pattern: re.Pattern[str]
+    scientific_baseline_id: str = "molerec"
     test_uses_basename: bool = False
     training_args: tuple[str, ...] = ()
 
@@ -94,6 +95,7 @@ PROFILES = {
         5e-4,
         COMMON_INPUTS,
         re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
+        scientific_baseline_id="molerec",
     ),
     "molerec-embedding": Profile(
         "molerec-embedding",
@@ -102,6 +104,7 @@ PROFILES = {
         5e-4,
         COMMON_INPUTS,
         re.compile(r"^Epoch_(\d+)_TARGET_.*_JA_.*_DDI_.*\.model$"),
+        scientific_baseline_id="molerec",
         training_args=("--embedding",),
     ),
 }
@@ -228,6 +231,11 @@ def training_command(python: str, entrypoint: Path, model_name: str) -> list[str
     ]
 
 
+def checkpoint_directory(work_src: Path, model_name: str) -> Path:
+    """Return the checkpoint directory for MoleRec models."""
+    return work_src.parent / "saved" / model_name
+
+
 def native_history_path(checkpoint_dir: Path, model_name: str) -> Path:
     """Return the frozen MoleRec history written beside checkpoints."""
     del model_name
@@ -240,7 +248,12 @@ def test_command(
     profile: Profile,
     model_name: str,
     checkpoint: Path,
+    *,
+    lane_id: str | None = None,
+    selection_path: Path | None = None,
+    **kwargs: Any,
 ) -> list[str]:
+    del lane_id, selection_path, kwargs
     resume_target = checkpoint.name if profile.test_uses_basename else str(checkpoint)
     return [
         python,

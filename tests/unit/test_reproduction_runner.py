@@ -143,6 +143,11 @@ def _module(tmp_path: Path, *, mode: str = "formal") -> SimpleNamespace:
             checkpoint_dir / f"history_{model_name}.pkl"
         ),
         test_command=lambda *args, **kwargs: ["test"],
+        checkpoint_directory=lambda work_src, model_name: (
+            (work_src.parent if profile.baseline_id.startswith("molerec") else work_src)
+            / "saved"
+            / model_name
+        ),
     )
 
 

@@ -106,12 +106,12 @@ def _validate_identity_binding(
         raise error_type("controller identity names a different Reproduction Program")
     if identity["model_source_revision"] != source_revision:
         raise error_type("controller identity names a different model source revision")
-    expected_baseline = profile.baseline_id
-    if expected_baseline.startswith("molerec"):
-        expected_baseline = "molerec"
-    elif expected_baseline.startswith("safedrug"):
-        expected_baseline = "safedrug"
-    if identity["scientific_baseline_id"] != expected_baseline:
+    expected_baseline = getattr(
+        profile,
+        "scientific_baseline_id",
+        getattr(profile, "baseline_id", None),
+    )
+    if expected_baseline is not None and identity["scientific_baseline_id"] != expected_baseline:
         raise error_type("controller identity names a different scientific baseline")
 
 
@@ -327,11 +327,7 @@ def run_training_lane_v2(
     (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
 
     model_name = f"{profile.model_name}_{run_root.name}"
-    checkpoint_dir = (
-        work_src.parent / "saved" / model_name
-        if profile.baseline_id.startswith("molerec")
-        else work_src / "saved" / model_name
-    )
+    checkpoint_dir = _module_value(module, "checkpoint_directory")(work_src, model_name)
     checkpoint_dir.mkdir(parents=True)
     started_at = _now()
     calc_sha256 = _module_value(module, "sha256")
@@ -548,11 +544,7 @@ def recover_training_lane_v2(
 
     model_name = f"{profile.model_name}_{run_root.name}"
     work_src = run_root / "work" / "src"
-    checkpoint_dir = (
-        work_src.parent / "saved" / model_name
-        if profile.baseline_id.startswith("molerec")
-        else work_src / "saved" / model_name
-    )
+    checkpoint_dir = _module_value(module, "checkpoint_directory")(work_src, model_name)
     history_path = _module_value(module, "native_history_path")(checkpoint_dir, model_name)
     validation = load_native_validation_history(
         history_path,
@@ -683,11 +675,7 @@ def run_smoke_lane_v2(
     adapted_entrypoint.write_text(adapted_source, encoding="utf-8")
     (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
     model_name = f"{profile.model_name}_{run_root.name}"
-    checkpoint_dir = (
-        work_src.parent / "saved" / model_name
-        if profile.baseline_id.startswith("molerec")
-        else work_src / "saved" / model_name
-    )
+    checkpoint_dir = _module_value(module, "checkpoint_directory")(work_src, model_name)
     checkpoint_dir.mkdir(parents=True)
     started_at = _now()
     calc_sha256 = _module_value(module, "sha256")
@@ -910,18 +898,15 @@ def run_test_lane_v2(
     )
     try:
         test_builder = _module_value(module, "test_command")
-        if profile.baseline_id.startswith("safedrug"):
-            command = test_builder(
-                python,
-                original_entrypoint,
-                profile,
-                model_name,
-                checkpoint,
-                lane_id=identity["lane_id"],
-                selection_path=selection_path,
-            )
-        else:
-            command = test_builder(python, original_entrypoint, profile, model_name, checkpoint)
+        command = test_builder(
+            python,
+            original_entrypoint,
+            profile,
+            model_name,
+            checkpoint,
+            lane_id=identity["lane_id"],
+            selection_path=selection_path,
+        )
         command = [*command, *getattr(profile, "training_args", ())]
         _module_value(module, "run_logged")(
             command,
@@ -929,14 +914,14 @@ def run_test_lane_v2(
             env=environment,
             log_path=test_destination / "test.log",
         )
-        if profile.baseline_id.startswith("molerec"):
-            parsed = _module_value(module, "parse_formal_test_log")(
-                (test_destination / "test.log").read_text(errors="replace")
-            )
-        else:
-            parsed = _module_value(module, "parse_test_log")(
-                (test_destination / "test.log").read_text(errors="replace")
-            )
+        parse_fn = getattr(
+            module,
+            "parse_formal_test_log",
+            getattr(module, "parse_test_log", None),
+        )
+        if parse_fn is None:
+            raise error_type("reproduction program is missing a formal test log parser")
+        parsed = parse_fn((test_destination / "test.log").read_text(errors="replace"))
         rounds = parsed.get("rounds", parsed.get("test_rounds"))
         summary = parsed.get("harness_summary")
         if not isinstance(rounds, list) or len(rounds) != 10:
