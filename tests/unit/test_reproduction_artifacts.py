@@ -12,7 +12,7 @@ from baselines.reproduction_artifacts import (
     identity_from_environment,
     reopen_v2_pair,
 )
-from baselines.safedrug_archived_contract import (
+from baselines.safedrug_archived import (
     SAFE_DRUG_LANE_IDS,
     SAFE_DRUG_SELECTION_RULE,
     require_selected_safedrug_selection,

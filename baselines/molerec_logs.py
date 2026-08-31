@@ -10,12 +10,12 @@ from pathlib import Path
 from typing import Any
 
 if __package__:
-    from .molerec_contract import Profile, ReproductionError
+    from .molerec_data import ReproductionError
 else:
     _pkg_dir = str(Path(__file__).parent)
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
-    from molerec_contract import Profile, ReproductionError
+    from molerec_data import ReproductionError
 
 
 _FORMAL_ROUND_PATTERN = re.compile(
@@ -164,7 +164,7 @@ def parse_formal_test_log(log_text: str) -> dict[str, Any]:
     }
 
 
-def select_checkpoint(checkpoint_dir: Path, profile: Profile, best_epoch: int) -> Path:
+def select_checkpoint(checkpoint_dir: Path, profile: Any, best_epoch: int) -> Path:
     if not checkpoint_dir.is_dir():
         raise ReproductionError(f"checkpoint directory not found: {checkpoint_dir}")
     candidates = []

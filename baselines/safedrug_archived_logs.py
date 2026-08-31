@@ -9,14 +9,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
-# Support both relative import and path-based import
 if __package__:
-    from .safedrug_archived_contract import ROUND_PATTERN, Profile, ReproductionError
+    from .safedrug_archived_data import ReproductionError
 else:
     _pkg_dir = str(Path(__file__).parent)
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
-    from safedrug_archived_contract import ROUND_PATTERN, Profile, ReproductionError
+    from safedrug_archived_data import ReproductionError
+
+
+ROUND_PATTERN = re.compile(
+    r"DDI Rate:\s*([0-9.]+),\s*Jaccard:\s*([0-9.]+),\s*PRAUC:\s*([0-9.]+),\s*"
+    r"AVG_PRC:\s*([0-9.]+),\s*AVG_RECALL:\s*([0-9.]+),\s*AVG_F1:\s*([0-9.]+),\s*"
+    r"AVG_MED:\s*([0-9.]+)"
+)
 
 
 _VALIDATION_JACCARD_PATTERN = re.compile(
@@ -54,7 +60,7 @@ def parse_validation_metrics(log_text: str) -> dict[str, float]:
     return values
 
 
-def select_checkpoint(checkpoint_dir: Path, profile: Profile, best_epoch: int) -> Path:
+def select_checkpoint(checkpoint_dir: Path, profile: Any, best_epoch: int) -> Path:
     matches = [
         path
         for path in checkpoint_dir.iterdir()

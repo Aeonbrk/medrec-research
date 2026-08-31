@@ -4,27 +4,44 @@
 from __future__ import annotations
 
 import importlib
-import sys
 from pathlib import Path
 from typing import Any
 
-if __package__:
-    from .molerec_contract import (
-        COMMON_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        ReproductionError,
-    )
-else:
-    _pkg_dir = str(Path(__file__).parent)
-    if _pkg_dir not in sys.path:
-        sys.path.insert(0, _pkg_dir)
-    from molerec_contract import (
-        COMMON_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        ReproductionError,
-    )
+
+class ReproductionError(RuntimeError):
+    """Raised when the reproduction harness detects contract or execution divergence."""
+
+
+REPORTED_PAPER_METADATA = {
+    "patients": 6350,
+    "visits": 14995,
+    "medications": 131,
+    "ddi_pairs": 448,
+    "molecular_substructures": 491,
+}
+EXPECTED_COUNTS = {
+    "patients": 6350,
+    "visits": 15032,
+    "medications": 131,
+    "ddi_pairs": 448,
+    "molecular_substructures": 491,
+}
+EXPECTED_STATISTICS = {
+    "diagnoses": {"numerator": 157_970, "max": 128},
+    "procedures": {"numerator": 57_778, "max": 50},
+    "medications": {"numerator": 171_900, "max": 65},
+}
+COMMON_INPUTS = (
+    "records_final.pkl",
+    "voc_final.pkl",
+    "ddi_A_final.pkl",
+    "ehr_adj_final.pkl",
+    "ddi_mask_H.pkl",
+    "substructure_smiles.pkl",
+    "idx2SMILES.pkl",
+    "idx2drug.pkl",
+)
+GATE_INPUTS = COMMON_INPUTS
 
 
 def matrix_shape(value: Any) -> tuple[int, int]:

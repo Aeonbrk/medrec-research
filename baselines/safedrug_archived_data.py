@@ -6,31 +6,40 @@ from __future__ import annotations
 import importlib
 import json
 import math
-import sys
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-# Support both relative import and path-based import
-if __package__:
-    from .safedrug_archived_contract import (
-        CANONICAL_SIX_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        REPORTED_PAPER_METADATA,
-        ReproductionError,
-    )
-else:
-    _pkg_dir = str(Path(__file__).parent)
-    if _pkg_dir not in sys.path:
-        sys.path.insert(0, _pkg_dir)
-    from safedrug_archived_contract import (
-        CANONICAL_SIX_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        REPORTED_PAPER_METADATA,
-        ReproductionError,
-    )
+
+class ReproductionError(RuntimeError):
+    """Raised when an archived reproduction contract is not satisfied."""
+
+
+CANONICAL_SIX_INPUTS = (
+    "records_final.pkl",
+    "voc_final.pkl",
+    "ddi_A_final.pkl",
+    "ddi_mask_H.pkl",
+    "ehr_adj_final.pkl",
+    "idx2drug.pkl",
+)
+EXPECTED_COUNTS = {
+    "patients": 6_350,
+    "visits": 15_032,
+    "medications": 131,
+    "ddi_pairs": 448,
+    "molecular_substructures": 491,
+}
+REPORTED_PAPER_METADATA = {
+    "paper_reported_visits": 14_995,
+    "executable_visits": 15_032,
+    "difference": 37,
+}
+EXPECTED_STATISTICS = {
+    "diagnoses": {"numerator": 157_970, "max": 128},
+    "procedures": {"numerator": 57_778, "max": 50},
+    "medications": {"numerator": 171_900, "max": 65},
+}
 
 
 def matrix_shape(value: Any) -> tuple[int, int]:

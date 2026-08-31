@@ -14,30 +14,37 @@ from pathlib import Path
 from typing import Any
 
 if __package__:
-    from .molerec_contract import (
-        ARCHIVED_REVISION,
-        PYG_EXTENSION_MODULES,
-        REGISTRY_IMPORT_MODULES,
+    from .molerec_data import (
         REPORTED_PAPER_METADATA,
         ReproductionError,
-        profile_for,
-        verify_upstream_source,
+        load_and_validate_canonical_inputs,
     )
-    from .molerec_data import load_and_validate_canonical_inputs
 else:
     _pkg_dir = str(Path(__file__).parent)
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
-    from molerec_contract import (
-        ARCHIVED_REVISION,
-        PYG_EXTENSION_MODULES,
-        REGISTRY_IMPORT_MODULES,
+    from molerec_data import (
         REPORTED_PAPER_METADATA,
         ReproductionError,
-        profile_for,
-        verify_upstream_source,
+        load_and_validate_canonical_inputs,
     )
-    from molerec_data import load_and_validate_canonical_inputs
+
+ARCHIVED_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+REGISTRY_IMPORT_MODULES = (
+    "torch",
+    "torch_geometric",
+    "ogb",
+    "rdkit",
+    "pandas",
+    "dill",
+    "sklearn",
+)
+PYG_EXTENSION_MODULES = (
+    "torch_scatter",
+    "torch_sparse",
+    "torch_cluster",
+    "torch_spline_conv",
+)
 
 
 def _package_version(module_name: str) -> str | None:
@@ -174,9 +181,34 @@ def run_probe(
     upstream_root: Path,
     data_dir: Path | None = None,
     scope: str = "full",
+    dispatch_module: Any = None,
 ) -> dict[str, Any]:
-    profile = profile_for(baseline_id)
-    verify_upstream_source(upstream_root)
+    mod = dispatch_module or sys.modules.get("baselines.molerec") or sys.modules.get("molerec")
+    get_profile = getattr(mod, "profile_for", None)
+    profile = get_profile(baseline_id) if get_profile is not None else None
+    required_inputs = (
+        profile.required_inputs
+        if profile is not None
+        else (
+            "records_final.pkl",
+            "voc_final.pkl",
+            "ddi_A_final.pkl",
+            "ehr_adj_final.pkl",
+            "ddi_mask_H.pkl",
+            "substructure_smiles.pkl",
+            "idx2SMILES.pkl",
+            "idx2drug.pkl",
+        )
+    )
+
+    verify_src = getattr(mod, "verify_upstream_source", None)
+    if verify_src is not None:
+        verify_src(upstream_root)
+    else:
+        source_dir = upstream_root / "src"
+        if not source_dir.is_dir():
+            raise ReproductionError(f"archived upstream missing src directory: {source_dir}")
+
     env_info = environment_summary()
     package_versions = env_info["packages"]
     import_checks = {
@@ -198,7 +230,7 @@ def run_probe(
         "schema_version": 1,
         "kind": "molerec_probe",
         "scope": scope,
-        "baseline_id": profile.baseline_id,
+        "baseline_id": baseline_id,
         "source_revision": ARCHIVED_REVISION,
         "environment": env_info,
         "checks": checks,
@@ -212,7 +244,7 @@ def run_probe(
     if data_dir is None or not data_dir.is_dir():
         raise ReproductionError("full probe scope requires --dataset-root")
     _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
-    report["inputs"] = {name: "passed" for name in profile.required_inputs}
+    report["inputs"] = {name: "passed" for name in required_inputs}
     report["dataset_counts"] = counts
     report["metadata"] = REPORTED_PAPER_METADATA
 

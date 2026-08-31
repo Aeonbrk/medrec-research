@@ -4,6 +4,7 @@ import importlib.util
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -264,20 +265,64 @@ def test_native_history_path_uses_fixed_molerec_filename(tmp_path: Path) -> None
     assert adapter.native_history_path(tmp_path, "MoleRec_attempt-1") == tmp_path / "history.pkl"
 
 
-def test_split_responsibility_modules_importable() -> None:
+def test_internal_modules_importable() -> None:
     from baselines import (
-        molerec_contract,
         molerec_data,
         molerec_logs,
         molerec_probe,
-        molerec_runner,
     )
 
-    assert molerec_contract.ARCHIVED_REVISION == adapter.ARCHIVED_REVISION
+    assert molerec_data.EXPECTED_COUNTS["patients"] == 6350
     assert hasattr(molerec_data, "load_and_validate_canonical_inputs")
     assert hasattr(molerec_logs, "parse_training_log")
     assert hasattr(molerec_probe, "run_probe")
-    assert hasattr(molerec_runner, "run_formal_lane")
+    assert hasattr(adapter, "run_formal_lane")
+    assert hasattr(adapter, "probe")
+    assert hasattr(adapter, "execute")
+
+
+def test_molerec_program_probe_and_execute_surfaces(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    probe_calls = []
+
+    def mock_run_probe(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        probe_calls.append((args, kwargs))
+        return {"kind": "molerec_probe", "status": "ok"}
+
+    monkeypatch.setattr(adapter, "run_probe", mock_run_probe)
+
+    probe_result = adapter.probe(
+        {
+            "baseline_id": "molerec",
+            "upstream_root": str(tmp_path / "upstream"),
+            "dataset_root": str(tmp_path / "data"),
+            "scope": "environment",
+        }
+    )
+    assert probe_result["kind"] == "molerec_probe"
+    assert len(probe_calls) == 1
+
+    smoke_calls = []
+
+    def mock_run_smoke(*args: Any, **kwargs: Any) -> None:
+        smoke_calls.append((args, kwargs))
+
+    monkeypatch.setattr(adapter, "run_smoke_lane", mock_run_smoke)
+
+    execute_result = adapter.execute(
+        {
+            "mode": "smoke",
+            "baseline_id": "molerec",
+            "upstream_root": str(tmp_path / "upstream"),
+            "dataset_root": str(tmp_path / "data"),
+            "run_root": str(tmp_path / "run"),
+        }
+    )
+    assert execute_result["state"] == "completed"
+    assert execute_result["mode"] == "smoke"
+    assert len(smoke_calls) == 1
 
 
 def test_probe_report_declares_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -79,6 +79,6 @@ Two standalone Reproduction Programs are provided:
 1. `baselines/safedrug_archived.py`: The SafeDrug archived reproduction program (covering `gamenet`, `safedrug`, `retain`, `leap-safedrug`).
 2. `baselines/molerec.py`: The MoleRec Table 1 reproduction program (covering `molerec`, `molerec-embedding`).
 
-Both programs are decomposed into clear single-responsibility submodules (`*_contract.py`, `*_data.py`, `*_logs.py`, `*_probe.py`, `*_runner.py`) behind clean CLI façades.
+Both programs are deep entries with internal collaborators (`*_data.py`, `*_logs.py`, `*_probe.py`) exposing clean CLI and programmatic (`probe`, `execute`) façades. Attempt-level orchestration and Table-1 schedule policy live in `src/medrec_research/reproduction/molerec_table1_attempt.py`, keeping `RemoteExecutor` and evaluation queue management strictly attempt-agnostic.
 
 There are no `adapters/`, `audits/`, `programs/`, `runners/`, or `scripts/` subdirectories under `baselines/`. A Prediction Adapter belongs there only after Comparison Mode needs a target-free translation module. Audits are durable evidence under `research/`; operating instructions belong in `docs/playbooks/`; run artifacts remain outside Git. Empty directories do not define modules or seams.

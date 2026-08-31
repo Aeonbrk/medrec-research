@@ -245,8 +245,10 @@ def test_load_and_validate_canonical_inputs_validates_all_six(
 ) -> None:
     import pickle
 
+    from baselines import safedrug_archived_data
+
     monkeypatch.setattr(
-        adapter.importlib,
+        safedrug_archived_data.importlib,
         "import_module",
         lambda name: pickle if name == "dill" else sys.modules.get(name),
     )
@@ -298,8 +300,10 @@ def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
 ) -> None:
     import pickle
 
+    from baselines import safedrug_archived_data
+
     monkeypatch.setattr(
-        adapter.importlib,
+        safedrug_archived_data.importlib,
         "import_module",
         lambda name: pickle if name == "dill" else sys.modules.get(name),
     )
@@ -328,8 +332,10 @@ def test_semantic_bridge_checks_reject_invalid_structures(
 ) -> None:
     import pickle
 
+    from baselines import safedrug_archived_data
+
     monkeypatch.setattr(
-        adapter.importlib,
+        safedrug_archived_data.importlib,
         "import_module",
         lambda name: pickle if name == "dill" else sys.modules.get(name),
     )
@@ -781,22 +787,20 @@ def test_terminal_status_is_written_before_result(
     assert result["status"] == status
 
 
-def test_split_responsibility_modules_importable_and_consistent() -> None:
+def test_internal_modules_importable_and_consistent() -> None:
     from baselines import (
-        safedrug_archived_contract,
         safedrug_archived_data,
         safedrug_archived_logs,
         safedrug_archived_probe,
-        safedrug_archived_runner,
     )
 
-    assert safedrug_archived_contract.ARCHIVED_REVISION == adapter.ARCHIVED_REVISION
+    assert safedrug_archived_data.EXPECTED_COUNTS["patients"] == 6350
     assert hasattr(safedrug_archived_data, "load_and_validate_canonical_inputs")
     assert not hasattr(safedrug_archived_data, "load_archived_values")
     assert not hasattr(adapter, "load_archived_values")
     assert hasattr(safedrug_archived_logs, "parse_training_log")
     assert hasattr(safedrug_archived_probe, "run_probe")
-    assert hasattr(safedrug_archived_runner, "run_formal_lane")
+    assert hasattr(adapter, "run_formal_lane")
 
 
 @pytest.mark.parametrize(
@@ -839,3 +843,47 @@ def test_profiles_include_candidate_learning_rates() -> None:
     assert adapter.PROFILES["safedrug-lr-1e-5"].learning_rate == 1e-5
     assert adapter.PROFILES["safedrug-lr-1e-4"].learning_rate == 1e-4
     assert adapter.PROFILES["safedrug-lr-5e-4"].learning_rate == 5e-4
+
+
+def test_program_probe_and_execute_surfaces(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    probe_calls = []
+
+    def mock_run_probe(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        probe_calls.append((args, kwargs))
+        return {"kind": "safedrug_archived_probe", "status": "ok"}
+
+    monkeypatch.setattr(adapter, "run_probe", mock_run_probe)
+
+    probe_result = adapter.probe(
+        {
+            "baseline_id": "safedrug",
+            "upstream_root": str(tmp_path / "upstream"),
+            "dataset_root": str(tmp_path / "data"),
+            "scope": "environment",
+        }
+    )
+    assert probe_result["kind"] == "safedrug_archived_probe"
+    assert len(probe_calls) == 1
+
+    smoke_calls = []
+
+    def mock_run_smoke(*args: Any, **kwargs: Any) -> None:
+        smoke_calls.append((args, kwargs))
+
+    monkeypatch.setattr(adapter, "run_smoke_lane", mock_run_smoke)
+
+    execute_result = adapter.execute(
+        {
+            "mode": "smoke",
+            "baseline_id": "safedrug",
+            "upstream_root": str(tmp_path / "upstream"),
+            "dataset_root": str(tmp_path / "data"),
+            "run_root": str(tmp_path / "run"),
+        }
+    )
+    assert execute_result["state"] == "completed"
+    assert execute_result["mode"] == "smoke"
+    assert len(smoke_calls) == 1

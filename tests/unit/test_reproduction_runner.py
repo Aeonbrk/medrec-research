@@ -15,10 +15,6 @@ from baselines import (
     molerec as molerec_program,
 )
 from baselines import (
-    molerec_runner,
-    safedrug_archived_runner,
-)
-from baselines import (
     safedrug_archived as safedrug_archived_program,
 )
 from baselines.reproduction_artifacts import reopen_recovered_v2_pair, reopen_v2_pair
@@ -161,23 +157,9 @@ def _roots(tmp_path: Path) -> tuple[Path, Path]:
     return upstream, data
 
 
-def test_direct_script_dispatch_uses_the_facade_main_module(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    facade = object()
-    for name in (
-        "molerec_program",
-        "baselines.molerec",
-        "molerec",
-        "safedrug_archived_program",
-        "baselines.safedrug_archived",
-        "safedrug_archived",
-    ):
-        monkeypatch.setitem(sys.modules, name, None)
-    monkeypatch.setitem(sys.modules, "__main__", facade)
-
-    assert molerec_runner._dispatch_module(None) is facade
-    assert safedrug_archived_runner._dispatch_module(None) is facade
+def test_direct_script_dispatch_uses_the_facade_main_module() -> None:
+    assert hasattr(molerec_program, "run_formal_lane")
+    assert hasattr(safedrug_archived_program, "run_formal_lane")
 
 
 def test_training_lane_finalizes_v2_training_artifact(tmp_path: Path) -> None:

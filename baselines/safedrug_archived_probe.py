@@ -14,28 +14,35 @@ from typing import Any
 
 # Support both relative import and path-based import
 if __package__:
-    from .safedrug_archived_contract import (
-        ARCHIVED_REVISION,
-        REGISTRY_IMPORT_MODULES,
-        REPORTED_PAPER_METADATA,
+    from .safedrug_archived_data import (
         ReproductionError,
-        profile_for,
-        verify_upstream_source,
+        load_and_validate_canonical_inputs,
     )
-    from .safedrug_archived_data import load_and_validate_canonical_inputs
 else:
     _pkg_dir = str(Path(__file__).parent)
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
-    from safedrug_archived_contract import (
-        ARCHIVED_REVISION,
-        REGISTRY_IMPORT_MODULES,
-        REPORTED_PAPER_METADATA,
+    from safedrug_archived_data import (
         ReproductionError,
-        profile_for,
-        verify_upstream_source,
+        load_and_validate_canonical_inputs,
     )
-    from safedrug_archived_data import load_and_validate_canonical_inputs
+
+ARCHIVED_REVISION = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
+REGISTRY_IMPORT_MODULES = (
+    "torch",
+    "dnc",
+    "rdkit",
+    "pandas",
+    "dill",
+    "sklearn",
+    "models",
+    "util",
+)
+REPORTED_PAPER_METADATA = {
+    "paper_reported_visits": 14_995,
+    "executable_visits": 15_032,
+    "difference": 37,
+}
 
 
 def environment_summary() -> dict[str, str]:
@@ -238,11 +245,17 @@ def run_probe(
         or sys.modules[__name__]
     )
 
-    get_profile = getattr(mod, "profile_for", profile_for)
-    get_profile(baseline_id)
+    get_profile = getattr(mod, "profile_for", None)
+    if get_profile is not None:
+        get_profile(baseline_id)
 
-    verify_src = getattr(mod, "verify_upstream_source", verify_upstream_source)
-    verify_src(upstream_root)
+    verify_src = getattr(mod, "verify_upstream_source", None)
+    if verify_src is not None:
+        verify_src(upstream_root)
+    else:
+        source_dir = upstream_root / "src"
+        if not source_dir.is_dir():
+            raise ReproductionError(f"archived upstream missing src directory: {source_dir}")
 
     chk_imports = getattr(mod, "check_imports", check_imports)
     import_checks = chk_imports(upstream_root)

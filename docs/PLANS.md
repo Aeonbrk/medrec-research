@@ -1,5 +1,18 @@
 # Plans
 
+## Completed: Reproduction Architecture Refactoring
+
+- **Plan**: `docs/plans/2026-08-31-1849-refactor-reproduction-architecture-plan.md`.
+- **Status**: Completed; units U1 through U7 implemented and verified across all 317 tests.
+- **Architectural Deliverables**:
+  - `RemoteExecutor` is attempt-agnostic and manages only generic 319 command execution, environment activation, preflight, SSH, and synchronization.
+  - Attempt-level scheduling, continuation validation, and Table 1 policy are isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
+  - `attempt_declaration.json` is the authoritative contract for evaluation queues with backward-compatible fallback for legacy queues.
+  - Shared reproduction execution (`reproduction_runner.py`, `reproduction_artifacts.py`) is reduced to mechanical primitives without model-specific branches or hardcoded lane tables.
+  - SafeDrug archived and MoleRec Reproduction Programs are deepened as self-contained programs (`safedrug_archived.py`, `molerec.py`) with programmatic `probe` and `execute` APIs, internal collaborator modules, and no legacy contract/runner split.
+  - Python 3.8.16 runtime compatibility verified for all MoleRec files.
+- **Verification**: 317 pytest tests passing, ruff lint and format check clean.
+
 ## Completed: Five-Model Baseline Readiness
 
 - **Plan**: `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`.
