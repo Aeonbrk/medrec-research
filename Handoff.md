@@ -35,10 +35,16 @@ The five-model baseline preparation is complete.
 
 ## Operational snapshot
 
-- **Branch**: `main`
-- **Head commit**: `c0bc670` (`docs(governance): synchronize documentation, rules, and baseline readiness state`)
-- **Suite health**: 312 unit/integration tests passing; `ruff` lint and formatting clean.
-- **Namespace structure**: `src/medrec_research/reproduction/` houses reproduction attempt controllers; core package remains protocol-agnostic.
+- **Branch**: `refactor/reproduction-architecture`
+- **Head commit**: `f9643ea` (`refactor(reproduction): deepen SafeDrug and MoleRec reproduction programs and remove obsolete surfaces`)
+- **Suite health**: 317 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean.
+- **Architecture**:
+  - Remote executor is attempt-agnostic (`src/medrec_research/remote_executor.py`).
+  - MoleRec Table 1 schedule and continuation validation isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
+  - Queue authority strictly bound to immutable `attempt_declaration.json` (`evaluation_queue.py`).
+  - Deep Reproduction Programs with `probe`/`execute` surfaces in `baselines/safedrug_archived.py` and `baselines/molerec.py`.
+  - Python 3.8.16 runtime compatibility verified for all MoleRec baseline files.
+  - Legacy contracts and lineage runners removed; shared reproduction runner/artifacts reduced to pure mechanical primitives.
 
 ## Next focus
 
