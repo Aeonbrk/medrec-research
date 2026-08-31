@@ -36,7 +36,7 @@ The five-model baseline preparation is complete.
 ## Operational snapshot
 
 - **Branch**: `refactor/reproduction-architecture`
-- **Head commit**: `f9643ea` (`refactor(reproduction): deepen SafeDrug and MoleRec reproduction programs and remove obsolete surfaces`)
+- **Head commit**: `b5d268a` (`fix(review): resolve correctness and boundary verification findings from code review`)
 - **Suite health**: 317 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean.
 - **Architecture**:
   - Remote executor is attempt-agnostic (`src/medrec_research/remote_executor.py`).
