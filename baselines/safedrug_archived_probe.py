@@ -232,45 +232,19 @@ def run_probe(
     upstream_root: Path,
     data_dir: Path | None,
     scope: str,
-    dispatch_module: Any = None,
 ) -> dict[str, Any]:
     if scope not in ("environment", "full"):
         raise ReproductionError(f"unknown probe scope '{scope}'")
 
-    mod = (
-        dispatch_module
-        or sys.modules.get("safedrug_archived_program")
-        or sys.modules.get("baselines.safedrug_archived")
-        or sys.modules.get("safedrug_archived")
-        or sys.modules[__name__]
-    )
+    source_dir = upstream_root / "src"
+    if not source_dir.is_dir():
+        raise ReproductionError(f"archived upstream missing src directory: {source_dir}")
 
-    get_profile = getattr(mod, "profile_for", None)
-    if get_profile is not None:
-        get_profile(baseline_id)
-
-    verify_src = getattr(mod, "verify_upstream_source", None)
-    if verify_src is not None:
-        verify_src(upstream_root)
-    else:
-        source_dir = upstream_root / "src"
-        if not source_dir.is_dir():
-            raise ReproductionError(f"archived upstream missing src directory: {source_dir}")
-
-    chk_imports = getattr(mod, "check_imports", check_imports)
-    import_checks = chk_imports(upstream_root)
-
-    chk_cuda = getattr(mod, "check_cuda_tensor", check_cuda_tensor)
-    cuda_status = chk_cuda()
-
-    chk_rdkit = getattr(mod, "check_rdkit_brics", check_rdkit_brics)
-    rdkit_status = chk_rdkit()
-
-    chk_dnc = getattr(mod, "check_dnc_forward", check_dnc_forward)
-    dnc_status = chk_dnc()
-
-    probe_env = getattr(mod, "probe_environment_details", probe_environment_details)
-    env_details = probe_env()
+    import_checks = check_imports(upstream_root)
+    cuda_status = check_cuda_tensor()
+    rdkit_status = check_rdkit_brics()
+    dnc_status = check_dnc_forward()
+    env_details = probe_environment_details()
 
     if env_details["cuda_visible_device_count"] != 1:
         raise ReproductionError("probe requires exactly 1 visible CUDA device")
@@ -284,16 +258,13 @@ def run_probe(
     if scope == "full":
         if data_dir is None:
             raise ReproductionError("full probe scope requires --dataset-root")
-        load_inputs = getattr(
-            mod, "load_and_validate_canonical_inputs", load_and_validate_canonical_inputs
-        )
         (
             inputs_result,
             dataset_counts,
             bridge_checks,
             statistics_evidence,
             metadata_disclosure,
-        ) = load_inputs(data_dir)
+        ) = load_and_validate_canonical_inputs(data_dir)
 
     return {
         "schema_version": 1,

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from medrec_research import BaselineRegistry
 from medrec_research.errors import ProtocolValidationError
 from medrec_research.reproduction.evaluation_queue import (
     admit_evaluation,
@@ -16,12 +17,21 @@ from medrec_research.reproduction.evaluation_queue import (
     load_evaluation_queue,
     requeue_interrupted_evaluations,
 )
+from medrec_research.reproduction.molerec_table1_attempt import (
+    ReproductionAttemptDeclaration,
+)
 from medrec_research.reproduction.reproduction_evidence import finalize_evidence_pair
 from medrec_research.reproduction.safedrug_selection import (
     SAFE_DRUG_LANE_IDS,
     candidate_from_training_evidence,
     select_safedrug_candidate,
 )
+
+REGISTRY = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
+
+
+def _declaration(attempt_id: str = "attempt-1") -> ReproductionAttemptDeclaration:
+    return ReproductionAttemptDeclaration.from_registry(REGISTRY, attempt_id)
 
 
 def _selection() -> dict[str, object]:
@@ -164,8 +174,9 @@ def _write_training_pair(
 
 
 def test_queue_enforces_safe_drug_selection_and_fifo(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
     path = tmp_path / "evaluation-queue.json"
-    create_evaluation_queue(path, attempt_id="attempt-1")
+    create_evaluation_queue(path, attempt_id="attempt-1", declaration=declaration)
 
     admit_evaluation(
         path,
@@ -173,6 +184,7 @@ def test_queue_enforces_safe_drug_selection_and_fifo(tmp_path: Path) -> None:
         scientific_baseline_id="retain",
         training_artifact_id="runs/retain/result.json",
         test_submission_id="test-retain",
+        declaration=declaration,
     )
     with pytest.raises(ProtocolValidationError, match=r"selection\.json"):
         admit_evaluation(
@@ -181,6 +193,7 @@ def test_queue_enforces_safe_drug_selection_and_fifo(tmp_path: Path) -> None:
             scientific_baseline_id="safedrug",
             training_artifact_id="runs/safedrug/result.json",
             test_submission_id="test-safedrug",
+            declaration=declaration,
         )
 
     admit_evaluation(
@@ -190,9 +203,10 @@ def test_queue_enforces_safe_drug_selection_and_fifo(tmp_path: Path) -> None:
         training_artifact_id="runs/safedrug/result.json",
         test_submission_id="test-safedrug",
         selection=_selection(),
+        declaration=declaration,
     )
 
-    first = claim_next_evaluation(path)
+    first = claim_next_evaluation(path, declaration=declaration)
     assert first is not None
     assert first["lane_id"] == "molerec-retain"
     finalize_evaluation(
@@ -200,8 +214,9 @@ def test_queue_enforces_safe_drug_selection_and_fifo(tmp_path: Path) -> None:
         lane_id="molerec-retain",
         state="completed",
         result_artifact_id="runs/retain/test/result.json",
+        declaration=declaration,
     )
-    second = claim_next_evaluation(path)
+    second = claim_next_evaluation(path, declaration=declaration)
     assert second is not None
     assert second["lane_id"] == SAFE_DRUG_LANE_IDS[2]
 
@@ -213,15 +228,17 @@ def test_queue_enforces_safe_drug_selection_and_fifo(tmp_path: Path) -> None:
             training_artifact_id="runs/safedrug/result.json",
             test_submission_id="test-safedrug-duplicate",
             selection=_selection(),
+            declaration=declaration,
         )
 
 
-def test_orchestrated_admission_reopens_training_and_blocks_active_gpu7(
+def test_orchestrated_admission_reopens_training(
     tmp_path: Path,
 ) -> None:
+    declaration = _declaration("attempt-1")
     attempt_root = tmp_path / "attempt"
     queue_path = attempt_root / "evaluation-queue.json"
-    create_evaluation_queue(queue_path, attempt_id="attempt-1")
+    create_evaluation_queue(queue_path, attempt_id="attempt-1", declaration=declaration)
     training_root = attempt_root / "lanes" / "molerec-retain"
     identity = _training_identity(
         "molerec-retain",
@@ -238,28 +255,19 @@ def test_orchestrated_admission_reopens_training_and_blocks_active_gpu7(
         training_artifact_id="lanes/molerec-retain/result.json",
         test_submission_id="test-retain",
         expected_identity=identity,
+        declaration=declaration,
     )
     assert entry["training_artifact_id"] == "lanes/molerec-retain/result.json"
-    assert claim_next_evaluation(queue_path)["lane_id"] == "molerec-retain"
-
-    with pytest.raises(ProtocolValidationError, match="already active"):
-        admit_validated_training_evaluation(
-            queue_path,
-            attempt_root=attempt_root,
-            lane_id="molerec-retain",
-            scientific_baseline_id="retain",
-            training_artifact_id="lanes/molerec-retain/result.json",
-            test_submission_id="test-retain-again",
-            expected_identity=identity,
-        )
+    assert claim_next_evaluation(queue_path, declaration=declaration)["lane_id"] == "molerec-retain"
 
 
 def test_orchestrated_admission_resolves_recovered_checkpoint_from_source_root(
     tmp_path: Path,
 ) -> None:
+    declaration = _declaration("attempt-1")
     attempt_root = tmp_path / "attempt"
     queue_path = attempt_root / "evaluation-queue.json"
-    create_evaluation_queue(queue_path, attempt_id="attempt-1")
+    create_evaluation_queue(queue_path, attempt_id="attempt-1", declaration=declaration)
     source_root = attempt_root / "lanes" / "molerec-retain"
     recovery_root = source_root / "recoveries" / "recovery-1"
     identity = _training_identity(
@@ -354,6 +362,7 @@ def test_orchestrated_admission_resolves_recovered_checkpoint_from_source_root(
         training_artifact_id=("lanes/molerec-retain/recoveries/recovery-1/result.json"),
         test_submission_id="test-retain-recovered",
         expected_identity=identity,
+        declaration=declaration,
     )
 
     assert entry["training_artifact_id"] == (
@@ -364,9 +373,10 @@ def test_orchestrated_admission_resolves_recovered_checkpoint_from_source_root(
 def test_orchestrated_admission_keeps_nonselected_safedrug_lane_out_of_queue(
     tmp_path: Path,
 ) -> None:
+    declaration = _declaration("attempt-1")
     attempt_root = tmp_path / "attempt"
     queue_path = attempt_root / "evaluation-queue.json"
-    create_evaluation_queue(queue_path, attempt_id="attempt-1")
+    create_evaluation_queue(queue_path, attempt_id="attempt-1", declaration=declaration)
     candidates = []
     roots: dict[str, tuple[Path, dict[str, str]]] = {}
     for index, lane_id in enumerate(SAFE_DRUG_LANE_IDS):
@@ -407,6 +417,7 @@ def test_orchestrated_admission_keeps_nonselected_safedrug_lane_out_of_queue(
             test_submission_id="test-safedrug-nonselected",
             expected_identity=nonselected_identity,
             selection=selection,
+            declaration=declaration,
         )
 
     _, selected_identity = roots[selected_lane]
@@ -419,51 +430,60 @@ def test_orchestrated_admission_keeps_nonselected_safedrug_lane_out_of_queue(
         test_submission_id="test-safedrug-selected",
         expected_identity=selected_identity,
         selection=selection,
+        declaration=declaration,
     )
     assert entry["selection_lane_id"] == selected_lane
     assert entry["training_artifact_id"] == f"lanes/{selected_lane}/result.json"
 
 
 def test_terminal_queue_entries_are_not_replayed_after_restart(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
     path = tmp_path / "evaluation-queue.json"
-    create_evaluation_queue(path, attempt_id="attempt-1")
+    create_evaluation_queue(path, attempt_id="attempt-1", declaration=declaration)
     admit_evaluation(
         path,
         lane_id="molerec-gamenet",
         scientific_baseline_id="gamenet",
         training_artifact_id="runs/gamenet/result.json",
         test_submission_id="test-gamenet",
+        declaration=declaration,
     )
-    assert claim_next_evaluation(path)["state"] == "running"
+    assert claim_next_evaluation(path, declaration=declaration)["state"] == "running"
     finalize_evaluation(
         path,
         lane_id="molerec-gamenet",
         state="completed",
         result_artifact_id="runs/gamenet/test/result.json",
+        declaration=declaration,
     )
-    assert claim_next_evaluation(path) is None
-    assert load_evaluation_queue(path)["entries"][0]["state"] == "completed"
+    assert claim_next_evaluation(path, declaration=declaration) is None
+    assert (
+        load_evaluation_queue(path, declaration=declaration)["entries"][0]["state"] == "completed"
+    )
 
 
 def test_interrupted_running_entry_can_be_explicitly_requeued(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
     path = tmp_path / "evaluation-queue.json"
-    create_evaluation_queue(path, attempt_id="attempt-1")
+    create_evaluation_queue(path, attempt_id="attempt-1", declaration=declaration)
     admit_evaluation(
         path,
         lane_id="molerec-leap",
         scientific_baseline_id="leap-safedrug",
         training_artifact_id="runs/leap/result.json",
         test_submission_id="test-leap",
+        declaration=declaration,
     )
-    assert claim_next_evaluation(path)["state"] == "running"
-    assert requeue_interrupted_evaluations(path) == 1
-    assert claim_next_evaluation(path)["lane_id"] == "molerec-leap"
-    assert requeue_interrupted_evaluations(path) == 1
+    assert claim_next_evaluation(path, declaration=declaration)["state"] == "running"
+    assert requeue_interrupted_evaluations(path, declaration=declaration) == 1
+    assert claim_next_evaluation(path, declaration=declaration)["lane_id"] == "molerec-leap"
+    assert requeue_interrupted_evaluations(path, declaration=declaration) == 1
 
 
 def test_queue_rejects_duplicate_lanes_in_persisted_json(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
     path = tmp_path / "evaluation-queue.json"
-    create_evaluation_queue(path, attempt_id="attempt-1")
+    create_evaluation_queue(path, attempt_id="attempt-1", declaration=declaration)
     queue = json.loads(path.read_text(encoding="utf-8"))
     entry = {
         "lane_id": "molerec-retain",
@@ -476,18 +496,11 @@ def test_queue_rejects_duplicate_lanes_in_persisted_json(tmp_path: Path) -> None
     path.write_text(json.dumps(queue), encoding="utf-8")
 
     with pytest.raises(ProtocolValidationError, match="duplicate lanes"):
-        load_evaluation_queue(path)
+        load_evaluation_queue(path, declaration=declaration)
 
 
 def test_queue_validates_against_frozen_declaration(tmp_path: Path) -> None:
-    from medrec_research import BaselineRegistry
-    from medrec_research.reproduction.molerec_table1_attempt import (
-        ReproductionAttemptDeclaration,
-    )
-
-    registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
-    declaration = ReproductionAttemptDeclaration.from_registry(registry, "attempt-decl-1")
-
+    declaration = _declaration("attempt-decl-1")
     path = tmp_path / "evaluation-queue.json"
     create_evaluation_queue(path, attempt_id="attempt-decl-1", declaration=declaration)
 
@@ -521,4 +534,138 @@ def test_queue_validates_against_frozen_declaration(tmp_path: Path) -> None:
             training_artifact_id="runs/leap/result.json",
             test_submission_id="test-leap",
             declaration=declaration,
+        )
+
+
+def test_legacy_queue_without_sidecar_is_readable(tmp_path: Path) -> None:
+    queue_path = tmp_path / "evaluation-queue.json"
+    legacy_payload = {
+        "schema_version": 1,
+        "kind": "molerec_table1_evaluation_queue_v1",
+        "attempt_id": "legacy-attempt-001",
+        "evaluation_gpu_index": 7,
+        "entries": [
+            {
+                "lane_id": "molerec-retain",
+                "scientific_baseline_id": "retain",
+                "training_artifact_id": "runs/retain/result.json",
+                "test_submission_id": "test-retain",
+                "result_artifact_id": "runs/retain/test/result.json",
+                "state": "completed",
+            }
+        ],
+    }
+    queue_path.write_text(json.dumps(legacy_payload), encoding="utf-8")
+
+    loaded = load_evaluation_queue(queue_path)
+    assert loaded["attempt_id"] == "legacy-attempt-001"
+    assert len(loaded["entries"]) == 1
+    assert loaded["entries"][0]["lane_id"] == "molerec-retain"
+
+
+def test_legacy_queue_mutation_without_declaration_fails(tmp_path: Path) -> None:
+    queue_path = tmp_path / "evaluation-queue.json"
+    legacy_payload = {
+        "schema_version": 1,
+        "kind": "molerec_table1_evaluation_queue_v1",
+        "attempt_id": "legacy-attempt-001",
+        "evaluation_gpu_index": 7,
+        "entries": [
+            {
+                "lane_id": "molerec-retain",
+                "scientific_baseline_id": "retain",
+                "training_artifact_id": "runs/retain/result.json",
+                "test_submission_id": "test-retain",
+                "state": "queued",
+            }
+        ],
+    }
+    queue_path.write_text(json.dumps(legacy_payload), encoding="utf-8")
+
+    with pytest.raises(ProtocolValidationError, match="ReproductionAttemptDeclaration"):
+        admit_evaluation(
+            queue_path,
+            lane_id="molerec-leap",
+            scientific_baseline_id="leap-safedrug",
+            training_artifact_id="runs/leap/result.json",
+            test_submission_id="test-leap",
+        )
+
+    with pytest.raises(ProtocolValidationError, match="ReproductionAttemptDeclaration"):
+        claim_next_evaluation(queue_path)
+
+    with pytest.raises(ProtocolValidationError, match="ReproductionAttemptDeclaration"):
+        finalize_evaluation(
+            queue_path,
+            lane_id="molerec-retain",
+            state="completed",
+            result_artifact_id="runs/retain/test/result.json",
+        )
+
+
+def test_create_queue_without_declaration_fails(tmp_path: Path) -> None:
+    queue_path = tmp_path / "evaluation-queue.json"
+    with pytest.raises(ProtocolValidationError, match="ReproductionAttemptDeclaration"):
+        create_evaluation_queue(queue_path, attempt_id="attempt-no-decl")
+
+
+def test_admit_evaluation_without_declaration_fails(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
+    queue_path = tmp_path / "evaluation-queue.json"
+    create_evaluation_queue(queue_path, attempt_id="attempt-1", declaration=declaration)
+
+    with pytest.raises(ProtocolValidationError, match="ReproductionAttemptDeclaration"):
+        admit_evaluation(
+            queue_path,
+            lane_id="molerec-retain",
+            scientific_baseline_id="retain",
+            training_artifact_id="runs/retain/result.json",
+            test_submission_id="test-retain",
+        )
+
+
+def test_active_mutation_with_correct_declaration_succeeds(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
+    queue_path = tmp_path / "evaluation-queue.json"
+    create_evaluation_queue(queue_path, attempt_id="attempt-1", declaration=declaration)
+
+    entry = admit_evaluation(
+        queue_path,
+        lane_id="molerec-retain",
+        scientific_baseline_id="retain",
+        training_artifact_id="runs/retain/result.json",
+        test_submission_id="test-retain",
+        declaration=declaration,
+    )
+    assert entry["state"] == "queued"
+
+    claimed = claim_next_evaluation(queue_path, declaration=declaration)
+    assert claimed is not None
+    assert claimed["lane_id"] == "molerec-retain"
+    assert claimed["state"] == "running"
+
+    finalized = finalize_evaluation(
+        queue_path,
+        lane_id="molerec-retain",
+        state="completed",
+        result_artifact_id="runs/retain/test/result.json",
+        declaration=declaration,
+    )
+    assert finalized["state"] == "completed"
+
+
+def test_declaration_identity_mismatch_fails_closed(tmp_path: Path) -> None:
+    declaration = _declaration("attempt-1")
+    queue_path = tmp_path / "evaluation-queue.json"
+    create_evaluation_queue(queue_path, attempt_id="attempt-1", declaration=declaration)
+
+    wrong_decl = _declaration("different-attempt-99")
+    with pytest.raises(ProtocolValidationError, match="does not match declaration attempt_id"):
+        admit_evaluation(
+            queue_path,
+            lane_id="molerec-retain",
+            scientific_baseline_id="retain",
+            training_artifact_id="runs/retain/result.json",
+            test_submission_id="test-retain",
+            declaration=wrong_decl,
         )

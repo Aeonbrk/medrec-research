@@ -181,33 +181,21 @@ def run_probe(
     upstream_root: Path,
     data_dir: Path | None = None,
     scope: str = "full",
-    dispatch_module: Any = None,
 ) -> dict[str, Any]:
-    mod = dispatch_module or sys.modules.get("baselines.molerec") or sys.modules.get("molerec")
-    get_profile = getattr(mod, "profile_for", None)
-    profile = get_profile(baseline_id) if get_profile is not None else None
     required_inputs = (
-        profile.required_inputs
-        if profile is not None
-        else (
-            "records_final.pkl",
-            "voc_final.pkl",
-            "ddi_A_final.pkl",
-            "ehr_adj_final.pkl",
-            "ddi_mask_H.pkl",
-            "substructure_smiles.pkl",
-            "idx2SMILES.pkl",
-            "idx2drug.pkl",
-        )
+        "records_final.pkl",
+        "voc_final.pkl",
+        "ddi_A_final.pkl",
+        "ehr_adj_final.pkl",
+        "ddi_mask_H.pkl",
+        "substructure_smiles.pkl",
+        "idx2SMILES.pkl",
+        "idx2drug.pkl",
     )
 
-    verify_src = getattr(mod, "verify_upstream_source", None)
-    if verify_src is not None:
-        verify_src(upstream_root)
-    else:
-        source_dir = upstream_root / "src"
-        if not source_dir.is_dir():
-            raise ReproductionError(f"archived upstream missing src directory: {source_dir}")
+    source_dir = upstream_root / "src"
+    if not source_dir.is_dir():
+        raise ReproductionError(f"archived upstream missing src directory: {source_dir}")
 
     env_info = environment_summary()
     package_versions = env_info["packages"]

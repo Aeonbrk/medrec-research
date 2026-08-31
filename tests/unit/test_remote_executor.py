@@ -328,7 +328,7 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
     launch = executor.calls[-1][1]
     assert f"MEDREC_RUN_ID={submission.session_id}" in launch
     assert f"MEDREC_DATA_ROOT={DATA_ROOT}" in launch
-    assert "SAFEDRUG_ROOT=/root/zhb/SafeDrug" in launch
+    assert "SAFEDRUG_ROOT=" not in launch
     assert "CUDA_VISIBLE_DEVICES=0" in launch
     assert "GPU_ID=" not in launch
     assert "CONDA_ENV=medrec-safedrug-archived" in launch

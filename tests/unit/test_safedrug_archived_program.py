@@ -396,17 +396,20 @@ def test_semantic_bridge_checks_reject_invalid_structures(
 
 
 def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(adapter, "verify_upstream_source", lambda upstream: None)
+    probe_mod = sys.modules.get("safedrug_archived_probe")
+    if probe_mod is None:
+        from baselines import safedrug_archived_probe as probe_mod
+
     monkeypatch.setattr(
-        adapter,
+        probe_mod,
         "check_imports",
         lambda upstream: {m: "passed" for m in adapter.REGISTRY_IMPORT_MODULES},
     )
-    monkeypatch.setattr(adapter, "check_cuda_tensor", lambda: "passed")
-    monkeypatch.setattr(adapter, "check_rdkit_brics", lambda: "passed")
-    monkeypatch.setattr(adapter, "check_dnc_forward", lambda: "passed")
+    monkeypatch.setattr(probe_mod, "check_cuda_tensor", lambda: "passed")
+    monkeypatch.setattr(probe_mod, "check_rdkit_brics", lambda: "passed")
+    monkeypatch.setattr(probe_mod, "check_dnc_forward", lambda: "passed")
     monkeypatch.setattr(
-        adapter,
+        probe_mod,
         "probe_environment_details",
         lambda: {
             "conda_explicit_sha256": "f" * 64,
@@ -427,6 +430,7 @@ def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
         },
     )
 
+    (tmp_path / "upstream" / "src").mkdir(parents=True)
     probe = adapter.run_probe(
         baseline_id="gamenet",
         upstream_root=tmp_path / "upstream",
@@ -445,17 +449,20 @@ def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 
 
 def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(adapter, "verify_upstream_source", lambda upstream: None)
+    probe_mod = sys.modules.get("safedrug_archived_probe")
+    if probe_mod is None:
+        from baselines import safedrug_archived_probe as probe_mod
+
     monkeypatch.setattr(
-        adapter,
+        probe_mod,
         "check_imports",
         lambda upstream: {m: "passed" for m in adapter.REGISTRY_IMPORT_MODULES},
     )
-    monkeypatch.setattr(adapter, "check_cuda_tensor", lambda: "passed")
-    monkeypatch.setattr(adapter, "check_rdkit_brics", lambda: "passed")
-    monkeypatch.setattr(adapter, "check_dnc_forward", lambda: "passed")
+    monkeypatch.setattr(probe_mod, "check_cuda_tensor", lambda: "passed")
+    monkeypatch.setattr(probe_mod, "check_rdkit_brics", lambda: "passed")
+    monkeypatch.setattr(probe_mod, "check_dnc_forward", lambda: "passed")
     monkeypatch.setattr(
-        adapter,
+        probe_mod,
         "probe_environment_details",
         lambda: {
             "conda_explicit_sha256": "f" * 64,
@@ -476,7 +483,7 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         },
     )
     monkeypatch.setattr(
-        adapter,
+        probe_mod,
         "load_and_validate_canonical_inputs",
         lambda d: (
             {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
@@ -491,6 +498,8 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         ),
     )
 
+    (tmp_path / "upstream" / "src").mkdir(parents=True)
+    (tmp_path / "data").mkdir(parents=True)
     probe = adapter.run_probe(
         baseline_id="safedrug",
         upstream_root=tmp_path / "upstream",
@@ -780,7 +789,7 @@ def test_terminal_status_is_written_before_result(
 
     monkeypatch.setattr(adapter, "write_json", recording_write)
     status = {"state": "completed", "stage": "terminal"}
-    adapter.finalize_result(tmp_path, status, {"schema_version": 1})
+    adapter._publish_legacy_terminal_status(tmp_path, status, {"schema_version": 1})
 
     assert [path.name for path in calls] == ["status.json", "result.json"]
     result = json.loads((tmp_path / "result.json").read_text())

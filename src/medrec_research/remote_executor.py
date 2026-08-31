@@ -809,11 +809,6 @@ class RemoteExecutor:
             f"MEDREC_SUBMISSION_ID={run_id}",
             "MEDREC_MODE=" + mode,
             f"MEDREC_DATA_ROOT={data_root}",
-            *(
-                [f"SAFEDRUG_ROOT={program.upstream_root}"]
-                if program.program_id == "safedrug-archived" or baseline_id == "safedrug"
-                else []
-            ),
             f"CUDA_VISIBLE_DEVICES={gpu_index}",
             f"CONDA_ENV={program.conda_environment}",
             "/root/anaconda3/bin/conda",

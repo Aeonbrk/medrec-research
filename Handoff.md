@@ -36,15 +36,16 @@ The five-model baseline preparation is complete.
 ## Operational snapshot
 
 - **Branch**: `refactor/reproduction-architecture`
-- **Head commit**: `b5d268a` (`fix(review): resolve correctness and boundary verification findings from code review`)
-- **Suite health**: 317 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean.
+- **Suite health**: 318 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; 16/16 baseline modules pass Python 3.8 AST parse.
 - **Architecture**:
-  - Remote executor is attempt-agnostic (`src/medrec_research/remote_executor.py`).
-  - MoleRec Table 1 schedule and continuation validation isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
-  - Queue authority strictly bound to immutable `attempt_declaration.json` (`evaluation_queue.py`).
-  - Deep Reproduction Programs with `probe`/`execute` surfaces in `baselines/safedrug_archived.py` and `baselines/molerec.py`.
-  - Python 3.8.16 runtime compatibility verified for all MoleRec baseline files.
-  - Legacy contracts and lineage runners removed; shared reproduction runner/artifacts reduced to pure mechanical primitives.
+  - Unidirectional dependency: `Concrete Reproduction Program -> shared mechanical primitives`.
+  - Callback cycle (`Program -> runner -> getattr/module hooks -> Program`) 100% eliminated.
+  - Remote executor is attempt- and baseline-agnostic (`src/medrec_research/remote_executor.py`).
+  - MoleRec Table 1 schedule, recovery, and continuation validation isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
+  - Queue authority strictly bound to immutable `attempt_declaration.json` (`src/medrec_research/reproduction/evaluation_queue.py`); historical legacy queues supported for read-only audit.
+  - Concrete Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) directly own execution and expose uniform `probe(request)` and `execute(request)` program boundaries.
+  - Python 3.8.16 runtime closure verified across all baseline execution files.
+  - Shared reproduction runner (`baselines/reproduction_runner.py`) reduced strictly to mechanical primitives (process execution, progress streaming, atomic writing, failure pair recording, layout validation).
 
 ## Next focus
 

@@ -53,12 +53,26 @@ if __package__:
         probe_environment_details,
         run_probe,
     )
-    from .reproduction_artifacts import identity_from_environment
+    from .reproduction_artifacts import (
+        finalize_v2_pair,
+        identity_from_environment,
+        reopen_recovered_v2_pair,
+        reopen_v2_pair,
+        terminal_result,
+        terminal_status,
+    )
+    from .reproduction_history import (
+        load_native_validation_history,
+        reconcile_history_checkpoint,
+    )
     from .reproduction_runner import (
-        recover_training_lane_v2,
-        run_smoke_lane_v2,
-        run_test_lane_v2,
-        run_training_lane_v2,
+        read_and_validate_adaptation,
+        run_logged,
+        run_logged_with_progress,
+        validate_identity_binding,
+        validate_run_layout,
+        write_failure_pair,
+        write_json_atomic,
     )
 else:
     _pkg_dir = str(Path(__file__).parent)
@@ -94,15 +108,32 @@ else:
         probe_environment_details,
         run_probe,
     )
-    from reproduction_artifacts import identity_from_environment
+    from reproduction_artifacts import (
+        finalize_v2_pair,
+        identity_from_environment,
+        reopen_recovered_v2_pair,
+        reopen_v2_pair,
+        terminal_result,
+        terminal_status,
+    )
+    from reproduction_history import (
+        load_native_validation_history,
+        reconcile_history_checkpoint,
+    )
     from reproduction_runner import (
-        recover_training_lane_v2,
-        run_smoke_lane_v2,
-        run_test_lane_v2,
-        run_training_lane_v2,
+        read_and_validate_adaptation,
+        run_logged,
+        run_logged_with_progress,
+        validate_identity_binding,
+        validate_run_layout,
+        write_failure_pair,
+        write_json_atomic,
     )
 
 ARCHIVED_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+_MISSING_VALIDATION_METRICS = "training log must contain validation Jaccard and DDI metrics"
+_RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
+_IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
 
 __all__ = (
     "ARCHIVED_REVISION",
@@ -134,7 +165,6 @@ __all__ = (
     "count_dataset",
     "environment_summary",
     "execute",
-    "finalize_result",
     "load_and_validate_canonical_inputs",
     "main",
     "matrix_shape",
@@ -353,17 +383,14 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
-def finalize_result(
+def _publish_legacy_terminal_status(
     run_root: Path,
     status: dict[str, Any],
     result: dict[str, Any],
-    dispatch_module: Any = None,
 ) -> None:
     """Publish terminal status before embedding it in result.json."""
-    mod = dispatch_module or sys.modules[__name__]
-    do_write_json = getattr(mod, "write_json", write_json)
-    do_write_json(run_root / "status.json", status)
-    do_write_json(run_root / "result.json", {**result, "status": status})
+    write_json(run_root / "status.json", status)
+    write_json(run_root / "result.json", {**result, "status": status})
 
 
 def verify_upstream_source(upstream_root: Path) -> None:
@@ -402,7 +429,7 @@ def _run_legacy_smoke_lane(
     run_root: Path,
     python: str,
     learning_rate: float | None = None,
-    dispatch_module: Any = None,
+    runner: Any = None,
 ) -> None:
     if run_root.exists():
         raise ReproductionError(f"run root already exists: {run_root}")
@@ -420,10 +447,7 @@ def _run_legacy_smoke_lane(
         raise ReproductionError("run root must be outside archived upstream source")
 
     active_lr = learning_rate if learning_rate is not None else profile.learning_rate
-    mod = dispatch_module or sys.modules[__name__]
-
-    verify_src = getattr(mod, "verify_upstream_source", verify_upstream_source)
-    verify_src(upstream_root)
+    verify_upstream_source(upstream_root)
 
     required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
     missing = [name for name in required_inputs if not (data_dir / name).is_file()]
@@ -432,20 +456,14 @@ def _run_legacy_smoke_lane(
     if any((data_dir / name).is_symlink() for name in required_inputs):
         raise ReproductionError("archived dataset inputs must be regular files, not symlinks")
 
-    load_inputs = getattr(
-        mod, "load_and_validate_canonical_inputs", load_and_validate_canonical_inputs
-    )
-    _, counts, _, _, _ = load_inputs(data_dir)
-
-    get_env_summary = getattr(mod, "environment_summary", environment_summary)
-    environment_identity = get_env_summary()
+    _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
+    environment_identity = environment_summary()
 
     source_dir = upstream_root / "src"
     original_entrypoint = source_dir / profile.entrypoint
     original_source = original_entrypoint.read_text(encoding="utf-8")
 
-    adapt_smoke = getattr(mod, "adapt_smoke_source", adapt_smoke_source)
-    adapted_source = adapt_smoke(original_source, target_lr=active_lr)
+    adapted_source = adapt_smoke_source(original_source, target_lr=active_lr)
 
     run_root.mkdir(parents=True)
     work_src = run_root / "work" / "src"
@@ -460,13 +478,12 @@ def _run_legacy_smoke_lane(
     checkpoint_dir.mkdir(parents=True)
     started_at = datetime.now(UTC).isoformat()
 
-    calc_sha256 = getattr(mod, "sha256", sha256)
     adaptation: dict[str, Any] = {
         "archived_revision": ARCHIVED_REVISION,
         "entrypoint": profile.entrypoint,
         "learning_rate": active_lr,
-        "original_sha256": calc_sha256(original_entrypoint),
-        "adapted_sha256": calc_sha256(adapted_entrypoint),
+        "original_sha256": sha256(original_entrypoint),
+        "adapted_sha256": sha256(adapted_entrypoint),
         "reverse_verification": "byte-identical",
         "epoch_limit": {
             "from": EPOCH_FORMAL,
@@ -475,9 +492,8 @@ def _run_legacy_smoke_lane(
             "reverse_verification": "byte-identical",
         },
     }
-    do_write_json = getattr(mod, "write_json", write_json)
-    do_write_json(run_root / "adaptation.json", adaptation)
-    do_write_json(
+    write_json(run_root / "adaptation.json", adaptation)
+    write_json(
         run_root / "status.json",
         {
             "schema_version": 1,
@@ -495,24 +511,21 @@ def _run_legacy_smoke_lane(
     environment["PYTHONPATH"] = os.pathsep.join(
         filter(None, (str(source_dir), environment.get("PYTHONPATH", "")))
     )
-    run_log = getattr(mod, "run_logged", run_logged)
-    train_cmd = getattr(mod, "training_command", training_command)
-    parse_train = getattr(mod, "parse_training_log", parse_training_log)
-    sel_ckpt = getattr(mod, "select_checkpoint", select_checkpoint)
+    run_log = runner or run_logged
 
     try:
         run_log(
-            [*train_cmd(python, adapted_entrypoint, model_name), *profile.training_args],
+            [*training_command(python, adapted_entrypoint, model_name), *profile.training_args],
             cwd=work_src,
             env=environment,
             log_path=run_root / "train.log",
         )
-        best_epoch = parse_train(
+        best_epoch = parse_training_log(
             (run_root / "train.log").read_text(errors="replace"), expected_epochs=1
         )
         if best_epoch != 0:
             raise ReproductionError(f"smoke mode requires best_epoch 0, observed {best_epoch}")
-        checkpoint = sel_ckpt(checkpoint_dir, profile, best_epoch=0)
+        checkpoint = select_checkpoint(checkpoint_dir, profile, best_epoch=0)
         finished_at = datetime.now(UTC).isoformat()
         terminal_status = {
             "schema_version": 1,
@@ -524,7 +537,7 @@ def _run_legacy_smoke_lane(
             "finished_at": finished_at,
             "failure_code": None,
         }
-        do_write_json(run_root / "status.json", terminal_status)
+        write_json(run_root / "status.json", terminal_status)
         smoke_record = {
             "schema_version": 1,
             "kind": "molerec_smoke",
@@ -543,14 +556,14 @@ def _run_legacy_smoke_lane(
             },
             "checkpoint": {
                 "best_epoch": 0,
-                "sha256": calc_sha256(checkpoint),
+                "sha256": sha256(checkpoint),
                 "size_bytes": checkpoint.stat().st_size,
             },
             "status": terminal_status,
         }
-        do_write_json(run_root / "smoke.json", smoke_record)
+        write_json(run_root / "smoke.json", smoke_record)
     except Exception:
-        do_write_json(
+        write_json(
             run_root / "status.json",
             {
                 "schema_version": 1,
@@ -566,6 +579,630 @@ def _run_legacy_smoke_lane(
         raise
 
 
+def _run_formal_training(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+    learning_rate: float | None,
+    identity: Mapping[str, str],
+    runner: Any = None,
+) -> None:
+    validate_run_layout(
+        upstream_root=upstream_root,
+        data_dir=data_dir,
+        run_root=run_root,
+        error_type=ReproductionError,
+    )
+    validate_identity_binding(
+        identity,
+        program_id="molerec",
+        source_revision=ARCHIVED_REVISION,
+        expected_baseline_id=profile.baseline_id,
+        error_type=ReproductionError,
+    )
+    active_lr = learning_rate if learning_rate is not None else profile.learning_rate
+    verify_upstream_source(upstream_root)
+
+    required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
+    missing = [name for name in required_inputs if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"dataset is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in required_inputs):
+        raise ReproductionError("dataset inputs must be regular files, not symlinks")
+
+    records, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
+    del records
+    environment_identity = environment_summary()
+    if environment_identity.get("conda_explicit_sha256") != identity["environment_sha256"]:
+        raise ReproductionError("runtime environment identity does not match controller identity")
+
+    source_dir = upstream_root / "src"
+    original_entrypoint = source_dir / profile.entrypoint
+    original_source = original_entrypoint.read_text(encoding="utf-8")
+    adapted_source = adapt_training_source(original_source, target_lr=active_lr)
+
+    run_root.mkdir(parents=True)
+    work_src = run_root / "work" / "src"
+    work_src.mkdir(parents=True, exist_ok=False)
+    adapted_entrypoint = work_src / profile.entrypoint
+    adapted_entrypoint.write_text(adapted_source, encoding="utf-8")
+    (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
+
+    model_name = f"{profile.model_name}_{run_root.name}"
+    checkpoint_dir = checkpoint_directory(work_src, model_name)
+    checkpoint_dir.mkdir(parents=True)
+    started_at = datetime.now(UTC).isoformat()
+    adaptation = {
+        "archived_revision": ARCHIVED_REVISION,
+        "entrypoint": profile.entrypoint,
+        "learning_rate": active_lr,
+        "original_sha256": sha256(original_entrypoint),
+        "adapted_sha256": sha256(adapted_entrypoint),
+        "reverse_verification": "byte-identical",
+        "phase": "training",
+    }
+    write_json_atomic(run_root / "adaptation.json", adaptation)
+    write_json_atomic(
+        run_root / "status.running.json",
+        {
+            "schema_version": 2,
+            "kind": "reproduction_progress_v2",
+            "identity": dict(identity),
+            "mode": "formal",
+            "state": "training",
+            "stage": "training",
+            "started_at": started_at,
+            "finished_at": None,
+            "non_evidence": False,
+            "heartbeat": 0,
+        },
+    )
+
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(source_dir), environment.get("PYTHONPATH", "")))
+    )
+
+    try:
+        train_log = run_logged_with_progress(
+            command=[
+                *training_command(python, adapted_entrypoint, model_name),
+                *getattr(profile, "training_args", ()),
+            ],
+            cwd=work_src,
+            env=environment,
+            log_path=run_root / "train.log",
+            runner=runner,
+        )
+        best_epoch = parse_training_log(train_log, expected_epochs=50)
+        checkpoint = select_checkpoint(checkpoint_dir, profile, best_epoch)
+        validation = parse_validation_metrics(train_log)
+        finished_at = datetime.now(UTC).isoformat()
+        status = terminal_status(
+            identity,
+            state="completed",
+            started_at=started_at,
+            finished_at=finished_at,
+            non_evidence=False,
+        )
+        result = terminal_result(
+            identity,
+            state="completed",
+            non_evidence=False,
+            payload={
+                "artifact_type": "training",
+                "scientific_baseline_id": identity["scientific_baseline_id"],
+                "profile_id": identity["profile_id"],
+                "learning_rate": active_lr,
+                "dataset_counts": counts,
+                "environment": environment_identity,
+                "adaptation": adaptation,
+                "epochs_requested": 50,
+                "epochs_observed": 50,
+                "best_epoch": best_epoch,
+                "validation_jaccard": validation["validation_jaccard"],
+                "validation_ddi_rate": validation["validation_ddi_rate"],
+                "checkpoint": {
+                    "best_epoch": best_epoch,
+                    "sha256": sha256(checkpoint),
+                    "size_bytes": checkpoint.stat().st_size,
+                    "relative_path": str(checkpoint.relative_to(run_root)),
+                },
+            },
+        )
+        finalize_v2_pair(run_root, status=status, result=result, error_type=ReproductionError)
+    except Exception:
+        write_failure_pair(
+            root=run_root,
+            identity=identity,
+            started_at=started_at,
+            artifact_type="training",
+            error_type=ReproductionError,
+        )
+        raise
+
+
+def _run_formal_test(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+    identity: Mapping[str, str],
+    training_source_root: Path | None = None,
+    test_root: Path | None = None,
+    selection_path: Path | None = None,
+    runner: Any = None,
+) -> None:
+    if not run_root.is_dir():
+        raise ReproductionError(f"training run root not found: {run_root}")
+    validate_identity_binding(
+        identity,
+        program_id="molerec",
+        source_revision=ARCHIVED_REVISION,
+        expected_baseline_id=profile.baseline_id,
+        error_type=ReproductionError,
+    )
+    if training_source_root is None:
+        checkpoint_root = run_root
+        training_status, training_result = reopen_v2_pair(
+            run_root,
+            expected_identity=identity,
+            error_type=ReproductionError,
+        )
+    else:
+        checkpoint_root = training_source_root
+        training_status, training_result = reopen_recovered_v2_pair(
+            training_source_root,
+            run_root,
+            error_type=ReproductionError,
+        )
+        training_identity = training_result["identity"]
+        validate_identity_binding(
+            training_identity,
+            program_id="molerec",
+            source_revision=ARCHIVED_REVISION,
+            expected_baseline_id=profile.baseline_id,
+            error_type=ReproductionError,
+        )
+        shared_fields = (
+            "attempt_id",
+            "lane_id",
+            "scientific_baseline_id",
+            "program_id",
+            "profile_id",
+            "model_source_revision",
+            "preprocessing_revision",
+            "snapshot_id",
+            "environment_sha256",
+            "mode",
+        )
+        if any(training_identity[field] != identity[field] for field in shared_fields):
+            raise ReproductionError("test identity does not continue the recovered training lane")
+    if (
+        training_status["state"] != "completed"
+        or training_result.get("artifact_type") != "training"
+    ):
+        raise ReproductionError("test admission requires a completed training artifact")
+
+    required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
+    missing = [name for name in required_inputs if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"dataset is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in required_inputs):
+        raise ReproductionError("dataset inputs must be regular files, not symlinks")
+    verify_upstream_source(upstream_root)
+
+    checkpoint_data = training_result.get("checkpoint")
+    relative_path = (
+        checkpoint_data.get("relative_path") if isinstance(checkpoint_data, Mapping) else None
+    )
+    if (
+        not isinstance(relative_path, str)
+        or Path(relative_path).is_absolute()
+        or ".." in Path(relative_path).parts
+    ):
+        raise ReproductionError("training artifact has an invalid checkpoint path")
+    checkpoint = checkpoint_root / relative_path
+    if not checkpoint.is_file() or checkpoint.is_symlink():
+        raise ReproductionError("training checkpoint is missing or is not a regular file")
+    if sha256(checkpoint) != checkpoint_data.get("sha256"):
+        raise ReproductionError("training checkpoint identity does not match its artifact")
+
+    test_destination = test_root or run_root / "test"
+    if test_destination.exists():
+        raise ReproductionError(f"test run root already exists: {test_destination}")
+    source_dir = upstream_root / "src"
+    original_entrypoint = source_dir / profile.entrypoint
+    model_root = training_source_root or run_root
+    model_name = f"{profile.model_name}_{model_root.name}"
+    test_destination.mkdir(parents=True)
+    work_src = test_destination / "work" / "src"
+    work_src.mkdir(parents=True, exist_ok=False)
+    (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
+    if profile.test_uses_basename:
+        staged_checkpoint = work_src / "saved" / model_name / checkpoint.name
+        staged_checkpoint.parent.mkdir(parents=True)
+        staged_checkpoint.symlink_to(checkpoint.resolve())
+    started_at = datetime.now(UTC).isoformat()
+    write_json_atomic(
+        test_destination / "status.running.json",
+        {
+            "schema_version": 2,
+            "kind": "reproduction_progress_v2",
+            "identity": dict(identity),
+            "mode": "formal",
+            "state": "testing",
+            "stage": "testing",
+            "started_at": started_at,
+            "finished_at": None,
+            "non_evidence": False,
+        },
+    )
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(source_dir), environment.get("PYTHONPATH", "")))
+    )
+    try:
+        command = test_command(
+            python,
+            original_entrypoint,
+            profile,
+            model_name,
+            checkpoint,
+            lane_id=identity["lane_id"],
+            selection_path=selection_path,
+        )
+        command = [*command, *getattr(profile, "training_args", ())]
+        execute_fn = runner or run_logged
+        execute_fn(
+            command,
+            cwd=work_src,
+            env=environment,
+            log_path=test_destination / "test.log",
+        )
+        parsed = parse_formal_test_log((test_destination / "test.log").read_text(errors="replace"))
+        rounds = parsed.get("rounds", parsed.get("test_rounds"))
+        summary = parsed.get("harness_summary")
+        if not isinstance(rounds, list) or len(rounds) != 10:
+            raise ReproductionError("formal test parser did not produce exactly ten rounds")
+        if not isinstance(summary, Mapping) or len(summary) != 5:
+            raise ReproductionError("formal test parser did not produce five summary metrics")
+        environment_identity = environment_summary()
+        if environment_identity.get("conda_explicit_sha256") != identity["environment_sha256"]:
+            raise ReproductionError(
+                "runtime environment identity does not match controller identity"
+            )
+        finished_at = datetime.now(UTC).isoformat()
+        status = terminal_status(
+            identity,
+            state="completed",
+            started_at=started_at,
+            finished_at=finished_at,
+            non_evidence=False,
+        )
+        result = terminal_result(
+            identity,
+            state="completed",
+            non_evidence=False,
+            payload={
+                "artifact_type": "test",
+                "scientific_baseline_id": identity["scientific_baseline_id"],
+                "profile_id": identity["profile_id"],
+                "dataset_counts": training_result["dataset_counts"],
+                "environment": environment_identity,
+                "epochs_requested": training_result["epochs_requested"],
+                "epochs_observed": training_result["epochs_observed"],
+                "checkpoint": checkpoint_data,
+                "rounds": rounds,
+                "harness_summary": dict(summary),
+                "upstream_summary": parsed.get("upstream_summary"),
+            },
+        )
+        finalize_v2_pair(
+            test_destination, status=status, result=result, error_type=ReproductionError
+        )
+    except Exception:
+        write_failure_pair(
+            root=test_destination,
+            identity=identity,
+            started_at=started_at,
+            artifact_type="test",
+            error_type=ReproductionError,
+        )
+        raise
+
+
+def _run_recovery(
+    *,
+    profile: Profile,
+    data_dir: Path,
+    run_root: Path,
+    recovery_id: str,
+    finalizer_revision: str,
+    identity: Mapping[str, str],
+) -> Path:
+    if not _RECOVERY_ID.fullmatch(recovery_id) or recovery_id in (".", ".."):
+        raise ReproductionError("recovery ID is invalid")
+    if not _IMMUTABLE_REVISION.fullmatch(finalizer_revision):
+        raise ReproductionError("finalizer revision must be an immutable Git revision")
+    validate_identity_binding(
+        identity,
+        program_id="molerec",
+        source_revision=ARCHIVED_REVISION,
+        expected_baseline_id=profile.baseline_id,
+        error_type=ReproductionError,
+    )
+    recovery_root = run_root / "recoveries" / recovery_id
+    if recovery_root.exists():
+        raise ReproductionError(f"recovery root already exists: {recovery_root}")
+
+    source_status, source_result = reopen_v2_pair(
+        run_root,
+        expected_identity=identity,
+        error_type=ReproductionError,
+    )
+    if (
+        source_status.get("state") != "failed"
+        or source_status.get("failure_code") != "training_failed"
+        or source_result.get("artifact_type") != "training"
+        or source_result.get("failure_code") != "training_failed"
+    ):
+        raise ReproductionError("source pair is not an eligible terminal training failure")
+
+    try:
+        train_log = (run_root / "train.log").read_text(errors="replace")
+    except OSError as error:
+        raise ReproductionError("source training log cannot be read") from error
+    parse_training_log(train_log, expected_epochs=50)
+    try:
+        parse_validation_metrics(train_log)
+    except ReproductionError as error:
+        if str(error) != _MISSING_VALIDATION_METRICS:
+            raise ReproductionError("source parser failure is not recoverable") from error
+    else:
+        raise ReproductionError(
+            "source validation parser does not reproduce the recoverable failure"
+        )
+
+    required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
+    missing = [name for name in required_inputs if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"dataset is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in required_inputs):
+        raise ReproductionError("dataset inputs must be regular files, not symlinks")
+    records, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
+    del records
+    environment_identity = environment_summary()
+    if environment_identity.get("conda_explicit_sha256") != identity["environment_sha256"]:
+        raise ReproductionError("runtime environment identity does not match controller identity")
+
+    adaptation = read_and_validate_adaptation(
+        run_root,
+        entrypoint=profile.entrypoint,
+        source_revision=ARCHIVED_REVISION,
+        calc_sha256=sha256,
+        error_type=ReproductionError,
+    )
+    learning_rate = adaptation["learning_rate"]
+
+    model_name = f"{profile.model_name}_{run_root.name}"
+    work_src = run_root / "work" / "src"
+    checkpoint_dir = checkpoint_directory(work_src, model_name)
+    history_path = native_history_path(checkpoint_dir, model_name)
+    validation = load_native_validation_history(
+        history_path,
+        expected_epochs=50,
+        error_type=ReproductionError,
+    )
+    best_epoch = int(validation["best_epoch"])
+    checkpoint = select_checkpoint(checkpoint_dir, profile, best_epoch)
+    reconcile_history_checkpoint(checkpoint, validation, error_type=ReproductionError)
+    checkpoint_relative_path = str(checkpoint.relative_to(run_root))
+    recovery = {
+        "schema_version": 1,
+        "kind": "training_finalization_recovery",
+        "recovery_id": recovery_id,
+        "finalizer_revision": finalizer_revision,
+        "source_relative_path": Path(os.path.relpath(run_root, recovery_root)).as_posix(),
+        "source_terminal_state": source_status["state"],
+        "source_failure_code": source_status["failure_code"],
+        "parser_classification": "validation_metrics_unlabeled",
+        "selected_epoch": best_epoch,
+        "checkpoint_relative_path": checkpoint_relative_path,
+        "validation_jaccard": validation["validation_jaccard"],
+        "validation_ddi_rate": validation["validation_ddi_rate"],
+    }
+    started_at = datetime.now(UTC).isoformat()
+    status = terminal_status(
+        identity,
+        state="completed",
+        started_at=started_at,
+        finished_at=datetime.now(UTC).isoformat(),
+        non_evidence=False,
+    )
+    status["recovery"] = recovery
+    result = terminal_result(
+        identity,
+        state="completed",
+        non_evidence=False,
+        payload={
+            "artifact_type": "training",
+            "scientific_baseline_id": identity["scientific_baseline_id"],
+            "profile_id": identity["profile_id"],
+            "learning_rate": float(learning_rate),
+            "dataset_counts": counts,
+            "environment": environment_identity,
+            "adaptation": adaptation,
+            "epochs_requested": 50,
+            "epochs_observed": validation["epochs_observed"],
+            "best_epoch": best_epoch,
+            "validation_jaccard": validation["validation_jaccard"],
+            "validation_ddi_rate": validation["validation_ddi_rate"],
+            "checkpoint": {
+                "best_epoch": best_epoch,
+                "sha256": sha256(checkpoint),
+                "size_bytes": checkpoint.stat().st_size,
+                "relative_path": checkpoint_relative_path,
+            },
+            "recovery": recovery,
+        },
+    )
+    finalize_v2_pair(recovery_root, status=status, result=result, error_type=ReproductionError)
+    reopen_recovered_v2_pair(
+        run_root,
+        recovery_root,
+        expected_identity=identity,
+        error_type=ReproductionError,
+    )
+    return recovery_root
+
+
+def _run_formal_smoke(
+    *,
+    profile: Profile,
+    upstream_root: Path,
+    data_dir: Path,
+    run_root: Path,
+    python: str,
+    learning_rate: float | None,
+    identity: Mapping[str, str],
+    runner: Any = None,
+) -> None:
+    validate_run_layout(
+        upstream_root=upstream_root,
+        data_dir=data_dir,
+        run_root=run_root,
+        error_type=ReproductionError,
+    )
+    validate_identity_binding(
+        identity,
+        program_id="molerec",
+        source_revision=ARCHIVED_REVISION,
+        expected_baseline_id=profile.baseline_id,
+        error_type=ReproductionError,
+    )
+    active_lr = learning_rate if learning_rate is not None else profile.learning_rate
+    verify_upstream_source(upstream_root)
+
+    required_inputs = tuple(dict.fromkeys((*profile.required_inputs, *GATE_INPUTS)))
+    missing = [name for name in required_inputs if not (data_dir / name).is_file()]
+    if missing:
+        raise ReproductionError(f"dataset is missing required inputs: {missing}")
+    if any((data_dir / name).is_symlink() for name in required_inputs):
+        raise ReproductionError("dataset inputs must be regular files, not symlinks")
+
+    _, counts, _, _, _ = load_and_validate_canonical_inputs(data_dir)
+    environment_identity = environment_summary()
+    if environment_identity.get("conda_explicit_sha256") != identity["environment_sha256"]:
+        raise ReproductionError("runtime environment identity does not match controller identity")
+    source_dir = upstream_root / "src"
+    original_entrypoint = source_dir / profile.entrypoint
+    original_source = original_entrypoint.read_text(encoding="utf-8")
+    adapted_source = adapt_smoke_source(original_source, target_lr=active_lr)
+
+    run_root.mkdir(parents=True)
+    work_src = run_root / "work" / "src"
+    work_src.mkdir(parents=True, exist_ok=False)
+    adapted_entrypoint = work_src / profile.entrypoint
+    adapted_entrypoint.write_text(adapted_source, encoding="utf-8")
+    (work_src.parent / "data").symlink_to(data_dir, target_is_directory=True)
+    model_name = f"{profile.model_name}_{run_root.name}"
+    checkpoint_dir = checkpoint_directory(work_src, model_name)
+    checkpoint_dir.mkdir(parents=True)
+    started_at = datetime.now(UTC).isoformat()
+    adaptation = {
+        "archived_revision": ARCHIVED_REVISION,
+        "entrypoint": profile.entrypoint,
+        "learning_rate": active_lr,
+        "original_sha256": sha256(original_entrypoint),
+        "adapted_sha256": sha256(adapted_entrypoint),
+        "reverse_verification": "byte-identical",
+        "phase": "smoke",
+    }
+    write_json_atomic(run_root / "adaptation.json", adaptation)
+    write_json_atomic(
+        run_root / "status.running.json",
+        {
+            "schema_version": 2,
+            "kind": "reproduction_progress_v2",
+            "identity": dict(identity),
+            "mode": "smoke",
+            "state": "training",
+            "stage": "training",
+            "started_at": started_at,
+            "finished_at": None,
+            "non_evidence": True,
+            "heartbeat": 0,
+        },
+    )
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(source_dir), environment.get("PYTHONPATH", "")))
+    )
+    try:
+        train_log = run_logged_with_progress(
+            command=[
+                *training_command(python, adapted_entrypoint, model_name),
+                *getattr(profile, "training_args", ()),
+            ],
+            cwd=work_src,
+            env=environment,
+            log_path=run_root / "train.log",
+            runner=runner,
+        )
+        best_epoch = parse_training_log(train_log, expected_epochs=1)
+        if best_epoch != 0:
+            raise ReproductionError(f"smoke mode requires best_epoch 0, observed {best_epoch}")
+        checkpoint = select_checkpoint(checkpoint_dir, profile, best_epoch)
+        finished_at = datetime.now(UTC).isoformat()
+        status = terminal_status(
+            identity,
+            state="completed",
+            started_at=started_at,
+            finished_at=finished_at,
+            non_evidence=True,
+        )
+        result = terminal_result(
+            identity,
+            state="completed",
+            non_evidence=True,
+            payload={
+                "artifact_type": "smoke",
+                "scientific_baseline_id": identity["scientific_baseline_id"],
+                "profile_id": identity["profile_id"],
+                "learning_rate": active_lr,
+                "dataset_counts": counts,
+                "environment": environment_identity,
+                "adaptation": adaptation,
+                "epochs_requested": 1,
+                "epochs_observed": 1,
+                "best_epoch": 0,
+                "checkpoint": {
+                    "best_epoch": 0,
+                    "sha256": sha256(checkpoint),
+                    "size_bytes": checkpoint.stat().st_size,
+                    "relative_path": str(checkpoint.relative_to(run_root)),
+                },
+            },
+        )
+        finalize_v2_pair(run_root, status=status, result=result, error_type=ReproductionError)
+    except Exception:
+        write_failure_pair(
+            root=run_root,
+            identity=identity,
+            started_at=started_at,
+            artifact_type="smoke",
+            error_type=ReproductionError,
+            non_evidence=True,
+        )
+        raise
+
+
 def run_formal_lane(
     *,
     profile: Profile,
@@ -574,11 +1211,11 @@ def run_formal_lane(
     run_root: Path,
     python: str,
     learning_rate: float | None = None,
-    dispatch_module: Any = None,
     phase: str = "training",
     selection_path: Path | None = None,
     training_source_root: Path | None = None,
     test_root: Path | None = None,
+    runner: Any = None,
 ) -> None:
     """Run the controller-identified training or serial test phase."""
     if phase not in ("training", "test"):
@@ -586,10 +1223,8 @@ def run_formal_lane(
     identity = identity_from_environment(mode="formal", error_type=ReproductionError)
     if identity is None:
         raise ReproductionError("formal execution requires a controller-issued v2 identity")
-    module = dispatch_module or sys.modules[__name__]
     if phase == "training":
-        run_training_lane_v2(
-            module=module,
+        _run_formal_training(
             profile=profile,
             upstream_root=upstream_root,
             data_dir=data_dir,
@@ -597,27 +1232,20 @@ def run_formal_lane(
             python=python,
             learning_rate=learning_rate,
             identity=identity,
-            program_id="molerec",
-            source_revision=ARCHIVED_REVISION,
-            gate_inputs=GATE_INPUTS,
-            error_type=ReproductionError,
+            runner=runner,
         )
     else:
-        run_test_lane_v2(
-            module=module,
+        _run_formal_test(
             profile=profile,
             upstream_root=upstream_root,
             data_dir=data_dir,
             run_root=run_root,
             python=python,
             identity=identity,
-            program_id="molerec",
-            source_revision=ARCHIVED_REVISION,
-            gate_inputs=GATE_INPUTS,
-            error_type=ReproductionError,
             selection_path=selection_path,
             training_source_root=training_source_root,
             test_root=test_root,
+            runner=runner,
         )
 
 
@@ -628,8 +1256,8 @@ def run_test_lane(
     data_dir: Path,
     run_root: Path,
     python: str,
-    dispatch_module: Any = None,
     selection_path: Path | None = None,
+    runner: Any = None,
 ) -> None:
     """Run the test phase against a finalized training lane."""
     run_formal_lane(
@@ -638,9 +1266,9 @@ def run_test_lane(
         data_dir=data_dir,
         run_root=run_root,
         python=python,
-        dispatch_module=dispatch_module,
         phase="test",
         selection_path=selection_path,
+        runner=runner,
     )
 
 
@@ -651,24 +1279,18 @@ def recover_formal_lane(
     run_root: Path,
     recovery_id: str,
     finalizer_revision: str,
-    dispatch_module: Any = None,
 ) -> Path:
     """Recover one controller-identified terminal training finalization failure."""
     identity = identity_from_environment(mode="formal", error_type=ReproductionError)
     if identity is None:
         raise ReproductionError("recovery requires a controller-issued v2 identity")
-    return recover_training_lane_v2(
-        module=dispatch_module or sys.modules[__name__],
+    return _run_recovery(
         profile=profile,
         data_dir=data_dir,
         run_root=run_root,
         recovery_id=recovery_id,
         finalizer_revision=finalizer_revision,
         identity=identity,
-        program_id="molerec",
-        source_revision=ARCHIVED_REVISION,
-        gate_inputs=GATE_INPUTS,
-        error_type=ReproductionError,
     )
 
 
@@ -680,7 +1302,7 @@ def run_smoke_lane(
     run_root: Path,
     python: str,
     learning_rate: float | None = None,
-    dispatch_module: Any = None,
+    runner: Any = None,
 ) -> None:
     """Run a v2 controller-identified smoke or the preserved local legacy smoke."""
     identity = identity_from_environment(mode="smoke", error_type=ReproductionError)
@@ -692,10 +1314,9 @@ def run_smoke_lane(
             run_root=run_root,
             python=python,
             learning_rate=learning_rate,
-            dispatch_module=dispatch_module,
+            runner=runner,
         )
-    run_smoke_lane_v2(
-        module=dispatch_module or sys.modules[__name__],
+    _run_formal_smoke(
         profile=profile,
         upstream_root=upstream_root,
         data_dir=data_dir,
@@ -703,10 +1324,7 @@ def run_smoke_lane(
         python=python,
         learning_rate=learning_rate,
         identity=identity,
-        program_id="molerec",
-        source_revision=ARCHIVED_REVISION,
-        gate_inputs=GATE_INPUTS,
-        error_type=ReproductionError,
+        runner=runner,
     )
 
 
@@ -721,7 +1339,6 @@ def probe(request: Mapping[str, Any]) -> dict[str, Any]:
         upstream_root=upstream_root,
         data_dir=data_dir,
         scope=scope,
-        dispatch_module=sys.modules[__name__],
     )
 
 
@@ -746,7 +1363,6 @@ def execute(request: Mapping[str, Any]) -> dict[str, Any]:
             run_root=run_root,
             python=python,
             learning_rate=learning_rate,
-            dispatch_module=sys.modules[__name__],
         )
         return {"state": "completed", "mode": "smoke", "run_root": str(run_root)}
     elif mode == "formal":
@@ -763,7 +1379,6 @@ def execute(request: Mapping[str, Any]) -> dict[str, Any]:
             run_root=run_root,
             python=python,
             learning_rate=learning_rate,
-            dispatch_module=sys.modules[__name__],
             phase=phase,
             selection_path=selection_path,
             training_source_root=training_source_root,
@@ -779,7 +1394,6 @@ def execute(request: Mapping[str, Any]) -> dict[str, Any]:
             run_root=run_root,
             recovery_id=recovery_id,
             finalizer_revision=finalizer_revision,
-            dispatch_module=sys.modules[__name__],
         )
         return {"state": "completed", "mode": "recovery", "marker_path": str(marker_path)}
     else:

@@ -205,7 +205,15 @@ def write_evaluation_queue(
     *,
     declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
-    """Validate and atomically write a queue, returning its normalized form."""
+    """Validate and atomically write a queue, requiring declaration authority."""
+    if declaration is None:
+        decl_path = Path(path).parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            raise ProtocolValidationError(
+                "evaluation queue mutation requires a valid ReproductionAttemptDeclaration"
+            )
     normalized = validate_evaluation_queue(queue, declaration=declaration)
     write_json_atomic(path, normalized)
     return normalized
@@ -217,11 +225,19 @@ def create_evaluation_queue(
     attempt_id: str,
     declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
-    """Create a queue exactly once."""
+    """Create a queue exactly once, requiring declaration authority."""
     queue_path = Path(path)
     if queue_path.exists():
         raise ProtocolValidationError(f"evaluation queue already exists: {queue_path}")
-    if declaration is not None and declaration.attempt_id != attempt_id:
+    if declaration is None:
+        decl_path = queue_path.parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            raise ProtocolValidationError(
+                "creating an evaluation queue requires a valid ReproductionAttemptDeclaration"
+            )
+    if declaration.attempt_id != attempt_id:
         raise ProtocolValidationError("queue attempt_id does not match declaration attempt_id")
     return write_evaluation_queue(
         queue_path,
@@ -241,23 +257,27 @@ def admit_evaluation(
     declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
     """Append one eligible test to the FIFO queue, failing closed on duplicates."""
+    if declaration is None:
+        decl_path = Path(path).parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            raise ProtocolValidationError(
+                "active evaluation admission requires a valid ReproductionAttemptDeclaration"
+            )
     queue = load_evaluation_queue(path, declaration=declaration)
     lane_id = require_identifier(lane_id, field="lane_id")
     scientific_baseline_id = require_identifier(
         scientific_baseline_id,
         field="scientific_baseline_id",
     )
-    if declaration is not None:
-        if not declaration.has_lane(lane_id):
-            raise ProtocolValidationError(
-                f"evaluation queue cannot admit undeclared lane: {lane_id}"
-            )
-        lane_decl = declaration.get_lane(lane_id)
-        if scientific_baseline_id != lane_decl.scientific_baseline_id:
-            raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
-        is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
-    else:
-        is_safedrug = lane_id in SAFE_DRUG_LANE_IDS
+    if not declaration.has_lane(lane_id):
+        raise ProtocolValidationError(f"evaluation queue cannot admit undeclared lane: {lane_id}")
+    lane_decl = declaration.get_lane(lane_id)
+    if scientific_baseline_id != lane_decl.scientific_baseline_id:
+        raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
+    is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
+
     if any(entry["lane_id"] == lane_id for entry in queue["entries"]):
         raise ProtocolValidationError(f"evaluation for lane '{lane_id}' is already queued")
     test_submission_id = require_identifier(test_submission_id, field="test_submission_id")
@@ -309,6 +329,10 @@ def admit_validated_training_evaluation(
             attempt_decl_path = Path(attempt_root) / "attempt_declaration.json"
             if attempt_decl_path.is_file():
                 declaration = ReproductionAttemptDeclaration.from_json(attempt_decl_path)
+            else:
+                raise ProtocolValidationError(
+                    "active evaluation admission requires a valid ReproductionAttemptDeclaration"
+                )
 
     queue = load_evaluation_queue(path, declaration=declaration)
     lane_id = require_identifier(lane_id, field="lane_id")
@@ -316,20 +340,12 @@ def admit_validated_training_evaluation(
         scientific_baseline_id,
         field="scientific_baseline_id",
     )
-    if declaration is not None:
-        if not declaration.has_lane(lane_id):
-            raise ProtocolValidationError(
-                f"evaluation queue cannot admit undeclared lane: {lane_id}"
-            )
-        lane_decl = declaration.get_lane(lane_id)
-        if scientific_baseline_id != lane_decl.scientific_baseline_id:
-            raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
-        is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
-    else:
-        is_safedrug = lane_id in SAFE_DRUG_LANE_IDS
-
-    if any(entry["state"] == "running" for entry in queue["entries"]):
-        raise ProtocolValidationError("GPU 7 evaluation is already active")
+    if not declaration.has_lane(lane_id):
+        raise ProtocolValidationError(f"evaluation queue cannot admit undeclared lane: {lane_id}")
+    lane_decl = declaration.get_lane(lane_id)
+    if scientific_baseline_id != lane_decl.scientific_baseline_id:
+        raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
+    is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
 
     training_root, source_root, _ = resolve_training_artifact(
         attempt_root,
@@ -343,19 +359,11 @@ def admit_validated_training_evaluation(
     identity = evidence["identity"]
     if identity["attempt_id"] != queue["attempt_id"]:
         raise ProtocolValidationError("training evidence belongs to a different queue attempt")
-    if declaration is not None:
-        lane_decl = declaration.get_lane(lane_id)
-        if (
-            identity["lane_id"] != lane_id
-            or identity["scientific_baseline_id"] != scientific_baseline_id
-            or identity["program_id"] != lane_decl.program_id
-            or identity["profile_id"] != lane_decl.profile_id
-            or identity["mode"] != "formal"
-        ):
-            raise ProtocolValidationError("training evidence does not name the admitted lane")
-    elif (
+    if (
         identity["lane_id"] != lane_id
         or identity["scientific_baseline_id"] != scientific_baseline_id
+        or identity["program_id"] != lane_decl.program_id
+        or identity["profile_id"] != lane_decl.profile_id
         or identity["mode"] != "formal"
     ):
         raise ProtocolValidationError("training evidence does not name the admitted lane")
@@ -401,6 +409,14 @@ def claim_next_evaluation(
     declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any] | None:
     """Claim the oldest queued evaluation; terminal entries are never replayed."""
+    if declaration is None:
+        decl_path = Path(path).parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            raise ProtocolValidationError(
+                "claiming an evaluation requires a valid ReproductionAttemptDeclaration"
+            )
     queue = load_evaluation_queue(path, declaration=declaration)
     if any(entry["state"] == "running" for entry in queue["entries"]):
         return None
@@ -421,6 +437,14 @@ def finalize_evaluation(
     declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
     """Mark one claimed evaluation terminal without allowing a second submission."""
+    if declaration is None:
+        decl_path = Path(path).parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            raise ProtocolValidationError(
+                "finalizing an evaluation requires a valid ReproductionAttemptDeclaration"
+            )
     lane_id = require_identifier(lane_id, field="lane_id")
     state = require_identifier(state, field="state")
     if state not in TERMINAL_QUEUE_STATES:
@@ -452,6 +476,14 @@ def requeue_interrupted_evaluations(
     declaration: ReproductionAttemptDeclaration | None = None,
 ) -> int:
     """Return non-terminal running entries to FIFO after an operator-verified interruption."""
+    if declaration is None:
+        decl_path = Path(path).parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            raise ProtocolValidationError(
+                "requeueing evaluations requires a valid ReproductionAttemptDeclaration"
+            )
     queue = load_evaluation_queue(path, declaration=declaration)
     changed = 0
     for entry in queue["entries"]:

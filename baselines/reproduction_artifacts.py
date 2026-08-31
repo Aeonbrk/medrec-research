@@ -1,4 +1,4 @@
-"""Standalone identity, selection, and atomic finalization helpers for 319 programs."""
+"""Standalone identity and atomic finalization helpers for 319 programs."""
 
 from __future__ import annotations
 
