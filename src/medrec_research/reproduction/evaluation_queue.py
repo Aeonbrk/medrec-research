@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from ._validation import (
+from .._validation import (
     parse_json_object,
     require_identifier,
     require_int,
@@ -15,7 +15,7 @@ from ._validation import (
     strict_fields,
     write_json_atomic,
 )
-from .errors import ProtocolValidationError
+from ..errors import ProtocolValidationError
 from .reproduction_evidence import (
     canonical_training_artifact_id,
     reopen_training_evidence,

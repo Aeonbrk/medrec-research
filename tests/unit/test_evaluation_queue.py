@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from medrec_research.errors import ProtocolValidationError
-from medrec_research.evaluation_queue import (
+from medrec_research.reproduction.evaluation_queue import (
     admit_evaluation,
     admit_validated_training_evaluation,
     claim_next_evaluation,
@@ -16,8 +16,8 @@ from medrec_research.evaluation_queue import (
     load_evaluation_queue,
     requeue_interrupted_evaluations,
 )
-from medrec_research.reproduction_evidence import finalize_evidence_pair
-from medrec_research.safedrug_selection import (
+from medrec_research.reproduction.reproduction_evidence import finalize_evidence_pair
+from medrec_research.reproduction.safedrug_selection import (
     SAFE_DRUG_LANE_IDS,
     candidate_from_training_evidence,
     select_safedrug_candidate,

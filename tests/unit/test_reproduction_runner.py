@@ -29,7 +29,7 @@ from baselines.reproduction_runner import (
     run_test_lane_v2,
     run_training_lane_v2,
 )
-from medrec_research.reproduction_evidence import reopen_recovered_finalized_pair
+from medrec_research.reproduction.reproduction_evidence import reopen_recovered_finalized_pair
 
 IDENTITY = {
     "attempt_id": "attempt-1",

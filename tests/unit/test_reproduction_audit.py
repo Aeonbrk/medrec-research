@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from medrec_research import ProtocolValidationError
-from medrec_research.reproduction_audit import (
+from medrec_research.reproduction.reproduction_audit import (
     ARCHIVED_SOURCE_REVISION,
     EXPECTED_DATASET_COUNTS,
     REQUIRED_BASELINES,

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from medrec_research.errors import ProtocolValidationError
-from medrec_research.molerec_snapshot import (
+from medrec_research.reproduction.molerec_snapshot import (
     SNAPSHOT_FILES,
     build_molerec_snapshot,
     publish_molerec_snapshot,

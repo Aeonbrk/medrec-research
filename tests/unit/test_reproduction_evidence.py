@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from medrec_research.errors import ProtocolValidationError
-from medrec_research.reproduction_evidence import (
+from medrec_research.reproduction.reproduction_evidence import (
     finalize_evidence_pair,
     reopen_finalized_pair,
     reopen_recovered_finalized_pair,

@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 
 from medrec_research import ProtocolValidationError
-from medrec_research.safedrug_c721 import (
+from medrec_research.reproduction.safedrug_c721 import (
     C721_SOURCE_REVISION,
     ORIGINAL_DDI_PATH,
     ORIGINAL_DIAGNOSES_PATH,

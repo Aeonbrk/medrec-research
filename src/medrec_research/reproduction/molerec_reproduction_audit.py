@@ -9,14 +9,14 @@ from pathlib import Path
 from statistics import fmean, pstdev
 from typing import Any
 
-from ._validation import (
+from .._validation import (
     parse_json_object,
     require_sha256,
     require_string,
     strict_fields,
     write_json_atomic,
 )
-from .errors import ProtocolValidationError
+from ..errors import ProtocolValidationError
 from .reproduction_evidence import reopen_finalized_pair
 from .safedrug_selection import require_selected_safedrug_lane
 

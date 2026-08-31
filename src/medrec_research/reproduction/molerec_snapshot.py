@@ -8,8 +8,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from ._validation import write_json_atomic
-from .errors import ProtocolValidationError
+from .._validation import write_json_atomic
+from ..errors import ProtocolValidationError
 
 SNAPSHOT_ID = "snapshots/molerec-table1-c721-www23"
 SNAPSHOT_FILES = (

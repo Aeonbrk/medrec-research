@@ -8,15 +8,18 @@ from typing import Any
 import pytest
 
 from medrec_research.errors import ProtocolValidationError
-from medrec_research.molerec_reproduction_audit import (
+from medrec_research.reproduction.molerec_reproduction_audit import (
     EXPECTED_DATASET_COUNTS,
     REQUIRED_MOLEREC_BASELINES,
     SUMMARY_METRICS,
     audit_molerec_table1,
     load_molerec_table1_reference,
 )
-from medrec_research.reproduction_evidence import finalize_evidence_pair
-from medrec_research.safedrug_selection import select_safedrug_candidate, write_selection
+from medrec_research.reproduction.reproduction_evidence import finalize_evidence_pair
+from medrec_research.reproduction.safedrug_selection import (
+    select_safedrug_candidate,
+    write_selection,
+)
 
 PROJECT_ROOT = Path(__file__).parents[2]
 REFERENCE_PATH = PROJECT_ROOT / "research" / "baseline-preflight" / "molerec-table1-reference.json"

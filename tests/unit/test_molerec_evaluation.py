@@ -7,19 +7,19 @@ from typing import Any
 
 import pytest
 
-import medrec_research.molerec_evaluation as molerec_evaluation
+import medrec_research.reproduction.molerec_evaluation as molerec_evaluation
 from medrec_research import BaselineRegistry
 from medrec_research.errors import ProtocolValidationError
-from medrec_research.evaluation_queue import (
+from medrec_research.reproduction.evaluation_queue import (
     load_evaluation_queue,
     write_evaluation_queue,
 )
-from medrec_research.molerec_evaluation import (
+from medrec_research.reproduction.molerec_evaluation import (
     claim_table1_evaluation,
     finalize_table1_evaluation,
     prepare_table1_evaluation,
 )
-from medrec_research.reproduction_evidence import finalize_evidence_pair
+from medrec_research.reproduction.reproduction_evidence import finalize_evidence_pair
 
 PROJECT_ROOT = Path(__file__).parents[2]
 ATTEMPT_ID = "formal-20260828-a09fcab-u8-b"

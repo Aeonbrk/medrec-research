@@ -20,18 +20,18 @@ from .commands import (
 from .dataset import DatasetManifest
 from .errors import ProtocolValidationError
 from .evaluation import evaluate_predictions
-from .molerec_evaluation import (
-    audit_prepared_table1_evaluation,
-    claim_table1_evaluation,
-    finalize_table1_evaluation,
-    prepare_table1_evaluation,
-)
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
 from .remote_executor import (
     FrozenSchedule,
     RemoteExecutor,
     validate_reproduction_continuation,
+)
+from .reproduction.molerec_evaluation import (
+    audit_prepared_table1_evaluation,
+    claim_table1_evaluation,
+    finalize_table1_evaluation,
+    prepare_table1_evaluation,
 )
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
@@ -420,7 +420,7 @@ def _reproduce_smoke(
 
 def _stage_safedrug_c721(args: argparse.Namespace) -> int:
     """Stage SafeDrug c721 dataset into staging directory."""
-    from .safedrug_c721 import stage_safedrug_c721
+    from .reproduction.safedrug_c721 import stage_safedrug_c721
 
     proof = stage_safedrug_c721(
         preprocessing_checkout=args.preprocessing_checkout,
@@ -449,7 +449,7 @@ def _stage_safedrug_c721(args: argparse.Namespace) -> int:
 
 def _stage_molerec_snapshot(args: argparse.Namespace) -> int:
     """Build and atomically publish the additive MoleRec eight-file snapshot."""
-    from .molerec_snapshot import build_molerec_snapshot, publish_molerec_snapshot
+    from .reproduction.molerec_snapshot import build_molerec_snapshot, publish_molerec_snapshot
 
     build_molerec_snapshot(
         common_snapshot=args.common_snapshot,
@@ -477,7 +477,7 @@ def _stage_molerec_snapshot(args: argparse.Namespace) -> int:
 
 def _audit_safedrug_table2(args: argparse.Namespace) -> int:
     """Audit four formal reproduction results against Table 2 and emit public-safe packet."""
-    from .reproduction_audit import audit_safedrug_table2
+    from .reproduction.reproduction_audit import audit_safedrug_table2
 
     result_paths = {
         "gamenet": args.gamenet_result,
@@ -509,7 +509,7 @@ def _audit_safedrug_table2(args: argparse.Namespace) -> int:
 
 def _audit_molerec_table1(args: argparse.Namespace) -> int:
     """Audit five formal reproduction results against MoleRec Table 1 and emit public-safe packet."""
-    from .molerec_reproduction_audit import audit_molerec_table1
+    from .reproduction.molerec_reproduction_audit import audit_molerec_table1
 
     result_paths = {
         "retain": args.retain_result,
@@ -564,7 +564,7 @@ def _recover_reproduction(args: argparse.Namespace) -> int:
 
 def _admit_evaluation(args: argparse.Namespace) -> int:
     """Validate terminal training evidence before queueing one GPU 7 evaluation."""
-    from .evaluation_queue import admit_validated_training_evaluation
+    from .reproduction.evaluation_queue import admit_validated_training_evaluation
 
     selection = None
     if args.selection is not None:

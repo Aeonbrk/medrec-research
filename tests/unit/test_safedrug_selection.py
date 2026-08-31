@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from medrec_research.errors import ProtocolValidationError
-from medrec_research.reproduction_evidence import finalize_evidence_pair
-from medrec_research.safedrug_selection import (
+from medrec_research.reproduction.reproduction_evidence import finalize_evidence_pair
+from medrec_research.reproduction.safedrug_selection import (
     SAFE_DRUG_LANE_IDS,
     candidate_from_training_evidence,
     require_selected_safedrug_lane,

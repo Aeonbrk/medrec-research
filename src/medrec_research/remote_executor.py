@@ -14,7 +14,6 @@ from pathlib import Path, PurePosixPath
 
 from ._validation import require_int
 from .errors import ProtocolValidationError
-from .evaluation_queue import resolve_training_artifact
 from .registry import (
     BaselineDefinition,
     BaselineRegistry,
@@ -22,7 +21,8 @@ from .registry import (
     ResearchMode,
     SourceStatus,
 )
-from .reproduction_evidence import reopen_training_evidence
+from .reproduction.evaluation_queue import resolve_training_artifact
+from .reproduction.reproduction_evidence import reopen_training_evidence
 
 APPROVED_319_HOSTS = ("319-lab", "319-lab-via-server")
 PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"

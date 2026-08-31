@@ -10,7 +10,7 @@ from collections.abc import Mapping
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from ._validation import (
+from .._validation import (
     canonical_json,
     parse_json_object,
     require_int,
@@ -20,7 +20,7 @@ from ._validation import (
     strict_fields,
     write_json_atomic,
 )
-from .errors import ProtocolValidationError
+from ..errors import ProtocolValidationError
 
 EVIDENCE_SCHEMA_VERSION = 2
 FINALIZATION_SCHEMA_VERSION = 1

@@ -8,7 +8,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from ._validation import (
+from .._validation import (
     require_int,
     require_probability,
     require_sha256,
@@ -16,7 +16,7 @@ from ._validation import (
     strict_fields,
     write_json_atomic,
 )
-from .errors import ProtocolValidationError
+from ..errors import ProtocolValidationError
 from .reproduction_evidence import (
     RECOVERY_FIELDS,
     reopen_training_evidence,

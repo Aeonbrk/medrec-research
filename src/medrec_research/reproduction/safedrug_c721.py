@@ -11,8 +11,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from ._validation import parse_json_object, write_json_atomic
-from .errors import ProtocolValidationError
+from .._validation import parse_json_object, write_json_atomic
+from ..errors import ProtocolValidationError
 
 C721_SOURCE_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
 ORIGINAL_PRESCRIPTIONS_PATH = (

@@ -8,8 +8,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from ._validation import parse_json_object, require_identifier, write_json_atomic
-from .errors import ProtocolValidationError
+from .._validation import parse_json_object, require_identifier, write_json_atomic
+from ..errors import ProtocolValidationError
+from ..registry import BaselineRegistry
 from .evaluation_queue import (
     admit_validated_training_evaluation,
     claim_next_evaluation,
@@ -19,8 +20,6 @@ from .evaluation_queue import (
     resolve_training_artifact,
 )
 from .molerec_reproduction_audit import audit_molerec_table1
-from .registry import BaselineRegistry
-from .remote_executor import RemoteExecutor
 from .reproduction_evidence import reopen_finalized_pair, reopen_training_evidence
 from .safedrug_selection import (
     SAFE_DRUG_LANE_IDS,
@@ -289,6 +288,8 @@ def claim_table1_evaluation(
         if entry["lane_id"].startswith("molerec-safedrug")
         else None
     )
+    from ..remote_executor import RemoteExecutor
+
     command = RemoteExecutor(registry).test_launch_command(
         entry["lane_id"],
         attempt_id=queue["attempt_id"],

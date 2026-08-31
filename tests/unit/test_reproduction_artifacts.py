@@ -15,7 +15,7 @@ from baselines.reproduction_artifacts import (
     reopen_v2_pair,
     require_selected_safedrug_selection,
 )
-from medrec_research.safedrug_selection import select_safedrug_candidate
+from medrec_research.reproduction.safedrug_selection import select_safedrug_candidate
 
 
 def _identity(*, mode: str = "formal", submission_id: str = "submission-1") -> dict[str, str]:
