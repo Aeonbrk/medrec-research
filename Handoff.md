@@ -35,8 +35,8 @@ The five-model baseline preparation is complete.
 
 ## Operational snapshot
 
-- **Branch**: `refactor/reproduction-namespace-isolation`
-- **Head commit**: `9c36ee5` (`refactor(core): isolate reproduction attempts into dedicated namespace`)
+- **Branch**: `main`
+- **Head commit**: `c0bc670` (`docs(governance): synchronize documentation, rules, and baseline readiness state`)
 - **Suite health**: 312 unit/integration tests passing; `ruff` lint and formatting clean.
 - **Namespace structure**: `src/medrec_research/reproduction/` houses reproduction attempt controllers; core package remains protocol-agnostic.
 
