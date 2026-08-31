@@ -17,7 +17,6 @@ from .evaluation_queue import (
     create_evaluation_queue,
     finalize_evaluation,
     load_evaluation_queue,
-    resolve_training_artifact,
 )
 from .molerec_reproduction_audit import audit_molerec_table1
 from .molerec_table1_attempt import (
@@ -26,7 +25,11 @@ from .molerec_table1_attempt import (
     ReproductionAttemptDeclaration,
     build_table1_test_launch_command,
 )
-from .reproduction_evidence import reopen_finalized_pair, reopen_training_evidence
+from .reproduction_evidence import (
+    reopen_finalized_pair,
+    reopen_training_evidence,
+    resolve_training_artifact,
+)
 from .safedrug_selection import (
     SAFE_DRUG_LANE_IDS,
     candidate_from_training_evidence,

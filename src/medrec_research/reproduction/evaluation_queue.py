@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -16,6 +15,7 @@ from .._validation import (
     write_json_atomic,
 )
 from ..errors import ProtocolValidationError
+from .molerec_table1_attempt import ReproductionAttemptDeclaration
 from .reproduction_evidence import (
     canonical_training_artifact_id,
     reopen_training_evidence,
@@ -27,38 +27,6 @@ QUEUE_KIND = "molerec_table1_evaluation_queue_v1"
 EVALUATION_GPU_INDEX = 7
 QUEUE_STATES = ("queued", "running", "completed", "failed", "blocked")
 TERMINAL_QUEUE_STATES = ("completed", "failed", "blocked")
-QUEUE_LANE_IDS = (
-    "molerec-retain",
-    "molerec-leap",
-    "molerec-gamenet",
-    "molerec-safedrug-lr-1e-5",
-    "molerec-safedrug-lr-1e-4",
-    "molerec-safedrug-lr-5e-4",
-    "molerec-embedding",
-)
-
-
-@dataclass(frozen=True)
-class _LaneMetadata:
-    scientific_baseline_id: str
-    program_id: str
-    profile_id: str
-
-
-_LANE_METADATA = {
-    "molerec-retain": _LaneMetadata("retain", "safedrug-archived", "retain"),
-    "molerec-leap": _LaneMetadata("leap-safedrug", "safedrug-archived", "leap-safedrug"),
-    "molerec-gamenet": _LaneMetadata("gamenet", "safedrug-archived", "gamenet"),
-    "molerec-safedrug-lr-1e-5": _LaneMetadata("safedrug", "safedrug-archived", "safedrug"),
-    "molerec-safedrug-lr-1e-4": _LaneMetadata("safedrug", "safedrug-archived", "safedrug"),
-    "molerec-safedrug-lr-5e-4": _LaneMetadata("safedrug", "safedrug-archived", "safedrug"),
-    "molerec-embedding": _LaneMetadata("molerec", "molerec", "molerec-embedding"),
-}
-LANE_BASELINES = {
-    lane_id: metadata.scientific_baseline_id for lane_id, metadata in _LANE_METADATA.items()
-}
-LANE_PROGRAMS = {lane_id: metadata.program_id for lane_id, metadata in _LANE_METADATA.items()}
-LANE_PROFILES = {lane_id: metadata.profile_id for lane_id, metadata in _LANE_METADATA.items()}
 
 
 def new_evaluation_queue(attempt_id: str) -> dict[str, Any]:
@@ -72,7 +40,12 @@ def new_evaluation_queue(attempt_id: str) -> dict[str, Any]:
     }
 
 
-def _validate_entry(value: object, *, index: int) -> dict[str, Any]:
+def _validate_entry(
+    value: object,
+    *,
+    index: int,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any]:
     payload = strict_fields(
         value,
         required=(
@@ -86,16 +59,24 @@ def _validate_entry(value: object, *, index: int) -> dict[str, Any]:
         context=f"evaluation queue entry {index}",
     )
     lane_id = require_identifier(payload["lane_id"], field=f"queue entry {index}.lane_id")
-    if lane_id not in QUEUE_LANE_IDS:
-        raise ProtocolValidationError(f"evaluation queue entry {index} names an undeclared lane")
     scientific_baseline_id = require_identifier(
         payload["scientific_baseline_id"],
         field=f"queue entry {index}.scientific_baseline_id",
     )
-    if scientific_baseline_id != LANE_BASELINES[lane_id]:
-        raise ProtocolValidationError(
-            f"evaluation queue entry {index} has the wrong scientific baseline"
-        )
+    if declaration is not None:
+        if not declaration.has_lane(lane_id):
+            raise ProtocolValidationError(
+                f"evaluation queue entry {index} names an undeclared lane: {lane_id}"
+            )
+        lane_decl = declaration.get_lane(lane_id)
+        if scientific_baseline_id != lane_decl.scientific_baseline_id:
+            raise ProtocolValidationError(
+                f"evaluation queue entry {index} has the wrong scientific baseline"
+            )
+        is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
+    else:
+        is_safedrug = lane_id in SAFE_DRUG_LANE_IDS
+
     state = require_identifier(payload["state"], field=f"queue entry {index}.state")
     if state not in QUEUE_STATES:
         raise ProtocolValidationError(f"queue entry {index}.state is not a valid queue state")
@@ -114,9 +95,9 @@ def _validate_entry(value: object, *, index: int) -> dict[str, Any]:
             selection_lane_id,
             field=f"queue entry {index}.selection_lane_id",
         )
-    if lane_id in SAFE_DRUG_LANE_IDS and selection_lane_id != lane_id:
+    if is_safedrug and selection_lane_id != lane_id:
         raise ProtocolValidationError(f"SafeDrug queue entry {index} must record its selected lane")
-    if lane_id not in SAFE_DRUG_LANE_IDS and selection_lane_id is not None:
+    if not is_safedrug and selection_lane_id is not None:
         raise ProtocolValidationError(
             f"non-SafeDrug queue entry {index} must not contain selection_lane_id"
         )
@@ -146,7 +127,11 @@ def _validate_entry(value: object, *, index: int) -> dict[str, Any]:
     return entry
 
 
-def validate_evaluation_queue(value: object) -> dict[str, Any]:
+def validate_evaluation_queue(
+    value: object,
+    *,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any]:
     """Validate and normalize a persisted queue without changing its order."""
     payload = strict_fields(
         value,
@@ -156,6 +141,8 @@ def validate_evaluation_queue(value: object) -> dict[str, Any]:
     if payload["schema_version"] != QUEUE_SCHEMA_VERSION or payload["kind"] != QUEUE_KIND:
         raise ProtocolValidationError("MoleRec evaluation queue has an unsupported schema")
     attempt_id = require_identifier(payload["attempt_id"], field="queue.attempt_id")
+    if declaration is not None and declaration.attempt_id != attempt_id:
+        raise ProtocolValidationError("queue attempt_id does not match declaration attempt_id")
     evaluation_gpu_index = require_int(
         payload["evaluation_gpu_index"],
         field="queue.evaluation_gpu_index",
@@ -167,7 +154,10 @@ def validate_evaluation_queue(value: object) -> dict[str, Any]:
     if not isinstance(raw_entries, list):
         raise ProtocolValidationError("MoleRec evaluation queue entries must be a list")
 
-    entries = [_validate_entry(entry, index=index) for index, entry in enumerate(raw_entries)]
+    entries = [
+        _validate_entry(entry, index=index, declaration=declaration)
+        for index, entry in enumerate(raw_entries)
+    ]
     lane_ids = [entry["lane_id"] for entry in entries]
     if len(lane_ids) != len(set(lane_ids)):
         raise ProtocolValidationError("MoleRec evaluation queue cannot contain duplicate lanes")
@@ -187,7 +177,11 @@ def validate_evaluation_queue(value: object) -> dict[str, Any]:
     }
 
 
-def load_evaluation_queue(path: str | Path) -> dict[str, Any]:
+def load_evaluation_queue(
+    path: str | Path,
+    *,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any]:
     """Read and validate a queue file."""
     queue_path = Path(path)
     try:
@@ -197,22 +191,42 @@ def load_evaluation_queue(path: str | Path) -> dict[str, Any]:
         )
     except OSError as error:
         raise ProtocolValidationError(f"failed to read evaluation queue: {error}") from error
-    return validate_evaluation_queue(value)
+    if declaration is None:
+        decl_path = queue_path.parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+    return validate_evaluation_queue(value, declaration=declaration)
 
 
-def write_evaluation_queue(path: str | Path, queue: Mapping[str, Any]) -> dict[str, Any]:
+def write_evaluation_queue(
+    path: str | Path,
+    queue: Mapping[str, Any],
+    *,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any]:
     """Validate and atomically write a queue, returning its normalized form."""
-    normalized = validate_evaluation_queue(queue)
+    normalized = validate_evaluation_queue(queue, declaration=declaration)
     write_json_atomic(path, normalized)
     return normalized
 
 
-def create_evaluation_queue(path: str | Path, *, attempt_id: str) -> dict[str, Any]:
+def create_evaluation_queue(
+    path: str | Path,
+    *,
+    attempt_id: str,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any]:
     """Create a queue exactly once."""
     queue_path = Path(path)
     if queue_path.exists():
         raise ProtocolValidationError(f"evaluation queue already exists: {queue_path}")
-    return write_evaluation_queue(queue_path, new_evaluation_queue(attempt_id))
+    if declaration is not None and declaration.attempt_id != attempt_id:
+        raise ProtocolValidationError("queue attempt_id does not match declaration attempt_id")
+    return write_evaluation_queue(
+        queue_path,
+        new_evaluation_queue(attempt_id),
+        declaration=declaration,
+    )
 
 
 def admit_evaluation(
@@ -223,18 +237,26 @@ def admit_evaluation(
     training_artifact_id: str,
     test_submission_id: str,
     selection: Mapping[str, Any] | None = None,
+    declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
     """Append one eligible test to the FIFO queue, failing closed on duplicates."""
-    queue = load_evaluation_queue(path)
+    queue = load_evaluation_queue(path, declaration=declaration)
     lane_id = require_identifier(lane_id, field="lane_id")
     scientific_baseline_id = require_identifier(
         scientific_baseline_id,
         field="scientific_baseline_id",
     )
-    if lane_id not in QUEUE_LANE_IDS:
-        raise ProtocolValidationError(f"evaluation queue cannot admit undeclared lane: {lane_id}")
-    if scientific_baseline_id != LANE_BASELINES[lane_id]:
-        raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
+    if declaration is not None:
+        if not declaration.has_lane(lane_id):
+            raise ProtocolValidationError(
+                f"evaluation queue cannot admit undeclared lane: {lane_id}"
+            )
+        lane_decl = declaration.get_lane(lane_id)
+        if scientific_baseline_id != lane_decl.scientific_baseline_id:
+            raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
+        is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
+    else:
+        is_safedrug = lane_id in SAFE_DRUG_LANE_IDS
     if any(entry["lane_id"] == lane_id for entry in queue["entries"]):
         raise ProtocolValidationError(f"evaluation for lane '{lane_id}' is already queued")
     test_submission_id = require_identifier(test_submission_id, field="test_submission_id")
@@ -251,7 +273,7 @@ def admit_evaluation(
         "test_submission_id": test_submission_id,
         "state": "queued",
     }
-    if lane_id in SAFE_DRUG_LANE_IDS:
+    if is_safedrug:
         if selection is None:
             raise ProtocolValidationError(
                 "SafeDrug evaluation admission requires a valid selection.json"
@@ -259,9 +281,9 @@ def admit_evaluation(
         require_selected_safedrug_lane(selection, lane_id)
         entry["selection_lane_id"] = lane_id
 
-    entry = _validate_entry(entry, index=len(queue["entries"]))
+    entry = _validate_entry(entry, index=len(queue["entries"]), declaration=declaration)
     queue["entries"].append(entry)
-    write_evaluation_queue(path, queue)
+    write_evaluation_queue(path, queue, declaration=declaration)
     return entry
 
 
@@ -309,18 +331,36 @@ def admit_validated_training_evaluation(
     test_submission_id: str,
     expected_identity: Mapping[str, Any] | None = None,
     selection: Mapping[str, Any] | None = None,
+    declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
     """Validate terminal training evidence before admitting one GPU 7 evaluation."""
-    queue = load_evaluation_queue(path)
+    if declaration is None:
+        decl_path = Path(path).parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        else:
+            attempt_decl_path = Path(attempt_root) / "attempt_declaration.json"
+            if attempt_decl_path.is_file():
+                declaration = ReproductionAttemptDeclaration.from_json(attempt_decl_path)
+
+    queue = load_evaluation_queue(path, declaration=declaration)
     lane_id = require_identifier(lane_id, field="lane_id")
     scientific_baseline_id = require_identifier(
         scientific_baseline_id,
         field="scientific_baseline_id",
     )
-    if lane_id not in QUEUE_LANE_IDS:
-        raise ProtocolValidationError(f"evaluation queue cannot admit undeclared lane: {lane_id}")
-    if scientific_baseline_id != LANE_BASELINES[lane_id]:
-        raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
+    if declaration is not None:
+        if not declaration.has_lane(lane_id):
+            raise ProtocolValidationError(
+                f"evaluation queue cannot admit undeclared lane: {lane_id}"
+            )
+        lane_decl = declaration.get_lane(lane_id)
+        if scientific_baseline_id != lane_decl.scientific_baseline_id:
+            raise ProtocolValidationError("evaluation admission has the wrong scientific baseline")
+        is_safedrug = lane_decl.scientific_baseline_id == "safedrug"
+    else:
+        is_safedrug = lane_id in SAFE_DRUG_LANE_IDS
+
     if any(entry["state"] == "running" for entry in queue["entries"]):
         raise ProtocolValidationError("GPU 7 evaluation is already active")
 
@@ -336,16 +376,24 @@ def admit_validated_training_evaluation(
     identity = evidence["identity"]
     if identity["attempt_id"] != queue["attempt_id"]:
         raise ProtocolValidationError("training evidence belongs to a different queue attempt")
-    if (
+    if declaration is not None:
+        lane_decl = declaration.get_lane(lane_id)
+        if (
+            identity["lane_id"] != lane_id
+            or identity["scientific_baseline_id"] != scientific_baseline_id
+            or identity["program_id"] != lane_decl.program_id
+            or identity["profile_id"] != lane_decl.profile_id
+            or identity["mode"] != "formal"
+        ):
+            raise ProtocolValidationError("training evidence does not name the admitted lane")
+    elif (
         identity["lane_id"] != lane_id
         or identity["scientific_baseline_id"] != scientific_baseline_id
-        or identity["program_id"] != LANE_PROGRAMS[lane_id]
-        or identity["profile_id"] != LANE_PROFILES[lane_id]
         or identity["mode"] != "formal"
     ):
         raise ProtocolValidationError("training evidence does not name the admitted lane")
 
-    if lane_id in SAFE_DRUG_LANE_IDS:
+    if is_safedrug:
         if selection is None:
             raise ProtocolValidationError(
                 "SafeDrug evaluation admission requires a valid selection.json"
@@ -376,18 +424,23 @@ def admit_validated_training_evaluation(
         training_artifact_id=canonical_id,
         test_submission_id=test_submission_id,
         selection=selection,
+        declaration=declaration,
     )
 
 
-def claim_next_evaluation(path: str | Path) -> dict[str, Any] | None:
+def claim_next_evaluation(
+    path: str | Path,
+    *,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any] | None:
     """Claim the oldest queued evaluation; terminal entries are never replayed."""
-    queue = load_evaluation_queue(path)
+    queue = load_evaluation_queue(path, declaration=declaration)
     if any(entry["state"] == "running" for entry in queue["entries"]):
         return None
     for entry in queue["entries"]:
         if entry["state"] == "queued":
             entry["state"] = "running"
-            write_evaluation_queue(path, queue)
+            write_evaluation_queue(path, queue, declaration=declaration)
             return dict(entry)
     return None
 
@@ -398,13 +451,14 @@ def finalize_evaluation(
     lane_id: str,
     state: str,
     result_artifact_id: str | None = None,
+    declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
     """Mark one claimed evaluation terminal without allowing a second submission."""
     lane_id = require_identifier(lane_id, field="lane_id")
     state = require_identifier(state, field="state")
     if state not in TERMINAL_QUEUE_STATES:
         raise ProtocolValidationError("evaluation final state must be terminal")
-    queue = load_evaluation_queue(path)
+    queue = load_evaluation_queue(path, declaration=declaration)
     for entry in queue["entries"]:
         if entry["lane_id"] != lane_id:
             continue
@@ -420,31 +474,31 @@ def finalize_evaluation(
                 field="result_artifact_id",
             )
         entry["state"] = state
-        write_evaluation_queue(path, queue)
+        write_evaluation_queue(path, queue, declaration=declaration)
         return dict(entry)
     raise ProtocolValidationError(f"evaluation for lane '{lane_id}' is not queued")
 
 
-def requeue_interrupted_evaluations(path: str | Path) -> int:
+def requeue_interrupted_evaluations(
+    path: str | Path,
+    *,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> int:
     """Return non-terminal running entries to FIFO after an operator-verified interruption."""
-    queue = load_evaluation_queue(path)
+    queue = load_evaluation_queue(path, declaration=declaration)
     changed = 0
     for entry in queue["entries"]:
         if entry["state"] == "running":
             entry["state"] = "queued"
             changed += 1
     if changed:
-        write_evaluation_queue(path, queue)
+        write_evaluation_queue(path, queue, declaration=declaration)
     return changed
 
 
 __all__ = (
     "EVALUATION_GPU_INDEX",
-    "LANE_BASELINES",
-    "LANE_PROFILES",
-    "LANE_PROGRAMS",
     "QUEUE_KIND",
-    "QUEUE_LANE_IDS",
     "QUEUE_SCHEMA_VERSION",
     "QUEUE_STATES",
     "TERMINAL_QUEUE_STATES",

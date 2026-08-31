@@ -19,8 +19,7 @@ from .._validation import (
 )
 from ..errors import ProtocolValidationError
 from ..registry import BaselineRegistry
-from .evaluation_queue import resolve_training_artifact
-from .reproduction_evidence import reopen_training_evidence
+from .reproduction_evidence import reopen_training_evidence, resolve_training_artifact
 
 TABLE1_PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
 TABLE1_DECLARATION_SCHEMA_VERSION = 1
@@ -197,6 +196,9 @@ class ReproductionAttemptDeclaration:
     @property
     def lane_ids(self) -> tuple[str, ...]:
         return tuple(lane.lane_id for lane in self.lanes)
+
+    def has_lane(self, lane_id: str) -> bool:
+        return any(lane.lane_id == lane_id for lane in self.lanes)
 
     def get_lane(self, lane_id: str) -> ReproductionLaneDeclaration:
         for lane in self.lanes:

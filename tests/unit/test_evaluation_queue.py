@@ -477,3 +477,48 @@ def test_queue_rejects_duplicate_lanes_in_persisted_json(tmp_path: Path) -> None
 
     with pytest.raises(ProtocolValidationError, match="duplicate lanes"):
         load_evaluation_queue(path)
+
+
+def test_queue_validates_against_frozen_declaration(tmp_path: Path) -> None:
+    from medrec_research import BaselineRegistry
+    from medrec_research.reproduction.molerec_table1_attempt import (
+        ReproductionAttemptDeclaration,
+    )
+
+    registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
+    declaration = ReproductionAttemptDeclaration.from_registry(registry, "attempt-decl-1")
+
+    path = tmp_path / "evaluation-queue.json"
+    create_evaluation_queue(path, attempt_id="attempt-decl-1", declaration=declaration)
+
+    # Valid admission
+    admit_evaluation(
+        path,
+        lane_id="molerec-retain",
+        scientific_baseline_id="retain",
+        training_artifact_id="runs/retain/result.json",
+        test_submission_id="test-retain",
+        declaration=declaration,
+    )
+
+    # Reject undeclared lane
+    with pytest.raises(ProtocolValidationError, match="undeclared lane"):
+        admit_evaluation(
+            path,
+            lane_id="undeclared-lane",
+            scientific_baseline_id="retain",
+            training_artifact_id="runs/undeclared/result.json",
+            test_submission_id="test-undeclared",
+            declaration=declaration,
+        )
+
+    # Reject wrong scientific baseline
+    with pytest.raises(ProtocolValidationError, match="wrong scientific baseline"):
+        admit_evaluation(
+            path,
+            lane_id="molerec-leap",
+            scientific_baseline_id="safedrug",
+            training_artifact_id="runs/leap/result.json",
+            test_submission_id="test-leap",
+            declaration=declaration,
+        )
