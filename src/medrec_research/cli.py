@@ -23,15 +23,19 @@ from .evaluation import evaluate_predictions
 from .reference import ReferenceConfig, run_reference_slice
 from .registry import BaselineRegistry
 from .remote_executor import (
-    FrozenSchedule,
     RemoteExecutor,
-    validate_reproduction_continuation,
 )
 from .reproduction.molerec_evaluation import (
     audit_prepared_table1_evaluation,
     claim_table1_evaluation,
     finalize_table1_evaluation,
     prepare_table1_evaluation,
+)
+from .reproduction.molerec_table1_attempt import (
+    FrozenSchedule,
+    ReproductionAttemptDeclaration,
+    validate_reproduction_continuation,
+    validate_table1_frozen_schedule,
 )
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
@@ -273,21 +277,22 @@ def _reproduce(
     )
     active_executor = executor or RemoteExecutor(registry)
     successor_lane_ids = {lane.lane_id for lane in registry.reproduction_lanes}
-    schedule: FrozenSchedule | None = None
     if any(baseline_id in successor_lane_ids for baseline_id, _ in lanes):
         schedule_path = getattr(args, "schedule", None)
         if schedule_path is None:
             raise ProtocolValidationError(
                 "successor formal reproduction requires an accepted frozen schedule artifact"
             )
+        declaration = ReproductionAttemptDeclaration.from_registry(registry, attempt_id)
         schedule = FrozenSchedule.from_json(
             schedule_path,
-            expected_lane_ids=tuple(lane.lane_id for lane in registry.reproduction_lanes),
+            declaration=declaration,
         )
-        cpu_sets = active_executor.validate_frozen_schedule(
+        cpu_sets = validate_table1_frozen_schedule(
             schedule,
             source_revision=source_revision,
             attempt_id=attempt_id,
+            declaration=declaration,
             requested_lanes=lanes,
             requested_cpu_sets=cpu_sets,
             require_complete=args.baseline_id == "all",
@@ -307,7 +312,6 @@ def _reproduce(
                 cpu_set=cpu_set,
                 dry_run=args.dry_run,
                 attempt_id=attempt_id,
-                schedule=schedule,
             )
             results.append(
                 {
@@ -609,10 +613,10 @@ def _admit_reproduction_continuation(
         artifacts[lane_id] = artifact_id
 
     registry = BaselineRegistry.load(args.registry)
-    lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
+    declaration = ReproductionAttemptDeclaration.from_registry(registry, args.attempt_id)
     source_schedule = FrozenSchedule.from_json(
         args.source_schedule,
-        expected_lane_ids=lane_ids,
+        declaration=declaration,
     )
     harness_revision = _local_source_revision(
         Path.cwd(),
@@ -620,7 +624,7 @@ def _admit_reproduction_continuation(
         runner=git_runner,
     )
     continuation = validate_reproduction_continuation(
-        registry=registry,
+        declaration=declaration,
         source_schedule=source_schedule,
         source_schedule_id=args.source_schedule_id,
         attempt_root=args.attempt_root,
@@ -649,8 +653,8 @@ def _admit_reproduction_continuation(
 def _prepare_molerec_evaluation(args: argparse.Namespace) -> int:
     """Select SafeDrug and publish the immutable five-test controller state."""
     registry = BaselineRegistry.load(args.registry)
-    lane_ids = tuple(lane.lane_id for lane in registry.reproduction_lanes)
-    schedule = FrozenSchedule.from_json(args.schedule, expected_lane_ids=lane_ids)
+    declaration = ReproductionAttemptDeclaration.from_registry(registry, args.attempt_id)
+    schedule = FrozenSchedule.from_json(args.schedule, declaration=declaration)
     if schedule.owner_attempt_id != args.attempt_id or schedule.source_harness_revision is None:
         raise ProtocolValidationError(
             "evaluation preparation requires the exact attempt-owned continuation schedule"
@@ -662,7 +666,7 @@ def _prepare_molerec_evaluation(args: argparse.Namespace) -> int:
         artifacts[lane_id] = artifact_id
     prepared = prepare_table1_evaluation(
         state_root=args.state_root,
-        registry=registry,
+        declaration=declaration,
         attempt_root=args.attempt_root,
         attempt_id=args.attempt_id,
         continuation_id=args.continuation_id,

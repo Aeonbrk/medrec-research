@@ -17,7 +17,8 @@ from medrec_research.cli import (
     _reproduce,
     _reproduce_smoke,
 )
-from medrec_research.remote_executor import FrozenSchedule, RemoteSubmission
+from medrec_research.remote_executor import RemoteSubmission
+from medrec_research.reproduction.molerec_table1_attempt import FrozenSchedule
 
 PROJECT_ROOT = Path(__file__).parents[2]
 REGISTRY_PATH = PROJECT_ROOT / "baselines" / "registry.toml"

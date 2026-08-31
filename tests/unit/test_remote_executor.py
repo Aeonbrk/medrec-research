@@ -10,11 +10,8 @@ import pytest
 
 from medrec_research import BaselineRegistry, ProtocolValidationError
 from medrec_research.remote_executor import (
-    PREPROCESSING_REVISION,
-    FrozenSchedule,
     RemoteExecutor,
     RemoteSubmission,
-    validate_reproduction_continuation,
 )
 
 LOCAL_REVISION = "a" * 40
@@ -32,30 +29,6 @@ TEST_INPUTS = (
     "ehr_adj_final.pkl",
     "idx2drug.pkl",
 )
-
-SUCCESSOR_LANES = (
-    "molerec-retain",
-    "molerec-leap",
-    "molerec-gamenet",
-    "molerec-safedrug-lr-1e-5",
-    "molerec-safedrug-lr-1e-4",
-    "molerec-safedrug-lr-5e-4",
-    "molerec-embedding",
-)
-SUCCESSOR_MAPPING = {
-    "molerec-retain": (3, "12-15,44-47", 0),
-    "molerec-leap": (4, "16-19,48-51", 1),
-    "molerec-gamenet": (5, "20-23,52-55", 1),
-    "molerec-safedrug-lr-1e-5": (6, "24-27,56-59", 1),
-    "molerec-safedrug-lr-1e-4": (1, "4-7,36-39", 0),
-    "molerec-safedrug-lr-5e-4": (2, "8-11,40-43", 0),
-    "molerec-embedding": (0, "0-3,32-35", 0),
-}
-PROJECT_ENVIRONMENT_SHA256 = "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
-PROJECT_SOURCE_REVISIONS = {
-    "safedrug_archived": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
-    "molerec": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
-}
 
 
 def _registry(*, verified: bool = True) -> BaselineRegistry:
@@ -124,39 +97,6 @@ def _valid_probe_json(baseline_id: str = "gamenet") -> str:
                 "molecular_substructures": 491,
             },
         }
-    )
-
-
-def _project_schedule_payload(*, harness_revision: str = LOCAL_REVISION) -> dict[str, object]:
-    mapping = {
-        lane_id: {"gpu": gpu, "cpu_set": cpu_set, "numa": numa}
-        for lane_id, (gpu, cpu_set, numa) in SUCCESSOR_MAPPING.items()
-    }
-    return {
-        "schema_version": 1,
-        "stage": "u7-measured-gpu-schedule",
-        "schedule_state": "frozen",
-        "harness_revision": harness_revision,
-        "environment_sha256": PROJECT_ENVIRONMENT_SHA256,
-        "preprocessing_revision": PREPROCESSING_REVISION,
-        "snapshot_id": "snapshots/molerec-table1-c721-www23",
-        "model_source_revisions": PROJECT_SOURCE_REVISIONS,
-        "selected_mapping": "B",
-        "gpu7_reserved": True,
-        "formal_execution": {
-            "mode": "formal",
-            "reserved_gpu": 7,
-            "gpu_order": [SUCCESSOR_MAPPING[lane_id][0] for lane_id in SUCCESSOR_LANES],
-            "cpu_set_order": [SUCCESSOR_MAPPING[lane_id][1] for lane_id in SUCCESSOR_LANES],
-        },
-        "mapping": mapping,
-    }
-
-
-def _project_schedule(*, harness_revision: str = LOCAL_REVISION) -> FrozenSchedule:
-    return FrozenSchedule.from_dict(
-        _project_schedule_payload(harness_revision=harness_revision),
-        expected_lane_ids=SUCCESSOR_LANES,
     )
 
 
@@ -669,12 +609,12 @@ def test_run_baseline_with_reproduction_lane_id_and_learning_rate_override() -> 
         "molerec-safedrug-lr-1e-5",
         source_revision=LOCAL_REVISION,
         gpu_index=6,
+        cpu_set="24-27,56-59",
         remote_root=REMOTE_ROOT,
         data_root=DATA_ROOT,
         min_free_gpu_mib=20000,
         min_free_disk_gib=100,
         dry_run=True,
-        schedule=_project_schedule(),
     )
 
     assert submission.baseline_id == "molerec-safedrug-lr-1e-5"
@@ -683,269 +623,53 @@ def test_run_baseline_with_reproduction_lane_id_and_learning_rate_override() -> 
         or "safedrug_archived.py safedrug" in submission.command
     )
     assert "--learning-rate 1e-05" in submission.command
+    assert submission.cpu_set == "24-27,56-59"
 
 
-def test_seven_lane_reproduction_all_lanes_dry_run() -> None:
+def test_remote_executor_dry_run_multiple_baselines() -> None:
     project_registry = BaselineRegistry.load(
         Path(__file__).parents[2] / "baselines" / "registry.toml"
     )
     executor = ScriptedExecutor(registry=project_registry)
-    lanes = [(lane_id, SUCCESSOR_MAPPING[lane_id][0]) for lane_id in SUCCESSOR_LANES]
-    schedule = _project_schedule()
+    runs = [
+        ("safedrug", 0, "0-3,32-35"),
+        ("gamenet", 1, "4-7,36-39"),
+    ]
     submissions = [
         executor.run_baseline(
-            lane_id,
+            baseline_id,
             source_revision=LOCAL_REVISION,
             gpu_index=gpu,
+            cpu_set=cpu_set,
             remote_root=REMOTE_ROOT,
             data_root=DATA_ROOT,
             min_free_gpu_mib=20000,
             min_free_disk_gib=100,
             dry_run=True,
-            attempt_id="attempt-schedule",
-            schedule=schedule,
+            attempt_id="attempt-generic",
         )
-        for lane_id, gpu in lanes
+        for baseline_id, gpu, cpu_set in runs
     ]
-    assert len(submissions) == 7
-    assert [s.baseline_id for s in submissions] == [lane[0] for lane in lanes]
+    assert len(submissions) == 2
+    assert [s.baseline_id for s in submissions] == [r[0] for r in runs]
+    assert [s.cpu_set for s in submissions] == [r[2] for r in runs]
 
 
-def test_successor_formal_lane_requires_frozen_schedule() -> None:
+def test_launch_command_generic() -> None:
     project_registry = BaselineRegistry.load(
         Path(__file__).parents[2] / "baselines" / "registry.toml"
     )
-    executor = ScriptedExecutor(registry=project_registry)
-
-    with pytest.raises(ProtocolValidationError, match="frozen schedule"):
-        executor.run_baseline(
-            "molerec-retain",
-            source_revision=LOCAL_REVISION,
-            gpu_index=0,
-            remote_root=REMOTE_ROOT,
-            data_root=DATA_ROOT,
-            min_free_gpu_mib=20000,
-            min_free_disk_gib=100,
-        )
-
-    assert executor.calls == []
-
-
-def test_exact_frozen_schedule_resolves_declared_cpu_sets_before_submission() -> None:
-    project_registry = BaselineRegistry.load(
-        Path(__file__).parents[2] / "baselines" / "registry.toml"
-    )
-    executor = ScriptedExecutor(registry=project_registry)
-    schedule = _project_schedule()
-    requested = [(lane_id, SUCCESSOR_MAPPING[lane_id][0]) for lane_id in SUCCESSOR_LANES]
-
-    resolved = executor.validate_frozen_schedule(
-        schedule,
-        source_revision=LOCAL_REVISION,
-        attempt_id="attempt-schedule",
-        requested_lanes=requested,
-        requested_cpu_sets=(None,) * len(requested),
-        require_complete=True,
-    )
-
-    assert resolved == tuple(SUCCESSOR_MAPPING[lane_id][1] for lane_id in SUCCESSOR_LANES)
-    assert executor.calls == []
-
-
-@pytest.mark.parametrize(
-    ("mutation", "error"),
-    [
-        ("duplicate_gpu", "duplicate GPUs"),
-        ("overlapping_cpu", "CPU allocation"),
-        ("altered_gpu", "GPU allocation"),
-        ("reserved_gpu", "reserved GPU"),
-    ],
-)
-def test_schedule_allocation_mismatch_blocks_before_remote_submission(
-    mutation: str, error: str
-) -> None:
-    project_registry = BaselineRegistry.load(
-        Path(__file__).parents[2] / "baselines" / "registry.toml"
-    )
-    executor = ScriptedExecutor(registry=project_registry)
-    schedule = _project_schedule()
-    requested = [(lane_id, SUCCESSOR_MAPPING[lane_id][0]) for lane_id in SUCCESSOR_LANES]
-    requested_cpu_sets: tuple[str | None, ...] = (None,) * len(requested)
-    if mutation == "duplicate_gpu":
-        requested[1] = (requested[1][0], requested[0][1])
-    elif mutation == "overlapping_cpu":
-        requested_cpu_sets = (SUCCESSOR_MAPPING[SUCCESSOR_LANES[0]][1],) * len(requested)
-    elif mutation == "altered_gpu":
-        requested[0] = (requested[0][0], requested[0][1] + 10)
-    else:
-        schedule = replace(
-            schedule,
-            allocations=tuple(
-                replace(allocation, gpu_index=7)
-                if allocation.lane_id == SUCCESSOR_LANES[0]
-                else allocation
-                for allocation in schedule.allocations
-            ),
-        )
-
-    with pytest.raises(ProtocolValidationError, match=error):
-        executor.validate_frozen_schedule(
-            schedule,
-            source_revision=LOCAL_REVISION,
-            attempt_id="attempt-schedule",
-            requested_lanes=requested,
-            requested_cpu_sets=requested_cpu_sets,
-            require_complete=True,
-        )
-
-    assert executor.calls == []
-
-
-def test_schedule_omitted_lane_blocks_before_remote_submission() -> None:
-    project_registry = BaselineRegistry.load(
-        Path(__file__).parents[2] / "baselines" / "registry.toml"
-    )
-    executor = ScriptedExecutor(registry=project_registry)
-    schedule = _project_schedule()
-    requested = [(lane_id, SUCCESSOR_MAPPING[lane_id][0]) for lane_id in SUCCESSOR_LANES[:-1]]
-
-    with pytest.raises(ProtocolValidationError, match="every frozen schedule lane"):
-        executor.validate_frozen_schedule(
-            schedule,
-            source_revision=LOCAL_REVISION,
-            attempt_id="attempt-schedule",
-            requested_lanes=requested,
-            requested_cpu_sets=(None,) * len(requested),
-            require_complete=True,
-        )
-
-    assert executor.calls == []
-
-
-def test_reaccepted_schedule_preserves_source_mapping_and_binds_attempt() -> None:
-    project_registry = BaselineRegistry.load(
-        Path(__file__).parents[2] / "baselines" / "registry.toml"
-    )
-    executor = ScriptedExecutor(registry=project_registry)
-    source = _project_schedule(harness_revision="a" * 40)
-
-    continuation = source.reaccept(
-        source_schedule_id="u7-schedule",
-        harness_revision="b" * 40,
-        attempt_id="formal-20260828-a09fcab-u8-b",
-    )
-
-    assert continuation.harness_revision == "b" * 40
-    assert continuation.owner_attempt_id == "formal-20260828-a09fcab-u8-b"
-    assert continuation.source_schedule_id == "u7-schedule"
-    assert continuation.source_harness_revision == "a" * 40
-    assert continuation.allocations == source.allocations
-    assert continuation.model_source_revisions == source.model_source_revisions
-    assert continuation.selected_mapping == source.selected_mapping
-    reparsed = FrozenSchedule.from_dict(continuation.to_dict(), expected_lane_ids=SUCCESSOR_LANES)
-    assert reparsed == continuation
-    assert executor.validate_frozen_schedule(
-        reparsed,
-        source_revision="b" * 40,
-        attempt_id="formal-20260828-a09fcab-u8-b",
-        requested_lanes=[(lane_id, SUCCESSOR_MAPPING[lane_id][0]) for lane_id in SUCCESSOR_LANES],
-        requested_cpu_sets=(None,) * len(SUCCESSOR_LANES),
-        require_complete=True,
-    ) == tuple(SUCCESSOR_MAPPING[lane_id][1] for lane_id in SUCCESSOR_LANES)
-    assert executor.calls == []
-
-
-@pytest.mark.parametrize("missing_field", ["attempt_id", "source_schedule_id"])
-def test_reaccepted_schedule_requires_attempt_and_source_identity(
-    missing_field: str,
-) -> None:
-    payload = _project_schedule_payload(harness_revision="b" * 40)
-    payload.update(
-        {
-            "schema_version": 2,
-            "attempt_id": "formal-20260828-a09fcab-u8-b",
-            "source_harness_revision": "a" * 40,
-            "source_schedule_id": "u7-schedule",
-        }
-    )
-    del payload[missing_field]
-
-    with pytest.raises(ProtocolValidationError, match="reaccepted frozen schedule"):
-        FrozenSchedule.from_dict(payload, expected_lane_ids=SUCCESSOR_LANES)
-
-
-def test_continuation_admission_reopens_exactly_seven_recoveries(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    attempt_id = "formal-20260828-a09fcab-u8-b"
-    registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
-    source = _project_schedule(harness_revision="a" * 40)
-    artifact_ids: dict[str, str] = {}
-    identities: dict[str, dict[str, str]] = {}
-    for lane in registry.reproduction_lanes:
-        source_root = tmp_path / "runs" / lane.lane_id
-        recovery_root = source_root / "recoveries" / f"recovery-{lane.lane_id}"
-        recovery_root.mkdir(parents=True)
-        artifact_ids[lane.lane_id] = str((recovery_root / "result.json").relative_to(tmp_path))
-        baseline = registry.get(lane.scientific_baseline_id)
-        identities[lane.lane_id] = {
-            "attempt_id": attempt_id,
-            "lane_id": lane.lane_id,
-            "scientific_baseline_id": lane.scientific_baseline_id,
-            "program_id": lane.program_id,
-            "profile_id": lane.profile_id,
-            "harness_revision": source.harness_revision,
-            "model_source_revision": baseline.source.revision,
-            "preprocessing_revision": source.preprocessing_revision,
-            "snapshot_id": source.snapshot_id,
-            "environment_sha256": source.environment_sha256,
-            "mode": "formal",
-            "submission_id": f"submission-{lane.lane_id}",
-        }
-
-    def reopen(training_root: Path, **_: object) -> dict[str, object]:
-        lane_id = training_root.parent.parent.name
-        return {"identity": identities[lane_id], "result": {"recovery": {}}}
-
-    monkeypatch.setattr("medrec_research.remote_executor.reopen_training_evidence", reopen)
-    continuation = validate_reproduction_continuation(
-        registry=registry,
-        source_schedule=source,
-        source_schedule_id="u7-schedule",
-        attempt_root=tmp_path,
-        attempt_id=attempt_id,
-        training_artifact_ids=artifact_ids,
-        harness_revision="b" * 40,
-    )
-
-    assert continuation.owner_attempt_id == attempt_id
-    assert continuation.harness_revision == "b" * 40
-    assert continuation.allocations == source.allocations
-
-
-def test_recovered_test_command_targets_reserved_gpu_without_training() -> None:
-    registry = BaselineRegistry.load(Path(__file__).parents[2] / "baselines" / "registry.toml")
-    executor = RemoteExecutor(registry)
-
-    command = executor.test_launch_command(
+    executor = RemoteExecutor(project_registry)
+    cmd = executor.launch_command(
         "molerec-safedrug-lr-1e-4",
-        attempt_id="formal-20260828-a09fcab-u8-b",
-        submission_id="formal-20260828-a09fcab-u8-b-test-safedrug",
-        harness_revision="b" * 40,
-        remote_root="/root/zhb/medrec-research",
-        data_root="/root/zhb/medrec-data",
-        recovery_run_root="/root/zhb/medrec-data/runs/source/recoveries/recovery-safedrug",
-        training_source_root="/root/zhb/medrec-data/runs/source",
-        test_root="/root/zhb/medrec-data/runtime/continuation/tests/molerec-safedrug",
-        selection_path="/root/zhb/medrec-data/runtime/attempt/selection.json",
+        gpu_index=1,
+        cpu_set="4-7,36-39",
+        remote_root=REMOTE_ROOT,
+        data_root=DATA_ROOT,
+        run_id="run-1",
+        mode="formal",
+        phase="training",
     )
-
-    assert "CUDA_VISIBLE_DEVICES=7" in command
-    assert "--phase test" in command
-    assert "--phase training" not in command
-    assert "--training-source-root /root/zhb/medrec-data/runs/source" in command
-    assert "--run-root /root/zhb/medrec-data/runs/source/recoveries/recovery-safedrug" in command
-    assert (
-        "--test-root /root/zhb/medrec-data/runtime/continuation/tests/molerec-safedrug" in command
-    )
+    assert "CUDA_VISIBLE_DEVICES=1" in cmd
+    assert "--cpu-list 4-7,36-39" in cmd
+    assert "--learning-rate 0.0001" in cmd

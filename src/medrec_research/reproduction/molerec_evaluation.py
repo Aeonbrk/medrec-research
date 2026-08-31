@@ -20,6 +20,12 @@ from .evaluation_queue import (
     resolve_training_artifact,
 )
 from .molerec_reproduction_audit import audit_molerec_table1
+from .molerec_table1_attempt import (
+    TABLE1_FIXED_TEST_LANES,
+    TABLE1_PAPER_BASELINES,
+    ReproductionAttemptDeclaration,
+    build_table1_test_launch_command,
+)
 from .reproduction_evidence import reopen_finalized_pair, reopen_training_evidence
 from .safedrug_selection import (
     SAFE_DRUG_LANE_IDS,
@@ -29,13 +35,8 @@ from .safedrug_selection import (
     write_selection,
 )
 
-_FIXED_TEST_LANES = (
-    "molerec-retain",
-    "molerec-leap",
-    "molerec-gamenet",
-    "molerec-embedding",
-)
-_PAPER_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
+_FIXED_TEST_LANES = TABLE1_FIXED_TEST_LANES
+_PAPER_BASELINES = TABLE1_PAPER_BASELINES
 
 
 def _test_submission_id(continuation_id: str, lane_id: str) -> str:
@@ -45,7 +46,8 @@ def _test_submission_id(continuation_id: str, lane_id: str) -> str:
 def prepare_table1_evaluation(
     *,
     state_root: str | Path,
-    registry: BaselineRegistry,
+    registry: BaselineRegistry | None = None,
+    declaration: ReproductionAttemptDeclaration | None = None,
     attempt_root: str | Path,
     attempt_id: str,
     continuation_id: str,
@@ -61,8 +63,13 @@ def prepare_table1_evaluation(
     if destination.exists():
         raise ProtocolValidationError(f"evaluation state already exists: {destination}")
     continuation_id = require_identifier(continuation_id, field="continuation_id")
-    lanes = tuple(registry.reproduction_lanes)
-    lane_ids = tuple(lane.lane_id for lane in lanes)
+    if declaration is None:
+        if registry is None:
+            raise ProtocolValidationError("either declaration or registry is required")
+        declaration = ReproductionAttemptDeclaration.from_registry(registry, attempt_id)
+
+    lanes = declaration.lanes
+    lane_ids = declaration.lane_ids
     if set(training_artifact_ids) != set(lane_ids):
         raise ProtocolValidationError(
             "evaluation preparation requires exactly seven training artifacts"
@@ -82,7 +89,6 @@ def prepare_table1_evaluation(
             source_run_root=source_root,
         )
         identity = evidence["identity"]
-        baseline = registry.get(lane.scientific_baseline_id)
         expected = {
             "attempt_id": attempt_id,
             "lane_id": lane.lane_id,
@@ -90,7 +96,7 @@ def prepare_table1_evaluation(
             "program_id": lane.program_id,
             "profile_id": lane.profile_id,
             "harness_revision": training_harness_revision,
-            "model_source_revision": baseline.source.revision,
+            "model_source_revision": lane.model_source_revision,
             "preprocessing_revision": preprocessing_revision,
             "snapshot_id": snapshot_id,
             "environment_sha256": environment_sha256,
@@ -129,6 +135,7 @@ def prepare_table1_evaluation(
         staging.mkdir()
         selection_path = staging / "selection.json"
         queue_path = staging / "evaluation-queue.json"
+        declaration.write_atomic(staging / "attempt_declaration.json")
         write_selection(selection_path, selection)
         create_evaluation_queue(queue_path, attempt_id=attempt_id)
         for lane_id in test_lanes:
@@ -147,12 +154,11 @@ def prepare_table1_evaluation(
         ledger_lanes: dict[str, dict[str, Any]] = {}
         for lane in lanes:
             is_test_lane = lane.lane_id in test_lanes
-            baseline = registry.get(lane.scientific_baseline_id)
             ledger_lanes[lane.lane_id] = {
                 "scientific_baseline_id": lane.scientific_baseline_id,
                 "program_id": lane.program_id,
                 "profile_id": lane.profile_id,
-                "model_source_revision": baseline.source.revision,
+                "model_source_revision": lane.model_source_revision,
                 "active_submission_id": (
                     _test_submission_id(continuation_id, lane.lane_id)
                     if is_test_lane
@@ -200,9 +206,7 @@ def prepare_table1_evaluation(
                         "scientific_baseline_id": lane_by_id[lane_id].scientific_baseline_id,
                         "program_id": lane_by_id[lane_id].program_id,
                         "profile_id": lane_by_id[lane_id].profile_id,
-                        "model_source_revision": registry.get(
-                            lane_by_id[lane_id].scientific_baseline_id
-                        ).source.revision,
+                        "model_source_revision": lane_by_id[lane_id].model_source_revision,
                         "training_artifact_id": training_artifact_ids[lane_id],
                         "test_submission_id": _test_submission_id(continuation_id, lane_id),
                         "seed_declaration": "upstream source default; no controller override",
@@ -253,7 +257,8 @@ def _continuation_test_root(
 def claim_table1_evaluation(
     *,
     state_root: str | Path,
-    registry: BaselineRegistry,
+    registry: BaselineRegistry | None = None,
+    declaration: ReproductionAttemptDeclaration | None = None,
     attempt_root: str | Path,
     remote_root: str,
     data_root: str,
@@ -288,9 +293,20 @@ def claim_table1_evaluation(
         if entry["lane_id"].startswith("molerec-safedrug")
         else None
     )
-    from ..remote_executor import RemoteExecutor
 
-    command = RemoteExecutor(registry).test_launch_command(
+    if declaration is None:
+        decl_path = state / "attempt_declaration.json"
+        if decl_path.is_file():
+            declaration = ReproductionAttemptDeclaration.from_json(decl_path)
+        elif registry is not None:
+            declaration = ReproductionAttemptDeclaration.from_registry(
+                registry, queue["attempt_id"]
+            )
+        else:
+            raise ProtocolValidationError("attempt declaration or registry is required")
+
+    command = build_table1_test_launch_command(
+        declaration,
         entry["lane_id"],
         attempt_id=queue["attempt_id"],
         submission_id=entry["test_submission_id"],

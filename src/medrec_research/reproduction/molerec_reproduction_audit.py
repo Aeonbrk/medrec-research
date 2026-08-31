@@ -17,10 +17,14 @@ from .._validation import (
     write_json_atomic,
 )
 from ..errors import ProtocolValidationError
+from .molerec_table1_attempt import (
+    TABLE1_PAPER_BASELINES,
+    ReproductionAttemptDeclaration,
+)
 from .reproduction_evidence import reopen_finalized_pair
 from .safedrug_selection import require_selected_safedrug_lane
 
-REQUIRED_MOLEREC_BASELINES = ("retain", "leap", "gamenet", "safedrug", "molerec")
+REQUIRED_MOLEREC_BASELINES = TABLE1_PAPER_BASELINES
 SCIENTIFIC_IDENTITY_IDS = {
     "retain": "retain",
     "leap": "leap-safedrug",
@@ -128,7 +132,11 @@ def load_molerec_table1_reference(
     return result
 
 
-def _load_ledger(path: Path) -> dict[str, Any]:
+def _load_ledger(
+    path: Path,
+    *,
+    declaration: ReproductionAttemptDeclaration | None = None,
+) -> dict[str, Any]:
     try:
         parsed = parse_json_object(
             path.read_text(encoding="utf-8"), context="MoleRec attempt ledger"
@@ -163,6 +171,15 @@ def _load_ledger(path: Path) -> dict[str, Any]:
         root["environment_sha256"], field="ledger.environment_sha256"
     )
 
+    if declaration is not None:
+        expected_lane_ids = declaration.lane_ids
+    else:
+        decl_path = path.parent / "attempt_declaration.json"
+        if decl_path.is_file():
+            expected_lane_ids = ReproductionAttemptDeclaration.from_json(decl_path).lane_ids
+        else:
+            expected_lane_ids = REQUIRED_LANE_IDS
+
     test_lane_ids = root["test_lane_ids"]
     if not isinstance(test_lane_ids, Mapping) or set(test_lane_ids) != set(
         REQUIRED_MOLEREC_BASELINES
@@ -174,14 +191,14 @@ def _load_ledger(path: Path) -> dict[str, Any]:
         )
         for baseline_id in REQUIRED_MOLEREC_BASELINES
     }
-    if not set(normalized_test_lane_ids.values()).issubset(set(REQUIRED_LANE_IDS)):
+    if not set(normalized_test_lane_ids.values()).issubset(set(expected_lane_ids)):
         raise ProtocolValidationError("ledger.test_lane_ids contains an undeclared lane")
 
     lanes = root["lanes"]
-    if not isinstance(lanes, Mapping) or set(lanes) != set(REQUIRED_LANE_IDS):
+    if not isinstance(lanes, Mapping) or set(lanes) != set(expected_lane_ids):
         raise ProtocolValidationError("ledger.lanes must contain exactly seven declared lanes")
     normalized_lanes: dict[str, dict[str, Any]] = {}
-    for lane_id in REQUIRED_LANE_IDS:
+    for lane_id in expected_lane_ids:
         lane = strict_fields(
             lanes[lane_id],
             required=(
@@ -420,13 +437,14 @@ def audit_molerec_table1(
     reference_path: Path | None = None,
     selection_path: Path | None = None,
     data_root: Path | None = None,
+    declaration: ReproductionAttemptDeclaration | None = None,
 ) -> dict[str, Any]:
     """Audit finalized five-model artifacts without treating direction as reproduction."""
     del data_root
     reference = load_molerec_table1_reference(
         reference_path or Path("research/baseline-preflight/molerec-table1-reference.json")
     )
-    ledger = _load_ledger(ledger_path)
+    ledger = _load_ledger(ledger_path, declaration=declaration)
     result_lane_ids = ledger["test_lane_ids"]
     selection_valid, selection_error = _read_selection(
         selection_path,

@@ -62,7 +62,7 @@ from .registry import (
     SourceIdentity,
     SourceStatus,
 )
-from .remote_executor import FrozenSchedule, RemoteExecutor, SSHConfig
+from .remote_executor import RemoteExecutor, SSHConfig
 from .run_record import ArtifactChecksum, RunParameter, RunParameterValue, RunRecord
 
 __all__ = (
@@ -90,7 +90,6 @@ __all__ = (
     "DecoderClass",
     "DecoderProfile",
     "EvaluationResult",
-    "FrozenSchedule",
     "IndependentEvaluationInput",
     "JoinedComparisonBatch",
     "MedicationScore",
