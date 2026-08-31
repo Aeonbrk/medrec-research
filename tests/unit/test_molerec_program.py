@@ -180,19 +180,21 @@ def test_embedding_profile_declares_embedding_training_argument() -> None:
 
 
 def test_validate_binary_symmetric_matrix_rejects_asymmetry() -> None:
+    data_mod = sys.modules.get("molerec_data") or sys.modules.get("baselines.molerec_data")
     ddi = [[0] * 131 for _ in range(131)]
     ddi[0][1] = 1
     ddi[1][0] = 0
 
     with pytest.raises(adapter.ReproductionError, match="asymmetric"):
-        adapter._validate_binary_symmetric_matrix(ddi, 131)
+        data_mod._validate_binary_symmetric_matrix(ddi, 131)
 
 
 def test_validate_records_statistics_rejects_invalid_counts() -> None:
+    data_mod = sys.modules.get("molerec_data") or sys.modules.get("baselines.molerec_data")
     records = [[[list(range(5)), list(range(5)), list(range(5))]]]
 
     with pytest.raises(adapter.ReproductionError, match="mismatch"):
-        adapter._validate_records_statistics(records)
+        data_mod._validate_records_statistics(records)
 
 
 def test_parse_training_log_extracts_best_epoch() -> None:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import Any
 
 from .._validation import (
@@ -19,6 +19,7 @@ from .molerec_table1_attempt import ReproductionAttemptDeclaration
 from .reproduction_evidence import (
     canonical_training_artifact_id,
     reopen_training_evidence,
+    resolve_training_artifact,
 )
 from .safedrug_selection import SAFE_DRUG_LANE_IDS, require_selected_safedrug_lane
 
@@ -285,40 +286,6 @@ def admit_evaluation(
     queue["entries"].append(entry)
     write_evaluation_queue(path, queue, declaration=declaration)
     return entry
-
-
-def resolve_training_artifact(
-    attempt_root: str | Path,
-    training_artifact_id: str,
-) -> tuple[Path, Path | None, str]:
-    """Resolve an attempt-owned result ID into its run and optional recovery source."""
-    artifact_id = require_string(training_artifact_id, field="training_artifact_id")
-    relative = PurePosixPath(artifact_id)
-    if (
-        relative.is_absolute()
-        or relative.name != "result.json"
-        or ".." in relative.parts
-        or str(relative) != artifact_id
-    ):
-        raise ProtocolValidationError("training_artifact_id must be a relative result.json path")
-    attempt_path = Path(attempt_root).resolve()
-    artifact_path = attempt_path.joinpath(*relative.parts)
-    try:
-        artifact_path.resolve().relative_to(attempt_path)
-    except ValueError as error:
-        raise ProtocolValidationError("training artifact is outside its attempt root") from error
-
-    recovery_positions = [
-        index for index, part in enumerate(relative.parts[:-1]) if part == "recoveries"
-    ]
-    if recovery_positions:
-        if len(recovery_positions) != 1 or recovery_positions[0] != len(relative.parts) - 3:
-            raise ProtocolValidationError("training recovery artifact path is invalid")
-        recovery_root = artifact_path.parent
-        source_root = recovery_root.parent.parent
-    else:
-        source_root = None
-    return artifact_path.parent, source_root, artifact_id
 
 
 def admit_validated_training_evaluation(

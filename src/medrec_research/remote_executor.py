@@ -319,24 +319,24 @@ class RemoteExecutor:
             program=program,
         )
         session_id = f"medrec-baseline-{baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
-        command = self._launch_command(
-            program,
-            baseline_id=baseline.baseline_id,
-            profile_id=profile_id,
-            learning_rate=learning_rate,
-            remote_root=remote_root,
-            data_root=data_root,
-            gpu_index=gpu_index,
-            run_id=session_id,
-            mode="formal",
-            attempt_id=active_attempt_id,
-            lane_id=lane_id,
-            harness_revision=source_revision,
-            model_source_revision=baseline.source.revision,
-            environment_sha256=program.environment_sha256 or "unverified",
-            cpu_set=cpu_set,
-        )
         if dry_run:
+            command = self._launch_command(
+                program,
+                baseline_id=baseline.baseline_id,
+                profile_id=profile_id,
+                learning_rate=learning_rate,
+                remote_root=remote_root,
+                data_root=data_root,
+                gpu_index=gpu_index,
+                run_id=session_id,
+                mode="formal",
+                attempt_id=active_attempt_id,
+                lane_id=lane_id,
+                harness_revision=source_revision,
+                model_source_revision=baseline.source.revision,
+                environment_sha256=program.environment_sha256 or "unverified",
+                cpu_set=cpu_set,
+            )
             return RemoteSubmission(
                 baseline_id=baseline_id,
                 host=None,
@@ -473,24 +473,24 @@ class RemoteExecutor:
         active_attempt_id = attempt_id or f"attempt-{self._timestamp()}-{secrets.token_hex(4)}"
         self._validate_job_id(active_attempt_id)
         session_id = f"medrec-smoke-{baseline_id}-{self._timestamp()}-{secrets.token_hex(4)}"
-        command = self._launch_command(
-            program,
-            baseline_id=baseline.baseline_id,
-            profile_id=profile_id,
-            learning_rate=learning_rate,
-            remote_root=remote_root,
-            data_root=data_root,
-            gpu_index=gpu_index,
-            run_id=session_id,
-            mode="smoke",
-            attempt_id=active_attempt_id,
-            lane_id=lane_id,
-            harness_revision=source_revision,
-            model_source_revision=baseline.source.revision,
-            environment_sha256=program.environment_sha256 or "unverified",
-            cpu_set=cpu_set,
-        )
         if dry_run:
+            command = self._launch_command(
+                program,
+                baseline_id=baseline.baseline_id,
+                profile_id=profile_id,
+                learning_rate=learning_rate,
+                remote_root=remote_root,
+                data_root=data_root,
+                gpu_index=gpu_index,
+                run_id=session_id,
+                mode="smoke",
+                attempt_id=active_attempt_id,
+                lane_id=lane_id,
+                harness_revision=source_revision,
+                model_source_revision=baseline.source.revision,
+                environment_sha256=program.environment_sha256 or "unverified",
+                cpu_set=cpu_set,
+            )
             return RemoteSubmission(
                 baseline_id=baseline_id,
                 host=None,
@@ -868,7 +868,7 @@ class RemoteExecutor:
 
     @staticmethod
     def _validate_job_id(job_id: str) -> None:
-        if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", job_id):
+        if not _PUBLIC_ID.fullmatch(job_id):
             raise ProtocolValidationError("job_id must be a safe identifier")
 
     @staticmethod

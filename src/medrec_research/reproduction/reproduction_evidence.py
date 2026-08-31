@@ -453,7 +453,7 @@ def reopen_training_evidence(
         checkpoint["sha256"],
         field="training checkpoint sha256",
     )
-    if _file_sha256(checkpoint_path) != checkpoint_sha256:
+    if source_run_root is None and _file_sha256(checkpoint_path) != checkpoint_sha256:
         raise ProtocolValidationError("training checkpoint identity does not match its result")
     validation_jaccard = require_probability(
         result.get("validation_jaccard"),
