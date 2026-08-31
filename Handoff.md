@@ -11,6 +11,7 @@ The five-model baseline preparation is complete.
 - Comparison revision `9fa239269f5a9ac0c394263ebe0ba3c02fbdafc5` produced five target-free Unified Research Protocol v1.1 qualifications under one shared scope.
 - RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec are all `comparison_ready` in `baselines/registry.toml`. The built-in reference remains `registered` and is not part of the five-model suite.
 - SafeDrug and MoleRec Comparison qualifications used the user-authorized shared-GPU Phase B exception on GPU 0 at 0% prelaunch utilization and 22,359 MiB free. The resident external process was not stopped. No model behavior, selection rule, threshold, decoder, target ownership, or evaluator changed.
+- Future remote GPU admission is utilization- and capacity-based: current utilization must be at most 10% and the run's free-memory threshold must pass. Existing external PIDs are ignored for admission and must not be stopped, preempted, or attached to.
 
 ## Terminal conclusions
 

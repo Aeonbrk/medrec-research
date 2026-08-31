@@ -2,17 +2,17 @@
 
 The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
 
-## Current snapshot (2026-08-29)
+## Current snapshot (2026-08-31)
 
 **SSH Connection**: ⚠️ Primary `319-lab` failed its preflight; approved fallback `319-lab-via-server` authenticated and was used for read-only checks and additive recovery work  
-**GPU Status**: ✅ 8× NVIDIA GeForce RTX 3090 (24 GiB each) were idle during the recovery preflight  
+**GPU Status**: ✅ 8× NVIDIA GeForce RTX 3090 (24 GiB each); resident external GPU processes are permitted when current utilization is at most 10% and the run's free-memory threshold passes
 **Disk**: ✅ `/root/zhb` filesystem had >2.5 TiB free capacity during the recovery preflight  
 **Repository**: ✅ `/root/zhb/medrec-research` remains a clean checkout at `a09fcab8c3760a5caa14ec3ab475ddf4152a3665`; the additive recovery worktree did not alter it  
 **Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured outside the checkout  
 **Conda Environment**: ✅ `medrec-molerec-table1` exists with the declared Python 3.8.16 runtime and was used for program-native recovery validation  
 **Reproduction Program**: ✅ SafeDrug archived and MoleRec program façades validated the seven recovery lanes without training or testing hooks
 
-**Status Summary**: SafeDrug `main` runs are historical only. The current attempt is `formal-20260828-a09fcab-u8-b`; all seven source lanes are terminal `training_failed` pairs with one validated immutable recovery sibling each. No test result exists. The frozen schedule is bound to the old harness revision above and must be re-accepted against the final clean revision before any formal submission.
+**Status Summary**: SafeDrug `main` runs are historical only. Attempt `formal-20260828-a09fcab-u8-b` completed through the authorized continuation with Reproduction verdict `completed_mismatch`; the five target baselines are Comparison-qualified under one Unified Research Protocol v1.1 scope.
 
 ## Verified snapshot
 
@@ -29,7 +29,7 @@ Do not launch a real run until all conditions hold:
 - A verified 319 checkout points to the exact source revision. The intended remote root is configurable and must not reuse the archived `New-Search` checkout.
 - `MEDREC_DATA_ROOT` exists outside the checkout on 319.
 - The declared baseline source revision, Reproduction Program, Conda environment, and requested scientific mode satisfy the run.
-- GPU memory and disk capacity are adequate without disrupting another job.
+- Current GPU utilization is at most 10%, the run's declared free-memory threshold passes, and disk capacity is adequate.
 
 The repository has a Git history and an `origin` remote. A 2026-08-12 read-only observation found a clean `/root/zhb/medrec-research` checkout through the fallback profile, but its revision differed from the current local accepted revision and `MEDREC_DATA_ROOT` was not configured. This supersedes the earlier missing-checkout observation without authorizing synchronization or environment changes.
 
@@ -62,7 +62,7 @@ test ! -e /root/zhb/medrec-research || git -C /root/zhb/medrec-research status -
 '
 ```
 
-A busy GPU is unavailable even when some memory remains. An empty `nvidia-smi` process table does not override observed memory use or utilization because process visibility may differ across containers or permissions. Do not kill, preempt, or attach to another user's process.
+A GPU is admissible when its current utilization is at most 10% and its free memory meets the run's declared threshold. Existing external PIDs are not an admission blocker: do not query them merely to decide admission, and never kill, preempt, or attach to them. Utilization above 10% or insufficient free memory blocks launch.
 
 ## Source deployment
 
@@ -133,9 +133,9 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research reproduce gamenet \
   --dry-run
 ```
 
-Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. Successor formal lanes additionally require an attempt-owned frozen schedule supplied with `--schedule`; the requested GPU order and CPU sets must match that artifact exactly, with GPU 7 reserved. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, scheduled idle GPUs, and free disk before creating one tmux session. A failed preflight or schedule gate creates no tmux state.
+Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. Successor formal lanes additionally require an attempt-owned frozen schedule supplied with `--schedule`; the requested GPU order and CPU sets must match that artifact exactly, with GPU 7 reserved. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, GPU utilization at most 10%, the declared free-memory threshold, and free disk before creating one tmux session. A failed preflight or schedule gate creates no tmux state.
 
-The checked-in registry leaves every archived lane at `registered` and the program environment identity unresolved. This keeps Comparison Mode unqualified and real reproduction blocked while allowing dry-run. Do not restore removed main-oriented declarations or raise readiness without the required evidence.
+The checked-in registry marks RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec `comparison_ready` only for their recorded v1.1 scope; the built-in reference remains `registered`. Readiness does not waive a new run's source, environment, data, GPU-capacity, or disk preflight.
 
 ### Archived implementation gate
 

@@ -198,7 +198,6 @@ class ScriptedExecutor(RemoteExecutor):
             "environment": ENVIRONMENT_SHA256,
             "program-probe": _valid_probe_json(baseline_match),
             "gpu": self.gpu_output,
-            "gpu-processes": "",
             "disk": str(200 * 1024 * 1024),
             "tmux-launch": "",
             "tmux-cleanup": "",
@@ -371,7 +370,6 @@ def test_successful_preflight_precedes_explicit_tmux_launch() -> None:
         "baseline-inputs",
         "environment",
         "gpu",
-        "gpu-processes",
         "disk",
         "program-probe",
         "tmux-launch",
@@ -454,7 +452,6 @@ def test_safedrug_family_profiles_launch_and_preflight() -> None:
         "environment",
         "program-probe",
         "gpu",
-        "gpu-processes",
         "disk",
     ],
 )
@@ -563,10 +560,8 @@ def test_failed_preflight_never_creates_tmux(gate: str) -> None:
         ),
         ({"gpu": "not,a,valid,report,shape"}, "GPU report is invalid"),
         ({"gpu": "1, GPU-0, 24000, 0"}, "GPU report is invalid"),
-        ({"gpu": "0, GPU-0, 24000, 1"}, "GPU is busy"),
+        ({"gpu": "0, GPU-0, 24000, 10.1"}, "GPU is busy"),
         ({"gpu": "0, GPU-0, 19999, 0"}, "GPU capacity is insufficient"),
-        ({"gpu-processes": "not-a-gpu-uuid"}, "GPU process report is invalid"),
-        ({"gpu-processes": "GPU-0"}, "GPU is busy"),
         ({"disk": "not-an-integer"}, "disk report is invalid"),
         ({"disk": str(99 * 1024 * 1024)}, "disk capacity is insufficient"),
     ],
@@ -617,16 +612,17 @@ def test_program_probe_requires_every_declared_runtime_check() -> None:
     assert "tmux-launch" not in [gate for _, _, gate in executor.calls]
 
 
-def test_nvidia_idle_process_sentinel_allows_tmux_launch() -> None:
-    executor = ScriptedExecutor(responses={"gpu-processes": "No running processes found"})
+def test_shared_gpu_at_utilization_limit_allows_tmux_launch_without_process_query() -> None:
+    executor = ScriptedExecutor(gpu_output="0, GPU-0, 24000, 10")
 
     _run(executor)
 
     assert "tmux-launch" in [gate for _, _, gate in executor.calls]
+    assert "gpu-processes" not in [gate for _, _, gate in executor.calls]
 
 
 def test_busy_gpu_fails_before_tmux() -> None:
-    executor = ScriptedExecutor(gpu_output="0, GPU-0, 24000, 1")
+    executor = ScriptedExecutor(gpu_output="0, GPU-0, 24000, 10.1")
 
     with pytest.raises(ProtocolValidationError, match="GPU is busy"):
         _run(executor)

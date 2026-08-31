@@ -26,6 +26,7 @@ from .reproduction_evidence import reopen_training_evidence
 
 APPROVED_319_HOSTS = ("319-lab", "319-lab-via-server")
 PREPROCESSING_REVISION = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"
+MAX_SHARED_GPU_UTILIZATION_PERCENT = 10.0
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40,64}")
 _PUBLIC_ID = re.compile(r"[A-Za-z0-9._-]{1,128}")
 _GPU_UUID = re.compile(r"GPU-[A-Za-z0-9-]+")
@@ -609,25 +610,11 @@ class RemoteExecutor:
             "--format=csv,noheader,nounits",
             gate="gpu",
         )
-        gpu_uuid = self._validate_gpu(
+        self._validate_gpu(
             gpu_output,
             gpu_index=gpu_index,
             min_free_gpu_mib=min_free_gpu_mib,
         )
-        process_output = self.ssh(
-            host,
-            "nvidia-smi --query-compute-apps=gpu_uuid --format=csv,noheader",
-            gate="gpu-processes",
-        )
-        process_uuids = (
-            set()
-            if process_output.strip() == "No running processes found"
-            else {line.strip() for line in process_output.splitlines() if line.strip()}
-        )
-        if any(not _GPU_UUID.fullmatch(value) for value in process_uuids):
-            raise ProtocolValidationError("remote GPU process report is invalid")
-        if gpu_uuid in process_uuids:
-            raise ProtocolValidationError("remote GPU is busy")
 
         disk_output = self.ssh(
             host,
@@ -1273,7 +1260,7 @@ class RemoteExecutor:
         gpu_uuid = fields[1]
         if observed_index != gpu_index or not _GPU_UUID.fullmatch(gpu_uuid):
             raise ProtocolValidationError("remote GPU report is invalid")
-        if utilization != 0:
+        if not 0 <= utilization <= MAX_SHARED_GPU_UTILIZATION_PERCENT:
             raise ProtocolValidationError("remote GPU is busy")
         if free_memory_mib < min_free_gpu_mib:
             raise ProtocolValidationError("remote GPU capacity is insufficient")
