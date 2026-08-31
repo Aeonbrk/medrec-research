@@ -13,12 +13,12 @@ Use this page to find the source of truth for the question in front of you.
 
 - [`PLANS.md`](PLANS.md) lists accepted multi-step work and its current outcome.
 - [`plans/`](plans/) contains implementation-ready plans and their decision history.
-- [`playbooks/index.md`](playbooks/index.md) routes operational work to the relevant playbook (including [`SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md`](playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md)).
+- [`playbooks/index.md`](playbooks/index.md) routes operational work to the relevant playbook (including [`MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`](playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md) and [`REMOTE_319_EXECUTION_PLAYBOOK.md`](playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md)).
 
 ## Inspect research state
 
 - [`../baselines/registry.toml`](../baselines/registry.toml) is the baseline identity, Reproduction Program, and readiness registry.
-- [`../baselines/safedrug_archived.py`](../baselines/safedrug_archived.py) is the implemented four-lane archived Reproduction Program.
+- [`../baselines/safedrug_archived.py`](../baselines/safedrug_archived.py) and [`../baselines/molerec.py`](../baselines/molerec.py) are the implemented Reproduction Programs for the five-model suite across seven lanes.
 - [`../research/README.md`](../research/README.md) explains curated Research Memory and Failure Records.
 - [`../README.md`](../README.md) gives runnable local commands and the current public-safe status.
 

@@ -66,7 +66,7 @@ Use `medrec` or `medrec-research` after `uv sync`:
      --dry-run
    ```
 
-6. **Plan four independent archived lanes**:
+6. **Plan multiple independent reproduction lanes**:
 
    ```bash
    rtk proxy /opt/homebrew/bin/uv run medrec reproduce all \

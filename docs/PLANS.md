@@ -88,10 +88,10 @@
   - Validated all 3/3 core publication scientific claims/relationships (SafeDrug Jaccard > GAMENet Jaccard, SafeDrug F1 > GAMENet F1, SafeDrug DDI < LEAP DDI).
   - Generated deterministic Table 2 audit packet (`completed_mismatch`, 12/20 point intervals within $2\sigma$, 3/3 relationships passed).
 
-## Accepted: SafeDrug Archived Single-Baseline Program
+## Completed (Superseded): SafeDrug Archived Single-Baseline Program
 
-- **Status**: in progress since `2026-08-23`; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the only active SafeDrug-family model source and the common baseline for future innovation. The shared four-model Reproduction Program, registry-driven dry-run, local synthetic contract tests, and 319 environment gate are implemented; the paper-lineage data gate remains blocked.
+- **Status**: completed and superseded; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` was consolidated under the four-model reproduction plan (`docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`) and five-model baseline readiness plan (`docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`).
 - **Plan**: `docs/plans/2026-08-23-archived-single-baseline-plan.md`.
 - **Scope**: reuse the existing `gamenet`, `safedrug`, `retain`, and `leap-safedrug` IDs under one archived lineage; regenerate paper-matching preprocessing, add only the mechanical training-mode adaptation required by the archived entrypoints, run four independent GPU lanes, and compare aggregate results with SafeDrug Table 2.
-- **Execution boundary**: no archived run is launchable until the exact paper aggregate counts pass, the training-mode adaptation is audited, and the archived environment succeeds. SafeDrug `main` receives no new registry identity or future run lane.
-- **Follow-on**: the decision history in this plan remains authoritative; the implementation-ready full execution is owned by `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
+- **Execution boundary**: superseded by the completed MoleRec Table 1 five-model reproduction and comparison qualification.
+- **Follow-on**: the decision history in this plan remains authoritative; the full execution was completed in subsequent formal attempts.

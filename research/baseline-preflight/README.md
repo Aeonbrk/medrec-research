@@ -1,14 +1,15 @@
 # Active baseline execution preflight
 
-Every active baseline remains `registered`. No archived result is Comparison Mode evidence.
+All five scientific baselines are `comparison_ready` under their recorded v1.1 Comparison Scope. See [`five-model-baseline-readiness-report.md`](five-model-baseline-readiness-report.md) and [`molerec-five-model-reproduction-report.md`](molerec-five-model-reproduction-report.md).
 
-| Baseline | Pinned source | Role |
-| --- | --- | --- |
-| GAMENet | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
-| SafeDrug | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
-| RETAIN | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
-| LEAP-SafeDrug | `ycq091044/SafeDrug@8deee38` | Archived paper-reproduction implementation |
+| Baseline | Pinned source | Role | Readiness |
+| --- | --- | --- | --- |
+| GAMENet | `ycq091044/SafeDrug@8deee38` | Archived paper reproduction / URP v1.1 comparison | `comparison_ready` |
+| SafeDrug | `ycq091044/SafeDrug@8deee38` | Archived paper reproduction / URP v1.1 comparison | `comparison_ready` |
+| RETAIN | `ycq091044/SafeDrug@8deee38` | Archived paper reproduction / URP v1.1 comparison | `comparison_ready` |
+| LEAP-SafeDrug | `ycq091044/SafeDrug@8deee38` | Archived paper reproduction / URP v1.1 comparison | `comparison_ready` |
+| MoleRec | `yangnianzu0515/MoleRec@dd5afaf` | Table 1 paper reproduction / URP v1.1 comparison | `comparison_ready` |
 
-The four SafeDrug-family entries use one archived preprocessing, split, and evaluation suite. They are distinct model lanes, not four source authorities. No second external baseline lineage participates in the active registry.
+The five models use two Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) and seven reproduction lanes bound to the verified `medrec-molerec-table1` environment.
 
-Before a real run, the 319 checkout, restricted data root, source checkouts, isolated Conda environments, GPU capacity, and disk capacity must pass the remote execution playbook. Store all patient data, generated datasets, environments, checkpoints, predictions, and logs outside Git.
+Before any new remote run, the 319 checkout, restricted data root, source checkouts, isolated Conda environments, GPU capacity, and disk capacity must pass the remote execution playbook. Store all patient data, generated datasets, environments, checkpoints, predictions, and logs outside Git.

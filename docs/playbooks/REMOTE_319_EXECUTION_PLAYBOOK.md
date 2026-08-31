@@ -137,15 +137,13 @@ Dry-run validates registry identity, local Git revision, paths, and thresholds, 
 
 The checked-in registry marks RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec `comparison_ready` only for their recorded v1.1 scope; the built-in reference remains `registered`. Readiness does not waive a new run's source, environment, data, GPU-capacity, or disk preflight.
 
-### Archived implementation gate
+### Implementation gate and readiness
 
-Submission remains blocked. The registered SafeDrug source is `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`. This branch stores generated inputs directly under `data/`, and all four entrypoints set `--Test` to `store_true, default=True`.
+The registered SafeDrug source is `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` and MoleRec is `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`. Both reproduction programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) and their isolated Conda environment (`medrec-molerec-table1`, lock SHA256 `6a01d313...`) are verified.
 
-`baselines/safedrug_archived.py` now provides one shared four-model Reproduction Program. It fails unless the five paper counts match, creates an external run-scoped work tree, performs the sole audited training adaptation in a copied entrypoint, runs the original entrypoint with explicit `--Test`, and validates checkpoint plus ten-round aggregate output. It preserves the archived learning-rate defaults: GAMENet `1e-4`; SafeDrug, RETAIN, and LEAP `5e-4`. The paper's SafeDrug `2e-4` statement is not silently substituted.
+All five scientific baselines (RETAIN, LEAP, GAMENet, SafeDrug, MoleRec) are marked `comparison_ready` under their recorded v1.1 Comparison Scope. Any new attempt or scope change requires prospective preflight and qualification.
 
-The Baseline Registry already owns the program entrypoint, external source/data/run paths, required inputs, environment name, and import probe for all four lanes. The clean exact harness Git revision binds the checked-in program; a second file hash would not change a preflight decision and is not recorded. Before real submission, synchronize clean checkouts, regenerate the archived dataset outside Git, pass the five-count B0 gate, create and verify the archived Conda environment, run the no-training adaptation/import smoke on 319, then record the observed `environment_sha256`. Until that fact exists, keep every baseline at `registered`; dry-run remains usable and real submission remains blocked.
-
-Plan all four independent lanes with:
+Dry-run plan across available GPUs with:
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run medrec-research reproduce all \

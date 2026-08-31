@@ -51,7 +51,7 @@ Remove AI artifacts from any external-facing text:
 Medical AI research codebase focused on:
 
 - General medication recommendation research library and Unified Research Protocol
-- Registry-driven Reproduction Programs (SafeDrug archived lineage: GAMENet, SafeDrug, RETAIN, LEAP)
+- Registry-driven Reproduction Programs (SafeDrug archived and MoleRec lineages: GAMENet, SafeDrug, RETAIN, LEAP, MoleRec)
 - Remote 319 execution plane and public-safe evidence intake
 
 ### Quick Navigation
@@ -69,7 +69,6 @@ Import additional rules:
 
 - @~/.claude/CLAUDE.md (global conventions)
 - @~/.claude/RTK.md (token optimization)
-- @.claude/rules/subagent-patterns.md
 - @.claude/rules/verification.md
 
 ---
@@ -105,14 +104,15 @@ Before completion, run the repository gates listed below.
 ### Baseline Programs
 
 - Registry: `baselines/registry.toml`
-- Reproduction entrypoint: `baselines/safedrug_archived.py`
+- Reproduction entrypoints: `baselines/safedrug_archived.py`, `baselines/molerec.py`
+- Comparison suite: `baselines/five_model_comparison.py`
 - CLI commands: `rtk proxy /opt/homebrew/bin/uv run medrec reproduce <baseline-id> --gpu <id> --dry-run`
-- Remote execution: Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`
+- Remote execution: Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` and `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`
 
 ### Dataset Conventions
 
 - Local Data Root: Repository-independent data root on 319, see `docs/playbooks/LOCAL_DATA_ROOT_PLAYBOOK.md`
-- Preparation & Preprocessing: See `docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md`
+- Preparation & Preprocessing: See `docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md` and `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`
 - Verification: Pinned SHA-256 and semantic bridge checks prior to snapshot publication
 
 ---
@@ -147,8 +147,6 @@ Skills load automatically by context:
 ---
 
 ## Subagent Delegation
-
-See @.claude/rules/subagent-patterns.md
 
 ### Work Directly
 

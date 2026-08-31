@@ -33,6 +33,13 @@ The five-model baseline preparation is complete.
 - `research/baseline-preflight/five-model-baseline-readiness-report.md` — per-model two-axis readiness report.
 - `baselines/registry.toml` — current Comparison readiness authority.
 
+## Operational snapshot
+
+- **Branch**: `refactor/reproduction-namespace-isolation`
+- **Head commit**: `9c36ee5` (`refactor(core): isolate reproduction attempts into dedicated namespace`)
+- **Suite health**: 312 unit/integration tests passing; `ruff` lint and formatting clean.
+- **Namespace structure**: `src/medrec_research/reproduction/` houses reproduction attempt controllers; core package remains protocol-agnostic.
+
 ## Next focus
 
 The suite may now be used for downstream mechanism experiments that stay inside the recorded Comparison Scope. A new dataset, cohort, feature set, medication vocabulary, DDI asset, protocol version, Adaptation Budget, threshold, decoder, or model configuration creates a different scope and requires prospective qualification. Reproduction mismatches remain visible and must not be tuned away.
