@@ -641,15 +641,12 @@ def validate_table1_frozen_schedule(
         schedule_sources = dict(schedule.model_source_revisions)
         for lane in declaration.lanes:
             baseline_source = lane.model_source_revision
-            # Check model source revision in schedule matches declaration
+            source_key = (
+                "safedrug_archived" if lane.program_id == "safedrug-archived" else "molerec"
+            )
             if (
-                lane.program_id == "safedrug-archived"
-                and "safedrug_archived" in schedule_sources
-                and schedule_sources["safedrug_archived"] != baseline_source
-            ) or (
-                lane.program_id == "molerec"
-                and "molerec" in schedule_sources
-                and schedule_sources["molerec"] != baseline_source
+                source_key not in schedule_sources
+                or schedule_sources[source_key] != baseline_source
             ):
                 raise ProtocolValidationError(
                     f"frozen schedule model source revision for '{lane.lane_id}' is mismatched"

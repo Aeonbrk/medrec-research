@@ -171,7 +171,8 @@ class RemoteExecutor:
             f"test -d {quoted_data_root} && "
             f"data_real=$(realpath -- {quoted_data_root}) && "
             f"repo_real=$(realpath -- {quoted_remote_root}) && "
-            'case "$data_real/" in "$repo_real/"*) exit 1;; esac && printf ok'
+            'case "$data_real/" in "$repo_real/"*) exit 1;; esac && '
+            'case "$repo_real/" in "$data_real/"*) exit 1;; esac && printf ok'
         )
         if self.ssh(host, data_check, gate="data-root") != "ok":
             raise ProtocolValidationError("remote data-root check failed")
@@ -301,6 +302,7 @@ class RemoteExecutor:
         dry_run: bool = False,
         attempt_id: str | None = None,
         cpu_set: str | None = None,
+        preprocessing_revision: str | None = None,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode formal run."""
         cpu_set = self._validate_cpu_set(cpu_set)
@@ -334,6 +336,7 @@ class RemoteExecutor:
                 lane_id=lane_id,
                 harness_revision=source_revision,
                 model_source_revision=baseline.source.revision,
+                preprocessing_revision=preprocessing_revision,
                 environment_sha256=program.environment_sha256 or "unverified",
                 cpu_set=cpu_set,
             )
@@ -374,6 +377,7 @@ class RemoteExecutor:
             lane_id=lane_id,
             harness_revision=source_revision,
             model_source_revision=baseline.source.revision,
+            preprocessing_revision=preprocessing_revision,
             environment_sha256=result.environment_sha256,
             cpu_set=cpu_set,
         )
@@ -412,6 +416,7 @@ class RemoteExecutor:
         cpu_set: str | None = None,
         harness_revision: str | None = None,
         environment_sha256: str | None = None,
+        preprocessing_revision: str | None = None,
         run_root_override: str | None = None,
         training_source_root: str | None = None,
         test_root: str | None = None,
@@ -435,6 +440,7 @@ class RemoteExecutor:
             harness_revision=harness_revision,
             model_source_revision=baseline.source.revision,
             environment_sha256=environment_sha256 or program.environment_sha256 or "unverified",
+            preprocessing_revision=preprocessing_revision,
             cpu_set=cpu_set,
             run_root_override=run_root_override,
             training_source_root=training_source_root,
@@ -455,6 +461,7 @@ class RemoteExecutor:
         dry_run: bool = False,
         attempt_id: str | None = None,
         cpu_set: str | None = None,
+        preprocessing_revision: str | None = None,
     ) -> RemoteSubmission:
         """Validate, preflight, and submit one declared Reproduction Mode smoke run."""
         cpu_set = self._validate_cpu_set(cpu_set)
@@ -488,6 +495,7 @@ class RemoteExecutor:
                 lane_id=lane_id,
                 harness_revision=source_revision,
                 model_source_revision=baseline.source.revision,
+                preprocessing_revision=preprocessing_revision,
                 environment_sha256=program.environment_sha256 or "unverified",
                 cpu_set=cpu_set,
             )
@@ -527,6 +535,7 @@ class RemoteExecutor:
             lane_id=lane_id,
             harness_revision=source_revision,
             model_source_revision=baseline.source.revision,
+            preprocessing_revision=preprocessing_revision,
             environment_sha256=result.environment_sha256,
             cpu_set=cpu_set,
         )
@@ -619,7 +628,11 @@ class RemoteExecutor:
         data_root = self._remote_path(data_root, field="data_root")
         repository_path = PurePosixPath(remote_root)
         data_path = PurePosixPath(data_root)
-        if data_path == repository_path or repository_path in data_path.parents:
+        if (
+            data_path == repository_path
+            or repository_path in data_path.parents
+            or data_path in repository_path.parents
+        ):
             raise ProtocolValidationError("data_root must be outside remote_root")
         self._validate_declaration(baseline, prog, require_verified=require_verified)
         return remote_root, data_root
@@ -796,7 +809,11 @@ class RemoteExecutor:
             f"MEDREC_SUBMISSION_ID={run_id}",
             "MEDREC_MODE=" + mode,
             f"MEDREC_DATA_ROOT={data_root}",
-            f"SAFEDRUG_ROOT={program.upstream_root}",
+            *(
+                [f"SAFEDRUG_ROOT={program.upstream_root}"]
+                if program.program_id == "safedrug-archived" or baseline_id == "safedrug"
+                else []
+            ),
             f"CUDA_VISIBLE_DEVICES={gpu_index}",
             f"CONDA_ENV={program.conda_environment}",
             "/root/anaconda3/bin/conda",

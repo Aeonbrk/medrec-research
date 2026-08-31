@@ -327,7 +327,7 @@ def test_command(
     **kwargs: Any,
 ) -> list[str]:
     del lane_id, selection_path, kwargs
-    resume_target = checkpoint.name if profile.test_uses_basename else str(checkpoint)
+    resume_target = checkpoint.name if profile.test_uses_basename else str(checkpoint.resolve())
     return [
         python,
         str(entrypoint),
