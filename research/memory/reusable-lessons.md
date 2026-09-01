@@ -46,7 +46,7 @@ Retrospective labels, DDI proxies, contraindication rules, and synthetic or adve
 
 ## Separate point-estimate fidelity from directional relationships
 
-In Reproduction Mode, validating directional advantages (e.g. Model A > Model B) does not establish reproduction of the published point estimates when observed means fall outside the reported $2\sigma$ statistical bounds. A directional pass with point interval misses must be honestly classified as `completed_mismatch`, not full reproduction. See `research/failures/safedrug-four-model-table2-mismatch-2026-08-26.md`.
+In Reproduction Mode, validating directional advantages (e.g. Model A > Model B) does not establish reproduction of the published point estimates when observed means fall outside the reported $2\sigma$ statistical bounds. A directional pass with point interval misses must be honestly classified as `completed_mismatch`, not full reproduction. See `research/baselines/failures/safedrug-four-model-table2-mismatch-2026-08-26.md`.
 
 ## Distinguish percentage-point differences from relative percentages
 

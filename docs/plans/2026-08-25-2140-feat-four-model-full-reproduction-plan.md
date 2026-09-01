@@ -209,7 +209,7 @@ U2 reads each header and counts data rows once while creating the manifest. U9 r
 - [SafeDrug `c7218d0` molecular mask source](https://github.com/ycq091044/SafeDrug/blob/c7218d0976e5ee5588aeaf5bdbc86b338126bba5/data/ddi_mask_H.py) and [molecule-map source](https://github.com/ycq091044/SafeDrug/blob/c7218d0976e5ee5588aeaf5bdbc86b338126bba5/data/get_SMILES.py).
 - `docs/plans/2026-08-23-archived-single-baseline-plan.md` for the accepted model-program decision history.
 - `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md` for the completed environment, probe, and smoke mechanics; its preparation-only authorization boundary is superseded by this plan.
-- `research/failures/safedrug-reproduction-b0-failure-2026-08-25.md` for the immutable execution facts and newly superseded interpretation of `formal-20260825-231500`.
+- `research/baselines/failures/safedrug-reproduction-b0-failure-2026-08-25.md` for the immutable execution facts and newly superseded interpretation of `formal-20260825-231500`.
 
 ---
 
@@ -335,7 +335,7 @@ U8 lands first because U1 also touches the archived program after its data-contr
 - **Goal:** Replace the former 14,995 hard gate across downstream validators and make the existing public-safe verdict path bind current-attempt evidence.
 - **Requirements:** R1, R12-R14, and R17-R21; KTD7-KTD10.
 - **Dependencies:** U8.
-- **Files:** `baselines/safedrug_archived.py`, `research/baseline-preflight/safedrug-table2-reference.json`, `src/medrec_research/reproduction_audit.py`, `src/medrec_research/remote_executor.py`, `src/medrec_research/cli.py`, `tests/unit/test_safedrug_archived_program.py`, `tests/unit/test_reproduction_audit.py`, `tests/unit/test_remote_executor.py`, `tests/integration/test_run_cli.py`, `research/failures/safedrug-reproduction-b0-failure-2026-08-25.md`, and `docs/PLANS.md`.
+- **Files:** `baselines/safedrug_archived.py`, `research/baselines/preflight/safedrug-table2-reference.json`, `src/medrec_research/reproduction_audit.py`, `src/medrec_research/remote_executor.py`, `src/medrec_research/cli.py`, `tests/unit/test_safedrug_archived_program.py`, `tests/unit/test_reproduction_audit.py`, `tests/unit/test_remote_executor.py`, `tests/integration/test_run_cli.py`, `research/baselines/failures/safedrug-reproduction-b0-failure-2026-08-25.md`, and `docs/PLANS.md`.
 - **Approach:**
   1. Preserve Appendix A's existing versioned Table 2 means and standard deviations; change only dataset admission and packet metadata.
   2. Preserve the existing scientific result schema version and add no attempt metadata to it. Normalize formal `status.json` to schema version 1 and kind `safedrug_archived_formal_status`, with `baseline_id`, `state`, `stage`, `started_at`, `finished_at`, and `failure_code`. A running status uses `state = running`, `stage = training` or `testing`, and null `finished_at`/`failure_code`; completed uses `state = completed`, `stage = terminal`, non-null `finished_at`, and null `failure_code`; failed uses `state = failed`, `stage = terminal`, non-null `finished_at`, and `failure_code = formal_failed`. Require the completed status embedded in `result.json` to equal the standalone parsed status object exactly.

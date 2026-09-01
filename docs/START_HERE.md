@@ -11,15 +11,15 @@ Use this page to find the source of truth for the question in front of you.
 
 ## Work on the repository
 
-- [`PLANS.md`](PLANS.md) lists accepted multi-step work and its current outcome.
-- [`plans/`](plans/) contains implementation-ready plans and their decision history.
+- [`PLANS.md`](PLANS.md) lists accepted multi-step software and infrastructure work and its current outcome. (Note: Scientific idea execution is tracked in `research/ideas/`).
+- [`plans/`](plans/) contains implementation-ready software/infrastructure plans and their decision history.
 - [`playbooks/index.md`](playbooks/index.md) routes operational work to the relevant playbook (including [`MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`](playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md) and [`REMOTE_319_EXECUTION_PLAYBOOK.md`](playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md)).
 
 ## Inspect research state
 
+- [`../research/README.md`](../research/README.md) is the main entry point for the scientific workflow (`Idea → Minimal Experiment → Evidence → Decision`). It explains the directory structure for early-stage ideas, baseline infrastructure, and global memory.
 - [`../baselines/registry.toml`](../baselines/registry.toml) is the baseline identity, Reproduction Program, and readiness registry.
 - [`../baselines/safedrug_archived.py`](../baselines/safedrug_archived.py) and [`../baselines/molerec.py`](../baselines/molerec.py) are the implemented Reproduction Programs for the five-model suite across seven lanes.
-- [`../research/README.md`](../research/README.md) explains curated Research Memory and Failure Records.
 - [`../README.md`](../README.md) gives runnable local commands and the current public-safe status.
 
 ## 科研方法参考

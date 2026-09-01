@@ -273,7 +273,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
 - **Goal:** Produce the attempt's five finalized ten-round test pairs and truthful four-axis terminal audit without another training execution.
 - **Requirements:** R1–R10, R22, R24.
 - **Dependencies:** U1, U2 and a clean committed continuation revision.
-- **Files:** `docs/PLANS.md`, `Handoff.md`, `research/baseline-preflight/molerec-five-model-reproduction-report.md` only after public-safe review; restricted attempt artifacts remain outside Git.
+- **Files:** `docs/PLANS.md`, `Handoff.md`, `research/baselines/preflight/molerec-five-model-reproduction-report.md` only after public-safe review; restricted attempt artifacts remain outside Git.
 - **Approach:**
   1. Run the playbook preflight and inspect ledger, source/recovery pairs, processes, capacity, and the source schedule.
   2. Deploy the clean commit through Git-native additive transfer and create the reaccepted schedule.
@@ -291,7 +291,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
 - **Goal:** Create one executable protocol packet that names the shared scope and five unchanged method profiles before any Comparison test evaluation.
 - **Requirements:** R11–R14, R20–R21.
 - **Dependencies:** U3 terminal with execution integrity and artifact completeness passed.
-- **Files:** `src/medrec_research/comparison_protocol.py`, `src/medrec_research/comparison_scope.py`, `src/medrec_research/dataset.py`, `tests/unit/test_comparison_protocol.py`, `tests/unit/test_dataset_manifest.py`, `research/baseline-preflight/five-model-comparison-protocol.json`.
+- **Files:** `src/medrec_research/comparison_protocol.py`, `src/medrec_research/comparison_scope.py`, `src/medrec_research/dataset.py`, `tests/unit/test_comparison_protocol.py`, `tests/unit/test_dataset_manifest.py`, `research/baselines/preflight/five-model-comparison-protocol.json`.
 - **Approach:**
   1. Build one restricted Dataset Manifest on 319 and expose only its public-safe identity and aggregates.
   2. Bind feature availability, eligible-visit semantics, medication vocabulary, DDI asset, lineage, protocol amendment, and Adaptation Budget into the protocol packet.
@@ -364,7 +364,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
 - **Goal:** Produce one legal v1.1 qualification packet per model under the same scope, or preserve the first exact blocking gate for that model.
 - **Requirements:** R11–R24.
 - **Dependencies:** U3, U4, U5, U6 and a clean committed Comparison revision.
-- **Files:** `baselines/registry.toml`, `research/baseline-preflight/five-model-comparison-qualification.json`, restricted predictions and model artifacts outside Git.
+- **Files:** `baselines/registry.toml`, `research/baselines/preflight/five-model-comparison-qualification.json`, restricted predictions and model artifacts outside Git.
 - **Approach:**
   1. Run the full preflight and build the restricted Dataset Manifest while memberships remain available.
   2. Execute validation/model selection under the frozen one-trial budget before constructing any Comparison test request.
@@ -383,7 +383,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
 - **Goal:** Record the per-model two-axis readiness and the three suite-level conclusions without overstating evidence.
 - **Requirements:** R22–R25.
 - **Dependencies:** U3, U7.
-- **Files:** `research/baseline-preflight/five-model-baseline-readiness-report.md`, `docs/PLANS.md`, `Handoff.md`, `baselines/registry.toml`.
+- **Files:** `research/baselines/preflight/five-model-baseline-readiness-report.md`, `docs/PLANS.md`, `Handoff.md`, `baselines/registry.toml`.
 - **Approach:**
   1. Summarize each pinned scientific identity, Phase A verdict, current-scope qualification, mechanism-experiment usability, and the sole blocker from its qualification-attempt artifact.
   2. Compute `engineering_ready`, `reproduction_complete`, and `research_baseline_ready` from their separate evidence gates.

@@ -33,8 +33,8 @@
 - **Shared scope**: Dataset Manifest `82d4efc2…`, 1,058 patient-disjoint test patients, 1,206 eligible visits, 131 medications, feature identity `9e403591…`, DDI asset `dcb20789…`, and equal Adaptation Budget `180fd7e4…`.
 - **Suite conclusions**: `engineering_ready = true`, `reproduction_complete = true`, and `research_baseline_ready = true`.
 - **Execution note**: the user explicitly authorized SafeDrug and MoleRec Phase B qualification on shared GPU 0 after 0% utilization and sufficient free memory were verified; the resident external process was not stopped. The exclusivity exception is public and did not change scientific behavior or qualification semantics.
-- **Reports**: `research/baseline-preflight/molerec-five-model-reproduction-report.md` and `research/baseline-preflight/five-model-baseline-readiness-report.md`.
-- **Qualification artifact**: `research/baseline-preflight/five-model-comparison-qualification.json`.
+- **Reports**: `research/baselines/preflight/molerec-five-model-reproduction-report.md` and `research/baselines/preflight/five-model-baseline-readiness-report.md`.
+- **Qualification artifact**: `research/baselines/preflight/five-model-comparison-qualification.json`.
 
 ## Completed: MoleRec Finalization Recovery and Conformance
 
@@ -90,7 +90,7 @@
 
 - **Status**: terminated on `2026-08-25` at the B0 Data Gate during attempt `formal-20260825-231500`.
 - **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
-- **Failure Record**: `research/failures/safedrug-reproduction-b0-failure-2026-08-25.md`.
+- **Failure Record**: `research/baselines/failures/safedrug-reproduction-b0-failure-2026-08-25.md`.
 - **Outcome**:
   - Remote environment preflight, 319 Input Contract validation, and `stage-safedrug-c721` execution completed cleanly.
   - Preprocessing script execution from upstream `c7218d0` generated 6,350 patients, 131 medications, 448 DDI pairs, and 491 substructures, but 15,032 visits (expected: 14,995 visits, difference: +37 visits).
@@ -102,8 +102,8 @@
 
 - **Status**: completed on `2026-08-26`; executed full end-to-end Reproduction Mode for GAMENet, SafeDrug, RETAIN, and LEAP on 319 under attempt `formal-20260826-025500`.
 - **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
-- **Audit Artifact**: `research/baseline-preflight/safedrug-table2-audit-packet.json`.
-- **Detailed Report**: `research/baseline-preflight/safedrug-four-model-reproduction-report.md`.
+- **Audit Artifact**: `research/baselines/preflight/safedrug-table2-audit-packet.json`.
+- **Detailed Report**: `research/baselines/preflight/safedrug-four-model-reproduction-report.md`.
 - **Summary**:
   - Validated 15,032 executable visits with 14,995 paper metadata disclosure (R17) and verified all R18 Table 1 average statistics (157,970 diag, 57,778 pro, 171,900 med) and 6 semantic bridge checks.
   - Published verified snapshot `snapshots/safedrug-paper-c721-ijcai21`.

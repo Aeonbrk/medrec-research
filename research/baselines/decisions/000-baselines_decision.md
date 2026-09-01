@@ -1,0 +1,15 @@
+Classical:
+RETAIN
+LEAP
+GAMENet
+SafeDrug
+MoleRec
+
+Recent strong methods:
+VITA AAAI'24 CCF-A
+ARMR IJCAI'25 CCF-A
+FLAME NeurIPS'25 CCF-A
+KEHGCN AAAI'26 CCF-A
+HypeMed TOIS'26 CCF-A
+
+Ours

@@ -243,9 +243,9 @@ Out of scope:
 - [CUDA 11.1 release notes](https://docs.nvidia.com/cuda/archive/11.1.0/pdf/CUDA_Toolkit_Release_Notes.pdf): driver compatibility.
 - [PyTorch previous versions](https://docs.pytorch.org/get-started/previous-versions/): official PyTorch 1.9 CUDA 11.1 artifacts.
 - [PyG 2.0.3 installation](https://pytorch-geometric.readthedocs.io/en/2.0.3/notes/installation.html) and [matching wheel index](https://data.pyg.org/whl/torch-1.9.0%2Bcu111.html): supported PyTorch/CUDA/Python combination.
-- `research/failures/safedrug-reproduction-b0-failure-2026-08-25.md`: immutable 14,995-versus-15,032 failure history.
-- `research/baseline-preflight/safedrug-four-model-reproduction-report.md`: completed pilot outcome and mismatch evidence.
-- `research/reusable-lessons.md`: durable claim and execution controls.
+- `research/baselines/failures/safedrug-reproduction-b0-failure-2026-08-25.md`: immutable 14,995-versus-15,032 failure history.
+- `research/baselines/preflight/safedrug-four-model-reproduction-report.md`: completed pilot outcome and mismatch evidence.
+- `research/memory/reusable-lessons.md`: durable claim and execution controls.
 
 ## Planning Contract
 
@@ -492,9 +492,9 @@ The only destructive action is U10's removal of the exact experiment-owned Conda
 - Modify `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`.
 - Modify `docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md`.
 - Modify `environments/README.md`.
-- Modify `research/README.md` and `research/reusable-lessons.md`.
-- Add `research/failures/safedrug-four-model-table2-mismatch-2026-08-26.md`.
-- Add `research/decisions/molerec-five-model-reproduction-authority-2026-08-26.md`.
+- Modify `research/README.md` and `research/memory/reusable-lessons.md`.
+- Add `research/baselines/failures/safedrug-four-model-table2-mismatch-2026-08-26.md`.
+- Add `research/baselines/decisions/molerec-five-model-reproduction-authority-2026-08-26.md`.
 
 **Implementation**
 
@@ -570,7 +570,7 @@ The only destructive action is U10's removal of the exact experiment-owned Conda
 - Add `baselines/molerec.py`.
 - Add `src/medrec_research/safedrug_selection.py`.
 - Add `src/medrec_research/molerec_reproduction_audit.py`.
-- Add `research/baseline-preflight/molerec-table1-reference.json`.
+- Add `research/baselines/preflight/molerec-table1-reference.json`.
 - Add focused unit/integration tests for all three components.
 - Add an orchestration integration test for evaluation admission and the SafeDrug selection barrier.
 
