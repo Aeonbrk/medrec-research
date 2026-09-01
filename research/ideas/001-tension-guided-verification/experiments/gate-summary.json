@@ -1,0 +1,126 @@
+{
+  "bootstrap": {
+    "intervals_95": {
+      "oracle_minus_random": {
+        "10%": {
+          "lower": 0.6732866793075132,
+          "upper": 0.6938271544886716
+        },
+        "20%": {
+          "lower": 0.6732866793075132,
+          "upper": 0.6938271544886716
+        },
+        "30%": {
+          "lower": 0.6732866793075132,
+          "upper": 0.6938271544886716
+        }
+      },
+      "oracle_minus_risk_only": {
+        "10%": {
+          "lower": 0.5987795850038734,
+          "upper": 0.6561369097865837
+        },
+        "20%": {
+          "lower": 0.6217650372562394,
+          "upper": 0.6674048292375732
+        },
+        "30%": {
+          "lower": 0.6525612987007754,
+          "upper": 0.6905851353636919
+        }
+      },
+      "risk_only_yield": {
+        "10%": {
+          "lower": 0.3438630902134164,
+          "upper": 0.40122041499612654
+        },
+        "20%": {
+          "lower": 0.3325951707624268,
+          "upper": 0.37823496274376067
+        },
+        "30%": {
+          "lower": 0.30941486463630813,
+          "upper": 0.3474387012992247
+        }
+      }
+    },
+    "replicates": 1000,
+    "seed": 1203,
+    "unit": "patient"
+  },
+  "decision_criteria": {
+    "gap_oracle_random_10_ci_above_zero": true,
+    "gap_oracle_random_20_ci_above_zero": true,
+    "gap_oracle_risk_indistinguishable_from_zero": false,
+    "support_requirement_met": true
+  },
+  "gaps": {
+    "oracle_minus_random": {
+      "10%": 0.6832593735931571,
+      "20%": 0.6832593735931571,
+      "30%": 0.6832593735931571
+    },
+    "oracle_minus_risk_only": {
+      "10%": 0.6293436293436294,
+      "20%": 0.6436153103891926,
+      "30%": 0.6713121783876501
+    }
+  },
+  "gate_id": "gate-01-routing-opportunity",
+  "idea_id": "001-tension-guided-verification",
+  "identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "canonical_ddi_semantics_sha256": "7e409b16672db61f6960ed64c531d6920388a244d245ea4033be57639c3fe954",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "harness_revision": "c6fc35bce97637a2eddc6319cdec768256abdccb",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "medication_vocabulary_size": 131,
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "kind": "gate_01_routing_opportunity_summary",
+  "method_id": "molerec",
+  "overall_prevalence": {
+    "harmful_revision_yield": 0.6832593735931571,
+    "pareto_beneficial_yield": 0.31674062640684286
+  },
+  "policies": {
+    "oracle": {
+      "yields": {
+        "10%": 1.0,
+        "20%": 1.0,
+        "30%": 1.0
+      }
+    },
+    "random": {
+      "yield": 0.31674062640684286
+    },
+    "risk_only": {
+      "yields": {
+        "10%": 0.37065637065637064,
+        "20%": 0.3563846896108073,
+        "30%": 0.32868782161234994
+      }
+    }
+  },
+  "profile_id": "molerec-embedding",
+  "schema_version": 1,
+  "split": "validation",
+  "support": {
+    "beneficial_patients": 844,
+    "eligible_candidates": 15549,
+    "eligible_patients": 858,
+    "eligible_visits": 1219,
+    "non_beneficial_patients": 857,
+    "support_sufficient": true
+  },
+  "verdict": "pass"
+}

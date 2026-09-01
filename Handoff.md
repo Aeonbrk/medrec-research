@@ -2,14 +2,16 @@
 
 ## Current state
 
-Gate 01 (**Routing Opportunity Under a Fixed Revision Operator**) for Idea `001-tension-guided-verification` is fully implemented, doubly hardened, statically and synthetically verified, committed, and pushed to `origin/main`. The working tree is clean.
+Gate 01 (**Routing Opportunity Under a Fixed Revision Operator**) for Idea `001-tension-guided-verification` has completed **formal remote execution on 319-wild** with verdict: **`pass`**.
 
-The actual 319 remote GPU execution has **not** been started and is paused awaiting explicit operator authorization.
-
-- **Repository HEAD**: `c6fc35bce97637a2eddc6319cdec768256abdccb` on `main`.
-- **Remote state**: In sync with `origin/main`.
-- **Test suite**: 333 core unit/integration tests passing; 8-stage synthetic self-test passing; `ruff` check and format passing; `markdownlint` clean.
-- **Scientific role**: Idea-stage hypothesis selection, not a baseline comparison qualification. Do not use `accept-comparison`.
+- **Execution ID**: `gate-01-routing-opportunity-20260902-010537`
+- **Execution Host**: 319-wild (`319-lab-via-server`, GPU 6: RTX 3090, 15 GiB free)
+- **Harness Revision**: `c6fc35bce97637a2eddc6319cdec768256abdccb`
+- **Dataset Manifest**: `82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712`
+- **MoleRec Checkpoint**: `5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca` (`Epoch_44_TARGET_0.06_JA_0.5327_DDI_0.0723.model`)
+- **Public Summary**: [gate-summary.json](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-summary.json)
+- **Scientific Verdict**: **`pass`** — Selective routing opportunity holds under $R_0$; Oracle significantly beats both Random and RiskOnly across all budget tiers.
+- **Stop Rule**: Strictly respected. No downstream Tension training or multi-step expansion has been started.
 
 ## What exists
 
@@ -53,55 +55,38 @@ All prototype files are strictly confined to `research/ideas/001-tension-guided-
 - `research/ideas/001-tension-guided-verification/experiments/gate-01-routing-opportunity.md` — Gate 01 protocol.
 - `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` — 319 remote execution preflight contract.
 
-## Remote 319 launch protocol
+## Executed 319 run record
 
-When authorized to run on `319-wild` (`319-lab` or `319-lab-via-server`):
+Formal execution was carried out on `319-lab-via-server`:
 
 ```bash
-# 1. Preflight check
-# Ensure GPU utilization <= 10%, free memory adequate, worktrees clean
-
-# 2. Paths and environment variables
 export MEDREC_DATA_ROOT=/root/zhb/medrec-data
 export MOLEREC_ROOT=/root/zhb/MoleRec
-export DATASET_MANIFEST="$MEDREC_DATA_ROOT/snapshots/molerec-table1-c721-www23/dataset-manifest.json"
-export MOLEREC_CHECKPOINT="$MEDREC_DATA_ROOT/runs/molerec/formal-20260828-a09fcab-u8-b/lanes/molerec-embedding/saved/MoleRec/best_model.pt"
-
-export GATE_RUN_ID="gate-01-routing-opportunity-$(date +%Y%m%d-%H%M%S)"
+export DATASET_MANIFEST="$MEDREC_DATA_ROOT/comparison/five-model-v1-1-fe7e526/dataset-manifest.json"
+export MOLEREC_CHECKPOINT="$MEDREC_DATA_ROOT/runs/molerec/medrec-baseline-molerec-embedding-20260828-081052-82b84a1f/work/saved/MoleRec_medrec-baseline-molerec-embedding-20260828-081052-82b84a1f/Epoch_44_TARGET_0.06_JA_0.5327_DDI_0.0723.model"
+export GATE_RUN_ID="gate-01-routing-opportunity-20260902-010537"
 export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verification/$GATE_RUN_ID"
 
-# 3. Launch execution
-cd /root/zhb/medrec-research
-git pull origin main
-source /root/anaconda3/etc/profile.d/conda.sh
-
-conda run -n medrec-core-evaluator \
-  python research/ideas/001-tension-guided-verification/experiments/run_routing_opportunity_gate.py \
-  --dataset-manifest "$DATASET_MANIFEST" \
-  --dataset-root "$MEDREC_DATA_ROOT/snapshots/molerec-table1-c721-www23" \
-  --molerec-root "$MOLEREC_ROOT" \
-  --checkpoint "$MOLEREC_CHECKPOINT" \
-  --output-root "$GATE_RUN_ROOT" \
-  --expected-harness-revision "c6fc35bce97637a2eddc6319cdec768256abdccb"
-
-# 4. Ingest aggregate-only public summary
-# Copy $GATE_RUN_ROOT/gate-summary.json to local repository
-# Leave candidate-revision-values.jsonl under $MEDREC_DATA_ROOT on 319
+# Execution completed in ~3 minutes on GPU 6.
+# gate-summary.json retrieved to local research/ideas/001-tension-guided-verification/experiments/
+# candidate-revision-values.jsonl preserved under $GATE_RUN_ROOT on 319.
 ```
 
-## Next steps & stop rule
+## Gate 01 Audit & Verdict
 
-1. **Do not run Gate 01 without user confirmation.**
-2. **Execute remote Gate 01**: After operator launches on 319, collect `gate-summary.json`.
-3. **Audit Gate 01 verdict**:
-   - `pass`: Oracle 95% CI > Random at 10% & 20% budgets, Oracle > RiskOnly. Confirms selective routing has headroom under $R_0$; unlocks designing predictive Tension triggers.
-   - `downgrade_risk_only`: Oracle > Random, but Oracle statistically indistinguishable from RiskOnly. Route pivots to testing whether Tension adds any incremental value over simple DDI degree sorting.
-   - `fail`: Oracle fails to reliably beat Random under $R_0$. Route stops; do not implement Tension.
-   - `insufficient_support`: Fewer than 50 distinct beneficial or non-beneficial validation patients. Inconclusive under current data support.
-4. **Stop rule**: Do not train a Tension policy, implement sequential multi-step revision, or proceed past Gate 01 until the public summary verdict has been inspected.
+- **Decision**: **`pass`**
+- **Empirical findings**:
+  1. **Base Prevalence**: Within the review universe $\mathcal Q$ (15,549 candidate revisions across 1,219 visits and 858 validation patients), only **31.67%** of singleton deletions are Pareto-beneficial ($Y^{PB}=1$), while **68.33%** are harmful to efficacy ($\Delta J < 0$).
+  2. **Random Policy**: Constant at base prevalence **31.67%**.
+  3. **RiskOnly Policy**: Yields **37.07%** (10% budget), **35.64%** (20% budget), **32.87%** (30% budget). Simple DDI-degree sorting fails to isolate safe deletions and causes substantial efficacy loss (>62% non-beneficial revisions).
+  4. **Oracle Policy**: Achieves **100.0%** Pareto-beneficial revisions across 10%, 20%, and 30% review budgets.
+  5. **Statistical Headroom**:
+     - Oracle - Random: **+68.33%** (95% CI: [67.33%, 69.38%])
+     - Oracle - RiskOnly: **+62.93%** at 10% (95% CI: [59.88%, 65.61%]), **+64.36%** at 20% (95% CI: [62.18%, 66.74%])
+  6. **Support**: 844 beneficial patients, 857 non-beneficial patients (both >> 50 required threshold).
 
-## Suggested skills
+## Next scientific step (Per Preregistration)
 
-- `ccf-experiment-designer`: Inspect Gate 01 results, audit decision criteria, and design the next hypothesis-selection or allocation step.
-- `ccf-idea-optimizer`: Concretize or pivot the Tension idea if Gate 01 yields `downgrade_risk_only` or requires adjusting problem scope.
-- `ce-handoff`: Manage session transitions and cross-agent continuity.
+- Per preregistered decision tree: `pass` confirms that selective routing headroom exists under fixed operator $R_0$, and that degree-based sorting (RiskOnly) is insufficient.
+- **Permitted next step**: We may now proceed to designing and training the predictive Tension revision-value trigger / classifier $\hat v_\theta(m \mid H_t, \hat M_t)$ without violating the falsification contract.
+- **Stop rule**: Maintain strict stop at Gate 01 until operator reviews the verdict and authorizes the next stage.
