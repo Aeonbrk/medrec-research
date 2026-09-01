@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -9,12 +8,7 @@ from typing import Any
 
 import pytest
 
-PROGRAM_PATH = Path(__file__).parents[2] / "baselines" / "safedrug_archived.py"
-SPEC = importlib.util.spec_from_file_location("safedrug_archived_program", PROGRAM_PATH)
-assert SPEC and SPEC.loader
-adapter = importlib.util.module_from_spec(SPEC)
-sys.modules[SPEC.name] = adapter
-SPEC.loader.exec_module(adapter)
+from baselines import safedrug_archived as adapter
 
 
 def paper_values() -> tuple[
@@ -207,37 +201,45 @@ def test_test_mode_default_rejects_ambiguous_source() -> None:
 
 
 def test_paper_dataset_counts_pass_exact_gate() -> None:
-    records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
-    counts = adapter.count_dataset(records, vocabulary, ddi, ddi_mask)
+    from baselines import safedrug_archived_data
 
-    assert counts == adapter.EXPECTED_COUNTS
-    adapter.require_executable_counts(counts)
+    records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
+    counts = safedrug_archived_data.count_dataset(records, vocabulary, ddi, ddi_mask)
+
+    assert counts == safedrug_archived_data.EXPECTED_COUNTS
+    safedrug_archived_data.require_executable_counts(counts)
 
 
 def test_dataset_gate_rejects_non_paper_visit_count() -> None:
-    counts = {**adapter.EXPECTED_COUNTS, "visits": 14_995}
+    from baselines import safedrug_archived_data
+
+    counts = {**safedrug_archived_data.EXPECTED_COUNTS, "visits": 14_995}
 
     with pytest.raises(adapter.ReproductionError, match="visits"):
-        adapter.require_executable_counts(counts)
+        safedrug_archived_data.require_executable_counts(counts)
 
 
 def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
+    from baselines import safedrug_archived_data
+
     records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
     ddi[0][1] = ddi[1][0] = 0
-    counts = adapter.count_dataset(records, vocabulary, ddi, ddi_mask)
+    counts = safedrug_archived_data.count_dataset(records, vocabulary, ddi, ddi_mask)
 
     assert counts["ddi_pairs"] == 447
     with pytest.raises(adapter.ReproductionError, match="ddi_pairs"):
-        adapter.require_executable_counts(counts)
+        safedrug_archived_data.require_executable_counts(counts)
 
 
 def test_dataset_gate_rejects_matrix_shape_drift() -> None:
+    from baselines import safedrug_archived_data
+
     records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
 
     with pytest.raises(adapter.ReproductionError, match="ddi_A_final shape"):
-        adapter.count_dataset(records, vocabulary, ddi[:-1], ddi_mask)
+        safedrug_archived_data.count_dataset(records, vocabulary, ddi[:-1], ddi_mask)
     with pytest.raises(adapter.ReproductionError, match="ddi_mask_H rows"):
-        adapter.count_dataset(records, vocabulary, ddi, ddi_mask[:-1])
+        safedrug_archived_data.count_dataset(records, vocabulary, ddi, ddi_mask[:-1])
 
 
 def test_load_and_validate_canonical_inputs_validates_all_six(
@@ -269,11 +271,11 @@ def test_load_and_validate_canonical_inputs_validates_all_six(
             pickle.dump(val, stream)
 
     results, counts, bridge_checks, statistics_evidence, metadata_disclosure = (
-        adapter.load_and_validate_canonical_inputs(data_dir)
+        safedrug_archived_data.load_and_validate_canonical_inputs(data_dir)
     )
     assert len(results) == 6
     assert all(status == "passed" for status in results.values())
-    assert counts == adapter.EXPECTED_COUNTS
+    assert counts == safedrug_archived_data.EXPECTED_COUNTS
     assert counts["visits"] == 15_032
     assert set(bridge_checks.keys()) == {
         "vocabulary_bijections",
@@ -299,6 +301,7 @@ def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     import pickle
+    import sys
 
     from baselines import safedrug_archived_data
 
@@ -324,13 +327,14 @@ def test_load_and_validate_canonical_inputs_rejects_shape_or_length_drift(
             pickle.dump(val, stream)
 
     with pytest.raises(adapter.ReproductionError, match="ehr_adj_final shape"):
-        adapter.load_and_validate_canonical_inputs(data_dir)
+        safedrug_archived_data.load_and_validate_canonical_inputs(data_dir)
 
 
 def test_semantic_bridge_checks_reject_invalid_structures(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     import pickle
+    import sys
 
     from baselines import safedrug_archived_data
 
@@ -358,52 +362,58 @@ def test_semantic_bridge_checks_reject_invalid_structures(
                 pickle.dump(val, stream)
         return data_dir
 
-    # 1. Non-symmetric matrix
-    _, _, ddi_bad, _, _, _ = paper_values()
-    ddi_bad[0][1] = 1
-    ddi_bad[1][0] = 0
-    d1 = write_dataset({"ddi_A_final.pkl": ddi_bad})
-    with pytest.raises(adapter.ReproductionError, match="symmetric"):
-        adapter.load_and_validate_canonical_inputs(d1)
+    # 1. Asymmetric DDI matrix
+    records, _vocabulary, ddi, _ddi_mask, ehr_adj, _idx2drug = paper_values()
+    ddi_asym = [row[:] for row in ddi]
+    ddi_asym[0][1] = 1
+    ddi_asym[1][0] = 0
+    d1 = write_dataset({"ddi_A_final.pkl": ddi_asym})
+    with pytest.raises(adapter.ReproductionError, match="must be symmetric"):
+        safedrug_archived_data.load_and_validate_canonical_inputs(d1)
 
-    # 2. Non-zero diagonal
-    _, _, _, _, ehr_bad, _ = paper_values()
-    ehr_bad[0][0] = 1
-    d2 = write_dataset({"ehr_adj_final.pkl": ehr_bad})
+    # 2. Non-zero diagonal in DDI matrix
+    ddi_diag = [row[:] for row in ddi]
+    ddi_diag[0][0] = 1
+    d2 = write_dataset({"ddi_A_final.pkl": ddi_diag})
     with pytest.raises(adapter.ReproductionError, match="zero diagonal"):
-        adapter.load_and_validate_canonical_inputs(d2)
+        safedrug_archived_data.load_and_validate_canonical_inputs(d2)
 
-    # 3. idx2drug missing special keys
+    # 3. Asymmetric EHR adjacency matrix
+    ehr_asym = [row[:] for row in ehr_adj]
+    ehr_asym[0][1] = 1
+    ehr_asym[1][0] = 0
+    d3 = write_dataset({"ehr_adj_final.pkl": ehr_asym})
+    with pytest.raises(adapter.ReproductionError, match="must be symmetric"):
+        safedrug_archived_data.load_and_validate_canonical_inputs(d3)
+
+    # 4. Inconsistent idx2drug keys
     _, _, _, _, _, idx2drug_bad = paper_values()
     del idx2drug_bad["seperator"]
-    d3 = write_dataset({"idx2drug.pkl": idx2drug_bad})
+    d4 = write_dataset({"idx2drug.pkl": idx2drug_bad})
     with pytest.raises(adapter.ReproductionError, match="idx2drug keys mismatch"):
-        adapter.load_and_validate_canonical_inputs(d3)
+        safedrug_archived_data.load_and_validate_canonical_inputs(d4)
 
-    # 4. records modality duplicate codes
-    records_bad, _, _, _, _, _ = paper_values()
-    records_bad[0][0] = [[0, 0], [0], [0]]
-    d4 = write_dataset({"records_final.pkl": records_bad})
-    with pytest.raises(adapter.ReproductionError, match="duplicate indices"):
-        adapter.load_and_validate_canonical_inputs(d4)
-
-    # 5. records modality out-of-range index
-    records_bad2, _, _, _, _, _ = paper_values()
-    records_bad2[0][0] = [[9999], [0], [0]]
-    d5 = write_dataset({"records_final.pkl": records_bad2})
+    # 5. Invalid admission indices out of vocabulary bounds
+    records_bad1 = [patient[:] for patient in records]
+    records_bad1[0] = [[records[0][0][0][:], records[0][0][1][:], [9999]], records[0][1]]
+    d5 = write_dataset({"records_final.pkl": records_bad1})
     with pytest.raises(adapter.ReproductionError, match="invalid index"):
-        adapter.load_and_validate_canonical_inputs(d5)
+        safedrug_archived_data.load_and_validate_canonical_inputs(d5)
+
+    records_bad2 = [patient[:] for patient in records]
+    records_bad2[0] = [[[9999], records[0][0][1][:], records[0][0][2][:]], records[0][1]]
+    d6 = write_dataset({"records_final.pkl": records_bad2})
+    with pytest.raises(adapter.ReproductionError, match="invalid index"):
+        safedrug_archived_data.load_and_validate_canonical_inputs(d6)
 
 
 def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    probe_mod = sys.modules.get("safedrug_archived_probe")
-    if probe_mod is None:
-        from baselines import safedrug_archived_probe as probe_mod
+    from baselines import safedrug_archived_probe as probe_mod
 
     monkeypatch.setattr(
         probe_mod,
         "check_imports",
-        lambda upstream: {m: "passed" for m in adapter.REGISTRY_IMPORT_MODULES},
+        lambda upstream: {m: "passed" for m in probe_mod.REGISTRY_IMPORT_MODULES},
     )
     monkeypatch.setattr(probe_mod, "check_cuda_tensor", lambda: "passed")
     monkeypatch.setattr(probe_mod, "check_rdkit_brics", lambda: "passed")
@@ -431,7 +441,7 @@ def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     )
 
     (tmp_path / "upstream" / "src").mkdir(parents=True)
-    probe = adapter.run_probe(
+    probe = probe_mod.run_probe(
         baseline_id="gamenet",
         upstream_root=tmp_path / "upstream",
         data_dir=None,
@@ -449,14 +459,13 @@ def test_probe_environment_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 
 
 def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    probe_mod = sys.modules.get("safedrug_archived_probe")
-    if probe_mod is None:
-        from baselines import safedrug_archived_probe as probe_mod
+    from baselines import safedrug_archived_data
+    from baselines import safedrug_archived_probe as probe_mod
 
     monkeypatch.setattr(
         probe_mod,
         "check_imports",
-        lambda upstream: {m: "passed" for m in adapter.REGISTRY_IMPORT_MODULES},
+        lambda upstream: {m: "passed" for m in probe_mod.REGISTRY_IMPORT_MODULES},
     )
     monkeypatch.setattr(probe_mod, "check_cuda_tensor", lambda: "passed")
     monkeypatch.setattr(probe_mod, "check_rdkit_brics", lambda: "passed")
@@ -486,21 +495,21 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
         probe_mod,
         "load_and_validate_canonical_inputs",
         lambda d: (
-            {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
-            adapter.EXPECTED_COUNTS,
+            {name: "passed" for name in safedrug_archived_data.CANONICAL_SIX_INPUTS},
+            safedrug_archived_data.EXPECTED_COUNTS,
             {"vocabulary_bijections": "passed", "records_structure": "passed"},
             {
                 "diagnoses": {"numerator": 157_970, "average": 10.5089, "max": 128},
                 "procedures": {"numerator": 57_778, "average": 3.8437, "max": 50},
                 "medications": {"numerator": 171_900, "average": 11.4356, "max": 65},
             },
-            adapter.REPORTED_PAPER_METADATA,
+            safedrug_archived_data.REPORTED_PAPER_METADATA,
         ),
     )
 
     (tmp_path / "upstream" / "src").mkdir(parents=True)
     (tmp_path / "data").mkdir(parents=True)
-    probe = adapter.run_probe(
+    probe = probe_mod.run_probe(
         baseline_id="safedrug",
         upstream_root=tmp_path / "upstream",
         data_dir=tmp_path / "data",
@@ -510,18 +519,20 @@ def test_probe_full_scope(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> No
     assert probe["schema_version"] == 1
     assert probe["scope"] == "full"
     assert len(probe["inputs"]) == 6
-    assert probe["dataset_counts"] == adapter.EXPECTED_COUNTS
+    assert probe["dataset_counts"] == safedrug_archived_data.EXPECTED_COUNTS
     assert probe["bridge_checks"] == {
         "vocabulary_bijections": "passed",
         "records_structure": "passed",
     }
-    assert probe["metadata"] == adapter.REPORTED_PAPER_METADATA
+    assert probe["metadata"] == safedrug_archived_data.REPORTED_PAPER_METADATA
     assert probe["statistics"]["diagnoses"]["numerator"] == 157_970
 
 
 def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from baselines import safedrug_archived_data
+
     upstream = tmp_path / "upstream"
     upstream_src = upstream / "src"
     upstream_src.mkdir(parents=True)
@@ -533,7 +544,7 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
 
     data_dir = tmp_path / "data"
     data_dir.mkdir()
-    for name in adapter.CANONICAL_SIX_INPUTS:
+    for name in safedrug_archived_data.CANONICAL_SIX_INPUTS:
         (data_dir / name).touch()
 
     run_root = tmp_path / "runs" / "smoke_run"
@@ -543,15 +554,15 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
         adapter,
         "load_and_validate_canonical_inputs",
         lambda d: (
-            {name: "passed" for name in adapter.CANONICAL_SIX_INPUTS},
-            adapter.EXPECTED_COUNTS,
+            {name: "passed" for name in safedrug_archived_data.CANONICAL_SIX_INPUTS},
+            safedrug_archived_data.EXPECTED_COUNTS,
             {"vocabulary_bijections": "passed"},
             {
                 "diagnoses": {"numerator": 157_970, "average": 10.5089, "max": 128},
                 "procedures": {"numerator": 57_778, "average": 3.8437, "max": 50},
                 "medications": {"numerator": 171_900, "average": 11.4356, "max": 65},
             },
-            adapter.REPORTED_PAPER_METADATA,
+            safedrug_archived_data.REPORTED_PAPER_METADATA,
         ),
     )
     monkeypatch.setattr(

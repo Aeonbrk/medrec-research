@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -8,12 +7,7 @@ from typing import Any
 
 import pytest
 
-PROGRAM_PATH = Path(__file__).parents[2] / "baselines" / "molerec.py"
-SPEC = importlib.util.spec_from_file_location("molerec_program", PROGRAM_PATH)
-assert SPEC and SPEC.loader
-adapter = importlib.util.module_from_spec(SPEC)
-sys.modules[SPEC.name] = adapter
-SPEC.loader.exec_module(adapter)
+from baselines import molerec as adapter
 
 
 def valid_records_and_vocab() -> tuple[
@@ -73,6 +67,8 @@ def valid_records_and_vocab() -> tuple[
 
 
 def test_molerec_profiles_match_entrypoints_and_defaults() -> None:
+    from baselines import molerec_data, molerec_probe
+
     observed = {
         baseline_id: (profile.entrypoint, profile.model_name, profile.learning_rate)
         for baseline_id, profile in adapter.PROFILES.items()
@@ -81,8 +77,8 @@ def test_molerec_profiles_match_entrypoints_and_defaults() -> None:
         "molerec": ("main.py", "MoleRec", 5e-4),
         "molerec-embedding": ("main.py", "MoleRec", 5e-4),
     }
-    assert adapter.PROFILES["molerec"].required_inputs == adapter.COMMON_INPUTS
-    assert adapter.COMMON_INPUTS == (
+    assert adapter.PROFILES["molerec"].required_inputs == molerec_data.COMMON_INPUTS
+    assert molerec_data.COMMON_INPUTS == (
         "records_final.pkl",
         "voc_final.pkl",
         "ddi_A_final.pkl",
@@ -92,7 +88,7 @@ def test_molerec_profiles_match_entrypoints_and_defaults() -> None:
         "idx2SMILES.pkl",
         "idx2drug.pkl",
     )
-    assert adapter.REGISTRY_IMPORT_MODULES == (
+    assert molerec_probe.REGISTRY_IMPORT_MODULES == (
         "torch",
         "torch_geometric",
         "ogb",
@@ -162,8 +158,10 @@ def test_learning_rate_adaptation_is_exact_and_reversible(lr: float) -> None:
 
 
 def test_count_dataset_returns_expected_canonical_counts() -> None:
+    from baselines import molerec_data
+
     records, vocab, ddi, ddi_mask = valid_records_and_vocab()
-    counts = adapter.count_dataset(records, vocab, ddi, ddi_mask)
+    counts = molerec_data.count_dataset(records, vocab, ddi, ddi_mask)
 
     assert counts == {
         "patients": 6350,
@@ -204,6 +202,8 @@ def test_parse_training_log_extracts_best_epoch() -> None:
 
 
 def test_parse_test_log_extracts_metrics() -> None:
+    from baselines import molerec_logs
+
     log_text = """
     Evaluation Results:
     DDI Rate: 0.0654
@@ -212,7 +212,7 @@ def test_parse_test_log_extracts_metrics() -> None:
     F1-score: 0.6840
     AVG_MED: 19.45
     """
-    parsed = adapter.parse_test_log(log_text)
+    parsed = molerec_logs.parse_test_log(log_text)
     metrics = parsed["metrics"]
     assert metrics["ddi_rate"] == 0.0654
     assert metrics["ja"] == 0.5230
