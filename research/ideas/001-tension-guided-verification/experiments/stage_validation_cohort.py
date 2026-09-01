@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import json
 import secrets
+from collections.abc import Iterable
 from pathlib import Path
 
 
@@ -35,6 +36,12 @@ def _content_sha256(value: object) -> str:
     return hashlib.sha256(serialized.encode("ascii")).hexdigest()
 
 
+def _vocabulary_sha256(vocabulary: Iterable[str]) -> str:
+    """Authoritative medication vocabulary hash matching DatasetManifest._ordered_digest."""
+    serialized = "".join(f"{code}\n" for code in sorted(vocabulary))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
 def _identifier(key: bytes, kind: str, *indices: int) -> str:
     message = ":".join((kind, *(str(index) for index in indices))).encode()
     return hmac.new(key, message, hashlib.sha256).hexdigest()
@@ -52,6 +59,17 @@ def _split_ranges(patient_count: int) -> dict[str, range]:
 
 def _vocabulary(idx2word: object) -> tuple[str, ...]:
     return tuple(str(idx2word[index]) for index in range(len(idx2word)))  # type: ignore[index]
+
+
+FEATURE_RULE = {
+    "current_diagnoses": True,
+    "current_medications": False,
+    "current_procedures": True,
+    "eligible_visit_rule": "test visits with at least one prior visit",
+    "history_diagnoses": True,
+    "history_medications": True,
+    "history_procedures": True,
+}
 
 
 def stage_validation(
@@ -90,16 +108,23 @@ def stage_validation(
         len(medication_vocabulary),
     )
 
-    # 1. Canonicalize every DDI relation with unordered-pair semantics: tuple(sorted((left, right)))
-    canonical_ddi_set = set()
-    for left in range(len(medication_vocabulary)):
-        for right in range(left + 1, len(medication_vocabulary)):
-            if ddi_matrix[left][right] == 1:
-                pair = tuple(sorted((medication_vocabulary[left], medication_vocabulary[right])))
-                canonical_ddi_set.add(pair)
-    canonical_ddi_pairs = sorted(canonical_ddi_set)
+    # 1. Compute raw DDI asset identity using authority algorithm from baselines/comparison_data.py
+    raw_ddi_pairs = tuple(
+        (medication_vocabulary[left], medication_vocabulary[right])
+        for left in range(len(medication_vocabulary))
+        for right in range(left + 1, len(medication_vocabulary))
+        if ddi_matrix[left][right] == 1
+    )
+    ddi_asset_sha256 = _content_sha256(list(raw_ddi_pairs))
 
-    # 2. Extract strictly validation split; never read, evaluate, or index test split
+    # 2. Canonicalize every DDI relation with unordered-pair semantics: tuple(sorted((left, right)))
+    canonical_ddi_set = set()
+    for left, right in raw_ddi_pairs:
+        canonical_ddi_set.add(tuple(sorted((left, right))))
+    canonical_ddi_pairs = sorted(canonical_ddi_set)
+    canonical_ddi_semantics_sha256 = _content_sha256(canonical_ddi_pairs)
+
+    # 3. Extract strictly validation split; never read, evaluate, or index test split
     splits = _split_ranges(len(records))
     validation_patient_indices = splits["validation"]
 
@@ -166,8 +191,8 @@ def stage_validation(
             "voc_final.pkl": _file_sha256(vocabulary_path),
         }
     )
-    ddi_asset_sha256 = _content_sha256(canonical_ddi_pairs)
-    vocab_sha256 = _content_sha256(list(medication_vocabulary))
+    vocab_sha256 = _vocabulary_sha256(medication_vocabulary)
+    feature_availability_sha256 = _content_sha256(FEATURE_RULE)
 
     meta = {
         "dataset_id": dataset_id,
@@ -179,6 +204,8 @@ def stage_validation(
         "visit_traversal_metadata": visit_traversal_metadata,
         "snapshot_sha256": snapshot_sha256,
         "ddi_asset_sha256": ddi_asset_sha256,
+        "canonical_ddi_semantics_sha256": canonical_ddi_semantics_sha256,
+        "feature_availability_sha256": feature_availability_sha256,
         "medication_vocabulary_sha256": vocab_sha256,
         "validation_patient_count": len(validation_patient_indices),
         "validation_visit_count": len(contexts),

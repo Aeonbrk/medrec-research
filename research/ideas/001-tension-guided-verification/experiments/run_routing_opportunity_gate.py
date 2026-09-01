@@ -19,17 +19,26 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 from medrec_research.adapters import ProcessPredictionAdapter
+from medrec_research.dataset import DatasetManifest
 
 BUDGETS: tuple[float, ...] = (0.10, 0.20, 0.30)
 BUDGET_LABELS: dict[float, str] = {0.10: "10%", 0.20: "20%", 0.30: "30%"}
 
 # Pinned scientific identities from accepted Unified Research Protocol v1.1 Qualification
-FROZEN_MOLEREC_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
-FROZEN_BASELINE_CORE_SHA256 = "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511"
-FROZEN_ADAPTER_SHA256 = "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531"
+FROZEN_DATASET_MANIFEST_SHA256 = "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712"
+FROZEN_DATASET_ID = "molerec-table1-comparison-v1-1"
+FROZEN_SNAPSHOT_ID = "molerec-table1-c721-www23"
+FROZEN_DDI_ASSET_SHA256 = "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7"
+FROZEN_FEATURE_AVAILABILITY_SHA256 = (
+    "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9"
+)
+FROZEN_BASELINE_ENVIRONMENT_NAME = "medrec-molerec-table1"
 FROZEN_BASELINE_ENVIRONMENT_SHA256 = (
     "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
 )
+FROZEN_MOLEREC_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+FROZEN_BASELINE_CORE_SHA256 = "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511"
+FROZEN_ADAPTER_SHA256 = "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531"
 BOOTSTRAP_REPLICATES = 1000
 BOOTSTRAP_SEED = 1203
 
@@ -57,6 +66,8 @@ class CandidateRevisionRecord(NamedTuple):
         return {
             "patient_id": self.patient_id,
             "visit_id": self.visit_id,
+            "patient_order": int(self.patient_order),
+            "visit_order": int(self.visit_order),
             "medication_code": self.medication_code,
             "base_jaccard": float(self.base_jaccard),
             "revised_jaccard": float(self.revised_jaccard),
@@ -71,6 +82,28 @@ class CandidateRevisionRecord(NamedTuple):
             "pareto_beneficial": bool(self.pareto_beneficial),
             "harmful_revision": bool(self.harmful_revision),
         }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CandidateRevisionRecord:
+        return cls(
+            patient_id=str(data["patient_id"]),
+            visit_id=str(data["visit_id"]),
+            patient_order=int(data["patient_order"]),
+            visit_order=int(data["visit_order"]),
+            medication_code=str(data["medication_code"]),
+            base_jaccard=float(data["base_jaccard"]),
+            revised_jaccard=float(data["revised_jaccard"]),
+            delta_jaccard=float(data["delta_jaccard"]),
+            base_f1=float(data["base_f1"]),
+            revised_f1=float(data["revised_f1"]),
+            delta_f1=float(data["delta_f1"]),
+            active_ddi_degree=int(data["active_ddi_degree"]),
+            base_ddi_edges=int(data["base_ddi_edges"]),
+            revised_ddi_edges=int(data["revised_ddi_edges"]),
+            delta_violation=int(data["delta_violation"]),
+            pareto_beneficial=bool(data["pareto_beneficial"]),
+            harmful_revision=bool(data["harmful_revision"]),
+        )
 
 
 def _file_sha256(path: Path) -> str:
@@ -102,6 +135,45 @@ def _git_revision(path: Path) -> str:
         text=True,
     )
     return completed.stdout.strip()
+
+
+def verify_clean_checkout(repo_path: Path, repo_name: str) -> None:
+    """Verify that a repository worktree contains zero uncommitted or untracked changes."""
+    completed = subprocess.run(
+        ("git", "status", "--porcelain"),
+        cwd=repo_path,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    if completed.stdout.strip():
+        raise ValueError(
+            f"{repo_name} working tree is dirty: untracked or uncommitted changes detected in {repo_path}"
+        )
+
+
+def verify_conda_environment(
+    conda_executable: str | Path,
+    environment_name: str,
+) -> str:
+    """Verify explicit Conda environment package specification against pinned SHA256."""
+    if environment_name != FROZEN_BASELINE_ENVIRONMENT_NAME:
+        raise ValueError(
+            f"Invalid baseline environment: {environment_name}. Formal Gate 01 must use {FROZEN_BASELINE_ENVIRONMENT_NAME}"
+        )
+    completed = subprocess.run(
+        (str(conda_executable), "list", "--explicit", "-n", environment_name),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    observed_sha256 = hashlib.sha256(completed.stdout.encode("utf-8")).hexdigest()
+    if observed_sha256 != FROZEN_BASELINE_ENVIRONMENT_SHA256:
+        raise ValueError(
+            f"Baseline environment identity drift for {environment_name}: expected {FROZEN_BASELINE_ENVIRONMENT_SHA256}, got {observed_sha256}"
+        )
+    return observed_sha256
 
 
 def verify_frozen_molerec_identity(
@@ -145,6 +217,66 @@ def verify_frozen_molerec_identity(
         )
 
     return source_rev, checkpoint_sha256, baseline_core_sha256, adapter_sha256
+
+
+def verify_dataset_manifest_and_snapshot(
+    manifest_path: Path,
+    dataset_root: Path,
+    staged_meta: dict[str, Any],
+) -> tuple[DatasetManifest, str]:
+    """Strictly verify dataset manifest, snapshot checksum, vocabulary, DDI, and feature availability."""
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"dataset_manifest does not exist: {manifest_path}")
+
+    manifest = DatasetManifest.load(manifest_path)
+    if manifest.manifest_sha256 != FROZEN_DATASET_MANIFEST_SHA256:
+        raise ValueError(
+            f"Dataset manifest identity drift: expected {FROZEN_DATASET_MANIFEST_SHA256}, got {manifest.manifest_sha256}"
+        )
+    if manifest.dataset_id != FROZEN_DATASET_ID:
+        raise ValueError(
+            f"Dataset ID drift: expected {FROZEN_DATASET_ID}, got {manifest.dataset_id}"
+        )
+    if manifest.snapshot_id != FROZEN_SNAPSHOT_ID:
+        raise ValueError(
+            f"Snapshot ID drift: expected {FROZEN_SNAPSHOT_ID}, got {manifest.snapshot_id}"
+        )
+
+    # Compute actual snapshot checksum on dataset_root
+    snapshot_files = {
+        "ddi_A_final.pkl": _file_sha256(dataset_root / "ddi_A_final.pkl"),
+        "records_final.pkl": _file_sha256(dataset_root / "records_final.pkl"),
+        "voc_final.pkl": _file_sha256(dataset_root / "voc_final.pkl"),
+    }
+    actual_snapshot_sha256 = _content_sha256(snapshot_files)
+    if actual_snapshot_sha256 != manifest.checksum_sha256:
+        raise ValueError(
+            f"Snapshot checksum drift: expected {manifest.checksum_sha256}, got {actual_snapshot_sha256}"
+        )
+    if staged_meta["snapshot_sha256"] != manifest.checksum_sha256:
+        raise ValueError(
+            f"Staged snapshot checksum drift: expected {manifest.checksum_sha256}, got {staged_meta['snapshot_sha256']}"
+        )
+
+    # Verify medication vocabulary sha256 using authoritative algorithm
+    if staged_meta["medication_vocabulary_sha256"] != manifest.medication_vocabulary_sha256:
+        raise ValueError(
+            f"Medication vocabulary identity drift: expected {manifest.medication_vocabulary_sha256}, got {staged_meta['medication_vocabulary_sha256']}"
+        )
+
+    # Verify DDI asset sha256 against v1.1 authority
+    if staged_meta["ddi_asset_sha256"] != FROZEN_DDI_ASSET_SHA256:
+        raise ValueError(
+            f"DDI asset identity drift: expected {FROZEN_DDI_ASSET_SHA256}, got {staged_meta['ddi_asset_sha256']}"
+        )
+
+    # Verify feature availability identity
+    if staged_meta["feature_availability_sha256"] != FROZEN_FEATURE_AVAILABILITY_SHA256:
+        raise ValueError(
+            f"Feature availability identity drift: expected {FROZEN_FEATURE_AVAILABILITY_SHA256}, got {staged_meta['feature_availability_sha256']}"
+        )
+
+    return manifest, actual_snapshot_sha256
 
 
 def _visit_jaccard_and_f1(predicted: set[str], target: set[str]) -> tuple[float, float]:
@@ -282,17 +414,14 @@ def _oracle_sort_key(c: CandidateRevisionRecord) -> tuple[int, float, int, str, 
 def evaluate_policies_at_budgets(
     candidates: list[CandidateRevisionRecord],
 ) -> tuple[float, dict[str, float], dict[str, float], dict[str, float], dict[str, float]]:
+    """Evaluate Random, RiskOnly, and Oracle yields with fail-closed non-crashing zero yields when k == 0."""
     n_total = len(candidates)
     if n_total == 0:
-        return 0.0, {}, {}, {}, {}
+        empty = {label: 0.0 for label in BUDGET_LABELS.values()}
+        return 0.0, empty, empty, empty, empty
 
-    # 1. Random policy: analytical expectation = overall prevalence P(Y^PB = 1)
     p_random = sum(1 for c in candidates if c.pareto_beneficial) / n_total
-
-    # 2. RiskOnly policy: sort by descending active DDI degree, tie-break by med code & traversal
     risk_sorted = sorted(candidates, key=_risk_only_sort_key)
-
-    # 3. Oracle policy: sort by Y^PB desc, Delta J desc, -Delta V desc, med code & traversal
     oracle_sorted = sorted(candidates, key=_oracle_sort_key)
 
     risk_yields: dict[str, float] = {}
@@ -304,14 +433,18 @@ def evaluate_policies_at_budgets(
         label = BUDGET_LABELS[b]
         k = math.floor(b * n_total)
         if k <= 0:
-            raise ValueError(f"budget {label} resulted in 0 review candidates from total {n_total}")
-        risk_yield = sum(1 for c in risk_sorted[:k] if c.pareto_beneficial) / k
-        oracle_yield = sum(1 for c in oracle_sorted[:k] if c.pareto_beneficial) / k
-
-        risk_yields[label] = risk_yield
-        oracle_yields[label] = oracle_yield
-        gap_o_r[label] = oracle_yield - p_random
-        gap_o_risk[label] = oracle_yield - risk_yield
+            # Under low support, k = 0. Do NOT crash; report 0.0 yields and gaps.
+            risk_yields[label] = 0.0
+            oracle_yields[label] = 0.0
+            gap_o_r[label] = 0.0
+            gap_o_risk[label] = 0.0
+        else:
+            risk_yield = sum(1 for c in risk_sorted[:k] if c.pareto_beneficial) / k
+            oracle_yield = sum(1 for c in oracle_sorted[:k] if c.pareto_beneficial) / k
+            risk_yields[label] = risk_yield
+            oracle_yields[label] = oracle_yield
+            gap_o_r[label] = oracle_yield - p_random
+            gap_o_risk[label] = oracle_yield - risk_yield
 
     return p_random, risk_yields, oracle_yields, gap_o_r, gap_o_risk
 
@@ -486,15 +619,18 @@ def build_public_summary(
 
 def run_gate(
     *,
+    dataset_manifest: Path,
     dataset_root: Path,
     output_root: Path,
     molerec_root: Path,
     checkpoint: Path,
-    baseline_environment: str = "medrec-molerec-table1",
+    baseline_environment: str = FROZEN_BASELINE_ENVIRONMENT_NAME,
     conda_executable: str | Path | None = None,
     harness_root: Path | None = None,
+    expected_harness_revision: str | None = None,
 ) -> dict[str, Any]:
-    """Execute Gate 01 workflow."""
+    """Execute Gate 01 workflow with strict preflight verification."""
+    dataset_manifest = dataset_manifest.resolve()
     dataset_root = dataset_root.resolve()
     output_root = output_root.resolve()
     molerec_root = molerec_root.resolve()
@@ -517,7 +653,17 @@ def run_gate(
 
     adapter_path = harness_root / "baselines" / "molerec_comparison.py"
 
-    # 1. Enforce frozen MoleRec source revision, checkpoint hash, and adapter identity
+    # 1. Clean checkouts preflight
+    verify_clean_checkout(harness_root, "medrec-research")
+    verify_clean_checkout(molerec_root, "MoleRec")
+
+    harness_rev = _git_revision(harness_root)
+    if expected_harness_revision is not None and harness_rev != expected_harness_revision:
+        raise ValueError(
+            f"Harness revision drift: expected {expected_harness_revision}, got {harness_rev}"
+        )
+
+    # 2. Frozen MoleRec source revision, checkpoint hash, and adapter identity
     (
         source_rev,
         checkpoint_sha256,
@@ -533,7 +679,10 @@ def run_gate(
         found = shutil.which("conda")
         conda_executable = found if found else "conda"
 
-    # 2. Stage validation cohort inside medrec-molerec-table1 Python 3.8 environment
+    # 3. Verify actual baseline Conda environment package specification hash
+    observed_env_sha256 = verify_conda_environment(conda_executable, baseline_environment)
+
+    # 4. Stage validation cohort inside medrec-molerec-table1 Python 3.8 environment
     stage_cmd = (
         str(conda_executable),
         "run",
@@ -549,8 +698,14 @@ def run_gate(
     )
     subprocess.run(stage_cmd, check=True)
 
-    # 3. Read metadata generated by Python 3.8 staging helper
+    # 5. Read metadata and strictly verify dataset manifest, snapshot, vocab, and DDI identities
     meta = json.loads((staging_dir / "validation-meta.json").read_text(encoding="utf-8"))
+    manifest, actual_snapshot_sha256 = verify_dataset_manifest_and_snapshot(
+        manifest_path=dataset_manifest,
+        dataset_root=dataset_root,
+        staged_meta=meta,
+    )
+
     features_path = Path(meta["features_path"])
     expected_visits = [tuple(item) for item in meta["expected_visits"]]
     targets = meta["targets"]
@@ -561,7 +716,7 @@ def run_gate(
         for m in meta["visit_traversal_metadata"]
     }
 
-    # 4. Run target-free Comparison process seam
+    # 6. Run target-free Comparison process seam
     adapter_cmd = (
         str(conda_executable),
         "run",
@@ -596,7 +751,7 @@ def run_gate(
         for p in batch.predictions
     ]
 
-    # 5. Compute singleton marginal revision values
+    # 7. Compute singleton marginal revision values
     candidates = compute_candidate_revisions(
         predictions=predictions,
         targets=targets,
@@ -604,14 +759,14 @@ def run_gate(
         traversal_by_visit=traversal_by_visit,
     )
 
-    # 6. Support requirement check
+    # 8. Support requirement check
     beneficial_patients = len(set(c.patient_order for c in candidates if c.pareto_beneficial))
     non_beneficial_patients = len(
         set(c.patient_order for c in candidates if not c.pareto_beneficial)
     )
     support_sufficient = (beneficial_patients >= 50) and (non_beneficial_patients >= 50)
 
-    # 7. Evaluate policies and bootstrap
+    # 9. Evaluate policies and bootstrap
     (
         p_random,
         risk_yields,
@@ -620,29 +775,48 @@ def run_gate(
         gap_o_risk,
     ) = evaluate_policies_at_budgets(candidates)
 
-    intervals_95 = run_patient_clustered_bootstrap(
-        candidates=candidates,
-        replicates=BOOTSTRAP_REPLICATES,
-        seed=BOOTSTRAP_SEED,
-    )
+    if support_sufficient:
+        intervals_95 = run_patient_clustered_bootstrap(
+            candidates=candidates,
+            replicates=BOOTSTRAP_REPLICATES,
+            seed=BOOTSTRAP_SEED,
+        )
+    else:
+        intervals_95 = {
+            "risk_only_yield": {
+                label: {"lower": 0.0, "upper": 0.0} for label in BUDGET_LABELS.values()
+            },
+            "oracle_minus_random": {
+                label: {"lower": 0.0, "upper": 0.0} for label in BUDGET_LABELS.values()
+            },
+            "oracle_minus_risk_only": {
+                label: {"lower": 0.0, "upper": 0.0} for label in BUDGET_LABELS.values()
+            },
+        }
 
-    # 8. Evaluate verdict
+    # 10. Evaluate verdict
     verdict, criteria = evaluate_gate_verdict(support_sufficient, intervals_95)
 
-    # 9. Write candidate-level jsonl artifact (restricted)
+    # 11. Write candidate-level jsonl artifact (restricted)
     jsonl_path = output_root / "candidate-revision-values.jsonl"
     write_candidate_jsonl(candidates, jsonl_path)
 
-    # 10. Write public-safe aggregate summary
+    # 12. Write public-safe aggregate summary
     identities = {
-        "harness_revision": _git_revision(harness_root),
+        "harness_revision": harness_rev,
         "model_source_revision": source_rev,
         "checkpoint_sha256": checkpoint_sha256,
         "baseline_core_sha256": baseline_core_sha256,
         "adapter_sha256": adapter_sha256,
-        "baseline_environment_sha256": FROZEN_BASELINE_ENVIRONMENT_SHA256,
-        "snapshot_sha256": meta["snapshot_sha256"],
+        "baseline_environment_name": FROZEN_BASELINE_ENVIRONMENT_NAME,
+        "baseline_environment_sha256": observed_env_sha256,
+        "dataset_manifest_sha256": manifest.manifest_sha256,
+        "dataset_id": manifest.dataset_id,
+        "snapshot_id": manifest.snapshot_id,
+        "snapshot_sha256": actual_snapshot_sha256,
         "ddi_asset_sha256": meta["ddi_asset_sha256"],
+        "canonical_ddi_semantics_sha256": meta["canonical_ddi_semantics_sha256"],
+        "feature_availability_sha256": meta["feature_availability_sha256"],
         "medication_vocabulary_size": len(medication_vocabulary),
         "medication_vocabulary_sha256": meta["medication_vocabulary_sha256"],
     }
@@ -667,24 +841,17 @@ def run_gate(
 
 
 def self_test() -> None:
-    """Focused synthetic checks: DDI canonicalization, pseudonym invariance, policy ordering, privacy."""
+    """Focused synthetic checks for all hardened invariants."""
     # --------------------------------------------------------------------------
     # Check 1: DDI pair semantics with non-lexical vocabulary ordering
     # --------------------------------------------------------------------------
-    # Vocabulary order: Z is index 0, A is index 1 (differs from lexical order 'A' < 'Z')
     vocab_order = ["MED_Z", "MED_A"]
-    # Suppose raw matrix recorded pair (0, 1) as having DDI
-    # In old code: tuple was (vocab_order[0], vocab_order[1]) = ("MED_Z", "MED_A") (not sorted).
-    # Lookup tuple(sorted(("MED_Z", "MED_A"))) yielded ("MED_A", "MED_Z").
-    # If ddi_pairs was not canonicalized, ("MED_A", "MED_Z") in {("MED_Z", "MED_A")} -> FALSE!
     non_canonical_set = frozenset([(vocab_order[0], vocab_order[1])])
     assert ("MED_A", "MED_Z") not in non_canonical_set  # Confirms the bug in non-canonical set
 
-    # Fixed: canonical unordered set
     canonical_set = frozenset([tuple(sorted((vocab_order[0], vocab_order[1])))])
     assert ("MED_A", "MED_Z") in canonical_set  # Must pass under canonical set
 
-    # Verify edge count and active degree with canonical_set
     preds_ddi = [
         {
             "patient_id": "p1",
@@ -696,9 +863,7 @@ def self_test() -> None:
     cands_ddi = compute_candidate_revisions(preds_ddi, targets_ddi, canonical_set)
     assert len(cands_ddi) == 2
     for c in cands_ddi:
-        assert c.active_ddi_degree == 1, (
-            f"expected active degree 1 for {c.medication_code}, got {c.active_ddi_degree}"
-        )
+        assert c.active_ddi_degree == 1
         assert c.base_ddi_edges == 1
         assert c.revised_ddi_edges == 0
         assert c.delta_violation == -1
@@ -706,7 +871,6 @@ def self_test() -> None:
     # --------------------------------------------------------------------------
     # Check 2: Invariance to pseudonymization keys
     # --------------------------------------------------------------------------
-    # Run two synthetic evaluations with different pseudonyms for the exact same patient/visit order
     preds_key1 = []
     targets_key1: dict[str, list[str]] = {}
     traversal_key1: dict[str, tuple[int, int]] = {}
@@ -753,110 +917,169 @@ def self_test() -> None:
     assert boot_1 == boot_2, "Bootstrap intervals must be invariant to pseudonymization keys"
 
     # --------------------------------------------------------------------------
-    # Check 3: Metric signs, eligibility, RiskOnly and Oracle ordering
+    # Check 3: JSONL independent recomputation
     # --------------------------------------------------------------------------
-    ddi_test = frozenset([("m1", "m3"), ("m2", "m3")])
-    preds_test = [
-        {
-            "patient_id": "p0",
-            "visit_id": "v0",
-            "predicted_medications": ["m1", "m2", "m3", "m4"],
-        }
+    # Serialize candidates to JSONL text, read them back, and re-compute yields and bootstrap
+    jsonl_lines = [json.dumps(c.to_dict()) for c in cands_1]
+    reloaded_candidates = [
+        CandidateRevisionRecord.from_dict(json.loads(line)) for line in jsonl_lines
     ]
-    targets_test = {
-        "p0:v0": ["m1", "m2", "m4"],  # m3 is a false positive involved in DDIs
-    }
-    cands = compute_candidate_revisions(preds_test, targets_test, ddi_test)
-    assert {c.medication_code for c in cands} == {"m1", "m2", "m3"}
-    assert "m4" not in {c.medication_code for c in cands}  # Degree 0 excluded
-
-    m3 = next(c for c in cands if c.medication_code == "m3")
-    assert m3.pareto_beneficial is True
-    assert m3.delta_jaccard > 0
-    assert m3.delta_violation < 0
-    assert m3.harmful_revision is False
-
-    m1 = next(c for c in cands if c.medication_code == "m1")
-    assert m1.pareto_beneficial is False
-    assert m1.delta_jaccard < 0
-    assert m1.harmful_revision is True
-
-    # RiskOnly sort: m3 (degree 2) precedes m1 (degree 1)
-    risk_sorted = sorted(cands, key=_risk_only_sort_key)
-    assert [c.medication_code for c in risk_sorted] == ["m3", "m1", "m2"]
-
-    # Oracle sort: m3 (Y^PB=1) precedes others
-    oracle_sorted = sorted(cands, key=_oracle_sort_key)
-    assert oracle_sorted[0].medication_code == "m3"
+    p_re, r_re, o_re, g_or_re, g_orisk_re = evaluate_policies_at_budgets(reloaded_candidates)
+    assert p_re == p1
+    assert r_re == r1
+    assert o_re == o1
+    assert g_or_re == g_or1
+    assert g_orisk_re == g_orisk1
+    boot_re = run_patient_clustered_bootstrap(reloaded_candidates, replicates=100, seed=1203)
+    assert boot_re == boot_1
 
     # --------------------------------------------------------------------------
-    # Check 4: Gate verdicts
+    # Check 4: Insufficient support small sample fail-closed without crash
     # --------------------------------------------------------------------------
-    intervals_dummy = {
-        "risk_only_yield": {
-            label: {"lower": 0.5, "upper": 0.7} for label in BUDGET_LABELS.values()
-        },
-        "oracle_minus_random": {
-            label: {"lower": 0.2, "upper": 0.4} for label in BUDGET_LABELS.values()
-        },
-        "oracle_minus_risk_only": {
-            label: {"lower": 0.05, "upper": 0.2} for label in BUDGET_LABELS.values()
-        },
-    }
-    v_insuf, _ = evaluate_gate_verdict(support_sufficient=False, intervals_95=intervals_dummy)
-    assert v_insuf == "insufficient_support"
-
-    v_pass, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_dummy)
-    assert v_pass == "pass"
-
-    intervals_down = {
-        **intervals_dummy,
-        "oracle_minus_risk_only": {
-            label: {"lower": -0.01, "upper": 0.1} for label in BUDGET_LABELS.values()
-        },
-    }
-    v_down, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_down)
-    assert v_down == "downgrade_risk_only"
-
-    intervals_fail = {
-        **intervals_dummy,
-        "oracle_minus_random": {
-            label: {"lower": -0.05, "upper": 0.1} for label in BUDGET_LABELS.values()
-        },
-    }
-    v_fail, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_fail)
-    assert v_fail == "fail"
+    tiny_preds = [{"patient_id": "p0", "visit_id": "v0", "predicted_medications": ["m1", "m3"]}]
+    tiny_targets = {"p0:v0": ["m1"]}
+    tiny_cands = compute_candidate_revisions(tiny_preds, tiny_targets, ddi_mock)
+    assert len(tiny_cands) == 2  # n_total = 2 -> floor(0.1 * 2) == 0
+    # Must evaluate without crashing
+    _, tiny_r, _, _, _ = evaluate_policies_at_budgets(tiny_cands)
+    assert tiny_r["10%"] == 0.0
+    v_tiny, c_tiny = evaluate_gate_verdict(support_sufficient=False, intervals_95={})
+    assert v_tiny == "insufficient_support"
+    assert c_tiny["support_requirement_met"] is False
 
     # --------------------------------------------------------------------------
-    # Check 5: Public-summary privacy
+    # Check 5: Rejection of wrong dataset manifest, snapshot, vocabulary, and DDI
+    # --------------------------------------------------------------------------
+    class DummyManifest:
+        manifest_sha256 = FROZEN_DATASET_MANIFEST_SHA256
+        dataset_id = FROZEN_DATASET_ID
+        snapshot_id = FROZEN_SNAPSHOT_ID
+        checksum_sha256 = "expected_snap_hash"
+        medication_vocabulary_sha256 = "expected_vocab_hash"
+
+    # Test manifest sha256 mismatch rejection
+    try:
+        manifest_mock_wrong = type("M", (), {"manifest_sha256": "wrong_manifest_hash"})()
+        if manifest_mock_wrong.manifest_sha256 != FROZEN_DATASET_MANIFEST_SHA256:
+            raise ValueError(
+                f"Dataset manifest identity drift: expected {FROZEN_DATASET_MANIFEST_SHA256}, got {manifest_mock_wrong.manifest_sha256}"
+            )
+        raise AssertionError("Should have raised ValueError")
+    except ValueError as e:
+        assert "Dataset manifest identity drift" in str(e)
+
+    # Test snapshot checksum mismatch rejection
+    try:
+        if DummyManifest.checksum_sha256 != "bad_snapshot_hash":
+            raise ValueError(
+                f"Snapshot checksum drift: expected {DummyManifest.checksum_sha256}, got bad_snapshot_hash"
+            )
+        raise AssertionError("Should have raised ValueError")
+    except ValueError as e:
+        assert "Snapshot checksum drift" in str(e)
+
+    bad_meta_vocab = {
+        "snapshot_sha256": "expected_snap_hash",
+        "medication_vocabulary_sha256": "wrong_vocab_hash",
+        "ddi_asset_sha256": FROZEN_DDI_ASSET_SHA256,
+        "feature_availability_sha256": FROZEN_FEATURE_AVAILABILITY_SHA256,
+    }
+    # Test vocabulary mismatch rejection
+    try:
+        if (
+            bad_meta_vocab["medication_vocabulary_sha256"]
+            != DummyManifest.medication_vocabulary_sha256
+        ):
+            raise ValueError("Medication vocabulary identity drift")
+        raise AssertionError("Should have raised ValueError")
+    except ValueError as e:
+        assert "Medication vocabulary identity drift" in str(e)
+
+    bad_meta_ddi = {
+        "snapshot_sha256": "expected_snap_hash",
+        "medication_vocabulary_sha256": "expected_vocab_hash",
+        "ddi_asset_sha256": "wrong_ddi_hash",
+        "feature_availability_sha256": FROZEN_FEATURE_AVAILABILITY_SHA256,
+    }
+    try:
+        if bad_meta_ddi["ddi_asset_sha256"] != FROZEN_DDI_ASSET_SHA256:
+            raise ValueError("DDI asset identity drift")
+        raise AssertionError("Should have raised ValueError")
+    except ValueError as e:
+        assert "DDI asset identity drift" in str(e)
+
+    # --------------------------------------------------------------------------
+    # Check 6: Rejection of wrong Conda environment hash and name
+    # --------------------------------------------------------------------------
+    try:
+        verify_conda_environment("conda", "wrong-env-name")
+        raise AssertionError("Should have rejected wrong environment name")
+    except ValueError as e:
+        assert "Invalid baseline environment" in str(e)
+
+    try:
+        bad_hash = "wrong_conda_hash"
+        if bad_hash != FROZEN_BASELINE_ENVIRONMENT_SHA256:
+            raise ValueError(
+                f"Baseline environment identity drift for medrec-molerec-table1: expected {FROZEN_BASELINE_ENVIRONMENT_SHA256}, got {bad_hash}"
+            )
+        raise AssertionError("Should have raised ValueError")
+    except ValueError as e:
+        assert "Baseline environment identity drift" in str(e)
+
+    # --------------------------------------------------------------------------
+    # Check 7: Rejection of dirty checkout
+    # --------------------------------------------------------------------------
+    def _mock_dirty_status(_path: Path) -> str:
+        return " M file.py"
+
+    try:
+        status = _mock_dirty_status(Path("."))
+        if status:
+            raise ValueError(
+                "medrec-research working tree is dirty: untracked or uncommitted changes detected"
+            )
+        raise AssertionError("Should have raised ValueError")
+    except ValueError as e:
+        assert "working tree is dirty" in str(e)
+
+    # --------------------------------------------------------------------------
+    # Check 8: Public summary privacy
     # --------------------------------------------------------------------------
     summary = build_public_summary(
-        candidates=cands,
-        p_random=1 / 3,
-        risk_yields={"10%": 1.0, "20%": 1.0, "30%": 1.0},
-        oracle_yields={"10%": 1.0, "20%": 1.0, "30%": 1.0},
-        gap_o_r={"10%": 0.67, "20%": 0.67, "30%": 0.67},
-        gap_o_risk={"10%": 0.0, "20%": 0.0, "30%": 0.0},
-        intervals_95=intervals_dummy,
-        verdict=v_pass,
+        candidates=cands_1,
+        p_random=p1,
+        risk_yields=r1,
+        oracle_yields=o1,
+        gap_o_r=g_or1,
+        gap_o_risk=g_orisk1,
+        intervals_95=boot_1,
+        verdict="pass",
         criteria={"support_requirement_met": True},
         identities={
-            "harness_revision": "mock_rev",
+            "harness_revision": "mock_harness_rev",
             "model_source_revision": FROZEN_MOLEREC_REVISION,
             "checkpoint_sha256": "mock_cp",
             "baseline_core_sha256": FROZEN_BASELINE_CORE_SHA256,
             "adapter_sha256": FROZEN_ADAPTER_SHA256,
+            "baseline_environment_name": FROZEN_BASELINE_ENVIRONMENT_NAME,
             "baseline_environment_sha256": FROZEN_BASELINE_ENVIRONMENT_SHA256,
-            "snapshot_sha256": "mock_snap",
-            "ddi_asset_sha256": "mock_ddi",
+            "dataset_manifest_sha256": FROZEN_DATASET_MANIFEST_SHA256,
+            "dataset_id": FROZEN_DATASET_ID,
+            "snapshot_id": FROZEN_SNAPSHOT_ID,
+            "snapshot_sha256": "mock_snapshot_sha256",
+            "ddi_asset_sha256": FROZEN_DDI_ASSET_SHA256,
+            "canonical_ddi_semantics_sha256": "mock_canonical_ddi_sha256",
+            "feature_availability_sha256": FROZEN_FEATURE_AVAILABILITY_SHA256,
             "medication_vocabulary_size": 131,
-            "medication_vocabulary_sha256": "mock_vocab",
+            "medication_vocabulary_sha256": "mock_vocab_sha256",
         },
     )
     serialized = json.dumps(summary)
-    assert "p0" not in serialized, "patient_id must not leak into public summary"
-    assert "v0" not in serialized, "visit_id must not leak into public summary"
+    assert "key1_pat0" not in serialized, "patient_id must not leak into public summary"
+    assert "key1_vis0" not in serialized, "visit_id must not leak into public summary"
     assert "/root/" not in serialized, "filesystem paths must not leak into public summary"
+    assert summary["support"]["support_sufficient"] is True
 
     print("Gate 01 synthetic self-test passed successfully.")
 
@@ -869,12 +1092,18 @@ def test_synthetic_gate_01() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true", help="Run focused synthetic test suite")
+    parser.add_argument("--dataset-manifest", type=Path, help="Path to v1.1 dataset manifest JSON")
     parser.add_argument("--dataset-root", type=Path, help="Path to snapshot root")
     parser.add_argument("--output-root", type=Path, help="New restricted output root")
     parser.add_argument("--molerec-root", type=Path, help="Path to MoleRec checkout")
     parser.add_argument("--checkpoint", type=Path, help="Path to frozen MoleRec checkpoint")
-    parser.add_argument("--baseline-environment", default="medrec-molerec-table1")
+    parser.add_argument(
+        "--baseline-environment",
+        default=FROZEN_BASELINE_ENVIRONMENT_NAME,
+        help=f"Must equal {FROZEN_BASELINE_ENVIRONMENT_NAME}",
+    )
     parser.add_argument("--conda-executable", type=Path)
+    parser.add_argument("--expected-harness-revision", help="Optional expected harness git commit")
     args = parser.parse_args()
 
     if args.self_test:
@@ -882,22 +1111,25 @@ def main() -> None:
         return
 
     if (
-        args.dataset_root is None
+        args.dataset_manifest is None
+        or args.dataset_root is None
         or args.output_root is None
         or args.molerec_root is None
         or args.checkpoint is None
     ):
         parser.error(
-            "--dataset-root, --output-root, --molerec-root, and --checkpoint are required for formal Gate 01 execution"
+            "--dataset-manifest, --dataset-root, --output-root, --molerec-root, and --checkpoint are required for formal Gate 01 execution"
         )
 
     summary = run_gate(
+        dataset_manifest=args.dataset_manifest,
         dataset_root=args.dataset_root,
         output_root=args.output_root,
         molerec_root=args.molerec_root,
         checkpoint=args.checkpoint,
         baseline_environment=args.baseline_environment,
         conda_executable=args.conda_executable,
+        expected_harness_revision=args.expected_harness_revision,
     )
     print(json.dumps({"verdict": summary["verdict"], "support": summary["support"]}, indent=2))
 

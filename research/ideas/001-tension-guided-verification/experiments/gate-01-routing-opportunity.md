@@ -346,11 +346,13 @@ Restricted 319-only artifact:
 
 `candidate-revision-values.jsonl`
 
-Minimum fields:
+Minimum fields per record:
 
 ```text
 patient_id
 visit_id
+patient_order
+visit_order
 medication_code
 base_jaccard
 revised_jaccard
@@ -365,6 +367,8 @@ delta_violation
 pareto_beneficial
 harmful_revision
 ```
+
+Fields `patient_order` and `visit_order` are integer validation traversal indices that allow independent auditors to recompute RiskOnly ordering, Oracle ordering, support counts, and patient-cluster bootstrap without relying on pseudonym keys. They remain strictly in the restricted artifact and must never enter public summaries.
 
 Public-safe aggregate artifact:
 
