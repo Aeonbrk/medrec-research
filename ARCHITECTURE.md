@@ -48,7 +48,7 @@ Comparison Mode freezes the Baseline Core. A Prediction Adapter can map files, i
 
 ## Ownership
 
-The core Python package owns public-safe schemas, deterministic evaluation, registry validation, process validation, and the synthetic vertical slice. The MacBook owns protocol checks, remote submission, monitoring, and public-safe intake. The 319 execution plane owns real-data computation, external Baseline Environments, the separate Core Evaluator Environment, GPU jobs, and restricted outputs. Research Memory owns accepted scientific state and failed-route constraints. The 319 Local Data Root owns all restricted data and private run artifacts.
+The core Python package owns public-safe schemas, deterministic evaluation, registry validation, process validation, and the synthetic vertical slice. Prototype experiment logic stays inside `research/ideas/<idea>/`; only capabilities that survive falsification and are reused across experiments are promoted to `src/medrec_research/` (`idea-local prototype → reusable research capability → src/`). The MacBook owns protocol checks, remote submission, monitoring, and public-safe intake. The 319 execution plane owns real-data computation, external Baseline Environments, the separate Core Evaluator Environment, GPU jobs, and restricted outputs. `research/ideas/` owns early-stage hypothesis-selection experiments; `papers/` owns mature claim-support packages; `research/memory/` owns cross-idea generalizable lessons; `research/baselines/` owns baseline infrastructure; and the 319 Local Data Root owns all restricted data and private run artifacts.
 
 ## Dependency direction
 
@@ -61,8 +61,9 @@ baselines/      Baseline Registry plus implemented Reproduction Programs
 docs/           Decisions, specifications, plans, and operational playbooks
 environments/   Verified or explicitly provisional 319 environment declarations
 fixtures/       Public synthetic data only
-research/       Curated Research Memory and Failure Records
-src/            Reusable protocol implementation
+papers/         Publication-facing paper projects (CCFA lifecycle, manuscript, claim-support experiments)
+research/       Early-stage ideas (ideas/), baseline infrastructure (baselines/), and cross-idea memory (memory/)
+src/            Reusable protocol and library implementation
 tests/          Tests through public module interfaces
 ```
 

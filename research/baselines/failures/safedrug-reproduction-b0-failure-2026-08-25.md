@@ -3,6 +3,7 @@
 # Failure Record: SafeDrug Four-Model Reproduction B0 Data Gate Termination
 
 - **Attempt ID**: `formal-20260825-231500`
+- **Status**: Historical (Terminal attempt; succeeded by `formal-20260826-025500`)
 - **Date**: 2026-08-25
 - **Harness Revision**: `caec25e7f41166998b4ed0d7ad201b8355f77eea`
 - **Archived Model Revision**: `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`

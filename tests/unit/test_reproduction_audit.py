@@ -17,7 +17,9 @@ from medrec_research.reproduction.reproduction_audit import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[2]
-REFERENCE_PATH = PROJECT_ROOT / "research" / "baseline-preflight" / "safedrug-table2-reference.json"
+REFERENCE_PATH = (
+    PROJECT_ROOT / "research" / "baselines" / "preflight" / "safedrug-table2-reference.json"
+)
 TEST_ENV_SHA = "c" * 64
 TEST_HARNESS_SHA = "a" * 64
 TEST_PREPROC_SHA = "c7218d0976e5ee5588aeaf5bdbc86b338126bba5"

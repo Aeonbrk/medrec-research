@@ -241,7 +241,7 @@ def audit_safedrug_table2(
     ref_path = (
         reference_path
         if reference_path is not None
-        else Path("research/baseline-preflight/safedrug-table2-reference.json")
+        else Path("research/baselines/preflight/safedrug-table2-reference.json")
     )
     reference = load_table2_reference(ref_path)
 

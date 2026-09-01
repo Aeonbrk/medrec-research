@@ -1,3 +1,14 @@
+<!-- markdownlint-disable MD001 MD013 -->
+
+# Idea 001: Tension-Guided Verification
+
+- **Idea ID**: `001-tension-guided-verification`
+- **Status**: Active
+- **Core Hypothesis**: Under limited verification resources, medication transitions subjected to simultaneously high predictive model support and high external constraint pressure yield a superior Pareto frontier than standard predictive uncertainty or boundary triggers.
+- **Key Uncertainty**: Whether apparent tension gains survive control for medication count, drug frequency, and global scalar reranking (competing simple explanations).
+- **Next Minimal Experiment**: S-1 (Task timestamp semantics audit) and S0/S0.5 (Action decomposition and coverage profiler).
+- **Current Verdict**: Active (Proceed to S-1 / S0 minimal pilot).
+
 > We use the tension between predictive support and external constraint pressure to identify medication decisions with high marginal value of verification.
 
 # MedRec Research Roadmap v2

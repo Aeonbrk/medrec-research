@@ -22,7 +22,9 @@ from medrec_research.reproduction.safedrug_selection import (
 )
 
 PROJECT_ROOT = Path(__file__).parents[2]
-REFERENCE_PATH = PROJECT_ROOT / "research" / "baseline-preflight" / "molerec-table1-reference.json"
+REFERENCE_PATH = (
+    PROJECT_ROOT / "research" / "baselines" / "preflight" / "molerec-table1-reference.json"
+)
 ENVIRONMENT_SHA = "d" * 64
 HARNESS_REVISION = "a" * 40
 PREPROCESSING_REVISION = "c" * 40

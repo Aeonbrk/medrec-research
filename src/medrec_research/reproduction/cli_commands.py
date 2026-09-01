@@ -861,7 +861,7 @@ def register_reproduction_commands(commands: Any) -> None:
     prepared_audit.add_argument(
         "--reference",
         type=Path,
-        default=Path("research/baseline-preflight/molerec-table1-reference.json"),
+        default=Path("research/baselines/preflight/molerec-table1-reference.json"),
     )
     prepared_audit.set_defaults(handler=_audit_prepared_molerec_evaluation)
 
@@ -1000,7 +1000,7 @@ def register_reproduction_commands(commands: Any) -> None:
     audit.add_argument(
         "--reference",
         type=Path,
-        default=Path("research/baseline-preflight/safedrug-table2-reference.json"),
+        default=Path("research/baselines/preflight/safedrug-table2-reference.json"),
         help="Optional path to Table 2 reference JSON",
     )
     audit.add_argument(
@@ -1067,7 +1067,7 @@ def register_reproduction_commands(commands: Any) -> None:
     audit_molerec.add_argument(
         "--reference",
         type=Path,
-        default=Path("research/baseline-preflight/molerec-table1-reference.json"),
+        default=Path("research/baselines/preflight/molerec-table1-reference.json"),
         help="Optional path to Table 1 reference JSON",
     )
     audit_molerec.add_argument(

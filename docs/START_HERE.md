@@ -18,6 +18,7 @@ Use this page to find the source of truth for the question in front of you.
 ## Inspect research state
 
 - [`../research/README.md`](../research/README.md) is the main entry point for the scientific workflow (`Idea → Minimal Experiment → Evidence → Decision`). It explains the directory structure for early-stage ideas, baseline infrastructure, and global memory.
+- [`../papers/README.md`](../papers/README.md) defines the boundary and governance for mature, publication-facing paper packages (`papers/<paper>/`).
 - [`../baselines/registry.toml`](../baselines/registry.toml) is the baseline identity, Reproduction Program, and readiness registry.
 - [`../baselines/safedrug_archived.py`](../baselines/safedrug_archived.py) and [`../baselines/molerec.py`](../baselines/molerec.py) are the implemented Reproduction Programs for the five-model suite across seven lanes.
 - [`../README.md`](../README.md) gives runnable local commands and the current public-safe status.

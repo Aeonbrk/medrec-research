@@ -28,9 +28,9 @@ The five-model baseline preparation is complete.
 
 - `docs/PLANS.md` — completed-work state.
 - `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md` — accepted plan and terminal outcome.
-- `research/baseline-preflight/molerec-five-model-reproduction-report.md` — public-safe Phase A report.
-- `research/baseline-preflight/five-model-comparison-qualification.json` — public-safe Phase B scope, gate, qualification, and outcome identities.
-- `research/baseline-preflight/five-model-baseline-readiness-report.md` — per-model two-axis readiness report.
+- `research/baselines/preflight/molerec-five-model-reproduction-report.md` — public-safe Phase A report.
+- `research/baselines/preflight/five-model-comparison-qualification.json` — public-safe Phase B scope, gate, qualification, and outcome identities.
+- `research/baselines/preflight/five-model-baseline-readiness-report.md` — per-model two-axis readiness report.
 - `baselines/registry.toml` — current Comparison readiness authority.
 
 ## Operational snapshot

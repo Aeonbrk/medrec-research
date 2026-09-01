@@ -83,7 +83,8 @@ Use `medrec` or `medrec-research` after `uv sync`:
 - [`ARCHITECTURE.md`](ARCHITECTURE.md): Architecture module and seam map.
 - [`docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`](docs/specs/UNIFIED_RESEARCH_PROTOCOL.md) and [`docs/specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md`](docs/specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md): Comparison Mode base contract and current amendment.
 - [`baselines/registry.toml`](baselines/registry.toml): Baseline identity and readiness registry.
-- [`research/README.md`](research/README.md): Research workflow and scientific memory.
+- [`research/README.md`](research/README.md): Research workflow, early-stage ideas, baseline infrastructure, and scientific memory.
+- [`papers/README.md`](papers/README.md): Publication-facing paper stage packages.
 - [`docs/PLANS.md`](docs/PLANS.md): Multi-step software/infrastructure work tracker.
 
 ## Execution model

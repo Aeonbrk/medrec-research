@@ -4,6 +4,8 @@
 
 Source boundary: `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. Every archive path in this record refers to that revision.
 
+- **Status**: Historical Memory (Route terminated; non-revival boundary fixed)
+
 ## Decision
 
 The EGSF context-conditioned selector route is failed historical memory. The archive does not support a method claim that patient or context buckets require different DDI trade-off parameters.

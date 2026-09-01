@@ -1,5 +1,7 @@
 # Unified Research Protocol v1.1 Amendment
 
+Status: `Current (Active Comparison Mode Protocol Amendment)`
+
 Protocol v1.1 is an additive Comparison Mode amendment to
 [Unified Research Protocol 1.0](UNIFIED_RESEARCH_PROTOCOL.md). Existing v1.0
 records remain readable and keep their original scope semantics. A v1.1

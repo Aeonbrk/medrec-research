@@ -442,7 +442,7 @@ def audit_molerec_table1(
     """Audit finalized five-model artifacts without treating direction as reproduction."""
     del data_root
     reference = load_molerec_table1_reference(
-        reference_path or Path("research/baseline-preflight/molerec-table1-reference.json")
+        reference_path or Path("research/baselines/preflight/molerec-table1-reference.json")
     )
     ledger = _load_ledger(ledger_path, declaration=declaration)
     result_lane_ids = ledger["test_lane_ids"]

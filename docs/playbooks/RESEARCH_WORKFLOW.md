@@ -9,6 +9,23 @@ This workflow guides research routes through evidence gates using the MedRec Res
 - **`research/memory/`**: Cross-idea reusable lessons and terminal global failures go here. Do not clutter this with idea-specific iterations.
 - **`papers/<paper-name>/`**: Once an idea is fully mature (evidence is solid, decision is to publish), it is promoted to a paper directory to manage the manuscript lifecycle (`ccfa.yaml`, `experiments/`, `manuscript/`). Do not duplicate this structure for early-stage ideas.
 
+## Core Governance Rules
+
+### 1. Code Promotion: Idea-Local Prototype → Reusable Capability → `src/`
+
+- Unproven experiment scripts and exploratory probes remain local to `research/ideas/<idea>/` (or runtime scratch).
+- Code is promoted to `src/medrec_research/` **only** when a capability survives falsification and is reused across multiple experiments or ideas. Never dump speculative idea logic into `src/`.
+
+### 2. Experiment Scope: Hypothesis Selection vs. Claim Support
+
+- **Idea Experiments (`research/ideas/<idea>/experiments/`)**: Designed strictly for *hypothesis selection*. The goal is falsification via the cheapest disconfirming test ("Should we continue or kill this idea?").
+- **Paper Experiments (`papers/<paper>/experiments/`)**: Designed strictly for *claim support*. Includes full-scale multi-backbone benchmarking, exhaustive ablations, stress tests, bootstrap confidence intervals, and reviewer-requested verification for frozen paper claims.
+
+### 3. Knowledge Retention: Idea-Specific Evidence vs. Cross-Idea Memory
+
+- Idea-specific outcomes and failures stay inside `research/ideas/<idea>/`.
+- Findings are promoted to `research/memory/` **only** when they represent cross-idea reusable methodology lessons (e.g. baseline traps, scalar reranking dominance) that constrain future research directions.
+
 ## Workflow
 
 1. **Refine the question (Idea)**: Create a new directory under `research/ideas/`. State the falsifiable question, novelty threat, causal mechanism, and the cheapest disconfirming test.

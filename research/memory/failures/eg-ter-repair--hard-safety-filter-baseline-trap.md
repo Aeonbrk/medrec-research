@@ -4,6 +4,8 @@
 
 Source boundary: `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. Every archive path in this record refers to that revision.
 
+- **Status**: Historical Memory (Route terminated; non-revival boundary fixed)
+
 ## Decision
 
 The EG-TER repair-policy route is failed. `D_therapeutic` remains reusable only as a scoped continuous diagnostic metric after hard-safety feasibility has been enforced.

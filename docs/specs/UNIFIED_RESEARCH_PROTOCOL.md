@@ -1,6 +1,7 @@
 # Unified Research Protocol
 
 Protocol version: `1.0`
+Status: `Current (Base Protocol; active Comparison Mode requires v1.1 amendment)`
 
 ## Purpose
 

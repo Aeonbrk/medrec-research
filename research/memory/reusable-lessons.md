@@ -34,7 +34,7 @@ When a preregistered gate returns no accepted action, tuning the risk budget, gr
 
 ## Preserve residue without promoting it
 
-Failed routes can leave useful assets: EGSF left a strong-control diagnostic package, EG-TER left a continuous distortion metric and a leveled hard-filter protocol, and CRC-PS left a calibration stop rule and guarantee boundary. Reuse those assets as controls or diagnostics until new evidence supports a new claim. Archive evidence: `ARCHITECTURE.md`, `docs/PROJECT_SENSE.md`, and the three Failure Records in this directory.
+Failed routes can leave useful assets: EGSF left a strong-control diagnostic package, EG-TER left a continuous distortion metric and a leveled hard-filter protocol, and CRC-PS left a calibration stop rule and guarantee boundary. Reuse those assets as controls or diagnostics until new evidence supports a new claim. Archive evidence: `ARCHITECTURE.md`, `docs/PROJECT_SENSE.md`, and the three Failure Records under `failures/` ([CRC-PS](failures/crc-ps-r006--conformal-risk-certificate-exhaustion.md), [EG-TER](failures/eg-ter-repair--hard-safety-filter-baseline-trap.md), [EGSF](failures/egsf-selector--global-scalar-reranking-dominance.md)).
 
 ## Keep archive logistics out of active research records
 
