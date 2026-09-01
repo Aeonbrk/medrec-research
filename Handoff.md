@@ -35,8 +35,8 @@ The five-model baseline preparation is complete.
 
 ## Operational snapshot
 
-- **Branch**: `refactor/architecture-surface-hardening`
-- **Suite health**: Local verification passed: 330 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
+- **Branch**: `main`
+- **Suite health**: Local verification passed: 333 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
 - **Architecture**:
   - Concrete Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) expose strictly `__all__ = ("execute", "probe")` as their formal programmatic façade, with `main()` acting as a thin transport wrapper.
   - Root `src/medrec_research/cli.py` is a pure composition root with zero direct reproduction domain imports, delegating reproduction CLI orchestration to `src/medrec_research/reproduction/cli_commands.py`.

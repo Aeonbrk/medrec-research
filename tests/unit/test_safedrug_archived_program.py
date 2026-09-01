@@ -1195,3 +1195,61 @@ def test_safedrug_parser_supports_probe_scope_and_modes() -> None:
     assert args.scope == "full"
     assert str(args.upstream_root) == "/path/to/upstream"
     assert str(args.dataset_root) == "/path/to/dataset"
+
+
+def test_safedrug_program_execute_recovery_dispatches_to_recover_formal_lane(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dataset = tmp_path / "data"
+    dataset.mkdir()
+    run = tmp_path / "run"
+    run.mkdir()
+    expected_marker = run / "recoveries" / "finalizer-1"
+
+    calls = []
+
+    def mock_recover_formal_lane(
+        *,
+        profile: Any,
+        data_dir: Path,
+        run_root: Path,
+        recovery_id: str,
+        finalizer_revision: str,
+    ) -> Path:
+        calls.append(
+            {
+                "profile": profile,
+                "data_dir": data_dir,
+                "run_root": run_root,
+                "recovery_id": recovery_id,
+                "finalizer_revision": finalizer_revision,
+            }
+        )
+        return expected_marker
+
+    monkeypatch.setattr(adapter, "recover_formal_lane", mock_recover_formal_lane)
+
+    request = {
+        "mode": "recovery",
+        "baseline_id": "retain",
+        "dataset_root": str(dataset),
+        "run_root": str(run),
+        "recovery_id": "finalizer-1",
+        "finalizer_revision": "e" * 40,
+    }
+
+    result = adapter.execute(request)
+
+    assert result == {
+        "state": "completed",
+        "mode": "recovery",
+        "marker_path": str(expected_marker),
+    }
+    assert len(calls) == 1
+    call = calls[0]
+    assert call["profile"].baseline_id == "retain"
+    assert call["data_dir"] == dataset
+    assert call["run_root"] == run
+    assert call["recovery_id"] == "finalizer-1"
+    assert call["finalizer_revision"] == "e" * 40

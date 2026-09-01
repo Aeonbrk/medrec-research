@@ -74,7 +74,7 @@ def test_recover_reproduction_handler_executes_via_program_execute(
     assert "recovery_root" in captured.out
 
 
-def test_recover_reproduction_translates_reproduction_error_and_preserves_privacy(
+def test_recover_reproduction_translates_reproduction_error_to_cli_error(
     tmp_path, monkeypatch, capsys
 ) -> None:
     from baselines import safedrug_archived
@@ -111,7 +111,7 @@ def test_recover_reproduction_translates_reproduction_error_and_preserves_privac
     with pytest.raises(ProtocolValidationError, match="source run has not failed"):
         args.handler(args)
 
-    # 2. CLI main masks traceback, emits error message to stderr, and exits with 2
+    # 2. CLI main suppresses traceback, emits error message to stderr, and exits with 2
     exit_code = main(
         [
             "recover-reproduction",
@@ -132,6 +132,39 @@ def test_recover_reproduction_translates_reproduction_error_and_preserves_privac
     assert captured.out == ""
     assert "medrec: error: source run has not failed" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_recover_reproduction_does_not_catch_unexpected_value_error(tmp_path, monkeypatch) -> None:
+    from baselines import safedrug_archived
+
+    dataset = tmp_path / "data"
+    dataset.mkdir()
+    run = tmp_path / "run"
+    run.mkdir()
+
+    def mock_execute_unexpected_error(request):
+        raise ValueError("unexpected path computation defect")
+
+    monkeypatch.setattr(safedrug_archived, "execute", mock_execute_unexpected_error)
+
+    args = _build_parser().parse_args(
+        [
+            "recover-reproduction",
+            "safedrug-archived",
+            "retain",
+            "--dataset-root",
+            str(dataset),
+            "--run-root",
+            str(run),
+            "--recovery-id",
+            "finalizer-1",
+            "--finalizer-revision",
+            "e" * 40,
+        ]
+    )
+
+    with pytest.raises(ValueError, match="unexpected path computation defect"):
+        args.handler(args)
 
 
 def test_recover_reproduction_dispatches_to_molerec_program(tmp_path, monkeypatch) -> None:

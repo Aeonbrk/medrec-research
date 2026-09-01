@@ -459,3 +459,61 @@ def test_molerec_cli_main_dispatches_probe_and_execute(
     assert len(execute_calls) == 1
     assert execute_calls[0]["baseline_id"] == "molerec"
     assert execute_calls[0]["mode"] == "smoke"
+
+
+def test_molerec_program_execute_recovery_dispatches_to_recover_formal_lane(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dataset = tmp_path / "data"
+    dataset.mkdir()
+    run = tmp_path / "run"
+    run.mkdir()
+    expected_marker = run / "recoveries" / "finalizer-molerec"
+
+    calls = []
+
+    def mock_recover_formal_lane(
+        *,
+        profile: Any,
+        data_dir: Path,
+        run_root: Path,
+        recovery_id: str,
+        finalizer_revision: str,
+    ) -> Path:
+        calls.append(
+            {
+                "profile": profile,
+                "data_dir": data_dir,
+                "run_root": run_root,
+                "recovery_id": recovery_id,
+                "finalizer_revision": finalizer_revision,
+            }
+        )
+        return expected_marker
+
+    monkeypatch.setattr(adapter, "recover_formal_lane", mock_recover_formal_lane)
+
+    request = {
+        "mode": "recovery",
+        "baseline_id": "molerec",
+        "dataset_root": str(dataset),
+        "run_root": str(run),
+        "recovery_id": "finalizer-molerec",
+        "finalizer_revision": "f" * 40,
+    }
+
+    result = adapter.execute(request)
+
+    assert result == {
+        "state": "completed",
+        "mode": "recovery",
+        "marker_path": str(expected_marker),
+    }
+    assert len(calls) == 1
+    call = calls[0]
+    assert call["profile"].baseline_id == "molerec"
+    assert call["data_dir"] == dataset
+    assert call["run_root"] == run
+    assert call["recovery_id"] == "finalizer-molerec"
+    assert call["finalizer_revision"] == "f" * 40
