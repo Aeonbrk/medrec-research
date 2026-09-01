@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -60,7 +61,7 @@ def valid_records_and_vocab() -> tuple[
     }
     ddi = [[0] * 131 for _ in range(131)]
     pairs = ((row, column) for row in range(131) for column in range(row + 1, 131))
-    for row, column in list(pairs)[:448]:
+    for row, column in itertools.islice(pairs, 448):
         ddi[row][column] = ddi[column][row] = 1
     ddi_mask = [[0] * 491 for _ in range(131)]
     return records, vocabulary, ddi, ddi_mask

@@ -38,7 +38,6 @@ if __package__:
     )
     from .reproduction_runner import (
         read_and_validate_adaptation,
-        run_logged,
         run_logged_with_progress,
         validate_identity_binding,
         validate_run_layout,
@@ -77,7 +76,6 @@ else:
     )
     from reproduction_runner import (
         read_and_validate_adaptation,
-        run_logged,
         run_logged_with_progress,
         validate_identity_binding,
         validate_run_layout,
@@ -101,8 +99,6 @@ else:
 
 ARCHIVED_REVISION = "8deee38cfdb2a38882377ff95cce5922d6d9e8d6"
 _MISSING_VALIDATION_METRICS = "training log must contain validation Jaccard and DDI metrics"
-_RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
-_IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
 
 __all__ = (
     "execute",

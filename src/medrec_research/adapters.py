@@ -138,7 +138,8 @@ class ProcessPredictionAdapter:
             raise ProtocolValidationError(
                 "medication_vocabulary must contain unique medication codes"
             )
-        if not visits or len(visits) != len(set(visits)):
+        visit_set = set(visits)
+        if not visits or len(visits) != len(visit_set):
             raise ProtocolValidationError("expected_visits must contain unique visits")
 
         input_text = canonical_json({"request": adapter_request, "schema_version": 2})
@@ -213,7 +214,7 @@ class ProcessPredictionAdapter:
             raise
         except ProtocolValidationError as error:
             raise AdapterProtocolError(str(error)) from error
-        if set(batch.visit_keys) != set(visits):
+        if set(batch.visit_keys) != visit_set:
             raise AdapterProtocolError("adapter output must match expected evaluation visits")
         return batch
 

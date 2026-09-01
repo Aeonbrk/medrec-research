@@ -53,7 +53,6 @@ if __package__:
     )
     from .reproduction_runner import (
         read_and_validate_adaptation,
-        run_logged,
         run_logged_with_progress,
         validate_identity_binding,
         validate_run_layout,
@@ -66,6 +65,7 @@ else:
         sys.path.insert(0, _pkg_dir)
     from molerec_data import (
         COMMON_INPUTS,
+        GATE_INPUTS,
         ReproductionError,
         load_and_validate_canonical_inputs,
     )
@@ -93,7 +93,6 @@ else:
     )
     from reproduction_runner import (
         read_and_validate_adaptation,
-        run_logged,
         run_logged_with_progress,
         validate_identity_binding,
         validate_run_layout,
@@ -117,7 +116,6 @@ TEST_DECLARATION = (
 TRAIN_DECLARATION = TEST_DECLARATION
 EPOCH_FORMAL = "        '--epochs', default=50, type=int,\n"
 EPOCH_SMOKE = "        '--epochs', default=1, type=int,\n"
-ROUND_PATTERN = re.compile(r"^\s*([A-Za-z0-9_]+)\s*:\s*([0-9.]+)\s*$")
 
 
 @dataclass(frozen=True)

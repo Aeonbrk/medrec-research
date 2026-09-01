@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -63,7 +64,7 @@ def paper_values() -> tuple[
     }
     ddi = [[0] * 131 for _ in range(131)]
     pairs = ((row, column) for row in range(131) for column in range(row + 1, 131))
-    for row, column in list(pairs)[:448]:
+    for row, column in itertools.islice(pairs, 448):
         ddi[row][column] = ddi[column][row] = 1
     ddi_mask = [[0] * 491 for _ in range(131)]
     ehr_adj = [[0] * 131 for _ in range(131)]
@@ -608,16 +609,10 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
     assert len(smoke["checkpoint"]["sha256"]) == 64
 
 
-def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Path) -> None:
-    entrypoint = tmp_path / "work" / "SafeDrug.py"
-    original = tmp_path / "upstream" / "src" / "SafeDrug.py"
-    checkpoint = tmp_path / "work" / "saved" / "SafeDrug_run" / "Epoch_49.model"
-    checkpoint.parent.mkdir(parents=True)
-    checkpoint.touch()
-    selection_path = tmp_path / "selection.json"
+def _write_test_selection_artifact(selection_path: Path) -> tuple[Path, dict[str, Any]]:
     candidate_specs = (
-        ("molerec-safedrug-lr-1e-4", 1e-4, "2" * 64, 0.51, 0.07),
         ("molerec-safedrug-lr-1e-5", 1e-5, "1" * 64, 0.50, 0.08),
+        ("molerec-safedrug-lr-1e-4", 1e-4, "2" * 64, 0.51, 0.07),
         ("molerec-safedrug-lr-5e-4", 5e-4, "3" * 64, 0.52, 0.06),
     )
     candidates = []
@@ -671,41 +666,52 @@ def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Pat
             candidate["lane_id"],
         ),
     )
-    selection_path.write_text(
-        json.dumps(
+    sorted_candidates = sorted(candidates, key=lambda candidate: candidate["lane_id"])
+    valid_selection = {
+        "schema_version": 1,
+        "kind": "safedrug_selection",
+        "state": "selection_ready",
+        "candidate_lane_ids": [
+            "molerec-safedrug-lr-1e-5",
+            "molerec-safedrug-lr-1e-4",
+            "molerec-safedrug-lr-5e-4",
+        ],
+        "candidates": sorted_candidates,
+        "selection_rule": [
+            "maximize validation_jaccard",
+            "minimize validation_ddi_rate",
+            "minimize learning_rate",
+            "minimize lane_id",
+        ],
+        "comparison_decisions": [
             {
-                "schema_version": 1,
-                "kind": "safedrug_selection",
-                "state": "selection_ready",
-                "candidate_lane_ids": [
-                    "molerec-safedrug-lr-1e-5",
-                    "molerec-safedrug-lr-1e-4",
-                    "molerec-safedrug-lr-5e-4",
-                ],
-                "candidates": candidates,
-                "selection_rule": [
-                    "maximize validation_jaccard",
-                    "minimize validation_ddi_rate",
-                    "minimize learning_rate",
-                    "minimize lane_id",
-                ],
-                "comparison_decisions": [
-                    {
-                        "rank": rank,
-                        "lane_id": candidate["lane_id"],
-                        "validation_jaccard": candidate["validation_jaccard"],
-                        "validation_ddi_rate": candidate["validation_ddi_rate"],
-                        "learning_rate": candidate["learning_rate"],
-                    }
-                    for rank, candidate in enumerate(ranked, start=1)
-                ],
-                "selected_lane_id": "molerec-safedrug-lr-5e-4",
-                "test_metrics_available": False,
-                "errors": [],
+                "rank": rank,
+                "lane_id": candidate["lane_id"],
+                "validation_jaccard": candidate["validation_jaccard"],
+                "validation_ddi_rate": candidate["validation_ddi_rate"],
+                "learning_rate": candidate["learning_rate"],
             }
-        ),
-        encoding="utf-8",
-    )
+            for rank, candidate in enumerate(ranked, start=1)
+        ],
+        "selected_lane_id": "molerec-safedrug-lr-5e-4",
+        "test_metrics_available": False,
+        "errors": [],
+    }
+    selection_path.write_text(json.dumps(valid_selection), encoding="utf-8")
+    return selection_path, valid_selection
+
+
+def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Path) -> None:
+    entrypoint = tmp_path / "work" / "SafeDrug.py"
+    entrypoint.parent.mkdir(parents=True, exist_ok=True)
+    entrypoint.touch()
+    original = tmp_path / "upstream" / "src" / "SafeDrug.py"
+    original.parent.mkdir(parents=True, exist_ok=True)
+    original.touch()
+    checkpoint = tmp_path / "work" / "saved" / "SafeDrug_run" / "Epoch_49.model"
+    checkpoint.parent.mkdir(parents=True)
+    checkpoint.touch()
+    selection_path, _ = _write_test_selection_artifact(tmp_path / "selection.json")
 
     assert adapter.training_command("python", entrypoint, "SafeDrug_run") == [
         "python",
@@ -920,95 +926,7 @@ def test_safedrug_selection_admission_via_execute(
 
     monkeypatch.setattr(adapter, "run_formal_lane", mock_run_formal)
 
-    selection_path = tmp_path / "selection.json"
-    candidate_specs = (
-        ("molerec-safedrug-lr-1e-5", 1e-5, "1" * 64, 0.50, 0.08),
-        ("molerec-safedrug-lr-1e-4", 1e-4, "2" * 64, 0.51, 0.07),
-        ("molerec-safedrug-lr-5e-4", 5e-4, "3" * 64, 0.52, 0.06),
-    )
-    candidates = []
-    for lane_id, learning_rate, checkpoint_identity, jaccard, ddi_rate in candidate_specs:
-        identity = {
-            "attempt_id": "attempt-1",
-            "lane_id": lane_id,
-            "scientific_baseline_id": "safedrug",
-            "program_id": "safedrug-archived",
-            "profile_id": "safedrug",
-            "harness_revision": "a" * 40,
-            "model_source_revision": "b" * 40,
-            "preprocessing_revision": "c" * 40,
-            "snapshot_id": "snapshots/molerec-table1-c721-www23",
-            "environment_sha256": "d" * 64,
-            "mode": "formal",
-            "submission_id": f"submission-{lane_id}",
-        }
-        checkpoint_evidence = {
-            "best_epoch": 49,
-            "relative_path": f"work/saved/SafeDrug_{lane_id}/Epoch_49.model",
-            "sha256": checkpoint_identity,
-            "size_bytes": 0,
-        }
-        candidates.append(
-            {
-                "lane_id": lane_id,
-                "learning_rate": learning_rate,
-                "checkpoint_identity": checkpoint_identity,
-                "validation_jaccard": jaccard,
-                "validation_ddi_rate": ddi_rate,
-                "training_evidence": {
-                    "state": "completed",
-                    "artifact_type": "training",
-                    "identity": identity,
-                    "learning_rate": learning_rate,
-                    "best_epoch": 49,
-                    "validation_jaccard": jaccard,
-                    "validation_ddi_rate": ddi_rate,
-                    "checkpoint": checkpoint_evidence,
-                    "recovery": None,
-                },
-            }
-        )
-    ranked = sorted(
-        candidates,
-        key=lambda candidate: (
-            -candidate["validation_jaccard"],
-            candidate["validation_ddi_rate"],
-            candidate["learning_rate"],
-            candidate["lane_id"],
-        ),
-    )
-    sorted_candidates = sorted(candidates, key=lambda candidate: candidate["lane_id"])
-    valid_selection = {
-        "schema_version": 1,
-        "kind": "safedrug_selection",
-        "state": "selection_ready",
-        "candidate_lane_ids": [
-            "molerec-safedrug-lr-1e-5",
-            "molerec-safedrug-lr-1e-4",
-            "molerec-safedrug-lr-5e-4",
-        ],
-        "candidates": sorted_candidates,
-        "selection_rule": [
-            "maximize validation_jaccard",
-            "minimize validation_ddi_rate",
-            "minimize learning_rate",
-            "minimize lane_id",
-        ],
-        "comparison_decisions": [
-            {
-                "rank": rank,
-                "lane_id": candidate["lane_id"],
-                "validation_jaccard": candidate["validation_jaccard"],
-                "validation_ddi_rate": candidate["validation_ddi_rate"],
-                "learning_rate": candidate["learning_rate"],
-            }
-            for rank, candidate in enumerate(ranked, start=1)
-        ],
-        "selected_lane_id": "molerec-safedrug-lr-5e-4",
-        "test_metrics_available": False,
-        "errors": [],
-    }
-    selection_path.write_text(json.dumps(valid_selection), encoding="utf-8")
+    selection_path, valid_selection = _write_test_selection_artifact(tmp_path / "selection.json")
 
     result = adapter.execute(
         {
@@ -1045,8 +963,7 @@ def test_safedrug_selection_admission_via_execute(
         )
 
     # Invalid selection with test_metrics leaked
-    invalid_selection = dict(valid_selection)
-    invalid_selection["candidates"] = [dict(c) for c in candidates]
+    invalid_selection = json.loads(json.dumps(valid_selection))
     invalid_selection["candidates"][0]["test_metrics"] = {"jaccard": 0.9}
     invalid_path = tmp_path / "invalid_selection.json"
     invalid_path.write_text(json.dumps(invalid_selection), encoding="utf-8")

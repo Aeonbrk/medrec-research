@@ -156,8 +156,6 @@ def _local_source_revision(
             )
         except (OSError, subprocess.CalledProcessError) as error:
             raise ProtocolValidationError("local Git source check failed") from error
-        if completed.returncode != 0:
-            raise ProtocolValidationError("local Git source check failed")
         return completed.stdout.strip()
 
     if require_clean and git("status", "--porcelain", "--untracked-files=all"):
@@ -387,6 +385,19 @@ def _admit_evaluation(args: argparse.Namespace) -> int:
     return 0
 
 
+def _parse_training_artifacts(
+    items: list[tuple[str, str]],
+    *,
+    context: str,
+) -> dict[str, str]:
+    artifacts: dict[str, str] = {}
+    for lane_id, artifact_id in items:
+        if lane_id in artifacts:
+            raise ProtocolValidationError(f"{context} repeats lane '{lane_id}'")
+        artifacts[lane_id] = artifact_id
+    return artifacts
+
+
 def _admit_reproduction_continuation(
     args: argparse.Namespace,
     *,
@@ -395,13 +406,10 @@ def _admit_reproduction_continuation(
     """Validate recovered lanes and publish one additive continuation schedule."""
     if args.output.exists():
         raise ProtocolValidationError(f"continuation schedule already exists: {args.output}")
-    artifacts: dict[str, str] = {}
-    for lane_id, artifact_id in args.training_artifact:
-        if lane_id in artifacts:
-            raise ProtocolValidationError(
-                f"continuation training artifact repeats lane '{lane_id}'"
-            )
-        artifacts[lane_id] = artifact_id
+    artifacts = _parse_training_artifacts(
+        args.training_artifact,
+        context="continuation training artifact",
+    )
 
     registry = BaselineRegistry.load(args.registry)
     declaration = ReproductionAttemptDeclaration.from_registry(registry, args.attempt_id)
@@ -450,11 +458,10 @@ def _prepare_molerec_evaluation(args: argparse.Namespace) -> int:
         raise ProtocolValidationError(
             "evaluation preparation requires the exact attempt-owned continuation schedule"
         )
-    artifacts: dict[str, str] = {}
-    for lane_id, artifact_id in args.training_artifact:
-        if lane_id in artifacts:
-            raise ProtocolValidationError(f"evaluation training artifact repeats lane '{lane_id}'")
-        artifacts[lane_id] = artifact_id
+    artifacts = _parse_training_artifacts(
+        args.training_artifact,
+        context="evaluation training artifact",
+    )
     prepared = prepare_table1_evaluation(
         state_root=args.state_root,
         declaration=declaration,
