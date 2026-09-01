@@ -1,54 +1,107 @@
-# Handoff: five-model baseline readiness
+# Handoff: Idea 001 Gate 01 Routing Opportunity Implementation
 
 ## Current state
 
-The five-model baseline preparation is complete.
+Gate 01 (**Routing Opportunity Under a Fixed Revision Operator**) for Idea `001-tension-guided-verification` is fully implemented, doubly hardened, statically and synthetically verified, committed, and pushed to `origin/main`. The working tree is clean.
 
-- All seven 50-epoch training lanes and their validated immutable recovery siblings remain the only accepted training evidence. No lane was retrained and no recovery ID was changed.
-- Continuation `continuation-20260830-pathfix-1` completed the exact five serial upstream tests with new submission identities and independent test roots.
-- Validation-only SafeDrug selection chose `molerec-safedrug-lr-5e-4`. The `1e-5` and `1e-4` candidates remain `not_tested_by_design`.
-- The Phase A audit verdict is `completed_mismatch`: `execution_integrity` and `artifact_completeness` passed, `paper_point_fidelity` passed 16/25 checks, and `directional_relationships` passed 3/4 checks.
-- Comparison revision `9fa239269f5a9ac0c394263ebe0ba3c02fbdafc5` produced five target-free Unified Research Protocol v1.1 qualifications under one shared scope.
-- RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec are all `comparison_ready` in `baselines/registry.toml`. The built-in reference remains `registered` and is not part of the five-model suite.
-- SafeDrug and MoleRec Comparison qualifications used the user-authorized shared-GPU Phase B exception on GPU 0 at 0% prelaunch utilization and 22,359 MiB free. The resident external process was not stopped. No model behavior, selection rule, threshold, decoder, target ownership, or evaluator changed.
-- Future remote GPU admission is utilization- and capacity-based: current utilization must be at most 10% and the run's free-memory threshold must pass. Existing external PIDs are ignored for admission and must not be stopped, preempted, or attached to.
+The actual 319 remote GPU execution has **not** been started and is paused awaiting explicit operator authorization.
 
-## Terminal conclusions
+- **Repository HEAD**: `c6fc35bce97637a2eddc6319cdec768256abdccb` on `main`.
+- **Remote state**: In sync with `origin/main`.
+- **Test suite**: 333 core unit/integration tests passing; 8-stage synthetic self-test passing; `ruff` check and format passing; `markdownlint` clean.
+- **Scientific role**: Idea-stage hypothesis selection, not a baseline comparison qualification. Do not use `accept-comparison`.
 
-- `execution_integrity`: passed
-- `paper_point_fidelity`: failed, 16/25 checks passed
-- `directional_relationships`: failed, 3/4 checks passed
-- `artifact_completeness`: passed
-- Reproduction Mode: `completed_mismatch`
-- `engineering_ready`: true
-- `reproduction_complete`: true
-- `research_baseline_ready`: true
+## What exists
+
+All prototype files are strictly confined to `research/ideas/001-tension-guided-verification/experiments/`:
+
+1. [gate-01-routing-opportunity.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-routing-opportunity.md)
+   - The preregistered hypothesis-selection protocol.
+   - Fixed singleton deletion operator $R_0(\hat M_t, m) = \hat M_t \setminus \{m\}$.
+   - Review universe $\mathcal Q_t = \{m \in \hat M_t : d_t(m) > 0\}$ with canonical unordered DDI semantics $\{m, j\} \in C$.
+   - Three policies: Random ($P(Y^{PB}=1)$), RiskOnly ($d_t(m) \downarrow$, med code $\uparrow$, validation traversal order), Oracle ($Y^{PB} \downarrow, \Delta J \downarrow, -\Delta V \downarrow$, med code $\uparrow$, validation traversal order).
+   - Budgets $B \in \{10\%, 20\%, 30\%\}$ with integer floor rule $k(B) = \lfloor B \times |\mathcal Q| \rfloor$.
+   - Minimum 50-patient support requirement for both beneficial and non-beneficial outcomes.
+   - 1,000-replicate patient-clustered bootstrap with seed 1203.
+   - Clear test split boundary: test split must never be indexed, inspected, scored, evaluated, or used for selection/configuration.
+   - Restricted artifact format: `candidate-revision-values.jsonl` with `patient_order` and `visit_order` allowing independent auditor recomputation.
+   - Public-safe artifact format: `gate-summary.json`.
+
+2. [stage_validation_cohort.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/stage_validation_cohort.py)
+   - Python 3.8-compatible helper executed in `medrec-molerec-table1` (with `dill`).
+   - Isolates validation patient split from `records_final.pkl`.
+   - Computes raw DDI asset SHA256 (`dcb20789...`) and canonical unordered DDI semantics SHA256.
+   - Computes authoritative medication vocabulary SHA256 matching `DatasetManifest._ordered_digest`.
+   - Generates `features.pkl` (for `molerec_comparison.py`) and standard JSON `validation-meta.json` (consumed by Python 3.11 runner).
+
+3. [run_routing_opportunity_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_routing_opportunity_gate.py)
+   - Python 3.11 orchestration runner executed in `medrec-core-evaluator`.
+   - Enforces clean checkouts for both `medrec-research` and `MoleRec` before inference.
+   - Verifies frozen MoleRec source revision (`dd5afaf...`), baseline core SHA256 (`516b7b5f...`), adapter SHA256 (`9bb5d114...`), and Conda explicit package specification SHA256 (`6a01d313...`).
+   - Verifies dataset manifest (`82d4efc2...`), dataset ID, snapshot ID (`molerec-table1-c721-www23`), snapshot checksum, vocabulary SHA256, DDI asset SHA256, and feature availability SHA256 (`9e403591...`).
+   - Uses `ProcessPredictionAdapter.predict_comparison` (target-free comparison seam).
+   - Evaluates policies and bootstrap invariant to pseudonyms.
+   - Implements fail-closed non-crashing behavior for low-support samples ($k=0$ yields $0.0$ and verdict `insufficient_support`).
+   - Enforces new `output_root` (`exist_ok=False`).
+   - Contains `--self-test` (and `test_synthetic_gate_01()` for pytest) covering all 8 hardened invariants.
 
 ## Authoritative records
 
-- `docs/PLANS.md` — completed-work state.
-- `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md` — accepted plan and terminal outcome.
-- `research/baselines/preflight/molerec-five-model-reproduction-report.md` — public-safe Phase A report.
-- `research/baselines/preflight/five-model-comparison-qualification.json` — public-safe Phase B scope, gate, qualification, and outcome identities.
-- `research/baselines/preflight/five-model-baseline-readiness-report.md` — per-model two-axis readiness report.
-- `baselines/registry.toml` — current Comparison readiness authority.
+- `research/baselines/preflight/five-model-comparison-qualification.json` — frozen baseline identities.
+- `baselines/registry.toml` — frozen Comparison Mode baseline registry.
+- `src/medrec_research/dataset.py` — authoritative `DatasetManifest` and `_ordered_digest` implementation.
+- `research/ideas/001-tension-guided-verification/experiments/gate-01-routing-opportunity.md` — Gate 01 protocol.
+- `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` — 319 remote execution preflight contract.
 
-## Operational snapshot
+## Remote 319 launch protocol
 
-- **Branch**: `main`
-- **Suite health**: Local verification passed: 333 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
-- **Architecture**:
-  - Concrete Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) expose strictly `__all__ = ("execute", "probe")` as their formal programmatic façade, with `main()` acting as a thin transport wrapper.
-  - Root `src/medrec_research/cli.py` is a pure composition root with zero direct reproduction domain imports, delegating reproduction CLI orchestration to `src/medrec_research/reproduction/cli_commands.py`.
-  - Process Adapter Schema v1 and unused `PredictionAdapter` protocol are completely removed; `ProcessPredictionAdapter.predict_comparison(...)` (schema v2) is the sole Comparison Mode process seam.
-  - Unidirectional dependency: `Concrete Reproduction Program -> shared mechanical primitives`.
-  - Callback cycle (`Program -> runner -> getattr/module hooks -> Program`) 100% eliminated.
-  - Remote executor is attempt- and baseline-agnostic (`src/medrec_research/remote_executor.py`).
-  - MoleRec Table 1 schedule, recovery, and continuation validation isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
-  - Queue authority strictly bound to immutable `attempt_declaration.json` (`src/medrec_research/reproduction/evaluation_queue.py`); historical legacy queues supported for read-only audit.
-  - Python 3.8 syntax compatibility verified across baseline execution files using AST parsing.
-  - Shared reproduction runner (`baselines/reproduction_runner.py`) reduced strictly to mechanical primitives (process execution, progress streaming, atomic writing, failure pair recording, layout validation).
+When authorized to run on `319-wild` (`319-lab` or `319-lab-via-server`):
 
-## Next focus
+```bash
+# 1. Preflight check
+# Ensure GPU utilization <= 10%, free memory adequate, worktrees clean
 
-The suite may now be used for downstream mechanism experiments that stay inside the recorded Comparison Scope. A new dataset, cohort, feature set, medication vocabulary, DDI asset, protocol version, Adaptation Budget, threshold, decoder, or model configuration creates a different scope and requires prospective qualification. Reproduction mismatches remain visible and must not be tuned away.
+# 2. Paths and environment variables
+export MEDREC_DATA_ROOT=/root/zhb/medrec-data
+export MOLEREC_ROOT=/root/zhb/MoleRec
+export DATASET_MANIFEST="$MEDREC_DATA_ROOT/snapshots/molerec-table1-c721-www23/dataset-manifest.json"
+export MOLEREC_CHECKPOINT="$MEDREC_DATA_ROOT/runs/molerec/formal-20260828-a09fcab-u8-b/lanes/molerec-embedding/saved/MoleRec/best_model.pt"
+
+export GATE_RUN_ID="gate-01-routing-opportunity-$(date +%Y%m%d-%H%M%S)"
+export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verification/$GATE_RUN_ID"
+
+# 3. Launch execution
+cd /root/zhb/medrec-research
+git pull origin main
+source /root/anaconda3/etc/profile.d/conda.sh
+
+conda run -n medrec-core-evaluator \
+  python research/ideas/001-tension-guided-verification/experiments/run_routing_opportunity_gate.py \
+  --dataset-manifest "$DATASET_MANIFEST" \
+  --dataset-root "$MEDREC_DATA_ROOT/snapshots/molerec-table1-c721-www23" \
+  --molerec-root "$MOLEREC_ROOT" \
+  --checkpoint "$MOLEREC_CHECKPOINT" \
+  --output-root "$GATE_RUN_ROOT" \
+  --expected-harness-revision "c6fc35bce97637a2eddc6319cdec768256abdccb"
+
+# 4. Ingest aggregate-only public summary
+# Copy $GATE_RUN_ROOT/gate-summary.json to local repository
+# Leave candidate-revision-values.jsonl under $MEDREC_DATA_ROOT on 319
+```
+
+## Next steps & stop rule
+
+1. **Do not run Gate 01 without user confirmation.**
+2. **Execute remote Gate 01**: After operator launches on 319, collect `gate-summary.json`.
+3. **Audit Gate 01 verdict**:
+   - `pass`: Oracle 95% CI > Random at 10% & 20% budgets, Oracle > RiskOnly. Confirms selective routing has headroom under $R_0$; unlocks designing predictive Tension triggers.
+   - `downgrade_risk_only`: Oracle > Random, but Oracle statistically indistinguishable from RiskOnly. Route pivots to testing whether Tension adds any incremental value over simple DDI degree sorting.
+   - `fail`: Oracle fails to reliably beat Random under $R_0$. Route stops; do not implement Tension.
+   - `insufficient_support`: Fewer than 50 distinct beneficial or non-beneficial validation patients. Inconclusive under current data support.
+4. **Stop rule**: Do not train a Tension policy, implement sequential multi-step revision, or proceed past Gate 01 until the public summary verdict has been inspected.
+
+## Suggested skills
+
+- `ccf-experiment-designer`: Inspect Gate 01 results, audit decision criteria, and design the next hypothesis-selection or allocation step.
+- `ccf-idea-optimizer`: Concretize or pivot the Tension idea if Gate 01 yields `downgrade_risk_only` or requires adjusting problem scope.
+- `ce-handoff`: Manage session transitions and cross-agent continuity.
