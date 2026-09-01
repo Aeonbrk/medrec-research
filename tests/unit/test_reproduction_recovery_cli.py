@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from medrec_research.cli import _build_parser, _recover_reproduction
+from medrec_research.cli import _build_parser
+from medrec_research.reproduction.cli_commands import _recover_reproduction
 
 
 def test_recovery_command_has_no_scientific_execution_hooks() -> None:

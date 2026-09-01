@@ -9,9 +9,9 @@ from pathlib import Path
 import pytest
 
 from medrec_research import BaselineRegistry, ProtocolValidationError
-from medrec_research.cli import (
+from medrec_research.cli import _build_parser
+from medrec_research.reproduction.cli_commands import (
     _admit_reproduction_continuation,
-    _build_parser,
     _local_source_revision,
     _prepare_molerec_evaluation,
     _reproduce,
@@ -450,7 +450,9 @@ def test_continuation_command_writes_only_reaccepted_schedule(
         stdout = "" if "status" in argv else "b" * 40 + "\n"
         return subprocess.CompletedProcess(argv, 0, stdout, "")
 
-    monkeypatch.setattr("medrec_research.cli.validate_reproduction_continuation", admit)
+    monkeypatch.setattr(
+        "medrec_research.reproduction.cli_commands.validate_reproduction_continuation", admit
+    )
     assert _admit_reproduction_continuation(args, git_runner=git_runner) == 0
 
     persisted = json.loads(output.read_text(encoding="utf-8"))
@@ -505,7 +507,9 @@ def test_prepare_evaluation_forwards_continuation_id(
             "test_lane_ids": {},
         }
 
-    monkeypatch.setattr("medrec_research.cli.prepare_table1_evaluation", prepare)
+    monkeypatch.setattr(
+        "medrec_research.reproduction.cli_commands.prepare_table1_evaluation", prepare
+    )
 
     assert _prepare_molerec_evaluation(args) == 0
     assert captured["continuation_id"] == "continuation-20260830-pathfix-1"
