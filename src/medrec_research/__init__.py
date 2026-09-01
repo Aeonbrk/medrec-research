@@ -6,7 +6,6 @@ from .adapters import (
     AdapterProcessError,
     AdapterProtocolError,
     AdapterTimeoutError,
-    PredictionAdapter,
     ProcessPredictionAdapter,
 )
 from .comparison_protocol import (
@@ -95,7 +94,6 @@ __all__ = (
     "MedicationScore",
     "MembershipDigestMethod",
     "OutcomeInterval",
-    "PredictionAdapter",
     "PredictionRecord",
     "ProcessPredictionAdapter",
     "ProtocolCheckRecord",
