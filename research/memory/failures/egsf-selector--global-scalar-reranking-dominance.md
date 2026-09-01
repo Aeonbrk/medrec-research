@@ -4,7 +4,7 @@
 
 Source boundary: `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. Every archive path in this record refers to that revision.
 
-- **Status**: Historical Memory (Route terminated; non-revival boundary fixed)
+- **Status**: Historical Memory (Original route terminated under recorded setting; revisit only if a materially different assumption, evidence source, problem formulation, baseline, or mechanism changes the failure condition)
 
 ## Decision
 

@@ -1,7 +1,11 @@
 # Unified Research Protocol
 
 Protocol version: `1.0`
-Status: `Current (Base Protocol; active Comparison Mode requires v1.1 amendment)`
+Status: `Current Base Protocol (Active Comparison Mode requires v1.1 amendment)`
+
+> [!IMPORTANT]
+> **Active Comparison Mode Notice**:
+> Protocol v1.0 defines the base scientific contract (cohort identity, split rules, prediction task seam, baseline integrity). For active Comparison Mode qualifications, this document must be read in conjunction with the additive [v1.1 Amendment](UNIFIED_RESEARCH_PROTOCOL_V1_1.md). Protocol v1.0 alone does not define the complete active comparison specification. (If future amendments accumulate beyond v1.1, they should be consolidated into a single current specification rather than stacked indefinitely.)
 
 ## Purpose
 

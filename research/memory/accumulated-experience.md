@@ -4,6 +4,17 @@
 
 This ledger carries the canonical scientific record from `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. It is complete for the archive's 6 idea cards, 11 experiment cards, and 12 claim cards. It is a curated memory, not a replacement for source records or raw artifacts.
 
+> [!NOTE]
+> **Role & Boundary**: This ledger is a historical synthesis of research state from the read-only `New-Search` archive (`commit 9971464`), **not** a live project-state registry.
+> Current operational and scientific state is owned by domain-specific authorities:
+>
+> - Active research ideas: [`../ideas/`](../ideas/)
+> - Baseline readiness & qualifications: [`../../baselines/registry.toml`](../../baselines/registry.toml) and [`../baselines/`](../baselines/)
+> - Paper package lifecycles: [`../../papers/`](../../papers/) (`ccfa.yaml`)
+> - Active comparison contracts: [`../../docs/specs/`](../../docs/specs/)
+>
+> This ledger preserves past evidence and historical non-revival boundaries without creating a duplicate authoritative state.
+
 ## Reading the Ledger
 
 The source's `status` or `stage` is a record-local field. The lifecycle column states the durable interpretation for new work in this repository.

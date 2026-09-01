@@ -2,12 +2,19 @@
 
 # Literature Memory
 
-This is the curated literature input carried from `New-Search` commit
-`9971464253c556345262b22ed6d44b2cc14c9da8`. It inventories all 21 canonical
-paper cards. A relationship below is supported by
-`research-wiki/graph/edges.jsonl` at that commit. When an archive card leaves
-its project relevance as `TODO`, this document says so instead of completing it
-from inference.
+This is the curated literature input carried from `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. It inventories all 21 canonical paper cards.
+
+## Interpretation Layers & Use Boundary
+
+When reading the entries below, distinguish three conceptual layers:
+
+1. **Source-Supported Fact**: The verifiable content of the external publication (authors, venue, proposed method, documented empirical claims).
+2. **Research Interpretation**: The internal conceptual framing and modeling assigned to the paper during the archive's research cycle.
+3. **Current Novelty Implication**: The team's provisional judgment regarding how the paper constrains or threatens the novelty of specific internal routes.
+
+> [!IMPORTANT]
+> **Novelty Implications are Hypothesis-Dependent**:
+> A note that a paper "threatens generic safe-MedRec novelty" represents an internal research judgment at the archive cutoff, **not** an immutable scientific fact about the paper itself. Novelty implications shift as new literature is published and as active research questions are reformulated in `research/ideas/`. All new work requires prospective, up-to-date literature review.
 
 ## Conformal, Calibration, and Recommendation Reliability
 

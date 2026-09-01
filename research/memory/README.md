@@ -21,6 +21,6 @@ This directory is **not** a dumping ground for dead markdown files or idea-local
   - [`crc-ps-r006--conformal-risk-certificate-exhaustion.md`](failures/crc-ps-r006--conformal-risk-certificate-exhaustion.md): Statistical certificate exhaustion on finite grids.
   - [`eg-ter-repair--hard-safety-filter-baseline-trap.md`](failures/eg-ter-repair--hard-safety-filter-baseline-trap.md): The "Hard-Safety Baseline Trap" (why unlevelled baselines overstate policy value).
   - [`egsf-selector--global-scalar-reranking-dominance.md`](failures/egsf-selector--global-scalar-reranking-dominance.md): Apparent selector gains absorbed by global scalar reranking under strict count matching.
-- **[`accumulated-experience.md`](accumulated-experience.md)**: Lifecycle-aware ledger for every historical idea, experiment, and claim node from the archive.
-- **[`literature-memory.md`](literature-memory.md)**: Canonical inventory of 21 paper cards and their archived prior-art threat boundaries.
+- **[`accumulated-experience.md`](accumulated-experience.md)**: Historical synthesis of archived routes (`New-Search` commit `9971464`), preserving historical evidence and non-revival boundaries without serving as a live project-state registry.
+- **[`literature-memory.md`](literature-memory.md)**: Curated inventory of 21 canonical paper cards, explicitly distinguishing source-supported facts from team research interpretations and hypothesis-dependent novelty implications.
 - **[`archive-evidence-index.md`](archive-evidence-index.md)**: File-to-file provenance map back to the read-only `New-Search` commit.

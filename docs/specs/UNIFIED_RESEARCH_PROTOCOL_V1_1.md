@@ -1,6 +1,10 @@
 # Unified Research Protocol v1.1 Amendment
 
-Status: `Current (Active Comparison Mode Protocol Amendment)`
+Status: `Current Active Amendment (Additive to Protocol v1.0)`
+
+> [!IMPORTANT]
+> **Additive Contract**:
+> Protocol v1.1 is an additive amendment to [Unified Research Protocol 1.0](UNIFIED_RESEARCH_PROTOCOL.md). It does not replace the base contract. An active Comparison Mode qualification must satisfy both the base v1.0 invariants and these v1.1 additions.
 
 Protocol v1.1 is an additive Comparison Mode amendment to
 [Unified Research Protocol 1.0](UNIFIED_RESEARCH_PROTOCOL.md). Existing v1.0

@@ -14,13 +14,13 @@ This directory manages the core scientific lifecycle for early-stage research: `
 
 1. **Idea Stage (`ideas/<idea-name>/`)**: A research direction starts as an idea folder containing a clear core hypothesis, key uncertainty, next minimal experiment, existing evidence, and current verdict.
 2. **Minimal Experiment (Hypothesis Selection)**: Experiments here (`ideas/<idea>/experiments/`) are designed strictly for *hypothesis selection* — asking "what research decision will this change?" and seeking the cheapest disconfirming test.
-   - *Code promotion rule*: Prototype scripts stay local to the idea. Only when a capability survives falsification and is reused across multiple experiments or ideas is it promoted to `src/medrec_research/` (`idea-local prototype → reusable capability → src/`).
+   - *Code promotion rule*: Prototype scripts stay local to the idea. Capabilities demonstrating multi-experiment reuse, stable semantics, and clear ownership are promoted to `src/medrec_research/` (see [`ARCHITECTURE.md`](../ARCHITECTURE.md)), independent of whether the motivating hypothesis was confirmed or killed.
 3. **Evidence & Decision**: Audited evidence produces a clear verdict: revise hypothesis, kill the idea, or continue to the next gate.
 4. **Failure & Lesson Preservation**:
    - *Idea-specific failures* remain inside `ideas/<idea-name>/` to document its experimental history.
    - *Cross-idea generalizable lessons* (e.g., negative controls, methodology pitfalls) are distilled into `memory/reusable-lessons.md` or `memory/failures/`.
 5. **Mature to Paper (`papers/<paper-name>/`)**: Once an idea survives hypothesis selection and is ready to enter the manuscript stage, it graduates to a paper project.
-   - Experiments in `papers/<paper>/experiments/` are *claim-support experiments* (full-scale multi-backbone runs, comprehensive ablations, robustness stress tests, statistical significance, and reviewer-requested verification). Early-stage hypothesis filtering is not repeated here.
+   - Experiments in `papers/<paper>/experiments/` are *claim-support experiments* (full-scale multi-backbone runs, comprehensive ablations, robustness stress tests, statistical significance, and reviewer-requested verification). Candidate claims may be narrowed or revised based on full evidence; what is frozen is the confirmation protocol and evaluation contract, not the claim itself (see [`papers/README.md`](../papers/README.md)).
 
 ## Source boundary
 
@@ -28,8 +28,8 @@ Historical memory is based on `New-Search` commit `9971464253c556345262b22ed6d44
 
 ## Navigation
 
-- [Accumulated Experience](memory/accumulated-experience.md) is the lifecycle-aware ledger for every canonical idea, experiment, and claim, including superseded early passes.
-- [Literature Memory](memory/literature-memory.md) inventories every canonical paper card and preserves its archived relevance boundary.
+- [Accumulated Experience](memory/accumulated-experience.md) is a historical synthesis of archived routes from `New-Search` (commit `9971464`), preserving past evidence without serving as a live project registry.
+- [Literature Memory](memory/literature-memory.md) inventories canonical paper cards from the archive, separating source-supported facts from internal interpretations and hypothesis-dependent novelty judgments.
 - [Reusable Lessons](memory/reusable-lessons.md) holds cross-route controls and claim limits that new work must carry forward.
 - [Decision Records](baselines/decisions/) holds authoritative decisions on baseline sources, data lineages, and protocol choices.
 - [Failure Records](memory/failures/) remain the detailed non-revival boundaries for the three terminal method routes and reproduction attempts.

@@ -14,12 +14,12 @@ This workflow guides research routes through evidence gates using the MedRec Res
 ### 1. Code Promotion: Idea-Local Prototype → Reusable Capability → `src/`
 
 - Unproven experiment scripts and exploratory probes remain local to `research/ideas/<idea>/` (or runtime scratch).
-- Code is promoted to `src/medrec_research/` **only** when a capability survives falsification and is reused across multiple experiments or ideas. Never dump speculative idea logic into `src/`.
+- Code is promoted to `src/medrec_research/` when it demonstrates real multi-experiment reuse, stable interfaces, and clear architectural ownership, independent of whether the original scientific hypothesis was confirmed or killed (see [`ARCHITECTURE.md`](../../ARCHITECTURE.md) for authoritative criteria).
 
 ### 2. Experiment Scope: Hypothesis Selection vs. Claim Support
 
-- **Idea Experiments (`research/ideas/<idea>/experiments/`)**: Designed strictly for *hypothesis selection*. The goal is falsification via the cheapest disconfirming test ("Should we continue or kill this idea?").
-- **Paper Experiments (`papers/<paper>/experiments/`)**: Designed strictly for *claim support*. Includes full-scale multi-backbone benchmarking, exhaustive ablations, stress tests, bootstrap confidence intervals, and reviewer-requested verification for frozen paper claims.
+- **Idea Experiments (`research/ideas/<idea>/experiments/`)**: Designed strictly for *hypothesis selection*. The goal is falsification via the cheapest disconfirming test ("Should we continue, revise, or kill this idea?").
+- **Paper Experiments (`papers/<paper>/experiments/`)**: Designed strictly for *claim support*. Focuses on gathering decisive evidence around committed candidate claims and storylines (full-scale multi-backbone benchmarks, ablations, stress tests, bootstrap confidence intervals). Candidate claims remain subject to refinement or narrowing as evidence dictates; what is frozen is the confirmation protocol and evaluation contract, not the scientific claim itself (see [`papers/README.md`](../../papers/README.md)).
 
 ### 3. Knowledge Retention: Idea-Specific Evidence vs. Cross-Idea Memory
 

@@ -21,7 +21,7 @@ Every idea folder (e.g. `001-tension-guided-verification/`) must be able to clea
 ## Lifecycle & Code Promotion
 
 - **Idea-Stage Code**: Prototype scripts, data probes, and temporary diagnostic logic stay inside the idea's directory or local scratch space. They must **not** be placed in `src/medrec_research/` prematurely.
-- **Promotion to Core**: Only when a capability survives falsification and is reused across multiple experiments or ideas is it promoted to `src/medrec_research/` (`idea-local prototype → reusable research capability → src/`).
+- **Promotion to Core**: Prototype scripts stay inside the idea's folder. Code is promoted to `src/medrec_research/` when it demonstrates real cross-experiment reuse, stable interfaces, and clear architectural ownership (e.g. instrumentation, metrics, profilers), independent of whether the original scientific hypothesis was confirmed or killed (see [`ARCHITECTURE.md`](../../ARCHITECTURE.md) for authoritative criteria).
 - **Failures**: Idea-specific failures remain in the idea's local experimental history. Only generalizable negative patterns (e.g. baseline traps, pseudo-gains from scalar reranking) are distilled into `research/memory/`.
 - **Graduation**: When an idea survives all minimal falsification gates and has sufficient multi-backbone evidence, it graduates to a dedicated paper project in `papers/<paper-name>/`.
 
