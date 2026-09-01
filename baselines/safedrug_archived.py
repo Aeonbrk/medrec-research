@@ -46,31 +46,17 @@ if __package__:
         write_json_atomic,
     )
     from .safedrug_archived_data import (
-        CANONICAL_SIX_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        REPORTED_PAPER_METADATA,
         ReproductionError,
-        count_dataset,
         load_and_validate_canonical_inputs,
-        matrix_shape,
-        require_executable_counts,
     )
     from .safedrug_archived_logs import (
-        ROUND_PATTERN,
         parse_test_log,
         parse_training_log,
         parse_validation_metrics,
         select_checkpoint,
     )
     from .safedrug_archived_probe import (
-        REGISTRY_IMPORT_MODULES,
-        check_cuda_tensor,
-        check_dnc_forward,
-        check_imports,
-        check_rdkit_brics,
         environment_summary,
-        probe_environment_details,
         run_probe,
     )
 else:
@@ -99,31 +85,17 @@ else:
         write_json_atomic,
     )
     from safedrug_archived_data import (
-        CANONICAL_SIX_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        REPORTED_PAPER_METADATA,
         ReproductionError,
-        count_dataset,
         load_and_validate_canonical_inputs,
-        matrix_shape,
-        require_executable_counts,
     )
     from safedrug_archived_logs import (
-        ROUND_PATTERN,
         parse_test_log,
         parse_training_log,
         parse_validation_metrics,
         select_checkpoint,
     )
     from safedrug_archived_probe import (
-        REGISTRY_IMPORT_MODULES,
-        check_cuda_tensor,
-        check_dnc_forward,
-        check_imports,
-        check_rdkit_brics,
         environment_summary,
-        probe_environment_details,
         run_probe,
     )
 

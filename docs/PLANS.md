@@ -1,5 +1,16 @@
 # Plans
 
+## Completed: Architecture Surface Hardening and Boundary Consolidation
+
+- **Plan**: `docs/plans/2026-09-01-refactor-architecture-surface-hardening-plan.md`.
+- **Status**: Completed; units U0 through U5 implemented and verified across all 323 tests.
+- **Architectural Deliverables**:
+  - Narrowed concrete Reproduction Programs (`baselines/safedrug_archived.py`, `baselines/molerec.py`) public interface to strictly `__all__ = ("execute", "probe")`, with `main()` acting as a thin CLI transport adapter delegating to `probe`/`execute`.
+  - Moved all 13 reproduction CLI commands, argument parsers, resource validators, and git revision inspectors out of root `src/medrec_research/cli.py` into `src/medrec_research/reproduction/cli_commands.py`. Root `cli.py` is a pure composition root delegating via `register_reproduction_commands`.
+  - Completely deleted dead Process Adapter Schema v1 and unused `PredictionAdapter` protocol, establishing `ProcessPredictionAdapter.predict_comparison(...)` (schema v2) as the single Comparison Mode process seam.
+  - Rewrote process adapter tests and CLI integration tests without architectural drift or compatibility wrappers.
+- **Verification**: Local verification passed: 323 pytest tests passing, ruff lint and format check clean, Python 3.8 AST syntax check clean across all baseline files.
+
 ## Completed: Reproduction Architecture Refactoring
 
 - **Plan**: `docs/plans/2026-08-31-1849-refactor-reproduction-architecture-plan.md`.

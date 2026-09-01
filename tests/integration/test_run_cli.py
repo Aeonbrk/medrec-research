@@ -10,6 +10,7 @@ import pytest
 
 from medrec_research import BaselineRegistry, ProtocolValidationError
 from medrec_research.cli import _build_parser
+from medrec_research.remote_executor import RemoteSubmission
 from medrec_research.reproduction.cli_commands import (
     _admit_reproduction_continuation,
     _local_source_revision,
@@ -17,7 +18,6 @@ from medrec_research.reproduction.cli_commands import (
     _reproduce,
     _reproduce_smoke,
 )
-from medrec_research.remote_executor import RemoteSubmission
 from medrec_research.reproduction.molerec_table1_attempt import FrozenSchedule
 
 PROJECT_ROOT = Path(__file__).parents[2]

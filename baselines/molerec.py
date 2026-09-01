@@ -25,32 +25,18 @@ UTC = timezone.utc  # noqa: UP017 -- archived environments may use Python 3.8.
 if __package__:
     from .molerec_data import (
         COMMON_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
         GATE_INPUTS,
-        REPORTED_PAPER_METADATA,
         ReproductionError,
-        count_dataset,
         load_and_validate_canonical_inputs,
-        matrix_shape,
-        require_executable_counts,
     )
     from .molerec_logs import (
         parse_formal_test_log,
-        parse_test_log,
         parse_training_log,
         parse_validation_metrics,
         select_checkpoint,
     )
     from .molerec_probe import (
-        PYG_EXTENSION_MODULES,
-        REGISTRY_IMPORT_MODULES,
-        check_cuda_tensor,
-        check_imports,
-        check_pyg_extensions,
-        check_rdkit,
         environment_summary,
-        probe_environment_details,
         run_probe,
     )
     from .reproduction_artifacts import (
@@ -79,33 +65,17 @@ else:
     if _pkg_dir not in sys.path:
         sys.path.insert(0, _pkg_dir)
     from molerec_data import (
-        COMMON_INPUTS,
-        EXPECTED_COUNTS,
-        EXPECTED_STATISTICS,
-        GATE_INPUTS,
-        REPORTED_PAPER_METADATA,
         ReproductionError,
-        count_dataset,
         load_and_validate_canonical_inputs,
-        matrix_shape,
-        require_executable_counts,
     )
     from molerec_logs import (
         parse_formal_test_log,
-        parse_test_log,
         parse_training_log,
         parse_validation_metrics,
         select_checkpoint,
     )
     from molerec_probe import (
-        PYG_EXTENSION_MODULES,
-        REGISTRY_IMPORT_MODULES,
-        check_cuda_tensor,
-        check_imports,
-        check_pyg_extensions,
-        check_rdkit,
         environment_summary,
-        probe_environment_details,
         run_probe,
     )
     from reproduction_artifacts import (

@@ -35,16 +35,18 @@ The five-model baseline preparation is complete.
 
 ## Operational snapshot
 
-- **Branch**: `main`
-- **Suite health**: Local verification passed: 318 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
+- **Branch**: `refactor/architecture-surface-hardening`
+- **Suite health**: Local verification passed: 323 unit/integration tests passing; `ruff` lint and formatting clean; `markdownlint` clean; Python 3.8 syntax compatibility verified across baseline execution files via AST parsing.
 - **Architecture**:
+  - Concrete Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) expose strictly `__all__ = ("execute", "probe")` as their formal programmatic façade, with `main()` acting as a thin transport wrapper.
+  - Root `src/medrec_research/cli.py` is a pure composition root with zero direct reproduction domain imports, delegating reproduction CLI orchestration to `src/medrec_research/reproduction/cli_commands.py`.
+  - Process Adapter Schema v1 and unused `PredictionAdapter` protocol are completely removed; `ProcessPredictionAdapter.predict_comparison(...)` (schema v2) is the sole Comparison Mode process seam.
   - Unidirectional dependency: `Concrete Reproduction Program -> shared mechanical primitives`.
   - Callback cycle (`Program -> runner -> getattr/module hooks -> Program`) 100% eliminated.
   - Remote executor is attempt- and baseline-agnostic (`src/medrec_research/remote_executor.py`).
   - MoleRec Table 1 schedule, recovery, and continuation validation isolated in `src/medrec_research/reproduction/molerec_table1_attempt.py`.
   - Queue authority strictly bound to immutable `attempt_declaration.json` (`src/medrec_research/reproduction/evaluation_queue.py`); historical legacy queues supported for read-only audit.
-  - Concrete Reproduction Programs (`baselines/safedrug_archived.py` and `baselines/molerec.py`) directly own execution and expose uniform `probe(request)` and `execute(request)` program boundaries.
-  - Python 3.8 syntax compatibility verified across baseline execution files using AST parsing; this architecture refactor did not require scientific runtime execution.
+  - Python 3.8 syntax compatibility verified across baseline execution files using AST parsing.
   - Shared reproduction runner (`baselines/reproduction_runner.py`) reduced strictly to mechanical primitives (process execution, progress streaming, atomic writing, failure pair recording, layout validation).
 
 ## Next focus

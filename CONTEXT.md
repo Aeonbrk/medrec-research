@@ -33,7 +33,7 @@ The scientific mechanism of an imported baseline. It remains unchanged in Compar
 _Avoid_: Baseline implementation, editable baseline
 
 **Prediction Adapter**:
-The translation between an unchanged Baseline Core and the Unified Research Protocol. It changes representation, not scientific behavior.
+The translation between an unchanged Baseline Core and the Unified Research Protocol. In runtime comparison execution, `ProcessPredictionAdapter.predict_comparison(...)` (Schema v2) validates target-free wire payloads without exposing targets or split membership. It changes representation, not scientific behavior.
 _Avoid_: Baseline patch, compatibility code
 
 **Adapter Prediction Payload**:
@@ -73,7 +73,7 @@ An external baseline source fixed to an immutable revision from which a Baseline
 _Avoid_: Latest upstream, copied checkout
 
 **Reproduction Program**:
-The harness-owned executable module that preserves one Pinned Baseline Source's recorded upstream semantics, enforces its reproduction gates, and publishes aggregate reproduction evidence. Several model lanes may share one Reproduction Program when they share source, data, environment, and evaluation lineage.
+The harness-owned executable module that preserves one Pinned Baseline Source's recorded upstream semantics, enforces its reproduction gates, and publishes aggregate reproduction evidence. Concrete programs expose programmatic `probe(request)` and `execute(request)` façades. Several model lanes may share one Reproduction Program when they share source, data, environment, and evaluation lineage.
 _Avoid_: Prediction Adapter, runner collection, baseline script
 
 **Local Data Root**:

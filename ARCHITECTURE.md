@@ -34,9 +34,9 @@ The core library exposes a small set of scientific interfaces. Dataset Manifest 
 
 These modules are deep because callers do not reimplement their invariants. Their public interfaces are the test surface.
 
-The Comparison Mode process seam has one production Prediction Adapter and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface should be invented in advance.
+The Comparison Mode process seam uses `ProcessPredictionAdapter.predict_comparison(...)` (Schema v2) and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface is maintained.
 
-Reproduction Mode uses a different deep module. A Reproduction Program owns the source-native data gate, mechanical invocation adaptation, training, checkpoint selection, upstream test procedure, and aggregate result finalization for one shared lineage. `RemoteExecutor` consumes the program declaration from the Baseline Registry, generates complete external data and run paths, accepts only approved 319 aliases, and performs the read-only preflight immediately before submission. Dry-run exercises this same interface without SSH; real submission additionally requires an exact clean harness revision and a 319-verified environment identity.
+Reproduction Mode uses a different deep module. A Reproduction Program owns the source-native data gate, mechanical invocation adaptation, training, checkpoint selection, upstream test procedure, and aggregate result finalization for one shared lineage. Programmatic callers interact strictly through `probe(request)` and `execute(request)` façades, with CLI `main()` serving as a thin transport wrapper. `RemoteExecutor` consumes the program declaration from the Baseline Registry, generates complete external data and run paths, accepts only approved 319 aliases, and performs the read-only preflight immediately before submission. Dry-run exercises this same interface without SSH; real submission additionally requires an exact clean harness revision and a 319-verified environment identity. Root CLI orchestration delegates reproduction command registration and argument parsing strictly to `src/medrec_research/reproduction/cli_commands.py`.
 
 ## Scientific modes
 
@@ -79,6 +79,6 @@ Two standalone Reproduction Programs are provided:
 1. `baselines/safedrug_archived.py`: The SafeDrug archived reproduction program (covering `gamenet`, `safedrug`, `retain`, `leap-safedrug`).
 2. `baselines/molerec.py`: The MoleRec Table 1 reproduction program (covering `molerec`, `molerec-embedding`).
 
-Both programs are deep entries with internal collaborators (`*_data.py`, `*_logs.py`, `*_probe.py`) exposing clean CLI and programmatic (`probe`, `execute`) façades. Attempt-level orchestration and Table-1 schedule policy live in `src/medrec_research/reproduction/molerec_table1_attempt.py`, keeping `RemoteExecutor` and evaluation queue management strictly attempt-agnostic.
+Both programs are deep entries with internal collaborators (`*_data.py`, `*_logs.py`, `*_probe.py`) exposing narrowed public programmatic surfaces (`__all__ = ("execute", "probe")`) and CLI transport wrappers. Attempt-level orchestration and Table-1 schedule policy live in `src/medrec_research/reproduction/molerec_table1_attempt.py`, keeping `RemoteExecutor` and evaluation queue management strictly attempt-agnostic.
 
 There are no `adapters/`, `audits/`, `programs/`, `runners/`, or `scripts/` subdirectories under `baselines/`. A Prediction Adapter belongs there only after Comparison Mode needs a target-free translation module. Audits are durable evidence under `research/`; operating instructions belong in `docs/playbooks/`; run artifacts remain outside Git. Empty directories do not define modules or seams.

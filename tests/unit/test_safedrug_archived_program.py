@@ -1026,7 +1026,7 @@ def test_safedrug_selection_admission_via_execute(
     assert authorized["selected_lane_id"] == "molerec-safedrug-lr-5e-4"
 
     # Missing selection_path
-    with pytest.raises(ValueError, match="requires selection.json"):
+    with pytest.raises(ValueError, match=r"requires selection\.json"):
         adapter.require_selected_safedrug_selection(
             None,
             lane_id="molerec-safedrug-lr-5e-4",
