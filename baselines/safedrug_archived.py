@@ -1759,6 +1759,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--scope",
+        "--probe-scope",
+        dest="scope",
         choices=["environment", "full"],
         default="full",
         help="Probe scope (probe mode only)",

@@ -974,3 +974,25 @@ def test_safedrug_selection_admission_via_execute(
             lane_id="molerec-safedrug-lr-5e-4",
             error_type=ValueError,
         )
+
+
+def test_safedrug_parser_supports_probe_scope_and_modes() -> None:
+    parser = adapter.build_parser()
+    args = parser.parse_args(
+        [
+            "safedrug",
+            "--upstream-root",
+            "/path/to/upstream",
+            "--dataset-root",
+            "/path/to/dataset",
+            "--mode",
+            "probe",
+            "--probe-scope",
+            "full",
+        ]
+    )
+    assert args.baseline_id == "safedrug"
+    assert args.mode == "probe"
+    assert args.scope == "full"
+    assert str(args.upstream_root) == "/path/to/upstream"
+    assert str(args.dataset_root) == "/path/to/dataset"

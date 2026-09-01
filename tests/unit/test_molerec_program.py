@@ -356,3 +356,25 @@ def test_probe_report_declares_scope(tmp_path: Path, monkeypatch: pytest.MonkeyP
 
     assert report["scope"] == "environment"
     assert report["environment"]["cuda_visible_device_count"] == 1
+
+
+def test_molerec_parser_supports_probe_scope_and_modes() -> None:
+    parser = adapter.build_parser()
+    args = parser.parse_args(
+        [
+            "molerec",
+            "--upstream-root",
+            "/path/to/upstream",
+            "--dataset-root",
+            "/path/to/dataset",
+            "--mode",
+            "probe",
+            "--probe-scope",
+            "full",
+        ]
+    )
+    assert args.baseline_id == "molerec"
+    assert args.mode == "probe"
+    assert args.scope == "full"
+    assert str(args.upstream_root) == "/path/to/upstream"
+    assert str(args.dataset_root) == "/path/to/dataset"
