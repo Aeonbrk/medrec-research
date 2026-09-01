@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import itertools
 import json
 import sys
@@ -216,7 +217,7 @@ def test_dataset_gate_rejects_non_paper_visit_count() -> None:
 
     counts = {**safedrug_archived_data.EXPECTED_COUNTS, "visits": 14_995}
 
-    with pytest.raises(adapter.ReproductionError, match="visits"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="visits"):
         safedrug_archived_data.require_executable_counts(counts)
 
 
@@ -228,7 +229,7 @@ def test_dataset_gate_uses_upper_triangle_and_rejects_count_drift() -> None:
     counts = safedrug_archived_data.count_dataset(records, vocabulary, ddi, ddi_mask)
 
     assert counts["ddi_pairs"] == 447
-    with pytest.raises(adapter.ReproductionError, match="ddi_pairs"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="ddi_pairs"):
         safedrug_archived_data.require_executable_counts(counts)
 
 
@@ -237,9 +238,9 @@ def test_dataset_gate_rejects_matrix_shape_drift() -> None:
 
     records, vocabulary, ddi, ddi_mask, _, _ = paper_values()
 
-    with pytest.raises(adapter.ReproductionError, match="ddi_A_final shape"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="ddi_A_final shape"):
         safedrug_archived_data.count_dataset(records, vocabulary, ddi[:-1], ddi_mask)
-    with pytest.raises(adapter.ReproductionError, match="ddi_mask_H rows"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="ddi_mask_H rows"):
         safedrug_archived_data.count_dataset(records, vocabulary, ddi, ddi_mask[:-1])
 
 
@@ -384,27 +385,27 @@ def test_semantic_bridge_checks_reject_invalid_structures(
     ehr_asym[0][1] = 1
     ehr_asym[1][0] = 0
     d3 = write_dataset({"ehr_adj_final.pkl": ehr_asym})
-    with pytest.raises(adapter.ReproductionError, match="must be symmetric"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="must be symmetric"):
         safedrug_archived_data.load_and_validate_canonical_inputs(d3)
 
     # 4. Inconsistent idx2drug keys
     _, _, _, _, _, idx2drug_bad = paper_values()
     del idx2drug_bad["seperator"]
     d4 = write_dataset({"idx2drug.pkl": idx2drug_bad})
-    with pytest.raises(adapter.ReproductionError, match="idx2drug keys mismatch"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="idx2drug keys mismatch"):
         safedrug_archived_data.load_and_validate_canonical_inputs(d4)
 
     # 5. Invalid admission indices out of vocabulary bounds
     records_bad1 = [patient[:] for patient in records]
     records_bad1[0] = [[records[0][0][0][:], records[0][0][1][:], [9999]], records[0][1]]
     d5 = write_dataset({"records_final.pkl": records_bad1})
-    with pytest.raises(adapter.ReproductionError, match="invalid index"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="invalid index"):
         safedrug_archived_data.load_and_validate_canonical_inputs(d5)
 
     records_bad2 = [patient[:] for patient in records]
     records_bad2[0] = [[[9999], records[0][0][1][:], records[0][0][2][:]], records[0][1]]
     d6 = write_dataset({"records_final.pkl": records_bad2})
-    with pytest.raises(adapter.ReproductionError, match="invalid index"):
+    with pytest.raises(safedrug_archived_data.ReproductionError, match="invalid index"):
         safedrug_archived_data.load_and_validate_canonical_inputs(d6)
 
 
@@ -610,94 +611,64 @@ def test_smoke_lane_executes_one_epoch_and_emits_smoke_json(
 
 
 def _write_test_selection_artifact(selection_path: Path) -> tuple[Path, dict[str, Any]]:
-    candidate_specs = (
-        ("molerec-safedrug-lr-1e-5", 1e-5, "1" * 64, 0.50, 0.08),
-        ("molerec-safedrug-lr-1e-4", 1e-4, "2" * 64, 0.51, 0.07),
-        ("molerec-safedrug-lr-5e-4", 5e-4, "3" * 64, 0.52, 0.06),
+    from medrec_research.reproduction.safedrug_selection import (
+        SAFE_DRUG_LANE_IDS,
+        select_safedrug_candidate,
+        write_selection,
     )
+
+    specs = {
+        "molerec-safedrug-lr-1e-5": (1e-5, 0.50, 0.08),
+        "molerec-safedrug-lr-1e-4": (1e-4, 0.51, 0.07),
+        "molerec-safedrug-lr-5e-4": (5e-4, 0.52, 0.06),
+    }
     candidates = []
-    for lane_id, learning_rate, checkpoint_identity, jaccard, ddi_rate in candidate_specs:
-        identity = {
-            "attempt_id": "attempt-1",
-            "lane_id": lane_id,
-            "scientific_baseline_id": "safedrug",
-            "program_id": "safedrug-archived",
-            "profile_id": "safedrug",
-            "harness_revision": "a" * 40,
-            "model_source_revision": "b" * 40,
-            "preprocessing_revision": "c" * 40,
-            "snapshot_id": "snapshots/molerec-table1-c721-www23",
-            "environment_sha256": "d" * 64,
-            "mode": "formal",
-            "submission_id": f"submission-{lane_id}",
-        }
-        checkpoint_evidence = {
-            "best_epoch": 49,
-            "relative_path": f"work/saved/SafeDrug_{lane_id}/Epoch_49.model",
-            "sha256": checkpoint_identity,
-            "size_bytes": 0,
-        }
+    for lane_id in SAFE_DRUG_LANE_IDS:
+        lr, jaccard, ddi_rate = specs[lane_id]
+        checkpoint_bytes = f"{lane_id}-bytes".encode()
+        checkpoint_sha256 = hashlib.sha256(checkpoint_bytes).hexdigest()
         candidates.append(
             {
                 "lane_id": lane_id,
-                "learning_rate": learning_rate,
-                "checkpoint_identity": checkpoint_identity,
+                "learning_rate": lr,
+                "checkpoint_identity": checkpoint_sha256,
                 "validation_jaccard": jaccard,
                 "validation_ddi_rate": ddi_rate,
                 "training_evidence": {
                     "state": "completed",
                     "artifact_type": "training",
-                    "identity": identity,
-                    "learning_rate": learning_rate,
+                    "identity": {
+                        "attempt_id": "attempt-1",
+                        "lane_id": lane_id,
+                        "scientific_baseline_id": "safedrug",
+                        "program_id": "safedrug-archived",
+                        "profile_id": "safedrug",
+                        "harness_revision": "a" * 40,
+                        "model_source_revision": adapter.ARCHIVED_REVISION,
+                        "preprocessing_revision": "c" * 40,
+                        "snapshot_id": "snapshots/molerec-table1-c721-www23",
+                        "environment_sha256": "d" * 64,
+                        "mode": "formal",
+                        "submission_id": f"submission-{lane_id}",
+                    },
+                    "learning_rate": lr,
                     "best_epoch": 49,
                     "validation_jaccard": jaccard,
                     "validation_ddi_rate": ddi_rate,
-                    "checkpoint": checkpoint_evidence,
+                    "checkpoint": {
+                        "best_epoch": 49,
+                        "relative_path": f"work/saved/SafeDrug_{lane_id}/Epoch_49.model",
+                        "sha256": checkpoint_sha256,
+                        "size_bytes": len(checkpoint_bytes),
+                    },
                     "recovery": None,
                 },
             }
         )
-    ranked = sorted(
-        candidates,
-        key=lambda candidate: (
-            -candidate["validation_jaccard"],
-            candidate["validation_ddi_rate"],
-            candidate["learning_rate"],
-            candidate["lane_id"],
-        ),
-    )
-    sorted_candidates = sorted(candidates, key=lambda candidate: candidate["lane_id"])
-    valid_selection = {
-        "schema_version": 1,
-        "kind": "safedrug_selection",
-        "state": "selection_ready",
-        "candidate_lane_ids": [
-            "molerec-safedrug-lr-1e-5",
-            "molerec-safedrug-lr-1e-4",
-            "molerec-safedrug-lr-5e-4",
-        ],
-        "candidates": sorted_candidates,
-        "selection_rule": [
-            "maximize validation_jaccard",
-            "minimize validation_ddi_rate",
-            "minimize learning_rate",
-            "minimize lane_id",
-        ],
-        "comparison_decisions": [
-            {
-                "rank": rank,
-                "lane_id": candidate["lane_id"],
-                "validation_jaccard": candidate["validation_jaccard"],
-                "validation_ddi_rate": candidate["validation_ddi_rate"],
-                "learning_rate": candidate["learning_rate"],
-            }
-            for rank, candidate in enumerate(ranked, start=1)
-        ],
-        "selected_lane_id": "molerec-safedrug-lr-5e-4",
-        "test_metrics_available": False,
-        "errors": [],
-    }
-    selection_path.write_text(json.dumps(valid_selection), encoding="utf-8")
+
+    selection_record = select_safedrug_candidate(candidates)
+    write_selection(selection_path, selection_record)
+    valid_selection = json.loads(selection_path.read_text(encoding="utf-8"))
     return selection_path, valid_selection
 
 
@@ -737,10 +708,15 @@ def test_training_and_test_commands_preserve_archived_cli_behavior(tmp_path: Pat
 
 
 def test_checkpoint_selection_uses_zero_based_best_epoch(tmp_path: Path) -> None:
+    from baselines import safedrug_archived_logs
+
     checkpoint = tmp_path / "Epoch_49_JA_0.5000_DDI_0.0800.model"
     checkpoint.touch()
 
-    assert adapter.select_checkpoint(tmp_path, adapter.PROFILES["gamenet"], 49) == checkpoint
+    assert (
+        safedrug_archived_logs.select_checkpoint(tmp_path, adapter.PROFILES["gamenet"], 49)
+        == checkpoint
+    )
 
 
 def test_native_history_path_is_model_specific(tmp_path: Path) -> None:
@@ -752,16 +728,22 @@ def test_native_history_path_is_model_specific(tmp_path: Path) -> None:
 def test_environment_summary_records_conda_and_python(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    completed = SimpleNamespace(stdout=b"explicit lock\n")
-    monkeypatch.setattr(adapter.subprocess, "run", lambda *args, **kwargs: completed)
+    from baselines import safedrug_archived_probe
 
-    summary = adapter.environment_summary()
+    completed = SimpleNamespace(stdout=b"explicit lock\n")
+    monkeypatch.setattr(
+        safedrug_archived_probe.subprocess, "run", lambda *args, **kwargs: completed
+    )
+
+    summary = safedrug_archived_probe.environment_summary()
 
     assert len(summary["conda_explicit_sha256"]) == 64
     assert summary["python"] == sys.version.split()[0]
 
 
 def test_test_log_requires_ten_rounds_and_matching_upstream_summary() -> None:
+    from baselines import safedrug_archived_logs
+
     metric_line = (
         "DDI Rate: 0.1, Jaccard: 0.2, PRAUC: 0.3, AVG_PRC: 0.4, "
         "AVG_RECALL: 0.5, AVG_F1: 0.6, AVG_MED: 7.0"
@@ -771,17 +753,19 @@ def test_test_log_requires_ten_rounds_and_matching_upstream_summary() -> None:
         "0.6000 $\\pm$ 0.0000 & 0.3000 $\\pm$ 0.0000 & 7.0000 $\\pm$ 0.0000 &"
     )
 
-    parsed = adapter.parse_test_log("\n".join([metric_line] * 10 + [summary_line]))
+    parsed = safedrug_archived_logs.parse_test_log("\n".join([metric_line] * 10 + [summary_line]))
 
     assert len(parsed["test_rounds"]) == 10
     assert parsed["harness_summary"]["avg_f1"]["mean"] == pytest.approx(0.6)
-    with pytest.raises(adapter.ReproductionError, match="disagrees"):
-        adapter.parse_test_log(
+    with pytest.raises(safedrug_archived_logs.ReproductionError, match="disagrees"):
+        safedrug_archived_logs.parse_test_log(
             "\n".join([metric_line] * 10 + [summary_line.replace("0.1000", "0.2000", 1)])
         )
 
 
 def test_test_log_comparison_respects_upstream_significant_digit_precision() -> None:
+    from baselines import safedrug_archived_logs
+
     metric_line = (
         "DDI Rate: 0.1, Jaccard: 0.2, PRAUC: 0.3, AVG_PRC: 0.4, "
         "AVG_RECALL: 0.5, AVG_F1: 0.6, AVG_MED: 20.58"
@@ -791,7 +775,7 @@ def test_test_log_comparison_respects_upstream_significant_digit_precision() -> 
         "0.6000 $\\pm$ 0.0000 & 0.3000 $\\pm$ 0.0000 & 20.5825 $\\pm$ 0.0000 &"
     )
 
-    adapter.parse_test_log("\n".join([metric_line] * 10 + [summary_line]))
+    safedrug_archived_logs.parse_test_log("\n".join([metric_line] * 10 + [summary_line]))
 
 
 def test_terminal_status_is_written_before_result(
@@ -919,61 +903,276 @@ def test_safedrug_selection_admission_via_execute(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    formal_calls = []
+    from baselines import safedrug_archived_data
 
-    def mock_run_formal(*args: Any, **kwargs: Any) -> None:
-        formal_calls.append((args, kwargs))
+    # 1. Active controller identity (selected lane: molerec-safedrug-lr-5e-4)
+    active_identity = {
+        "attempt_id": "attempt-1",
+        "lane_id": "molerec-safedrug-lr-5e-4",
+        "scientific_baseline_id": "safedrug",
+        "program_id": "safedrug-archived",
+        "profile_id": "safedrug",
+        "harness_revision": "a" * 40,
+        "model_source_revision": adapter.ARCHIVED_REVISION,
+        "preprocessing_revision": "c" * 40,
+        "snapshot_id": "snapshots/molerec-table1-c721-www23",
+        "environment_sha256": "d" * 64,
+        "mode": "formal",
+        "submission_id": "submission-1",
+    }
+    monkeypatch.setattr(adapter, "identity_from_environment", lambda mode, **_: active_identity)
 
-    monkeypatch.setattr(adapter, "run_formal_lane", mock_run_formal)
+    # 2. Upstream tree with entrypoint
+    upstream = tmp_path / "upstream"
+    upstream_src = upstream / "src"
+    upstream_src.mkdir(parents=True)
+    (upstream_src / "SafeDrug.py").touch()
+    monkeypatch.setattr(adapter, "verify_upstream_source", lambda root: None)
 
+    # 3. Dataset directory with required inputs
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    for name in safedrug_archived_data.CANONICAL_SIX_INPUTS:
+        (data_dir / name).touch()
+
+    # 4. Completed training run_root with valid checkpoint and v2 artifacts
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+    checkpoint_file = run_root / "work" / "saved" / f"SafeDrug_{run_root.name}" / "Epoch_49.model"
+    checkpoint_file.parent.mkdir(parents=True)
+    checkpoint_file.write_bytes(b"checkpoint-evidence")
+    checkpoint_sha = hashlib.sha256(b"checkpoint-evidence").hexdigest()
+
+    training_status = {
+        "schema_version": 2,
+        "kind": "reproduction_status_v2",
+        "state": "completed",
+        "stage": "terminal",
+        "identity": active_identity,
+        "mode": "formal",
+        "non_evidence": False,
+    }
+    training_result = {
+        "schema_version": 2,
+        "kind": "reproduction_result_v2",
+        "state": "completed",
+        "identity": active_identity,
+        "artifact_type": "training",
+        "mode": "formal",
+        "non_evidence": False,
+        "status": training_status,
+        "dataset_counts": safedrug_archived_data.EXPECTED_COUNTS,
+        "epochs_requested": 50,
+        "epochs_observed": 50,
+        "checkpoint": {
+            "best_epoch": 49,
+            "relative_path": str(checkpoint_file.relative_to(run_root)),
+            "sha256": checkpoint_sha,
+            "size_bytes": len(b"checkpoint-evidence"),
+        },
+    }
+    (run_root / "status.json").write_text(json.dumps(training_status), encoding="utf-8")
+    (run_root / "result.json").write_text(json.dumps(training_result), encoding="utf-8")
+    (run_root / "finalization.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "kind": "reproduction_finalization",
+                "status": "finalized",
+                "identity": active_identity,
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        adapter,
+        "environment_summary",
+        lambda: {"conda_explicit_sha256": active_identity["environment_sha256"]},
+    )
+
+    # 5. Generate selection.json using core selector
     selection_path, valid_selection = _write_test_selection_artifact(tmp_path / "selection.json")
 
-    result = adapter.execute(
-        {
-            "mode": "formal",
-            "phase": "test",
-            "baseline_id": "safedrug",
-            "upstream_root": str(tmp_path / "upstream"),
-            "dataset_root": str(tmp_path / "data"),
-            "run_root": str(tmp_path / "run"),
-            "selection_path": str(selection_path),
-            "training_source_root": str(tmp_path / "train_run"),
-            "test_root": str(tmp_path / "test_run"),
-        }
-    )
+    # 6. Mock ONLY lower-level work after admission so no scientific workload runs
+    executed_commands: list[list[str]] = []
+
+    def mock_run_logged(cmd: list[str], *, cwd: Path, env: dict[str, str], log_path: Path) -> None:
+        executed_commands.append(cmd)
+        metric_line = (
+            "DDI Rate: 0.1, Jaccard: 0.2, PRAUC: 0.3, AVG_PRC: 0.4, "
+            "AVG_RECALL: 0.5, AVG_F1: 0.6, AVG_MED: 7.0"
+        )
+        summary_line = (
+            "0.1000 $\\pm$ 0.0000 & 0.2000 $\\pm$ 0.0000 & "
+            "0.6000 $\\pm$ 0.0000 & 0.3000 $\\pm$ 0.0000 & 7.0000 $\\pm$ 0.0000 &"
+        )
+        log_path.write_text("\n".join([metric_line] * 10 + [summary_line]), encoding="utf-8")
+
+    monkeypatch.setattr(adapter, "run_logged", mock_run_logged)
+
+    # Positive test: genuine Program-side admission through execute(request)
+    base_request = {
+        "mode": "formal",
+        "phase": "test",
+        "baseline_id": "safedrug",
+        "upstream_root": str(upstream),
+        "dataset_root": str(data_dir),
+        "run_root": str(run_root),
+        "selection_path": str(selection_path),
+        "test_root": str(tmp_path / "test_success"),
+    }
+    result = adapter.execute(base_request)
     assert result["state"] == "completed"
     assert result["phase"] == "test"
-    assert len(formal_calls) == 1
-    assert formal_calls[0][1]["selection_path"] == Path(selection_path)
+    assert len(executed_commands) == 1
+    assert "--Test" in executed_commands[0]
+    assert "--resume_path" in executed_commands[0]
 
-    # Valid selector admission via require_selected_safedrug_selection
-    authorized = adapter.require_selected_safedrug_selection(
-        selection_path,
-        lane_id="molerec-safedrug-lr-5e-4",
-        error_type=ValueError,
+    # Negative 1: Missing selection_path rejected during execute
+    req_missing_selection = dict(
+        base_request,
+        selection_path=None,
+        test_root=str(tmp_path / "test_missing_selection"),
     )
-    assert authorized["selected_lane_id"] == "molerec-safedrug-lr-5e-4"
+    with pytest.raises(adapter.ReproductionError, match=r"requires selection\.json"):
+        adapter.execute(req_missing_selection)
 
-    # Missing selection_path
-    with pytest.raises(ValueError, match=r"requires selection\.json"):
-        adapter.require_selected_safedrug_selection(
-            None,
-            lane_id="molerec-safedrug-lr-5e-4",
-            error_type=ValueError,
-        )
+    # Negative 2: Unselected lane rejected during execute
+    unselected_identity = {**active_identity, "lane_id": "molerec-safedrug-lr-1e-5"}
+    unselected_run = tmp_path / "run_unselected"
+    unselected_run.mkdir()
+    unselected_ckpt = (
+        unselected_run / "work" / "saved" / f"SafeDrug_{unselected_run.name}" / "Epoch_49.model"
+    )
+    unselected_ckpt.parent.mkdir(parents=True)
+    unselected_ckpt.write_bytes(b"checkpoint-evidence-1e5")
+    unselected_status = dict(training_status, identity=unselected_identity)
+    unselected_result = dict(
+        training_result,
+        identity=unselected_identity,
+        status=unselected_status,
+        checkpoint={
+            "best_epoch": 49,
+            "relative_path": str(unselected_ckpt.relative_to(unselected_run)),
+            "sha256": hashlib.sha256(b"checkpoint-evidence-1e5").hexdigest(),
+            "size_bytes": len(b"checkpoint-evidence-1e5"),
+        },
+    )
+    (unselected_run / "status.json").write_text(json.dumps(unselected_status), encoding="utf-8")
+    (unselected_run / "result.json").write_text(json.dumps(unselected_result), encoding="utf-8")
+    (unselected_run / "finalization.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "kind": "reproduction_finalization",
+                "status": "finalized",
+                "identity": unselected_identity,
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        adapter,
+        "identity_from_environment",
+        lambda mode, **_: unselected_identity,
+    )
+    req_unselected = dict(
+        base_request,
+        run_root=str(unselected_run),
+        test_root=str(tmp_path / "test_unselected"),
+    )
+    with pytest.raises(adapter.ReproductionError, match="does not authorize this lane"):
+        adapter.execute(req_unselected)
 
-    # Invalid selection with test_metrics leaked
+    # Negative 3: Tampered selection with leaked test_metrics rejected during execute
+    monkeypatch.setattr(
+        adapter,
+        "identity_from_environment",
+        lambda mode, **_: active_identity,
+    )
     invalid_selection = json.loads(json.dumps(valid_selection))
     invalid_selection["candidates"][0]["test_metrics"] = {"jaccard": 0.9}
     invalid_path = tmp_path / "invalid_selection.json"
     invalid_path.write_text(json.dumps(invalid_selection), encoding="utf-8")
+    req_tampered = dict(
+        base_request,
+        selection_path=str(invalid_path),
+        test_root=str(tmp_path / "test_tampered"),
+    )
+    with pytest.raises(adapter.ReproductionError, match="invalid candidate evidence"):
+        adapter.execute(req_tampered)
 
-    with pytest.raises(ValueError, match="invalid candidate"):
-        adapter.require_selected_safedrug_selection(
-            invalid_path,
-            lane_id="molerec-safedrug-lr-5e-4",
-            error_type=ValueError,
-        )
+
+def test_safedrug_cli_main_dispatches_probe_and_execute(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    upstream = tmp_path / "upstream"
+    upstream.mkdir()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+
+    probe_calls = []
+    execute_calls = []
+
+    def mock_probe(req):
+        probe_calls.append(req)
+        return {"kind": "safedrug_probe", "status": "ok"}
+
+    def mock_execute(req):
+        execute_calls.append(req)
+        return {"state": "completed", "mode": req["mode"]}
+
+    monkeypatch.setattr(adapter, "probe", mock_probe)
+    monkeypatch.setattr(adapter, "execute", mock_execute)
+
+    # 1. Main dispatches probe
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "SafeDrug.py",
+            "safedrug",
+            "--upstream-root",
+            str(upstream),
+            "--dataset-root",
+            str(data_dir),
+            "--mode",
+            "probe",
+            "--scope",
+            "environment",
+        ],
+    )
+    adapter.main()
+    assert len(probe_calls) == 1
+    assert probe_calls[0]["baseline_id"] == "safedrug"
+    captured = capsys.readouterr()
+    assert "safedrug_probe" in captured.out
+
+    # 2. Main dispatches execute (smoke)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "SafeDrug.py",
+            "safedrug",
+            "--upstream-root",
+            str(upstream),
+            "--dataset-root",
+            str(data_dir),
+            "--run-root",
+            str(run_root),
+            "--mode",
+            "smoke",
+        ],
+    )
+    adapter.main()
+    assert len(execute_calls) == 1
+    assert execute_calls[0]["baseline_id"] == "safedrug"
+    assert execute_calls[0]["mode"] == "smoke"
 
 
 def test_safedrug_parser_supports_probe_scope_and_modes() -> None:

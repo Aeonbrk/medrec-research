@@ -179,26 +179,30 @@ def test_embedding_profile_declares_embedding_training_argument() -> None:
 
 
 def test_validate_binary_symmetric_matrix_rejects_asymmetry() -> None:
-    data_mod = sys.modules.get("molerec_data") or sys.modules.get("baselines.molerec_data")
+    from baselines import molerec_data
+
     ddi = [[0] * 131 for _ in range(131)]
     ddi[0][1] = 1
     ddi[1][0] = 0
 
-    with pytest.raises(adapter.ReproductionError, match="asymmetric"):
-        data_mod._validate_binary_symmetric_matrix(ddi, 131)
+    with pytest.raises(molerec_data.ReproductionError, match="asymmetric"):
+        molerec_data._validate_binary_symmetric_matrix(ddi, 131)
 
 
 def test_validate_records_statistics_rejects_invalid_counts() -> None:
-    data_mod = sys.modules.get("molerec_data") or sys.modules.get("baselines.molerec_data")
+    from baselines import molerec_data
+
     records = [[[list(range(5)), list(range(5)), list(range(5))]]]
 
-    with pytest.raises(adapter.ReproductionError, match="mismatch"):
-        data_mod._validate_records_statistics(records)
+    with pytest.raises(molerec_data.ReproductionError, match="mismatch"):
+        molerec_data._validate_records_statistics(records)
 
 
 def test_parse_training_log_extracts_best_epoch() -> None:
+    from baselines import molerec_logs
+
     log_text = "\n".join([f"epoch {i}\nloss: 0.1\nbest_epoch: {min(i, 42)}" for i in range(50)])
-    best_epoch = adapter.parse_training_log(log_text, expected_epochs=50)
+    best_epoch = molerec_logs.parse_training_log(log_text, expected_epochs=50)
     assert best_epoch == 42
 
 
@@ -223,6 +227,8 @@ def test_parse_test_log_extracts_metrics() -> None:
 
 
 def test_parse_formal_test_log_recomputes_ten_round_population_summary() -> None:
+    from baselines import molerec_logs
+
     rounds = "\n".join(
         (
             f"DDI Rate: {0.10 + index / 100:.2f}, "
@@ -242,7 +248,7 @@ def test_parse_formal_test_log_recomputes_ten_round_population_summary() -> None
         "24.5000 $\\pm$ 2.8723 &\n"
     )
 
-    parsed = adapter.parse_formal_test_log(log_text)
+    parsed = molerec_logs.parse_formal_test_log(log_text)
 
     assert len(parsed["rounds"]) == 10
     assert parsed["harness_summary"]["jaccard"] == pytest.approx(
@@ -255,12 +261,14 @@ def test_parse_formal_test_log_recomputes_ten_round_population_summary() -> None
 
 
 def test_select_checkpoint_finds_exact_epoch(tmp_path: Path) -> None:
+    from baselines import molerec_logs
+
     profile = adapter.PROFILES["molerec"]
     (tmp_path / "Epoch_10_TARGET_0.30_JA_0.50_DDI_0.07.model").touch()
     (tmp_path / "Epoch_25_TARGET_0.28_JA_0.53_DDI_0.06.model").touch()
     (tmp_path / "Epoch_40_TARGET_0.31_JA_0.51_DDI_0.07.model").touch()
 
-    selected = adapter.select_checkpoint(tmp_path, profile, best_epoch=25)
+    selected = molerec_logs.select_checkpoint(tmp_path, profile, best_epoch=25)
     assert selected.name == "Epoch_25_TARGET_0.28_JA_0.53_DDI_0.06.model"
 
 
@@ -378,3 +386,76 @@ def test_molerec_parser_supports_probe_scope_and_modes() -> None:
     assert args.scope == "full"
     assert str(args.upstream_root) == "/path/to/upstream"
     assert str(args.dataset_root) == "/path/to/dataset"
+
+
+def test_molerec_cli_main_dispatches_probe_and_execute(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    upstream = tmp_path / "upstream"
+    upstream.mkdir()
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    run_root = tmp_path / "run"
+    run_root.mkdir()
+
+    probe_calls = []
+    execute_calls = []
+
+    def mock_probe(req):
+        probe_calls.append(req)
+        return {"kind": "molerec_probe", "status": "ok"}
+
+    def mock_execute(req):
+        execute_calls.append(req)
+        return {"state": "completed", "mode": req["mode"]}
+
+    monkeypatch.setattr(adapter, "probe", mock_probe)
+    monkeypatch.setattr(adapter, "execute", mock_execute)
+
+    # 1. Main dispatches probe
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "main.py",
+            "molerec",
+            "--upstream-root",
+            str(upstream),
+            "--dataset-root",
+            str(data_dir),
+            "--mode",
+            "probe",
+            "--scope",
+            "environment",
+        ],
+    )
+    adapter.main()
+    assert len(probe_calls) == 1
+    assert probe_calls[0]["baseline_id"] == "molerec"
+    assert probe_calls[0]["scope"] == "environment"
+    captured = capsys.readouterr()
+    assert "molerec_probe" in captured.out
+
+    # 2. Main dispatches execute (smoke)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "main.py",
+            "molerec",
+            "--upstream-root",
+            str(upstream),
+            "--dataset-root",
+            str(data_dir),
+            "--run-root",
+            str(run_root),
+            "--mode",
+            "smoke",
+        ],
+    )
+    adapter.main()
+    assert len(execute_calls) == 1
+    assert execute_calls[0]["baseline_id"] == "molerec"
+    assert execute_calls[0]["mode"] == "smoke"

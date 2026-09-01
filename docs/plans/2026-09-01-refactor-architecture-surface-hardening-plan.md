@@ -1,7 +1,7 @@
 ---
 title: "refactor: Harden MedRec architecture surfaces"
 type: refactor
-status: active
+status: completed
 date: 2026-09-01
 artifact_readiness: implementation-ready
 execution: code

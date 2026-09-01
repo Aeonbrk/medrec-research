@@ -349,7 +349,7 @@ def _recover_reproduction(args: argparse.Namespace) -> int:
                 "finalizer_revision": args.finalizer_revision,
             }
         )
-    except Exception as error:
+    except (program.ReproductionError, OSError, ValueError) as error:
         raise ProtocolValidationError(str(error)) from error
     print(json.dumps({"recovery_root": result["marker_path"]}, sort_keys=True))
     return 0
