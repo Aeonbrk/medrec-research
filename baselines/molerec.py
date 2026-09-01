@@ -136,60 +136,8 @@ _RECOVERY_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 _IMMUTABLE_REVISION = re.compile(r"[0-9a-f]{40}")
 
 __all__ = (
-    "ARCHIVED_REVISION",
-    "COMMON_INPUTS",
-    "EPOCH_FORMAL",
-    "EPOCH_SMOKE",
-    "EXPECTED_COUNTS",
-    "EXPECTED_STATISTICS",
-    "GATE_INPUTS",
-    "PROFILES",
-    "PYG_EXTENSION_MODULES",
-    "REGISTRY_IMPORT_MODULES",
-    "REPORTED_PAPER_METADATA",
-    "ROUND_PATTERN",
-    "TEST_DECLARATION",
-    "TRAIN_DECLARATION",
-    "Profile",
-    "ReproductionError",
-    "adapt_epoch_source",
-    "adapt_learning_rate_source",
-    "adapt_smoke_source",
-    "adapt_training_source",
-    "build_parser",
-    "check_cuda_tensor",
-    "check_imports",
-    "check_pyg_extensions",
-    "check_rdkit",
-    "checkpoint_directory",
-    "count_dataset",
-    "environment_summary",
     "execute",
-    "load_and_validate_canonical_inputs",
-    "main",
-    "matrix_shape",
-    "native_history_path",
-    "parse_formal_test_log",
-    "parse_test_log",
-    "parse_training_log",
-    "parse_validation_metrics",
     "probe",
-    "probe_environment_details",
-    "profile_for",
-    "recover_formal_lane",
-    "require_executable_counts",
-    "run_formal_lane",
-    "run_logged",
-    "run_probe",
-    "run_smoke_lane",
-    "run_test_lane",
-    "select_checkpoint",
-    "sha256",
-    "test_command",
-    "test_mode_default",
-    "training_command",
-    "verify_upstream_source",
-    "write_json",
 )
 
 TEST_DECLARATION = (
@@ -1488,11 +1436,13 @@ def main() -> None:
         parser.error("baseline_id is required")
 
     if args.mode == "probe":
-        result = run_probe(
-            baseline_id=baseline_id,
-            upstream_root=args.upstream_root.resolve(),
-            data_dir=args.dataset_root.resolve() if args.dataset_root else None,
-            scope=args.scope,
+        result = probe(
+            {
+                "baseline_id": baseline_id,
+                "upstream_root": args.upstream_root.resolve(),
+                "dataset_root": args.dataset_root.resolve() if args.dataset_root else None,
+                "scope": args.scope,
+            }
         )
         print(json.dumps(result, indent=2, sort_keys=True))
         return
@@ -1502,30 +1452,27 @@ def main() -> None:
     if args.run_root is None:
         parser.error("--run-root is required for smoke and formal modes")
 
-    if args.mode == "smoke":
-        run_smoke_lane(
-            profile=profile_for(baseline_id),
-            upstream_root=args.upstream_root.resolve(),
-            data_dir=args.dataset_root.resolve(),
-            run_root=args.run_root.resolve(),
-            python=args.python,
-            learning_rate=args.learning_rate,
-        )
-    else:
-        run_formal_lane(
-            profile=profile_for(baseline_id),
-            upstream_root=args.upstream_root.resolve(),
-            data_dir=args.dataset_root.resolve(),
-            run_root=args.run_root.resolve(),
-            python=args.python,
-            learning_rate=args.learning_rate,
-            phase=args.phase,
-            selection_path=args.selection,
-            training_source_root=(
-                args.training_source_root.resolve() if args.training_source_root else None
-            ),
-            test_root=args.test_root.resolve() if args.test_root else None,
-        )
+    request: dict[str, Any] = {
+        "mode": args.mode,
+        "baseline_id": baseline_id,
+        "upstream_root": args.upstream_root.resolve(),
+        "dataset_root": args.dataset_root.resolve(),
+        "run_root": args.run_root.resolve(),
+        "python": args.python,
+    }
+    if args.learning_rate is not None:
+        request["learning_rate"] = args.learning_rate
+
+    if args.mode == "formal":
+        request["phase"] = args.phase
+        if args.selection:
+            request["selection_path"] = args.selection.resolve()
+        if args.training_source_root:
+            request["training_source_root"] = args.training_source_root.resolve()
+        if args.test_root:
+            request["test_root"] = args.test_root.resolve()
+
+    execute(request)
 
 
 if __name__ == "__main__":

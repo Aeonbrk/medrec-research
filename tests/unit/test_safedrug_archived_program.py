@@ -809,7 +809,7 @@ def test_internal_modules_importable_and_consistent() -> None:
     assert not hasattr(adapter, "load_archived_values")
     assert hasattr(safedrug_archived_logs, "parse_training_log")
     assert hasattr(safedrug_archived_probe, "run_probe")
-    assert hasattr(adapter, "run_formal_lane")
+    assert adapter.__all__ == ("execute", "probe")
 
 
 @pytest.mark.parametrize(
@@ -896,3 +896,153 @@ def test_program_probe_and_execute_surfaces(
     assert execute_result["state"] == "completed"
     assert execute_result["mode"] == "smoke"
     assert len(smoke_calls) == 1
+
+
+def test_safedrug_selection_admission_via_execute(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    formal_calls = []
+
+    def mock_run_formal(*args: Any, **kwargs: Any) -> None:
+        formal_calls.append((args, kwargs))
+
+    monkeypatch.setattr(adapter, "run_formal_lane", mock_run_formal)
+
+    selection_path = tmp_path / "selection.json"
+    candidate_specs = (
+        ("molerec-safedrug-lr-1e-5", 1e-5, "1" * 64, 0.50, 0.08),
+        ("molerec-safedrug-lr-1e-4", 1e-4, "2" * 64, 0.51, 0.07),
+        ("molerec-safedrug-lr-5e-4", 5e-4, "3" * 64, 0.52, 0.06),
+    )
+    candidates = []
+    for lane_id, learning_rate, checkpoint_identity, jaccard, ddi_rate in candidate_specs:
+        identity = {
+            "attempt_id": "attempt-1",
+            "lane_id": lane_id,
+            "scientific_baseline_id": "safedrug",
+            "program_id": "safedrug-archived",
+            "profile_id": "safedrug",
+            "harness_revision": "a" * 40,
+            "model_source_revision": "b" * 40,
+            "preprocessing_revision": "c" * 40,
+            "snapshot_id": "snapshots/molerec-table1-c721-www23",
+            "environment_sha256": "d" * 64,
+            "mode": "formal",
+            "submission_id": f"submission-{lane_id}",
+        }
+        checkpoint_evidence = {
+            "best_epoch": 49,
+            "relative_path": f"work/saved/SafeDrug_{lane_id}/Epoch_49.model",
+            "sha256": checkpoint_identity,
+            "size_bytes": 0,
+        }
+        candidates.append(
+            {
+                "lane_id": lane_id,
+                "learning_rate": learning_rate,
+                "checkpoint_identity": checkpoint_identity,
+                "validation_jaccard": jaccard,
+                "validation_ddi_rate": ddi_rate,
+                "training_evidence": {
+                    "state": "completed",
+                    "artifact_type": "training",
+                    "identity": identity,
+                    "learning_rate": learning_rate,
+                    "best_epoch": 49,
+                    "validation_jaccard": jaccard,
+                    "validation_ddi_rate": ddi_rate,
+                    "checkpoint": checkpoint_evidence,
+                    "recovery": None,
+                },
+            }
+        )
+    ranked = sorted(
+        candidates,
+        key=lambda candidate: (
+            -candidate["validation_jaccard"],
+            candidate["validation_ddi_rate"],
+            candidate["learning_rate"],
+            candidate["lane_id"],
+        ),
+    )
+    sorted_candidates = sorted(candidates, key=lambda candidate: candidate["lane_id"])
+    valid_selection = {
+        "schema_version": 1,
+        "kind": "safedrug_selection",
+        "state": "selection_ready",
+        "candidate_lane_ids": [
+            "molerec-safedrug-lr-1e-5",
+            "molerec-safedrug-lr-1e-4",
+            "molerec-safedrug-lr-5e-4",
+        ],
+        "candidates": sorted_candidates,
+        "selection_rule": [
+            "maximize validation_jaccard",
+            "minimize validation_ddi_rate",
+            "minimize learning_rate",
+            "minimize lane_id",
+        ],
+        "comparison_decisions": [
+            {
+                "rank": rank,
+                "lane_id": candidate["lane_id"],
+                "validation_jaccard": candidate["validation_jaccard"],
+                "validation_ddi_rate": candidate["validation_ddi_rate"],
+                "learning_rate": candidate["learning_rate"],
+            }
+            for rank, candidate in enumerate(ranked, start=1)
+        ],
+        "selected_lane_id": "molerec-safedrug-lr-5e-4",
+        "test_metrics_available": False,
+        "errors": [],
+    }
+    selection_path.write_text(json.dumps(valid_selection), encoding="utf-8")
+
+    result = adapter.execute(
+        {
+            "mode": "formal",
+            "phase": "test",
+            "baseline_id": "safedrug",
+            "upstream_root": str(tmp_path / "upstream"),
+            "dataset_root": str(tmp_path / "data"),
+            "run_root": str(tmp_path / "run"),
+            "selection_path": str(selection_path),
+            "training_source_root": str(tmp_path / "train_run"),
+            "test_root": str(tmp_path / "test_run"),
+        }
+    )
+    assert result["state"] == "completed"
+    assert result["phase"] == "test"
+    assert len(formal_calls) == 1
+    assert formal_calls[0][1]["selection_path"] == Path(selection_path)
+
+    # Valid selector admission via require_selected_safedrug_selection
+    authorized = adapter.require_selected_safedrug_selection(
+        selection_path,
+        lane_id="molerec-safedrug-lr-5e-4",
+        error_type=ValueError,
+    )
+    assert authorized["selected_lane_id"] == "molerec-safedrug-lr-5e-4"
+
+    # Missing selection_path
+    with pytest.raises(ValueError, match="requires selection.json"):
+        adapter.require_selected_safedrug_selection(
+            None,
+            lane_id="molerec-safedrug-lr-5e-4",
+            error_type=ValueError,
+        )
+
+    # Invalid selection with test_metrics leaked
+    invalid_selection = dict(valid_selection)
+    invalid_selection["candidates"] = [dict(c) for c in candidates]
+    invalid_selection["candidates"][0]["test_metrics"] = {"jaccard": 0.9}
+    invalid_path = tmp_path / "invalid_selection.json"
+    invalid_path.write_text(json.dumps(invalid_selection), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="invalid candidate"):
+        adapter.require_selected_safedrug_selection(
+            invalid_path,
+            lane_id="molerec-safedrug-lr-5e-4",
+            error_type=ValueError,
+        )

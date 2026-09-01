@@ -278,9 +278,7 @@ def test_internal_modules_importable() -> None:
     assert hasattr(molerec_data, "load_and_validate_canonical_inputs")
     assert hasattr(molerec_logs, "parse_training_log")
     assert hasattr(molerec_probe, "run_probe")
-    assert hasattr(adapter, "run_formal_lane")
-    assert hasattr(adapter, "probe")
-    assert hasattr(adapter, "execute")
+    assert adapter.__all__ == ("execute", "probe")
 
 
 def test_molerec_program_probe_and_execute_surfaces(

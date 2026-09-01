@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import hashlib
-import json
 from pathlib import Path
 
 import pytest
@@ -12,12 +10,6 @@ from baselines.reproduction_artifacts import (
     identity_from_environment,
     reopen_v2_pair,
 )
-from baselines.safedrug_archived import (
-    SAFE_DRUG_LANE_IDS,
-    SAFE_DRUG_SELECTION_RULE,
-    require_selected_safedrug_selection,
-)
-from medrec_research.reproduction.safedrug_selection import select_safedrug_candidate
 
 
 def _identity(*, mode: str = "formal", submission_id: str = "submission-1") -> dict[str, str]:
@@ -34,70 +26,6 @@ def _identity(*, mode: str = "formal", submission_id: str = "submission-1") -> d
         "environment_sha256": "d" * 64,
         "mode": mode,
         "submission_id": submission_id,
-    }
-
-
-def _selection() -> dict[str, object]:
-    return select_safedrug_candidate(
-        [
-            _selection_candidate(
-                SAFE_DRUG_LANE_IDS[0], learning_rate=1e-5, jaccard=0.50, ddi_rate=0.08
-            ),
-            _selection_candidate(
-                SAFE_DRUG_LANE_IDS[1], learning_rate=1e-4, jaccard=0.52, ddi_rate=0.07
-            ),
-            _selection_candidate(
-                SAFE_DRUG_LANE_IDS[2], learning_rate=5e-4, jaccard=0.52, ddi_rate=0.06
-            ),
-        ]
-    )
-
-
-def _selection_candidate(
-    lane_id: str,
-    *,
-    learning_rate: float,
-    jaccard: float,
-    ddi_rate: float,
-) -> dict[str, object]:
-    checkpoint_bytes = f"{lane_id}-checkpoint".encode()
-    checkpoint_identity = hashlib.sha256(checkpoint_bytes).hexdigest()
-    identity = {
-        "attempt_id": "attempt-1",
-        "lane_id": lane_id,
-        "scientific_baseline_id": "safedrug",
-        "program_id": "safedrug-archived",
-        "profile_id": "safedrug",
-        "harness_revision": "a" * 40,
-        "model_source_revision": "b" * 40,
-        "preprocessing_revision": "c" * 40,
-        "snapshot_id": "snapshots/molerec-table1-c721-www23",
-        "environment_sha256": "d" * 64,
-        "mode": "formal",
-        "submission_id": f"submission-{lane_id}",
-    }
-    return {
-        "lane_id": lane_id,
-        "learning_rate": learning_rate,
-        "checkpoint_identity": checkpoint_identity,
-        "validation_jaccard": jaccard,
-        "validation_ddi_rate": ddi_rate,
-        "training_evidence": {
-            "state": "completed",
-            "artifact_type": "training",
-            "identity": identity,
-            "learning_rate": learning_rate,
-            "best_epoch": 0,
-            "validation_jaccard": jaccard,
-            "validation_ddi_rate": ddi_rate,
-            "checkpoint": {
-                "best_epoch": 0,
-                "relative_path": "work/checkpoint.model",
-                "sha256": checkpoint_identity,
-                "size_bytes": len(checkpoint_bytes),
-            },
-            "recovery": None,
-        },
     }
 
 
@@ -155,28 +83,5 @@ def test_v2_pair_marker_is_required_for_reopen(tmp_path: Path) -> None:
         reopen_v2_pair(
             tmp_path,
             expected_identity=recovered_identity,
-            error_type=ValueError,
-        )
-
-
-def test_safedrug_selection_reader_requires_full_selector_artifact(tmp_path: Path) -> None:
-    path = tmp_path / "selection.json"
-    selection = _selection()
-    assert selection["selection_rule"] == list(SAFE_DRUG_SELECTION_RULE)
-    path.write_text(json.dumps(selection), encoding="utf-8")
-
-    authorized = require_selected_safedrug_selection(
-        path,
-        lane_id=SAFE_DRUG_LANE_IDS[2],
-        error_type=ValueError,
-    )
-    assert authorized["selected_lane_id"] == SAFE_DRUG_LANE_IDS[2]
-
-    selection["candidates"][0]["test_metrics"] = {"jaccard": 0.9}  # type: ignore[index]
-    path.write_text(json.dumps(selection), encoding="utf-8")
-    with pytest.raises(ValueError, match="invalid candidate"):
-        require_selected_safedrug_selection(
-            path,
-            lane_id=SAFE_DRUG_LANE_IDS[2],
             error_type=ValueError,
         )
