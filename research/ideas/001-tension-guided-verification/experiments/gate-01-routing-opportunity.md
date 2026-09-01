@@ -43,7 +43,7 @@ Dataset semantics:
 * same DDI asset as the current v1.1 Comparison Scope
 * current diagnoses/procedures/history feature semantics remain unchanged
 
-The test split must not be read or evaluated during this gate.
+The test split must never be indexed, inspected, scored, evaluated, or used for selection or configuration during Gate 01. Because the source snapshot is a single combined archive, deserializing the dataset snapshot does not constitute test evaluation, provided that test patients, visits, features, and targets are never accessed or processed. Validation staging logic must isolate and process only the validation patient split.
 
 This experiment is deliberately retrospective, so unresolved S-1 prospective timestamp semantics do not block it. If the route later makes a prospective recommendation claim, S-1 remains a separate hard validity gate.
 
@@ -55,7 +55,7 @@ $$
 \hat M_t.
 $$
 
-Let $C$ be the frozen DDI relation set.
+Let $C$ be the frozen DDI relation set, defined as symmetric unordered medication pairs $\{i, j\}$.
 
 For medication $m\in\hat M_t$, define its active predicted-prescription DDI degree:
 
@@ -63,7 +63,7 @@ $$
 d_t(m)
 =
 \sum_{j\in\hat M_t\setminus\{m\}}
-\mathbf 1[(m,j)\in C].
+\mathbf 1[\{m,j\}\in C].
 $$
 
 The eligible review universe is:
@@ -126,7 +126,7 @@ Let:
 $$
 E_C(M)
 =
-\{(i,j):i,j\in M,\;(i,j)\in C\}.
+\{(i,j):i,j\in M,\;\{i,j\}\in C\}.
 $$
 
 Define constraint change:
@@ -191,7 +191,7 @@ $$
 d_t(m).
 $$
 
-Tie-break deterministically by medication code.
+Tie-break deterministically by medication code ascending, followed by original validation traversal order. Tie-breaking must not depend on pseudonymous or randomized identifiers.
 
 This is the strongest simple explanation required before pursuing Tension.
 
@@ -204,9 +204,10 @@ Rank lexicographically by:
 1. $Y^{PB}$ descending;
 2. $\Delta J$ descending;
 3. $-\Delta V$ descending;
-4. deterministic medication-code tie break.
+4. deterministic medication-code tie break (ascending);
+5. deterministic original validation traversal order.
 
-Oracle must never become a deployable policy or trigger feature.
+Oracle must never depend on pseudonymous identifiers and must never become a deployable policy or trigger feature.
 
 ## Budgets
 
@@ -217,6 +218,14 @@ B\in\{10\%,20\%,30\%\}
 $$
 
 of the eligible validation candidate universe.
+
+The integer budget review cutoff is explicitly defined by the floor rule:
+
+$$
+k(B) = \lfloor B \times |\mathcal Q| \rfloor.
+$$
+
+Because these are maximum review allowances, the floor rule guarantees the budget cap is never exceeded. Support requirements guarantee $k(B) > 0$.
 
 This gate measures selected-candidate yield only.
 
@@ -272,7 +281,7 @@ Do not compensate by enlarging the test set or changing the candidate definition
 
 Use patient-level clustered bootstrap with 1,000 resamples.
 
-The bootstrap exists to detect whether apparent routing headroom is driven by a small number of repeatedly represented patients.
+The bootstrap exists to detect whether apparent routing headroom is driven by a small number of repeatedly represented patients. Patient clusters must be enumerated in deterministic original validation traversal order before drawing resamples with the declared PRNG seed, ensuring invariance to pseudonymization keys.
 
 Report 95% intervals for:
 
@@ -335,7 +344,7 @@ This failure is scoped to $R_0$. It does not establish that every possible verif
 
 Restricted 319-only artifact:
 
-`candidate-revision-values.parquet`
+`candidate-revision-values.jsonl`
 
 Minimum fields:
 

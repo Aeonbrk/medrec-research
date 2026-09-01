@@ -10,25 +10,35 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import hmac
 import json
 import math
 import random
-import secrets
 import shutil
+import subprocess
 from pathlib import Path
 from typing import Any, NamedTuple
 
-# Re-use existing comparison process adapter
 from medrec_research.adapters import ProcessPredictionAdapter
 
 BUDGETS: tuple[float, ...] = (0.10, 0.20, 0.30)
 BUDGET_LABELS: dict[float, str] = {0.10: "10%", 0.20: "20%", 0.30: "30%"}
 
+# Pinned scientific identities from accepted Unified Research Protocol v1.1 Qualification
+FROZEN_MOLEREC_REVISION = "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a"
+FROZEN_BASELINE_CORE_SHA256 = "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511"
+FROZEN_ADAPTER_SHA256 = "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531"
+FROZEN_BASELINE_ENVIRONMENT_SHA256 = (
+    "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda"
+)
+BOOTSTRAP_REPLICATES = 1000
+BOOTSTRAP_SEED = 1203
+
 
 class CandidateRevisionRecord(NamedTuple):
     patient_id: str
     visit_id: str
+    patient_order: int
+    visit_order: int
     medication_code: str
     base_jaccard: float
     revised_jaccard: float
@@ -63,23 +73,78 @@ class CandidateRevisionRecord(NamedTuple):
         }
 
 
-def _identifier(key: bytes, kind: str, *indices: int) -> str:
-    message = ":".join((kind, *(str(index) for index in indices))).encode()
-    return hmac.new(key, message, hashlib.sha256).hexdigest()
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
-def _split_ranges(patient_count: int) -> dict[str, range]:
-    split_point = int(patient_count * 2 / 3)
-    evaluation_length = int((patient_count - split_point) / 2)
-    return {
-        "train": range(0, split_point),
-        "test": range(split_point, split_point + evaluation_length),
-        "validation": range(split_point + evaluation_length, patient_count),
+def _content_sha256(value: object) -> str:
+    serialized = json.dumps(
+        value,
+        allow_nan=False,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(serialized.encode("ascii")).hexdigest()
+
+
+def _git_revision(path: Path) -> str:
+    completed = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=path,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    return completed.stdout.strip()
+
+
+def verify_frozen_molerec_identity(
+    molerec_root: Path,
+    checkpoint: Path,
+    adapter_path: Path,
+) -> tuple[str, str, str, str]:
+    """Cryptographically verify MoleRec source revision, checkpoint, and adapter identity."""
+    source_rev = _git_revision(molerec_root)
+    if source_rev != FROZEN_MOLEREC_REVISION:
+        raise ValueError(
+            f"MoleRec source revision drift: expected {FROZEN_MOLEREC_REVISION}, got {source_rev}"
+        )
+
+    checkpoint_sha256 = _file_sha256(checkpoint)
+    source_files = (
+        "src/modules/MoleRec.py",
+        "src/modules/SetTransformer.py",
+        "src/modules/gnn/GNNs.py",
+        "src/modules/gnn/GNNConv.py",
+    )
+    source_identity = {
+        "revision": FROZEN_MOLEREC_REVISION,
+        "source_files": {name: _file_sha256(molerec_root / name) for name in source_files},
     }
+    baseline_core_sha256 = _content_sha256(
+        {
+            "checkpoint_sha256": checkpoint_sha256,
+            **source_identity,
+        }
+    )
+    if baseline_core_sha256 != FROZEN_BASELINE_CORE_SHA256:
+        raise ValueError(
+            f"MoleRec baseline core identity drift: expected {FROZEN_BASELINE_CORE_SHA256}, got {baseline_core_sha256}"
+        )
 
+    adapter_sha256 = _file_sha256(adapter_path)
+    if adapter_sha256 != FROZEN_ADAPTER_SHA256:
+        raise ValueError(
+            f"MoleRec adapter identity drift: expected {FROZEN_ADAPTER_SHA256}, got {adapter_sha256}"
+        )
 
-def _vocabulary(idx2word: object) -> tuple[str, ...]:
-    return tuple(str(idx2word[index]) for index in range(len(idx2word)))  # type: ignore[index]
+    return source_rev, checkpoint_sha256, baseline_core_sha256, adapter_sha256
 
 
 def _visit_jaccard_and_f1(predicted: set[str], target: set[str]) -> tuple[float, float]:
@@ -100,7 +165,8 @@ def _ddi_edge_count(medications: set[str], ddi_pairs: frozenset[tuple[str, str]]
     edges = 0
     for i, left in enumerate(med_list):
         for right in med_list[i + 1 :]:
-            if (left, right) in ddi_pairs:
+            # Canonical unordered pair lookup
+            if tuple(sorted((left, right))) in ddi_pairs:
                 edges += 1
     return edges
 
@@ -115,111 +181,19 @@ def _percentile(values: list[float], quantile: float) -> float:
     return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
 
 
-def stage_validation_cohort(
-    dataset_root: Path,
-    output_dir: Path,
-    dataset_id: str = "molerec-table1-comparison-v1-1",
-) -> tuple[
-    Path,
-    dict[tuple[str, str], tuple[str, ...]],
-    frozenset[tuple[str, str]],
-    tuple[str, ...],
-    list[tuple[str, str]],
-]:
-    """Reproduce v1.1 patient split and feature staging for the validation split only."""
-    try:
-        import dill as serializer
-    except ImportError:
-        import pickle as serializer  # type: ignore[no-redef]
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    records_path = dataset_root / "records_final.pkl"
-    vocabulary_path = dataset_root / "voc_final.pkl"
-    ddi_path = dataset_root / "ddi_A_final.pkl"
-
-    with records_path.open("rb") as stream:
-        records = serializer.load(stream)
-    with vocabulary_path.open("rb") as stream:
-        voc = serializer.load(stream)
-    with ddi_path.open("rb") as stream:
-        ddi_matrix = serializer.load(stream)
-
-    medication_vocabulary = _vocabulary(voc["med_voc"].idx2word)
-    voc_size = (
-        len(voc["diag_voc"].idx2word),
-        len(voc["pro_voc"].idx2word),
-        len(medication_vocabulary),
-    )
-
-    ddi_pairs = frozenset(
-        (medication_vocabulary[left], medication_vocabulary[right])
-        for left in range(len(medication_vocabulary))
-        for right in range(left + 1, len(medication_vocabulary))
-        if ddi_matrix[left][right] == 1
-    )
-
-    key = secrets.token_bytes(32)
-    splits = _split_ranges(len(records))
-    validation_patient_indices = splits["validation"]
-
-    contexts: list[dict[str, Any]] = []
-    targets: dict[tuple[str, str], tuple[str, ...]] = {}
-    expected_visits: list[tuple[str, str]] = []
-
-    for patient_index in validation_patient_indices:
-        patient_id = _identifier(key, "patient", patient_index)
-        patient = records[patient_index]
-        for visit_index in range(1, len(patient)):
-            visit_id = _identifier(key, "visit", patient_index, visit_index)
-            visit_key = (patient_id, visit_id)
-            expected_visits.append(visit_key)
-
-            history = tuple(
-                (
-                    tuple(int(code) for code in admission[0]),
-                    tuple(int(code) for code in admission[1]),
-                    tuple(int(code) for code in admission[2]),
-                )
-                for admission in patient[:visit_index]
-            )
-            current = patient[visit_index]
-            contexts.append(
-                {
-                    "current_diagnoses": tuple(int(code) for code in current[0]),
-                    "current_procedures": tuple(int(code) for code in current[1]),
-                    "history": history,
-                    "patient_id": patient_id,
-                    "visit_id": visit_id,
-                }
-            )
-            targets[visit_key] = tuple(medication_vocabulary[int(code)] for code in current[2])
-
-    features_bundle = {
-        "contexts": contexts,
-        "dataset_id": dataset_id,
-        "medication_vocabulary": medication_vocabulary,
-        "schema_version": 1,
-        "voc_size": voc_size,
-    }
-    features_path = output_dir / "features.pkl"
-    with features_path.open("wb") as stream:
-        serializer.dump(features_bundle, stream)
-
-    return features_path, targets, ddi_pairs, medication_vocabulary, expected_visits
-
-
 def compute_candidate_revisions(
     predictions: list[dict[str, Any]],
-    targets: dict[tuple[str, str], tuple[str, ...]],
+    targets: dict[str, list[str]],
     ddi_pairs: frozenset[tuple[str, str]],
+    traversal_by_visit: dict[str, tuple[int, int]] | None = None,
 ) -> list[CandidateRevisionRecord]:
-    """Evaluate singleton marginal revision value for every eligible validation candidate."""
+    """Evaluate singleton marginal revision values using canonical unordered DDI semantics."""
     candidate_records: list[CandidateRevisionRecord] = []
 
     for pred in predictions:
         patient_id = str(pred["patient_id"])
         visit_id = str(pred["visit_id"])
-        visit_key = (patient_id, visit_id)
+        visit_key = f"{patient_id}:{visit_id}"
         if visit_key not in targets:
             continue
 
@@ -231,7 +205,7 @@ def compute_candidate_revisions(
         base_jaccard, base_f1 = _visit_jaccard_and_f1(pred_meds, target_set)
         base_ddi_edges = _ddi_edge_count(pred_meds, ddi_pairs)
 
-        # Active DDI degree for each predicted medication
+        # Active DDI degree using canonical unordered pair lookup
         active_degrees: dict[str, int] = {}
         for med in pred_meds:
             degree = 0
@@ -243,6 +217,12 @@ def compute_candidate_revisions(
         # Eligible review universe Q_t = {m in M_hat_t : d_t(m) > 0}
         eligible_meds = sorted(m for m, degree in active_degrees.items() if degree > 0)
 
+        # Traversal order coordinates for deterministic pseudonym-independent tie-breaking
+        if traversal_by_visit is not None and visit_key in traversal_by_visit:
+            patient_order, visit_order = traversal_by_visit[visit_key]
+        else:
+            patient_order, visit_order = 0, 0
+
         for med in eligible_meds:
             degree = active_degrees[med]
             # Fixed singleton revision operator R_0(M_hat_t, m) = M_hat_t \ {m}
@@ -252,7 +232,7 @@ def compute_candidate_revisions(
 
             delta_jaccard = rev_jaccard - base_jaccard
             delta_f1 = rev_f1 - base_f1
-            delta_violation = rev_ddi_edges - base_ddi_edges  # strictly < 0 (= -degree)
+            delta_violation = rev_ddi_edges - base_ddi_edges  # = -degree (< 0)
 
             # Pareto-beneficial: Delta J >= 0 and Delta V < 0
             pareto_beneficial = (delta_jaccard >= 0.0) and (delta_violation < 0)
@@ -261,6 +241,8 @@ def compute_candidate_revisions(
             record = CandidateRevisionRecord(
                 patient_id=patient_id,
                 visit_id=visit_id,
+                patient_order=patient_order,
+                visit_order=visit_order,
                 medication_code=med,
                 base_jaccard=base_jaccard,
                 revised_jaccard=rev_jaccard,
@@ -280,18 +262,20 @@ def compute_candidate_revisions(
     return candidate_records
 
 
-def _risk_only_sort_key(c: CandidateRevisionRecord) -> tuple[int, str, str, str]:
-    return (-c.active_ddi_degree, c.medication_code, c.patient_id, c.visit_id)
+def _risk_only_sort_key(c: CandidateRevisionRecord) -> tuple[int, str, int, int]:
+    # Preregistered: active DDI degree desc, med_code asc, original traversal order
+    return (-c.active_ddi_degree, c.medication_code, c.patient_order, c.visit_order)
 
 
-def _oracle_sort_key(c: CandidateRevisionRecord) -> tuple[int, float, int, str, str, str]:
+def _oracle_sort_key(c: CandidateRevisionRecord) -> tuple[int, float, int, str, int, int]:
+    # Preregistered: Y^PB desc, Delta J desc, -Delta V desc, med_code asc, original traversal order
     return (
         -int(c.pareto_beneficial),
         -c.delta_jaccard,
         -c.active_ddi_degree,
         c.medication_code,
-        c.patient_id,
-        c.visit_id,
+        c.patient_order,
+        c.visit_order,
     )
 
 
@@ -305,10 +289,10 @@ def evaluate_policies_at_budgets(
     # 1. Random policy: analytical expectation = overall prevalence P(Y^PB = 1)
     p_random = sum(1 for c in candidates if c.pareto_beneficial) / n_total
 
-    # 2. RiskOnly policy: sort by descending active DDI degree, tie-break by med code
+    # 2. RiskOnly policy: sort by descending active DDI degree, tie-break by med code & traversal
     risk_sorted = sorted(candidates, key=_risk_only_sort_key)
 
-    # 3. Oracle policy: sort by Y^PB desc, Delta J desc, -Delta V desc, med code
+    # 3. Oracle policy: sort by Y^PB desc, Delta J desc, -Delta V desc, med code & traversal
     oracle_sorted = sorted(candidates, key=_oracle_sort_key)
 
     risk_yields: dict[str, float] = {}
@@ -318,7 +302,9 @@ def evaluate_policies_at_budgets(
 
     for b in BUDGETS:
         label = BUDGET_LABELS[b]
-        k = max(1, round(b * n_total))
+        k = math.floor(b * n_total)
+        if k <= 0:
+            raise ValueError(f"budget {label} resulted in 0 review candidates from total {n_total}")
         risk_yield = sum(1 for c in risk_sorted[:k] if c.pareto_beneficial) / k
         oracle_yield = sum(1 for c in oracle_sorted[:k] if c.pareto_beneficial) / k
 
@@ -332,16 +318,17 @@ def evaluate_policies_at_budgets(
 
 def run_patient_clustered_bootstrap(
     candidates: list[CandidateRevisionRecord],
-    replicates: int = 1000,
-    seed: int = 1203,
+    replicates: int = BOOTSTRAP_REPLICATES,
+    seed: int = BOOTSTRAP_SEED,
 ) -> dict[str, dict[str, dict[str, float]]]:
-    """Patient-level clustered bootstrap with 1,000 resamples."""
-    by_patient: dict[str, list[CandidateRevisionRecord]] = {}
+    """Patient-level clustered bootstrap with patient clusters in deterministic traversal order."""
+    by_patient_order: dict[int, list[CandidateRevisionRecord]] = {}
     for c in candidates:
-        by_patient.setdefault(c.patient_id, []).append(c)
+        by_patient_order.setdefault(c.patient_order, []).append(c)
 
-    unique_patients = sorted(by_patient.keys())
-    u = len(unique_patients)
+    # Enumerate strictly by ascending original patient_order
+    unique_patient_orders = sorted(by_patient_order.keys())
+    u = len(unique_patient_orders)
     if u == 0:
         return {}
 
@@ -352,10 +339,10 @@ def run_patient_clustered_bootstrap(
     boot_gap_o_risk: dict[str, list[float]] = {BUDGET_LABELS[b]: [] for b in BUDGETS}
 
     for _ in range(replicates):
-        sampled_patients = [unique_patients[rng.randrange(u)] for _ in range(u)]
+        sampled_orders = [unique_patient_orders[rng.randrange(u)] for _ in range(u)]
         resampled_candidates: list[CandidateRevisionRecord] = []
-        for p in sampled_patients:
-            resampled_candidates.extend(by_patient[p])
+        for order in sampled_orders:
+            resampled_candidates.extend(by_patient_order[order])
 
         _, r_yields, _, g_o_r, g_o_risk = evaluate_policies_at_budgets(resampled_candidates)
         for b in BUDGETS:
@@ -422,31 +409,11 @@ def evaluate_gate_verdict(
     return "pass", criteria
 
 
-def write_candidate_parquet(records: list[CandidateRevisionRecord], path: Path) -> None:
-    """Write candidate-level data to parquet file."""
-    data = [r.to_dict() for r in records]
-    try:
-        import pyarrow as pa
-        import pyarrow.parquet as pq
-
-        table = pa.Table.from_pylist(data)
-        pq.write_table(table, path)
-        return
-    except ImportError:
-        pass
-
-    try:
-        import pandas as pd
-
-        df = pd.DataFrame(data)
-        df.to_parquet(path, index=False)
-        return
-    except ImportError:
-        pass
-
-    raise RuntimeError(
-        "Writing candidate-revision-values.parquet requires 'pyarrow' or 'pandas' in the execution environment."
-    )
+def write_candidate_jsonl(records: list[CandidateRevisionRecord], path: Path) -> None:
+    """Write restricted candidate-level records in standard-library jsonl format."""
+    with path.open("w", encoding="utf-8") as stream:
+        for r in records:
+            stream.write(json.dumps(r.to_dict(), sort_keys=True) + "\n")
 
 
 def build_public_summary(
@@ -459,15 +426,16 @@ def build_public_summary(
     intervals_95: dict[str, dict[str, dict[str, float]]],
     verdict: str,
     criteria: dict[str, bool],
-    replicates: int,
-    seed: int,
+    identities: dict[str, Any],
 ) -> dict[str, Any]:
-    """Create aggregate-only public-safe summary."""
+    """Create aggregate-only public-safe summary with frozen identities."""
     eligible_candidates = len(candidates)
     eligible_visits = len(set((c.patient_id, c.visit_id) for c in candidates))
-    eligible_patients = len(set(c.patient_id for c in candidates))
-    beneficial_patients = len(set(c.patient_id for c in candidates if c.pareto_beneficial))
-    non_beneficial_patients = len(set(c.patient_id for c in candidates if not c.pareto_beneficial))
+    eligible_patients = len(set(c.patient_order for c in candidates))
+    beneficial_patients = len(set(c.patient_order for c in candidates if c.pareto_beneficial))
+    non_beneficial_patients = len(
+        set(c.patient_order for c in candidates if not c.pareto_beneficial)
+    )
 
     return {
         "schema_version": 1,
@@ -506,12 +474,13 @@ def build_public_summary(
             "oracle_minus_risk_only": gap_o_risk,
         },
         "bootstrap": {
-            "replicates": replicates,
-            "seed": seed,
+            "replicates": BOOTSTRAP_REPLICATES,
+            "seed": BOOTSTRAP_SEED,
             "unit": "patient",
             "intervals_95": intervals_95,
         },
         "decision_criteria": criteria,
+        "identities": identities,
     }
 
 
@@ -519,99 +488,130 @@ def run_gate(
     *,
     dataset_root: Path,
     output_root: Path,
-    molerec_root: Path | None = None,
-    checkpoint: Path | None = None,
+    molerec_root: Path,
+    checkpoint: Path,
     baseline_environment: str = "medrec-molerec-table1",
     conda_executable: str | Path | None = None,
     harness_root: Path | None = None,
-    bootstrap_replicates: int = 1000,
-    bootstrap_seed: int = 1203,
-    smoke: bool = False,
-    predictions_file: Path | None = None,
 ) -> dict[str, Any]:
     """Execute Gate 01 workflow."""
+    dataset_root = dataset_root.resolve()
     output_root = output_root.resolve()
-    output_root.mkdir(parents=True, exist_ok=True)
-    staging_dir = output_root / ".staging"
-    staging_dir.mkdir(parents=True, exist_ok=True)
+    molerec_root = molerec_root.resolve()
+    checkpoint = checkpoint.resolve()
+
+    if output_root.exists():
+        raise FileExistsError(
+            f"output_root already exists: {output_root}. Gate 01 requires a fresh output directory."
+        )
+    output_root.mkdir(parents=True, exist_ok=False)
 
     if harness_root is None:
         harness_root = Path(__file__).resolve().parents[4]
+    else:
+        harness_root = harness_root.resolve()
 
-    # 1. Stage validation cohort
+    staging_script = Path(__file__).resolve().parent / "stage_validation_cohort.py"
+    staging_dir = output_root / ".staging"
+    staging_dir.mkdir(parents=True, exist_ok=False)
+
+    adapter_path = harness_root / "baselines" / "molerec_comparison.py"
+
+    # 1. Enforce frozen MoleRec source revision, checkpoint hash, and adapter identity
     (
-        features_path,
-        targets,
-        ddi_pairs,
-        medication_vocabulary,
-        expected_visits,
-    ) = stage_validation_cohort(
-        dataset_root=dataset_root,
-        output_dir=staging_dir,
+        source_rev,
+        checkpoint_sha256,
+        baseline_core_sha256,
+        adapter_sha256,
+    ) = verify_frozen_molerec_identity(
+        molerec_root=molerec_root,
+        checkpoint=checkpoint,
+        adapter_path=adapter_path,
     )
 
-    # 2. Obtain predictions from MoleRec Comparison process adapter or precomputed file
-    if predictions_file is not None:
-        raw = json.loads(predictions_file.read_text(encoding="utf-8"))
-        predictions = raw["predictions"]
-    else:
-        if molerec_root is None or checkpoint is None:
-            raise ValueError(
-                "molerec_root and checkpoint are required when predictions_file is not provided"
-            )
-        if conda_executable is None:
-            found = shutil.which("conda")
-            conda_executable = found if found else "conda"
+    if conda_executable is None:
+        found = shutil.which("conda")
+        conda_executable = found if found else "conda"
 
-        adapter_cmd = (
-            str(conda_executable),
-            "run",
-            "--no-capture-output",
-            "-n",
-            baseline_environment,
-            "python",
-            str((harness_root / "baselines" / "molerec_comparison.py").resolve()),
-            "--upstream-root",
-            str(molerec_root.resolve()),
-            "--dataset-root",
-            str(dataset_root.resolve()),
-            "--features",
-            str(features_path.resolve()),
-            "--checkpoint",
-            str(checkpoint.resolve()),
-        )
-        if smoke:
-            adapter_cmd = (*adapter_cmd, "--smoke")
+    # 2. Stage validation cohort inside medrec-molerec-table1 Python 3.8 environment
+    stage_cmd = (
+        str(conda_executable),
+        "run",
+        "--no-capture-output",
+        "-n",
+        baseline_environment,
+        "python",
+        str(staging_script),
+        "--dataset-root",
+        str(dataset_root),
+        "--output-dir",
+        str(staging_dir),
+    )
+    subprocess.run(stage_cmd, check=True)
 
-        adapter = ProcessPredictionAdapter(adapter_cmd, timeout_seconds=3600.0)
-        batch = adapter.predict_comparison(
-            {"dataset_id": "molerec-table1-comparison-v1-1"},
-            method_id="molerec",
-            expected_visits=expected_visits[:1] if smoke else expected_visits,
-            medication_vocabulary=medication_vocabulary,
-        )
-        predictions = [
-            {
-                "patient_id": p.patient_id,
-                "visit_id": p.visit_id,
-                "predicted_medications": list(p.predicted_medications),
-            }
-            for p in batch.predictions
-        ]
+    # 3. Read metadata generated by Python 3.8 staging helper
+    meta = json.loads((staging_dir / "validation-meta.json").read_text(encoding="utf-8"))
+    features_path = Path(meta["features_path"])
+    expected_visits = [tuple(item) for item in meta["expected_visits"]]
+    targets = meta["targets"]
+    ddi_pairs = frozenset(tuple(item) for item in meta["ddi_pairs"])
+    medication_vocabulary = tuple(meta["medication_vocabulary"])
+    traversal_by_visit = {
+        f"{m['patient_id']}:{m['visit_id']}": (int(m["patient_order"]), int(m["visit_order"]))
+        for m in meta["visit_traversal_metadata"]
+    }
 
-    # 3. Compute singleton marginal revision values
+    # 4. Run target-free Comparison process seam
+    adapter_cmd = (
+        str(conda_executable),
+        "run",
+        "--no-capture-output",
+        "-n",
+        baseline_environment,
+        "python",
+        str(adapter_path),
+        "--upstream-root",
+        str(molerec_root),
+        "--dataset-root",
+        str(dataset_root),
+        "--features",
+        str(features_path),
+        "--checkpoint",
+        str(checkpoint),
+    )
+
+    adapter = ProcessPredictionAdapter(adapter_cmd, timeout_seconds=3600.0)
+    batch = adapter.predict_comparison(
+        {"dataset_id": meta["dataset_id"]},
+        method_id="molerec",
+        expected_visits=expected_visits,
+        medication_vocabulary=medication_vocabulary,
+    )
+    predictions = [
+        {
+            "patient_id": p.patient_id,
+            "visit_id": p.visit_id,
+            "predicted_medications": list(p.predicted_medications),
+        }
+        for p in batch.predictions
+    ]
+
+    # 5. Compute singleton marginal revision values
     candidates = compute_candidate_revisions(
         predictions=predictions,
         targets=targets,
         ddi_pairs=ddi_pairs,
+        traversal_by_visit=traversal_by_visit,
     )
 
-    # 4. Support requirement check
-    beneficial_patients = len(set(c.patient_id for c in candidates if c.pareto_beneficial))
-    non_beneficial_patients = len(set(c.patient_id for c in candidates if not c.pareto_beneficial))
+    # 6. Support requirement check
+    beneficial_patients = len(set(c.patient_order for c in candidates if c.pareto_beneficial))
+    non_beneficial_patients = len(
+        set(c.patient_order for c in candidates if not c.pareto_beneficial)
+    )
     support_sufficient = (beneficial_patients >= 50) and (non_beneficial_patients >= 50)
 
-    # 5. Evaluate policies and bootstrap
+    # 7. Evaluate policies and bootstrap
     (
         p_random,
         risk_yields,
@@ -622,18 +622,31 @@ def run_gate(
 
     intervals_95 = run_patient_clustered_bootstrap(
         candidates=candidates,
-        replicates=bootstrap_replicates,
-        seed=bootstrap_seed,
+        replicates=BOOTSTRAP_REPLICATES,
+        seed=BOOTSTRAP_SEED,
     )
 
-    # 6. Evaluate verdict
+    # 8. Evaluate verdict
     verdict, criteria = evaluate_gate_verdict(support_sufficient, intervals_95)
 
-    # 7. Write candidate-level parquet artifact (restricted)
-    parquet_path = output_root / "candidate-revision-values.parquet"
-    write_candidate_parquet(candidates, parquet_path)
+    # 9. Write candidate-level jsonl artifact (restricted)
+    jsonl_path = output_root / "candidate-revision-values.jsonl"
+    write_candidate_jsonl(candidates, jsonl_path)
 
-    # 8. Write public-safe aggregate summary
+    # 10. Write public-safe aggregate summary
+    identities = {
+        "harness_revision": _git_revision(harness_root),
+        "model_source_revision": source_rev,
+        "checkpoint_sha256": checkpoint_sha256,
+        "baseline_core_sha256": baseline_core_sha256,
+        "adapter_sha256": adapter_sha256,
+        "baseline_environment_sha256": FROZEN_BASELINE_ENVIRONMENT_SHA256,
+        "snapshot_sha256": meta["snapshot_sha256"],
+        "ddi_asset_sha256": meta["ddi_asset_sha256"],
+        "medication_vocabulary_size": len(medication_vocabulary),
+        "medication_vocabulary_sha256": meta["medication_vocabulary_sha256"],
+    }
+
     summary = build_public_summary(
         candidates=candidates,
         p_random=p_random,
@@ -644,8 +657,7 @@ def run_gate(
         intervals_95=intervals_95,
         verdict=verdict,
         criteria=criteria,
-        replicates=bootstrap_replicates,
-        seed=bootstrap_seed,
+        identities=identities,
     )
 
     summary_path = output_root / "gate-summary.json"
@@ -655,52 +667,131 @@ def run_gate(
 
 
 def self_test() -> None:
-    """Focused synthetic check for singleton metric signs, eligible-DDI filtering, RiskOnly ordering, and public-summary privacy."""
-    # 1. Metric signs & eligible-DDI filtering
-    ddi_pairs = frozenset([("m1", "m3"), ("m2", "m3")])
-    predictions = [
+    """Focused synthetic checks: DDI canonicalization, pseudonym invariance, policy ordering, privacy."""
+    # --------------------------------------------------------------------------
+    # Check 1: DDI pair semantics with non-lexical vocabulary ordering
+    # --------------------------------------------------------------------------
+    # Vocabulary order: Z is index 0, A is index 1 (differs from lexical order 'A' < 'Z')
+    vocab_order = ["MED_Z", "MED_A"]
+    # Suppose raw matrix recorded pair (0, 1) as having DDI
+    # In old code: tuple was (vocab_order[0], vocab_order[1]) = ("MED_Z", "MED_A") (not sorted).
+    # Lookup tuple(sorted(("MED_Z", "MED_A"))) yielded ("MED_A", "MED_Z").
+    # If ddi_pairs was not canonicalized, ("MED_A", "MED_Z") in {("MED_Z", "MED_A")} -> FALSE!
+    non_canonical_set = frozenset([(vocab_order[0], vocab_order[1])])
+    assert ("MED_A", "MED_Z") not in non_canonical_set  # Confirms the bug in non-canonical set
+
+    # Fixed: canonical unordered set
+    canonical_set = frozenset([tuple(sorted((vocab_order[0], vocab_order[1])))])
+    assert ("MED_A", "MED_Z") in canonical_set  # Must pass under canonical set
+
+    # Verify edge count and active degree with canonical_set
+    preds_ddi = [
         {
             "patient_id": "p1",
             "visit_id": "v1",
+            "predicted_medications": ["MED_Z", "MED_A"],
+        }
+    ]
+    targets_ddi = {"p1:v1": ["MED_Z"]}
+    cands_ddi = compute_candidate_revisions(preds_ddi, targets_ddi, canonical_set)
+    assert len(cands_ddi) == 2
+    for c in cands_ddi:
+        assert c.active_ddi_degree == 1, (
+            f"expected active degree 1 for {c.medication_code}, got {c.active_ddi_degree}"
+        )
+        assert c.base_ddi_edges == 1
+        assert c.revised_ddi_edges == 0
+        assert c.delta_violation == -1
+
+    # --------------------------------------------------------------------------
+    # Check 2: Invariance to pseudonymization keys
+    # --------------------------------------------------------------------------
+    # Run two synthetic evaluations with different pseudonyms for the exact same patient/visit order
+    preds_key1 = []
+    targets_key1: dict[str, list[str]] = {}
+    traversal_key1: dict[str, tuple[int, int]] = {}
+    preds_key2 = []
+    targets_key2: dict[str, list[str]] = {}
+    traversal_key2: dict[str, tuple[int, int]] = {}
+
+    for i in range(10):
+        p1 = f"key1_pat{i}"
+        v1 = f"key1_vis{i}"
+        p2 = f"key2_pseudonym_{999 - i}"
+        v2 = f"key2_visit_{999 - i}"
+
+        preds_key1.append(
+            {"patient_id": p1, "visit_id": v1, "predicted_medications": ["m1", "m2", "m3"]}
+        )
+        targets_key1[f"{p1}:{v1}"] = ["m1", "m2"]
+        traversal_key1[f"{p1}:{v1}"] = (i, 1)
+
+        preds_key2.append(
+            {"patient_id": p2, "visit_id": v2, "predicted_medications": ["m1", "m2", "m3"]}
+        )
+        targets_key2[f"{p2}:{v2}"] = ["m1", "m2"]
+        traversal_key2[f"{p2}:{v2}"] = (i, 1)
+
+    ddi_mock = frozenset([tuple(sorted(("m1", "m3"))), tuple(sorted(("m2", "m3")))])
+    cands_1 = compute_candidate_revisions(
+        preds_key1, targets_key1, ddi_mock, traversal_by_visit=traversal_key1
+    )
+    cands_2 = compute_candidate_revisions(
+        preds_key2, targets_key2, ddi_mock, traversal_by_visit=traversal_key2
+    )
+
+    p1, r1, o1, g_or1, g_orisk1 = evaluate_policies_at_budgets(cands_1)
+    p2, r2, o2, g_or2, g_orisk2 = evaluate_policies_at_budgets(cands_2)
+    assert p1 == p2
+    assert r1 == r2
+    assert o1 == o2
+    assert g_or1 == g_or2
+    assert g_orisk1 == g_orisk2
+
+    boot_1 = run_patient_clustered_bootstrap(cands_1, replicates=100, seed=1203)
+    boot_2 = run_patient_clustered_bootstrap(cands_2, replicates=100, seed=1203)
+    assert boot_1 == boot_2, "Bootstrap intervals must be invariant to pseudonymization keys"
+
+    # --------------------------------------------------------------------------
+    # Check 3: Metric signs, eligibility, RiskOnly and Oracle ordering
+    # --------------------------------------------------------------------------
+    ddi_test = frozenset([("m1", "m3"), ("m2", "m3")])
+    preds_test = [
+        {
+            "patient_id": "p0",
+            "visit_id": "v0",
             "predicted_medications": ["m1", "m2", "m3", "m4"],
         }
     ]
-    targets = {
-        ("p1", "v1"): ("m1", "m2", "m4"),  # m3 is a false positive involved in DDIs with m1 and m2
+    targets_test = {
+        "p0:v0": ["m1", "m2", "m4"],  # m3 is a false positive involved in DDIs
     }
-    candidates = compute_candidate_revisions(predictions, targets, ddi_pairs)
-    eligible_meds = {c.medication_code for c in candidates}
-    assert eligible_meds == {"m1", "m2", "m3"}, f"expected {{m1, m2, m3}}, got {eligible_meds}"
-    assert "m4" not in eligible_meds, "m4 has degree 0 and must not be in candidate universe"
+    cands = compute_candidate_revisions(preds_test, targets_test, ddi_test)
+    assert {c.medication_code for c in cands} == {"m1", "m2", "m3"}
+    assert "m4" not in {c.medication_code for c in cands}  # Degree 0 excluded
 
-    m3_cand = next(c for c in candidates if c.medication_code == "m3")
-    assert m3_cand.pareto_beneficial is True, "deleting false positive m3 must be Pareto-beneficial"
-    assert m3_cand.delta_jaccard > 0, "deleting false positive must increase Jaccard"
-    assert m3_cand.delta_violation < 0, "deleting DDI medication must reduce violations"
-    assert m3_cand.harmful_revision is False
+    m3 = next(c for c in cands if c.medication_code == "m3")
+    assert m3.pareto_beneficial is True
+    assert m3.delta_jaccard > 0
+    assert m3.delta_violation < 0
+    assert m3.harmful_revision is False
 
-    m1_cand = next(c for c in candidates if c.medication_code == "m1")
-    assert m1_cand.pareto_beneficial is False, (
-        "deleting true positive m1 must not be Pareto-beneficial"
-    )
-    assert m1_cand.delta_jaccard < 0, "deleting true positive must decrease Jaccard"
-    assert m1_cand.harmful_revision is True
+    m1 = next(c for c in cands if c.medication_code == "m1")
+    assert m1.pareto_beneficial is False
+    assert m1.delta_jaccard < 0
+    assert m1.harmful_revision is True
 
-    # 2. RiskOnly & Oracle ordering
-    risk_sorted = sorted(candidates, key=_risk_only_sort_key)
+    # RiskOnly sort: m3 (degree 2) precedes m1 (degree 1)
+    risk_sorted = sorted(cands, key=_risk_only_sort_key)
     assert [c.medication_code for c in risk_sorted] == ["m3", "m1", "m2"]
 
-    oracle_sorted = sorted(candidates, key=_oracle_sort_key)
+    # Oracle sort: m3 (Y^PB=1) precedes others
+    oracle_sorted = sorted(cands, key=_oracle_sort_key)
     assert oracle_sorted[0].medication_code == "m3"
 
-    # 3. Policy yields at budgets
-    p_rand, r_yields, o_yields, g_o_r, g_o_risk = evaluate_policies_at_budgets(candidates)
-    assert p_rand == 1 / 3
-    assert o_yields["10%"] == 1.0
-    assert r_yields["10%"] == 1.0
-    assert g_o_r["10%"] == 1.0 - (1 / 3)
-
-    # 4. Support requirement check (< 50 patients -> insufficient_support)
+    # --------------------------------------------------------------------------
+    # Check 4: Gate verdicts
+    # --------------------------------------------------------------------------
     intervals_dummy = {
         "risk_only_yield": {
             label: {"lower": 0.5, "upper": 0.7} for label in BUDGET_LABELS.values()
@@ -712,26 +803,20 @@ def self_test() -> None:
             label: {"lower": 0.05, "upper": 0.2} for label in BUDGET_LABELS.values()
         },
     }
-    verdict, criteria = evaluate_gate_verdict(
-        support_sufficient=False, intervals_95=intervals_dummy
-    )
-    assert verdict == "insufficient_support"
-    assert criteria["support_requirement_met"] is False
+    v_insuf, _ = evaluate_gate_verdict(support_sufficient=False, intervals_95=intervals_dummy)
+    assert v_insuf == "insufficient_support"
 
-    # 5. Gate verdict decisions with support_sufficient=True
-    verdict_pass, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_dummy)
-    assert verdict_pass == "pass"
+    v_pass, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_dummy)
+    assert v_pass == "pass"
 
-    intervals_downgrade = {
+    intervals_down = {
         **intervals_dummy,
         "oracle_minus_risk_only": {
-            label: {"lower": -0.02, "upper": 0.1} for label in BUDGET_LABELS.values()
+            label: {"lower": -0.01, "upper": 0.1} for label in BUDGET_LABELS.values()
         },
     }
-    verdict_down, _ = evaluate_gate_verdict(
-        support_sufficient=True, intervals_95=intervals_downgrade
-    )
-    assert verdict_down == "downgrade_risk_only"
+    v_down, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_down)
+    assert v_down == "downgrade_risk_only"
 
     intervals_fail = {
         **intervals_dummy,
@@ -739,37 +824,39 @@ def self_test() -> None:
             label: {"lower": -0.05, "upper": 0.1} for label in BUDGET_LABELS.values()
         },
     }
-    verdict_fail, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_fail)
-    assert verdict_fail == "fail"
+    v_fail, _ = evaluate_gate_verdict(support_sufficient=True, intervals_95=intervals_fail)
+    assert v_fail == "fail"
 
-    # 6. Public-summary privacy
+    # --------------------------------------------------------------------------
+    # Check 5: Public-summary privacy
+    # --------------------------------------------------------------------------
     summary = build_public_summary(
-        candidates=candidates,
-        p_random=p_rand,
-        risk_yields=r_yields,
-        oracle_yields=o_yields,
-        gap_o_r=g_o_r,
-        gap_o_risk=g_o_risk,
+        candidates=cands,
+        p_random=1 / 3,
+        risk_yields={"10%": 1.0, "20%": 1.0, "30%": 1.0},
+        oracle_yields={"10%": 1.0, "20%": 1.0, "30%": 1.0},
+        gap_o_r={"10%": 0.67, "20%": 0.67, "30%": 0.67},
+        gap_o_risk={"10%": 0.0, "20%": 0.0, "30%": 0.0},
         intervals_95=intervals_dummy,
-        verdict=verdict_pass,
-        criteria=criteria,
-        replicates=10,
-        seed=1203,
+        verdict=v_pass,
+        criteria={"support_requirement_met": True},
+        identities={
+            "harness_revision": "mock_rev",
+            "model_source_revision": FROZEN_MOLEREC_REVISION,
+            "checkpoint_sha256": "mock_cp",
+            "baseline_core_sha256": FROZEN_BASELINE_CORE_SHA256,
+            "adapter_sha256": FROZEN_ADAPTER_SHA256,
+            "baseline_environment_sha256": FROZEN_BASELINE_ENVIRONMENT_SHA256,
+            "snapshot_sha256": "mock_snap",
+            "ddi_asset_sha256": "mock_ddi",
+            "medication_vocabulary_size": 131,
+            "medication_vocabulary_sha256": "mock_vocab",
+        },
     )
     serialized = json.dumps(summary)
-    assert "p1" not in serialized, "patient_id must not appear in public summary"
-    assert "v1" not in serialized, "visit_id must not appear in public summary"
-    assert "/root/" not in serialized, "no filesystem paths in public summary"
-    assert summary["verdict"] in ("pass", "downgrade_risk_only", "fail", "insufficient_support")
-
-    # 7. Clustered bootstrap reproducibility
-    boot_intervals = run_patient_clustered_bootstrap(candidates, replicates=50, seed=1203)
-    assert "risk_only_yield" in boot_intervals
-    for b_label in BUDGET_LABELS.values():
-        assert (
-            boot_intervals["risk_only_yield"][b_label]["lower"]
-            <= boot_intervals["risk_only_yield"][b_label]["upper"]
-        )
+    assert "p0" not in serialized, "patient_id must not leak into public summary"
+    assert "v0" not in serialized, "visit_id must not leak into public summary"
+    assert "/root/" not in serialized, "filesystem paths must not leak into public summary"
 
     print("Gate 01 synthetic self-test passed successfully.")
 
@@ -783,24 +870,25 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true", help="Run focused synthetic test suite")
     parser.add_argument("--dataset-root", type=Path, help="Path to snapshot root")
-    parser.add_argument("--output-root", type=Path, help="Restricted output root")
+    parser.add_argument("--output-root", type=Path, help="New restricted output root")
     parser.add_argument("--molerec-root", type=Path, help="Path to MoleRec checkout")
     parser.add_argument("--checkpoint", type=Path, help="Path to frozen MoleRec checkpoint")
     parser.add_argument("--baseline-environment", default="medrec-molerec-table1")
     parser.add_argument("--conda-executable", type=Path)
-    parser.add_argument("--bootstrap-replicates", type=int, default=1000)
-    parser.add_argument("--bootstrap-seed", type=int, default=1203)
-    parser.add_argument("--smoke", action="store_true")
-    parser.add_argument("--predictions-file", type=Path, help="Optional precomputed predictions")
     args = parser.parse_args()
 
     if args.self_test:
         self_test()
         return
 
-    if args.dataset_root is None or args.output_root is None:
+    if (
+        args.dataset_root is None
+        or args.output_root is None
+        or args.molerec_root is None
+        or args.checkpoint is None
+    ):
         parser.error(
-            "--dataset-root and --output-root are required unless --self-test is specified"
+            "--dataset-root, --output-root, --molerec-root, and --checkpoint are required for formal Gate 01 execution"
         )
 
     summary = run_gate(
@@ -810,10 +898,6 @@ def main() -> None:
         checkpoint=args.checkpoint,
         baseline_environment=args.baseline_environment,
         conda_executable=args.conda_executable,
-        bootstrap_replicates=args.bootstrap_replicates,
-        bootstrap_seed=args.bootstrap_seed,
-        smoke=args.smoke,
-        predictions_file=args.predictions_file,
     )
     print(json.dumps({"verdict": summary["verdict"], "support": summary["support"]}, indent=2))
 
