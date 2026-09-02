@@ -76,9 +76,9 @@ export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verificati
 
 - **Decision**: **`pass`**
 - **Empirical findings**:
-  1. **Base Prevalence**: Within the review universe $\mathcal Q$ (15,549 candidate revisions across 1,219 visits and 858 validation patients), only **31.67%** of singleton deletions are Pareto-beneficial ($Y^{PB}=1$), while **68.33%** are harmful to efficacy ($\Delta J < 0$).
+  1. **Base Prevalence**: Within the review universe $\mathcal Q$ (15,549 candidate revisions across 1,219 visits and 858 validation patients), only **31.67%** of singleton deletions are Pareto-beneficial ($Y^{PB}=1$), while **68.33%** reduce visit-level Jaccard under singleton deletion ($\Delta J < 0$, non-beneficial revisions under $R_0$).
   2. **Random Policy**: Constant at base prevalence **31.67%**.
-  3. **RiskOnly Policy**: Yields **37.07%** (10% budget), **35.64%** (20% budget), **32.87%** (30% budget). Simple DDI-degree sorting fails to isolate safe deletions and causes substantial efficacy loss (>62% non-beneficial revisions).
+  3. **RiskOnly Policy**: Yields **37.07%** (10% budget), **35.64%** (20% budget), **32.87%** (30% budget). Simple DDI-degree sorting fails to isolate Pareto-beneficial revisions under $R_0$ and results in >62% non-beneficial revisions (revisions that reduce visit-level Jaccard).
   4. **Oracle Policy**: Achieves **100.0%** Pareto-beneficial revisions across 10%, 20%, and 30% review budgets.
   5. **Statistical Headroom**:
      - Oracle - Random: **+68.33%** (95% CI: [67.33%, 69.38%])

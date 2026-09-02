@@ -196,3 +196,47 @@ The exact required corrections are:
 - **P0 Status**: `CLAIM_CORRECTION_REQUIRED`
 - **Formal Gate 02 Unlocked**: `no`
 - **Action**: In accordance with P0 governance, the auditor does not automatically edit the documentation during the first audit pass. Gate 02 execution remains blocked until the specified text adjustments are committed and a clean verification pass confirms alignment.
+
+---
+
+## 6. Follow-up Claim Closure (P0 Resolution)
+
+- **Audit Date**: 2026-09-02
+- **Auditor**: `ccf-integrity-auditor`
+- **Audit Mode**: `claim-audit`
+- **Target Document**: [`Handoff.md`](file:///Users/oian/Codes/master/medrec-research/Handoff.md)
+
+### 6.1 Verification of Corrections
+
+1. **[`Handoff.md:L79`](file:///Users/oian/Codes/master/medrec-research/Handoff.md#L79)**:
+   - Verified replaced text: `"while 68.33% reduce visit-level Jaccard under singleton deletion ($\Delta J < 0$, non-beneficial revisions under $R_0$)"`.
+   - The phrase `"harmful to efficacy"` has been completely removed. The statement is now strictly scoped to retrospective visit-level Jaccard change.
+2. **[`Handoff.md:L81`](file:///Users/oian/Codes/master/medrec-research/Handoff.md#L81)**:
+   - Verified replaced text: `"Simple DDI-degree sorting fails to isolate Pareto-beneficial revisions under $R_0$ and results in >62% non-beneficial revisions (revisions that reduce visit-level Jaccard)"`.
+   - The phrases `"safe deletions"` and `"causes substantial efficacy loss"` have been completely removed. The statement now reports retrospective sorting outcomes under operator $R_0$ without causal or clinical safety assertions.
+3. **Repository-Wide Active Documentation Scan**:
+   - Zero unsupported causal clinical claims ("safe medication deletion", "clinical safety improved", "patient benefit") remain in active Gate 01 interpretation.
+   - Zero overclaims asserting that the "Tension hypothesis is confirmed", "Tension predicts revision value", or "Tension is necessary" exist in active Gate 01 records.
+   - The narrow supported scientific claim remains fully supported by the frozen numerical evidence.
+
+### 6.2 Follow-up Audit Summary
+
+```text
+Follow-up mode: claim-audit
+Original P0 status: CLAIM_CORRECTION_REQUIRED
+Claim corrections verified: yes
+Remaining material overclaims: 0
+Final P0 Status: AUDIT_PASS
+Formal Gate 02 unlocked: yes
+```
+
+### 6.3 Scientific Scope Invariants
+
+`AUDIT_PASS` denotes solely that Gate 01 retrospective integrity closure is complete, all row-level numerical invariants and bootstrap uncertainties are reproduced, and active documentation is aligned with the empirical evidence boundary. It authorizes proceeding to the formal remote execution of Gate 02.
+
+It does **not** imply or establish:
+
+- that Gate 02 will achieve a `pass` verdict;
+- that `ScoreOnly` baseline is insufficient;
+- that DDI degree contains incremental predictive signal over visit features;
+- that the Tension hypothesis is validated.
