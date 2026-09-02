@@ -1,0 +1,253 @@
+{
+  "bootstrap": {
+    "intervals_95": {
+      "i_tension": {
+        "lower": -0.04574850112305523,
+        "upper": 0.03644644456590089
+      },
+      "oracle_minus_scalar": {
+        "10%": {
+          "lower": 0.3543485871982865,
+          "upper": 0.4260717463949729
+        },
+        "20%": {
+          "lower": 0.3899593267882188,
+          "upper": 0.44403143995174355
+        },
+        "30%": {
+          "lower": 0.422580136005202,
+          "upper": 0.46856309712456545
+        }
+      },
+      "oracle_minus_score": {
+        "10%": {
+          "lower": 0.3543485871982865,
+          "upper": 0.4260717463949729
+        },
+        "20%": {
+          "lower": 0.3899593267882188,
+          "upper": 0.44403143995174355
+        },
+        "30%": {
+          "lower": 0.422580136005202,
+          "upper": 0.46856309712456545
+        }
+      },
+      "scalar_minus_score": {
+        "10%": {
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "20%": {
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "30%": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "scalar_yield": {
+        "10%": {
+          "lower": 0.5739282536050271,
+          "upper": 0.6456514128017135
+        },
+        "20%": {
+          "lower": 0.5559685600482565,
+          "upper": 0.6100406732117811
+        },
+        "30%": {
+          "lower": 0.5282967101230804,
+          "upper": 0.5771813702846041
+        }
+      },
+      "score_minus_random": {
+        "10%": {
+          "lower": 0.2676757676776693,
+          "upper": 0.332323377790475
+        },
+        "20%": {
+          "lower": 0.2504897588112481,
+          "upper": 0.29525957586082974
+        },
+        "30%": {
+          "lower": 0.22486053075116919,
+          "upper": 0.25837238344900115
+        }
+      },
+      "score_minus_risk": {
+        "10%": {
+          "lower": 0.1958700254287182,
+          "upper": 0.2933417721518987
+        },
+        "20%": {
+          "lower": 0.195796854863923,
+          "upper": 0.26116428346547277
+        },
+        "30%": {
+          "lower": 0.19429099203426417,
+          "upper": 0.24503390138235
+        }
+      },
+      "score_only_yield": {
+        "10%": {
+          "lower": 0.5739282536050271,
+          "upper": 0.6456514128017135
+        },
+        "20%": {
+          "lower": 0.5559685600482565,
+          "upper": 0.6100406732117811
+        },
+        "30%": {
+          "lower": 0.5282967101230804,
+          "upper": 0.5771813702846041
+        }
+      }
+    },
+    "replicates": 1000,
+    "seed": 1203,
+    "unit": "patient"
+  },
+  "decision_criteria": {
+    "interaction_ci_above_zero": false,
+    "interaction_support_met": true,
+    "residual_headroom_survives_score_10": true,
+    "residual_headroom_survives_score_20": true,
+    "scalar_beats_score_10": false,
+    "scalar_beats_score_20": false,
+    "support_requirement_met": true
+  },
+  "dev_audit_counts": {
+    "audit_candidates": 7959,
+    "audit_patients": 428,
+    "dev_beneficial_patients": 421,
+    "dev_candidates": 7590,
+    "dev_non_beneficial_patients": 429,
+    "dev_patients": 430
+  },
+  "gaps": {
+    "oracle_minus_scalar": {
+      "10%": 0.3886792452830189,
+      "20%": 0.414833438089252,
+      "30%": 0.4474235441977378
+    },
+    "oracle_minus_score": {
+      "10%": 0.3886792452830189,
+      "20%": 0.414833438089252,
+      "30%": 0.4474235441977378
+    },
+    "scalar_minus_score": {
+      "10%": 0.0,
+      "20%": 0.0,
+      "30%": 0.0
+    },
+    "score_minus_random": {
+      "10%": 0.30098025967991615,
+      "20%": 0.27482606687368305,
+      "30%": 0.24223596076519727
+    },
+    "score_minus_risk": {
+      "10%": 0.24654088050314465,
+      "20%": 0.22752985543683224,
+      "30%": 0.21826560536237954
+    }
+  },
+  "gate_id": "gate-02-confidence-sufficiency",
+  "headroom_capture": {
+    "scalar_headroom_capture": {
+      "10%": 0.43641863486836446,
+      "20%": 0.3984952935411994,
+      "30%": 0.35123993655132174
+    },
+    "score_headroom_capture": {
+      "10%": 0.43641863486836446,
+      "20%": 0.3984952935411994,
+      "30%": 0.35123993655132174
+    }
+  },
+  "idea_id": "001-tension-guided-verification",
+  "identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "canonical_ddi_semantics_sha256": "7e409b16672db61f6960ed64c531d6920388a244d245ea4033be57639c3fe954",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "harness_revision": "ef40f288fbf64f499d3f9967a7b2783ee3fe090b",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "medication_vocabulary_size": 131,
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "interaction": {
+    "cells": {
+      "HH": {
+        "candidates": 2589,
+        "distinct_patients": 408,
+        "prevalence": 0.12630359212050984
+      },
+      "HL": {
+        "candidates": 1382,
+        "distinct_patients": 413,
+        "prevalence": 0.15267727930535455
+      },
+      "LH": {
+        "candidates": 2399,
+        "distinct_patients": 417,
+        "prevalence": 0.4760316798666111
+      },
+      "LL": {
+        "candidates": 1589,
+        "distinct_patients": 403,
+        "prevalence": 0.4971680302076778
+      }
+    },
+    "i_tension": -0.005237336843778001,
+    "interaction_support_sufficient": true,
+    "support_score_median": 0.9249944388866425
+  },
+  "kind": "gate_02_confidence_sufficiency_summary",
+  "method_id": "molerec",
+  "policy_yields": {
+    "oracle": {
+      "10%": 1.0,
+      "20%": 1.0,
+      "30%": 1.0
+    },
+    "random": {
+      "yield": 0.31034049503706496
+    },
+    "risk_only": {
+      "10%": 0.36477987421383645,
+      "20%": 0.35763670647391577,
+      "30%": 0.3343108504398827
+    },
+    "scalar": {
+      "10%": 0.6113207547169811,
+      "20%": 0.585166561910748,
+      "30%": 0.5525764558022622
+    },
+    "score_only": {
+      "10%": 0.6113207547169811,
+      "20%": 0.585166561910748,
+      "30%": 0.5525764558022622
+    }
+  },
+  "profile_id": "molerec-embedding",
+  "schema_version": 1,
+  "selected_lambda": 0.0,
+  "split": "validation",
+  "support": {
+    "audit_beneficial_patients": 423,
+    "audit_eligible_candidates": 7959,
+    "audit_eligible_patients": 428,
+    "audit_non_beneficial_patients": 428,
+    "support_sufficient": true
+  },
+  "verdict": "STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL"
+}

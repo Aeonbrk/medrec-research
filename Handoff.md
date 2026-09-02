@@ -90,18 +90,26 @@ export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verificati
 - **Gate 01 Status**: Formally executed on 319 (`pass`); P0 Integrity Closure completed: **`AUDIT_PASS`** ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md)).
 - **Gate 02 Status**:
   - Preregistration frozen at [gate-02-confidence-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-confidence-sufficiency.md).
-  - Implementation completed at [run_confidence_sufficiency_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_confidence_sufficiency_gate.py) with deterministic Dev/Audit 50/50 partition, `ScoreOnly`, Dev-only scalar selection, Audit evaluation, interaction diagnostic, and patient-cluster bootstrap.
-  - Pre-execution corrections applied:
-    1. Dev/Audit partition draws from complete `range(validation_patient_count)` rather than visit subset.
-    2. Fail-closed behavior on missing traversal metadata and missing frozen vocabulary scores.
-    3. Audit scalar normalization clarified as $q^{\text{Audit}}(m) = d_t(m) / D_{\max}^{\text{Dev}}$ without renormalization.
-    4. Dev aggregate support counts (`dev_beneficial_patients`, `dev_non_beneficial_patients`) included in public summary.
-    5. Lifecycle wording aligned: implementation and synthetic checks prepared ahead of time; formal 319 execution unlocked by Gate 01 `AUDIT_PASS`.
-  - Synthetic test suite verified and passing under pytest (337 tests): [test_gate_02_synthetic.py](file:///Users/oian/Codes/master/medrec-research/tests/unit/test_gate_02_synthetic.py).
-  - Current execution state: Gate 02 has not yet produced any scientific results. `ScoreOnly` sufficiency remains unknown, incremental DDI signal remains unknown, and the Tension hypothesis remains unconfirmed.
+  - Implementation completed at [run_confidence_sufficiency_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_confidence_sufficiency_gate.py).
+  - Synthetic test suite verified: [test_gate_02_synthetic.py](file:///Users/oian/Codes/master/medrec-research/tests/unit/test_gate_02_synthetic.py).
+  - **P4 Formal 319 Execution Completed**:
+    - **Execution ID**: `gate-02-confidence-sufficiency-20260902-155433`
+    - **Execution Host**: 319-wild (`319-lab`, GPU 0: RTX 3090, 24 GiB free)
+    - **Harness Revision**: `ef40f288fbf64f499d3f9967a7b2783ee3fe090b`
+    - **Public Summary**: [gate-02-summary.json](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-summary.json) (SHA256: `9f0e54ff484de7e935f62300e5a0016ed2042eb052ae8dcb86b2f7c3bd844e28`)
+    - **Restricted Artifacts on 319** (`/root/zhb/medrec-data/runs/ideas/001-tension-guided-verification/gate-02-confidence-sufficiency-20260902-155433/`):
+      - `gate-02-candidates.jsonl`
+      - `gate-02-dev-selection.json`
+    - **Provisional Formal Verdict**: `STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL` (`P5 audit pending`)
+    - **Empirical Summary**:
+      - Dev selection: $\lambda^* = 0.0$ ($D_{\max}^{\text{Dev}} = 12.0$, score median $\tau_s = 0.92499$)
+      - Audit evaluation: Random 31.03%, RiskOnly 36.48%/35.76%/33.43%, ScoreOnly 61.13%/58.52%/55.26%, Scalar ($\lambda^*=0.0$) 61.13%/58.52%/55.26%, Oracle 100.0%
+      - Gaps: Score - Random (+30.10%/+27.48%/+24.22%), Score - Risk (+24.65%/+22.75%/+21.83%), Scalar - Score (0.0% across all budgets; 95% CI: [0.0, 0.0]), Oracle - Score (+38.87%/+41.48%/+44.74%)
+      - Interaction diagnostic: $I_{\text{Tension}} = -0.0052$ (95% CI: [-0.0457, 0.0364], includes 0; support 408-417 patients per cell $\ge 50$)
+      - Audit support: 423 beneficial patients, 428 non-beneficial patients (both >> 50 required threshold)
 - **Prerequisite Queue**:
   - `P0`: Done — Gate 01 Integrity Closure completed with `AUDIT_PASS`.
   - `P1-P3`: Done (preregistration, implementation, synthetic verification).
-  - `P4`: Formal 319 execution of Gate 02 is now unlocked, but has not yet been executed.
-  - `P5`: Gate 02 Integrity Audit by `ccf-integrity-auditor` (mandatory gate following formal 319 run).
-- **Stop rule**: Strictly respected. No real 319 Gate 02 experiment executed; awaiting operator launch of Gate 02 formal execution.
+  - `P4`: Done — Formal 319 execution completed.
+  - `P5`: Pending — Gate 02 Integrity Audit by `ccf-integrity-auditor`.
+- **Stop rule**: Strictly respected. Mandatory hard stop in effect. Formal result is provisional until P5 independently verifies it. No Gate 03 designed, no Tension model trained, no route continuation or termination declared before P5.
