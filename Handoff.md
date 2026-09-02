@@ -111,5 +111,5 @@ export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verificati
   - `P0`: Done — Gate 01 Integrity Closure completed with `AUDIT_PASS`.
   - `P1-P3`: Done (preregistration, implementation, synthetic verification).
   - `P4`: Done — Formal 319 execution completed.
-  - `P5`: Pending — Gate 02 Integrity Audit by `ccf-integrity-auditor`.
-- **Stop rule**: Strictly respected. Mandatory hard stop in effect. Formal result is provisional until P5 independently verifies it. No Gate 03 designed, no Tension model trained, no route continuation or termination declared before P5.
+  - `P5`: Done — Gate 02 Integrity Audit completed: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)). Formal Gate 02 verdict independently reproduced (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`). P6 research decision unlocked.
+- **Stop rule**: Strictly respected. Mandatory hard stop in effect. Next owner is `ccf-pipeline-orchestrator` for the P6 research decision. No Gate 03 designed, no Tension model trained, no route continuation or termination declared before P6.
