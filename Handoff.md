@@ -87,6 +87,14 @@ export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verificati
 
 ## Next scientific step (Per Preregistration)
 
-- Per preregistered decision tree: `pass` confirms that selective routing headroom exists under fixed operator $R_0$, and that degree-based sorting (RiskOnly) is insufficient.
-- **Permitted next step**: We may now proceed to designing and training the predictive Tension revision-value trigger / classifier $\hat v_\theta(m \mid H_t, \hat M_t)$ without violating the falsification contract.
-- **Stop rule**: Maintain strict stop at Gate 01 until operator reviews the verdict and authorizes the next stage.
+- **Gate 01 Status**: Formally executed on 319 (`pass`), pending mandatory P0 closure by `ccf-integrity-auditor` (Integrity Gate 01).
+- **Gate 02 Status**:
+  - Preregistration frozen at [gate-02-confidence-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-confidence-sufficiency.md).
+  - Implementation completed at [run_confidence_sufficiency_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_confidence_sufficiency_gate.py) with deterministic Dev/Audit 50/50 partition, `ScoreOnly`, Dev-only scalar selection, Audit evaluation, interaction diagnostic, and patient-cluster bootstrap.
+  - Synthetic test suite verified and passing under pytest: [test_gate_02_synthetic.py](file:///Users/oian/Codes/master/medrec-research/tests/unit/test_gate_02_synthetic.py).
+- **Prerequisite Queue**:
+  - `P0`: Gate 01 Integrity Closure by `ccf-integrity-auditor`.
+  - `P1-P3`: Done (preregistration, implementation, synthetic verification).
+  - `P4`: Formal 319 execution of Gate 02 (after P0 `AUDIT_PASS`).
+  - `P5`: Gate 02 Integrity Audit by `ccf-integrity-auditor`.
+- **Stop rule**: Strictly respected. No real 319 Gate 02 experiment executed; awaiting human review and P0 audit clearance.
