@@ -3,12 +3,13 @@
 # Idea 002: Score-Geometry Sufficiency
 
 - **Idea ID**: `002-score-geometry-sufficiency`
-- **Status**: Hypothesis selected; experiment not yet designed or authorized
+- **Status**: Gate 01 designed; awaiting implementation and formal execution
 - **Mode**: `ccf-idea-optimizer / exploratory -> hypothesis selection`
 - **Source boundary**: Begins after authoritative Idea 001 closure commit `194daf4580ca7dfe80497ccfdce89ffcee95f46f`
 - **Previous route**: Idea 001 `TERMINATE_CURRENT_TENSION_ROUTE`
 - **Gate 03 under Idea 001**: `NOT_AUTHORIZED`
-- **Next CCFA owner**: `ccf-experiment-designer`
+- **Gate 01 protocol**: [`experiments/gate-01-score-geometry-sufficiency.md`](experiments/gate-01-score-geometry-sufficiency.md)
+- **Next CCFA owner**: `ccf-pipeline-orchestrator` for implementation/execution coordination; `ccf-integrity-auditor` after formal execution
 
 ## Current audited state
 
@@ -348,32 +349,36 @@ No current candidate justifies jumping directly to patient-context neural networ
 
 > Determine whether residual false-positive routing headroom among DDI-active predicted medications can first be explained by low-complexity structure in the frozen recommender's own output distribution, before introducing any new evidence source or learned selector.
 
-## Proposed first gate
+## Gate 01 — designed protocol
 
-`Gate 01 — Score-Geometry Sufficiency`
+The first gate is now frozen in:
 
-The eventual gate should preserve the same scientific task semantics — DDI-active predicted medications, fixed singleton $R_0$, validation only, and
+[`experiments/gate-01-score-geometry-sufficiency.md`](experiments/gate-01-score-geometry-sufficiency.md)
+
+It preserves the same scientific task semantics — DDI-active predicted medications, fixed singleton $R_0$, validation only, and
 
 $$
 Y^{PB}=\mathbf1[m\notin M_t].
 $$
 
-Its minimal comparison surface should be limited to:
+The formal comparison surface is limited to:
 
 ```text
 Random
 ScoreOnly
-Predeclared one-dimensional score-only residual map g(s)
+ScoreGeometry: preregistered five-bin Dev-fitted score-only map g(s)
 Oracle
 ```
+
+The protocol fixes a fresh patient-disjoint Idea-002 Dev/Audit split, split seed, exact score-map construction, budgets, patient-cluster bootstrap, deterministic tie-breaking, support rules, decision tree, public result schema, implementation scope, and post-hoc non-revival boundary.
 
 No DDI feature, history feature, co-selection feature, second model, or architecture belongs in this first gate.
 
 ## What this gate would falsify
 
-The gate would test whether remaining Oracle–ScoreOnly headroom is materially attributable to a simple misspecification of how the existing MoleRec scalar confidence is converted into review priority.
+The gate tests whether remaining Oracle–ScoreOnly headroom is materially attributable to a simple misspecification of how the existing MoleRec scalar confidence is converted into review priority.
 
-A negative result would support the narrower statement:
+A negative result supports the narrower statement:
 
 $$
 \boxed{
@@ -383,29 +388,23 @@ $$
 
 Only then would within-visit relative confidence geometry become the next justified information hypothesis.
 
-## Stop boundary
+## Execution boundary
 
-This ideation stage ends at hypothesis selection.
+The experiment is designed but has not yet produced scientific evidence.
 
-### Do NOT implement
+Implementation must remain idea-local and must preserve the frozen protocol. Formal execution must remain validation-only and use the registered remote workflow. A successful process exit is not a scientific pass; the formal result must undergo independent `ccf-integrity-auditor` review before any continuation decision.
 
-- Do not create Idea 002 runner code.
-- Do not create selector architectures.
-- Do not create DDI transforms.
-- Do not create longitudinal encoders.
-- Do not create ensemble infrastructure.
+### Still prohibited
+
 - Do not modify Idea 001.
-
-### Do NOT run
-
-- Do not execute 319.
 - Do not use the test split.
-- Do not train a model.
-- Do not regenerate five-backbone predictions.
-- Do not retrospectively probe the old Gate 02 Audit rows to select candidate features.
+- Do not train a new model.
+- Do not add a new backbone.
+- Do not add richer features to Gate 01.
+- Do not change the five-bin map, split, budgets, or PASS/FAIL rule after observing outcomes.
 
 ## Next CCFA owner
 
-`ccf-experiment-designer`
+`ccf-pipeline-orchestrator`
 
-Its next task is limited to preregistering the minimal `Gate 01 — Score-Geometry Sufficiency` experiment. Implementation and execution remain unauthorized until that design is independently reviewed and frozen.
+Its task is to coordinate the frozen Gate 01 through idea-local implementation, minimal synthetic verification, one formal validation-only execution, integrity audit, and research decision without redesigning the scientific protocol.
