@@ -4,17 +4,17 @@
 
 - **Protocol**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md`.
 - **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`.
-- **Formal Run**: `gate-01-prescription-relative-confidence-20260902-233128` executed on `319-lab` under `medrec-core-evaluator` at harness revision `ac9dfe860bbce7a9a9620cf21836931136582055`.
+- **Formal Run**: `gate-01-prescription-relative-confidence-20260902-233128` executed on `319-lab-via-server` under `medrec-core-evaluator` at harness revision `ac9dfe860bbce7a9a9620cf21836931136582055`.
 - **Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/003-prescription-relative-confidence/experiments/gate-01-integrity-audit.md`.
 - **Scientific Findings**:
-  - `StrongControl` ($u, c, f, u \cdot c, u \cdot f$) improves modestly over raw `ScoreOnly`: 57.49% vs 56.85% (10% budget) and 57.17% vs 55.88% (20% budget).
-  - Substantial residual Oracle headroom survives on Audit partition: $+42.51\%$ at 10% budget (95% CI: $[+39.04\%, +46.15\%]$) and $+42.83\%$ at 20% budget (95% CI: $[+40.34\%, +45.78\%]$); Gate B passes.
-  - `RankAugmented` fails Gate C at both primary budgets: point gap is negative ($-0.26\%$ at 10% and 20%) and bootstrap 95% CIs cross zero ($[-1.37\%, +1.19\%]$ at 10%, $[-0.65\%, +0.80\%]$ at 20%). Within-prescription relative confidence provides zero reproducible incremental false-positive routing signal.
-- **Decision & Bounds**: Gate 02 is `NOT_AUTHORIZED`; Idea 003 is authoritatively terminated (`TERMINATE_IDEA_003`). Test split remains 100% untouched.
+  - `StrongControl` ($u, c, f, u \cdot c, u \cdot f$) yields 57.49% vs 56.85% for raw `ScoreOnly` at 10% budget (95% CI for the gap crosses zero) and 57.17% vs 55.88% at 20% budget (95% CI for the gap is strictly positive).
+  - Substantial retrospective Oracle headroom survives on Audit: $Oracle - StrongControl = +42.51\%$ at 10% budget (95% CI: $[+39.04\%, +46.15\%]$) and $+42.83\%$ at 20% budget (95% CI: $[+40.34\%, +45.78\%]$). This shows outcome heterogeneity not explained by the frozen control; because Oracle uses the target, it does not establish a target-free mechanism.
+  - The preregistered within-prescription mid-rank feature fails Gate C at both primary budgets: `RankAugmented - StrongControl = -0.26%` at 10% and 20%, with bootstrap 95% CIs crossing zero ($[-1.37\%, +1.19\%]$ and $[-0.65\%, +0.80\%]$).
+- **Decision & Bounds**: Gate 02 is `NOT_AUTHORIZED`; Idea 003 is authoritatively terminated (`TERMINATE_IDEA_003`). The failure is scoped to the tested mid-rank route and does not exhaust broader single-visit, relational, temporal, structural, patient-conditioned, DDI-derived, or cross-model information families. Test split remains 100% untouched.
 - **Decision Document**: `research/ideas/003-prescription-relative-confidence/research-decision.md`.
 - **Failure Record**: `research/memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md`.
 - **Public Summary**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-summary.json`.
-- **Next Direction**: Candidate Idea 004 framing (e.g. `004-longitudinal-prescription-novelty` targeting multi-visit patient history and repeat vs novel prescription transition dynamics).
+- **Next Stage**: Post-negative-result idea selection. No Idea 004 is selected or authorized. Current literature monitoring/search and exploratory candidate generation must precede strict multi-idea review; longitudinal transition information is one candidate, not the default successor.
 
 ## Completed: Gate 01 — Score-Geometry Sufficiency (Idea 002)
 
@@ -102,7 +102,7 @@
 - **Status**: completed on `2026-08-23` as historical SafeDrug `main@88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a` Reproduction Mode evidence; concurrent 3-GPU execution completed for `safedrug` (GPU 2), `retain` (GPU 3), and `leap-safedrug` (GPU 4).
 - **Historical implementation**: preserved in Git history. It repaired the shared `medrec-gamenet` environment on 319 (`971ad2bf...`), executed 50 training epochs, selected best checkpoints, ran 10 test rounds, and validated aggregate result artifacts for all three lanes.
 - **Evidence**:
-  - `safedrug`: Run `medrec-baseline-safedrug-20260822-132448-0bfb210f` (best epoch: 41), DDI $0.0589 \pm 0.0005$, Jaccard $0.5122 \pm 0.0031$, F1 $0.6687 \pm 0.0028$, PRAUC $0.7653 \pm 0.0027$, Avg Meds $20.5825 \pm 0.1611$.
+  - `safrug`: Run `medrec-baseline-safedrug-20260822-132448-0bfb210f` (best epoch: 41), DDI $0.0589 \pm 0.0005$, Jaccard $0.5122 \pm 0.0031$, F1 $0.6687 \pm 0.0028$, PRAUC $0.7653 \pm 0.0027$, Avg Meds $20.5825 \pm 0.1611$.
   - `retain`: Run `medrec-baseline-retain-20260822-132548-abcbd1ce` (best epoch: 49), DDI $0.0851 \pm 0.0017$, Jaccard $0.4818 \pm 0.0025$, F1 $0.6425 \pm 0.0023$, PRAUC $0.7587 \pm 0.0019$, Avg Meds $19.6382 \pm 0.3093$.
   - `leap-safedrug`: Run `medrec-baseline-leap-safedrug-20260822-132647-545ede8a` (best epoch: 44), DDI $0.0705 \pm 0.0005$, Jaccard $0.4442 \pm 0.0030$, F1 $0.6068 \pm 0.0031$, PRAUC $0.6506 \pm 0.0035$, Avg Meds $18.9097 \pm 0.0782$.
 - **Boundary**: these runs used 15,032 visits and a 112-medication vocabulary, not the paper's 14,995 visits and 131 medications. They remain truthful historical provenance but do not participate in future baseline selection, paper reproduction, or Comparison Mode.
