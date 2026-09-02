@@ -3,13 +3,30 @@
 # Idea 001: Tension-Guided Verification
 
 - **Idea ID**: `001-tension-guided-verification`
-- **Status**: Active
-- **Core Hypothesis**: Under limited verification resources, medication transitions subjected to simultaneously high predictive model support and high external constraint pressure yield a superior Pareto frontier than standard predictive uncertainty or boundary triggers.
+- **Status**: Terminated (`TERMINATE_CURRENT_TENSION_ROUTE`)
+- **Core Hypothesis (Historical)**: Under limited verification resources, medication transitions subjected to simultaneously high predictive model support and high external constraint pressure yield a superior Pareto frontier than standard predictive uncertainty or boundary triggers.
 - **Key Uncertainty**: Whether apparent tension gains survive control for medication count, drug frequency, and global scalar reranking (competing simple explanations).
-- **Next Minimal Experiment**: S-1 (Task timestamp semantics audit) and S0/S0.5 (Action decomposition and coverage profiler).
-- **Current Verdict**: Active (Proceed to S-1 / S0 minimal pilot).
+- **Final Decision (P6)**: Current Tension route terminated at Gate 02 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`); Gate 03 is `NOT_AUTHORIZED`.
+- **Audited Lifecycle State**:
+  - Gate 01: `pass` / `P0 Status: AUDIT_PASS` ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md))
+  - Gate 02: `STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL` / `P5 Status: INTEGRITY_PASS` ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md))
+- **Residual Opportunity**: Retained as `UNRESOLVED_RESEARCH_OPPORTUNITY` (residual Oracle headroom over ScoreOnly).
+- **Formal Decision Record**: [research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/research-decision.md)
+- **Failure Memory Record**: [tension-gate-02--recommender-confidence-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/memory/failures/tension-gate-02--recommender-confidence-sufficiency.md)
+- **Next CCFA Owner**: `ccf-idea-optimizer` / Research Operator (Ideation Stage; not paper-writing or implementation)
 
-> We use the tension between predictive support and external constraint pressure to identify medication decisions with high marginal value of verification.
+> **Scientific Lifecycle Summary (P6 Decision)**:
+>
+> Under the frozen MoleRec validation setting, fixed candidate universe, fixed singleton revision operator $R_0$, frozen recommender confidence signal, preregistered global DDI-degree scalar control, and preregistered support-pressure interaction diagnostic:
+>
+> 1. **Routing opportunity exists**: Gate 01 established substantial selective routing headroom under $R_0$ (Oracle achieved 100.0% yield, +68.33% over Random).
+> 2. **Recommender confidence is a strong simple predictor**: MoleRec probability alone (`ScoreOnly`) achieves 61.13% yield at 10% review budget (vs Random 31.03% and RiskOnly 36.48%).
+> 3. **Preregistered Tension explanation failed**: Dev parameter selection chose $\lambda^* = 0.0$; on Audit, Scalar minus ScoreOnly was 0.0 across all budgets; support-pressure interaction diagnostic $I_{\text{Tension}} = -0.0052$ (95% CI: [-0.0457, +0.0364]) showed no positive interaction.
+> 4. **Residual Oracle headroom survives**: Oracle minus ScoreOnly remains +38.87% (10% budget) and +41.48% (20% budget), indicating recommender confidence does not exhaust routing headroom.
+>
+> Following the preregistered stop rule, the current Tension route is **terminated** (`TERMINATE_CURRENT_TENSION_ROUTE`). No Gate 03 is authorized under Idea 001. Residual Oracle headroom is preserved as an `UNRESOLVED_RESEARCH_OPPORTUNITY`. Any future inquiry into this headroom must be initiated as a new research Idea from first principles, not a post-hoc rescue of Idea 001.
+>
+> *(The sections below preserve the historical hypothesis, task ontology, and roadmap as originally formulated prior to empirical falsification).*
 
 # MedRec Research Roadmap v2
 

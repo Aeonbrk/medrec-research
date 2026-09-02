@@ -59,3 +59,7 @@ When upstream literature explores multiple candidate hyperparameters (such as le
 ## Document minimal hardware compatibility deviations explicitly
 
 When running archived scientific baselines on newer hardware (such as RTX 3090 / Ampere requiring CUDA 11+ instead of recorded CUDA 10.2), keep scientific package versions identical and record the necessary CUDA/driver runtime deviation as an environment compatibility deviation, not exact historical reproduction.
+
+## Residual Oracle headroom is not evidence for a proposed mechanism
+
+Establishing that an oracle routing or revision allocation has substantial headroom over trivial baselines (e.g. random or risk-only) proves that heterogeneity exists, but does not validate any specific proposed selection mechanism. When a strong observable control (such as the base recommender's own confidence) explains substantial variance, the proposed additional signal must demonstrate preregistered incremental information beyond that control before mechanism-specific modeling or architectural expansion is justified. Evidence: Idea 001 Gate 01 (`gate-summary.json`) vs Gate 02 (`gate-02-summary.json`).

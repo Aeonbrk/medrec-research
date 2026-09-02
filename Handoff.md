@@ -1,17 +1,18 @@
-# Handoff: Idea 001 Gate 01 Routing Opportunity Implementation
+# Handoff: Idea 001 Research Lifecycle Closure (P6 Final Decision)
 
 ## Current state
 
-Gate 01 (**Routing Opportunity Under a Fixed Revision Operator**) for Idea `001-tension-guided-verification` has completed **formal remote execution on 319-wild** with verdict: **`pass`**.
+The research lifecycle for Idea `001-tension-guided-verification` is formally **closed**.
+Following the preregistered stop rule in Gate 02 and independent P5 integrity verification, the current Tension route is **terminated** (`TERMINATE_CURRENT_TENSION_ROUTE`). Gate 03 is **not authorized**.
 
-- **Execution ID**: `gate-01-routing-opportunity-20260902-010537`
-- **Execution Host**: 319-wild (`319-lab-via-server`, GPU 6: RTX 3090, 15 GiB free)
-- **Harness Revision**: `c6fc35bce97637a2eddc6319cdec768256abdccb`
-- **Dataset Manifest**: `82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712`
-- **MoleRec Checkpoint**: `5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca` (`Epoch_44_TARGET_0.06_JA_0.5327_DDI_0.0723.model`)
-- **Public Summary**: [gate-summary.json](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-summary.json)
-- **Scientific Verdict**: **`pass`** — Selective routing opportunity holds under $R_0$; Oracle significantly beats both Random and RiskOnly across all budget tiers.
-- **Stop Rule**: Strictly respected. No downstream Tension training or multi-step expansion has been started.
+- **Gate 01**: Formally executed on 319 (`pass`); P0 Integrity Audit: **`AUDIT_PASS`** ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md)).
+- **Gate 02**: Formally executed on 319 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`); P5 Integrity Audit: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)).
+- **P6 Final Research Decision**: Completed with verdict **`TERMINATE_CURRENT_TENSION_ROUTE`** ([research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/research-decision.md)).
+- **Gate 03 Authorization**: **`NOT_AUTHORIZED`**.
+- **Failure Record**: Preserved in [`tension-gate-02--recommender-confidence-sufficiency.md`](file:///Users/oian/Codes/master/medrec-research/research/memory/failures/tension-gate-02--recommender-confidence-sufficiency.md).
+- **Residual Routing Opportunity**: Preserved as **`UNRESOLVED_RESEARCH_OPPORTUNITY`** (Oracle - ScoreOnly headroom: +38.87% at 10% budget, +41.48% at 20% budget).
+- **Next Owner**: Operator / Research Ideation (`ccf-idea-optimizer`) for formulating new research directions from first principles.
+- **Strict Boundary**: No Gate 03 designed, no Tension model trained, no post-hoc rescue attempted.
 
 ## What exists
 
@@ -85,31 +86,23 @@ export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verificati
      - Oracle - RiskOnly: **+62.93%** at 10% (95% CI: [59.88%, 65.61%]), **+64.36%** at 20% (95% CI: [62.18%, 66.74%])
   6. **Support**: 844 beneficial patients, 857 non-beneficial patients (both >> 50 required threshold).
 
-## Next scientific step (Per Preregistration)
+## Scientific Lifecycle Summary & Final Decision (P6)
 
 - **Gate 01 Status**: Formally executed on 319 (`pass`); P0 Integrity Closure completed: **`AUDIT_PASS`** ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md)).
-- **Gate 02 Status**:
-  - Preregistration frozen at [gate-02-confidence-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-confidence-sufficiency.md).
-  - Implementation completed at [run_confidence_sufficiency_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_confidence_sufficiency_gate.py).
-  - Synthetic test suite verified: [test_gate_02_synthetic.py](file:///Users/oian/Codes/master/medrec-research/tests/unit/test_gate_02_synthetic.py).
-  - **P4 Formal 319 Execution Completed**:
-    - **Execution ID**: `gate-02-confidence-sufficiency-20260902-155433`
-    - **Execution Host**: 319-wild (`319-lab`, GPU 0: RTX 3090, 24 GiB free)
-    - **Harness Revision**: `ef40f288fbf64f499d3f9967a7b2783ee3fe090b`
-    - **Public Summary**: [gate-02-summary.json](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-summary.json) (SHA256: `9f0e54ff484de7e935f62300e5a0016ed2042eb052ae8dcb86b2f7c3bd844e28`)
-    - **Restricted Artifacts on 319** (`/root/zhb/medrec-data/runs/ideas/001-tension-guided-verification/gate-02-confidence-sufficiency-20260902-155433/`):
-      - `gate-02-candidates.jsonl`
-      - `gate-02-dev-selection.json`
-    - **Provisional Formal Verdict**: `STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL` (`P5 audit pending`)
-    - **Empirical Summary**:
-      - Dev selection: $\lambda^* = 0.0$ ($D_{\max}^{\text{Dev}} = 12.0$, score median $\tau_s = 0.92499$)
-      - Audit evaluation: Random 31.03%, RiskOnly 36.48%/35.76%/33.43%, ScoreOnly 61.13%/58.52%/55.26%, Scalar ($\lambda^*=0.0$) 61.13%/58.52%/55.26%, Oracle 100.0%
-      - Gaps: Score - Random (+30.10%/+27.48%/+24.22%), Score - Risk (+24.65%/+22.75%/+21.83%), Scalar - Score (0.0% across all budgets; 95% CI: [0.0, 0.0]), Oracle - Score (+38.87%/+41.48%/+44.74%)
-      - Interaction diagnostic: $I_{\text{Tension}} = -0.0052$ (95% CI: [-0.0457, 0.0364], includes 0; support 408-417 patients per cell $\ge 50$)
-      - Audit support: 423 beneficial patients, 428 non-beneficial patients (both >> 50 required threshold)
-- **Prerequisite Queue**:
+- **Gate 02 Status**: Formally executed on 319 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`); P5 Integrity Audit completed: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)).
+  - Dev selection: $\lambda^* = 0.0$ ($D_{\max}^{\text{Dev}} = 12.0$, score median $\tau_s = 0.92499$).
+  - Audit evaluation: Random 31.03%, RiskOnly 36.48%/35.76%/33.43%, ScoreOnly 61.13%/58.52%/55.26%, Scalar ($\lambda^*=0.0$) 61.13%/58.52%/55.26%, Oracle 100.0%.
+  - Gaps: Score - Random (+30.10%/+27.48%/+24.22%), Score - Risk (+24.65%/+22.75%/+21.83%), Scalar - Score (0.0% across all budgets; 95% CI: [0.0, 0.0]), Oracle - Score (+38.87%/+41.48%/+44.74%).
+  - Interaction diagnostic: $I_{\text{Tension}} = -0.0052$ (95% CI: [-0.0457, 0.0364], includes 0; support 408-417 patients per cell $\ge 50$).
+  - Audit support: 423 beneficial patients, 428 non-beneficial patients (both >> 50 required threshold).
+- **Completed Lifecycle Queue**:
   - `P0`: Done — Gate 01 Integrity Closure completed with `AUDIT_PASS`.
   - `P1-P3`: Done (preregistration, implementation, synthetic verification).
   - `P4`: Done — Formal 319 execution completed.
-  - `P5`: Done — Gate 02 Integrity Audit completed: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)). Formal Gate 02 verdict independently reproduced (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`). P6 research decision unlocked.
-- **Stop rule**: Strictly respected. Mandatory hard stop in effect. Next owner is `ccf-pipeline-orchestrator` for the P6 research decision. No Gate 03 designed, no Tension model trained, no route continuation or termination declared before P6.
+  - `P5`: Done — Gate 02 Integrity Audit completed: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)).
+  - `P6`: Done — Final research decision executed: **`TERMINATE_CURRENT_TENSION_ROUTE`** ([research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/research-decision.md)).
+- **Terminal Decision**: Current Tension route terminated. Gate 03 is **`NOT_AUTHORIZED`**.
+- **Residual Opportunity**: Retained as `UNRESOLVED_RESEARCH_OPPORTUNITY`:
+  $$\boxed{\text{What target-free observable information explains residual revision-value heterogeneity beyond frozen recommender confidence?}}$$
+- **Next CCFA Owner**: `ccf-idea-optimizer` / Research Operator (Stage: Research Ideation / Problem Formulation).
+- **Strict Prohibition**: Not authorized for `ccf-paper-writer` or Tension implementation. No post-hoc rescue attempts allowed.

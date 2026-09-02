@@ -25,8 +25,8 @@ Every idea folder (e.g. `001-tension-guided-verification/`) must be able to clea
 - **Failures**: Idea-specific failures remain in the idea's local experimental history. Only generalizable negative patterns (e.g. baseline traps, pseudo-gains from scalar reranking) are distilled into `research/memory/`.
 - **Graduation**: When an idea survives all minimal falsification gates and has sufficient multi-backbone evidence, it graduates to a dedicated paper project in `papers/<paper-name>/`.
 
-## Active Ideas Index
+## Ideas Index
 
 | ID | Title | Status | Core Uncertainty | Next Minimal Experiment |
 | :--- | :--- | :--- | :--- | :--- |
-| [`001-tension-guided-verification`](001-tension-guided-verification/README.md) | Tension-Guided Verification | **Active** | Can decision tension outperform simple predictive uncertainty or global scalar reranking under strict count matching? | S-1 timestamp semantics audit & S0 transition decomposition |
+| [`001-tension-guided-verification`](001-tension-guided-verification/README.md) | Tension-Guided Verification | **Terminated** (`TERMINATE_CURRENT_TENSION_ROUTE`) | Can decision tension outperform simple predictive uncertainty or global scalar reranking under strict count matching? | Route terminated at Gate 02 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`). Residual Oracle headroom preserved as unresolved research opportunity. |
