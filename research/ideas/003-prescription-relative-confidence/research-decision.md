@@ -6,6 +6,7 @@
 - **Gate**: `gate-01-prescription-relative-confidence`
 - **Formal Run ID**: `gate-01-prescription-relative-confidence-20260902-233128`
 - **Harness Revision**: `ac9dfe860bbce7a9a9620cf21836931136582055`
+- **Execution Host**: `319-lab-via-server`
 - **Decision Date**: 2026-09-02
 - **Authoritative Verdict**: `STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`
 - **Action**: `TERMINATE_IDEA_003`
@@ -56,12 +57,9 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ## 3. Failure Diagnosis
 
-1. **Relative Rank Does Not Supply Incremental FP Routing Signal**:
-   Although within-prescription relative rank $r_t(m)$ receives a positive coefficient on Dev ($\beta_r = +0.2223$), on the held-out Audit cohort its inclusion yields negative point gaps ($-0.26\%$ at 10% and 20%) and confidence intervals crossing zero.
-2. **Absolute Score and Marginal Prevalence Absorb Observable Variance**:
-   The simple control features (absolute score $u$, prescription size $c$, train prevalence $f$, and their pairwise interactions) capture all identifiable predictive signal available from single-visit confidence outputs. Once these controls are accounted for, within-prescription ordering provides zero incremental routing value.
-3. **Large Residual Outcome Heterogeneity Remains Unexplained**:
-   The retrospective Oracle headroom over `StrongControl` exceeds $+42.5\%$ across all review budgets. True false positives are highly concentrated, but intra-prescription score rank does not index them.
+1. **The preregistered relative-rank feature did not generalize incrementally**: Although within-prescription relative rank $r_t(m)$ received a positive coefficient on Dev ($\beta_r = +0.2223$), its addition produced negative point gaps on held-out Audit ($-0.26\%$ at both primary budgets) with confidence intervals crossing zero.
+2. **The Gate does not identify a universal explanation for that failure**: The evidence supports the narrower conclusion that the frozen `RankAugmented` construction did not improve routing beyond the frozen `StrongControl`. It does not establish that the control absorbs all possible single-visit predictive information, nor does it distinguish definitively among redundancy, estimator mismatch, weak signal, or absence of signal as causal explanations.
+3. **Residual retrospective outcome heterogeneity remains unexplained**: `Oracle - StrongControl` exceeds $+42.5\%$ at both primary budgets. Because Oracle uses the target, this establishes substantial retrospective heterogeneity not explained by the frozen control; it does not establish that the heterogeneity is target-free observable, concentrated in any particular feature space, or attributable to a specific mechanism.
 
 ---
 
@@ -70,19 +68,29 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 - Idea 003 is formally **CLOSED** at Gate 01.
 - No Gate 02 will be designed or executed for Idea 003.
 - The test split remains 100% untouched and unindexed.
-- This result does not imply that multi-agent, patient-conditioned, or longitudinal signals are useless; it establishes that within-prescription relative confidence ranking on frozen MoleRec predictions is insufficient for false-positive routing.
+- The failed hypothesis is the preregistered one-scalar within-prescription mid-rank route under the frozen MoleRec setting and strong control.
+- This result does not establish that other single-visit, medication-set relational, patient-conditioned, longitudinal, structural, DDI-derived, or cross-model observables are useless.
 
 ---
 
-## 5. Next Idea Recommendation (Idea 004)
+## 5. Post-Idea-003 Research Selection
 
-Synthesizing findings across Ideas 001, 002, and 003:
+Synthesizing the scoped findings across Ideas 001, 002, and 003:
 
-- **Idea 001**: Direct DDI degree / tension pressure interaction adds zero incremental signal over recommender score ($Scalar - Score = 0.0\%$).
-- **Idea 002**: Non-monotone score geometry quintile mapping collapses identically to monotonic score sorting ($Geometry - Score = 0.0\%$).
-- **Idea 003**: Within-prescription relative confidence ranking adds zero incremental signal beyond absolute score, prescription size, and train-only prevalence ($Rank - Control \le 0$).
-- **Common Crux**: Single-visit prediction-time observables ($s, n_t, r_t, d_t$) and static marginal train prevalence ($p_{train}$) have been exhausted. Yet retrospective Oracle headroom ($>+42\%$) proves substantial outcome heterogeneity exists.
+- **Idea 001**: The preregistered active-DDI-degree scalar and Tension interaction did not establish incremental routing information beyond frozen recommender confidence under the recorded setting.
+- **Idea 002**: The preregistered five-bin Dev-fitted score map induced the same candidate ordering as `ScoreOnly` and produced zero incremental routing yield.
+- **Idea 003**: The preregistered within-prescription mid-rank feature did not establish incremental routing information beyond absolute score, prescription size, train-only prevalence, and their frozen interactions.
+- **Residual question**: Substantial retrospective Oracle headroom remains beyond the frozen `StrongControl`; its target-free observable explanation is unresolved.
 
-**Recommended Direction for Idea 004**:
-**`004-longitudinal-prescription-novelty`** (or **`004-longitudinal-transition-verification`**):
-Investigate whether **patient-specific longitudinal recurrence** (i.e. distinguishing repeat prescriptions previously administered to this specific patient vs novel drug initiations) provides reproducible incremental false-positive routing signal beyond the `StrongControl` benchmark. In clinical EHR prescribing, false-positive recommender errors disproportionately occur during acute medication continuation or novel initiations. Patient history is target-free, clinically grounded, and completely unexploited by static single-visit selectors.
+No Idea 004 is selected by this decision. In particular, longitudinal prescription recurrence or transition status is a candidate information source rather than an authorized successor. It must undergo current literature grounding and compete against materially different candidate hypotheses before any Idea 004 directory or Gate is created.
+
+The next CCFA sequence is:
+
+```text
+ccf-pipeline-orchestrator
+-> ccf-literature-monitor / ccf-literature-searcher
+-> ccf-idea-optimizer (exploratory)
+-> ccf-idea-reviewer (standard, explicit ranking)
+-> ccf-idea-optimizer (standard, winner only)
+-> ccf-experiment-designer
+```
