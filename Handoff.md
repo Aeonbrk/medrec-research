@@ -91,10 +91,16 @@ export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verificati
 - **Gate 02 Status**:
   - Preregistration frozen at [gate-02-confidence-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-confidence-sufficiency.md).
   - Implementation completed at [run_confidence_sufficiency_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_confidence_sufficiency_gate.py) with deterministic Dev/Audit 50/50 partition, `ScoreOnly`, Dev-only scalar selection, Audit evaluation, interaction diagnostic, and patient-cluster bootstrap.
-  - Synthetic test suite verified and passing under pytest: [test_gate_02_synthetic.py](file:///Users/oian/Codes/master/medrec-research/tests/unit/test_gate_02_synthetic.py).
+  - Pre-execution corrections applied:
+    1. Dev/Audit partition draws from complete `range(validation_patient_count)` rather than visit subset.
+    2. Fail-closed behavior on missing traversal metadata and missing frozen vocabulary scores.
+    3. Audit scalar normalization clarified as $q^{\text{Audit}}(m) = d_t(m) / D_{\max}^{\text{Dev}}$ without renormalization.
+    4. Dev aggregate support counts (`dev_beneficial_patients`, `dev_non_beneficial_patients`) included in public summary.
+    5. Lifecycle wording aligned: implementation and synthetic checks prepared ahead of time; formal 319 execution strictly blocked until Gate 01 achieves `AUDIT_PASS`.
+  - Synthetic test suite verified and passing under pytest (337 tests): [test_gate_02_synthetic.py](file:///Users/oian/Codes/master/medrec-research/tests/unit/test_gate_02_synthetic.py).
 - **Prerequisite Queue**:
   - `P0`: Gate 01 Integrity Closure by `ccf-integrity-auditor`.
   - `P1-P3`: Done (preregistration, implementation, synthetic verification).
-  - `P4`: Formal 319 execution of Gate 02 (after P0 `AUDIT_PASS`).
+  - `P4`: Formal 319 execution of Gate 02 (strictly requires P0 `AUDIT_PASS`).
   - `P5`: Gate 02 Integrity Audit by `ccf-integrity-auditor`.
-- **Stop rule**: Strictly respected. No real 319 Gate 02 experiment executed; awaiting human review and P0 audit clearance.
+- **Stop rule**: Strictly respected. No real 319 Gate 02 experiment executed; awaiting Gate 01 `ccf-integrity-auditor` P0 closure and operator Go/No-Go.

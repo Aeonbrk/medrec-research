@@ -162,13 +162,15 @@ Such a change would constitute a new preregistered route.
 
 # 3. Integrity Gate 01 — mandatory upstream closure
 
-Before implementing or executing Gate 02, hand Gate 01 to:
+Before formal 319 execution of Gate 02 or interpretation of any Gate 02 results, hand Gate 01 to:
 
 `ccf-integrity-auditor`
 
 Mode:
 
 `full`, with emphasis on `claim-audit + numeric-audit`.
+
+Gate 02 repository implementation and synthetic verification may be prepared in advance because software checks produce no Gate 02 scientific evidence. However, formal execution and evaluation remain strictly blocked until Gate 01 achieves `AUDIT_PASS`.
 
 This audit must operate where the restricted Gate 01 artifact is authorized to remain.
 
@@ -239,13 +241,13 @@ Only:
 
 `AUDIT_PASS`
 
-permits Gate 02 execution.
+permits Gate 02 formal execution.
 
 Any numeric mismatch affecting the verdict:
 
 `AUDIT_BLOCK`
 
-and Gate 02 must stop.
+and Gate 02 formal execution must stop.
 
 Minor wording-only overclaim does not invalidate Gate 01 numerics, but must be corrected before Gate 02 results are interpreted.
 
@@ -357,7 +359,7 @@ Take validation patients only and perform one deterministic patient-level split:
 
 Procedure:
 
-1. start from deterministic validation `patient_order`;
+1. start from the complete validation patient universe $\text{patient\_order} \in \{0, \dots, N_{\text{val\_patients}} - 1\}$ as defined by `validation_patient_count` in the staged metadata (ensuring patients without eligible follow-up visits are included in the permutation so that seeded shuffling does not shift subsequent patient assignments);
 2. shuffle patient indices with PRNG seed `1203`;
 3. assign the first half to Dev and the remainder to Audit;
 4. all visits/candidates from one patient remain in exactly one partition.
@@ -464,20 +466,37 @@ This is Gate 02's central falsification control.
 
 To prevent repeating the EGSF weak-control mistake, include one simple two-signal global scalar before any Tension model.
 
-On the Dev partition define:
+On the Dev partition, freeze the maximum DDI degree:
 
 $$
-q_t(m)
+D_{\max}^{\text{Dev}}
 =
-\frac{d_t(m)}
-{\max_{(t',m')\in \mathcal Q_{\text{Dev}}} d_{t'}(m')}.
+\max_{(t',m')\in \mathcal Q_{\text{Dev}}} d_{t'}(m').
 $$
 
-Thus:
+Define the normalized constraint degree on Dev:
 
 $$
-q_t(m)\in(0,1].
+q_t^{\text{Dev}}(m)
+=
+\frac{d_t(m)}{D_{\max}^{\text{Dev}}}.
 $$
+
+Thus on Dev:
+
+$$
+q_t^{\text{Dev}}(m)\in(0,1].
+$$
+
+On the Audit partition, evaluation must continue to use the frozen Dev denominator $D_{\max}^{\text{Dev}}$:
+
+$$
+q_t^{\text{Audit}}(m)
+=
+\frac{d_t(m)}{D_{\max}^{\text{Dev}}}.
+$$
+
+Do not renormalize using Audit maximum degree. If an Audit candidate's degree exceeds $D_{\max}^{\text{Dev}}$, $q_t^{\text{Audit}}(m) > 1$ is permitted.
 
 Define:
 
@@ -1065,7 +1084,7 @@ Return locally only:
 It may contain:
 
 * frozen public identities;
-* Dev/Audit aggregate counts;
+* Dev/Audit aggregate counts (including `dev_candidates`, `dev_patients`, `dev_beneficial_patients`, `dev_non_beneficial_patients`);
 * support counts;
 * selected $\lambda^*$;
 * policy yields;
@@ -1221,17 +1240,15 @@ They are not scientific evidence.
 
 Run `ccf-integrity-auditor`.
 
-If blocked, stop.
+If blocked, stop. Must achieve `AUDIT_PASS` before P4.
 
 ### P1 — Gate 02 preregistration
 
 Create the protocol and freeze all definitions above.
 
-Do not execute.
-
 ### P2 — Minimal implementation
 
-Reuse the current process adapter and schema-v2 `vocabulary_scores`.
+Reuse the current process adapter and schema-v2 `vocabulary_scores`. Implementation and synthetic tests may be prepared in advance of P0 without constituting experimental execution.
 
 Do not add a second adapter architecture.
 
@@ -1239,9 +1256,11 @@ Do not train Tension.
 
 ### P3 — Static / synthetic verification
 
-Only the seven changed-path checks above.
+Only the changed-path checks above.
 
 ### P4 — Formal 319 Gate 02 execution
+
+Requires P0 `AUDIT_PASS`.
 
 Validation only.
 
@@ -1303,11 +1322,11 @@ Every Gate 02 outcome must come from the formal frozen execution and pass indepe
 
 Immediate:
 
-`ccf-integrity-auditor` for Gate 01 closure.
+`ccf-integrity-auditor` for Gate 01 closure (P0).
 
 After `AUDIT_PASS`:
 
-repository implementation + formal 319 execution.
+formal 319 execution of Gate 02 (P4).
 
 After Gate 02 execution:
 

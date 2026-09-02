@@ -327,10 +327,17 @@ def compute_gate_02_candidates(
             active_degrees[med] = degree
 
         eligible_meds = sorted(m for m, degree in active_degrees.items() if degree > 0)
-        patient_order, visit_order = traversal_by_visit.get(visit_key, (0, 0))
+
+        if visit_key not in traversal_by_visit:
+            raise KeyError(f"Missing traversal metadata for visit: {visit_key}")
+        patient_order, visit_order = traversal_by_visit[visit_key]
         partition = "dev" if patient_order in dev_patients else "audit"
 
         for med in eligible_meds:
+            if med not in score_by_med:
+                raise KeyError(
+                    f"Missing frozen vocabulary score for eligible predicted medication: {med} in {visit_key}"
+                )
             degree = active_degrees[med]
             revised_meds = pred_meds - {med}
             rev_jaccard = _visit_jaccard(revised_meds, target_set)
@@ -338,7 +345,7 @@ def compute_gate_02_candidates(
             delta_violation = -degree  # delta violation < 0 by construction
 
             pareto_beneficial = (delta_jaccard >= 0.0) and (delta_violation < 0)
-            model_score = float(score_by_med.get(med, 0.5))
+            model_score = float(score_by_med[med])
 
             record = Gate02CandidateRecord(
                 patient_id=patient_id,
@@ -785,6 +792,13 @@ def build_gate_02_public_summary(
         set(c.patient_order for c in audit_candidates if not c.pareto_beneficial)
     )
 
+    dev_beneficial_patients = len(
+        set(c.patient_order for c in dev_candidates if c.pareto_beneficial)
+    )
+    dev_non_beneficial_patients = len(
+        set(c.patient_order for c in dev_candidates if not c.pareto_beneficial)
+    )
+
     return {
         "schema_version": 1,
         "kind": "gate_02_confidence_sufficiency_summary",
@@ -797,6 +811,8 @@ def build_gate_02_public_summary(
         "dev_audit_counts": {
             "dev_candidates": len(dev_candidates),
             "dev_patients": len(set(c.patient_order for c in dev_candidates)),
+            "dev_beneficial_patients": dev_beneficial_patients,
+            "dev_non_beneficial_patients": dev_non_beneficial_patients,
             "audit_candidates": n_audit_candidates,
             "audit_patients": audit_eligible_patients,
         },
@@ -977,9 +993,11 @@ def run_gate_02(
         for p in batch.predictions
     ]
 
-    # 7. Deterministic validation patient partition (50% Dev / 50% Audit)
-    all_patient_orders = [t[0] for t in traversal_by_visit.values()]
-    dev_patients, _audit_patients = partition_validation_patients(all_patient_orders, seed=1203)
+    # 7. Deterministic validation patient partition (50% Dev / 50% Audit) from full validation patient universe
+    val_patient_count = int(meta["validation_patient_count"])
+    dev_patients, _audit_patients = partition_validation_patients(
+        range(val_patient_count), seed=1203
+    )
 
     # 8. Compute eligible candidates with model scores and partition assignment
     candidates = compute_gate_02_candidates(
@@ -1123,7 +1141,7 @@ def run_gate_02(
 def self_test_gate_02() -> None:
     """Check the seven changed critical paths per Section 24."""
     # --------------------------------------------------------------------------
-    # Check 1: Extraction of candidate medication's frozen vocabulary_score
+    # Check 1: Extraction of candidate medication's frozen vocabulary_score and fail-closed checks
     # --------------------------------------------------------------------------
     pred_data = [
         {
@@ -1152,8 +1170,42 @@ def self_test_gate_02() -> None:
     assert by_code["MED_B"].model_score == 0.52
     assert by_code["MED_B"].pareto_beneficial is True  # Delta J >= 0 (FP removed)
 
+    # Missing traversal metadata must fail closed
+    try:
+        compute_gate_02_candidates(
+            predictions=pred_data,
+            targets=targets,
+            ddi_pairs=ddi_mock,
+            traversal_by_visit={},  # empty
+            dev_patients=dev_pats,
+        )
+        raise AssertionError("Expected KeyError on missing traversal metadata")
+    except KeyError as e:
+        assert "Missing traversal metadata" in str(e)
+
+    # Missing vocabulary score must fail closed
+    pred_data_missing_score = [
+        {
+            "patient_id": "p1",
+            "visit_id": "v1",
+            "predicted_medications": ["MED_A", "MED_B"],
+            "vocabulary_scores": {"MED_A": 0.88},  # MED_B score missing
+        }
+    ]
+    try:
+        compute_gate_02_candidates(
+            predictions=pred_data_missing_score,
+            targets=targets,
+            ddi_pairs=ddi_mock,
+            traversal_by_visit=traversal,
+            dev_patients=dev_pats,
+        )
+        raise AssertionError("Expected KeyError on missing vocabulary score")
+    except KeyError as e:
+        assert "Missing frozen vocabulary score" in str(e)
+
     # --------------------------------------------------------------------------
-    # Check 2: Deterministic patient Dev/Audit split
+    # Check 2: Deterministic patient Dev/Audit split on full validation universe
     # --------------------------------------------------------------------------
     orders = list(range(20))
     dev1, audit1 = partition_validation_patients(orders, seed=1203)
@@ -1163,6 +1215,13 @@ def self_test_gate_02() -> None:
     assert len(dev1) == 10
     assert len(audit1) == 10
     assert len(dev1 & audit1) == 0
+
+    # Omitting patients without eligible follow-up visits shifts the seeded shuffle:
+    orders_missing_pat5 = [i for i in range(20) if i != 5]
+    dev_drift, _ = partition_validation_patients(orders_missing_pat5, seed=1203)
+    assert dev_drift != dev1 - {5}, (
+        "Omitting patients drifts seeded shuffle, proving full universe range() is required"
+    )
 
     # --------------------------------------------------------------------------
     # Check 3: ScoreOnly ordering
