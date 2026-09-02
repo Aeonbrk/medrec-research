@@ -3,12 +3,16 @@
 # Idea 003: Prescription-Relative Confidence Residual
 
 - **Idea ID**: `003-prescription-relative-confidence`
-- **Status**: `SELECTED`
-- **Gate 01 Status**: `Gate 01 DESIGNED / FROZEN`
-- **Execution Status**: `NOT EXECUTED`
+- **Status**: `CLOSED (Gate 01 Falsified)`
+- **Gate 01 Status**: `EXECUTED / FALSIFIED`
+- **Formal Verdict**: `STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`
 - **Protocol**: [`experiments/gate-01-prescription-relative-confidence.md`](experiments/gate-01-prescription-relative-confidence.md)
+- **Summary**: [`experiments/gate-01-summary.json`](experiments/gate-01-summary.json)
 - **Design Audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`INTEGRITY_PASS`)
-- **Scientific stage**: Gate 01 protocol preregistered and frozen; ready for P0 verification and P1 implementation
+- **Integrity Audit**: [`experiments/gate-01-integrity-audit.md`](experiments/gate-01-integrity-audit.md) (`INTEGRITY_PASS`)
+- **Research Decision**: [`research-decision.md`](research-decision.md)
+- **Failure Record**: [`research/memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md`](../../memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md)
+- **Scientific stage**: Gate 01 executed on 319; hypothesis conclusively falsified; Idea 003 terminated
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
 - **Literature grounding**: `literature-search-20260902-residual-fp-routing/`
 - **Strict idea review**: [`idea-review.md`](idea-review.md)

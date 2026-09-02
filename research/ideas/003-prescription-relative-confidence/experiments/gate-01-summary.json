@@ -1,0 +1,176 @@
+{
+  "audit_support": {
+    "distinct_beneficial_patients": 417,
+    "distinct_non_beneficial_patients": 423,
+    "k_by_budget": {
+      "10%": 774,
+      "20%": 1548,
+      "30%": 2322
+    },
+    "support_requirement_met": true,
+    "threshold_required": 50
+  },
+  "bootstrap": {
+    "confidence_level": "95%_percentile",
+    "intervals": {
+      "control_minus_score": {
+        "10%": {
+          "lower": -0.00698366502493484,
+          "upper": 0.01439837751229992
+        },
+        "20%": {
+          "lower": 0.003356790859237094,
+          "upper": 0.01734858174255013
+        },
+        "30%": {
+          "lower": -0.003721827181832263,
+          "upper": 0.01128093060572136
+        }
+      },
+      "oracle_minus_control": {
+        "10%": {
+          "lower": 0.390390033956383,
+          "upper": 0.46147016625648857
+        },
+        "20%": {
+          "lower": 0.40341815174030277,
+          "upper": 0.457818626933885
+        },
+        "30%": {
+          "lower": 0.4248183351924542,
+          "upper": 0.4690051707240346
+        }
+      },
+      "rank_minus_control": {
+        "10%": {
+          "lower": -0.01367064255482872,
+          "upper": 0.011891011903088871
+        },
+        "20%": {
+          "lower": -0.006512455195286715,
+          "upper": 0.00798443113772454
+        },
+        "30%": {
+          "lower": -0.00939354129113065,
+          "upper": 0.0034321139991243255
+        }
+      }
+    },
+    "replicates": 1000,
+    "resampling_unit": "patient",
+    "seed": 1203
+  },
+  "decision_criteria": {
+    "gate_a_support_met": true,
+    "gate_b_oracle_headroom_10": true,
+    "gate_b_oracle_headroom_20": true,
+    "gate_c_rank_incremental_10": false,
+    "gate_c_rank_incremental_20": false
+  },
+  "formal_run_id": "gate-01-prescription-relative-confidence-20260902-233128",
+  "gaps": {
+    "control_minus_score": {
+      "10%": 0.006459948320413411,
+      "20%": 0.012919896640826933,
+      "30%": 0.004306632213608941
+    },
+    "oracle_minus_control": {
+      "10%": 0.4250645994832042,
+      "20%": 0.42829457364341084,
+      "30%": 0.4470284237726099
+    },
+    "rank_minus_control": {
+      "10%": -0.0025839793281653423,
+      "20%": -0.0025839793281653423,
+      "30%": -0.003014642549526214
+    }
+  },
+  "gate_id": "gate-01-prescription-relative-confidence",
+  "harness_revision": "ac9dfe860bbce7a9a9620cf21836931136582055",
+  "idea_id": "003-prescription-relative-confidence",
+  "identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "policy_yields": {
+    "oracle": {
+      "10%": 1.0,
+      "20%": 1.0,
+      "30%": 1.0
+    },
+    "random": {
+      "10%": 0.31369509043927646,
+      "20%": 0.31369509043927646,
+      "30%": 0.31369509043927646
+    },
+    "rank_augmented": {
+      "10%": 0.5723514211886305,
+      "20%": 0.5691214470284238,
+      "30%": 0.5499569336778639
+    },
+    "score_only": {
+      "10%": 0.5684754521963824,
+      "20%": 0.5587855297157622,
+      "30%": 0.5486649440137812
+    },
+    "strong_control": {
+      "10%": 0.5749354005167958,
+      "20%": 0.5717054263565892,
+      "30%": 0.5529715762273901
+    }
+  },
+  "schema_version": 2,
+  "selector": {
+    "algorithm": "fixed_ridge_linear_probability",
+    "rank_augmented_coefficients": {
+      "coefficients": {
+        "c": -0.15222450307809066,
+        "f": -0.04136421837820255,
+        "r": 0.22229587854751662,
+        "u": -0.035022406110414295,
+        "u_c": 0.27443715101309074,
+        "u_f": 0.0978084553278068
+      },
+      "intercept": 0.5933330074788951
+    },
+    "ridge_penalty": 1e-06,
+    "strong_control_coefficients": {
+      "coefficients": {
+        "c": -0.14846012294438293,
+        "f": -0.06053284455098541,
+        "u": 0.2321445073422428,
+        "u_c": 0.32042229372947073,
+        "u_f": 0.17445948324696306
+      },
+      "intercept": 0.6442735827887429
+    }
+  },
+  "split": {
+    "audit_candidates_count": 7740,
+    "audit_patient_count": 530,
+    "dev_candidates_count": 7809,
+    "dev_patient_count": 529,
+    "eligible_audit_patients": 423,
+    "eligible_dev_patients": 435,
+    "patient_level": true,
+    "seed": 2003,
+    "source": "validation",
+    "validation_patient_count": 1059
+  },
+  "train_prevalence": {
+    "eligible_train_visits": 6256,
+    "smoothing": "laplace_1_1"
+  },
+  "verdict": "STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE"
+}

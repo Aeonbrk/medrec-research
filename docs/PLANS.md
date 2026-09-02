@@ -1,14 +1,20 @@
 # Plans
 
-## Active: Gate 01 — Prescription-Relative Confidence (Idea 003)
+## Completed: Gate 01 — Prescription-Relative Confidence (Idea 003)
 
 - **Protocol**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md`.
-- **Status**: Gate 01 DESIGNED / FROZEN, NOT EXECUTED.
-- **Design Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/003-prescription-relative-confidence/experiments/gate-01-design-integrity-audit.md`.
-- **Scientific Scope**: Tests whether within-prescription relative confidence position ($r_t(m)$) contains reproducible incremental false-positive routing information beyond a strong simple control built from absolute medication score, predicted prescription size, and train-only medication prevalence.
-- **Frozen Baseline**: MoleRec Table 1 comparison baseline (`5de4665570d8...`).
-- **Partition Discipline**: Validation universe partitioned with seed `2003` into 529 Dev patients and 530 Audit patients. Test split remains unindexed and untouched.
-- **Next Steps**: P0 state / protocol verification, P1 idea-local implementation, P2 synthetic testing, P3 implementation commit, P4 single formal 319 execution, P5 integrity audit, P6 research decision.
+- **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`.
+- **Formal Run**: `gate-01-prescription-relative-confidence-20260902-233128` executed on `319-lab` under `medrec-core-evaluator` at harness revision `ac9dfe860bbce7a9a9620cf21836931136582055`.
+- **Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/003-prescription-relative-confidence/experiments/gate-01-integrity-audit.md`.
+- **Scientific Findings**:
+  - `StrongControl` ($u, c, f, u \cdot c, u \cdot f$) improves modestly over raw `ScoreOnly`: 57.49% vs 56.85% (10% budget) and 57.17% vs 55.88% (20% budget).
+  - Substantial residual Oracle headroom survives on Audit partition: $+42.51\%$ at 10% budget (95% CI: $[+39.04\%, +46.15\%]$) and $+42.83\%$ at 20% budget (95% CI: $[+40.34\%, +45.78\%]$); Gate B passes.
+  - `RankAugmented` fails Gate C at both primary budgets: point gap is negative ($-0.26\%$ at 10% and 20%) and bootstrap 95% CIs cross zero ($[-1.37\%, +1.19\%]$ at 10%, $[-0.65\%, +0.80\%]$ at 20%). Within-prescription relative confidence provides zero reproducible incremental false-positive routing signal.
+- **Decision & Bounds**: Gate 02 is `NOT_AUTHORIZED`; Idea 003 is authoritatively terminated (`TERMINATE_IDEA_003`). Test split remains 100% untouched.
+- **Decision Document**: `research/ideas/003-prescription-relative-confidence/research-decision.md`.
+- **Failure Record**: `research/memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md`.
+- **Public Summary**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-summary.json`.
+- **Next Direction**: Candidate Idea 004 framing (e.g. `004-longitudinal-prescription-novelty` targeting multi-visit patient history and repeat vs novel prescription transition dynamics).
 
 ## Completed: Gate 01 — Score-Geometry Sufficiency (Idea 002)
 
