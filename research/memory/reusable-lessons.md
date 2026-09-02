@@ -60,6 +60,14 @@ When upstream literature explores multiple candidate hyperparameters (such as le
 
 When running archived scientific baselines on newer hardware (such as RTX 3090 / Ampere requiring CUDA 11+ instead of recorded CUDA 10.2), keep scientific package versions identical and record the necessary CUDA/driver runtime deviation as an environment compatibility deviation, not exact historical reproduction.
 
+## Treat frozen recommender confidence as a mandatory selective-revision control
+
+For any future medication-level selective revision, verification, or routing mechanism layered on a score-producing recommender, unchanged frozen recommender confidence is a mandatory simple control. A candidate observable earns mechanistic interest only through preregistered incremental evidence beyond that control and any candidate-specific trivial confound control. Evidence: Idea 001 Gate 02 and Idea 002 Gate 01.
+
+## Order-equivalent score transforms are not new routing information
+
+If a transformation $g(s)$ is strictly monotone over the relevant score support, it preserves the candidate ordering induced by $s$ and therefore cannot by itself constitute a new routing mechanism. Temperature scaling, logits, sign reversal with the corresponding ranking direction, and fixed affine reparameterizations may change numeric presentation or calibration but not ranking information. When a score-only route claims new routing structure, the decisive question is whether its frozen construction induces reproducibly different ordering and improves over raw `ScoreOnly`, not whether it uses a different formula. Evidence: Idea 002 Gate 01 and `research/memory/failures/score-geometry-gate-01--no-incremental-score-geometry.md`.
+
 ## Residual Oracle headroom is not evidence for a proposed mechanism
 
-Establishing that an oracle routing or revision allocation has substantial headroom over trivial baselines (e.g. random or risk-only) proves that heterogeneity exists, but does not validate any specific proposed selection mechanism. When a strong observable control (such as the base recommender's own confidence) explains substantial variance, the proposed additional signal must demonstrate preregistered incremental information beyond that control before mechanism-specific modeling or architectural expansion is justified. Evidence: Idea 001 Gate 01 (`gate-summary.json`) vs Gate 02 (`gate-02-summary.json`).
+Establishing that an oracle routing or revision allocation has substantial headroom over trivial baselines (e.g. random or risk-only) proves that heterogeneity exists, but does not validate any specific proposed selection mechanism. When a strong observable control (such as the base recommender's own confidence) explains substantial variance, the proposed additional signal must demonstrate preregistered incremental information beyond that control before mechanism-specific modeling or architectural expansion is justified. Evidence: Idea 001 Gate 01 (`gate-summary.json`) vs Gate 02 (`gate-02-summary.json`), and Idea 002 Gate 01 (`gate-01-summary.json`).
