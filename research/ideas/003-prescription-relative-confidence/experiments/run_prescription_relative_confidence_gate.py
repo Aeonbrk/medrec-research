@@ -15,12 +15,17 @@ import math
 import random
 import shutil
 import subprocess
+import sys
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from medrec_research.adapters import ProcessPredictionAdapter
-from medrec_research.dataset import DatasetManifest
+_HARNESS_ROOT = Path(__file__).resolve().parents[4]
+if str(_HARNESS_ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(_HARNESS_ROOT / "src"))
+
+from medrec_research.adapters import ProcessPredictionAdapter  # noqa: E402
+from medrec_research.dataset import DatasetManifest  # noqa: E402
 
 BUDGETS: tuple[float, ...] = (0.10, 0.20, 0.30)
 BUDGET_LABELS: dict[float, str] = {0.10: "10%", 0.20: "20%", 0.30: "30%"}
