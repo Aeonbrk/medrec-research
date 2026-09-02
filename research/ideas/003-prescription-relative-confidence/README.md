@@ -4,7 +4,11 @@
 
 - **Idea ID**: `003-prescription-relative-confidence`
 - **Status**: `SELECTED`
-- **Scientific stage**: hypothesis selected; Gate 01 design is the next CCFA owner
+- **Gate 01 Status**: `Gate 01 DESIGNED / FROZEN`
+- **Execution Status**: `NOT EXECUTED`
+- **Protocol**: [`experiments/gate-01-prescription-relative-confidence.md`](experiments/gate-01-prescription-relative-confidence.md)
+- **Design Audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`INTEGRITY_PASS`)
+- **Scientific stage**: Gate 01 protocol preregistered and frozen; ready for P0 verification and P1 implementation
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
 - **Literature grounding**: `literature-search-20260902-residual-fp-routing/`
 - **Strict idea review**: [`idea-review.md`](idea-review.md)
@@ -191,4 +195,4 @@ Gate 01 is the only authorized next experiment. No architecture expansion and no
 
 ## Next CCFA owner
 
-`ccf-experiment-designer` in standard/design mode for Gate 01 preregistration, followed by a design-level `ccf-integrity-auditor` check. No formal 319 execution is authorized in the current ChatGPT session.
+P0 state / protocol verification, followed by P1 implementation of the frozen Gate 01 protocol (`stage_gate01_inputs.py` and `run_prescription_relative_confidence_gate.py`).

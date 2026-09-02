@@ -1,5 +1,15 @@
 # Plans
 
+## Active: Gate 01 — Prescription-Relative Confidence (Idea 003)
+
+- **Protocol**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md`.
+- **Status**: Gate 01 DESIGNED / FROZEN, NOT EXECUTED.
+- **Design Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/003-prescription-relative-confidence/experiments/gate-01-design-integrity-audit.md`.
+- **Scientific Scope**: Tests whether within-prescription relative confidence position ($r_t(m)$) contains reproducible incremental false-positive routing information beyond a strong simple control built from absolute medication score, predicted prescription size, and train-only medication prevalence.
+- **Frozen Baseline**: MoleRec Table 1 comparison baseline (`5de4665570d8...`).
+- **Partition Discipline**: Validation universe partitioned with seed `2003` into 529 Dev patients and 530 Audit patients. Test split remains unindexed and untouched.
+- **Next Steps**: P0 state / protocol verification, P1 idea-local implementation, P2 synthetic testing, P3 implementation commit, P4 single formal 319 execution, P5 integrity audit, P6 research decision.
+
 ## Completed: Gate 01 — Score-Geometry Sufficiency (Idea 002)
 
 - **Protocol**: `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-score-geometry-sufficiency.md`.
