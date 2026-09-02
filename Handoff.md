@@ -1,108 +1,93 @@
-# Handoff: Idea 001 Research Lifecycle Closure (P6 Final Decision)
+# Handoff: Idea 002 Research Lifecycle Closure (Gate 01 Decision)
 
 ## Current state
 
-The research lifecycle for Idea `001-tension-guided-verification` is formally **closed**.
-Following the preregistered stop rule in Gate 02 and independent P5 integrity verification, the current Tension route is **terminated** (`TERMINATE_CURRENT_TENSION_ROUTE`). Gate 03 is **not authorized**.
+The research lifecycle for Idea `002-score-geometry-sufficiency` is formally **closed**.
+Following the preregistered stop rule in Gate 01 and independent P5 integrity verification, Idea 002 is **terminated** (`TERMINATE_IDEA_002`). Gate 02 is **not authorized**; Candidate 2 is **not authorized**.
 
-- **Gate 01**: Formally executed on 319 (`pass`); P0 Integrity Audit: **`AUDIT_PASS`** ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md)).
-- **Gate 02**: Formally executed on 319 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`); P5 Integrity Audit: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)).
-- **P6 Final Research Decision**: Completed with verdict **`TERMINATE_CURRENT_TENSION_ROUTE`** ([research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/research-decision.md)).
-- **Gate 03 Authorization**: **`NOT_AUTHORIZED`**.
-- **Failure Record**: Preserved in [`tension-gate-02--recommender-confidence-sufficiency.md`](file:///Users/oian/Codes/master/medrec-research/research/memory/failures/tension-gate-02--recommender-confidence-sufficiency.md).
-- **Residual Routing Opportunity**: Preserved as **`UNRESOLVED_RESEARCH_OPPORTUNITY`** (Oracle - ScoreOnly headroom: +38.87% at 10% budget, +41.48% at 20% budget).
-- **Next Owner**: Operator / Research Ideation (`ccf-idea-optimizer`) for formulating new research directions from first principles.
-- **Strict Boundary**: No Gate 03 designed, no Tension model trained, no post-hoc rescue attempted.
+- **Idea 001**: Closed and terminated (`TERMINATE_CURRENT_TENSION_ROUTE`); Gate 03 `NOT_AUTHORIZED`.
+- **Idea 002 Gate 01**: Formally executed on `319-lab` (`STOP_NO_INCREMENTAL_SCORE_GEOMETRY`); P5 Integrity Audit: **`INTEGRITY_PASS`** ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/experiments/gate-01-integrity-audit.md)).
+- **Idea 002 Research Decision**: Completed with verdict **`STOP_NO_INCREMENTAL_SCORE_GEOMETRY`** ([research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/research-decision.md)).
+- **Gate 02 Authorization**: **`NOT_AUTHORIZED`**.
+- **Candidate 2 Authorization**: **`NOT_AUTHORIZED`**.
+- **Residual Routing Opportunity**: Preserved as **`UNRESOLVED_RESEARCH_OPPORTUNITY`** (Oracle - ScoreOnly headroom: +38.79% at 10% budget, +40.68% at 20% budget on fresh Idea-002 Audit partition).
+- **Next Owner**: Operator / Research Ideation (`ccf-idea-optimizer`) for formulating new research directions from first principles (exploring representations beyond 1D score geometry).
+- **Strict Boundary**: No Gate 02 designed, no Candidate 2 ad-hoc rescue attempted, no test split touched, no model retrained.
 
 ## What exists
 
-All prototype files are strictly confined to `research/ideas/001-tension-guided-verification/experiments/`:
+### Idea 002 Artifacts
 
-1. [gate-01-routing-opportunity.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-routing-opportunity.md)
-   - The preregistered hypothesis-selection protocol.
-   - Fixed singleton deletion operator $R_0(\hat M_t, m) = \hat M_t \setminus \{m\}$.
-   - Review universe $\mathcal Q_t = \{m \in \hat M_t : d_t(m) > 0\}$ with canonical unordered DDI semantics $\{m, j\} \in C$.
-   - Three policies: Random ($P(Y^{PB}=1)$), RiskOnly ($d_t(m) \downarrow$, med code $\uparrow$, validation traversal order), Oracle ($Y^{PB} \downarrow, \Delta J \downarrow, -\Delta V \downarrow$, med code $\uparrow$, validation traversal order).
-   - Budgets $B \in \{10\%, 20\%, 30\%\}$ with integer floor rule $k(B) = \lfloor B \times |\mathcal Q| \rfloor$.
-   - Minimum 50-patient support requirement for both beneficial and non-beneficial outcomes.
-   - 1,000-replicate patient-clustered bootstrap with seed 1203.
-   - Clear test split boundary: test split must never be indexed, inspected, scored, evaluated, or used for selection/configuration.
-   - Restricted artifact format: `candidate-revision-values.jsonl` with `patient_order` and `visit_order` allowing independent auditor recomputation.
-   - Public-safe artifact format: `gate-summary.json`.
+All prototype and execution files for Idea 002 are strictly confined to `research/ideas/002-score-geometry-sufficiency/`:
 
-2. [stage_validation_cohort.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/stage_validation_cohort.py)
-   - Python 3.8-compatible helper executed in `medrec-molerec-table1` (with `dill`).
-   - Isolates validation patient split from `records_final.pkl`.
-   - Computes raw DDI asset SHA256 (`dcb20789...`) and canonical unordered DDI semantics SHA256.
-   - Computes authoritative medication vocabulary SHA256 matching `DatasetManifest._ordered_digest`.
-   - Generates `features.pkl` (for `molerec_comparison.py`) and standard JSON `validation-meta.json` (consumed by Python 3.11 runner).
+1. [gate-01-score-geometry-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/experiments/gate-01-score-geometry-sufficiency.md)
+   - Preregistered hypothesis-selection protocol.
+   - 5-quintile score map fit strictly on Dev partition.
+   - Preregistered Dev early stop rule: `STOP_DEV_ORDER_EQUIVALENT`.
+   - Fresh patient-level 50/50 split with standard library `random.Random(2002)` over 1,059 validation universe.
+   - Preregistered decision tree requiring $LowerCI_{95\%}[Gap_{Oracle-Score}] > 0$ and $LowerCI_{95\%}[Gap_{Geometry-Score}] > 0$ at 10% and 20% review budgets.
+2. [run_score_geometry_sufficiency_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/experiments/run_score_geometry_sufficiency_gate.py)
+   - Executed under `medrec-core-evaluator` on `319-lab`.
+   - Frozen harness revision: `28fc24c64998c81563446f3f8e5bc10340e2b17b`.
+   - Contains `--self-test` covering split determinism, Dev firewall, deterministic ordering, and decision tree verdicts.
+3. [gate-01-summary.json](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/experiments/gate-01-summary.json)
+   - Public-safe artifact containing all empirical yields, gaps, bootstrap intervals, and frozen identities.
+   - SHA256: `ee2ef10ffb9bd9b4e52135f6062e2e4375c6dabc7c53799f436117a39b476a58`.
+4. [gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/experiments/gate-01-integrity-audit.md)
+   - Independent P5 integrity audit report with status `INTEGRITY_PASS`.
+   - 15,549 rows verified, 0 invariant failures, 0 partition leaks.
+5. [research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/002-score-geometry-sufficiency/research-decision.md)
+   - Authoritative P6 research decision terminating Idea 002.
 
-3. [run_routing_opportunity_gate.py](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/run_routing_opportunity_gate.py)
-   - Python 3.11 orchestration runner executed in `medrec-core-evaluator`.
-   - Enforces clean checkouts for both `medrec-research` and `MoleRec` before inference.
-   - Verifies frozen MoleRec source revision (`dd5afaf...`), baseline core SHA256 (`516b7b5f...`), adapter SHA256 (`9bb5d114...`), and Conda explicit package specification SHA256 (`6a01d313...`).
-   - Verifies dataset manifest (`82d4efc2...`), dataset ID, snapshot ID (`molerec-table1-c721-www23`), snapshot checksum, vocabulary SHA256, DDI asset SHA256, and feature availability SHA256 (`9e403591...`).
-   - Uses `ProcessPredictionAdapter.predict_comparison` (target-free comparison seam).
-   - Evaluates policies and bootstrap invariant to pseudonyms.
-   - Implements fail-closed non-crashing behavior for low-support samples ($k=0$ yields $0.0$ and verdict `insufficient_support`).
-   - Enforces new `output_root` (`exist_ok=False`).
-   - Contains `--self-test` (and `test_synthetic_gate_01()` for pytest) covering all 8 hardened invariants.
+### Historical Idea 001 Artifacts
+
+Preserved under `research/ideas/001-tension-guided-verification/`:
+
+- `experiments/gate-01-routing-opportunity.md` (`pass`)
+- `experiments/gate-02-confidence-sufficiency.md` (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`)
+- `experiments/gate-02-integrity-audit.md` (`INTEGRITY_PASS`)
+- `research-decision.md` (`TERMINATE_CURRENT_TENSION_ROUTE`)
 
 ## Authoritative records
 
 - `research/baselines/preflight/five-model-comparison-qualification.json` — frozen baseline identities.
 - `baselines/registry.toml` — frozen Comparison Mode baseline registry.
-- `src/medrec_research/dataset.py` — authoritative `DatasetManifest` and `_ordered_digest` implementation.
-- `research/ideas/001-tension-guided-verification/experiments/gate-01-routing-opportunity.md` — Gate 01 protocol.
+- `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-score-geometry-sufficiency.md` — Gate 01 protocol.
+- `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-summary.json` — Gate 01 public summary.
 - `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` — 319 remote execution preflight contract.
 
 ## Executed 319 run record
 
-Formal execution was carried out on `319-lab-via-server`:
+Formal execution was carried out on `319-lab`:
 
 ```bash
 export MEDREC_DATA_ROOT=/root/zhb/medrec-data
-export MOLEREC_ROOT=/root/zhb/MoleRec
-export DATASET_MANIFEST="$MEDREC_DATA_ROOT/comparison/five-model-v1-1-fe7e526/dataset-manifest.json"
-export MOLEREC_CHECKPOINT="$MEDREC_DATA_ROOT/runs/molerec/medrec-baseline-molerec-embedding-20260828-081052-82b84a1f/work/saved/MoleRec_medrec-baseline-molerec-embedding-20260828-081052-82b84a1f/Epoch_44_TARGET_0.06_JA_0.5327_DDI_0.0723.model"
-export GATE_RUN_ID="gate-01-routing-opportunity-20260902-010537"
-export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verification/$GATE_RUN_ID"
+export GATE_RUN_ID="gate-01-score-geometry-sufficiency-20260902-174013"
+export GATE_RUN_ROOT="$MEDREC_DATA_ROOT/runs/ideas/002-score-geometry-sufficiency/$GATE_RUN_ID"
+export CANDIDATES_IN="$MEDREC_DATA_ROOT/runs/ideas/001-tension-guided-verification/gate-02-confidence-sufficiency-20260902-155433/gate-02-candidates.jsonl"
+export SUMMARY_OUT="/root/zhb/medrec-research/research/ideas/002-score-geometry-sufficiency/experiments/gate-01-summary.json"
 
-# Execution completed in ~3 minutes on GPU 6.
-# gate-summary.json retrieved to local research/ideas/001-tension-guided-verification/experiments/
-# candidate-revision-values.jsonl preserved under $GATE_RUN_ROOT on 319.
+conda run -n medrec-core-evaluator python3 research/ideas/002-score-geometry-sufficiency/experiments/run_score_geometry_sufficiency_gate.py \
+  --candidate-corpus "${CANDIDATES_IN}" \
+  --output-root "${GATE_RUN_ROOT}" \
+  --summary-output "${SUMMARY_OUT}" \
+  --expected-harness-revision "28fc24c64998c81563446f3f8e5bc10340e2b17b"
 ```
 
 ## Gate 01 Audit & Verdict
 
-- **Decision**: **`pass`**
+- **Decision**: **`STOP_NO_INCREMENTAL_SCORE_GEOMETRY`** (Dev diagnostic: `STOP_DEV_ORDER_EQUIVALENT`)
 - **Empirical findings**:
-  1. **Base Prevalence**: Within the review universe $\mathcal Q$ (15,549 candidate revisions across 1,219 visits and 858 validation patients), only **31.67%** of singleton deletions are Pareto-beneficial ($Y^{PB}=1$), while **68.33%** reduce visit-level Jaccard under singleton deletion ($\Delta J < 0$, non-beneficial revisions under $R_0$).
-  2. **Random Policy**: Constant at base prevalence **31.67%**.
-  3. **RiskOnly Policy**: Yields **37.07%** (10% budget), **35.64%** (20% budget), **32.87%** (30% budget). Simple DDI-degree sorting fails to isolate Pareto-beneficial revisions under $R_0$ and results in >62% non-beneficial revisions (revisions that reduce visit-level Jaccard).
-  4. **Oracle Policy**: Achieves **100.0%** Pareto-beneficial revisions across 10%, 20%, and 30% review budgets.
-  5. **Statistical Headroom**:
-     - Oracle - Random: **+68.33%** (95% CI: [67.33%, 69.38%])
-     - Oracle - RiskOnly: **+62.93%** at 10% (95% CI: [59.88%, 65.61%]), **+64.36%** at 20% (95% CI: [62.18%, 66.74%])
-  6. **Support**: 844 beneficial patients, 857 non-beneficial patients (both >> 50 required threshold).
-
-## Scientific Lifecycle Summary & Final Decision (P6)
-
-- **Gate 01 Status**: Formally executed on 319 (`pass`); P0 Integrity Closure completed: **`AUDIT_PASS`** ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md)).
-- **Gate 02 Status**: Formally executed on 319 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`); P5 Integrity Audit completed: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)).
-  - Dev selection: $\lambda^* = 0.0$ ($D_{\max}^{\text{Dev}} = 12.0$, score median $\tau_s = 0.92499$).
-  - Audit evaluation: Random 31.03%, RiskOnly 36.48%/35.76%/33.43%, ScoreOnly 61.13%/58.52%/55.26%, Scalar ($\lambda^*=0.0$) 61.13%/58.52%/55.26%, Oracle 100.0%.
-  - Gaps: Score - Random (+30.10%/+27.48%/+24.22%), Score - Risk (+24.65%/+22.75%/+21.83%), Scalar - Score (0.0% across all budgets; 95% CI: [0.0, 0.0]), Oracle - Score (+38.87%/+41.48%/+44.74%).
-  - Interaction diagnostic: $I_{\text{Tension}} = -0.0052$ (95% CI: [-0.0457, 0.0364], includes 0; support 408-417 patients per cell $\ge 50$).
-  - Audit support: 423 beneficial patients, 428 non-beneficial patients (both >> 50 required threshold).
-- **Completed Lifecycle Queue**:
-  - `P0`: Done — Gate 01 Integrity Closure completed with `AUDIT_PASS`.
-  - `P1-P3`: Done (preregistration, implementation, synthetic verification).
-  - `P4`: Done — Formal 319 execution completed.
-  - `P5`: Done — Gate 02 Integrity Audit completed: **`INTEGRITY_PASS`** ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md)).
-  - `P6`: Done — Final research decision executed: **`TERMINATE_CURRENT_TENSION_ROUTE`** ([research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/research-decision.md)).
-- **Terminal Decision**: Current Tension route terminated. Gate 03 is **`NOT_AUTHORIZED`**.
-- **Residual Opportunity**: Retained as `UNRESOLVED_RESEARCH_OPPORTUNITY`:
-  $$\boxed{\text{What target-free observable information explains residual revision-value heterogeneity beyond frozen recommender confidence?}}$$
-- **Next CCFA Owner**: `ccf-idea-optimizer` / Research Operator (Stage: Research Ideation / Problem Formulation).
-- **Strict Prohibition**: Not authorized for `ccf-paper-writer` or Tension implementation. No post-hoc rescue attempts allowed.
+  1. **Cohort & Split**: Full 1,059 validation universe partitioned via seed 2002. Dev: 529 patients (7,422 candidates). Audit: 530 patients (8,127 candidates). 0 patient overlap.
+  2. **Dev Map Fitting**: Nearest-rank cutpoints $c_q \in \{0.758362, 0.890841, 0.949205, 0.979460\}$. Empirical risks strictly decrease: $B_1 (0.5811) \to B_2 (0.4629) \to B_3 (0.3172) \to B_4 (0.1799) \to B_5 (0.0539)$.
+  3. **Dev Order Equivalence**: Because bin risk decreases monotonically with score and within-bin tie-breaking sorts score ascending, `ScoreGeometry` ordering is 100% order-equivalent to `ScoreOnly` on both Dev and Audit (`STOP_DEV_ORDER_EQUIVALENT`).
+  4. **Audit Performance**:
+     - Random: 31.46%
+     - ScoreOnly: 61.21% (10% budget), 59.32% (20% budget), 56.32% (30% budget)
+     - ScoreGeometry: 61.21% (10% budget), 59.32% (20% budget), 56.32% (30% budget)
+     - Oracle: 100.0% across all budgets
+  5. **Gaps & Residual Capture**:
+     - $Geometry - Score = 0.000000$ (95% CI: $[0.0, 0.0]$ across all budgets).
+     - $Oracle - Score = +38.79\%$ (10% budget), $+40.68\%$ (20% budget). Both lower CIs $> 0$.
+     - $ResidualCapture_{Geometry} = 0.000000$.
+  6. **Support**: 419 beneficial patients, 421 non-beneficial patients (both >> 50 required threshold).

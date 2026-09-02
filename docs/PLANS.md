@@ -1,5 +1,19 @@
 # Plans
 
+## Completed: Gate 01 — Score-Geometry Sufficiency (Idea 002)
+
+- **Protocol**: `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-score-geometry-sufficiency.md`.
+- **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_SCORE_GEOMETRY` (Dev condition `STOP_DEV_ORDER_EQUIVALENT`).
+- **Formal Run**: `gate-01-score-geometry-sufficiency-20260902-174013` executed on `319-lab` under `medrec-core-evaluator` at harness revision `28fc24c64998c81563446f3f8e5bc10340e2b17b`.
+- **Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-integrity-audit.md`.
+- **Scientific Findings**:
+  - Raw score provides strong monotonic Pareto-beneficial selection ($Score - Random = +29.74\%$ at 10% budget, $+27.86\%$ at 20% budget).
+  - Residual headroom survives on fresh validation Audit partition ($Oracle - Score = +38.79\%$ at 10% budget, $+40.68\%$ at 20% budget).
+  - Dev quintile map has strictly monotonic empirical risks ($B_1: 0.5811 \to B_5: 0.0539$), rendering `ScoreGeometry` candidate ranking 100% order-equivalent to `ScoreOnly` ($Geometry - Score = 0.000000$, 95% CI: $[0.0, 0.0]$ across all budgets).
+- **Decision & Bounds**: Gate 02 is `NOT_AUTHORIZED`; Candidate 2 is `NOT_AUTHORIZED`; Idea 002 is authoritatively terminated (`TERMINATE_IDEA_002`). No test split contamination.
+- **Decision Document**: `research/ideas/002-score-geometry-sufficiency/research-decision.md`.
+- **Public Summary**: `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-summary.json`.
+
 ## Completed: Architecture Surface Hardening and Boundary Consolidation
 
 - **Plan**: `docs/plans/2026-09-01-refactor-architecture-surface-hardening-plan.md`.

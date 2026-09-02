@@ -1,0 +1,266 @@
+{
+  "audit_support": {
+    "audit_beneficial_patients": 419,
+    "audit_eligible_candidates": 8127,
+    "audit_eligible_patients": 422,
+    "audit_non_beneficial_patients": 421,
+    "support_sufficient": true
+  },
+  "bootstrap": {
+    "intervals_95": {
+      "geometry_minus_score": {
+        "10%": {
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "20%": {
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "30%": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "geometry_residual_capture": {
+        "10%": {
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "20%": {
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "30%": {
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      },
+      "oracle_minus_geometry": {
+        "10%": {
+          "lower": 0.343593552692572,
+          "upper": 0.42289801476278344
+        },
+        "20%": {
+          "lower": 0.3764520526501168,
+          "upper": 0.4405574525524054
+        },
+        "30%": {
+          "lower": 0.4113926944202439,
+          "upper": 0.4623219668475363
+        }
+      },
+      "oracle_minus_score": {
+        "10%": {
+          "lower": 0.343593552692572,
+          "upper": 0.42289801476278344
+        },
+        "20%": {
+          "lower": 0.3764520526501168,
+          "upper": 0.4405574525524054
+        },
+        "30%": {
+          "lower": 0.4113926944202439,
+          "upper": 0.4623219668475363
+        }
+      },
+      "score_geometry_yield": {
+        "10%": {
+          "lower": 0.5771019852372166,
+          "upper": 0.6564064473074279
+        },
+        "20%": {
+          "lower": 0.5594425474475946,
+          "upper": 0.6235479473498833
+        },
+        "30%": {
+          "lower": 0.5367607429936536,
+          "upper": 0.588607305579756
+        }
+      },
+      "score_minus_random": {
+        "10%": {
+          "lower": 0.2659995929242709,
+          "upper": 0.3374522093579255
+        },
+        "20%": {
+          "lower": 0.2527888567542813,
+          "upper": 0.30156259366880667
+        },
+        "30%": {
+          "lower": 0.230715763971254,
+          "upper": 0.2651822989604424
+        }
+      },
+      "score_only_yield": {
+        "10%": {
+          "lower": 0.5771019852372166,
+          "upper": 0.6564064473074279
+        },
+        "20%": {
+          "lower": 0.5594425474475946,
+          "upper": 0.6235479473498833
+        },
+        "30%": {
+          "lower": 0.5367607429936536,
+          "upper": 0.588607305579756
+        }
+      }
+    },
+    "replicates": 1000,
+    "seed": 1203,
+    "unit": "patient"
+  },
+  "decision_criteria": {
+    "dev_early_stop_verdict": "STOP_DEV_ORDER_EQUIVALENT",
+    "dev_order_equivalent_to_scoreonly": true,
+    "geometry_beats_score_10": false,
+    "geometry_beats_score_20": false,
+    "residual_headroom_survives_score_10": true,
+    "residual_headroom_survives_score_20": true,
+    "support_requirement_met": true
+  },
+  "dev_score_geometry": {
+    "bins": {
+      "B1": {
+        "candidate_count": 1485,
+        "distinct_patients": 409,
+        "empirical_pb_rate": 0.5811447811447812,
+        "pareto_beneficial_count": 863,
+        "priority_rank": 1,
+        "score_interval": "s <= c_0.2"
+      },
+      "B2": {
+        "candidate_count": 1484,
+        "distinct_patients": 403,
+        "empirical_pb_rate": 0.46293800539083557,
+        "pareto_beneficial_count": 687,
+        "priority_rank": 2,
+        "score_interval": "c_0.2 < s <= c_0.4"
+      },
+      "B3": {
+        "candidate_count": 1485,
+        "distinct_patients": 412,
+        "empirical_pb_rate": 0.31717171717171716,
+        "pareto_beneficial_count": 471,
+        "priority_rank": 3,
+        "score_interval": "c_0.4 < s <= c_0.6"
+      },
+      "B4": {
+        "candidate_count": 1484,
+        "distinct_patients": 408,
+        "empirical_pb_rate": 0.17991913746630728,
+        "pareto_beneficial_count": 267,
+        "priority_rank": 4,
+        "score_interval": "c_0.6 < s <= c_0.8"
+      },
+      "B5": {
+        "candidate_count": 1484,
+        "distinct_patients": 362,
+        "empirical_pb_rate": 0.05390835579514825,
+        "pareto_beneficial_count": 80,
+        "priority_rank": 5,
+        "score_interval": "s > c_0.8"
+      }
+    },
+    "cutpoints": {
+      "0.2": 0.75836181640625,
+      "0.4": 0.8908411264419556,
+      "0.6": 0.9492053389549255,
+      "0.8": 0.9794603586196899
+    },
+    "dev_early_stop_verdict": "STOP_DEV_ORDER_EQUIVALENT",
+    "order_equivalent_to_scoreonly": true,
+    "priority_ordering": [
+      "B1",
+      "B2",
+      "B3",
+      "B4",
+      "B5"
+    ]
+  },
+  "gaps": {
+    "geometry_minus_score": {
+      "10%": 0.0,
+      "20%": 0.0,
+      "30%": 0.0
+    },
+    "oracle_minus_geometry": {
+      "10%": 0.3879310344827587,
+      "20%": 0.40676923076923077,
+      "30%": 0.4368334700574241
+    },
+    "oracle_minus_score": {
+      "10%": 0.3879310344827587,
+      "20%": 0.40676923076923077,
+      "30%": 0.4368334700574241
+    },
+    "score_minus_random": {
+      "10%": 0.2974387206544383,
+      "20%": 0.27860052436796623,
+      "30%": 0.24853628507977288
+    }
+  },
+  "gate_id": "gate-01-score-geometry-sufficiency",
+  "harness_revision": "28fc24c64998c81563446f3f8e5bc10340e2b17b",
+  "idea_id": "002-score-geometry-sufficiency",
+  "identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "policy_yields": {
+    "oracle": {
+      "10%": 1.0,
+      "20%": 1.0,
+      "30%": 1.0
+    },
+    "random": {
+      "yield": 0.314630244862803
+    },
+    "score_geometry": {
+      "10%": 0.6120689655172413,
+      "20%": 0.5932307692307692,
+      "30%": 0.5631665299425759
+    },
+    "score_only": {
+      "10%": 0.6120689655172413,
+      "20%": 0.5932307692307692,
+      "30%": 0.5631665299425759
+    }
+  },
+  "residual_capture": {
+    "geometry": {
+      "10%": 0.0,
+      "20%": 0.0,
+      "30%": 0.0
+    }
+  },
+  "schema_version": 1,
+  "split": {
+    "audit_candidate_count": 8127,
+    "audit_eligible_patient_count": 422,
+    "audit_patient_count": 530,
+    "dev_candidate_count": 7422,
+    "dev_eligible_patient_count": 436,
+    "dev_patient_count": 529,
+    "patient_level": true,
+    "seed": 2002,
+    "source": "validation",
+    "validation_patient_universe_count": 1059
+  },
+  "upstream_audited_candidate_source": {
+    "row_count": 15549,
+    "run_id": "gate-02-confidence-sufficiency-20260902-155433",
+    "sha256": "50b8f7587f44ec81dd5ec0ec188d953cf9edfbb332279ce3fb759ae33ed2e736"
+  },
+  "verdict": "STOP_NO_INCREMENTAL_SCORE_GEOMETRY"
+}
