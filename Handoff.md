@@ -1,66 +1,88 @@
-# Handoff: Idea 003 Gate 01 Closure and Post-Negative Ideation
+# Handoff: Idea 004 Gate 01 Frozen Design
 
 ## Current state
 
-Idea `003-prescription-relative-confidence` Gate 01 has completed formal execution on `319-lab-via-server`, passed independent integrity audit, and reached the authoritative research decision to terminate:
+Idea `004-co-selection-compatibility` is selected after literature-grounded exploratory ideation and strict CCFA review. Gate 01 has been designed and passed design-level integrity audit. It has not been executed.
 
-- **Idea ID**: `003-prescription-relative-confidence`
-- **Idea Status**: `CLOSED (Gate 01 Falsified)`
-- **Gate 01 Status**: `EXECUTED / FALSIFIED`
-- **Formal Verdict**: `STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE` (`TERMINATE_IDEA_003`)
-- **Protocol**: [`research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md`](research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md)
-- **Design Audit**: [`research/ideas/003-prescription-relative-confidence/experiments/gate-01-design-integrity-audit.md`](research/ideas/003-prescription-relative-confidence/experiments/gate-01-design-integrity-audit.md) (`INTEGRITY_PASS`)
-- **Integrity Audit**: [`research/ideas/003-prescription-relative-confidence/experiments/gate-01-integrity-audit.md`](research/ideas/003-prescription-relative-confidence/experiments/gate-01-integrity-audit.md) (`INTEGRITY_PASS`)
-- **Research Decision**: [`research/ideas/003-prescription-relative-confidence/research-decision.md`](research/ideas/003-prescription-relative-confidence/research-decision.md)
-- **Failure Record**: [`research/memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md`](research/memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md)
-- **Public Summary**: [`research/ideas/003-prescription-relative-confidence/experiments/gate-01-summary.json`](research/ideas/003-prescription-relative-confidence/experiments/gate-01-summary.json)
-- **Formal Run ID**: `gate-01-prescription-relative-confidence-20260902-233128`
-- **Harness Revision**: `ac9dfe860bbce7a9a9620cf21836931136582055`
-- **Completion Commit**: `99702ac54115111e55cce44d5392029127dcf40f`
-- **Test Split**: Strictly unindexed, unpredicted, and untouched.
+- **Idea ID**: `004-co-selection-compatibility`
+- **Idea Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`
+- **Gate**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-co-selection-compatibility.md`
+- **Design Audit**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-design-integrity-audit.md`
+- **Design Verdict**: `DESIGN_INTEGRITY_PASS`
+- **Idea Selection Commit**: `f29c9db61f001d88efe7c789b6f0793378add5af`
+- **Test Split**: unindexed, unpredicted, and untouched
+- **ccfa.yaml**: absent; per `ccf-pipeline-orchestrator`, project-state tracking remains unavailable and no file should be created solely for this workflow
 
-## Executed 319 Run Summary
-
-Formal execution was carried out on `319-lab-via-server` under `medrec-core-evaluator`:
-
-- **Audit Cohort Support**: 7,740 candidates from 423 eligible patients ($N_{PB=1}=417$, $N_{PB=0}=423$, both $\ge 50$; $k(10\%)=774$, $k(20\%)=1,548$). Gate A passed.
-- **Audit Policy Yields**:
-  - `Random`: 31.37% (0.313695)
-  - `ScoreOnly`: 56.85% (10%), 55.88% (20%), 54.87% (30%)
-  - `StrongControl`: 57.49% (10%), 57.17% (20%), 55.30% (30%)
-  - `RankAugmented`: 57.24% (10%), 56.91% (20%), 55.00% (30%)
-  - `Oracle`: 100.0% across all budgets
-- **Gaps & Bootstrap 95% CIs (1,000 patient-cluster replicates, seed `1203`)**:
-  - `Oracle - StrongControl` (Gate B): $+42.51\%$ (10%, CI $[+39.04\%, +46.15\%]$); $+42.83\%$ (20%, CI $[+40.34\%, +45.78\%]$). Lower bounds strictly $> 0$; Gate B passed.
-  - `RankAugmented - StrongControl` (Gate C): $-0.26\%$ (10%, CI $[-1.37\%, +1.19\%]$); $-0.26\%$ (20%, CI $[-0.65\%, +0.80\%]$). Lower bounds $\le 0$; Gate C failed.
-
-## Cumulative Knowledge Across Ideas 001, 002, 003
-
-1. **Idea 001**: The preregistered active-DDI-degree scalar and Tension interaction did not establish incremental routing information beyond frozen recommender confidence under the recorded setting.
-2. **Idea 002**: The preregistered five-bin Dev-fitted score map induced the same ordering as `ScoreOnly` and provided zero incremental routing yield.
-3. **Idea 003**: The preregistered within-prescription mid-rank observable did not establish incremental routing information beyond its frozen `StrongControl`.
-4. **Scoped negative evidence**: These results terminate those tested routes. They do not establish that all single-visit, relational, temporal, structural, DDI-derived, or patient-conditioned observables have been exhausted.
-5. **Residual question**: Substantial retrospective `Oracle - StrongControl` headroom shows false-positive outcome heterogeneity that is not explained by the frozen control. Because Oracle uses the target, this does not establish that a target-free observable mechanism exists or identify its information source.
-
-## Post-Idea-003 Research Stage
-
-No Idea 004 has been selected or authorized.
-
-The next scientific task is renewed hypothesis selection from the scoped residual question:
+## Scientific question
 
 $$
-\boxed{\text{What target-free observable information, not already tested in Ideas 001--003, explains residual medication-level false-positive heterogeneity beyond the frozen strong control?}}
+\boxed{\text{Does one train-only frequency-corrected co-selection statistic explain medication-level false-positive heterogeneity beyond the strongest simple frozen control?}}
 $$
 
-Longitudinal prescription transition status is one candidate information source, not the default successor. It must compete against materially different hypotheses after current closest-work search. Other legitimate candidates may include transparent medication-set relational statistics, patient-conditioned observables, or cross-model evidence, provided each introduces genuinely new observable information and faces its strongest simple control.
+The candidate universe and revision operator remain:
 
-## Next CCFA owners
+$$
+\mathcal Q_t=\{m\in\hat M_t:d_t(m)>0\},
+$$
 
-1. `ccf-pipeline-orchestrator` — confirm post-negative-result idea-selection stage and evidence boundaries.
-2. `ccf-literature-monitor` / `ccf-literature-searcher` — update recent work and closest prior art for the candidate information sources.
-3. `ccf-idea-optimizer` in exploratory mode — generate 3–5 coherent, falsifiable candidates without scoring.
-4. `ccf-idea-reviewer` in standard mode — perform explicit literature-grounded ranking and select a winner only if one survives strict review.
-5. `ccf-idea-optimizer` in standard mode — concretize only the selected winner.
-6. `ccf-experiment-designer` — design the cheapest decisive Gate 01 only after Idea 004 is selected.
+$$
+R_0(\hat M_t,m)=\hat M_t\setminus\{m\}.
+$$
 
-Do not create an Idea 004 directory, design a Gate, or execute 319 work before this selection sequence is complete.
+The retrospective outcome remains:
+
+$$
+Y^{PB}_{t,m}=\mathbf1[m\notin M_t].
+$$
+
+## Exact observable
+
+`CoSelectionCompatibility` is the mean empirical train-only NPMI between candidate $m$ and every other medication in the same frozen predicted prescription. For pair count zero, NPMI is fixed to `-1`; for full joint support, it is fixed to `+1`; otherwise empirical NPMI is used.
+
+No alternative co-selection formula is authorized after Audit inspection.
+
+## Strongest simple control
+
+`StrongControl` contains:
+
+- frozen MoleRec candidate risk `1-score`;
+- log predicted-set size;
+- train-only candidate-prevalence log odds;
+- train-only peer-set mean-prevalence log odds;
+- score-by-size, score-by-candidate-prevalence, and score-by-peer-prevalence interactions.
+
+`CoSelectionAugmented` adds exactly one feature: `CoSelectionCompatibility`.
+
+## Split and inference
+
+- patient-disjoint validation Dev/Audit split;
+- split seed `2004`, derived from the established Idea-number convention before outcome inspection;
+- fixed ridge linear probability ranking estimator, penalty `1e-6`;
+- primary budgets 10% and 20%; 30% descriptive only;
+- patient-clustered bootstrap, 1000 replicates, seed `1204`;
+- PASS requires lower 95% CI of `CoSelectionAugmented - StrongControl` to be strictly positive at both primary budgets, after Audit-support and Oracle-headroom gates pass.
+
+## Evidence boundary
+
+Ideas 001--003 support only scoped negative conclusions for their tested routes. They do not establish exhaustion of static, relational, longitudinal, structural, patient-conditioned, or cross-model information. Retrospective Oracle headroom does not prove target-free observability.
+
+Idea 004's closest-work neighborhood is dense: HI-DR, DMRNet, MSAM, GenRxR, GRAIN, CRHP, COGNet, KERL, and HeteroMed already cover medication relations and/or longitudinal reuse for recommendation. The novelty delta is restricted to conditional medication-level false-positive routing beyond a frozen score and explicit trivial controls.
+
+## Next owner
+
+Local execution agent only.
+
+Execute exactly:
+
+```text
+P0 state/protocol verification
+P1 exact Idea-local implementation
+P2 minimal synthetic scientific-semantics verification
+P3 freeze implementation revision
+P4 one formal validation-only 319 execution
+P5 independent ccf-integrity-auditor audit
+P6 research decision
+STOP
+```
+
+Do not redesign the Idea or Gate, access test, run multiple outcome-seeking attempts, add features, begin Gate 02, begin Idea 005, or invest in a relational architecture.

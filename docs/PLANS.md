@@ -1,5 +1,17 @@
 # Plans
 
+## Designed: Gate 01 — Co-Selection Compatibility (Idea 004)
+
+- **Idea**: `research/ideas/004-co-selection-compatibility/README.md`.
+- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`.
+- **Idea Selection Commit**: `f29c9db61f001d88efe7c789b6f0793378add5af`.
+- **Protocol**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-co-selection-compatibility.md`.
+- **Design Audit**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`).
+- **Scientific Question**: whether mean train-only empirical NPMI between a candidate and the other medications in the same frozen predicted prescription adds medication-level false-positive routing information beyond frozen score, predicted-set size, candidate prevalence, peer-set popularity, and fixed score interactions.
+- **Candidate Universe**: $\mathcal Q_t=\{m\in\hat M_t:d_t(m)>0\}$; singleton deletion remains the revision operator.
+- **Split / Inference**: fresh patient-disjoint validation Dev/Audit split with seed `2004`; fixed ridge linear ranking estimator; primary budgets 10% and 20%; patient-clustered bootstrap with 1000 replicates and seed `1204`.
+- **Execution Boundary**: no formal 319 execution has occurred; test remains unindexed, unpredicted, and untouched. The next owner may execute only frozen P0--P6 and must stop after P6.
+
 ## Completed: Gate 01 — Prescription-Relative Confidence (Idea 003)
 
 - **Protocol**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md`.
@@ -14,7 +26,7 @@
 - **Decision Document**: `research/ideas/003-prescription-relative-confidence/research-decision.md`.
 - **Failure Record**: `research/memory/failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md`.
 - **Public Summary**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-summary.json`.
-- **Next Stage**: Post-negative-result idea selection. No Idea 004 is selected or authorized. Current literature monitoring/search and exploratory candidate generation must precede strict multi-idea review; longitudinal transition information is one candidate, not the default successor.
+- **Next Stage**: superseded by selected Idea 004 co-selection compatibility and its frozen validation-only Gate 01 design.
 
 ## Completed: Gate 01 — Score-Geometry Sufficiency (Idea 002)
 

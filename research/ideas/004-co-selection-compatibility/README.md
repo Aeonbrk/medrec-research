@@ -3,18 +3,20 @@
 # Idea 004: Frequency-Corrected Co-Selection Compatibility
 
 - **Idea ID**: `004-co-selection-compatibility`
-- **Status**: `SELECTED / GATE_01_NOT_YET_DESIGNED`
-- **Scientific stage**: Post-negative-result hypothesis selection
+- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`
+- **Scientific stage**: Idea / hypothesis selection
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
 - **Literature grounding**: `literature-search-20260903-co-selection-fp-routing/`
 - **Strict idea review**: [`idea-review.md`](idea-review.md)
-- **Next CCFA owner**: `ccf-experiment-designer / design`
+- **Gate 01**: [`experiments/gate-01-co-selection-compatibility.md`](experiments/gate-01-co-selection-compatibility.md)
+- **Design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md)
+- **Next CCFA owner**: local execution agent, P0 protocol/state verification only
 
 ## Problem statement
 
-Ideas 001--003 closed three specific medication-level false-positive routing routes under frozen MoleRec: active-DDI-degree/Tension, a preregistered five-bin score-only geometry map, and within-prescription relative confidence mid-rank. None established reproducible incremental routing information beyond its strongest frozen control.
+Ideas 001--003 closed three specific medication-level false-positive routing routes under frozen MoleRec: active-DDI-degree/Tension, preregistered five-bin score geometry, and within-prescription relative-confidence mid-rank. None established reproducible incremental routing information beyond its strongest frozen control.
 
-The cumulative evidence does not show that static, relational, longitudinal, or patient-conditioned information is exhausted. Substantial retrospective `Oracle - StrongControl` headroom remains, but Oracle uses the current target and therefore does not establish that a target-free explanation exists.
+The cumulative evidence does not show that static, relational, longitudinal, patient-conditioned, structural, or cross-model information is exhausted. Retrospective Oracle headroom remains substantial, but Oracle uses the target and therefore does not establish that a target-free observable mechanism exists.
 
 ## Residual question
 
@@ -27,9 +29,7 @@ $$
 
 ## Falsifiable hypothesis
 
-Let the frozen predicted prescription at visit $t$ be $\hat M_t$, with $n_t=|\hat M_t|$. For each medication pair $(m,j)$, compute a frequency-corrected co-selection relation using **training prescriptions only**.
-
-For the eligible training-visit universe $\mathcal T_{train}$ of size $V_{train}$, define counts
+Let the frozen predicted prescription at visit $t$ be $\hat M_t$, with $n_t=|\hat M_t|$. Over eligible training visits $\mathcal T_{train}$ of size $V_{train}$, define
 
 $$
 C(m)=\sum_{v\in\mathcal T_{train}}\mathbf1[m\in M_v],
@@ -41,35 +41,37 @@ $$
 C(m,j)=\sum_{v\in\mathcal T_{train}}\mathbf1[m\in M_v\land j\in M_v].
 $$
 
-Use Laplace-smoothed Bernoulli probabilities
+For $C(m,j)>0$, define empirical probabilities
 
 $$
-p_{train}(m)=\frac{C(m)+1}{V_{train}+2},
+p_{train}(m)=\frac{C(m)}{V_{train}},\qquad
+p_{train}(j)=\frac{C(j)}{V_{train}},\qquad
+p_{train}(m,j)=\frac{C(m,j)}{V_{train}},
 $$
 
-$$
-p_{train}(m,j)=\frac{C(m,j)+1}{V_{train}+2}.
-$$
-
-Define pairwise normalized pointwise mutual information
+and pairwise normalized pointwise mutual information
 
 $$
 \operatorname{NPMI}_{train}(m,j)=
-\frac{
-\log\frac{p_{train}(m,j)}{p_{train}(m)p_{train}(j)}
-}{
--\log p_{train}(m,j)
-}.
+\frac{\log\frac{p_{train}(m,j)}{p_{train}(m)p_{train}(j)}}{-\log p_{train}(m,j)}.
 $$
 
-For candidate $m\in\hat M_t$, define the exact proposed observable
+Boundary values are fixed before outcome inspection:
 
 $$
-A_t(m)=\frac{1}{n_t-1}\sum_{j\in\hat M_t\setminus\{m\}}
-\operatorname{NPMI}_{train}(m,j).
+\operatorname{NPMI}_{train}(m,j)=
+\begin{cases}
+-1,&C(m,j)=0,\\
+1,&C(m,j)=V_{train},\\
+\frac{\log\frac{p_{train}(m,j)}{p_{train}(m)p_{train}(j)}}{-\log p_{train}(m,j)},&\text{otherwise.}
+\end{cases}
 $$
 
-The frozen candidate universe guarantees $n_t\ge2$.
+The candidate-level observable is
+
+$$
+A_t(m)=\frac{1}{n_t-1}\sum_{j\in\hat M_t\setminus\{m\}}\operatorname{NPMI}_{train}(m,j).
+$$
 
 The hypothesis is:
 
@@ -79,40 +81,27 @@ $$
 
 ## Exact observable
 
-`CoSelectionCompatibility` = $A_t(m)$, the mean train-only pairwise NPMI between candidate $m$ and every other medication in the same frozen predicted prescription.
+`CoSelectionCompatibility` = $A_t(m)$, the mean train-only empirical NPMI between candidate $m$ and every other medication in the same frozen predicted prescription.
 
-Higher values mean that the candidate is, on average, more compatible with its co-predicted medications under frequency-corrected historical co-selection structure. The Gate may learn either coefficient sign on Dev; no outcome-direction claim is hard-coded.
+Higher values mean stronger historical co-selection association after marginal-frequency normalization. The Dev estimator may learn either coefficient sign; no outcome-direction claim is hard-coded.
 
 ## Why this information is new relative to prior controls
 
-Ideas 001--003 tested DDI degree/Tension, score-only remapping, and same-visit relative score position. `CoSelectionCompatibility` instead observes **medication identities plus train-only medication-medication co-selection relations**.
+Ideas 001--003 tested DDI degree/Tension, score-only remapping, and same-visit relative score position. `CoSelectionCompatibility` instead observes medication identities plus train-only medication-medication co-selection relations.
 
-Two candidates can have the same frozen score, prescription size, medication prevalence, and relative score position while receiving different $A_t(m)$ because their co-predicted medication identities differ and the train-only pair relations differ.
+Two candidates can have identical frozen score, predicted-set size, candidate prevalence, peer-set mean prevalence, and relative score position while receiving different $A_t(m)$ because their peer identities and pair relations differ.
 
-This is materially new information relative to the tested selector controls. It is not claimed to be a new information source for medication recommendation generally: co-prescription relations are established prior art.
+This is materially new information relative to the tested selector controls. Co-prescription relations themselves are established prior art and are not claimed as novel.
 
 ## Mechanism
 
-A frozen recommender can assign a medication high individual confidence while the medication remains weakly coherent with the rest of the simultaneously predicted regimen under empirical training-prescription relations. Frequency correction separates pair association from the simpler explanation that common medications co-occur often because they are common.
+A frozen recommender can assign a medication high individual confidence while the medication remains statistically atypical relative to the other medications simultaneously predicted. Frequency correction asks whether pair association carries residual information after candidate confidence, set size, candidate prevalence, and peer-set popularity are controlled.
 
-The narrow mechanism is therefore:
-
-> residual medication-level false positives may be enriched among candidates whose predicted-set membership is relationally atypical after accounting for candidate confidence, prescription size, candidate prevalence, and peer-set popularity.
-
-This is an error-routing hypothesis, not a claim that co-selection represents therapeutic synergy or clinical appropriateness.
+The mechanism is an error-routing hypothesis. Co-selection association is not interpreted as therapeutic synergy, clinical appropriateness, or causal compatibility.
 
 ## Closest prior work
 
-The closest-work search identifies substantial relation-modeling prior art:
-
-- HI-DR, AAAI 2025, DOI `10.1609/aaai.v39i11.33301`: uses a weighted EHR Graph+ to represent how strongly medications are co-prescribed and combines it with health-status-aware evidence.
-- DMRNet, Neural Networks 2026, DOI `10.1016/j.neunet.2026.109168`: mines frequent medication patterns and uses temporal prescription recalibration.
-- MSAM, arXiv `2601.19259`: models collective medication effects and medication-set abstractions.
-- GenRxR, RecSys 2026, DOI `10.1145/3773078.3831753`, arXiv `2607.24829`: explicitly models co-recommended medication relations for rare-med recommendation.
-- GRAIN, arXiv `2608.00098`: includes an EHR-derived co-prescription graph alongside drug- and ingredient-level DDI knowledge.
-- CRHP, IEEE JBHI, DOI `10.1109/JBHI.2025.3582393`: uses covariance knowledge graphs and hierarchical prescription inference.
-
-These works make generic claims such as “medication relations improve recommendation” non-novel for this project.
+The retained closest-work set includes HI-DR (AAAI 2025; DOI `10.1609/aaai.v39i11.33301`), DMRNet (Neural Networks 2026; DOI `10.1016/j.neunet.2026.109168`), MSAM (arXiv `2601.19259`), GenRxR (RecSys 2026; DOI `10.1145/3773078.3831753`), GRAIN (arXiv `2608.00098`), and CRHP (IEEE JBHI; DOI `10.1109/JBHI.2025.3582393`). These works make generic “use medication relations/co-prescription” claims non-novel.
 
 ## Novelty delta
 
@@ -120,32 +109,33 @@ Within the completed search scope, no retained work directly tests the following
 
 ```text
 frozen medication score
-+ prescription-size / medication-popularity / peer-popularity controls
++ predicted-set size
++ candidate prevalence
++ peer-set popularity
++ predeclared score interactions
 vs.
-those same controls + one frequency-corrected train-only co-selection statistic
+those same controls + one train-only frequency-corrected co-selection statistic
 ```
 
-with medication-level false-positive routing as the decision unit, a patient-disjoint Dev/Audit validation split, and held-out incremental review yield as the central claim.
+with medication-level false-positive routing as the decision unit, a fresh patient-disjoint validation Dev/Audit split, and held-out incremental review yield as the central claim.
 
-This is search-scoped wording, not a universal novelty claim. The proposed NPMI statistic itself is not novel.
+This is search-scoped wording, not universal novelty proof. NPMI itself is not novel.
 
 ## Strongest simple control
 
-Gate 01 must begin with the strongest simple explanation of the proposed relation statistic. The primary control must include:
+Gate 01 freezes the following control variables:
 
 - frozen MoleRec medication confidence;
 - frozen predicted prescription size;
 - train-only candidate-medication prevalence;
 - mean train-only prevalence of the other medications in the frozen predicted prescription;
-- only the minimal score interactions needed to prevent the relation feature from standing in for those quantities.
+- score-by-size, score-by-candidate-prevalence, and score-by-peer-prevalence interactions.
 
-The augmented selector may add exactly one scientific feature: `CoSelectionCompatibility`.
+The augmented selector adds exactly one scientific feature: `CoSelectionCompatibility`.
 
-No GNN, Transformer, Mamba, LLM verifier, learned relation encoder, or new backbone is justified by Idea selection.
+No GNN, hypergraph encoder, Transformer, Mamba, LLM verifier, learned relation encoder, or new backbone is justified.
 
 ## Candidate universe
-
-The scientific formalization remains unchanged:
 
 $$
 \mathcal Q_t=\{m\in\hat M_t:d_t(m)>0\}.
@@ -153,13 +143,11 @@ $$
 
 ## Revision operator
 
-Singleton deletion remains fixed:
-
 $$
 R_0(\hat M_t,m)=\hat M_t\setminus\{m\}.
 $$
 
-Within $\mathcal Q_t$, deletion removes at least one active DDI edge. The retrospective Gate outcome therefore remains
+Within $\mathcal Q_t$, singleton deletion removes at least one active DDI edge. The retrospective Gate outcome remains
 
 $$
 Y^{PB}_{t,m}=\mathbf1[m\notin M_t].
@@ -175,40 +163,38 @@ Allowed at prediction/revision time:
 - frozen MoleRec predicted medication set for the current visit;
 - predicted medication count;
 - train-only medication prevalence;
-- train-only pairwise co-selection counts/probabilities and the frozen NPMI relation derived from them;
+- train-only pairwise co-selection counts and frozen empirical NPMI relations;
 - DDI graph only to reproduce the already frozen candidate universe $\mathcal Q_t$.
 
 Forbidden selector inputs:
 
-- membership in the current target prescription;
-- current-visit outcome labels;
+- current target-prescription membership;
+- current outcome labels;
 - future visits or future prescriptions;
-- Dev/Audit target-derived pair statistics;
-- Audit labels for fitting, cutpoints, feature selection, or coefficient selection;
+- validation-derived co-selection statistics;
+- Audit labels for fitting, feature selection, coefficient selection, cutpoints, or formula selection;
 - any test data, test targets, test predictions, or test-derived statistics;
 - Idea 001 Tension features, Idea 002 score bins, or Idea 003 relative-rank cosmetic variants as rescue features.
 
 ## Prediction-time availability
 
-Yes. The current predicted set and scores are frozen model outputs. The co-selection matrix and medication prevalences are computed once from the training split and frozen before validation evaluation.
+Yes. The current predicted set and scores are frozen model outputs. Medication prevalence and pairwise co-selection relations are computed once from training prescriptions and frozen before validation evaluation.
 
 ## Leakage boundary
 
-Training target prescriptions may define aggregate train-only prevalence and pair statistics. They may not be joined to validation target prescriptions.
-
-Dev labels may fit the preregistered low-capacity control and augmented selector. Audit labels may only evaluate already frozen selectors. The test split remains unindexed, unpredicted, and untouched.
+Training target prescriptions may define aggregate train-only prevalence and pair statistics. They may not be joined to validation targets. Dev labels may fit the preregistered low-capacity selectors. Audit labels may only evaluate already frozen selectors. Test remains unindexed, unpredicted, and untouched.
 
 ## Cheapest decisive experiment
 
 One validation-only Gate 01:
 
-1. reproduce or identity-verify the frozen validation prediction payload without accessing test;
-2. compute train-only prevalence and pairwise NPMI once;
-3. create a fresh deterministic patient-disjoint Idea-004 Dev/Audit split chosen before outcome inspection;
-4. fit the low-capacity strongest simple control on Dev;
-5. fit the identical model with exactly one additional $A_t(m)$ feature on Dev;
+1. identity-verify or regenerate frozen validation prediction payloads without accessing test;
+2. compute train-only prevalence and empirical NPMI once;
+3. create the preregistered patient-disjoint Idea-004 Dev/Audit split;
+4. fit the frozen strongest simple control on Dev;
+5. fit the identical estimator with exactly one additional $A_t(m)$ feature on Dev;
 6. freeze both selectors;
-7. compare Audit Pareto-beneficial yield at preregistered review budgets using patient-clustered bootstrap uncertainty.
+7. compare Audit Pareto-beneficial yield at preregistered budgets with patient-clustered bootstrap uncertainty.
 
 ## PASS semantics
 
@@ -218,41 +204,39 @@ PASS means only:
 
 ## FAIL semantics
 
-FAIL means:
+FAIL means only:
 
 > The preregistered one-scalar train-only co-selection-compatibility route did not establish incremental medication-level false-positive routing information beyond the frozen strongest simple control.
 
-FAIL terminates this representation. It does not authorize replacing NPMI with embeddings, frequent-pattern mining, a hypergraph, attention, or a learned relation model on the same information after inspecting the outcome.
+FAIL terminates this representation. It does not authorize replacing NPMI with embeddings, frequent-pattern mining, a hypergraph, attention, or a learned relation model on the same information after outcome inspection.
 
 ## What PASS would not prove
 
-PASS would not prove clinical safety, patient benefit, therapeutic compatibility, causal mechanism, prescribing correctness, prospective utility, untouched final generalization, or that co-selection relations are novel in MedRec. It would not prove that NPMI is the optimal relation statistic.
+PASS would not prove clinical safety, patient benefit, therapeutic compatibility, causality, prescribing correctness, prospective utility, untouched final generalization, cross-backbone portability, or that co-selection relations are novel in MedRec. It would not prove NPMI is the optimal relation statistic.
 
 ## What FAIL would not prove
 
-FAIL would not prove that all medication relations are useless, that all static observables are exhausted, that longitudinal history is useless, that DDI topology is useless, that patient-conditioned evidence is useless, or that no target-free explanation of residual heterogeneity exists.
+FAIL would not prove that all medication relations are useless, all static observables are exhausted, longitudinal history is useless, DDI topology is useless, patient-conditioned evidence is useless, or no target-free explanation of residual heterogeneity exists.
 
 ## Portability
 
-The statistic is backbone-agnostic for multi-label recommenders whose medication vocabulary can be aligned to a train-only prescription corpus and whose current predicted set is exposed. Cross-backbone empirical portability is a later question and is not part of Gate 01.
+The statistic is backbone-agnostic for multi-label recommenders whose medication vocabulary aligns to a train-only prescription corpus and whose current predicted set is exposed. Cross-backbone empirical portability is outside Gate 01.
 
 ## Known limitations
 
-- The Gate remains retrospective and validation-only.
-- Co-prescription association is observational and can encode historical prescribing practice or bias; it must not be interpreted as therapeutic synergy.
-- MoleRec already learns from EHR-derived information, so a PASS would show that an explicit relation statistic retains residual predictive information after the frozen score, not that the raw data source was absent from the backbone.
-- The closest-work neighborhood is dense. The novelty claim depends on the conditional medication-level error-routing formulation, not on co-prescription modeling itself.
+- The Gate is retrospective and validation-only.
+- Co-prescription association can encode historical prescribing practice or bias.
+- MoleRec already learns from EHR-derived information; a PASS would establish residual information in an explicit statistic after the frozen score, not a previously unavailable raw data source.
+- The closest-work neighborhood is dense; novelty depends on the conditional medication-level error-routing formulation.
 
 ## Historical validation adaptivity
 
-Validation data has already been used for route selection in Ideas 001--003. A fresh Idea-004 patient-disjoint Dev/Audit partition can provide held-out **route-selection evidence** only. It must not be described as untouched final-generalization evidence.
-
-The test split remains reserved for a later, explicitly authorized stage.
+Ideas 001--003 already used validation data for route selection. A fresh Idea-004 patient-disjoint Dev/Audit partition is held-out route-selection evidence only, not untouched final-generalization evidence. Test remains reserved for a later explicitly authorized stage.
 
 ## Stop boundary
 
-Gate 01 is the only authorized next scientific experiment after protocol freeze. No architecture expansion, test evaluation, multi-backbone benchmark, Gate 02, or Idea 005 is implied by Idea selection.
+Gate 01 is the only authorized next scientific experiment after protocol freeze. No architecture expansion, test evaluation, multi-backbone benchmark, Gate 02, or Idea 005 is implied.
 
 ## Next CCFA owner
 
-`ccf-experiment-designer / design` for the validation-only Gate 01 preregistration, followed by a design-level `ccf-integrity-auditor` review before any implementation or formal 319 execution.
+Local execution agent: execute only frozen P0--P6 Gate 01 workflow, then stop.
