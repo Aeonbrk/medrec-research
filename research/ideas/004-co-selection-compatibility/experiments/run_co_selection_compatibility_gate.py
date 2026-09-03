@@ -237,7 +237,7 @@ def verify_dataset_manifest_and_snapshot(
     dataset_root: Path,
     staged_meta: dict[str, Any],
 ) -> tuple[DatasetManifest, str]:
-    manifest = DatasetManifest.from_file(manifest_path)
+    manifest = DatasetManifest.load(manifest_path)
     if manifest.manifest_sha256 != FROZEN_DATASET_MANIFEST_SHA256:
         raise ValueError(
             f"Dataset manifest checksum drift: expected {FROZEN_DATASET_MANIFEST_SHA256}, got {manifest.manifest_sha256}"
@@ -245,6 +245,10 @@ def verify_dataset_manifest_and_snapshot(
     if manifest.dataset_id != FROZEN_DATASET_ID:
         raise ValueError(
             f"Dataset ID drift: expected {FROZEN_DATASET_ID}, got {manifest.dataset_id}"
+        )
+    if manifest.snapshot_id != FROZEN_SNAPSHOT_ID:
+        raise ValueError(
+            f"Snapshot ID drift: expected {FROZEN_SNAPSHOT_ID}, got {manifest.snapshot_id}"
         )
     snapshot_files = {
         "ddi_A_final.pkl": _file_sha256(dataset_root / "ddi_A_final.pkl"),
