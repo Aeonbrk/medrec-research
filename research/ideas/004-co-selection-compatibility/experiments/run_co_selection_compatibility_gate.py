@@ -222,23 +222,20 @@ def verify_conda_environment(
     conda_executable: str | Path,
     environment_name: str,
 ) -> str:
-    export_proc = subprocess.run(
-        [str(conda_executable), "list", "-n", environment_name, "--export"],
+    if environment_name != FROZEN_BASELINE_ENVIRONMENT_NAME:
+        raise ValueError(
+            f"Invalid baseline environment: {environment_name}. Must use {FROZEN_BASELINE_ENVIRONMENT_NAME}"
+        )
+    completed = subprocess.run(
+        (str(conda_executable), "list", "--explicit", "-n", environment_name),
         check=True,
         capture_output=True,
         text=True,
     )
-    observed_spec = [
-        line.strip()
-        for line in export_proc.stdout.splitlines()
-        if line.strip() and not line.strip().startswith("#")
-    ]
-    observed_sha256 = hashlib.sha256(
-        ("\n".join(sorted(observed_spec)) + "\n").encode("utf-8")
-    ).hexdigest()
+    observed_sha256 = hashlib.sha256(completed.stdout.encode("utf-8")).hexdigest()
     if observed_sha256 != FROZEN_BASELINE_ENVIRONMENT_SHA256:
         raise ValueError(
-            f"Baseline Conda environment drift: expected {FROZEN_BASELINE_ENVIRONMENT_SHA256}, got {observed_sha256}"
+            f"Baseline environment identity drift for {environment_name}: expected {FROZEN_BASELINE_ENVIRONMENT_SHA256}, got {observed_sha256}"
         )
     return observed_sha256
 
