@@ -183,13 +183,24 @@ def verify_frozen_molerec_identity(
     actual_checkpoint_sha256 = _file_sha256(checkpoint)
     if actual_checkpoint_sha256 != FROZEN_CHECKPOINT_SHA256:
         raise ValueError(
-            f"Checkpoint checksum drift: expected {FROZEN_CHECKPOINT_SHA256}, got {actual_checkpoint_sha256}"
+            f"MoleRec checkpoint hash drift: expected {FROZEN_CHECKPOINT_SHA256}, got {actual_checkpoint_sha256}"
         )
-    core_files = {
-        "models.py": _file_sha256(molerec_root / "models.py"),
-        "util.py": _file_sha256(molerec_root / "util.py"),
+    source_files = (
+        "src/modules/MoleRec.py",
+        "src/modules/SetTransformer.py",
+        "src/modules/gnn/GNNs.py",
+        "src/modules/gnn/GNNConv.py",
+    )
+    source_identity = {
+        "revision": FROZEN_MOLEREC_REVISION,
+        "source_files": {name: _file_sha256(molerec_root / name) for name in source_files},
     }
-    actual_core_sha256 = _content_sha256(core_files)
+    actual_core_sha256 = _content_sha256(
+        {
+            "checkpoint_sha256": actual_checkpoint_sha256,
+            **source_identity,
+        }
+    )
     if actual_core_sha256 != FROZEN_BASELINE_CORE_SHA256:
         raise ValueError(
             f"Baseline core checksum drift: expected {FROZEN_BASELINE_CORE_SHA256}, got {actual_core_sha256}"
