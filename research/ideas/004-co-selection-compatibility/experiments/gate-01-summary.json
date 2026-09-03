@@ -1,0 +1,180 @@
+{
+  "audit_support": {
+    "distinct_beneficial_patients": 417,
+    "distinct_non_beneficial_patients": 426,
+    "k_by_budget": {
+      "10%": 778,
+      "20%": 1557,
+      "30%": 2336
+    },
+    "support_requirement_met": true,
+    "threshold_required": 50
+  },
+  "bootstrap": {
+    "confidence_level": "95%_percentile",
+    "intervals": {
+      "co_selection_minus_control": {
+        "10%": {
+          "lower": -0.011629797078658499,
+          "upper": 0.025001649076517172
+        },
+        "20%": {
+          "lower": -0.006806483655409076,
+          "upper": 0.007843671043735073
+        },
+        "30%": {
+          "lower": -0.011809612385766579,
+          "upper": -0.0004265041546061
+        }
+      },
+      "control_minus_score": {
+        "10%": {
+          "lower": -0.018049523770868783,
+          "upper": 0.016631145211707873
+        },
+        "20%": {
+          "lower": 0.0014053216223198688,
+          "upper": 0.020702667352468264
+        },
+        "30%": {
+          "lower": -0.005768068054836012,
+          "upper": 0.012898153124104243
+        }
+      },
+      "oracle_minus_control": {
+        "10%": {
+          "lower": 0.33866933742861066,
+          "upper": 0.4293327584523771
+        },
+        "20%": {
+          "lower": 0.3718128137337611,
+          "upper": 0.43610120444828093
+        },
+        "30%": {
+          "lower": 0.4043100305847446,
+          "upper": 0.4615073123948376
+        }
+      }
+    },
+    "replicates": 1000,
+    "resampling_unit": "patient",
+    "seed": 1204
+  },
+  "decision_criteria": {
+    "gate_a_support_met": true,
+    "gate_b_oracle_headroom_10": true,
+    "gate_b_oracle_headroom_20": true,
+    "gate_c_co_selection_incremental_10": false,
+    "gate_c_co_selection_incremental_20": false
+  },
+  "formal_run_id": "gate-01-co-selection-compatibility-20260903-154343",
+  "gaps": {
+    "co_selection_minus_control": {
+      "10%": 0.007712082262210762,
+      "20%": 0.0006422607578676631,
+      "30%": -0.008133561643835607
+    },
+    "control_minus_score": {
+      "10%": 0.0,
+      "20%": 0.011560693641618491,
+      "30%": 0.005565068493150638
+    },
+    "oracle_minus_control": {
+      "10%": 0.384318766066838,
+      "20%": 0.4046242774566474,
+      "30%": 0.43193493150684936
+    }
+  },
+  "gate_id": "gate-01-co-selection-compatibility",
+  "harness_revision": "8640ce521a942bd34daa2a5547c2e2db1febca6a",
+  "idea_id": "004-co-selection-compatibility",
+  "identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "policy_yields": {
+    "co_selection_augmented": {
+      "10%": 0.6233933161953727,
+      "20%": 0.5960179833012202,
+      "30%": 0.559931506849315
+    },
+    "oracle": {
+      "10%": 1.0,
+      "20%": 1.0,
+      "30%": 1.0
+    },
+    "random": {
+      "10%": 0.31642481058173877,
+      "20%": 0.31642481058173877,
+      "30%": 0.31642481058173877
+    },
+    "score_only": {
+      "10%": 0.615681233933162,
+      "20%": 0.5838150289017341,
+      "30%": 0.5625
+    },
+    "strong_control": {
+      "10%": 0.615681233933162,
+      "20%": 0.5953757225433526,
+      "30%": 0.5680650684931506
+    }
+  },
+  "schema_version": 2,
+  "selector": {
+    "algorithm": "fixed_ridge_linear_probability",
+    "co_selection_augmented_coefficients": {
+      "coefficients": {
+        "c": -0.012050530020388764,
+        "co_selection_compatibility": -0.9438650508876993,
+        "f": -0.07570281101311441,
+        "g": 0.11299831307528924,
+        "u": 3.343479603632135,
+        "u_c": -0.7049888953930403,
+        "u_f": 0.1500565773966633,
+        "u_g": -0.9674659163061988
+      },
+      "intercept": 0.2935115946572539
+    },
+    "ridge_penalty": 1e-06,
+    "strong_control_coefficients": {
+      "coefficients": {
+        "c": -0.04373952434151268,
+        "f": -0.06793524384078707,
+        "g": 0.08093231076030706,
+        "u": 3.126758688280391,
+        "u_c": -0.6234773614244415,
+        "u_f": 0.1387978821311186,
+        "u_g": -0.8810764218223798
+      },
+      "intercept": 0.32647314621467927
+    }
+  },
+  "split": {
+    "audit_candidates_count": 7787,
+    "audit_patient_count": 530,
+    "dev_candidates_count": 7762,
+    "dev_patient_count": 529,
+    "eligible_audit_patients": 426,
+    "eligible_dev_patients": 432,
+    "patient_level": true,
+    "seed": 2004,
+    "source": "validation",
+    "validation_patient_count": 1059
+  },
+  "train_statistics": {
+    "eligible_train_visits": 6256,
+    "formula": "empirical_npmi"
+  },
+  "verdict": "STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY"
+}

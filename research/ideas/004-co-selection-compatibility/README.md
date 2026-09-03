@@ -3,14 +3,18 @@
 # Idea 004: Frequency-Corrected Co-Selection Compatibility
 
 - **Idea ID**: `004-co-selection-compatibility`
-- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`
-- **Scientific stage**: Idea / hypothesis selection
+- **Status**: `REJECTED / TERMINATED_AT_GATE_01`
+- **Scientific stage**: Idea / hypothesis selection (terminated)
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
 - **Literature grounding**: `literature-search-20260903-co-selection-fp-routing/`
 - **Strict idea review**: [`idea-review.md`](idea-review.md)
-- **Gate 01**: [`experiments/gate-01-co-selection-compatibility.md`](experiments/gate-01-co-selection-compatibility.md)
-- **Design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md)
-- **Next CCFA owner**: local execution agent, P0 protocol/state verification only
+- **Gate 01 Protocol**: [`experiments/gate-01-co-selection-compatibility.md`](experiments/gate-01-co-selection-compatibility.md)
+- **Design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`)
+- **Gate 01 Summary**: [`experiments/gate-01-summary.json`](experiments/gate-01-summary.json)
+- **Gate 01 Integrity Audit**: [`experiments/gate-01-integrity-audit.md`](experiments/gate-01-integrity-audit.md) (`INTEGRITY_PASS`)
+- **Research Decision**: [`research-decision.md`](research-decision.md) (`STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY`)
+- **Failure Record**: [`../../memory/failures/co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md`](../../memory/failures/co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md)
+- **Next CCFA owner**: `ccf-pipeline-orchestrator` / exploratory direction scouting
 
 ## Problem statement
 
@@ -239,4 +243,4 @@ Gate 01 is the only authorized next scientific experiment after protocol freeze.
 
 ## Next CCFA owner
 
-Local execution agent: execute only frozen P0--P6 Gate 01 workflow, then stop.
+Execution complete. Next CCFA owner: `ccf-pipeline-orchestrator` / exploratory research direction scouting.

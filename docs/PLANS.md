@@ -1,16 +1,20 @@
 # Plans
 
-## Designed: Gate 01 — Co-Selection Compatibility (Idea 004)
+## Completed: Gate 01 — Co-Selection Compatibility (Idea 004)
 
-- **Idea**: `research/ideas/004-co-selection-compatibility/README.md`.
-- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`.
-- **Idea Selection Commit**: `f29c9db61f001d88efe7c789b6f0793378add5af`.
 - **Protocol**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-co-selection-compatibility.md`.
-- **Design Audit**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`).
-- **Scientific Question**: whether mean train-only empirical NPMI between a candidate and the other medications in the same frozen predicted prescription adds medication-level false-positive routing information beyond frozen score, predicted-set size, candidate prevalence, peer-set popularity, and fixed score interactions.
-- **Candidate Universe**: $\mathcal Q_t=\{m\in\hat M_t:d_t(m)>0\}$; singleton deletion remains the revision operator.
-- **Split / Inference**: fresh patient-disjoint validation Dev/Audit split with seed `2004`; fixed ridge linear ranking estimator; primary budgets 10% and 20%; patient-clustered bootstrap with 1000 replicates and seed `1204`.
-- **Execution Boundary**: no formal 319 execution has occurred; test remains unindexed, unpredicted, and untouched. The next owner may execute only frozen P0--P6 and must stop after P6.
+- **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY`.
+- **Formal Run**: `gate-01-co-selection-compatibility-20260903-154343` executed on `319-lab` under `medrec-core-evaluator` at harness revision `8640ce521a942bd34daa2a5547c2e2db1febca6a`.
+- **Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/004-co-selection-compatibility/experiments/gate-01-integrity-audit.md`.
+- **Scientific Findings**:
+  - `StrongControl` ($u, c, f, g, u \cdot c, u \cdot f, u \cdot g$) yields 61.57% vs 61.57% for raw `ScoreOnly` at 10% budget (tie) and 59.54% vs 58.38% at 20% budget (95% CI for the gap is strictly positive $[+0.14\%, +2.07\%]$), replicating the finding from Idea 003 that prevalence and set size refine scores at broader review depths.
+  - Substantial retrospective Oracle headroom survives on Audit: $Oracle - StrongControl = +38.43\%$ at 10% budget (95% CI: $[+33.87\%, +42.93\%]$) and $+40.46\%$ at 20% budget (95% CI: $[+37.18\%, +43.61\%]$). This shows outcome heterogeneity not explained by the frozen control; because Oracle uses the target, it does not establish a target-free mechanism.
+  - The preregistered train-only co-selection compatibility observable $A_t(m)$ fails Gate C at both primary budgets: `CoSelectionAugmented - StrongControl = +0.77%` at 10% (95% CI: $[-1.16\%, +2.50\%]$) and `+0.06%` at 20% (95% CI: $[-0.68\%, +0.78\%]$), with bootstrap 95% CIs crossing zero.
+- **Decision & Bounds**: Gate 02 is `NOT_AUTHORIZED`; Idea 004 is authoritatively terminated (`TERMINATE_IDEA_004`). The failure is scoped to the tested empirical NPMI co-selection compatibility route and does not exhaust broader longitudinal, patient-conditioned, structural, or cross-model information families. Test split remains 100% untouched.
+- **Decision Document**: `research/ideas/004-co-selection-compatibility/research-decision.md`.
+- **Failure Record**: `research/memory/failures/co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md`.
+- **Public Summary**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-summary.json`.
+- **Next Stage**: next CCFA sequence for exploratory direction scouting.
 
 ## Completed: Gate 01 — Prescription-Relative Confidence (Idea 003)
 
