@@ -1,76 +1,123 @@
-# Handoff: Idea 005 Gate 01 Completed Execution & Verdict
+# Handoff: Idea 005 Semantic Admission Frozen Design
 
 ## Current state
 
-Idea `005-safety-substitution-structure` has completed its formal validation-only Gate 01 execution on `319-lab`, underwent an independent integrity audit by `ccf-integrity-auditor`, and formed an authoritative research decision.
+Idea `005-safety-substitution-structure` completed formal Gate 01 with `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION` and `INTEGRITY_PASS`. The next scientific task, Semantic Admission, is now designed and has passed a design-level integrity review. It has not been executed.
 
 - **Idea ID**: `005-safety-substitution-structure`
-- **Idea Status**: `GATE_01_PASSED / SEMANTIC_ADMISSION_PENDING`
+- **Idea Status**: `GATE_01_PASSED / SEMANTIC_ADMISSION_DESIGNED_NOT_EXECUTED`
 - **Primary Method Direction**: safety by substitution, not suppression
-- **Gate Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`
-- **Protocol Commit**: `95966eab6d018e34b6dae4a52271562826bb5b4d`
-- **Execution Revision**: `4bb07d3d0050070a811f7a4e307522906470e6f7`
-- **Formal Run ID**: `gate-01-output-structure-signature-20260904-155810`
-- **Execution Host**: `319-lab` under `medrec-core-evaluator`
-- **Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-summary.json`
-- **Design Audit**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`)
-- **Integrity Audit**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-integrity-audit.md` (`INTEGRITY_PASS`)
-- **Research Decision**: `research/ideas/005-safety-substitution-structure/research-decision.md`
-- **Formal Verdict**: `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`
+- **Gate 01 Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`
+- **Gate 01 Protocol Commit**: `95966eab6d018e34b6dae4a52271562826bb5b4d`
+- **Gate 01 Execution Revision**: `4bb07d3d0050070a811f7a4e307522906470e6f7`
+- **Gate 01 Formal Run ID**: `gate-01-output-structure-signature-20260904-155810`
+- **Gate 01 Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-summary.json`
+- **Gate 01 Integrity Audit**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-integrity-audit.md` (`INTEGRITY_PASS`)
+- **Gate 01 Research Decision**: `research/ideas/005-safety-substitution-structure/research-decision.md`
+- **Gate 01 Verdict**: `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`
+- **Semantic Admission Protocol**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-protocol.md`
+- **Semantic Admission Design Audit**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`)
+- **Semantic Admission Status**: `DESIGNED_NOT_EXECUTED`
 - **Gate 02**: `NOT_AUTHORIZED`
-- **Test Split**: unindexed, unpredicted, unevaluated, and untouched (100% isolated)
+- **Test Split**: unindexed, unpredicted, unevaluated, and untouched
 
-## Scientific question & result
+## Gate 01 result retained as upstream evidence
+
+Under the frozen validation Audit partition:
+
+- 20 candidate ATC-2 sibling groups had at least 50 eligible Audit patients;
+- 338 distinct patients exhibited a raw `AnySignature` across 8 supported ATC-2 parents;
+- after Dev-only per-medication F1 calibration, 394 distinct patients exhibited `AnySignature` across 14 supported ATC-2 parents.
+
+The only supported claim is:
+
+> A material ATC-2-sibling output-structure error signature survives Dev-only per-medication threshold calibration under frozen MoleRec validation.
+
+No therapeutic-substitution claim follows from Gate 01.
+
+## Semantic Admission scientific question
 
 $$
 \boxed{\begin{aligned}
-&\text{In frozen MoleRec ATC-3 validation outputs, does a material sibling-group}\\
-&\text{mass-allocation error signature remain after Dev-only per-medication}\\
-&\text{threshold calibration?}
+&\text{Do the empirically supported target-to-sibling relations contain a material subset}\\
+&\text{for which independent authoritative evidence supports an alternative-treatment interpretation?}
 \end{aligned}}
 $$
 
-**Result**: **YES**. A material ATC-2-sibling output-structure error signature survives Dev-only per-medication threshold calibration under frozen MoleRec validation.
+The null explanation is that the Gate-01 structure is only taxonomy proximity or shared indication.
 
-### Mechanical Decision Tree Findings
+## Frozen Semantic Admission design
 
-1. **Gate A (ATC-3 Group Support)**: **PASS**
-   - Requirement: $\ge 3$ sibling groups each represented by $\ge 50$ distinct Audit patients with eligible singleton-target units.
-   - Observed: 20 candidate groups meet this criterion out of 31 candidate groups with $|G| \ge 2$.
-2. **Gate B (Raw Signature Materiality)**: **PASS**
-   - Requirement: $\ge 50$ signature patients overall and $\ge 3$ parents each with $\ge 10$ signature patients.
-   - Observed: 338 distinct Audit patients with `AnySignature`; 8 distinct ATC-2 parents each with $\ge 10$ signature patients.
-   - Breakdown: Raw SplitMassFN: 65 patients (71 units); Raw DuplicateSiblingFP: 326 patients (680 units); AnySignature: 338 patients (751 units).
-3. **Gate C (Killer Control: Dev-Only Per-Medication Calibration)**: **PASS**
-   - Requirement: Same materiality conditions hold under Dev-frozen F1-optimal per-medication thresholds.
-   - Observed: 394 distinct Audit patients with `AnySignature`; 14 distinct ATC-2 parents each with $\ge 10$ signature patients.
-   - Breakdown: Calibrated SplitMassFN: 46 patients (50 units); Calibrated DuplicateSiblingFP: 391 patients (1,122 units); AnySignature: 394 patients (1,172 units).
+### Candidate relation
 
-## Strict scope boundaries
+Use the existing restricted Gate-01 calibrated `AnySignature` units only. Do not rerun MoleRec.
 
-The Gate 01 PASS does **not** prove or imply:
+Each unit contributes exactly one directed relation $y_t\rightarrow a_t$:
 
-- ATC siblings are therapeutic substitutes;
-- observed prescriptions are clinically optimal;
-- the signatures are caused by DDI training;
-- safety optimization causes undertreatment;
-- a group-aware decoder or loss will improve recommendation;
-- clinical safety or patient benefit;
-- cross-backbone or test-set generalization.
+- `SplitMassFN`: highest frozen-score non-target sibling;
+- `DuplicateSiblingFP`: highest frozen-score emitted non-target sibling;
+- ties: ATC-3 code ascending.
 
-## Preserved artifacts
+Only relations occurring in at least 10 distinct Audit patients enter semantic review.
 
-- Restricted per-unit and threshold artifacts remain outside Git on `319-lab`:
-  `/root/zhb/medrec-data/runs/ideas/005-safety-substitution-structure/gate-01-output-structure-signature-20260904-155810/`
-- Public-safe aggregate summary and audit documents are committed in repository.
+### Semantic A — relation concentration
+
+Require supported relations to:
+
+- cover at least 50% of the 394 calibrated-signature patients;
+- span at least 3 ATC-2 parents.
+
+Otherwise:
+
+`STOP_SEMANTIC_SIGNAL_TOO_DIFFUSE`
+
+### Evidence hierarchy
+
+Strict admission requires authoritative guideline / formulary evidence explicitly positioning the compared treatment classes as alternatives in the same indication and overlapping clinical context.
+
+- WHO ATC / RxNorm: identity and taxonomy only;
+- FDA / DailyMed: shared-indication and restriction corroboration only;
+- shared indication alone: `NAIVE_SHARED_INDICATION`, never strict admission.
+
+The semantic adjudicator receives relation identities without Gate-01 support counts until labels are frozen.
+
+### Strict labels
+
+Exactly one label per supported relation:
+
+- `ADMIT_ALTERNATIVE_CLASS_RELATION`;
+- `REJECT_NOT_ALTERNATIVE`;
+- `UNRESOLVED_INSUFFICIENT_EVIDENCE`.
+
+### Semantic B — material strict admission
+
+PASS requires:
+
+- strict admitted relations cover at least 25% of the 394 calibrated-signature patients;
+- admitted relations span at least 3 ATC-2 parents;
+- each of those parents has at least 10 distinct admitted-relation patients.
+
+If not:
+
+`STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`
+
+If yes:
+
+`PASS_SEMANTIC_ADMISSION_FOR_METHOD_DESIGN`
 
 ## Next owner
 
-CCFA workflow planner / protocol designer.
+Local execution / evidence-curation agent.
 
-The next stage is strictly:
+Execute only the frozen Semantic Admission protocol, then run `ccf-integrity-auditor` in `claim-audit + citation-audit + numeric-audit` mode and form the mechanical decision.
 
-- Designing a **Semantic Admission Protocol** for independent review to test whether high-support ATC-2 sibling groups contain clinically defensible alternatives.
-- **Gate 02 remains NOT_AUTHORIZED**.
-- Do not access test split.
-- Do not train or implement group-aware decoders/models before semantic admission is formally designed, reviewed, and audited.
+Do not:
+
+- access test;
+- rerun or retrain MoleRec;
+- change relation selection after seeing clinical evidence;
+- expose support counts to the semantic adjudicator before labels are frozen;
+- treat ATC membership or shared indication as strict admission;
+- loosen the 50% / 25% / multi-parent materiality conditions after inspection;
+- implement a group-aware decoder or loss;
+- begin Gate 02 or publication experiments.
