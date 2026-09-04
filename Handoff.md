@@ -1,23 +1,26 @@
-# Handoff: Idea 005 Gate 01 Frozen Design & Implementation
+# Handoff: Idea 005 Gate 01 Completed Execution & Verdict
 
 ## Current state
 
-Idea `005-safety-substitution-structure` is selected for one minimal validation-only hypothesis gate after independent literature review and adversarial direction arbitration. Gate 01 has a frozen protocol, Idea-local implementation, focused synthetic verification, and a design-level integrity audit. It has **not** been executed on real data.
+Idea `005-safety-substitution-structure` has completed its formal validation-only Gate 01 execution on `319-lab`, underwent an independent integrity audit by `ccf-integrity-auditor`, and formed an authoritative research decision.
 
 - **Idea ID**: `005-safety-substitution-structure`
-- **Idea Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`
+- **Idea Status**: `GATE_01_PASSED / SEMANTIC_ADMISSION_PENDING`
 - **Primary Method Direction**: safety by substitution, not suppression
 - **Gate Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`
 - **Protocol Commit**: `95966eab6d018e34b6dae4a52271562826bb5b4d`
-- **Grounding / Plan Commit**: `33132719d714da726454ca584deb13302a3f5936`
-- **Implementation Commit**: `ddd1a2ce9f36110977d053fbc9ac4b0411a4422c`
+- **Execution Revision**: `4bb07d3d0050070a811f7a4e307522906470e6f7`
+- **Formal Run ID**: `gate-01-output-structure-signature-20260904-155810`
+- **Execution Host**: `319-lab` under `medrec-core-evaluator`
+- **Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-summary.json`
 - **Design Audit**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`)
-- **Execution Plan**: `docs/plans/2026-09-04-idea-005-output-structure-signature-gate-plan.md`
+- **Integrity Audit**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-integrity-audit.md` (`INTEGRITY_PASS`)
+- **Research Decision**: `research/ideas/005-safety-substitution-structure/research-decision.md`
+- **Formal Verdict**: `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`
 - **Gate 02**: `NOT_AUTHORIZED`
-- **Test Split**: unindexed, unpredicted, and untouched for Idea 005
-- **ccfa.yaml**: absent per repository conventions
+- **Test Split**: unindexed, unpredicted, unevaluated, and untouched (100% isolated)
 
-## Scientific question
+## Scientific question & result
 
 $$
 \boxed{\begin{aligned}
@@ -27,117 +30,47 @@ $$
 \end{aligned}}
 $$
 
-This is a premise Gate for the possible downstream method story:
+**Result**: **YES**. A material ATC-2-sibling output-structure error signature survives Dev-only per-medication threshold calibration under frozen MoleRec validation.
 
-$$
-\text{unsafe action} \rightarrow \text{acceptable alternative}
-$$
+### Mechanical Decision Tree Findings
 
-rather than
+1. **Gate A (ATC-3 Group Support)**: **PASS**
+   - Requirement: $\ge 3$ sibling groups each represented by $\ge 50$ distinct Audit patients with eligible singleton-target units.
+   - Observed: 20 candidate groups meet this criterion out of 31 candidate groups with $|G| \ge 2$.
+2. **Gate B (Raw Signature Materiality)**: **PASS**
+   - Requirement: $\ge 50$ signature patients overall and $\ge 3$ parents each with $\ge 10$ signature patients.
+   - Observed: 338 distinct Audit patients with `AnySignature`; 8 distinct ATC-2 parents each with $\ge 10$ signature patients.
+   - Breakdown: Raw SplitMassFN: 65 patients (71 units); Raw DuplicateSiblingFP: 326 patients (680 units); AnySignature: 338 patients (751 units).
+3. **Gate C (Killer Control: Dev-Only Per-Medication Calibration)**: **PASS**
+   - Requirement: Same materiality conditions hold under Dev-frozen F1-optimal per-medication thresholds.
+   - Observed: 394 distinct Audit patients with `AnySignature`; 14 distinct ATC-2 parents each with $\ge 10$ signature patients.
+   - Breakdown: Calibrated SplitMassFN: 46 patients (50 units); Calibrated DuplicateSiblingFP: 391 patients (1,122 units); AnySignature: 394 patients (1,172 units).
 
-$$
-\text{unsafe action} \rightarrow \varnothing.
-$$
+## Strict scope boundaries
 
-Gate 01 does **not** claim ATC siblings are therapeutic substitutes and does not test a safety-aware method.
+The Gate 01 PASS does **not** prove or imply:
 
-## Frozen Gate 01 design
+- ATC siblings are therapeutic substitutes;
+- observed prescriptions are clinically optimal;
+- the signatures are caused by DDI training;
+- safety optimization causes undertreatment;
+- a group-aware decoder or loss will improve recommendation;
+- clinical safety or patient benefit;
+- cross-backbone or test-set generalization.
 
-### Candidate groups
+## Preserved artifacts
 
-The current executable vocabulary is ATC-3. Gate 01 groups ATC-3 codes by their three-character ATC-2 prefix and retains parents with at least two vocabulary members.
-
-This is output-space geometry only:
-
-$$
-\text{same ATC-2 parent}\not\Rightarrow\text{clinical substitutability}.
-$$
-
-### Eligible unit
-
-For visit $t$ and sibling group $G$, evaluate only when the observed prescription contains exactly one member of $G$:
-
-$$
-|M_t\cap G|=1.
-$$
-
-### Two prespecified signatures
-
-For frozen scores $p_t(m)$ define
-
-$$
-S_t(G)=1-\prod_{m\in G}(1-p_t(m)).
-$$
-
-`SplitMassFN`: the unique observed member is missed, no sibling is predicted, and $S_t(G)\ge0.5$.
-
-`DuplicateSiblingFP`: the unique observed member is predicted and at least one additional non-target sibling is also predicted.
-
-No third signature is authorized.
-
-### Strongest simple killer control
-
-Each medication receives one threshold fitted on Dev only to maximize medication-level F1. Thresholds are frozen before Audit. If the calibrated policy removes the preregistered signature materiality, the structural route stops.
-
-### Split
-
-- source: validation only;
-- patient-disjoint Dev/Audit;
-- seed: `2005`;
-- expected validation patients: `1059`;
-- test access: forbidden.
-
-## Mechanical decision tree
-
-```text
-Gate A: >=3 sibling groups with >=50 eligible Audit patients each?
-  NO  -> INCONCLUSIVE_INSUFFICIENT_ATC3_GROUP_SUPPORT
-  YES -> Gate B
-
-Gate B: raw threshold has >=50 signature patients overall
-        AND >=3 parents with >=10 signature patients each?
-  NO  -> STOP_NO_MATERIAL_OUTPUT_STRUCTURE_SIGNATURE
-  YES -> Gate C
-
-Gate C: same materiality survives Dev-only per-medication calibration?
-  NO  -> STOP_SIGNATURE_EXPLAINED_BY_PER_DRUG_CALIBRATION
-  YES -> PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION
-```
-
-A PASS authorizes only later semantic admission after independent integrity audit. It does not authorize a group-aware decoder/loss, Gate 02, additional backbones, or test evaluation.
-
-## Implementation surface
-
-Idea-local files:
-
-```text
-research/ideas/005-safety-substitution-structure/experiments/
-  gate-01-output-structure-signature.md
-  gate-01-design-integrity-audit.md
-  stage_gate01_inputs.py
-  run_output_structure_signature_gate.py
-
-tests/unit/
-  test_gate_01_output_structure_signature.py
-```
-
-The runner reuses the frozen MoleRec Comparison identities, stages only validation inputs on 319, obtains complete vocabulary scores through the existing target-free Comparison adapter, verifies the raw adapter set equals `score >= 0.5`, fits thresholds on Dev only, and writes restricted per-unit artifacts only under the 319 run root.
-
-The only Git-eligible execution output is the public-safe aggregate summary after integrity audit. Patient/visit rows, score vectors, threshold maps, targets, predictions, checkpoints, and logs remain outside Git.
+- Restricted per-unit and threshold artifacts remain outside Git on `319-lab`:
+  `/root/zhb/medrec-data/runs/ideas/005-safety-substitution-structure/gate-01-output-structure-signature-20260904-155810/`
+- Public-safe aggregate summary and audit documents are committed in repository.
 
 ## Next owner
 
-Local execution agent.
+CCFA workflow planner / protocol designer.
 
-Execute only the P0--P5 workflow in `docs/plans/2026-09-04-idea-005-output-structure-signature-gate-plan.md` and the frozen Gate protocol.
+The next stage is strictly:
 
-The next owner must:
-
-1. synchronize to the accepted clean harness revision and run local software checks;
-2. perform the 319 preflight from `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`;
-3. run exactly one formal validation-only Gate 01 in a fresh restricted run directory;
-4. independently audit the result against the frozen protocol;
-5. record the public-safe summary, integrity audit, and research decision;
-6. stop after the Gate 01 verdict.
-
-Do not redesign the Gate, access test, change seed/grouping/signatures/support thresholds, run outcome-seeking variants, begin semantic admission, or implement the downstream method in the same execution.
+- Designing a **Semantic Admission Protocol** for independent review to test whether high-support ATC-2 sibling groups contain clinically defensible alternatives.
+- **Gate 02 remains NOT_AUTHORIZED**.
+- Do not access test split.
+- Do not train or implement group-aware decoders/models before semantic admission is formally designed, reviewed, and audited.

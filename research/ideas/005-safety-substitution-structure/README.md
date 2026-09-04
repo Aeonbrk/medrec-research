@@ -3,16 +3,19 @@
 # Idea 005: Safety-Preserving Substitution Structure
 
 - **Idea ID**: `005-safety-substitution-structure`
-- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`
+- **Status**: `GATE_01_PASSED / SEMANTIC_ADMISSION_PENDING`
 - **Scientific stage**: Idea / hypothesis selection
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
 - **Primary method direction**: safety by substitution, not suppression
 - **Gate 01**: [`experiments/gate-01-output-structure-signature.md`](experiments/gate-01-output-structure-signature.md)
+- **Gate 01 Summary**: [`experiments/gate-01-summary.json`](experiments/gate-01-summary.json)
+- **Integrity Audit**: [`experiments/gate-01-integrity-audit.md`](experiments/gate-01-integrity-audit.md) (`INTEGRITY_PASS`)
+- **Research Decision**: [`research-decision.md`](research-decision.md) (`PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`)
 - **Design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`)
 - **Literature grounding**: [`literature-search-20260904-safety-substitution-output-structure/`](literature-search-20260904-safety-substitution-output-structure/)
 - **Strict idea review**: [`idea-review.md`](idea-review.md)
 - **Gate 02**: `NOT_AUTHORIZED`
-- **Test split**: must remain unindexed, unpredicted, and untouched
+- **Test split**: remains unindexed, unpredicted, and untouched
 
 ## Scientific question
 

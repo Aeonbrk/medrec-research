@@ -1,0 +1,77 @@
+{
+  "audit": {
+    "calibrated": {
+      "any_signature_patients": 394,
+      "any_signature_units": 1172,
+      "duplicate_signature_patients": 391,
+      "duplicate_signature_units": 1122,
+      "signature_parents_with_at_least_10_patients": 14,
+      "split_signature_patients": 46,
+      "split_signature_units": 50
+    },
+    "candidate_group_count": 31,
+    "eligible_group_count": 31,
+    "eligible_patients": 440,
+    "eligible_units": 3919,
+    "groups_with_at_least_50_eligible_patients": 20,
+    "raw": {
+      "any_signature_patients": 338,
+      "any_signature_units": 751,
+      "duplicate_signature_patients": 326,
+      "duplicate_signature_units": 680,
+      "signature_parents_with_at_least_10_patients": 8,
+      "split_signature_patients": 65,
+      "split_signature_units": 71
+    }
+  },
+  "calibration_control": {
+    "fit_split": "Dev only",
+    "objective": "per-medication F1",
+    "tie_break": "closest_to_0.5_then_larger_threshold"
+  },
+  "decision_criteria": {
+    "gate_a_multi_group_support": true,
+    "gate_b_signature_groups": true,
+    "gate_b_signature_patients": true,
+    "gate_c_calibrated_signature_groups": true,
+    "gate_c_calibrated_signature_patients": true
+  },
+  "formal_run_id": "gate-01-output-structure-signature-20260904-155810",
+  "gate_id": "gate-01-output-structure-signature",
+  "group_definition": {
+    "candidate_parent": "first three characters / ATC-2",
+    "clinical_substitutability_claimed": false,
+    "medication_level": "ATC-3",
+    "minimum_vocabulary_members": 2
+  },
+  "group_mass_threshold": 0.5,
+  "harness_revision": "4bb07d3d0050070a811f7a4e307522906470e6f7",
+  "idea_id": "005-safety-substitution-structure",
+  "identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "protocol_commit": "95966eab6d018e34b6dae4a52271562826bb5b4d",
+  "raw_threshold": 0.5,
+  "schema_version": 1,
+  "split": {
+    "audit_patient_count": 530,
+    "dev_patient_count": 529,
+    "patient_level": true,
+    "seed": 2005,
+    "source": "validation",
+    "validation_patient_count": 1059
+  },
+  "verdict": "PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION"
+}

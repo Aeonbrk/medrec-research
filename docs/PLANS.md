@@ -1,13 +1,19 @@
 # Plans
 
-## Active: Gate 01 — Output-Structure Signature (Idea 005)
+## Completed: Gate 01 — Output-Structure Signature (Idea 005)
 
 - **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`.
-- **Plan**: `docs/plans/2026-09-04-idea-005-output-structure-signature-gate-plan.md`.
-- **Overview**: `research/ideas/005-safety-substitution-structure/README.md`.
-- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`.
-- **Protocol Commit**: `95966eab6d018e34b6dae4a52271562826bb5b4d`.
-- **Scope**: Validation-only hypothesis selection on frozen MoleRec ATC-3 outputs under deterministic patient split seed 2005 (529 Dev / 530 Audit); testing raw 0.5 and Dev-only per-medication F1-calibrated policies on ATC-2 sibling candidate groups for SplitMassFN and DuplicateSiblingFP signatures. Test split remains unindexed and untouched; Gate 02 is `NOT_AUTHORIZED`.
+- **Status**: Completed; formal verdict `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`.
+- **Formal Run**: `gate-01-output-structure-signature-20260904-155810` executed on `319-lab` under `medrec-core-evaluator` at harness revision `4bb07d3d0050070a811f7a4e307522906470e6f7`.
+- **Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/005-safety-substitution-structure/experiments/gate-01-integrity-audit.md`.
+- **Scientific Findings**:
+  - Gate A (ATC-3 group support) passed: 20 candidate ATC-2 sibling groups meet the $\ge 50$ distinct Audit patients criterion (out of 31 candidate groups with $|G| \ge 2$), exceeding the required $\ge 3$ groups.
+  - Gate B (raw structural signature) passed: 338 distinct Audit patients exhibit `AnySignature` ($\ge 50$), with 8 distinct ATC-2 parents having $\ge 10$ signature patients ($\ge 3$). Raw SplitMassFN: 65 patients (71 units); raw DuplicateSiblingFP: 326 patients (680 units).
+  - Gate C (killer control) passed: Under Dev-frozen F1-optimal per-medication thresholds, materiality persists on Audit: 394 distinct Audit patients exhibit `AnySignature` ($\ge 50$), with 14 distinct ATC-2 parents having $\ge 10$ signature patients ($\ge 3$). Calibrated SplitMassFN: 46 patients (50 units); calibrated DuplicateSiblingFP: 391 patients (1,122 units).
+- **Decision & Bounds**: Gate 02 remains `NOT_AUTHORIZED`. Idea 005 is retained for semantic admission protocol design only. Findings do not establish therapeutic substitution, safety by substitution, or clinical benefit. Test split remains 100% untouched.
+- **Decision Document**: `research/ideas/005-safety-substitution-structure/research-decision.md`.
+- **Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-summary.json`.
+- **Next Stage**: Semantic admission protocol design only (not executed in this session).
 
 ## Completed: Gate 01 — Co-Selection Compatibility (Idea 004)
 
