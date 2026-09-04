@@ -39,9 +39,9 @@ Under the frozen Semantic Admission protocol (`experiments/semantic-admission-pr
 
 The empirical multi-label sibling correlation observed in deep recommender outputs is characterized clinically by:
 
-1. **Complementary combination regimens**: In clinical practice, therapies frequently appear together in EHR visits as part of multimodal regimens (e.g. pain regimens, sequential nephron blockade), meaning joint co-occurrence rather than alternative mass allocation dominates sibling pairs.
+1. **Complementary combination regimens**: Many high-support sibling relations correspond clinically to complementary regimens or other non-substitution treatment structure; this adjudication does not identify the causal mechanism that produced the model scores.
 2. **Coarse taxonomy co-location**: WHO ATC-2 groupings cluster drugs by broad anatomical organ system rather than therapeutic interchangeability. At the ATC-3 level, subgroups often represent disjoint severity strata (mild episodic vs severe chronic).
-3. **Narrow scope of class-level substitution**: At the ATC-3 prediction resolution, true class-wide therapeutic alternatives are exceedingly rare (only ACEi vs ARB in `C09` satisfied class-level criteria), while other candidate domains (e.g. antibacterials) are limited to narrow, agent-specific regimens and fail class-wide interchangeability.
+3. **Narrow scope of class-level substitution**: Within the 23 supported relations under the frozen ATC-3 action space and preregistered evidence criteria, only `C09A -> C09C` satisfied strict class-resolution admission.
 
 ## Reusable constraints
 
@@ -56,6 +56,6 @@ Idea-local evidence:
 
 General guidance:
 
-- **Do not equate empirical taxonomy sibling errors with clinical substitution**: Deep multi-label recommenders produce sibling false positives in training co-occurrence contexts without implying that clinicians consider the drug classes interchangeable.
+- **Do not equate empirical taxonomy sibling errors with clinical substitution**: Observed sibling false positives do not imply that clinicians consider the corresponding drug classes interchangeable.
 - **Do not treat shared approved indication as therapeutic equivalence**: Shared indication is an unreliable proxy for substitution; in hospital medicine, drugs sharing an indication are frequently complementary combination partners or sequential escalation steps.
 - **Do not develop substitution decoders without prior semantic admission**: Designing group-aware or substitution-based decoders without verifying clinical interchangeability leads to optimizing an artifactual, clinically invalid loss surface.
