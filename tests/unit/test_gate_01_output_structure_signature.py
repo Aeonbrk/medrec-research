@@ -28,9 +28,7 @@ def test_gate_01_self_test_passes() -> None:
 
 def test_atc2_sibling_grouping_is_prefix_only() -> None:
     module = _load_gate_module()
-    groups = module.build_sibling_groups(
-        ("A02A", "A02B", "A03A", "B01A", "B01B", "B01C", "C01A")
-    )
+    groups = module.build_sibling_groups(("A02A", "A02B", "A03A", "B01A", "B01B", "B01C", "C01A"))
     assert groups == {
         "A02": ("A02A", "A02B"),
         "B01": ("B01A", "B01B", "B01C"),
@@ -60,9 +58,7 @@ def test_seed_2005_split_is_deterministic_and_patient_disjoint() -> None:
 
 def test_per_medication_threshold_f1_and_tie_breaking() -> None:
     module = _load_gate_module()
-    assert module.choose_f1_threshold(
-        [(0.9, True), (0.8, True), (0.7, False), (0.2, False)]
-    ) == 0.8
+    assert module.choose_f1_threshold([(0.9, True), (0.8, True), (0.7, False), (0.2, False)]) == 0.8
     assert module.choose_f1_threshold([(0.9, False), (0.1, False)]) == 0.5
 
 

@@ -113,12 +113,10 @@ def verify_frozen_molerec_identity(
     source_revision = _git_revision(molerec_root)
     if source_revision != FROZEN_MOLEREC_REVISION:
         raise ValueError(
-            "MoleRec source revision drift: expected {}, got {}".format(
-                FROZEN_MOLEREC_REVISION, source_revision
-            )
+            f"MoleRec source revision drift: expected {FROZEN_MOLEREC_REVISION}, got {source_revision}"
         )
     if not checkpoint.exists():
-        raise FileNotFoundError("MoleRec checkpoint not found at {}".format(checkpoint))
+        raise FileNotFoundError(f"MoleRec checkpoint not found at {checkpoint}")
     checkpoint_sha256 = _file_sha256(checkpoint)
     if checkpoint_sha256 != FROZEN_CHECKPOINT_SHA256:
         raise ValueError("MoleRec checkpoint identity drift")
@@ -133,9 +131,7 @@ def verify_frozen_molerec_identity(
         {
             "checkpoint_sha256": checkpoint_sha256,
             "revision": FROZEN_MOLEREC_REVISION,
-            "source_files": {
-                name: _file_sha256(molerec_root / name) for name in source_files
-            },
+            "source_files": {name: _file_sha256(molerec_root / name) for name in source_files},
         }
     )
     if core_sha256 != FROZEN_BASELINE_CORE_SHA256:
@@ -149,9 +145,7 @@ def verify_frozen_molerec_identity(
 
 def verify_conda_environment(conda_executable: str | Path, environment_name: str) -> str:
     if environment_name != FROZEN_BASELINE_ENVIRONMENT_NAME:
-        raise ValueError(
-            "Formal Gate 01 must use {}".format(FROZEN_BASELINE_ENVIRONMENT_NAME)
-        )
+        raise ValueError(f"Formal Gate 01 must use {FROZEN_BASELINE_ENVIRONMENT_NAME}")
     completed = subprocess.run(
         (str(conda_executable), "list", "--explicit", "-n", environment_name),
         check=True,
@@ -199,7 +193,7 @@ def verify_dataset_manifest_and_snapshot(
 
 def atc2_parent(medication_code: str) -> str:
     if len(medication_code) < 4:
-        raise ValueError("Expected ATC-3 medication code, got {!r}".format(medication_code))
+        raise ValueError(f"Expected ATC-3 medication code, got {medication_code!r}")
     return medication_code[:3]
 
 
@@ -238,9 +232,9 @@ def partition_validation_patients(
 
 
 def medication_f1(labels: list[bool], predictions: list[bool]) -> float:
-    tp = sum(1 for label, pred in zip(labels, predictions) if label and pred)
-    fp = sum(1 for label, pred in zip(labels, predictions) if not label and pred)
-    fn = sum(1 for label, pred in zip(labels, predictions) if label and not pred)
+    tp = sum(1 for label, pred in zip(labels, predictions, strict=True) if label and pred)
+    fp = sum(1 for label, pred in zip(labels, predictions, strict=True) if not label and pred)
+    fn = sum(1 for label, pred in zip(labels, predictions, strict=True) if label and not pred)
     denominator = 2 * tp + fp + fn
     return 0.0 if denominator == 0 else (2.0 * tp) / denominator
 
@@ -306,8 +300,7 @@ def fit_per_medication_thresholds(
                 (float(scores[medication]), medication in target_set)
             )
     return {
-        medication: choose_f1_threshold(rows)
-        for medication, rows in rows_by_medication.items()
+        medication: choose_f1_threshold(rows) for medication, rows in rows_by_medication.items()
     }
 
 
@@ -332,9 +325,8 @@ def signature_flags(
         and not group_predictions
         and mass >= GROUP_MASS_THRESHOLD
     )
-    duplicate_sibling_fp = (
-        target_member in policy_prediction
-        and bool(group_predictions.difference({target_member}))
+    duplicate_sibling_fp = target_member in policy_prediction and bool(
+        group_predictions.difference({target_member})
     )
     if split_mass_fn and duplicate_sibling_fp:
         raise AssertionError("Gate 01 signatures must be mutually exclusive")
@@ -381,9 +373,7 @@ def evaluate_audit_units(
             medication for medication, score in scores.items() if float(score) >= RAW_THRESHOLD
         )
         if adapter_predicted != threshold_predicted:
-            raise ValueError(
-                "Frozen adapter predicted set does not equal vocabulary_scores >= 0.5"
-            )
+            raise ValueError("Frozen adapter predicted set does not equal vocabulary_scores >= 0.5")
 
         raw_prediction = threshold_predicted
         calibrated_prediction = predicted_set(scores, calibrated_thresholds)
@@ -456,7 +446,9 @@ def evaluate_audit_units(
         "eligible_units": eligible_units,
         "eligible_patients": len(eligible_patients),
         "candidate_group_count": len(groups),
-        "eligible_group_count": sum(1 for patients in eligible_patients_by_group.values() if patients),
+        "eligible_group_count": sum(
+            1 for patients in eligible_patients_by_group.values() if patients
+        ),
         "groups_with_at_least_50_eligible_patients": sum(
             1
             for patients in eligible_patients_by_group.values()
@@ -472,9 +464,7 @@ def evaluate_decision_tree(stats: dict[str, Any]) -> tuple[str, dict[str, bool]]
     gate_a = stats["groups_with_at_least_50_eligible_patients"] >= GATE_A_MIN_GROUPS
     raw = stats["raw"]
     gate_b_patients = raw["any_signature_patients"] >= SIGNATURE_MIN_PATIENTS
-    gate_b_groups = (
-        raw["signature_parents_with_at_least_10_patients"] >= SIGNATURE_MIN_GROUPS
-    )
+    gate_b_groups = raw["signature_parents_with_at_least_10_patients"] >= SIGNATURE_MIN_GROUPS
     calibrated = stats["calibrated"]
     gate_c_patients = calibrated["any_signature_patients"] >= SIGNATURE_MIN_PATIENTS
     gate_c_groups = (
@@ -514,9 +504,7 @@ def self_test_gate_01() -> None:
     assert choose_f1_threshold([(0.1, False), (0.2, False)]) == RAW_THRESHOLD
 
     scores = {"A02A": 0.4, "A02B": 0.3}
-    split, duplicate, _ = signature_flags(
-        ("A02A", "A02B"), "A02A", scores, frozenset()
-    )
+    split, duplicate, _ = signature_flags(("A02A", "A02B"), "A02A", scores, frozenset())
     assert split and not duplicate
     split, duplicate, _ = signature_flags(
         ("A02A", "A02B"),
@@ -550,10 +538,7 @@ def self_test_gate_01() -> None:
     )
     no_support = json.loads(json.dumps(base_stats))
     no_support["groups_with_at_least_50_eligible_patients"] = 2
-    assert (
-        evaluate_decision_tree(no_support)[0]
-        == "INCONCLUSIVE_INSUFFICIENT_ATC3_GROUP_SUPPORT"
-    )
+    assert evaluate_decision_tree(no_support)[0] == "INCONCLUSIVE_INSUFFICIENT_ATC3_GROUP_SUPPORT"
 
 
 def run_gate(
@@ -574,7 +559,7 @@ def run_gate(
     molerec_root = molerec_root.resolve()
     checkpoint = checkpoint.resolve()
     if output_root.exists():
-        raise FileExistsError("Gate 01 requires a fresh output directory: {}".format(output_root))
+        raise FileExistsError(f"Gate 01 requires a fresh output directory: {output_root}")
     output_root.mkdir(parents=True, exist_ok=False)
 
     harness_root = _HARNESS_ROOT if harness_root is None else harness_root.resolve()
@@ -583,9 +568,7 @@ def run_gate(
     harness_revision = _git_revision(harness_root)
     if expected_harness_revision is not None and harness_revision != expected_harness_revision:
         raise ValueError(
-            "Harness revision drift: expected {}, got {}".format(
-                expected_harness_revision, harness_revision
-            )
+            f"Harness revision drift: expected {expected_harness_revision}, got {harness_revision}"
         )
 
     adapter_path = harness_root / "baselines" / "molerec_comparison.py"
@@ -664,8 +647,7 @@ def run_gate(
             "visit_id": prediction.visit_id,
             "predicted_medications": list(prediction.predicted_medications),
             "vocabulary_scores": {
-                item.medication_code: float(item.score)
-                for item in prediction.vocabulary_scores
+                item.medication_code: float(item.score) for item in prediction.vocabulary_scores
             },
         }
         for prediction in batch.predictions

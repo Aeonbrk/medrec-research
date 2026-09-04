@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD013 -->
+<!-- markdownlint-disable MD013 MD036 -->
 
 # Idea Grounding — Residual False-Positive Routing Beyond Frozen Score
 

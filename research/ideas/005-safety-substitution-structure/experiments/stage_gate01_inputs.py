@@ -12,9 +12,8 @@ import hashlib
 import hmac
 import json
 import secrets
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
-
 
 FEATURE_RULE = {
     "current_diagnoses": True,
@@ -47,12 +46,12 @@ def _content_sha256(value: object) -> str:
 
 
 def _vocabulary_sha256(vocabulary: Iterable[str]) -> str:
-    serialized = "".join("{}\n".format(code) for code in sorted(vocabulary))
+    serialized = "".join(f"{code}\n" for code in sorted(vocabulary))
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def _identifier(key: bytes, kind: str, *indices: int) -> str:
-    message = ":".join((kind,) + tuple(str(index) for index in indices)).encode()
+    message = ":".join((kind, *tuple(str(index) for index in indices))).encode()
     return hmac.new(key, message, hashlib.sha256).hexdigest()
 
 
@@ -123,7 +122,7 @@ def stage_gate01_inputs(
         patient = records[patient_index]
         for visit_order, visit_index in enumerate(range(1, len(patient)), start=1):
             visit_id = _identifier(membership_key, "visit", patient_index, visit_index)
-            visit_key = "{}:{}".format(patient_id, visit_id)
+            visit_key = f"{patient_id}:{visit_id}"
             expected_visits.append([patient_id, visit_id])
 
             history = tuple(

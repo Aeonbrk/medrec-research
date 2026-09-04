@@ -1,5 +1,14 @@
 # Plans
 
+## Active: Gate 01 — Output-Structure Signature (Idea 005)
+
+- **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`.
+- **Plan**: `docs/plans/2026-09-04-idea-005-output-structure-signature-gate-plan.md`.
+- **Overview**: `research/ideas/005-safety-substitution-structure/README.md`.
+- **Status**: `SELECTED / GATE_01_DESIGNED_NOT_EXECUTED`.
+- **Protocol Commit**: `95966eab6d018e34b6dae4a52271562826bb5b4d`.
+- **Scope**: Validation-only hypothesis selection on frozen MoleRec ATC-3 outputs under deterministic patient split seed 2005 (529 Dev / 530 Audit); testing raw 0.5 and Dev-only per-medication F1-calibrated policies on ATC-2 sibling candidate groups for SplitMassFN and DuplicateSiblingFP signatures. Test split remains unindexed and untouched; Gate 02 is `NOT_AUTHORIZED`.
+
 ## Completed: Gate 01 — Co-Selection Compatibility (Idea 004)
 
 - **Protocol**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-co-selection-compatibility.md`.
