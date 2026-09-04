@@ -1,5 +1,16 @@
 # Plans
 
+## Active: Semantic Admission — Safety-Preserving Substitution Structure (Idea 005)
+
+- **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-protocol.md`.
+- **Design Audit**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`).
+- **Status**: `DESIGNED_NOT_EXECUTED`.
+- **Upstream Evidence**: Gate 01 verdict `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION` with `INTEGRITY_PASS`; 394 calibrated-signature Audit patients across 14 supported ATC-2 parents.
+- **Scientific Question**: whether the empirically supported target-to-sibling relations contain a material subset supported by independent authoritative evidence as alternative treatment structure at the repository's ATC-3 prediction resolution.
+- **Strong Semantic Control**: `same ATC parent + shared approved indication` is recorded only as `NAIVE_SHARED_INDICATION` and cannot determine PASS. Strict admission requires authoritative guideline/formulary evidence explicitly positioning the compared treatment classes as alternatives in the same indication and overlapping clinical context.
+- **Decision Tree**: supported relations must first cover at least 50% of calibrated-signature patients across at least 3 ATC-2 parents; strict admitted relations must then cover at least 25% of calibrated-signature patients and span at least 3 ATC-2 parents with at least 10 admitted-relation patients per parent.
+- **Execution Boundary**: reuse the existing restricted Gate-01 Audit artifacts without new MoleRec inference; hide support counts during semantic adjudication; run `ccf-integrity-auditor` claim/citation/numeric audit after labels freeze; test remains untouched; Gate 02 and method implementation remain `NOT_AUTHORIZED`.
+
 ## Completed: Gate 01 — Output-Structure Signature (Idea 005)
 
 - **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`.
