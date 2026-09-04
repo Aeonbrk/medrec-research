@@ -47,9 +47,9 @@ Research decision unlocked: yes
 | :--- | :--- | :--- | :--- | :--- |
 | `semantic-admission-protocol.md` §4 | "Each semantic unit contributes exactly one deterministic directed class relation $y_t \to a_t$." | 1,121 calibrated signature units evaluated across the 20 high-support groups. | **Supported** | SplitMassFN: $\arg\max_{m \in G \setminus \{y_t\}} p_t(m)$; DuplicateSiblingFP: $\arg\max_{m \in (\hat M_t^{cal} \cap G) \setminus \{y_t\}} p_t(m)$; tie-break: ATC-3 ascending. |
 | `semantic-admission-summary.json` §Semantic A | Supported relations cover $\ge 50\%$ of calibrated signature patients and span $\ge 3$ ATC-2 parents. | 23 supported relations cover 381 distinct patients (96.70%) across 12 ATC-2 parents. | **Supported** | Semantic A concentration gate unconditionally PASSED. |
-| `semantic-admission-ledger.md` §1 | Every ADMIT relation is supported by Tier-A clinical guideline evidence. | All 4 admitted relations cite ACC/AHA or ATS/IDSA guidelines explicitly positioning classes as alternatives. | **Supported** | 0 ADMIT relations based on Tier-B or Tier-C alone. |
-| `semantic-admission-ledger.md` §Negative Control | `NAIVE_SHARED_INDICATION = true` is tracked separately and does not determine PASS. | 14 relations have shared indication; 10 are rejected due to complementary combination or distinct disease severity. | **Supported** | Strong negative control prevented semantic inflation. |
-| `semantic-admission-summary.json` §Semantic B | Strict ADMIT relations fail the $\ge 25\%$ coverage and $\ge 3$ qualifying parent threshold. | 75 distinct patients (19.04% < 25%) across 2 parents (`C09`: 11 pts, `J01`: 65 pts; $2 < 3$). | **Supported** | Semantic B criteria fail mechanically. |
+| `semantic-admission-ledger.md` §1 | Every ADMIT relation is supported by Tier-A clinical guideline evidence at class resolution. | 1 admitted relation (`C09A -> C09C`) cites ACC/AHA/KDIGO guidelines explicitly positioning classes as alternatives. | **Supported** | 0 ADMIT relations based on Tier-B or Tier-C alone; candidate J01 relations re-audited and rejected under §8.1(4). |
+| `semantic-admission-ledger.md` §Negative Control | `NAIVE_SHARED_INDICATION = true` is tracked separately and does not determine PASS. | 14 relations have shared indication; 13 are rejected due to complementary combination, disjoint severity, or failure of class-level equivalence. | **Supported** | Strong negative control prevented semantic inflation. |
+| `semantic-admission-summary.json` §Semantic B | Strict ADMIT relations fail the $\ge 25\%$ coverage and $\ge 3$ qualifying parent threshold. | 11 distinct patients (2.79% < 25%) across 1 parent (`C09`: 11 pts; $1 < 3$). | **Supported** | Semantic B criteria fail mechanically. |
 | `semantic-admission-summary.json` §Verdict | Mechanical verdict is `STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`. | Direct mechanical consequence of Semantic B failure. | **Supported** | Matches preregistered decision tree exactly. |
 
 ---
@@ -57,9 +57,8 @@ Research decision unlocked: yes
 ## 2. Evidence Hierarchy & Citation Audit
 
 1. **Tier-A Verification for ADMIT**:
-   - `C09A -> C09C`: 2017 ACC/AHA High Blood Pressure Guideline ([10.1161/HYP.0000000000000065](https://doi.org/10.1161/HYP.0000000000000065)) & 2022 AHA/ACC/HFSA Heart Failure Guideline ([10.1161/CIR.0000000000001063](https://doi.org/10.1161/CIR.0000000000001063)). Explicit first-line alternatives for hypertension/HFrEF; ARB alternative when ACEi intolerant; dual blockade contraindicated. (Tier A validated).
-   - `J01C -> J01D`: 2011 IDSA Neutropenic Fever Guideline ([10.1093/cid/cir073](https://doi.org/10.1093/cid/cir073)) & 2016 IDSA/ATS HAP/VAP Guideline ([10.1093/cid/ciw353](https://doi.org/10.1093/cid/ciw353)). Broad-spectrum antipseudomonal monotherapy alternatives (piperacillin-tazobactam vs cefepime/meropenem). (Tier A validated).
-   - `J01D -> J01M` & `J01M -> J01D`: 2019 ATS/IDSA CAP Guideline ([10.1164/rccm.201908-1581ST](https://doi.org/10.1164/rccm.201908-1581ST)). Inpatient empiric alternative monotherapy / substitute for beta-lactam intolerance (cephalosporin vs respiratory fluoroquinolone). (Tier A validated).
+   - `C09A -> C09C`: 2017 ACC/AHA High Blood Pressure Guideline ([10.1161/HYP.0000000000000065](https://doi.org/10.1161/HYP.0000000000000065)) & 2022 AHA/ACC/HFSA Heart Failure Guideline ([10.1161/CIR.0000000000001063](https://doi.org/10.1161/CIR.0000000000001063)). Explicit first-line alternatives for hypertension/HFrEF; ARB alternative when ACEi intolerant; dual blockade contraindicated. (Tier A validated at class resolution).
+   - `J01` Class-Resolution Re-audit: Under §8.1(4) and §8.2 of the frozen protocol, Tier-A evidence must support the alternative relation at the ATC-3 class resolution represented by the model. While IDSA/ATS guidelines support specific agent/regimen alternatives in select infection contexts (e.g. piperacillin-tazobactam vs cefepime in neutropenic fever; ceftriaxone vs levofloxacin in CAP for penicillin-allergic patients), they do not support whole class interchangeability between heterogeneous ATC-3 groups (`J01C`, `J01D`, `J01M`). Pursuant to §8.2, `J01C -> J01D`, `J01D -> J01M`, and `J01M -> J01D` are correctly classified as `REJECT_NOT_ALTERNATIVE`.
 
 2. **Citation Context Audit**:
    - Confirmed that citation context supports alternative therapeutic positioning, NOT mere mention in the same chapter.
@@ -97,11 +96,11 @@ Research decision unlocked: yes
 | **Supported Relations** | Distinct audit patients $\ge 10$ | 23 relations | Exact match |
 | **Semantic A Patient Coverage** | $\ge 50.0\%$ ($197 / 394$) | 381 patients ($96.70\%$) | **PASS** |
 | **Semantic A Parent Span** | $\ge 3$ ATC-2 parents | 12 parents | **PASS** |
-| **Strict Admitted Relations** | Formally meeting Tier-A criteria | 4 relations (`C09A->C09C`, `J01C->J01D`, `J01D->J01M`, `J01M->J01D`) | Exact match |
-| **Strict Rejected Relations** | Not alternative / complementary / disjoint | 19 relations | Exact match |
+| **Strict Admitted Relations** | Formally meeting Tier-A criteria at class resolution | 1 relation (`C09A->C09C`) | Exact match |
+| **Strict Rejected Relations** | Not alternative / complementary / disjoint / class-heterogeneous | 22 relations | Exact match |
 | **Strict Unresolved Relations** | Insufficient evidence | 0 relations | Exact match |
-| **Semantic B Patient Coverage** | $\ge 25.0\%$ ($99 / 394$) | 75 patients ($19.04\%$) | **FAIL** ($19.04\% < 25.0\%$) |
-| **Semantic B Qualifying Parents** | $\ge 3$ parents with $\ge 10$ admitted pts | 2 parents (`C09`: 11, `J01`: 65) | **FAIL** ($2 < 3$) |
+| **Semantic B Patient Coverage** | $\ge 25.0\%$ ($99 / 394$) | 11 patients ($2.79\%$) | **FAIL** ($2.79\% < 25.0\%$) |
+| **Semantic B Qualifying Parents** | $\ge 3$ parents with $\ge 10$ admitted pts | 1 parent (`C09`: 11) | **FAIL** ($1 < 3$) |
 | **Mechanical Decision** | Decision tree terminal node | `STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE` | **Verified** |
 
 ---

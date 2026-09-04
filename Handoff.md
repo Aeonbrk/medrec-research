@@ -37,7 +37,7 @@ $$
 \end{aligned}}
 $$
 
-**Result**: **NO**. At the repository's ATC-3 prediction resolution, the empirically observed output structure is predominantly driven by complementary combination regimens, sequential disease escalation, and broad anatomical taxonomy co-location, rather than clinically defensible therapeutic alternative substitution.
+**Result**: **NO**. At the repository's ATC-3 prediction resolution, many high-support relations correspond clinically to complementary combination therapy, disjoint treatment contexts, or coarse taxonomy co-location rather than therapeutic alternatives.
 
 ### Mechanical Decision Tree Findings
 
@@ -47,20 +47,21 @@ $$
 2. **Semantic A (Relation Concentration Gate)**: **PASS**
    - Requirement: supported relations cover $\ge 50\%$ of the 394 calibrated-signature patients across $\ge 3$ ATC-2 parents.
    - Observed: 23 supported relations cover 381 distinct patients (96.70% of 394) across 12 ATC-2 parents.
-3. **Blinded Evidence Adjudication & Negative Control**:
-   - Only 4 relations were admitted under Tier-A clinical guideline evidence:
-     - `C09A -> C09C` (ACEi vs ARB in hypertension/HFrEF; ACC/AHA guidelines);
-     - `J01C -> J01D` (Penicillins vs Cephalosporins in febrile neutropenia/HAP; IDSA guidelines);
-     - `J01D -> J01M` and `J01M -> J01D` (Cephalosporins vs Quinolones in pneumonia/cUTI; ATS/IDSA guidelines).
-   - 19 relations were strictly rejected:
+3. **Support-Count-Blinded Evidence Adjudication & Negative Control**:
+   - Strict Tier-A alternative treatment evidence at the ATC-3 class resolution was confirmed for only 1 relation:
+     - `C09A -> C09C` (ACEi vs ARB in hypertension/HFrEF; ACC/AHA guidelines; 11 patients).
+   - Re-audit of the three candidate antibacterial relations (`J01C -> J01D`, `J01D <-> J01M`) under frozen protocol §8.1(4) confirmed that clinical guidelines (IDSA/ATS) support only specific agent/regimen alternatives in select infection contexts, not wholesale class interchangeability between heterogeneous ATC-3 groups. Pursuant to §8.2, they were assigned `REJECT_NOT_ALTERNATIVE`.
+   - 22 relations in total were strictly rejected:
      - Complementary combinations: multimodal analgesia (`N02B <-> N02A`), sequential nephron blockade (`C03C -> C03A`);
      - Disjoint disease stages/severity: mucosal healing vs on-demand antacid neutralization (`A02B <-> A02A`);
      - Contraindications / distinct mechanisms: DHP vs non-DHP CCBs (`C08C -> C08D` contraindicated in HFrEF);
-     - Disjoint psychiatric domains: psychosis vs anxiety vs sleep (`N05A <-> N05B`, `N05C -> N05A`, `N05C -> N05B`).
-   - Strong negative control: 14 relations had shared approved indications (`NAIVE_SHARED_INDICATION = true`), but 10 of these 14 (71.4%) were rejected upon clinical examination, confirming that shared indication $\neq$ therapeutic substitution.
+     - Disjoint psychiatric domains: psychosis vs anxiety vs sleep (`N05A <-> N05B`, `N05C -> N05A`, `N05C -> N05B`);
+     - Heterogeneous antibacterial classes failing class-level interchangeability (`J01C -> J01D`, `J01D <-> J01M`).
+   - Strong negative control: Among the 14 supported relations labeled `NAIVE_SHARED_INDICATION`, 13 (92.9%) failed strict semantic admission, confirming that shared indication $\neq$ therapeutic substitution.
 4. **Semantic B (Material Strict Alternative Admission)**: **FAIL**
    - Requirement: strict admitted relations cover $\ge 25\%$ of calibrated-signature patients and span $\ge 3$ ATC-2 parents each with $\ge 10$ admitted patients.
-   - Observed: admitted relations cover only 75 distinct patients (19.04% < 25.0%) across only 2 parents (`C09` with 11 patients, `J01` with 65 patients).
+   - Observed: admitted relations cover only 11 distinct patients (2.79% < 25.0%) across only 1 parent (`C09` with 11 patients).
+   - Terminal Verdict: `STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`.
 
 ## Strict scope & termination boundaries
 

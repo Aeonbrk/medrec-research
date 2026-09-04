@@ -28,8 +28,8 @@
   },
   "evidence_adjudication": {
     "total_supported_relations": 23,
-    "admitted_relations_count": 4,
-    "rejected_relations_count": 19,
+    "admitted_relations_count": 1,
+    "rejected_relations_count": 22,
     "unresolved_relations_count": 0,
     "naive_shared_indication_count": 14,
     "admitted_relations": [
@@ -39,40 +39,18 @@
         "atc2_parent": "C09",
         "distinct_audit_patients": 11,
         "unit_count": 13
-      },
-      {
-        "target_atc3": "J01C",
-        "candidate_atc3": "J01D",
-        "atc2_parent": "J01",
-        "distinct_audit_patients": 10,
-        "unit_count": 10
-      },
-      {
-        "target_atc3": "J01D",
-        "candidate_atc3": "J01M",
-        "atc2_parent": "J01",
-        "distinct_audit_patients": 39,
-        "unit_count": 49
-      },
-      {
-        "target_atc3": "J01M",
-        "candidate_atc3": "J01D",
-        "atc2_parent": "J01",
-        "distinct_audit_patients": 21,
-        "unit_count": 23
       }
     ]
   },
   "semantic_b": {
-    "admitted_distinct_patients": 75,
-    "admitted_patient_coverage": 0.19035532994923857,
+    "admitted_distinct_patients": 11,
+    "admitted_patient_coverage": 0.027918781725888325,
     "coverage_threshold": 0.25,
-    "admitted_atc2_parents_count": 2,
+    "admitted_atc2_parents_count": 1,
     "parent_threshold": 3,
-    "admitted_parents_with_at_least_10_patients": 2,
+    "admitted_parents_with_at_least_10_patients": 1,
     "per_parent_admitted_patients": {
-      "C09": 11,
-      "J01": 65
+      "C09": 11
     },
     "criteria": {
       "pass_coverage": false,

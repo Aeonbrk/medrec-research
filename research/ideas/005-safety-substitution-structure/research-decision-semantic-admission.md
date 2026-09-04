@@ -27,17 +27,15 @@ Idea 005 investigated whether model safety should be achieved through therapeuti
 
 ### Result
 
-Under the preregistered, blinded Semantic Admission protocol:
+Under the preregistered, support-count-blinded Semantic Admission protocol:
 
 1. **Semantic A (Concentration Gate)**: **PASS**. The 23 supported relations ($\ge 10$ distinct Audit patients) concentrate across 381 distinct patients (96.70% of 394 calibrated signature patients) and span 12 ATC-2 parents.
 2. **Semantic B (Material Strict Alternative Admission)**: **FAIL**.
-   - Strict Tier-A alternative treatment evidence was confirmed for only 4 relations across 2 ATC-2 parents:
+   - Strict Tier-A alternative treatment evidence at the ATC-3 class resolution was confirmed for only 1 relation across 1 ATC-2 parent:
      - `C09`: `C09A` (ACE inhibitors) $\to$ `C09C` (ARBs) (11 patients)
-     - `J01`: `J01C` (Extended-spectrum penicillins) $\to$ `J01D` (Cephalosporins/Carbapenems) (10 patients)
-     - `J01`: `J01D` (Cephalosporins) $\to$ `J01M` (Fluoroquinolones) (39 patients)
-     - `J01`: `J01M` (Fluoroquinolones) $\to$ `J01D` (Cephalosporins) (21 patients)
-   - These 4 relations cover only **75 distinct patients** (**19.04%**), failing the preregistered $\ge 25.0\%$ threshold ($19.04\% < 25.0\%$).
-   - Admitted relations span only **2 ATC-2 parents** (`C09` and `J01`), failing the preregistered multi-parent requirement of $\ge 3$ parents each with $\ge 10$ admitted patients ($2 < 3$).
+   - Re-audit of the three candidate antibacterial relations (`J01C -> J01D`, `J01D -> J01M`, `J01M -> J01D`) under frozen protocol §8.1(4) confirmed that clinical guidelines (IDSA/ATS) support only specific agent/regimen alternatives in select infection contexts (e.g. piperacillin-tazobactam vs cefepime for empiric pseudomonal coverage; ceftriaxone vs levofloxacin in CAP for penicillin-allergic patients), rather than wholesale interchangeability between heterogeneous ATC-3 classes. Under §8.2, class heterogeneity and context-specific regimen choices fail class-level equivalence, resulting in `REJECT_NOT_ALTERNATIVE`.
+   - The single admitted relation covers only **11 distinct patients** (**2.79%**), failing the preregistered $\ge 25.0\%$ threshold ($2.79\% < 25.0\%$).
+   - Admitted relations span only **1 ATC-2 parent** (`C09`), failing the preregistered multi-parent requirement of $\ge 3$ parents each with $\ge 10$ admitted patients ($1 < 3$).
 
 Pursuant to the frozen decision tree, the formal verdict is:
 
@@ -62,19 +60,14 @@ $$
 
 The answer is **NO** at the current ATC-3 prediction resolution.
 
-The empirical phenomenon identified in Gate 01 is genuine: the baseline model frequently misallocates mass among sibling codes sharing an ATC-2 prefix (such as antacids vs PPIs, or opioids vs acetaminophen). However, independent clinical adjudication revealed that this empirical mass-sharing is **not** driven by clinical interchangeability:
+The empirical phenomenon identified in Gate 01 is genuine: the baseline model frequently misallocates mass among sibling codes sharing an ATC-2 prefix. However, support-count-blinded evidence adjudication revealed that many high-support relations correspond clinically to complementary combination therapy, disjoint treatment contexts, or coarse taxonomy co-location rather than therapeutic alternatives:
 
 1. **Taxonomy Artifact & Disjoint Severity**: High-frequency relations such as `A02B -> A02A` (195 patients) reflect coarse anatomical co-location under WHO ATC, but represent fundamentally disjoint clinical roles (transient on-demand symptom neutralization vs chronic mucosal healing antisecretory therapy).
-2. **Complementary Combination Therapy**: Relations such as `N02B -> N02A` (111 patients) and `N02A -> N02B` (32 patients) reflect foundational multimodal analgesia (where non-opioids and opioids are deliberately co-prescribed for synergistic opioid-sparing) or sequential WHO ladder escalation, rather than therapeutic substitution. Similarly, loop diuretics (`C03C`) and thiazides (`C03A`) are combined for sequential nephron blockade in refractory heart failure, not used as interchangeable substitutes.
+2. **Complementary Combination Regimens**: Relations such as `N02B -> N02A` (111 patients) and `N02A -> N02B` (32 patients) clinically correspond to foundational multimodal analgesia (where non-opioids and opioids are co-prescribed for synergistic opioid-sparing) or sequential WHO ladder escalation, rather than therapeutic substitution. Similarly, loop diuretics (`C03C`) and thiazides (`C03A`) are combined for sequential nephron blockade in refractory heart failure, not used as interchangeable substitutes.
 3. **Clinical Non-Equivalence & Contraindication**: Calcium channel blockers (`C08C -> C08D`) cannot be substituted because non-dihydropyridines depress myocardial contractility and AV conduction, and are strictly contraindicated in HFrEF.
-4. **Strong Negative Control Diagnostic**: 14 of the 23 relations (60.9%) shared at least one approved indication under FDA labeling (`NAIVE_SHARED_INDICATION = true`). However, 10 of these 14 relations (71.4%) were rejected upon rigorous clinical review. This decisively validates the protocol's premise that **shared indication $\neq$ therapeutic interchangeability**.
+4. **Negative Control Diagnostic**: Among the 14 supported relations labeled `NAIVE_SHARED_INDICATION`, 13 failed strict semantic admission (92.9%). This confirms that shared indication alone is insufficient for therapeutic substitution.
 
-Only two pharmacological domains exhibited genuine, guideline-backed alternative treatment positioning at the ATC-3 level:
-
-- Renin-angiotensin inhibitors (`C09`: ACEi vs ARB in hypertension and heart failure);
-- Broad-spectrum systemic antibacterials (`J01`: Penicillins vs Cephalosporins vs Fluoroquinolones in pneumonia, neutropenic fever, and sepsis).
-
-Because these valid domains cover less than 20% of the signature population and span only two parent classes, the substitution premise is too narrow and heterogeneous across the wider vocabulary to sustain a general architectural claim of "safety by substitution" for the medication recommendation benchmark.
+Under this frozen supported-relation set, current ATC-3 action space, and preregistered evidence criteria, strict admitted support did not reach the required multi-parent materiality (only ACEi vs ARB in `C09` met class-resolution alternative criteria, covering 2.79% of patients in 1 parent). Therefore, the substitution premise is too narrow and heterogeneous across the wider vocabulary to sustain a general architectural claim of "safety by substitution" for the medication recommendation benchmark.
 
 ---
 

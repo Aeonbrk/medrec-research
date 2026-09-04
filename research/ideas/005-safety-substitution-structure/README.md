@@ -69,16 +69,17 @@ Semantic Admission was executed under the frozen protocol (`experiments/semantic
    - 23 relations met the preregistered threshold of $\ge 10$ distinct Audit patients.
 2. **Semantic A (Concentration Gate)**: **PASS**
    - The 23 supported relations covered 381 distinct patients (96.70% $\ge 50\%$) across 12 ATC-2 parents ($\ge 3$).
-3. **Blinded Evidence Adjudication**:
+3. **Support-Count-Blinded Evidence Adjudication**:
    - Conducted against specialty-society and national guidelines (Tier A), FDA labeling (Tier B), and WHO ATC (Tier C).
-   - Only 4 relations were admitted under Tier-A evidence (`C09A -> C09C`, `J01C -> J01D`, `J01D -> J01M`, `J01M -> J01D`).
-   - 19 relations were rejected because empirical sibling co-occurrence reflects complementary combinations (e.g. multimodal analgesia `N02B <-> N02A`; sequential nephron blockade `C03C -> C03A`), disjoint disease severity (`A02B <-> A02A`), or non-substitutable contraindications (`C08C -> C08D`).
-   - 14 relations shared an approved indication, but 10 of these 14 (71.4%) were rejected upon clinical review, validating `NAIVE_SHARED_INDICATION` as a necessary negative control.
+   - Strict Tier-A alternative treatment evidence at the ATC-3 class resolution was confirmed for only 1 relation: `C09A -> C09C` (ACEi vs ARB, 11 patients).
+   - Re-audit of the three candidate antibacterial relations (`J01C -> J01D`, `J01D <-> J01M`) under frozen protocol §8.1(4) confirmed that clinical guidelines (IDSA/ATS) support only specific agent/regimen alternatives in select infection contexts, not wholesale class interchangeability between heterogeneous ATC-3 groups. Pursuant to §8.2, they were assigned `REJECT_NOT_ALTERNATIVE`.
+   - 22 relations in total were rejected because empirical sibling relations clinically correspond to complementary combinations (e.g. multimodal analgesia `N02B <-> N02A`; sequential nephron blockade `C03C -> C03A`), disjoint disease severity (`A02B <-> A02A`), or non-substitutable contraindications (`C08C -> C08D`).
+   - Among the 14 supported relations labeled `NAIVE_SHARED_INDICATION`, 13 (92.9%) failed strict semantic admission, validating `NAIVE_SHARED_INDICATION` as an effective negative control.
 4. **Semantic B (Material Strict Alternative Admission)**: **FAIL**
-   - Admitted relations covered only 75 distinct patients (19.04% < 25.0%).
-   - Admitted relations spanned only 2 ATC-2 parents (`C09` with 11 patients, `J01` with 65 patients; required $\ge 3$ parents with $\ge 10$ patients).
+   - Admitted relations covered only 11 distinct patients (2.79% < 25.0%).
+   - Admitted relations spanned only 1 qualifying ATC-2 parent (`C09` with 11 patients; required $\ge 3$ parents each with $\ge 10$ patients).
 5. **Integrity Audit**: **`INTEGRITY_PASS`**
-   - All 10 verification invariants passed without discrepancy.
+   - Verified across claim-audit, citation-audit, and numeric-audit without discrepancy.
 
 ## Authoritative decision
 
@@ -86,7 +87,7 @@ Semantic Admission was executed under the frozen protocol (`experiments/semantic
 
 Idea 005 is authoritatively **terminated**.
 
-The output-structure phenotype observed in Gate 01 is real, but it is predominantly driven by complementary combination regimens and coarse anatomical co-location, not by clinically defensible therapeutic alternative substitution.
+Under this frozen supported-relation set, current ATC-3 action space, and preregistered evidence criteria, strict admitted support did not reach the required multi-parent materiality.
 
 ## Stop boundary
 
