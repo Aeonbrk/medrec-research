@@ -16,6 +16,8 @@ This directory is **not** a dumping ground for dead markdown files or idea-local
 
 ## Navigation
 
+- **[`research-space-reorientation.md`](research-space-reorientation.md)**: Current cross-idea research-space SSOT after Ideas 001--005, including closed evidence boundaries, reopen conditions, the CCF-A method-paper constraint, and the active pre-Idea premise gate.
+- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: Compact current literature refresh supporting the reorientation and distinguishing crowded method families from the one active project-local premise.
 - **[`reusable-lessons.md`](reusable-lessons.md)**: Authoritative cross-route methodological guardrails (e.g., leveling hard filters across baselines, separating diagnostic metrics from solvers, distinguishing percentage points from relative gains).
 - **`failures/`**: Decisive negative cases whose failure mechanisms provide permanent methodological lessons:
   - [`crc-ps-r006--conformal-risk-certificate-exhaustion.md`](failures/crc-ps-r006--conformal-risk-certificate-exhaustion.md): Statistical certificate exhaustion on finite grids.
