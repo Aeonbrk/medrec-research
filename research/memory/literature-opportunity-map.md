@@ -23,10 +23,16 @@ Source policy: primary publisher/proceedings pages, PubMed/DBLP, and stable arXi
 | HeteroMed, 2026, DOI `10.1007/s13755-026-00430-5` | pure method | Heterogeneous graph and temporal medication modeling including introduction/retention structure | Add/retain temporal structure is already represented in current literature. |
 | DAPSNet, *Bioinformatics* 2023, DOI `10.1093/bioinformatics/btad003` | pure method | Reports standard accuracy, DDI, and average-number-of-drugs metrics; ablations show DDI regularization changes both DDI and medication count | Supports treating medication count as a confound/control in safety comparisons, but does not answer the current B0 causal attribution question. |
 | HypeMed, *ACM TOIS* 2026, DOI `10.1145/3803851` | pure method | Reports Jaccard/F1/PRAUC, DDI rate, and average medication count and explicitly treats prescription compactness as an evaluation dimension | Count is visible in current method evaluation, so a future paper cannot claim novelty from merely reporting it; the opportunity would have to be a method that resolves a demonstrated count-safety-fidelity mechanism. |
+| RES-MR, SIGIR 2026, DOI `10.1145/3805712.3809604` | pure method | Risk-aware reasoning for explainable and safe medication recommendation with personalized safety boundaries | Generic personalized safety/risk reasoning is already a formal SIGIR method contribution; a new route needs a different mechanism and claim, not another safety-aware reasoning wrapper. |
+| MedPIC-Bench, arXiv `2608.03028` | benchmark / evaluation | 467 medication-safety questions across 28 models; mean accuracy falls from 63.6% on guideline-following cases to 45.1% on counterfactual variants, with difficulty narrowing or withdrawing warnings | Counterfactual medication-safety sensitivity is already an explicit evaluation topic; the phenomenon alone is not a method novelty claim. |
+| Counterfactual Evaluation Reveals Hidden Capability Profiles in Clinical LLMs and Agents, arXiv `2605.30590` | evaluation | In an oncology counterfactual benchmark, all six evaluated frontier models struggle to update recommendations after surgery-status intervention; the best reported surgery-status CSS is 17.2% | Directly narrows Axis A phenomenon novelty: "state changed but treatment recommendation did not update" is already documented in clinical-AI evaluation. |
+| Compared to What? Baselines and Metrics for Counterfactual Prompting, arXiv `2605.01048`, COLM 2026 | methodology / evaluation | Shows that targeted counterfactual effects can be indistinguishable from meaning-preserving perturbation sensitivity unless a null baseline is measured | If Axis A reopens, a null perturbation distribution is mandatory before interpreting response changes as targeted path dependence. |
 
 ## Axis A update
 
-Recent counterfactual clinical-AI evaluation already studies failure to update recommendations when patient state changes. This reduces the novelty of the phenomenon itself. More importantly, the current repository lacks an admitted independent positive treatment target after a contraindication becomes inactive.
+Counterfactual clinical-AI evaluation already studies failure to update recommendations when patient state changes. MedPIC-Bench reports a large counterfactual drop in medication-safety reasoning, while the oncology evaluation directly reports failure to update treatment recommendations after surgery-status changes. This reduces the novelty of the phenomenon itself.
+
+More importantly, the current repository lacks an admitted independent positive treatment target after a contraindication becomes inactive.
 
 Therefore the current blocker is semantic/methodological, not missing broad literature coverage:
 
@@ -55,9 +61,10 @@ Idea 005 supplies a complementary local warning: ATC-3 sibling structure is not 
 ## Current opportunity judgment
 
 - Generic longitudinal modeling: `CROWDED / LOW PRIOR`.
-- Generic rule/KG/RAG safety injection: `CROWDED / LOW PRIOR`.
+- Generic rule/KG/RAG/safety-reasoning injection: `CROWDED / LOW PRIOR`.
 - Generic diagnosis-aware fine-graining: `CROWDED`; FineMed is direct close work.
-- Path-dependent rule refresh: `BLOCKED` until an independent positive target is admitted.
+- Counterfactual recommendation sensitivity as a phenomenon: `CROWDED EVALUATION TOPIC`.
+- Path-dependent rule refresh as a method: `BLOCKED` until an independent positive target is admitted.
 - Count-controlled treatment-preserving safety: `ACTIVE PREMISE`, but only B0 is authorized.
 - Action-space granularity: `OPEN PREMISE`, not yet an Idea.
 
@@ -71,3 +78,7 @@ The literature does not currently justify creating Idea 006. The next evidence o
 - HeteroMed: https://doi.org/10.1007/s13755-026-00430-5
 - DAPSNet: https://doi.org/10.1093/bioinformatics/btad003
 - HypeMed: https://doi.org/10.1145/3803851
+- RES-MR: https://doi.org/10.1145/3805712.3809604
+- MedPIC-Bench: https://arxiv.org/abs/2608.03028
+- Clinical counterfactual treatment-update evaluation: https://arxiv.org/abs/2605.30590
+- Counterfactual null-baseline methodology: https://arxiv.org/abs/2605.01048
