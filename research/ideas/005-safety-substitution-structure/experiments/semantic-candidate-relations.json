@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "idea_id": "005-safety-substitution-structure",
+  "formal_run_id": "gate-01-output-structure-signature-20260904-155810",
+  "total_calibrated_signature_patients": 394,
+  "supported_relation_threshold_patients": 10,
+  "supported_relations_count": 23,
+  "supported_atc2_parents_count": 12,
+  "supported_relation_distinct_patients": 381,
+  "supported_relation_patient_coverage": 0.967005076142132,
+  "relations": [
+    {
+      "target_atc3": "A02A",
+      "target_title": "Antacids",
+      "candidate_atc3": "A02B",
+      "candidate_title": "Drugs for peptic ulcer and gastro-oesophageal reflux disease (GORD)",
+      "atc2_parent": "A02",
+      "atc2_parent_title": "Drugs for acid related disorders",
+      "distinct_audit_patients": 13,
+      "unit_count": 13
+    },
+    {
+      "target_atc3": "A02B",
+      "target_title": "Drugs for peptic ulcer and gastro-oesophageal reflux disease (GORD)",
+      "candidate_atc3": "A02A",
+      "candidate_title": "Antacids",
+      "atc2_parent": "A02",
+      "atc2_parent_title": "Drugs for acid related disorders",
+      "distinct_audit_patients": 195,
+      "unit_count": 237
+    },
+    {
+      "target_atc3": "A03F",
+      "target_title": "Propulsives",
+      "candidate_atc3": "A03A",
+      "candidate_title": "Synthetic anticholinergics, esters with tertiary amino group",
+      "atc2_parent": "A03",
+      "atc2_parent_title": "Drugs for functional gastrointestinal disorders",
+      "distinct_audit_patients": 32,
+      "unit_count": 34
+    },
+    {
+      "target_atc3": "A07A",
+      "target_title": "Intestinal antiinfectives",
+      "candidate_atc3": "A07E",
+      "candidate_title": "Intestinal antiinflammatory agents",
+      "atc2_parent": "A07",
+      "atc2_parent_title": "Antidiarrheals, intestinal antiinflammatory/antiinfective agents",
+      "distinct_audit_patients": 35,
+      "unit_count": 42
+    },
+    {
+      "target_atc3": "A07E",
+      "target_title": "Intestinal antiinflammatory agents",
+      "candidate_atc3": "A07A",
+      "candidate_title": "Intestinal antiinfectives",
+      "atc2_parent": "A07",
+      "atc2_parent_title": "Antidiarrheals, intestinal antiinflammatory/antiinfective agents",
+      "distinct_audit_patients": 13,
+      "unit_count": 15
+    },
+    {
+      "target_atc3": "A12B",
+      "target_title": "Potassium",
+      "candidate_atc3": "A12C",
+      "candidate_title": "Other mineral supplements",
+      "atc2_parent": "A12",
+      "atc2_parent_title": "Mineral supplements",
+      "distinct_audit_patients": 21,
+      "unit_count": 24
+    },
+    {
+      "target_atc3": "A12C",
+      "target_title": "Other mineral supplements",
+      "candidate_atc3": "A12B",
+      "candidate_title": "Potassium",
+      "atc2_parent": "A12",
+      "atc2_parent_title": "Mineral supplements",
+      "distinct_audit_patients": 99,
+      "unit_count": 109
+    },
+    {
+      "target_atc3": "C01B",
+      "target_title": "Antiarrhythmics, class I and III",
+      "candidate_atc3": "C01C",
+      "candidate_title": "Cardiac stimulants excl. cardiac glycosides",
+      "atc2_parent": "C01",
+      "atc2_parent_title": "Cardiac therapy",
+      "distinct_audit_patients": 17,
+      "unit_count": 19
+    },
+    {
+      "target_atc3": "C01C",
+      "target_title": "Cardiac stimulants excl. cardiac glycosides",
+      "candidate_atc3": "C01B",
+      "candidate_title": "Antiarrhythmics, class I and III",
+      "atc2_parent": "C01",
+      "atc2_parent_title": "Cardiac therapy",
+      "distinct_audit_patients": 34,
+      "unit_count": 36
+    },
+    {
+      "target_atc3": "C03C",
+      "target_title": "High-ceiling diuretics",
+      "candidate_atc3": "C03A",
+      "candidate_title": "Low-ceiling diuretics, thiazides",
+      "atc2_parent": "C03",
+      "atc2_parent_title": "Diuretics",
+      "distinct_audit_patients": 11,
+      "unit_count": 11
+    },
+    {
+      "target_atc3": "C03C",
+      "target_title": "High-ceiling diuretics",
+      "candidate_atc3": "C03D",
+      "candidate_title": "Potassium-sparing agents",
+      "atc2_parent": "C03",
+      "atc2_parent_title": "Diuretics",
+      "distinct_audit_patients": 28,
+      "unit_count": 28
+    },
+    {
+      "target_atc3": "C08C",
+      "target_title": "Selective calcium channel blockers with mainly vascular effects",
+      "candidate_atc3": "C08D",
+      "candidate_title": "Selective calcium channel blockers with direct cardiac effects",
+      "atc2_parent": "C08",
+      "atc2_parent_title": "Calcium channel blockers",
+      "distinct_audit_patients": 17,
+      "unit_count": 22
+    },
+    {
+      "target_atc3": "C09A",
+      "target_title": "ACE inhibitors, plain",
+      "candidate_atc3": "C09C",
+      "candidate_title": "Angiotensin II receptor blockers (ARBs), plain",
+      "atc2_parent": "C09",
+      "atc2_parent_title": "Agents acting on the renin-angiotensin system",
+      "distinct_audit_patients": 11,
+      "unit_count": 13
+    },
+    {
+      "target_atc3": "J01C",
+      "target_title": "Beta-lactam antibacterials, penicillins",
+      "candidate_atc3": "J01D",
+      "candidate_title": "Other beta-lactam antibacterials",
+      "atc2_parent": "J01",
+      "atc2_parent_title": "Antibacterials for systemic use",
+      "distinct_audit_patients": 10,
+      "unit_count": 10
+    },
+    {
+      "target_atc3": "J01D",
+      "target_title": "Other beta-lactam antibacterials",
+      "candidate_atc3": "J01M",
+      "candidate_title": "Quinolone antibacterials",
+      "atc2_parent": "J01",
+      "atc2_parent_title": "Antibacterials for systemic use",
+      "distinct_audit_patients": 39,
+      "unit_count": 49
+    },
+    {
+      "target_atc3": "J01M",
+      "target_title": "Quinolone antibacterials",
+      "candidate_atc3": "J01D",
+      "candidate_title": "Other beta-lactam antibacterials",
+      "atc2_parent": "J01",
+      "atc2_parent_title": "Antibacterials for systemic use",
+      "distinct_audit_patients": 21,
+      "unit_count": 23
+    },
+    {
+      "target_atc3": "N02A",
+      "target_title": "Opioids",
+      "candidate_atc3": "N02B",
+      "candidate_title": "Other analgesics and antipyretics",
+      "atc2_parent": "N02",
+      "atc2_parent_title": "Analgesics",
+      "distinct_audit_patients": 32,
+      "unit_count": 32
+    },
+    {
+      "target_atc3": "N02B",
+      "target_title": "Other analgesics and antipyretics",
+      "candidate_atc3": "N02A",
+      "candidate_title": "Opioids",
+      "atc2_parent": "N02",
+      "atc2_parent_title": "Analgesics",
+      "distinct_audit_patients": 111,
+      "unit_count": 125
+    },
+    {
+      "target_atc3": "N05A",
+      "target_title": "Antipsychotics",
+      "candidate_atc3": "N05B",
+      "candidate_title": "Anxiolytics",
+      "atc2_parent": "N05",
+      "atc2_parent_title": "Psycholeptics",
+      "distinct_audit_patients": 15,
+      "unit_count": 16
+    },
+    {
+      "target_atc3": "N05B",
+      "target_title": "Anxiolytics",
+      "candidate_atc3": "N05A",
+      "candidate_title": "Antipsychotics",
+      "atc2_parent": "N05",
+      "atc2_parent_title": "Psycholeptics",
+      "distinct_audit_patients": 20,
+      "unit_count": 22
+    },
+    {
+      "target_atc3": "N05C",
+      "target_title": "Hypnotics and sedatives",
+      "candidate_atc3": "N05A",
+      "candidate_title": "Antipsychotics",
+      "atc2_parent": "N05",
+      "atc2_parent_title": "Psycholeptics",
+      "distinct_audit_patients": 26,
+      "unit_count": 27
+    },
+    {
+      "target_atc3": "N05C",
+      "target_title": "Hypnotics and sedatives",
+      "candidate_atc3": "N05B",
+      "candidate_title": "Anxiolytics",
+      "atc2_parent": "N05",
+      "atc2_parent_title": "Psycholeptics",
+      "distinct_audit_patients": 12,
+      "unit_count": 12
+    },
+    {
+      "target_atc3": "N06A",
+      "target_title": "Antidepressants",
+      "candidate_atc3": "N06B",
+      "candidate_title": "Psychostimulants, agents used for ADHD and nootropics",
+      "atc2_parent": "N06",
+      "atc2_parent_title": "Psychoanaleptics",
+      "distinct_audit_patients": 26,
+      "unit_count": 40
+    }
+  ]
+}

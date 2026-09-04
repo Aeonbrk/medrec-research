@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "idea_id": "005-safety-substitution-structure",
+  "gate_id": "semantic-admission",
+  "formal_run_id": "gate-01-output-structure-signature-20260904-155810",
+  "protocol_commit": "587e3f626cf8c5849553176f8f1fae3aa2eb0d84",
+  "upstream_gate_01": {
+    "protocol_commit": "95966eab6d018e34b6dae4a52271562826bb5b4d",
+    "execution_revision": "4bb07d3d0050070a811f7a4e307522906470e6f7",
+    "decision_commit": "aeb9b53599c3240ca84f1875a6be501f8ca8eb9d",
+    "formal_run_id": "gate-01-output-structure-signature-20260904-155810",
+    "verdict": "PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION",
+    "calibrated_signature_patients": 394
+  },
+  "semantic_a": {
+    "candidate_relations_total": 67,
+    "supported_relations_count": 23,
+    "supported_relation_distinct_patients": 381,
+    "supported_relation_coverage": 0.967005076142132,
+    "coverage_threshold": 0.5,
+    "supported_atc2_parents_count": 12,
+    "parent_threshold": 3,
+    "criteria": {
+      "pass_coverage": true,
+      "pass_parents": true
+    },
+    "verdict": "PASS"
+  },
+  "evidence_adjudication": {
+    "total_supported_relations": 23,
+    "admitted_relations_count": 4,
+    "rejected_relations_count": 19,
+    "unresolved_relations_count": 0,
+    "naive_shared_indication_count": 14,
+    "admitted_relations": [
+      {
+        "target_atc3": "C09A",
+        "candidate_atc3": "C09C",
+        "atc2_parent": "C09",
+        "distinct_audit_patients": 11,
+        "unit_count": 13
+      },
+      {
+        "target_atc3": "J01C",
+        "candidate_atc3": "J01D",
+        "atc2_parent": "J01",
+        "distinct_audit_patients": 10,
+        "unit_count": 10
+      },
+      {
+        "target_atc3": "J01D",
+        "candidate_atc3": "J01M",
+        "atc2_parent": "J01",
+        "distinct_audit_patients": 39,
+        "unit_count": 49
+      },
+      {
+        "target_atc3": "J01M",
+        "candidate_atc3": "J01D",
+        "atc2_parent": "J01",
+        "distinct_audit_patients": 21,
+        "unit_count": 23
+      }
+    ]
+  },
+  "semantic_b": {
+    "admitted_distinct_patients": 75,
+    "admitted_patient_coverage": 0.19035532994923857,
+    "coverage_threshold": 0.25,
+    "admitted_atc2_parents_count": 2,
+    "parent_threshold": 3,
+    "admitted_parents_with_at_least_10_patients": 2,
+    "per_parent_admitted_patients": {
+      "C09": 11,
+      "J01": 65
+    },
+    "criteria": {
+      "pass_coverage": false,
+      "pass_multi_parent": false
+    },
+    "verdict": "FAIL"
+  },
+  "decision_criteria": {
+    "semantic_a_concentration": true,
+    "semantic_b_coverage": false,
+    "semantic_b_multi_parent": false
+  },
+  "mechanical_verdict": "STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE",
+  "authorized_interpretation": "The ATC-sibling output-structure phenotype is real, but the first clinically meaningful semantic interpretation required for the substitution method story is not sufficiently supported at the current prediction resolution."
+}

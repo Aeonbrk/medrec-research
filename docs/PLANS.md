@@ -1,15 +1,20 @@
 # Plans
 
-## Active: Semantic Admission — Safety-Preserving Substitution Structure (Idea 005)
+## Completed: Semantic Admission — Safety-Preserving Substitution Structure (Idea 005)
 
 - **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-protocol.md`.
-- **Design Audit**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-design-integrity-audit.md` (`DESIGN_INTEGRITY_PASS`).
-- **Status**: `DESIGNED_NOT_EXECUTED`.
-- **Upstream Evidence**: Gate 01 verdict `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION` with `INTEGRITY_PASS`; 394 calibrated-signature Audit patients across 14 supported ATC-2 parents.
-- **Scientific Question**: whether the empirically supported target-to-sibling relations contain a material subset supported by independent authoritative evidence as alternative treatment structure at the repository's ATC-3 prediction resolution.
-- **Strong Semantic Control**: `same ATC parent + shared approved indication` is recorded only as `NAIVE_SHARED_INDICATION` and cannot determine PASS. Strict admission requires authoritative guideline/formulary evidence explicitly positioning the compared treatment classes as alternatives in the same indication and overlapping clinical context.
-- **Decision Tree**: supported relations must first cover at least 50% of calibrated-signature patients across at least 3 ATC-2 parents; strict admitted relations must then cover at least 25% of calibrated-signature patients and span at least 3 ATC-2 parents with at least 10 admitted-relation patients per parent.
-- **Execution Boundary**: reuse the existing restricted Gate-01 Audit artifacts without new MoleRec inference; hide support counts during semantic adjudication; run `ccf-integrity-auditor` claim/citation/numeric audit after labels freeze; test remains untouched; Gate 02 and method implementation remain `NOT_AUTHORIZED`.
+- **Status**: Completed and Terminated; formal verdict `STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`.
+- **Integrity Audit**: `INTEGRITY_PASS` in `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-integrity-audit.md`.
+- **Scientific Findings**:
+  - Semantic A (concentration gate) passed: 23 supported relations ($\ge 10$ distinct Audit patients) cover 381 distinct patients (96.70% $\ge 50\%$) across 12 ATC-2 parents ($\ge 3$).
+  - Semantic B (strict alternative admission) failed materiality: only 4 relations across 2 parents (`C09`, `J01`) met Tier-A guideline criteria (`C09A -> C09C`, `J01C -> J01D`, `J01D -> J01M`, `J01M -> J01D`). 19 relations were rejected due to complementary combinations (multimodal analgesia `N02B <-> N02A`, sequential nephron blockade `C03C -> C03A`), disjoint severity stages (`A02B <-> A02A`), or non-substitutable contraindications (`C08C -> C08D`).
+  - Admitted relations cover only 75 distinct patients (19.04% < 25.0%) and span only 2 qualifying ATC-2 parents (required $\ge 3$ parents with $\ge 10$ patients).
+  - Strong negative control `NAIVE_SHARED_INDICATION`: 14 relations shared an approved indication, but 10 of these 14 (71.4%) were rejected upon clinical review, demonstrating that shared indication $\neq$ therapeutic substitution.
+- **Decision & Bounds**: Gate 02 is `NOT_AUTHORIZED`; Idea 005 is authoritatively terminated (`TERMINATE_IDEA_005`). Test split remains 100% untouched.
+- **Decision Document**: `research/ideas/005-safety-substitution-structure/research-decision-semantic-admission.md`.
+- **Failure Record**: `research/memory/failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md`.
+- **Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-summary.json`.
+- **Next Stage**: next CCFA sequence for exploratory direction scouting.
 
 ## Completed: Gate 01 — Output-Structure Signature (Idea 005)
 
