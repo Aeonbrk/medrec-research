@@ -6,13 +6,19 @@
 
 Refresh date: 2026-09-05.
 
-Current project state: `NO_HIGH_VALUE_DIRECTION_YET`.
+Current project state: `RESOURCE_ADMISSION_R0`.
 
-The earlier B0 premise has been executed and failed. The single bounded post-B0 exploratory reset has also been completed. No literature-backed route is currently admitted for method implementation or Idea 006 creation.
+The earlier B0 cardinality premise failed and the selective-prescription-supervision reset was not admitted. A subsequent resource-changing reset has selected one route for **resource admission only**:
 
-Detailed reset folder: [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/).
+> exposure-localized medication safety at provider order time.
 
-The user-maintained `xray-papers-innovation-summary.md` 64-paper map remains the primary supplied literature prior; this file records only the decision-relevant current opportunity state.
+Detailed packet: [`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/).
+
+Strict pre-Idea verdict: `ACCEPT_TO_DEVELOP / RESOURCE_ADMISSION_REQUIRED`, weighted score `4.04/5`.
+
+No Idea 006 exists. R0 must pass before Idea creation.
+
+The user-maintained `xray-papers-innovation-summary.md` 64-paper map remains the primary supplied literature prior; this file records the current decision-relevant opportunity state.
 
 ## Closed or strongly compressed spaces
 
@@ -20,97 +26,125 @@ The user-maintained `xray-papers-innovation-summary.md` 64-paper map remains the
 
 `CLOSED under B0`.
 
-B0 showed that oracle reference-count matching slightly improves retrospective fidelity but leaves pair-normalized DDI rate essentially unchanged. The required count-mediated safety trade-off is absent under frozen MoleRec.
+Oracle reference-count matching changed retrospective fidelity but left pair-normalized DDI essentially unchanged. Cardinality is not the current safety mechanism.
+
+### Selective prescription supervision
+
+`NOT ADMITTED`.
+
+The problem that unprescribed medications are not necessarily exhaustive clinical negatives is real, but current retrospective prescription labels cannot identify a latent acceptable-treatment set. Future medication occurrence does not establish earlier appropriateness, while narrower variants collide with KRAM and generic PU/MNAR correction.
 
 ### Generic longitudinal/history modeling
 
 `CROWDED / LOW PRIOR`.
 
-MR-DTR, DrugDoctor, HeteroMed, DMRNet, HypeMed and related work already cover time-aware treatment regimes, historical condition matching, medication inheritance/expansion, history recalibration, and visit-conditioned retrieval. A new method needs a more specific learning mechanism than 'use history better'.
+MR-DTR, DrugDoctor, HeteroMed, DMRNet, HypeMed, ChainCare and related work already cover dynamic treatment regimes, medication inheritance/expansion, monitoring-event chains, history recalibration, and visit-conditioned retrieval.
 
 ### Generic rule/KG/RAG/agent safety
 
 `CROWDED / LOW PRIOR`.
 
-KATMed, RES-MR, SafeRx-Agent, ATLAS and related work already cover contraindication-aware learning, personalized safety boundaries, knowledge-grounded verification, and patient-specific conflict reasoning. A rule-conditioned method must also survive the repository's rule-entitlement control.
+KATMed, RES-MR, SafeRx-Agent, ATLAS and related work already cover contraindication-aware learning, personalized safety boundaries, knowledge-grounded verification, and patient-specific conflict reasoning. The repository's rule-entitlement control remains mandatory.
 
-### Generic fine-grained diagnosis/action mapping
+### Generic finer action granularity
 
-`CROWDED`.
+`CROWDED / HIGH COST`.
 
-FineMed already supplies diagnosis-level medication supervision; SafeRx-Agent, GRAIN, RxEval and related work push medication/action resolution toward ATC-L4, active ingredients, and prescription-level units. Action-space remapping remains scientifically open but high-cost and highly collision-prone.
+FineMed, SafeRx-Agent, GRAIN and RxEval already push beyond coarse visit-level ATC-3 prediction toward diagnosis-level subrecommendations, ATC-L4, active ingredients, and drug-dose-route units.
 
-## Bounded reset: prescription supervision semantics
+### Order-time medication prediction by itself
 
-### Source-supported problem boundary
+`PRIOR ART`.
 
-Current evaluation work provides direct evidence that a single historical prescription set is not equivalent to a complete clinically acceptable therapy set:
+Rough et al. (2020), DOI `10.1002/cpt.1826`, already create one example per inpatient medication-order event, use only patient information available before the order, and predict medication orders in the following 10-minute window over 990 normalized medication concepts. Therefore temporal causal masking / next-order prediction is not the new contribution.
 
-- Physician-RAG uses expert `CORE`, `ALT`, and `AVOID` medication categories.
-- SafeRx-Agent includes a case where an out-of-current-ground-truth continuation is interpreted as clinically reasonable.
+## Selected resource reset: exposure-localized DDI semantics
 
-This supports a narrow statement:
+### Source-supported premise
 
-> An unprescribed medication is not automatically a proven clinical negative.
+Current MedRec commonly regularizes or evaluates a medication combination through a static pairwise DDI graph at visit/set level. That abstraction assumes pairwise risk relevance whenever both medications are members of the same predicted or observed set.
 
-It does **not** support treating arbitrary zero labels as hidden positives.
+Clinical DDI decision-support literature does not make that assumption universally:
 
-### Closest method pressure
+- time-dependent DDIs can depend on administration spacing;
+- contextualized DDI algorithms use concomitant exposure intervals;
+- stopped medications, short courses, route, laboratory state, and administration timing can suppress otherwise pairwise alerts;
+- changing administration time is itself a common medication-safety intervention.
 
-- **KRAM (ESWA 2026)**: MedRec label-noise robustness via co-denoising and label refinement; closest domain-specific collision.
-- **DMRNet (Neural Networks 2026)**: medication-frequency imbalance and historical recurrence; killer collision for popularity/history explanations.
-- **FineMed (Information Sciences 2026)**: diagnosis-level supervision; generic 'better supervision' is not novel.
-- **WSDM 2020 MNAR implicit feedback** and **NeurIPS 2025 Counterfactual Implicit Feedback Modeling**: generic PU/MNAR observation correction is established prior art.
-- **Correct-and-Weight 2026**: current simple uncertain-negative / false-negative correction baseline family.
+MIMIC-IV exposes the corresponding data resource:
 
-### Optimizer route
+- `prescriptions` and `poe` record medication requests/orders;
+- `emar` and `emar_detail` record actual medication administrations;
+- `poe_id`, `pharmacy_id`, and medication/product identifiers provide linkage paths depending on the local version;
+- eMAR is distinct from prescription/request semantics.
 
-The strongest nontrivial route was refined to **trajectory-privileged negative reliability**: future longitudinal context would be available only during training to identify zero labels inconsistent with surrounding trajectories; a deployable student would remain current/past-only and would attenuate rather than flip low-reliability negative gradients.
+This creates a specific opportunity:
 
-### Strict review result
+> condition medication-recommendation DDI pressure on a **pre-order, execution-confirmed active regimen**, rather than on the union of every medication that appears somewhere in the hospitalization.
 
-`PIVOT_WITH_RESCUE_ROUTE / DO_NOT_CREATE_IDEA_006`
+This is a new risk-state semantic, not merely another temporal encoder.
 
-Weighted score: `3.54/5`.
+## Closest-work subtraction
 
-The decisive blockers are:
+| Work / family | Already covered | Remaining delta for current route |
+| --- | --- | --- |
+| Rough et al. 2020 inpatient medication-order prediction | order-time task, pre-order-only EHR, next-order multilabel prediction | safety pressure conditioned on current executed-active regimen |
+| SafeDrug / static-DDI MedRec | differentiable DDI pressure | dynamic applicability state instead of full predicted-set pair union |
+| KATMed 2026 | differentiable clinical contraindication constraints | medication-exposure state rather than drug-disease rule applicability |
+| HeteroMed 2026 | dynamic medication expansion/inheritance plus expected DDI regularizer | DDI applicability itself becomes order-time state-dependent |
+| SafeRx-Agent / GRAIN 2026 | finer safety/action granularity | current route is temporal/execution applicability, not finer taxonomy alone |
+| Contextualized DDI CDS | concomitant exposure, time-dependent alert suppression, stopped-drug/course context | learns medication recommendation under dynamic risk state rather than only firing/suppressing alerts |
 
-1. future prescription does not establish earlier clinical appropriateness;
-2. the current MIMIC target cannot validate a latent acceptable-treatment set;
-3. if the claim is narrowed to fitting the same observed prescription labels, the route risks becoming generic PU/noisy-label regularization;
-4. KRAM, DMRNet, and generic PU/MNAR methods form strong simple and closest-work controls.
+A focused search did not find a recent MedRec paper whose central method is actual-administration / execution-confirmed active exposure-conditioned DDI regularization for order-time recommendation. This is provisional novelty, not proof of exhaustiveness.
 
-See [`literature-search-20260905-prescription-supervision-reset/idea-admission-review.md`](literature-search-20260905-prescription-supervision-reset/idea-admission-review.md).
+## Why eMAR is not a new label
+
+Administration evidence is used only to define an operational medication-exposure state. It is **not** treated as proof of optimal therapy or clinical safety.
+
+The method/evaluation language must remain:
+
+- medication-order fidelity;
+- exposure-localized DDI surrogate;
+- execution-confirmed concomitant medication state.
+
+Do not claim ADE reduction, optimal prescribing, or physiologic exposure without separate evidence.
 
 ## Current opportunity judgment
 
-| Research axis | Judgment | Why it is not the current method route |
+| Research axis | Judgment | Current action |
 | --- | --- | --- |
-| Post-hoc score/context routing | `CLOSED` | Repeated project-local failures under strong controls |
-| Count-mediated safety/coverage | `CLOSED` | B0 normalized-DDI attribution failed |
-| ATC sibling substitution | `CLOSED` | Semantic admission failed |
-| Generic longitudinal modeling | `CROWDED / LOW PRIOR` | Heavy recent method collision |
-| Generic KG/RAG/agent safety | `CROWDED / LOW PRIOR` | Heavy recent method collision plus rule-entitlement baseline risk |
-| Generic fine-grained action mapping | `CROWDED / HIGH COST` | FineMed/GRAIN/SafeRx-Agent/RxEval pressure and action-space rebuild cost |
-| Selective prescription supervision | `NOT ADMITTED` | Interesting problem, but latent target is not identifiable/evaluable under current labels |
+| Post-hoc score/context routing | `CLOSED` | none |
+| Count-mediated safety/coverage | `CLOSED` | none |
+| ATC sibling substitution | `CLOSED` | none |
+| Selective prescription supervision | `NOT ADMITTED` | reopen only with identifiable supervision |
+| Generic longitudinal modeling | `CROWDED / LOW PRIOR` | none |
+| Generic KG/RAG/agent safety | `CROWDED / LOW PRIOR` | none |
+| Generic fine-grained action mapping | `CROWDED / HIGH COST` | none |
+| Order-time prediction alone | `PRIOR ART` | none |
+| **Exposure-localized order-time safety** | **`SELECTED FOR RESOURCE ADMISSION`** | execute R0 only |
 
-## What would reopen method search
+## R0 requirement
 
-A new reset should occur only when a binding scientific resource changes. The highest-value reopen conditions are:
+Before any method or Idea 006, the project must verify on a quarantined Discovery subset of raw MIMIC-IV that:
 
-1. **supervision semantics**: an independently grounded multi-valid treatment / reliable-negative target at useful scale;
-2. **patient state**: clinically richer state variables sufficient to support a mechanism that current diagnosis/procedure codes cannot identify;
-3. **action resolution**: a feasible remapping with evidence that current 131-label granularity destroys a material decision relation, not merely a finer taxonomy.
+1. medication order and eMAR administration resources can be linked and normalized at useful scale;
+2. the resulting action/DDI vocabulary is large enough for a general medication-recommendation method;
+3. among DDI pairs where both medications were actually administered in one hospitalization, a material fraction are not execution-confirmed concurrently active;
+4. a strictly pre-order active medication state can be constructed without future events or discharge-coded current-visit diagnoses/procedures.
 
-These are resource-changing pivots, not invitations to another feature search.
+Protocol: [`resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`](resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md).
 
-## Stable source links for the latest reset
+R0 is the only authorized next evidence collection.
 
-- KRAM: https://doi.org/10.1016/j.eswa.2026.131330
-- DMRNet: https://doi.org/10.1016/j.neunet.2026.109168
-- FineMed: https://doi.org/10.1016/j.ins.2026.123930
-- Physician-RAG: https://doi.org/10.1016/j.ijmedinf.2026.106598
+## Stable source links
+
+- Rough et al. 2020 medication-order prediction: https://doi.org/10.1002/cpt.1826
+- MIMIC-IV data paper: https://doi.org/10.1038/s41597-022-01899-x
+- MIMIC-IV on FHIR: https://physionet.org/content/mimic-iv-fhir/
+- Time-dependent DDI alerts: https://doi.org/10.1197/jamia.M2810
+- High-priority DDI criteria: https://doi.org/10.1186/1472-6947-13-65
+- Contextualized DDI management: https://doi.org/10.1002/cpt.2624
+- Contextualized DDI algorithms: https://pmc.ncbi.nlm.nih.gov/articles/PMC7976224/
 - SafeRx-Agent: https://arxiv.org/abs/2605.29146
-- WSDM 2020 MNAR implicit-feedback learning: https://doi.org/10.1145/3336191.3371783
-- Counterfactual Implicit Feedback Modeling: https://proceedings.neurips.cc/paper_files/paper/2025/hash/1436e87a58b3e6ac177450bd10721726-Abstract-Conference.html
-- Correct-and-Weight: https://arxiv.org/abs/2601.04291
+- GRAIN: https://arxiv.org/abs/2608.00098
+- Temporal leakage appraisal: https://doi.org/10.1016/j.jbi.2026.105016
