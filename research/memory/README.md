@@ -16,15 +16,18 @@ This directory is **not** a dumping ground for dead markdown files or idea-local
 
 The authoritative cross-idea state is:
 
-`NO_HIGH_VALUE_DIRECTION_YET`
+`RESOURCE_ADMISSION_R0`
 
-No Idea 006 is currently authorized. The test split remains untouched.
+One resource-changing route is authorized for a single bounded admission gate: **exposure-localized medication safety at provider order time**.
+
+No Idea 006 exists yet. Creation is conditional on `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`. The existing project test split remains untouched.
 
 ## Navigation
 
-- **[`research-space-reorientation.md`](research-space-reorientation.md)**: Current cross-idea research-space SSOT, including Ideas 001--005, B0, closed/reopen boundaries, and the CCF-A method-paper constraint.
-- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: Current opportunity judgment after the B0 failure and the single bounded post-B0 literature reset.
-- **[`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/)**: CCFA exploratory search folder for the supervision-semantics reset. Includes screened papers, search notes, idea-grounding packet, and strict pre-Idea admission review.
+- **[`research-space-reorientation.md`](research-space-reorientation.md)**: Cross-idea SSOT for Ideas 001--005, B0, closed/reopen boundaries, the CCF-A method-paper constraint, and the current resource reset.
+- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: Current opportunity judgment and closest-work pressure.
+- **[`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/)**: Active resource-reset packet. Contains the exploratory search notes, paper ledger, optimized idea grounding, strict admission review, and frozen R0 protocol.
+- **[`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/)**: Previous supervision-semantics reset; retained because its strict review establishes the identifiability boundary that the current route must not reintroduce.
 - **[`reusable-lessons.md`](reusable-lessons.md)**: Authoritative methodological guardrails.
 - **`failures/`**: Decisive negative cases whose mechanisms constrain future research:
   - [`cardinality-attribution-b0--no-material-count-safety-tradeoff.md`](failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md): Oracle-count correction did not expose a material normalized-DDI trade-off; separates cardinality burden from interaction propensity.
