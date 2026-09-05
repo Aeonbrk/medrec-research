@@ -1,0 +1,13 @@
+title,year,venue,doi_or_id,role,risk_to_route
+"Predicting Inpatient Medication Orders From Electronic Health Record Data",2020,"Clinical Pharmacology & Therapeutics","10.1002/cpt.1826","closest task prior","high if route claims order-time prediction novelty"
+"MIMIC-IV, a freely accessible electronic health record dataset",2023,"Scientific Data","10.1038/s41597-022-01899-x","data/protocol anchor","low"
+"MIMIC-IV on FHIR",2024,"PhysioNet","mimic-iv-fhir","schema anchor","low"
+"Time-dependent Drug-Drug Interaction Alerts in Care Provider Order Entry",2009,"JAMIA","10.1197/jamia.M2810","clinical semantic anchor","low; supports premise"
+"Criteria for assessing high-priority drug-drug interactions for clinical decision support in electronic health records",2013,"BMC Medical Informatics and Decision Making","10.1186/1472-6947-13-65","clinical semantic anchor","low; supports premise"
+"Contextualized Drug-Drug Interaction Management Improves Clinical Utility Compared With Basic Drug-Drug Interaction Management in Hospitalized Patients",2022,"Clinical Pharmacology & Therapeutics","10.1002/cpt.2624","contextual DDI anchor","medium; direct rule control required"
+"Designing and evaluating contextualized drug-drug interaction algorithms",2021,"JAMIA Open","PMC7976224","exposure-definition anchor","medium; contextual CDS already known"
+"SafeRx-Agent",2026,"arXiv","2605.29146","fine-grained safe MedRec prior","medium"
+"KATMed",2026,"Journal of Biomedical Informatics","PMID 41621768","differentiable safety prior","high for generic rule-loss claims"
+"HeteroMed",2026,"Health Information Science and Systems","PMID 41567975","dynamic medication prior","medium"
+"GRAIN",2026,"arXiv","2608.00098","DDI granularity prior","medium"
+"Patient-level and temporal data leakage can inflate performance in medication recommendation models",2026,"Journal of Biomedical Informatics","10.1016/j.jbi.2026.105016","protocol warning","low; constrains design"
