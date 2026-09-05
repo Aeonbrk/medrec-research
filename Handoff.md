@@ -1,108 +1,157 @@
-# Handoff: No Admitted Method Direction
+# Handoff: Exposure-Localized Safety Resource Admission
 
 ## Current state
 
-The repository has completed Ideas 001--005, the cross-idea research-space reorientation, B0 Cardinality Attribution, and the single bounded post-B0 exploratory literature reset.
+The project completed Ideas 001--005, B0 Cardinality Attribution, and the rejected selective-prescription-supervision reset. A new resource-level reset has now identified one method-capable route that survives literature/optimizer/reviewer scrutiny **conditionally on raw-data admission**.
 
 - **Previous Idea**: `005-safety-substitution-structure`
 - **Previous Idea Status**: `TERMINATED / STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`
 - **B0**: `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
-- **Current Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
+- **Rejected post-B0 seed**: selective prescription supervision / trajectory-privileged negative reliability
+- **Current Stage**: `RESOURCE_ADMISSION_R0`
+- **Selected resource route**: exposure-localized medication safety at provider order time
 - **Paper Objective**: first formal method paper, targeting at least a CCF-A venue family
 - **Current Active Idea**: none
-- **Idea 006**: not created and not authorized
-- **Current Research-Space SSOT**: `research/memory/research-space-reorientation.md`
-- **Current Literature Opportunity Map**: `research/memory/literature-opportunity-map.md`
-- **Post-B0 Search Folder**: `research/memory/literature-search-20260905-prescription-supervision-reset/`
-- **B0 Failure Record**: `research/memory/failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md`
-- **Test Split**: untouched and not authorized
+- **Idea 006**: not created; creation is conditional on R0 PASS
+- **Resource-reset folder**: `research/memory/resource-reset-20260905-exposure-localized-safety/`
+- **R0 Protocol**: `research/memory/resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`
+- **Strict pre-Idea review**: `ACCEPT_TO_DEVELOP / RESOURCE_ADMISSION_REQUIRED`, weighted score `4.04/5`
+- **Existing project test split**: untouched and not authorized
 
-## B0 decision
+## Why this reset is different
 
-B0 is closed.
+The route does not add another feature to the current 131-label visit-level benchmark.
 
-The frozen oracle-count diagnostic evaluated 1,220 validation visits and did **not** expose the preregistered count-mediated normalized-DDI/fidelity trade-off.
+It changes the scientific resource and the safety semantics:
 
-Key evidence:
+> At a provider medication-order decision point, condition DDI pressure on the medications that are execution-confirmed and currently active before that order, rather than treating every medication that appears anywhere in the hospitalization as simultaneously relevant.
 
-- under-count prevalence: 33.77%;
-- over-count prevalence: 58.44%;
-- original vs oracle-count F1: 0.6881 vs 0.6981;
-- `delta F1 = +0.009977`, 95% CI `[+0.0067, +0.0134]`;
-- original vs oracle-count pair-normalized DDI rate: 0.044519 vs 0.044516;
-- `delta DDI = -0.000002`, 95% CI `[-0.0007, +0.0007]`;
-- integrity audit: `PASS`;
-- test isolation: confirmed.
+The new resource is raw MIMIC-IV medication request/order plus medication-administration data:
 
-The decisive failure is the absence of normalized-DDI change, not merely the near-threshold F1 point estimate.
+- `prescriptions` / `pharmacy` / `poe` for provider medication requests/orders;
+- `emar` / `emar_detail` for actual medication administration.
 
-Do not rescue Axis B by changing thresholds, adding features, mining subgroups, adding a second backbone, or building a model around the same count-mediated premise.
+MIMIC-IV explicitly separates requested medications from administered medications and supplies medication/order linkage fields. Clinical DDI decision-support literature independently shows that concomitant exposure, administration timing, stopped-medication status, and other context can change whether a pairwise DDI alert is applicable.
 
-## Post-B0 exploratory reset
+This route therefore changes **risk-state semantics**, not merely model architecture.
 
-The one bounded `ccf-literature-searcher / exploratory` reset searched method-capable **pre-prediction supervision** opportunities outside the closed map.
+## What is already prior art
 
-The strongest seed was `selective prescription supervision`:
+Do not claim any of the following as novelty:
 
-> historical prescription positives are observed treatment actions, while an unprescribed medication is not automatically a proven clinical negative.
+- medication prediction at provider order time;
+- pre-order-only causal masking;
+- generic temporal EHR modeling;
+- static DDI regularization;
+- ATC-L4 or ingredient-level medication granularity;
+- contextual DDI alerting in clinical decision support.
 
-Closest-work pressure includes:
+Rough et al. (2020) already predict inpatient medication orders from the EHR available before each order event. SafeDrug/KATMed/HeteroMed and related methods already provide static or rule-conditioned safety objectives. SafeRx-Agent/GRAIN/RxEval already increase action granularity.
 
-- KRAM: MedRec label-noise robustness;
-- DMRNet: medication-frequency/history debiasing;
-- FineMed: diagnosis-level supervision;
-- WSDM 2020 and NeurIPS 2025: generic PU/MNAR implicit-feedback learning;
-- current simple false-negative weighting losses.
+The only currently defensible novelty delta is the interaction:
 
-`ccf-idea-optimizer` refined the strongest method route to **trajectory-privileged negative reliability**: use future longitudinal context only during training to attenuate low-confidence negative gradients while keeping deployment current/past-only.
+> **order-time medication recommendation whose DDI optimization is conditioned on a pre-order, execution-confirmed active medication state, with the same exposure-risk signal also given to direct reranking/filtering controls.**
 
-`ccf-idea-reviewer` returned:
+This delta remains provisional until R0 passes and a final pre-Idea closest-work check is performed.
 
-`PIVOT_WITH_RESCUE_ROUTE / DO_NOT_CREATE_IDEA_006`
+## Strict review result
 
-Weighted score: `3.54 / 5`.
+`ACCEPT_TO_DEVELOP / RESOURCE_ADMISSION_REQUIRED`
 
-The route is not admitted because:
+Weighted score: `4.04 / 5.00`.
 
-1. a future prescription does not establish that the medication should have been prescribed earlier;
-2. current retrospective MIMIC labels cannot validate a latent clinically acceptable treatment set;
-3. narrowing the claim to better fit the same observed labels makes the route vulnerable to 'generic PU/noisy-label regularization applied to MedRec';
-4. no current low-cost evidence source resolves that identifiability/evaluation problem.
+Development potential: high.
 
-Strict review: `research/memory/literature-search-20260905-prescription-supervision-reset/idea-admission-review.md`.
+Current conference readiness: medium-low because the raw MIMIC-IV resource and premise have not yet been admitted.
 
-## Current workflow decision
+The decisive reviewer risks are:
 
-`NO_HIGH_VALUE_DIRECTION_YET` is the authoritative state.
+1. the raw order/eMAR linkage or medication normalization may be too incomplete or costly;
+2. static visit-union DDI may not differ materially from execution-confirmed overlap in this cohort;
+3. the eventual method may collapse to `Rough 2020 + dynamic SafeDrug loss`;
+4. a direct exposure-aware scalar reranker or hard filter may absorb the entire gain.
 
-This state does **not** authorize another local diagnostic. It also does not authorize `ccf-idea-optimizer` on the rejected selective-supervision seed without a changed scientific resource.
+The third and fourth risks are method-stage gates. R0 handles only the first two.
 
-The project should remain idle at the experiment layer until a future research-space reset changes at least one binding resource:
+## R0 — only authorized local execution
 
-1. **Supervision semantics** — an independently grounded multi-valid treatment or reliable-negative target at useful scale;
-2. **Patient state** — clinically richer state variables sufficient to support a mechanism that diagnosis/procedure-only data cannot identify;
-3. **Action resolution** — a feasible remapping with evidence that the current 131-label abstraction destroys a material decision relation.
+Run exactly:
 
-Any future reset must compare the infrastructure cost against the closest 2023--2026 methods before authorizing another Idea.
+`R0 — Exposure Resource & Premise Admission`
 
-## Publication constraint
+Protocol SSOT:
 
-The next Idea must plausibly support a CCF-A **method paper** with:
+`research/memory/resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`
 
-- a nontrivial and falsifiable problem/mechanism statement;
-- a deployable method rather than a diagnostic result;
-- a novelty delta after closest current work;
-- strongest-simple-control comparisons;
-- no clinical semantic claim without semantic admission;
-- a feasible claim-support path beyond the already adaptive validation cohort;
-- eventual multi-backbone / multi-setting evidence after hypothesis selection.
+R0 must not train a recommender.
 
-Do not create a benchmark, measurement, survey, or months-long feature-search project as a substitute for a method direction.
+It must:
+
+1. verify local raw MIMIC-IV table availability and version;
+2. immediately create the frozen patient-level Discovery/Dev/Holdout split from `subject_id` only;
+3. use Discovery only for all scientific R0 aggregates;
+4. establish deterministic order-to-administration linkage and medication normalization;
+5. quantify eMAR-observed visit-union DDI episodes versus execution-confirmed overlapping DDI episodes;
+6. apply the frozen R0 decision floors without post-result relaxation;
+7. commit only aggregate public-safe artifacts.
+
+The new Holdout is quarantined before hypothesis-selection experiments. Holdout membership may be assigned, but Holdout clinical/event aggregates are not inspected in R0.
+
+This does not authorize any access to the existing project's untouched test split.
+
+## Routing
+
+### If R0 passes
+
+Record:
+
+`PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
+
+Then:
+
+1. return to `ccf-pipeline-orchestrator`;
+2. perform one final closest-work delta check;
+3. create Idea 006 around exposure-conditional medication recommendation;
+4. run `ccf-experiment-designer` before any model training;
+5. Gate 01 must pit end-to-end exposure-conditioned learning against the same exposure-risk signal used as a direct scalar reranker and hard filter.
+
+R0 PASS does not authorize Holdout/test evaluation.
+
+### If R0 fails
+
+Record:
+
+`FAIL_R0_EXPOSURE_RESOURCE_OR_PREMISE`
+
+Then return to:
+
+`NO_HIGH_VALUE_DIRECTION_YET`
+
+Do not:
+
+- relax mapping/mismatch floors;
+- hand-curate a small medication subgroup;
+- substitute inferred timing for missing eMAR only to save the route;
+- add richer labs/vitals to rescue it;
+- start R1/R2;
+- create Idea 006.
+
+## Publication boundary
+
+Even if R0 passes, the eventual paper may claim only what its evidence supports. eMAR administration is not proof of clinical appropriateness. Execution-confirmed DDI overlap is an operational exposure surrogate, not an ADE label.
+
+A CCF-A method paper would ultimately need:
+
+- a leakage-safe order-time task;
+- a simple architecture-agnostic exposure-conditioned mechanism;
+- direct exposure-aware reranker/filter controls with equal DDI entitlement;
+- matched-risk comparisons;
+- more than one materially different predictor family;
+- no clinical-safety overclaim;
+- untouched claim-support evidence after hypothesis selection.
 
 ## Next owner
 
-`ccf-pipeline-orchestrator`
+Local repository Agent executes R0 exactly from the frozen protocol.
 
-Current action: **no local Agent execution is required**.
-
-A new owner should be assigned only when the user/project deliberately changes one of the three binding resources above or supplies new evidence that reopens a recorded boundary.
+No other experiment, model, Idea creation, or literature expansion is authorized in the same run.
