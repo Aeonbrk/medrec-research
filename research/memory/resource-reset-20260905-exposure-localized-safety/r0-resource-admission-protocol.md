@@ -78,6 +78,16 @@ If an order `stoptime` or status field in the local schema is only known retrosp
 
 The separate retrospective premise diagnostic below may use completed Discovery order intervals to determine whether two medications were ever concomitantly active; that retrospective diagnostic is not an inference feature.
 
+### Episode counting unit
+
+All DDI episode counts in R0 are deduplicated at:
+
+```text
+(subject_id, hadm_id, unordered(normalized_medication_i, normalized_medication_j))
+```
+
+Repeated orders, administrations, scans, pharmacy updates, or eMAR rows for the same patient-hospitalization-medication pair do **not** create additional DDI episodes.
+
 ### eMAR-observed visit-union DDI episode
 
 For one Discovery hospitalization, include a DDI pair $(i,j)$ in the premise denominator only when:
@@ -158,7 +168,7 @@ R0 PASS means only:
 
 - raw MIMIC-IV can support the intended temporal state at useful scale;
 - static visit-union DDI and execution-confirmed concomitant exposure differ materially in Discovery;
-- the route deserves one method-level Idea and one learned-vs-direct-control gate.
+- the route deserves final novelty subtraction and, if still admitted, one method-level Idea and one learned-vs-direct-control gate.
 
 R0 PASS does **not** establish:
 
@@ -186,9 +196,12 @@ Record the failure and return the project to `NO_HIGH_VALUE_DIRECTION_YET`.
 If R0 passes:
 
 1. `ccf-pipeline-orchestrator` records the admitted resource state;
-2. create Idea 006 around exposure-conditional medication recommendation;
-3. `ccf-experiment-designer` freezes Gate 01 before any training;
-4. Gate 01 must compare end-to-end exposure-conditioned learning against the same exposure-risk signal used as a direct scalar reranker and hard filter.
+2. run exactly one final `ccf-literature-searcher / quick` closest-work delta check using the now-frozen task/state semantics;
+3. if that check preserves a defensible novelty delta, create Idea 006 around exposure-conditional medication recommendation;
+4. `ccf-experiment-designer` freezes Gate 01 before any training;
+5. Gate 01 must compare end-to-end exposure-conditioned learning against the same exposure-risk signal used as a direct scalar reranker and hard filter.
+
+If the final closest-work check finds a direct collision that removes the novelty delta, do not create Idea 006 even after R0 PASS.
 
 No test or new Holdout access is authorized at R0 PASS.
 
@@ -198,6 +211,7 @@ Local execution may commit only aggregate/public-safe artifacts:
 
 - one R0 runner in this reset folder;
 - `r0-summary.json`;
-- `r0-decision.md`.
+- `r0-decision.md`;
+- `r0-integrity-audit.md`.
 
 Do not commit raw patient rows, subject identifiers, private data paths, restricted mapping dumps, or event-level extracts.
