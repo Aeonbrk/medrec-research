@@ -4,18 +4,20 @@
 
 ## Current workflow state
 
-**Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
+**Stage**: `RESOURCE_ADMISSION_R0`
 
 **Paper objective**: the next surviving route must be capable of becoming the project's first formal **method paper**, targeting at least a CCF-A venue family. Pure benchmark, measurement, survey, and indefinitely exploratory work are not acceptable terminal outcomes.
 
 **Current authorization**:
 
-- Do **not** create Idea 006.
-- Do **not** touch the test split.
-- Do **not** rescue B0 with new features, models, thresholds, or subgroups.
-- Do **not** start another open-ended diagnostic sequence.
-- The single bounded post-B0 literature reset is complete.
-- No experiment execution is currently authorized.
+- Do **not** create Idea 006 yet.
+- Do **not** touch the existing project test split.
+- Do **not** rescue B0 or the rejected selective-supervision seed.
+- Do **not** start an open-ended richer-state or action-granularity rebuild.
+- Authorize exactly one resource/premise gate: `R0 — Exposure Resource & Premise Admission`.
+- R0 may use only the quarantined Discovery partition of a newly split raw MIMIC-IV resource and may not train a recommender.
+
+Current reset packet: [`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/).
 
 ## Authoritative evidence base
 
@@ -23,26 +25,28 @@ Project evidence:
 
 - Ideas 001--005 and formal decisions under [`research/ideas/`](../ideas/).
 - Cross-route failures under [`research/memory/failures/`](failures/).
-- B0 protocol and result under [`research/premise-audit/`](../premise-audit/).
+- B0 protocol/result under [`research/premise-audit/`](../premise-audit/).
+- Previous selective-supervision reset under [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/).
 - [`reusable-lessons.md`](reusable-lessons.md).
 
-Current search evidence:
+Current resource-reset evidence:
 
-- [`literature-opportunity-map.md`](literature-opportunity-map.md).
-- [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/).
-- The user-maintained `xray-papers-innovation-summary.md` remains the primary 64-paper prior supplied for this reorientation; it is not repository-owned.
+- [`resource-reset-20260905-exposure-localized-safety/search-notes.md`](resource-reset-20260905-exposure-localized-safety/search-notes.md).
+- [`resource-reset-20260905-exposure-localized-safety/papers.md`](resource-reset-20260905-exposure-localized-safety/papers.md).
+- [`resource-reset-20260905-exposure-localized-safety/idea-grounding.md`](resource-reset-20260905-exposure-localized-safety/idea-grounding.md).
+- [`resource-reset-20260905-exposure-localized-safety/idea-admission-review.md`](resource-reset-20260905-exposure-localized-safety/idea-admission-review.md).
+- [`resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`](resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md).
+- The user-maintained `xray-papers-innovation-summary.md` remains the primary supplied 64-paper prior and is not repository-owned.
 
 ## Failure landscape
 
 ### 1. Post-hoc same-action routes are strongly compressed
 
-Ideas 001--004 and EGSF repeatedly showed that low-dimensional post-hoc observables layered on frozen predictions fail to provide robust incremental value after strong controls. This closes cosmetic resurrection of the tested score, rank, DDI/tension, and static co-selection premises.
-
-It does **not** prove that the same raw EHR fields cannot support a materially different end-to-end objective or supervision signal.
+Ideas 001--004 and EGSF repeatedly showed that low-dimensional post-hoc observables layered on frozen predictions fail to provide robust incremental value after strong controls. Cosmetic resurrection of the tested score, rank, DDI/tension, and static co-selection premises remains closed.
 
 ### 2. Statistical or taxonomic structure is not clinical action semantics
 
-Idea 005 found reproducible ATC output structure but strict semantic admission left only `C09A -> C09C`, covering 11 patients (2.79%) and one qualifying ATC-2 parent. ATC proximity, shared indication, or output regularity cannot be promoted directly into therapeutic substitution.
+Idea 005 found reproducible ATC output structure, but strict semantic admission left only `C09A -> C09C`, covering 11 patients (2.79%) and one qualifying ATC-2 parent. ATC proximity, shared indication, or output regularity cannot be promoted directly into therapeutic substitution.
 
 ### 3. Rule entitlement must be symmetric
 
@@ -54,22 +58,15 @@ CRC-PS showed that empirical feasibility does not imply finite-sample certifiabi
 
 ### 5. Cardinality does not explain the current normalized-DDI/fidelity behavior
 
-B0 tested whether restoring reference prescription size under the unchanged frozen MoleRec ranking exposed a material fidelity-versus-DDI trade-off.
+B0 returned `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`.
 
-The frozen verdict was:
+The decisive result was not the near-threshold F1 point estimate. Pair-normalized DDI remained effectively unchanged after oracle-count correction, even though absolute DDI-pair burden and medication count changed. This closes count-mediated treatment-preserving safety under the tested premise.
 
-`FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
+### 6. Selective prescription supervision is scientifically plausible but currently unidentifiable
 
-Key evidence:
+The 2026-09-05 supervision reset found that historical prescriptions are observed treatment actions rather than exhaustive clinical-negative annotations. However, future medication occurrence does not establish earlier appropriateness, and current MIMIC prescription labels cannot validate a latent acceptable-treatment set. The strongest trajectory-privileged route remained too close to generic PU/noisy-label learning under available evidence.
 
-- 33.77% of validation visits were under-counted, but 58.44% were over-counted.
-- Oracle-count reduced mean prediction size from 21.55 to 19.95.
-- F1 rose from 0.6881 to 0.6981 (`delta = +0.009977`, 95% CI `[+0.0067, +0.0134]`), missing the frozen `+0.010` point floor.
-- Pair-normalized DDI rate remained effectively unchanged: 0.044519 versus 0.044516 (`delta = -0.000002`, 95% CI `[-0.0007, +0.0007]`).
-
-The decisive scientific point is not the near-threshold F1 result. The normalized DDI mechanism was absent. Absolute DDI-pair burden changed mechanically with set size, but pair-normalized interaction propensity did not.
-
-See [`failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md`](failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md).
+Strict verdict: `PIVOT_WITH_RESCUE_ROUTE / DO_NOT_CREATE_IDEA_006`, weighted score `3.54/5`.
 
 ## Higher-order reusable constraints
 
@@ -77,17 +74,17 @@ See [`failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md`
 
 When predictor outputs and action semantics are frozen, replacing a failed low-dimensional observable with a nearby transform, statistic, or more expressive post-hoc function over the same tested information is not a new scientific premise.
 
-### C1b — Open in principle: same raw data with new end-to-end supervision
+### C1b — Open in principle: new end-to-end supervision or state semantics
 
-A materially different training objective or supervision signal can change what is learned from the same raw EHR fields. Ideas 001--004 do not falsify that class. The 2026-09-05 reset examined the most promising such seed—selective prescription supervision—but strict review did not admit it under current evidence.
+A materially different training objective, supervision signal, or decision state can change what is learned from the same clinical domain. This remains open only when the new target/state is identifiable and not reducible to a generic loss transplant.
 
 ### C2 — Semantic admission precedes architecture
 
-Therapeutic substitution, treatment obligation, contraindication resolution, acceptable alternatives, or hidden-positive claims require an independently grounded relation at the action resolution before architecture design.
+Therapeutic substitution, treatment obligation, contraindication resolution, acceptable alternatives, or hidden-positive claims require an independently grounded relation at the claimed action resolution before architecture design.
 
 ### C3 — Rule entitlement must be symmetric
 
-If an external rule is available to a proposed method, the strongest simple baseline receives it as well.
+If an external risk relation or deterministic feasibility rule is available to the proposed method, the strongest simple baseline receives it as well.
 
 ### C4 — Certification follows mechanism evidence
 
@@ -95,57 +92,140 @@ Do not spend the first method-paper budget on guarantees before a non-certified 
 
 ### C5 — Separate cardinality burden from normalized interaction propensity
 
-Changing medication count can mechanically alter absolute DDI-pair burden without altering pair-normalized DDI propensity. Any future undertreatment/safety claim must make that distinction explicit.
+Changing medication count can mechanically alter absolute DDI-pair burden without altering pair-normalized DDI propensity.
+
+### C6 — Candidate constraint: pair membership is not automatically current exposure applicability
+
+Clinical DDI decision-support literature treats concomitant exposure, administration timing, stopped-medication status, and other context as relevant to whether a known pairwise interaction is currently applicable. This challenges the common visit-set abstraction that every DDI pair appearing anywhere in one hospitalization is simultaneously active.
+
+Status: **EXTERNAL-EVIDENCE SUPPORTED / PROJECT-LOCAL ADMISSION PENDING**.
+
+R0 is designed to decide whether this semantic mismatch is mechanically observable at sufficient scale in raw MIMIC-IV. Until R0 passes, C6 must not be treated as a project-local empirical finding.
 
 ## Research-space boundary map
 
-| Route / premise | Status | Evidence boundary | Reopen condition |
+| Route / premise | Status | Evidence boundary | Reopen / advance condition |
 | --- | --- | --- | --- |
 | Frozen-output DDI/tension scalar routing | `CLOSED` | Idea 001 | New information or action semantics, not a scalar rewrite |
 | Pure score-geometry remapping | `CLOSED` | Idea 002 | Decision information must change, not numeric calibration alone |
 | Within-prescription relative/rank features | `CLOSED` | Idea 003 | New supervision or non-post-hoc action formulation |
 | Static train-only NPMI co-selection scalar | `CLOSED` | Idea 004 | Materially different relational semantics plus strong controls |
 | Generic post-hoc contextual scalar selector | `CLOSED` | EGSF | New information source or end-to-end objective |
-| ATC sibling substitution in current 131-label space | `CLOSED` | Idea 005 | Finer action resolution or independently grounded alternative-treatment mapping with material support |
+| ATC sibling substitution in current 131-label space | `CLOSED` | Idea 005 | Finer action resolution plus independently grounded semantic support |
 | Current EG-TER repair policy | `CLOSED` | Rule-levelled comparison | Independent learned value after equal feasibility rules |
 | Current CRC-PS certified action family | `CLOSED` | Frozen R006 contract | New mechanism, not certificate relaxation |
-| Count-mediated treatment-preserving safety | `CLOSED` | B0 | New independently grounded coverage semantics not relying on count-to-DDI attribution |
-| Generic longitudinal/trajectory modeling | `OPEN, CROWDED` | MR-DTR, DrugDoctor, HeteroMed, DMRNet and related work | A specific mechanism outside generic history use |
+| Count-mediated treatment-preserving safety | `CLOSED` | B0 | New safety/coverage semantics not relying on count-to-DDI attribution |
+| Selective prescription supervision / uncertain negatives | `NOT ADMITTED` | 2026-09-05 reset | Identifiable supervision/evaluation source beyond generic PU/KRAM/history controls |
+| Generic longitudinal/trajectory modeling | `OPEN, CROWDED` | MR-DTR, DrugDoctor, HeteroMed, DMRNet, ChainCare and related work | A specific mechanism outside generic history use |
 | Generic rule/KG/RAG/agent safety modeling | `OPEN, CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS and related work | Independent contribution beyond rule injection/verifier assembly |
-| Generic diagnosis-aware fine-graining | `OPEN, CROWDED` | FineMed | Different decision/supervision semantics, not diagnosis mapping alone |
-| Action-space granularity | `OPEN, HIGH COST / HIGH COLLISION` | Idea 005 plus GRAIN/SafeRx-Agent/RxEval/FineMed | Evidence that remapping recovers a material, method-relevant decision relation |
-| Selective prescription supervision / uncertain negatives | `NOT ADMITTED` | 2026-09-05 bounded reset and strict review | Identifiable supervision/evaluation source beyond generic PU/KRAM/history controls |
+| Generic diagnosis-aware/finer action mapping | `OPEN, CROWDED / HIGH COST` | FineMed, SafeRx-Agent, GRAIN, RxEval | Material decision semantics beyond taxonomy refinement |
+| Order-time medication prediction alone | `PRIOR ART` | Rough et al. 2020 | Not a novelty route |
+| Medication + administration-time prediction | `NOT SELECTED` | Workflow-label identifiability plus temporal-event prior art | Normative timing target would be required |
+| **Exposure-localized order-time safety** | **`SELECTED FOR R0`** | external contextual-DDI evidence + raw MIMIC-IV resource hypothesis | `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE` |
 
 `CLOSED` is always conditional on the recorded scientific premise and evidence boundary.
 
-## Bounded reset result: selective prescription supervision
+## Resource-reset comparison
 
-The post-B0 exploratory search asked whether the project should move from feature engineering to supervision semantics:
+| Resource change | Decision | Reason |
+| --- | --- | --- |
+| Supervision semantics only | `BLOCKED` | strongest route remains unidentifiable under current labels and collides with PU/KRAM |
+| Add labs/vitals/monitoring features to visit-level MedRec | `CROWDED / INSUFFICIENT PREMISE` | richer temporal-state modeling is already active; feature addition alone is not a method problem |
+| Finer medication/action labels only | `CROWDED / HIGH COST` | ATC-L4, ingredient, diagnosis-aware, and drug-dose-route directions already exist |
+| Prescription-time causal masking / next-order task | `PRIOR ART` | Rough et al. 2020 already uses pre-order-only state and order-event targets |
+| Predict medication plus timing | `REJECTED` | administration timing is workflow-sensitive and not a defensible optimality target |
+| **Executed-active exposure state for DDI pressure** | **`SELECTED`** | changes safety-state semantics while keeping a directly observable operational state and a deployable order-time decision |
 
-> An observed prescription is a positive action, but is every unprescribed medication a reliable clinical negative?
+## Selected route: exposure-conditional medication recommendation
 
-The problem boundary has real external support: current prescribing evaluation can distinguish essential therapies, acceptable alternatives, and unsafe options; current MedRec case analyses also contain examples where an out-of-ground-truth continuation is clinically plausible. Generic recommendation research, however, already has mature PU/MNAR and false-negative correction methods, while KRAM directly addresses MedRec label noise, DMRNet addresses frequency/history bias, and FineMed addresses finer supervision.
+### Scientific question
 
-`ccf-idea-optimizer` refined the strongest route to training-time trajectory-privileged negative reliability: future longitudinal context would be used only during training to attenuate low-confidence negative gradients, while deployment remains current/past-only.
+At provider medication-order time, can a recommender preserve medication-order fidelity better when DDI pressure is conditioned on medications that are execution-confirmed and currently active before that order, rather than on the union of all medications appearing in the hospitalization?
 
-`ccf-idea-reviewer` did **not** admit the route. The core blocker is identifiability/evaluation:
+### Why it survives previous failures
 
-- a future medication does not establish that it should have been prescribed earlier;
-- current retrospective labels cannot validate a latent clinically acceptable treatment set;
-- if the claim is narrowed to better agreement with the same observed labels, the contribution risks collapsing into generic noisy-label/PU regularization.
+- It does not mine another frozen prediction feature.
+- It does not derive therapeutic alternatives from ATC structure.
+- It does not use prescription cardinality as a safety proxy.
+- eMAR is used as an operational exposure-state observation, not as proof of clinical appropriateness.
+- The same exposure-risk signal must be given to direct reranking/filtering controls, satisfying C3.
 
-Strict review: [`literature-search-20260905-prescription-supervision-reset/idea-admission-review.md`](literature-search-20260905-prescription-supervision-reset/idea-admission-review.md), weighted score `3.54/5`, verdict `PIVOT_WITH_RESCUE_ROUTE / DO_NOT_CREATE_IDEA_006`.
+### What is not novel
 
-## Current research judgment
+- order-time medication prediction;
+- pre-order-only temporal masking;
+- temporal EHR encoders;
+- static DDI regularization;
+- contextual DDI alerting;
+- finer medication taxonomies.
 
-`NO_HIGH_VALUE_DIRECTION_YET`
+### Provisional novelty delta
 
-This is not a statement that medication recommendation lacks open problems. It means that, under the current executable data, accumulated failure boundaries, closest 2023--2026 work, and the requirement that the first formal project become a CCF-A-level **method** paper, no route currently deserves another implementation unit.
+The only defensible delta is the interaction:
 
-The next move should not be another local feature or diagnostic. A future reset must change one of the scientific resources that is currently binding the project—most plausibly supervision semantics, clinically richer patient state, or action resolution—and must first justify the added infrastructure cost against current closest work.
+> medication-order recommendation whose pairwise DDI optimization is conditioned on a pre-order, execution-confirmed active medication state, explicitly compared with direct use of the same dynamic risk signal.
 
-## Validation and test boundary
+This remains provisional until R0 passes and the final pre-Idea closest-work check is complete.
 
-The validation cohort has been used repeatedly for route selection and is not untouched confirmatory evidence. B0 was one final bounded route-selection diagnostic under that policy.
+## Strict pre-Idea review
 
-The test split remains untouched. No test access is authorized while the project is in `NO_HIGH_VALUE_DIRECTION_YET`.
+Verdict: `ACCEPT_TO_DEVELOP / RESOURCE_ADMISSION_REQUIRED`.
+
+Weighted score: `4.04/5`.
+
+Development potential: high conditional on R0.
+
+Current conference readiness: medium-low because raw order/eMAR linkability, medication normalization, and cohort-level static-versus-executed mismatch are not yet established.
+
+The score is a development decision aid, not an acceptance probability.
+
+## R0 — current gate
+
+R0 combines resource feasibility and premise materiality into one bounded gate to prevent another diagnostic sequence.
+
+Protocol SSOT: [`resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`](resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md).
+
+R0 must:
+
+1. use the locally available authorized raw MIMIC-IV version;
+2. immediately freeze a patient-level `Discovery / Dev / Holdout` split from `subject_id` only;
+3. inspect scientific aggregates from Discovery only;
+4. establish deterministic medication order/eMAR linkage and normalization at useful scale;
+5. define a conservative eMAR-observed visit-union DDI denominator in which both medications were actually administered;
+6. determine how much of that denominator lacks execution-confirmed overlapping active exposure;
+7. verify that a strictly pre-order active state can be constructed without future events or discharge-coded current-visit diagnoses/procedures;
+8. apply the frozen pass/fail floors without rescue.
+
+No recommender training is authorized in R0.
+
+## R0 routing
+
+### PASS
+
+`PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
+
+Then:
+
+1. `ccf-pipeline-orchestrator` records resource admission;
+2. perform one final closest-work delta check;
+3. create Idea 006;
+4. `ccf-experiment-designer` freezes Gate 01;
+5. Gate 01 compares end-to-end exposure-conditioned learning against the same exposure signal used as a direct scalar reranker/hard filter.
+
+No Holdout or existing project-test evaluation is authorized by R0 PASS.
+
+### FAIL
+
+`FAIL_R0_EXPOSURE_RESOURCE_OR_PREMISE`
+
+Then return to `NO_HIGH_VALUE_DIRECTION_YET`.
+
+Do not relax floors, hand-curate a small subgroup, infer timing solely to rescue missing eMAR, add labs/vitals as a rescue, start R1/R2, or create Idea 006.
+
+## Evidence boundaries
+
+The existing project validation cohort has been heavily used for route selection and is not untouched evidence. The existing project test split remains untouched and unauthorized.
+
+The resource reset creates a separate raw-MIMIC-IV patient split before scientific inspection. Discovery is the only R0 evidence source; Dev and Holdout remain outside R0 scientific analysis.
+
+Even after R0 PASS, eMAR administration is not clinical-effectiveness ground truth and executed DDI overlap is not an ADE label. Any eventual paper must keep those claims operational and surrogate-level unless stronger evidence is added.
