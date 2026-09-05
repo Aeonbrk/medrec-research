@@ -2,83 +2,115 @@
 
 # Literature Opportunity Map
 
-## Purpose
-
-This is a compact cross-idea literature refresh for the current pre-Idea premise stage. It supplements the user-maintained `xray-papers-innovation-summary.md` 64-paper prior; it is not a standalone novelty verdict and does not authorize a method.
-
-Search mode: `ccf-literature-searcher / quick`.
+## Current status
 
 Refresh date: 2026-09-05.
 
-Source policy: primary publisher/proceedings pages, PubMed/DBLP, and stable arXiv pages. MDPI sources are excluded by CCFA source policy.
+Current project state: `NO_HIGH_VALUE_DIRECTION_YET`.
 
-## High-value current papers
+The earlier B0 premise has been executed and failed. The single bounded post-B0 exploratory reset has also been completed. No literature-backed route is currently admitted for method implementation or Idea 006 creation.
 
-| Work | Type | What it covers | Implication for this project |
-| --- | --- | --- | --- |
-| FineMed, *Information Sciences* 2026, DOI `10.1016/j.ins.2026.123930` | pure method | Reformulates visit-level set prediction into diagnosis-aware sub-recommendations; uses medication mapping and diagnosis enhancement | Fine-grained action/supervision is already an active method direction. Any action-space pivot must exceed "map drugs to diagnoses" and must avoid circular weak supervision. |
-| Beyond Accuracy, *Journal of Biomedical Informatics* 2026, DOI `10.1016/j.jbi.2026.105072` | other / evaluation guidance | Shows that aggregate accuracy/safety metrics can hide untreated conditions when drugs are stopped to avoid interactions | Strong motivation for the count/coverage premise, but it is evaluation evidence, not a method novelty claim. |
-| Time-aware Medication Recommendation via Intervention of Dynamic Treatment Regimes, WWW 2025, DOI `10.1145/3696410.3714533` | pure method | Explicit time-aware longitudinal medication recommendation via dynamic treatment regimes | Generic "model treatment trajectory/history better" is crowded and is not a sufficiently sharp new premise. |
-| DrugDoctor, *Briefings in Bioinformatics* 2024 | pure method | Visit-level representation learning, longitudinal health-condition matching, cold-start medication recommendation | Further weakens generic history-aware or patient-state retrieval novelty. |
-| HeteroMed, 2026, DOI `10.1007/s13755-026-00430-5` | pure method | Heterogeneous graph and temporal medication modeling including introduction/retention structure | Add/retain temporal structure is already represented in current literature. |
-| DAPSNet, *Bioinformatics* 2023, DOI `10.1093/bioinformatics/btad003` | pure method | Reports standard accuracy, DDI, and average-number-of-drugs metrics; ablations show DDI regularization changes both DDI and medication count | Supports treating medication count as a confound/control in safety comparisons, but does not answer the current B0 causal attribution question. |
-| HypeMed, *ACM TOIS* 2026, DOI `10.1145/3803851` | pure method | Reports Jaccard/F1/PRAUC, DDI rate, and average medication count and explicitly treats prescription compactness as an evaluation dimension | Count is visible in current method evaluation, so a future paper cannot claim novelty from merely reporting it; the opportunity would have to be a method that resolves a demonstrated count-safety-fidelity mechanism. |
-| RES-MR, SIGIR 2026, DOI `10.1145/3805712.3809604` | pure method | Risk-aware reasoning for explainable and safe medication recommendation with personalized safety boundaries | Generic personalized safety/risk reasoning is already a formal SIGIR method contribution; a new route needs a different mechanism and claim, not another safety-aware reasoning wrapper. |
-| MedPIC-Bench, arXiv `2608.03028` | benchmark / evaluation | 467 medication-safety questions across 28 models; mean accuracy falls from 63.6% on guideline-following cases to 45.1% on counterfactual variants, with difficulty narrowing or withdrawing warnings | Counterfactual medication-safety sensitivity is already an explicit evaluation topic; the phenomenon alone is not a method novelty claim. |
-| Counterfactual Evaluation Reveals Hidden Capability Profiles in Clinical LLMs and Agents, arXiv `2605.30590` | evaluation | In an oncology counterfactual benchmark, all six evaluated frontier models struggle to update recommendations after surgery-status intervention; the best reported surgery-status CSS is 17.2% | Directly narrows Axis A phenomenon novelty: "state changed but treatment recommendation did not update" is already documented in clinical-AI evaluation. |
-| Compared to What? Baselines and Metrics for Counterfactual Prompting, arXiv `2605.01048`, COLM 2026 | methodology / evaluation | Shows that targeted counterfactual effects can be indistinguishable from meaning-preserving perturbation sensitivity unless a null baseline is measured | If Axis A reopens, a null perturbation distribution is mandatory before interpreting response changes as targeted path dependence. |
+Detailed reset folder: [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/).
 
-## Axis A update
+The user-maintained `xray-papers-innovation-summary.md` 64-paper map remains the primary supplied literature prior; this file records only the decision-relevant current opportunity state.
 
-Counterfactual clinical-AI evaluation already studies failure to update recommendations when patient state changes. MedPIC-Bench reports a large counterfactual drop in medication-safety reasoning, while the oncology evaluation directly reports failure to update treatment recommendations after surgery-status changes. This reduces the novelty of the phenomenon itself.
+## Closed or strongly compressed spaces
 
-More importantly, the current repository lacks an admitted independent positive treatment target after a contraindication becomes inactive.
+### Count-mediated treatment-preserving safety
 
-Therefore the current blocker is semantic/methodological, not missing broad literature coverage:
+`CLOSED under B0`.
 
-> What learned target exists beyond direct current-state rule application?
+B0 showed that oracle reference-count matching slightly improves retrospective fidelity but leaves pair-normalized DDI rate essentially unchanged. The required count-mediated safety trade-off is absent under frozen MoleRec.
 
-Until that is answered, additional Axis A episode counting or generic counterfactual search has low expected value.
+### Generic longitudinal/history modeling
 
-If the axis is ever reopened, counterfactual evaluation must include a meaning-preserving or clinically irrelevant null perturbation baseline so general model instability is not misread as targeted path dependence.
+`CROWDED / LOW PRIOR`.
 
-## Axis B update
+MR-DTR, DrugDoctor, HeteroMed, DMRNet, HypeMed and related work already cover time-aware treatment regimes, historical condition matching, medication inheritance/expansion, history recalibration, and visit-conditioned retrieval. A new method needs a more specific learning mechanism than 'use history better'.
 
-The literature supports the concern that lower interaction burden can coexist with treatment omission, while current medication-recommendation papers commonly report average medication count alongside DDI and fidelity metrics. The closest current method collision is not a paper that performs the exact B0 intervention; rather, the field already exposes all ingredients separately.
+### Generic rule/KG/RAG/agent safety
 
-The remaining falsifiable premise is therefore narrow:
+`CROWDED / LOW PRIOR`.
 
-> Under this repository's frozen predictions, does restoring target cardinality with the unchanged ranking recover enough fidelity while worsening normalized DDI rate enough to justify a new allocation mechanism?
+KATMed, RES-MR, SafeRx-Agent, ATLAS and related work already cover contraindication-aware learning, personalized safety boundaries, knowledge-grounded verification, and patient-specific conflict reasoning. A rule-conditioned method must also survive the repository's rule-entitlement control.
 
-This answer is in project-local data, not in literature. Literature search should not replace B0.
+### Generic fine-grained diagnosis/action mapping
 
-## Action-space granularity
+`CROWDED`.
 
-FineMed strengthens the hypothesis that visit-level set prediction may be too coarse for clinically meaningful correspondence, but it also raises the collision bar. A new action-space route would need a materially different supervision or decision unit and an independently grounded mapping; simply decomposing the prescription by diagnosis is no longer sufficient positioning.
+FineMed already supplies diagnosis-level medication supervision; SafeRx-Agent, GRAIN, RxEval and related work push medication/action resolution toward ATC-L4, active ingredients, and prescription-level units. Action-space remapping remains scientifically open but high-cost and highly collision-prone.
 
-Idea 005 supplies a complementary local warning: ATC-3 sibling structure is not automatically therapeutic interchangeability.
+## Bounded reset: prescription supervision semantics
+
+### Source-supported problem boundary
+
+Current evaluation work provides direct evidence that a single historical prescription set is not equivalent to a complete clinically acceptable therapy set:
+
+- Physician-RAG uses expert `CORE`, `ALT`, and `AVOID` medication categories.
+- SafeRx-Agent includes a case where an out-of-current-ground-truth continuation is interpreted as clinically reasonable.
+
+This supports a narrow statement:
+
+> An unprescribed medication is not automatically a proven clinical negative.
+
+It does **not** support treating arbitrary zero labels as hidden positives.
+
+### Closest method pressure
+
+- **KRAM (ESWA 2026)**: MedRec label-noise robustness via co-denoising and label refinement; closest domain-specific collision.
+- **DMRNet (Neural Networks 2026)**: medication-frequency imbalance and historical recurrence; killer collision for popularity/history explanations.
+- **FineMed (Information Sciences 2026)**: diagnosis-level supervision; generic 'better supervision' is not novel.
+- **WSDM 2020 MNAR implicit feedback** and **NeurIPS 2025 Counterfactual Implicit Feedback Modeling**: generic PU/MNAR observation correction is established prior art.
+- **Correct-and-Weight 2026**: current simple uncertain-negative / false-negative correction baseline family.
+
+### Optimizer route
+
+The strongest nontrivial route was refined to **trajectory-privileged negative reliability**: future longitudinal context would be available only during training to identify zero labels inconsistent with surrounding trajectories; a deployable student would remain current/past-only and would attenuate rather than flip low-reliability negative gradients.
+
+### Strict review result
+
+`PIVOT_WITH_RESCUE_ROUTE / DO_NOT_CREATE_IDEA_006`
+
+Weighted score: `3.54/5`.
+
+The decisive blockers are:
+
+1. future prescription does not establish earlier clinical appropriateness;
+2. the current MIMIC target cannot validate a latent acceptable-treatment set;
+3. if the claim is narrowed to fitting the same observed prescription labels, the route risks becoming generic PU/noisy-label regularization;
+4. KRAM, DMRNet, and generic PU/MNAR methods form strong simple and closest-work controls.
+
+See [`literature-search-20260905-prescription-supervision-reset/idea-admission-review.md`](literature-search-20260905-prescription-supervision-reset/idea-admission-review.md).
 
 ## Current opportunity judgment
 
-- Generic longitudinal modeling: `CROWDED / LOW PRIOR`.
-- Generic rule/KG/RAG/safety-reasoning injection: `CROWDED / LOW PRIOR`.
-- Generic diagnosis-aware fine-graining: `CROWDED`; FineMed is direct close work.
-- Counterfactual recommendation sensitivity as a phenomenon: `CROWDED EVALUATION TOPIC`.
-- Path-dependent rule refresh as a method: `BLOCKED` until an independent positive target is admitted.
-- Count-controlled treatment-preserving safety: `ACTIVE PREMISE`, but only B0 is authorized.
-- Action-space granularity: `OPEN PREMISE`, not yet an Idea.
+| Research axis | Judgment | Why it is not the current method route |
+| --- | --- | --- |
+| Post-hoc score/context routing | `CLOSED` | Repeated project-local failures under strong controls |
+| Count-mediated safety/coverage | `CLOSED` | B0 normalized-DDI attribution failed |
+| ATC sibling substitution | `CLOSED` | Semantic admission failed |
+| Generic longitudinal modeling | `CROWDED / LOW PRIOR` | Heavy recent method collision |
+| Generic KG/RAG/agent safety | `CROWDED / LOW PRIOR` | Heavy recent method collision plus rule-entitlement baseline risk |
+| Generic fine-grained action mapping | `CROWDED / HIGH COST` | FineMed/GRAIN/SafeRx-Agent/RxEval pressure and action-space rebuild cost |
+| Selective prescription supervision | `NOT ADMITTED` | Interesting problem, but latent target is not identifiable/evaluable under current labels |
 
-The literature does not currently justify creating Idea 006. The next evidence owner remains the bounded local B0 premise audit.
+## What would reopen method search
 
-## Stable source links
+A new reset should occur only when a binding scientific resource changes. The highest-value reopen conditions are:
 
+1. **supervision semantics**: an independently grounded multi-valid treatment / reliable-negative target at useful scale;
+2. **patient state**: clinically richer state variables sufficient to support a mechanism that current diagnosis/procedure codes cannot identify;
+3. **action resolution**: a feasible remapping with evidence that current 131-label granularity destroys a material decision relation, not merely a finer taxonomy.
+
+These are resource-changing pivots, not invitations to another feature search.
+
+## Stable source links for the latest reset
+
+- KRAM: https://doi.org/10.1016/j.eswa.2026.131330
+- DMRNet: https://doi.org/10.1016/j.neunet.2026.109168
 - FineMed: https://doi.org/10.1016/j.ins.2026.123930
-- Beyond Accuracy: https://doi.org/10.1016/j.jbi.2026.105072
-- MR-DTR: https://doi.org/10.1145/3696410.3714533
-- HeteroMed: https://doi.org/10.1007/s13755-026-00430-5
-- DAPSNet: https://doi.org/10.1093/bioinformatics/btad003
-- HypeMed: https://doi.org/10.1145/3803851
-- RES-MR: https://doi.org/10.1145/3805712.3809604
-- MedPIC-Bench: https://arxiv.org/abs/2608.03028
-- Clinical counterfactual treatment-update evaluation: https://arxiv.org/abs/2605.30590
-- Counterfactual null-baseline methodology: https://arxiv.org/abs/2605.01048
+- Physician-RAG: https://doi.org/10.1016/j.ijmedinf.2026.106598
+- SafeRx-Agent: https://arxiv.org/abs/2605.29146
+- WSDM 2020 MNAR implicit-feedback learning: https://doi.org/10.1145/3336191.3371783
+- Counterfactual Implicit Feedback Modeling: https://proceedings.neurips.cc/paper_files/paper/2025/hash/1436e87a58b3e6ac177450bd10721726-Abstract-Conference.html
+- Correct-and-Weight: https://arxiv.org/abs/2601.04291
