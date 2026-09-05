@@ -2,51 +2,27 @@
 
 # Pre-Idea Premise Audit
 
-## Scope
+## Status
 
-This directory contains bounded empirical premise tests that occur **before** an Idea is created. It exists only when the next research decision depends on project-local evidence that literature search cannot answer.
+The only authorized pre-Idea premise audit has been completed.
 
-It must not become a standing exploratory lane. Every audit must have one frozen decision question, one minimal execution, an explicit pass/fail rule, and a named downstream owner.
+- **Gate**: `B0 — Cardinality Attribution`
+- **Verdict**: `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
+- **Decision**: [`b0-decision.md`](b0-decision.md)
+- **Aggregate summary**: [`b0-summary.json`](b0-summary.json)
+- **Runner**: [`run_cardinality_attribution_gate.py`](run_cardinality_attribution_gate.py)
+- **Integrity audit**: `PASS`
+- **Test split**: untouched
+- **Axis B**: terminated
+- **Idea 006**: not created
 
-Current authorized audit: **B0 — Cardinality Attribution**.
+No new premise audit is currently authorized. This directory is historical evidence for the completed bounded pre-Idea gate; it must not become a standing exploratory lane.
 
-No Idea 006 exists. No method implementation is authorized.
+## B0 scientific question
 
-## B0 — Cardinality Attribution
+Under frozen MoleRec validation predictions, does restoring the reference medication count with the **unchanged frozen score ranking** recover material target fidelity while materially increasing pair-normalized DDI rate?
 
-### Scientific decision question
-
-Under the frozen MoleRec validation predictions, is there a material count-mediated safety/fidelity trade-off?
-
-More precisely, when the prediction set is expanded or contracted to the reference medication count using the **unchanged frozen score ranking**, does restoring count recover target-medication fidelity while materially increasing the pair-normalized DDI rate?
-
-The gate tests a premise for a possible future treatment-preserving safety method. It does not test such a method.
-
-### Frozen evidence setting
-
-Use the existing Unified Research Protocol lineage and frozen MoleRec identity already used by Ideas 001--005.
-
-Required input per validation visit $t$:
-
-- frozen current-visit MoleRec score $s_t(m)$ over the complete 131-medication vocabulary;
-- frozen original predicted set $\hat M_t$ under the repository's existing decision rule;
-- validation target medication set $M_t$;
-- frozen DDI relation asset used by the current Comparison scope;
-- patient identifier sufficient only for patient-clustered aggregation/bootstrap.
-
-Prefer the existing restricted validation prediction payload. If it does not contain complete vocabulary scores, regenerate **validation-only target-free inference** under the exact frozen MoleRec checkpoint/configuration already authorized by the earlier gates. Do not retrain MoleRec and do not change its threshold or configuration.
-
-The test split must not be indexed, staged, predicted, evaluated, or inspected.
-
-### Diagnostic construction
-
-For every validation visit define the original prediction:
-
-$$
-\hat M_t^{orig}=\hat M_t.
-$$
-
-Define the oracle-count diagnostic set:
+For validation visit $t$ the diagnostic used:
 
 $$
 \hat M_t^{oc}
@@ -55,37 +31,36 @@ $$
 k_t=|M_t|.
 $$
 
-Ties are resolved deterministically by medication code ascending.
+Because $k_t$ uses the target, `oracle-count` is diagnostic-only and non-deployable.
 
-`oracle-count` is a diagnostic intervention because $k_t$ uses the target. It is not deployable and must never be reported later as a fair production baseline.
+## Frozen protocol identity
 
-### Required metrics
+B0 used the Unified Research Protocol lineage and frozen MoleRec identity already established by earlier Ideas. It did not retrain, fine-tune, alter thresholds, add a second backbone, or access the test split.
 
-Compute visit-level and patient-aggregated values for both `orig` and `oracle-count`:
+Required evidence consisted of:
 
-- medication count;
-- count error $|\hat M_t|-|M_t|$;
+- complete 131-medication frozen validation score vectors;
+- original frozen predicted sets;
+- validation target medication sets;
+- the frozen Comparison-scope DDI relation asset;
+- patient identifiers for clustered aggregation/bootstrap only.
+
+## Metrics
+
+For both original and oracle-count predictions B0 computed:
+
+- medication count and count error;
 - Jaccard;
 - F1;
 - precision;
 - recall;
-- pair-normalized DDI rate using the repository's current evaluator semantics;
-- absolute number of DDI pairs per visit.
+- pair-normalized DDI rate under repository evaluator semantics;
+- absolute DDI-pair burden per visit.
 
-Also report the prevalence of visits with:
-
-$$
-|\hat M_t|<|M_t|,
-\quad
-|\hat M_t|=|M_t|,
-\quad
-|\hat M_t|>|M_t|.
-$$
-
-The primary mechanism analysis is the paired difference:
+Primary paired effects were:
 
 $$
-\Delta F1 = F1(\hat M_t^{oc},M_t)-F1(\hat M_t^{orig},M_t),
+\Delta F1 = F1(\hat M_t^{oc},M_t)-F1(\hat M_t^{orig},M_t)
 $$
 
 and
@@ -94,70 +69,59 @@ $$
 \Delta DDI = DDI(\hat M_t^{oc})-DDI(\hat M_t^{orig}).
 $$
 
-Report Jaccard and recall analogues as secondary corroboration. DDI-pair burden is descriptive because it is mechanically affected by set size; the pair-normalized DDI rate is the primary safety-side attribution quantity.
+Absolute DDI-pair burden remained descriptive because it changes mechanically with set size; pair-normalized DDI rate was the primary safety-side attribution quantity.
 
-### Statistical unit
+## Statistical unit
 
-Use patient-clustered paired bootstrap with 2,000 replicates and a fixed public seed `260905`.
+B0 used patient-clustered paired bootstrap:
 
-Bootstrap patients, retaining all of a sampled patient's validation visits together. Report the mean paired difference and two-sided 95% percentile confidence interval.
+- 2,000 replicates;
+- fixed seed `260905`;
+- patient as the resampling unit;
+- two-sided 95% percentile confidence intervals.
 
-Do not run repeated alternative seeds or multiple bootstrap schemes after seeing the result.
+## Frozen pass rule
 
-### Frozen pass rule
+`PASS_B0_MATERIAL_COUNT_SAFETY_TRADEOFF` required all three conditions:
 
-Return `PASS_B0_MATERIAL_COUNT_SAFETY_TRADEOFF` only if **all** conditions hold:
+1. at least 20% of validation visits under-counted by the original prediction;
+2. mean `delta F1 >= +0.010` and its 95% CI strictly above zero;
+3. mean `delta DDI >= +0.005` and its 95% CI strictly above zero.
 
-1. At least 20% of validation visits are under-counted by the original prediction: $|\hat M_t|<|M_t|$.
-2. Oracle-count improves mean F1 by at least `+0.010` absolute, and the 95% patient-clustered bootstrap CI for $\Delta F1$ is strictly above zero.
-3. Oracle-count increases the pair-normalized DDI rate by at least `+0.005` absolute, and the 95% patient-clustered bootstrap CI for $\Delta DDI$ is strictly above zero.
+Any failure returned `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`.
 
-Otherwise return `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`.
+## Result
 
-These floors are hypothesis-selection thresholds, not clinical safety thresholds. They require a trade-off large enough to justify investing in a method paper rather than continuing diagnostics around a negligible effect.
+B0 evaluated 1,220 eligible validation visits.
 
-### Interpretation
+- Under-count prevalence: 33.77% — Condition 1 passed.
+- Over-count prevalence: 58.44%; oracle-count reduced mean predicted count from 21.55 to 19.95.
+- F1: 0.6881 -> 0.6981, `delta = +0.009977`, 95% CI `[+0.0067, +0.0134]` — Condition 2 failed the frozen point-estimate floor.
+- Pair-normalized DDI rate: 0.044519 -> 0.044516, `delta = -0.000002`, 95% CI `[-0.0007, +0.0007]` — Condition 3 decisively failed.
 
-A pass establishes only this narrow premise:
+The scientific result is therefore not a near-pass. The cardinality intervention did not expose the required normalized-DDI trade-off.
 
-> Restoring reference cardinality using the unchanged score ranking recovers a material amount of target fidelity but exposes a material increase in normalized DDI rate.
+## Interpretation boundary
 
-It does **not** establish:
+B0 establishes only that, under the frozen MoleRec validation setting, reference-cardinality restoration does not reveal a material count-mediated normalized-DDI/fidelity trade-off.
 
-- that the reference count is deployable;
-- that every omitted target medication is clinically required;
-- that lower DDI rate is clinically safer;
-- that a learned allocation mechanism can solve the trade-off;
-- that action-space semantics are adequate.
+It does not establish clinical efficacy, clinical safety, or the impossibility of all undertreatment research.
 
-A pass hands the route to `ccf-idea-optimizer`. The optimizer must propose a deployable mechanism that does not use oracle count and whose learned contribution can beat simple deployable cardinality and DDI-aware allocation controls.
+The reusable failure record is:
 
-A failure terminates Axis B. Do not add features, subgroup searches, diagnosis maps, GNNs, LLMs, or alternative thresholds to rescue B0.
+[`../memory/failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md`](../memory/failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md)
 
-### Explicit exclusions
+## Closed execution boundary
 
-B0 must not:
+Do not rescue B0 through:
 
-- train or fine-tune any recommender;
-- access the test split;
-- add a second backbone;
-- search hyperparameters;
-- introduce clinical indication/substitution mappings;
-- perform action-space remapping;
-- become a benchmark or paper contribution;
-- create Idea 006.
+- omission/count features;
+- diagnosis maps;
+- subgroup mining;
+- alternative thresholds;
+- a second backbone;
+- GNN/LLM/RAG machinery;
+- action-space remapping;
+- a B1/B2 diagnostic derived from the same count-mediated premise.
 
-### Public artifacts after execution
-
-Commit only public-safe artifacts:
-
-- `run_cardinality_attribution_gate.py` — idea-local-style standalone runner for this bounded audit;
-- `b0-summary.json` — aggregate counts, metrics, paired effects, confidence intervals, frozen identities, and verdict;
-- `b0-decision.md` — concise evidence-bound research decision.
-
-Restricted prediction payloads, private dataset paths, raw patient-level rows, and environment-specific execution traces remain off Git.
-
-## Next owner
-
-- B0 pass -> `ccf-idea-optimizer`, then `ccf-idea-reviewer`.
-- B0 fail -> `ccf-pipeline-orchestrator` records `NO_HIGH_VALUE_DIRECTION_YET`, then one bounded `ccf-literature-searcher / exploratory` reset outside the closed research-space map.
+The current project state and next workflow owner are defined in [`../../Handoff.md`](../../Handoff.md).
