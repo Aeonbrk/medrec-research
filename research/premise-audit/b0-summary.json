@@ -1,0 +1,144 @@
+{
+  "bootstrap_analysis": {
+    "delta_count": {
+      "ci_lower_95": -1.9447846455635194,
+      "ci_upper_95": -1.2489638526515496,
+      "mean": -1.5907430298305691
+    },
+    "delta_ddi": {
+      "ci_lower_95": -0.0006833905302931554,
+      "ci_upper_95": 0.0007290166964827247,
+      "mean": 5.756333909292106e-06
+    },
+    "delta_ddi_pairs_per_visit": {
+      "ci_lower_95": -1.4923508357889796,
+      "ci_upper_95": -0.7675534083226186,
+      "mean": -1.1203497663867001
+    },
+    "delta_f1": {
+      "ci_lower_95": 0.006745605616502151,
+      "ci_upper_95": 0.013361871989008477,
+      "mean": 0.009979906146695371
+    },
+    "delta_jaccard": {
+      "ci_lower_95": 0.00920508649965869,
+      "ci_upper_95": 0.0166198428216351,
+      "mean": 0.012850768772796048
+    },
+    "delta_precision": {
+      "ci_lower_95": 0.021953499331048374,
+      "ci_upper_95": 0.03446337498891177,
+      "mean": 0.0280898037995
+    },
+    "delta_recall": {
+      "ci_lower_95": -0.043504753218140214,
+      "ci_upper_95": -0.02824928990257352,
+      "mean": -0.03577638469432712
+    },
+    "oc_ddi": {
+      "ci_lower_95": 0.04340253913387652,
+      "ci_upper_95": 0.045717863994945346,
+      "mean": 0.044506455336339824
+    },
+    "oc_f1": {
+      "ci_lower_95": 0.6918414830203321,
+      "ci_upper_95": 0.7048693232332727,
+      "mean": 0.698325205354858
+    },
+    "orig_ddi": {
+      "ci_lower_95": 0.043496357095053,
+      "ci_upper_95": 0.04555109496616777,
+      "mean": 0.04450069900243055
+    },
+    "orig_f1": {
+      "ci_lower_95": 0.682079610211249,
+      "ci_upper_95": 0.6948926516172432,
+      "mean": 0.6883452992081613
+    }
+  },
+  "bootstrap_specification": {
+    "confidence_level": 0.95,
+    "replicates": 2000,
+    "seed": 260905,
+    "unit": "patient"
+  },
+  "cohort": {
+    "validation_cohort_patient_count": 1059,
+    "validation_patient_count": 859,
+    "validation_visit_count": 1220
+  },
+  "count_prevalence": {
+    "equalcount_count": 95,
+    "equalcount_prevalence": 0.0778688524590164,
+    "overcount_count": 713,
+    "overcount_prevalence": 0.5844262295081967,
+    "undercount_count": 412,
+    "undercount_prevalence": 0.3377049180327869
+  },
+  "decision_criteria": {
+    "condition_1_undercount_at_least_20_percent": true,
+    "condition_2_delta_f1_ge_0_010_and_ci_positive": false,
+    "condition_3_delta_ddi_ge_0_005_and_ci_positive": false
+  },
+  "frozen_identities": {
+    "adapter_sha256": "9bb5d114a5c7f834f928a65dbd7e67c352840978ddb5f7a6a396d825cff90531",
+    "baseline_core_sha256": "516b7b5ffdc98665d8489305112b12f8ac7df3600dc22ea73fd2b15fbd6bc511",
+    "baseline_environment_name": "medrec-molerec-table1",
+    "baseline_environment_sha256": "6a01d31391312fc4a930e9ef23acabf0223b2f979164c98938a6f4473e0d4dda",
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "dataset_manifest_sha256": "82d4efc2e03e22008d0aa80e862cedfd4538dc1038be45252abdd21fc3e04712",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "feature_availability_sha256": "9e403591dce7ec8cc202968d45dca81643f7220564816039fff964dd32cf7fc9",
+    "medication_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "model_source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "protocol_commit": "95966eab6d018e34b6dae4a52271562826bb5b4d",
+    "snapshot_id": "molerec-table1-c721-www23",
+    "snapshot_sha256": "42c09b2a23fc55b9484f2a25fa55231b95f2bae717f35b6e1cb60827c1b18f58"
+  },
+  "gate_id": "B0 \u2014 Cardinality Attribution",
+  "gate_thresholds": {
+    "min_delta_ddi": 0.005,
+    "min_delta_f1": 0.01,
+    "min_undercount_prevalence": 0.2
+  },
+  "oracle_count_metrics": {
+    "abs_count_error": 0.0,
+    "count": 19.954918032786885,
+    "count_error": 0.0,
+    "ddi_pairs_per_visit": 9.440163934426229,
+    "evaluator_ddi_rate": 0.04451633850506737,
+    "f1": 0.6981197829351182,
+    "jaccard": 0.5468131924178796,
+    "macro_ddi_rate": 0.04364973709191238,
+    "precision": 0.6981197829351182,
+    "recall": 0.6981197829351182,
+    "total_ddi_pairs": 11517,
+    "total_predicted_pairs": 258714
+  },
+  "original_metrics": {
+    "abs_count_error": 4.192622950819672,
+    "count": 21.549180327868854,
+    "count_error": 1.5942622950819672,
+    "ddi_pairs_per_visit": 10.564754098360655,
+    "evaluator_ddi_rate": 0.04451882093686748,
+    "f1": 0.6881425015990438,
+    "jaccard": 0.5339655967140218,
+    "macro_ddi_rate": 0.04591765902146777,
+    "precision": 0.6699549087069528,
+    "recall": 0.7339829047938028,
+    "total_ddi_pairs": 12889,
+    "total_predicted_pairs": 289518
+  },
+  "paired_deltas": {
+    "delta_count": -1.5942622950819683,
+    "delta_ddi": -2.482431800107654e-06,
+    "delta_ddi_pairs_per_visit": -1.1245901639344265,
+    "delta_f1": 0.00997728133607445,
+    "delta_jaccard": 0.01284759570385785,
+    "delta_precision": 0.028164874228165382,
+    "delta_recall": -0.035863121858684566
+  },
+  "schema_version": 1,
+  "verdict": "FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF"
+}
