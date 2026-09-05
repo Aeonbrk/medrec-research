@@ -4,182 +4,148 @@
 
 ## Current workflow state
 
-**Stage**: `PRE_IDEA_PREMISE_AUDIT`
+**Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
 
 **Paper objective**: the next surviving route must be capable of becoming the project's first formal **method paper**, targeting at least a CCF-A venue family. Pure benchmark, measurement, survey, and indefinitely exploratory work are not acceptable terminal outcomes.
 
 **Current authorization**:
 
-- Do **not** create Idea 006 yet.
+- Do **not** create Idea 006.
 - Do **not** touch the test split.
-- Do **not** launch another feature-mining sequence over frozen predictions.
-- Authorize exactly one bounded empirical premise gate, `B0 — Cardinality Attribution`, under [`research/premise-audit/README.md`](../premise-audit/README.md).
-- Axis A is blocked before data execution until it can name an independent positive therapeutic target beyond direct rule applicability.
-- If B0 fails, return `NO_HIGH_VALUE_DIRECTION_YET`; do not repair the failed premise by adding features, model classes, thresholds, or subgroups.
-
-This stage exists because the remaining uncertainty is partly empirical and cannot be resolved by literature search alone. It is a bounded pre-Idea exception, not a new permanent research phase.
+- Do **not** rescue B0 with new features, models, thresholds, or subgroups.
+- Do **not** start another open-ended diagnostic sequence.
+- The single bounded post-B0 literature reset is complete.
+- No experiment execution is currently authorized.
 
 ## Authoritative evidence base
 
 Project evidence:
 
-- Ideas 001--005 and their formal research decisions under [`research/ideas/`](../ideas/).
-- Cross-route failure records and controls under [`research/memory/failures/`](failures/).
+- Ideas 001--005 and formal decisions under [`research/ideas/`](../ideas/).
+- Cross-route failures under [`research/memory/failures/`](failures/).
+- B0 protocol and result under [`research/premise-audit/`](../premise-audit/).
 - [`reusable-lessons.md`](reusable-lessons.md).
-- Current baseline and evaluation contracts in [`ARCHITECTURE.md`](../../ARCHITECTURE.md), [`baselines/registry.toml`](../../baselines/registry.toml), and [`docs/playbooks/RESEARCH_WORKFLOW.md`](../../docs/playbooks/RESEARCH_WORKFLOW.md).
 
-Literature evidence:
+Current search evidence:
 
-- The user-maintained `xray-papers-innovation-summary.md` is the primary 64-paper prior supplied for this reorientation. It covers 2026-03 through 2026-08 and is not currently a repository-owned artifact.
-- A narrow current-source refresh is recorded in [`literature-opportunity-map.md`](literature-opportunity-map.md).
+- [`literature-opportunity-map.md`](literature-opportunity-map.md).
+- [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/).
+- The user-maintained `xray-papers-innovation-summary.md` remains the primary 64-paper prior supplied for this reorientation; it is not repository-owned.
 
 ## Failure landscape
 
-### 1. Post-hoc same-action routes have repeatedly collapsed under stronger controls
+### 1. Post-hoc same-action routes are strongly compressed
 
-Ideas 001--004 and the historical EGSF route repeatedly tested low-dimensional observables or transformations layered on unchanged recommender behavior. The decisive pattern is narrower than "the backbone already knows everything":
+Ideas 001--004 and EGSF repeatedly showed that low-dimensional post-hoc observables layered on frozen predictions fail to provide robust incremental value after strong controls. This closes cosmetic resurrection of the tested score, rank, DDI/tension, and static co-selection premises.
 
-- frozen score/constraint observables must beat frozen recommender confidence and route-specific trivial controls;
-- order-equivalent score transforms do not create new routing information;
-- within-set rank and prescription-relative confidence features did not add robust incremental signal;
-- the tested train-only NPMI co-selection scalar did not add robust incremental signal over the expanded strong control;
-- a context-conditioned post-hoc selector was absorbed by a strong global scalar control.
-
-The evidence closes cosmetic post-hoc resurrection of these premises. It does **not** prove that a materially different end-to-end objective or supervision signal extracted from the same raw EHR fields is impossible.
+It does **not** prove that the same raw EHR fields cannot support a materially different end-to-end objective or supervision signal.
 
 ### 2. Statistical or taxonomic structure is not clinical action semantics
 
-Idea 005 found reproducible output structure, but strict semantic admission left only `C09A -> C09C` as an admitted ATC-3 alternative relation, covering 11 patients (2.79%) and one ATC-2 parent. The other supported relations were largely complementary therapy, distinct disease stage/context, contraindicated mechanisms, or coarse taxonomy co-location rather than therapeutic alternatives.
+Idea 005 found reproducible ATC output structure but strict semantic admission left only `C09A -> C09C`, covering 11 patients (2.79%) and one qualifying ATC-2 parent. ATC proximity, shared indication, or output regularity cannot be promoted directly into therapeutic substitution.
 
-Therefore output regularity, shared indication, and ATC proximity cannot be promoted directly into substitution semantics.
+### 3. Rule entitlement must be symmetric
 
-### 3. A method cannot receive rules that the baseline is denied
+EG-TER showed that a learned policy cannot receive clinical feasibility machinery that a strong baseline is denied. Any future rule-conditioned method must beat a rule-matched control.
 
-The EG-TER route lost its claimed policy advantage after contraindication, severe-DDI, and coverage feasibility filters were leveled across policies. Future rule-conditioned methods must compare against a rule-matched baseline that receives the same non-oracle information.
+### 4. Certification adds an independent evidence burden
 
-### 4. Empirical feasibility and finite-sample certifiability are different gates
+CRC-PS showed that empirical feasibility does not imply finite-sample certifiability. Certification should follow mechanism evidence rather than serve as the first novelty investment.
 
-CRC-PS reached an empirically plausible action family but admitted no action under its finite-grid corrected certificate. The evidence does not identify whether sample size, margin, correction, or action-family geometry was the dominant cause. The reusable conclusion is narrower: certification adds a separate statistical-evidence burden and should not be the first investment before a mechanism has earned evidence.
+### 5. Cardinality does not explain the current normalized-DDI/fidelity behavior
+
+B0 tested whether restoring reference prescription size under the unchanged frozen MoleRec ranking exposed a material fidelity-versus-DDI trade-off.
+
+The frozen verdict was:
+
+`FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
+
+Key evidence:
+
+- 33.77% of validation visits were under-counted, but 58.44% were over-counted.
+- Oracle-count reduced mean prediction size from 21.55 to 19.95.
+- F1 rose from 0.6881 to 0.6981 (`delta = +0.009977`, 95% CI `[+0.0067, +0.0134]`), missing the frozen `+0.010` point floor.
+- Pair-normalized DDI rate remained effectively unchanged: 0.044519 versus 0.044516 (`delta = -0.000002`, 95% CI `[-0.0007, +0.0007]`).
+
+The decisive scientific point is not the near-threshold F1 result. The normalized DDI mechanism was absent. Absolute DDI-pair burden changed mechanically with set size, but pair-normalized interaction propensity did not.
+
+See [`failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md`](failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md).
 
 ## Higher-order reusable constraints
 
 ### C1a — Closed: post-hoc same-information cosmetic resurrection
 
-When the learned predictor and action are frozen, replacing a failed low-dimensional observable with a monotone transform, nearby scalar statistic, or more expressive post-hoc function over the same tested information does not constitute a new scientific premise.
+When predictor outputs and action semantics are frozen, replacing a failed low-dimensional observable with a nearby transform, statistic, or more expressive post-hoc function over the same tested information is not a new scientific premise.
 
-Status: **CLOSED for the tested information/action setting**.
+### C1b — Open in principle: same raw data with new end-to-end supervision
 
-### C1b — Open, low prior: same raw data with new end-to-end supervision
-
-A different training objective, supervision signal, or action formulation can change what is learned from the same raw EHR fields. Ideas 001--004 do not falsify that class.
-
-Status: **OPEN, LOW PRIOR / HIGH COLLISION**. It must carry a new supervision or action premise, not merely a new encoder.
+A materially different training objective or supervision signal can change what is learned from the same raw EHR fields. Ideas 001--004 do not falsify that class. The 2026-09-05 reset examined the most promising such seed—selective prescription supervision—but strict review did not admit it under current evidence.
 
 ### C2 — Semantic admission precedes architecture
 
-Any route whose claimed contribution depends on therapeutic substitution, required treatment, contraindication resolution, or acceptable alternatives must establish that the required clinical relation is observable and externally grounded at the repository's action resolution before model implementation.
+Therapeutic substitution, treatment obligation, contraindication resolution, acceptable alternatives, or hidden-positive claims require an independently grounded relation at the action resolution before architecture design.
 
 ### C3 — Rule entitlement must be symmetric
 
-If an external rule or deterministic feasibility predicate is available to the proposed method, the strongest simple baseline receives the same rule. Learned value must exist after this leveling.
+If an external rule is available to a proposed method, the strongest simple baseline receives it as well.
 
 ### C4 — Certification follows mechanism evidence
 
-Do not make statistical certification the primary novelty before a non-certified mechanism has demonstrated enough scientific value to justify the additional evidence burden.
+Do not spend the first method-paper budget on guarantees before a non-certified mechanism has earned scientific evidence.
+
+### C5 — Separate cardinality burden from normalized interaction propensity
+
+Changing medication count can mechanically alter absolute DDI-pair burden without altering pair-normalized DDI propensity. Any future undertreatment/safety claim must make that distinction explicit.
 
 ## Research-space boundary map
 
-| Route / premise | Current status | Evidence boundary | Reopen condition |
+| Route / premise | Status | Evidence boundary | Reopen condition |
 | --- | --- | --- | --- |
-| Frozen-output DDI/tension scalar routing | `CLOSED` | Idea 001 selective singleton-deletion setting | New observable information or different action semantics, not a scalar rewrite |
-| Pure score-geometry remapping | `CLOSED` | Idea 002 ordering-equivalent routing | A representation that provably changes decision information, not numeric calibration alone |
-| Within-prescription relative/rank features | `CLOSED` | Idea 003 tested representation family | New supervision or non-post-hoc action formulation |
-| Static train-only NPMI co-selection scalar | `CLOSED` | Idea 004 tested scalar relation | Materially different relational semantics plus its own strong control |
-| Generic post-hoc contextual scalar selector | `CLOSED` | EGSF frozen-output selector family | New information source or end-to-end objective that cannot be reduced to the strong scalar control |
-| ATC-2/ATC-3 sibling substitution in current 131-label space | `CLOSED` | Idea 005 strict semantic admission | Finer action resolution or an externally grounded alternative-treatment mapping with material cohort support |
-| Current EG-TER repair policy | `CLOSED` | Rule-levelled comparison | A mechanism whose value remains after identical feasibility rules are given to controls |
-| Current CRC-PS certified action family | `CLOSED` | Frozen R006 contract | New preregistered route with a different scientific mechanism, not parameter relaxation |
-| Same raw EHR data + materially different end-to-end supervision | `OPEN, LOW PRIOR` | Not falsified by post-hoc failures | Clear supervision/mechanism hypothesis and closest-work separation |
-| Generic longitudinal/trajectory modeling | `OPEN, CROWDED` | MR-DTR, DrugDoctor, HeteroMed and related work | A specific unresolved mechanism, not "use history better" |
-| Generic rule/KG/RAG/agent safety modeling | `OPEN, CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS and related work | A method contribution beyond rule injection or verifier assembly |
-| Count-controlled safety versus treatment recovery | `ACTIVE PREMISE` | Not yet tested under current frozen outputs | Pass B0 and then formulate a deployable learned mechanism |
-| Action-space granularity as root cause | `OPEN PREMISE` | Suggested by Idea 005 and fine-grained recent work | Evidence that current 131-label abstraction destroys a material decision relation and can be remapped without turning the project into benchmark reconstruction |
+| Frozen-output DDI/tension scalar routing | `CLOSED` | Idea 001 | New information or action semantics, not a scalar rewrite |
+| Pure score-geometry remapping | `CLOSED` | Idea 002 | Decision information must change, not numeric calibration alone |
+| Within-prescription relative/rank features | `CLOSED` | Idea 003 | New supervision or non-post-hoc action formulation |
+| Static train-only NPMI co-selection scalar | `CLOSED` | Idea 004 | Materially different relational semantics plus strong controls |
+| Generic post-hoc contextual scalar selector | `CLOSED` | EGSF | New information source or end-to-end objective |
+| ATC sibling substitution in current 131-label space | `CLOSED` | Idea 005 | Finer action resolution or independently grounded alternative-treatment mapping with material support |
+| Current EG-TER repair policy | `CLOSED` | Rule-levelled comparison | Independent learned value after equal feasibility rules |
+| Current CRC-PS certified action family | `CLOSED` | Frozen R006 contract | New mechanism, not certificate relaxation |
+| Count-mediated treatment-preserving safety | `CLOSED` | B0 | New independently grounded coverage semantics not relying on count-to-DDI attribution |
+| Generic longitudinal/trajectory modeling | `OPEN, CROWDED` | MR-DTR, DrugDoctor, HeteroMed, DMRNet and related work | A specific mechanism outside generic history use |
+| Generic rule/KG/RAG/agent safety modeling | `OPEN, CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS and related work | Independent contribution beyond rule injection/verifier assembly |
+| Generic diagnosis-aware fine-graining | `OPEN, CROWDED` | FineMed | Different decision/supervision semantics, not diagnosis mapping alone |
+| Action-space granularity | `OPEN, HIGH COST / HIGH COLLISION` | Idea 005 plus GRAIN/SafeRx-Agent/RxEval/FineMed | Evidence that remapping recovers a material, method-relevant decision relation |
+| Selective prescription supervision / uncertain negatives | `NOT ADMITTED` | 2026-09-05 bounded reset and strict review | Identifiable supervision/evaluation source beyond generic PU/KRAM/history controls |
 
-`CLOSED` always means closed under the recorded scientific premise and evidence boundary; it is not a permanent ban on every future problem sharing the same noun.
+`CLOSED` is always conditional on the recorded scientific premise and evidence boundary.
 
-## Axis A — Path-dependent rule applicability
+## Bounded reset result: selective prescription supervision
 
-### Status
+The post-B0 exploratory search asked whether the project should move from feature engineering to supervision semantics:
 
-`BLOCKED_AT_A0_POSITIVE_TARGET`
+> An observed prescription is a positive action, but is every unprescribed medication a reliable clinical negative?
 
-A direct conditional rule can determine whether a medication is currently forbidden or permissible. When a contraindication deactivates, the rule establishes permissibility, not that the medication should now be recommended. A learned "refresh" mechanism therefore needs an independent positive therapeutic target that direct current-state rule application does not already provide.
+The problem boundary has real external support: current prescribing evaluation can distinguish essential therapies, acceptable alternatives, and unsafe options; current MedRec case analyses also contain examples where an out-of-ground-truth continuation is clinically plausible. Generic recommendation research, however, already has mature PU/MNAR and false-negative correction methods, while KRAM directly addresses MedRec label noise, DMRNet addresses frequency/history bias, and FineMed addresses finer supervision.
 
-No such target is currently admitted in the repository. Idea 005 specifically warns against deriving it from ATC proximity or naive shared indication.
+`ccf-idea-optimizer` refined the strongest route to training-time trajectory-privileged negative reliability: future longitudinal context would be used only during training to attenuate low-confidence negative gradients, while deployment remains current/past-only.
 
-### Consequence
+`ccf-idea-reviewer` did **not** admit the route. The core blocker is identifiability/evaluation:
 
-Do not count active-to-inactive episodes and do not build a stale-state model yet. Axis A reopens only if a narrow external source provides a positive, temporally observable treatment relation at usable action resolution, with enough cohort support to evaluate learned value beyond a rule-matched baseline.
+- a future medication does not establish that it should have been prescribed earlier;
+- current retrospective labels cannot validate a latent clinically acceptable treatment set;
+- if the claim is narrowed to better agreement with the same observed labels, the contribution risks collapsing into generic noisy-label/PU regularization.
 
-If Axis A reopens, its mandatory controls include:
+Strict review: [`literature-search-20260905-prescription-supervision-reset/idea-admission-review.md`](literature-search-20260905-prescription-supervision-reset/idea-admission-review.md), weighted score `3.54/5`, verdict `PIVOT_WITH_RESCUE_ROUTE / DO_NOT_CREATE_IDEA_006`.
 
-- direct current-state rule application;
-- simple history/recency control;
-- a meaning-preserving or clinically irrelevant null perturbation baseline for counterfactual sensitivity.
+## Current research judgment
 
-## Axis B — Cardinality attribution before treatment-preserving safety
+`NO_HIGH_VALUE_DIRECTION_YET`
 
-### Status
+This is not a statement that medication recommendation lacks open problems. It means that, under the current executable data, accumulated failure boundaries, closest 2023--2026 work, and the requirement that the first formal project become a CCF-A-level **method** paper, no route currently deserves another implementation unit.
 
-`AUTHORIZED_B0_ONLY`
+The next move should not be another local feature or diagnostic. A future reset must change one of the scientific resources that is currently binding the project—most plausibly supervision semantics, clinically richer patient state, or action resolution—and must first justify the added infrastructure cost against current closest work.
 
-The unresolved premise is not yet "we need a new safety model." It is:
+## Validation and test boundary
 
-> Does the apparent safety/fidelity trade-off materially depend on suppressing medication count, such that restoring the reference count recovers target medications but measurably worsens normalized DDI rate?
+The validation cohort has been used repeatedly for route selection and is not untouched confirmatory evidence. B0 was one final bounded route-selection diagnostic under that policy.
 
-B0 uses frozen validation-only MoleRec scores because those artifacts already exist or can be regenerated by inference under the frozen identity. No model training, new features, threshold search, or test access is authorized.
-
-The exact-count comparison uses the ground-truth medication count and is therefore **oracle-count, diagnostic-only, and non-deployable**. Its role is mechanism attribution, not a method baseline for final deployment claims.
-
-See [`research/premise-audit/README.md`](../premise-audit/README.md) for the frozen decision rule.
-
-### Advancement rule
-
-B0 must pass before any treatment-preserving safety method is designed. A pass authorizes `ccf-idea-optimizer` to formulate a deployable mechanism whose contribution is not oracle cardinality and which must eventually face simple count-prediction and DDI-aware allocation controls.
-
-A B0 failure terminates this axis. Do not add omission features, diagnosis maps, GNNs, LLMs, or subgroup mining to rescue it.
-
-## Validation and confirmation boundary
-
-The validation cohort has already been used repeatedly for route selection. This is acceptable for the current **hypothesis-selection** role but it is not untouched confirmatory evidence. Building an OOF infrastructure solely for B0 would add engineering cost without changing the paper claim, because B0 is not publication evidence.
-
-Therefore:
-
-- B0 may reuse or regenerate frozen validation-only target-free MoleRec predictions;
-- B0 outputs are route-selection evidence only;
-- the test split remains untouched;
-- a surviving method must later receive a fresh, explicitly frozen claim-support protocol before test evaluation.
-
-## Publication-shape constraint
-
-A route advances only if it can plausibly support all three components of a CCF-A method paper:
-
-1. a nontrivial problem/mechanism statement, not a metric observation;
-2. a deployable method whose value survives the strongest simple control and rule entitlement;
-3. multi-baseline/multi-setting evidence after the method survives hypothesis selection.
-
-Diagnostics are allowed only to decide whether to invest in that method. They are not themselves the intended paper contribution.
-
-## Current gate and next owner
-
-Current gate: `B0 — Cardinality Attribution`.
-
-Primary owner: `ccf-experiment-designer` in raw protocol / hypothesis-selection mode.
-
-Local execution owner: repository Agent, using the prompt supplied with this handoff.
-
-Next state:
-
-- `PASS_B0_MATERIAL_COUNT_SAFETY_TRADEOFF` -> `ccf-idea-optimizer`, then `ccf-idea-reviewer` before implementation;
-- `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF` -> `NO_HIGH_VALUE_DIRECTION_YET`, followed by one bounded `ccf-literature-searcher / exploratory` reset over method-capable pre-prediction supervision or action-formulation opportunities outside the closed map;
-- no result permits automatic creation of Idea 006 without the optimizer/reviewer gate.
+The test split remains untouched. No test access is authorized while the project is in `NO_HIGH_VALUE_DIRECTION_YET`.
