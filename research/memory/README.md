@@ -2,36 +2,32 @@
 
 # Cross-Idea Research Memory
 
-This directory stores curated, cross-idea reusable knowledge, negative lessons, and research-space admission evidence. It is not a dumping ground for idea-local scratchpads.
-
-## Boundaries & admission policy
-
-Knowledge belongs here only if it has decoupled from one Idea and changes the design, controls, evaluation, or admission of future research.
-
-- Idea-specific hypotheses/results stay in `research/ideas/<idea>/`.
-- Baseline reproduction evidence stays in `research/baselines/`.
-- Cross-idea constraints, decisive failures, and resource-reset evidence live here.
+This directory stores curated cross-idea constraints, decisive failures, literature-space admission evidence, and resource resets. It is not a dumping ground for idea-local scratch work.
 
 ## Current state
 
 Authoritative project stage:
 
-`IDEA_006_GATE_01`
+`PRE_IDEA_PRACTICE_SHIFT_S0`
 
-Active Idea:
+There is currently **no active Idea**. Idea 006 terminated at Gate 01 with `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`.
 
-[`../ideas/006-exposure-conditional-medication-recommendation/README.md`](../ideas/006-exposure-conditional-medication-recommendation/README.md).
+The only authorized local scientific execution is the bounded Medication-Transition Practice Shift S0 gate.
 
-R0 has passed; Idea 006 has been created and strictly admitted for **Gate 01 only**. R0 Holdout and the existing project test split remain untouched and unauthorized.
+Idea 007 does not exist and is not authorized.
+
+The MIMIC-IV `2017 - 2019` and `2020 - 2022` future-period groups, R0 Holdout, and the historical project test split remain quarantined.
 
 ## Navigation
 
-- **[`research-space-reorientation.md`](research-space-reorientation.md)**: current cross-idea SSOT, failure landscape, reusable constraints, R0 admission result, and active Idea-006 boundary.
-- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: current literature-space judgment after R0 PASS and final closest-work subtraction.
-- **[`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/)**: resource-reset packet containing search notes, paper ledger, pre-Idea review, frozen R0 protocol/results, and final closest-work check.
-- **[`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/)**: rejected supervision-semantics reset; preserves the latent-target/PU identifiability boundary.
-- **[`reusable-lessons.md`](reusable-lessons.md)**: authoritative methodological guardrails.
-- **`failures/`**: decisive negative cases whose mechanisms constrain future work:
+- **[`research-space-reorientation.md`](research-space-reorientation.md)**: current cross-idea SSOT, cumulative failure landscape, reusable constraints, and S0 routing.
+- **[`literature-search-20260908-medication-practice-shift/`](literature-search-20260908-medication-practice-shift/)**: active bounded reset packet: literature ledger, search notes, idea grounding, and frozen S0 protocol.
+- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: prior opportunity map; current authoritative routing is the reorientation SSOT and 2026-09-08 practice-shift packet.
+- **[`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/)**: completed resource reset whose R0 exposure-state evidence remains reusable.
+- **[`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/)**: rejected selective-supervision reset and identifiability boundary.
+- **[`reusable-lessons.md`](reusable-lessons.md)**: durable methodological guardrails.
+- **`failures/`**: decisive cross-idea failures:
+  - [`exposure-conditioned-learning-gate-01--direct-control-sufficiency.md`](failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md): a real new exposure-state semantic failed to create incremental learned value beyond direct equal-entitlement use.
   - [`cardinality-attribution-b0--no-material-count-safety-tradeoff.md`](failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md): cardinality changed absolute DDI burden but not normalized DDI propensity.
   - [`safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md`](failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md): predictive ATC structure failed therapeutic semantic admission.
   - [`co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md`](failures/co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md): static train-only co-selection compatibility added no robust routing signal.
@@ -41,16 +37,16 @@ R0 has passed; Idea 006 has been created and strictly admitted for **Gate 01 onl
   - [`egsf-selector--global-scalar-reranking-dominance.md`](failures/egsf-selector--global-scalar-reranking-dominance.md): contextual selector gains were absorbed by a global scalar control.
   - [`eg-ter-repair--hard-safety-filter-baseline-trap.md`](failures/eg-ter-repair--hard-safety-filter-baseline-trap.md): unlevelled hard-safety rules overstated learned repair value.
   - [`crc-ps-r006--conformal-risk-certificate-exhaustion.md`](failures/crc-ps-r006--conformal-risk-certificate-exhaustion.md): empirical feasibility did not survive the finite-grid certificate.
-- **[`accumulated-experience.md`](accumulated-experience.md)**: historical archive synthesis; not the live project-state registry.
+- **[`accumulated-experience.md`](accumulated-experience.md)**: historical archive synthesis; not live routing state.
 - **[`literature-memory.md`](literature-memory.md)**: curated canonical literature cards.
-- **[`archive-evidence-index.md`](archive-evidence-index.md)**: provenance map to the read-only `New-Search` archive.
+- **[`archive-evidence-index.md`](archive-evidence-index.md)**: provenance map to the read-only archive.
 
-## Active cross-idea constraint
+## Current cross-idea lesson
 
-R0 adds one admitted reusable constraint:
+Idea 006 adds a durable rule:
 
-> hospitalization/visit-level DDI pair co-membership is not equivalent to execution-confirmed current exposure applicability.
+> A newly observable state/risk semantic is not sufficient evidence for a learned method. The learned component must create value beyond the strongest direct control receiving the same signal.
 
-On Discovery, 21.0521% of eMAR-observed visit-union DDI patient-hospitalization-pair episodes were static-only under the frozen R0 operational definition.
+The current S0 applies the analogous discipline to temporal deployment shift:
 
-This constraint justifies testing a new method formulation; it does not establish that the learned formulation works. Idea 006 Gate 01 is the required learned-vs-direct-control test.
+> A future-period performance gap does not justify an adaptation method until medication marginal-prior drift has been given a strong direct correction baseline.
