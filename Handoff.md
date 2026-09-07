@@ -1,136 +1,174 @@
-# Handoff: Idea 006 — Exposure-Conditional Medication Recommendation
+# Handoff: Medication-Transition Practice Shift Premise Admission
 
 ## Current state
 
-The project has completed Ideas 001--005, B0 Cardinality Attribution, the rejected selective-prescription-supervision reset, and the exposure-localized resource reset.
+Ideas 001--006 are terminated. The latest method route, Idea 006, ended at its frozen equal-entitlement Gate 01.
 
-- **R0**: `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
-- **R0 execution commit**: `ea134b7e75583186242bc72bc71eb2975b812edc`
-- **Final closest-work verdict**: `NOVELTY_DELTA_SURVIVES_FOR_IDEA_CREATION`
-- **Current Stage**: `IDEA_006_GATE_01_COMPLETED`
-- **Current Active Idea**: `006-exposure-conditional-medication-recommendation`
-- **Gate 01 verdict**: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
-- **Gate 01 integrity audit**: `INTEGRITY_AUDIT_PASS`
-- **Pre-Dev Freeze SHA256**: `c7d5d7d19640e2aafdb41b98bdf58d4092cb82d4ddb44ae105450385813775c9`
-- **Idea review**: `ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY`, weighted score `4.30/5`
-- **Gate 01 protocol**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-exposure-conditioned-learning.md`
-- **Gate 01 summary**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-summary.json`
-- **Gate 01 decision**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-decision.md`
-- **R0 Dev**: evaluated strictly once under pre-Dev freeze manifest
-- **R0 Holdout**: quarantined and uninspected
-- **Existing project test split**: untouched and uninspected
+- **Idea 006 verdict**: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
+- **Idea 006 execution commit**: `3e51887a570bf8c4ef9503f7ffb852881c931130`
+- **Idea 006 integrity audit**: `INTEGRITY_AUDIT_PASS`
+- **Current active Idea**: none
+- **Idea 007**: not created / not authorized
+- **Current Stage**: `PRE_IDEA_PRACTICE_SHIFT_S0`
+- **Selected reset premise**: `MEDICATION_TRANSITION_PRACTICE_SHIFT`
+- **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
+- **R0 Holdout**: quarantined / uninspected
+- **Historical project test split**: untouched / uninspected
 
-## R0 evidence now admitted
+## Idea 006 closure
 
-R0 used raw MIMIC-IV 3.1 Discovery only and passed all seven frozen resource/premise floors.
+R0 remains valid: raw MIMIC-IV order/eMAR data established a material mismatch between hospitalization-level DDI pair co-membership and execution-confirmed temporal overlap.
 
-Key project-local evidence:
+Gate 01 nevertheless falsified the learned-method claim.
 
-- order normalization coverage: 81.9248%;
-- administration normalization coverage: 81.8875%;
-- shared vocabulary: 131 ATC-L4 concepts, 91 represented in the frozen DDI asset;
-- eMAR-observed visit-union DDI episodes: 1,050,523;
-- execution-confirmed overlapping episodes: 829,366;
-- static-only episodes: 221,157;
-- `static_only_fraction = 21.0521%`;
-- 391 unique DDI relations and 68,695 contributing patients;
-- 280 relations each contribute at least 20 static-only episodes;
-- strictly pre-order execution-confirmed medication state: feasible;
-- integrity audit: `PASS_ALL_AUDITS`.
+On frozen Dev at `K=5`:
 
-R0 therefore establishes a material operational mismatch between hospitalization-level pair co-membership and execution-confirmed temporal overlap. It does **not** establish ADE reduction, clinical appropriateness, or method superiority.
+| Method | Recall@5 | IncrementalExposureDDI@5 |
+| --- | ---: | ---: |
+| Base | 0.510442 | 0.098269 |
+| DirectExposureRerank | 0.509797 | 0.087302 |
+| ExposureConditional | 0.505470 | 0.074756 |
 
-## Final novelty boundary
+`ExposureConditional` reduced the operational DDI surrogate substantially, but its Recall@5 was lower than the equal-entitlement direct reranker by approximately `0.004327`, with 95% CI `[-0.005315, -0.003362]`. The preregistered method-admission condition required at least `+0.005` Recall@5 with CI lower bound above zero.
 
-The final closest-work check explicitly subtracts:
+The route is therefore closed. Do not rescue it with a richer safety model, personalized risk network, new DDI source, dose/route, labs/vitals, LLM, subgroup mining, or a second backbone.
 
-- Rough et al. 2020: provider-order-time, pre-order-only medication prediction;
-- contextualized DDI-CDS: stopped-medication and administration-time-dependent alert applicability;
-- SafeDrug/PIMNet/KATMed/RES-MR: safe medication-recommendation objectives and contextual safety;
-- GRAIN/SafeRx-Agent: finer medication/safety granularity.
+Formal closure:
 
-Do **not** claim any of those ingredients individually as novel.
+- `research/ideas/006-exposure-conditional-medication-recommendation/research-decision.md`
+- `research/memory/failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md`
 
-The surviving search-scoped delta is:
+Reusable lesson:
 
-> **At provider-order time, condition DDI optimization on a strictly pre-order, execution-confirmed active regimen derived from actual administration evidence, and require the learned method to beat direct controls receiving the identical exposure-risk signal.**
+> A new state/risk semantic can be empirically real without creating incremental learned-method value. New information semantics must survive direct-use controls before they support a learned method claim.
 
-Final literature packet:
+## Bounded post-Idea-006 reset
 
-`research/memory/resource-reset-20260905-exposure-localized-safety/final-closest-work-check.md`
+One non-safety research-space reset was performed with `ccf-literature-searcher / exploratory`.
 
-## Idea 006 scientific question
+Packet:
 
-The first learned method question is deliberately narrow:
+`research/memory/literature-search-20260908-medication-practice-shift/`
 
-> Does end-to-end exposure-conditioned DDI learning create a reproducible active-exposure safety/fidelity advantage beyond direct exposure-aware reranking when both receive the same active-regimen state and the same DDI matrix?
+The search explicitly excluded Idea-006 safety rescue.
 
-The first candidate method is a simple common causal order-time predictor trained with:
+### Literature result
 
-`prediction loss + conventional new-set DDI term + active-regimen DDI term`.
+Current general MedRec increasingly reports MIMIC-III/MIMIC-IV/eICU results and sometimes describes eICU as cross-institutional generalization. A narrow schizophrenia medication recommender also reports real temporal and geographic validation degradation.
 
-The method is not allowed a richer architecture or richer information than the controls.
+However, within the retained search, no close general MedRec method was found whose central question is:
 
-## Primary killer control
+> adapt a source-trained medication recommender to a later prescribing-practice environment while separating simple medication marginal-prior drift from residual conditional medication-transition shift.
 
-The strongest null is:
+This is a search-scoped opportunity, not a novelty proof.
 
-> The dynamic exposure signal is useful, but learning is unnecessary; direct greedy reranking of Base logits with the same active-regimen DDI signal is sufficient.
+Multi-dataset evaluation, temporal validation, external validation, order-time prediction, medication-frequency debiasing, and generic domain adaptation are not novelty claims.
 
-Gate 01 gives the identical `A_t` and frozen DDI matrix to:
+## Why S0 is required before Idea 007
 
-- `ExposureConditional`;
-- `DirectExposureRerank`;
-- `ExposureHardConstraint`.
+A future-period performance drop is scientifically trivial if it is mostly explained by changed medication frequencies.
 
-It also includes `Base` and conventional `StaticLoss`.
+Therefore the strongest simple null is tested before any adaptation method:
 
-If the direct reranker absorbs the learned gain, Idea 006 terminates. Do not rescue the route with a GNN, Transformer, personalized risk network, LLM, labs/vitals, dose/route, a new DDI database, subgroup mining, or extra hyperparameter searches.
+> A target-era per-medication logit-bias adjustment, estimated on patient-disjoint target-era adaptation patients, recovers most of the source-to-future degradation.
 
-## Gate 01 — only authorized local execution
+If that null is sufficient, the method-paper premise is terminated.
+
+## S0 — only authorized local scientific execution
 
 Protocol SSOT:
 
-`research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-exposure-conditioned-learning.md`
+`research/memory/literature-search-20260908-medication-practice-shift/s0-practice-shift-admission-protocol.md`
 
-Gate 01 freezes:
+S0 uses raw MIMIC-IV 3.1 and the already available leakage-safe medication-order task infrastructure.
 
-- non-overlapping 10-minute medication-order bursts;
-- strict feature timestamps `< decision time`;
-- causal pre-order active-regimen construction using prior administration and pre-order D/C transactions only;
-- R0 Discovery -> patient-disjoint InnerTrain/InnerTune;
-- R0 Dev -> one frozen outer evaluation;
-- one small GRU backbone shared by all learned variants;
-- fixed `K=5` primary ranking evaluation;
-- `IncrementalExposureDDI@5` as primary safety surrogate;
-- `Recall@5` as primary fidelity metric;
-- a common InnerTune safety budget equal to 90% of Base risk;
-- fixed lambda/gamma grids;
-- 2,000-replicate paired patient-clustered bootstrap, seed `260907`;
-- an all-conditions PASS rule.
+It does **not** use DDI/safety as a scientific objective.
 
-No Holdout/test access is authorized.
+### Temporal groups
 
-## Frozen decision routing
+Only order bursts satisfying:
 
-### PASS
+`year(decision_time) == patient.anchor_year`
 
-`PASS_GATE01_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
+are retained, so the burst's approximate real period is unambiguously the patient's `anchor_year_group`.
 
-Only then return to `ccf-pipeline-orchestrator` to design broader claim-support evidence. Do not automatically consume Holdout or test. A later stage should add at least one materially different causal predictor family before final claim support.
+- `2008 - 2010` + `2011 - 2013`: source era
+- `2014 - 2016`: target adaptation/evaluation era
+- `2017 - 2019` + `2020 - 2022`: quarantined future reserve
 
-### FAIL
+### Source/target evidence hierarchy
 
-`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
+Source era:
 
-Terminate Idea 006's current method route. Preserve R0 as a valid resource/semantic result, but do not turn that measurement into the target paper and do not add a rescue model in the same premise family.
+- SourceTrain 80%
+- SourceTune 10%
+- SourceAudit 10%
 
-## Publication boundary
+Target `2014 - 2016`:
 
-Even on Gate-01 PASS, the project may claim only exposure-localized DDI **surrogate** optimization and medication-order fidelity. eMAR administration is not proof of appropriate treatment, static-only is not proof of safety, and DDI overlap is not an ADE label.
+- TargetPriorBuild 10%
+- TargetBiasTune 10%
+- TargetAudit 80%
+
+All partitions are patient-disjoint by frozen subject-only hashes.
+
+No model weights may train on target-era patients.
+
+### Strong simple control
+
+`TargetPriorBias` adjusts frozen SourceOnly logits by the smoothed medication-marginal logit difference between SourceTrain and TargetPriorBuild.
+
+Only one scalar `alpha` is selected on TargetBiasTune from:
+
+`{0.0, 0.25, 0.5, 1.0, 2.0}`.
+
+TargetAudit is accessed only after the source checkpoint, target priors, alpha, metrics, and gate logic are frozen.
+
+### Frozen PASS rule
+
+S0 returns `PASS_S0_RESIDUAL_MEDICATION_PRACTICE_SHIFT` only if:
+
+1. all cohort support floors pass;
+2. source-to-target SourceOnly Recall@5 gap is at least `0.020`, with 95% CI lower bound above `0.010`;
+3. TargetPriorBias recovers at most 50% of that gap;
+4. residual Recall@5 gap after bias adjustment is at least `0.010`, with 95% CI lower bound above zero.
+
+Otherwise:
+
+`FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_SHIFT`.
+
+## Routing
+
+### S0 PASS
+
+Stop local execution and return to `ccf-pipeline-orchestrator`.
+
+Next:
+
+1. `ccf-idea-optimizer` on the single practice-shift family;
+2. strict `ccf-idea-reviewer` against generic fine-tuning/domain adaptation/continual learning;
+3. Idea 007 may be created only if that review admits a genuine MedRec-specific method contribution.
+
+Do not inspect the 2017--2022 future reserve, R0 Holdout, or historical test split.
+
+### S0 FAIL
+
+Return to:
+
+`NO_HIGH_VALUE_DIRECTION_YET`.
+
+Do not:
+
+- change temporal groups;
+- remove anchor-year matching;
+- add diagnoses/procedures/labs/vitals;
+- switch to eICU as a rescue;
+- weaken the bias control;
+- run S0b;
+- create Idea 007.
 
 ## Next owner
 
-`ccf-pipeline-orchestrator` owns post-Gate-01 routing under `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`.
+Local repository Agent executes S0 exactly from the frozen protocol, followed by `ccf-integrity-auditor`.
 
-No rescue model or relaxed threshold is authorized. R0 Holdout and existing project test split remain quarantined.
+No other scientific execution is authorized in the same run.
