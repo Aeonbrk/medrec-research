@@ -1,0 +1,191 @@
+{
+  "schema_version": "1.0",
+  "gate_id": "R0_EXPOSURE_RESOURCE_AND_PREMISE",
+  "raw_mimic_version": "3.1",
+  "table_availability": {
+    "patients": true,
+    "admissions": true,
+    "prescriptions": true,
+    "pharmacy": true,
+    "poe": true,
+    "poe_detail": true,
+    "emar": true,
+    "emar_detail": true
+  },
+  "split_specification": {
+    "salt": "exposure-reset-20260905",
+    "hash_algorithm": "SHA256[:8] / 0xffffffff",
+    "ranges": {
+      "discovery": "0.00 <= u < 0.70",
+      "dev": "0.70 <= u < 0.85",
+      "holdout": "0.85 <= u <= 1.00"
+    },
+    "patient_counts": {
+      "discovery": 255345,
+      "dev": 54647,
+      "holdout": 54635,
+      "total": 364627
+    },
+    "discovery_fraction": 0.7002909822914924
+  },
+  "discovery_aggregate_counts": {
+    "patients_with_medication_orders": 137764,
+    "hospitalizations_with_medication_orders": 323216,
+    "eligible_order_request_events_total": 14138795,
+    "eligible_order_request_events_main": 11701152,
+    "eligible_emar_administration_events": 20701305,
+    "hospitalizations_with_mapped_orders": 322994,
+    "hospitalizations_with_mapped_administrations": 175583
+  },
+  "linkage_coverage": {
+    "order_poe_id_count": 14009505,
+    "order_poe_id_fraction": 0.9908556563695845,
+    "order_pharmacy_id_count": 14138795,
+    "order_pharmacy_id_fraction": 1.0,
+    "administration_poe_id_count": 20701305,
+    "administration_poe_id_fraction": 1.0,
+    "administration_pharmacy_id_count": 19346908,
+    "administration_pharmacy_id_fraction": 0.9345743178992822
+  },
+  "mapping_identity": {
+    "strategy": "deterministic_hierarchical_ndc_formulary_consensus",
+    "primary_asset": "SafeDrug ndc2atc_level4 + KGDNet drug_codes_mapping + MIMIC-IV BIDMC formulary consensus",
+    "vocabulary_type": "ATC Level 4 (4-character)"
+  },
+  "mapping_coverage": {
+    "order_main_safedrug_ndc_coverage": 0.4014849136221801,
+    "order_main_kgd_ndc_coverage": 0.568795875824876,
+    "order_main_combined_ndc_coverage": 0.6393133770076656,
+    "order_main_consensus_formulary_coverage": 0.8192483099099986,
+    "administration_coverage": 0.8188748004050952,
+    "mapped_pharmacy_ids_count": 10353621,
+    "consensus_formulary_rules_count": 2695
+  },
+  "normalized_vocabulary_size": 131,
+  "ddi_asset_identity": {
+    "provenance": "SafeDrug / MoleRec Table 1 canonical DDI matrix",
+    "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "expected_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+    "sha256_match": true,
+    "canonical_pair_count": 448
+  },
+  "ddi_represented_concept_count": 91,
+  "emar_observed_visit_union_ddi_episode_count": 1050523,
+  "execution_confirmed_overlap_episode_count": 829366,
+  "static_only_episode_count": 221157,
+  "static_only_fraction": 0.21052085485039357,
+  "distinct_patient_count": 68695,
+  "unique_ddi_relation_count": 391,
+  "distributed_mismatch_relation_count": 280,
+  "static_only_relation_distribution": {
+    "top_10_relations": [
+      {
+        "relation": "C07A-J01D",
+        "count": 7418
+      },
+      {
+        "relation": "N02A-N05B",
+        "count": 7091
+      },
+      {
+        "relation": "B01A-N02A",
+        "count": 6857
+      },
+      {
+        "relation": "A02B-N05B",
+        "count": 6496
+      },
+      {
+        "relation": "J01D-S01A",
+        "count": 6464
+      },
+      {
+        "relation": "N05B-N06A",
+        "count": 4988
+      },
+      {
+        "relation": "C10A-N02B",
+        "count": 4976
+      },
+      {
+        "relation": "B01A-C10A",
+        "count": 4906
+      },
+      {
+        "relation": "C07A-C10A",
+        "count": 4820
+      },
+      {
+        "relation": "C03C-C10A",
+        "count": 4737
+      }
+    ],
+    "top_5_concentration_ratio": 0.15521100394742196,
+    "top_10_concentration_ratio": 0.2656619505600094,
+    "herfindahl_hirschman_index": 0.013105299089749356,
+    "gini_coefficient": 0.7651093356001996
+  },
+  "emar_coverage_heterogeneity": {
+    "hospitalizations_with_rx": 323216,
+    "hospitalizations_with_admin": 175583,
+    "admin_coverage_rate_across_hadms": 0.5432373397356567,
+    "mean_administered_medications_per_hadm": 11.579646093300605
+  },
+  "preorder_state_feasibility": {
+    "documented_order_time_source": "poe.ordertime (and prescriptions.starttime for order interval)",
+    "strictly_preorder_state_construction": "Active regimen at decision time t includes medication m iff m has an ord...
+    "retrospective_vs_online_distinction": "Retrospective premise diagnostic uses completed [starttime, stoptime] int...
+    "feasible": true
+  },
+  "decision_criteria": {
+    "condition_1_resource_availability": {
+      "threshold": "All 8 required tables present with linkable chronological events",
+      "observed": true,
+      "passed": true
+    },
+    "condition_2_normalization_coverage": {
+      "threshold": "order coverage >= 0.80 and admin coverage >= 0.80",
+      "observed": {
+        "order_coverage": 0.8192483099099986,
+        "admin_coverage": 0.8188748004050952
+      },
+      "passed": true
+    },
+    "condition_3_vocabulary_size": {
+      "threshold": "action vocab >= 100 and DDI represented >= 60",
+      "observed": {
+        "action_vocabulary": 131,
+        "ddi_represented": 91
+      },
+      "passed": true
+    },
+    "condition_4_premise_support": {
+      "threshold": "episodes >= 1000, patients >= 500, relations >= 30",
+      "observed": {
+        "episodes": 1050523,
+        "distinct_patients": 68695,
+        "unique_relations": 391
+      },
+      "passed": true
+    },
+    "condition_5_semantic_mismatch": {
+      "threshold": "static_only_fraction >= 0.20",
+      "observed": 0.21052085485039357,
+      "passed": true
+    },
+    "condition_6_mismatch_distribution": {
+      "threshold": ">= 10 relations with >= 20 static-only episodes",
+      "observed": 280,
+      "passed": true
+    },
+    "condition_7_deployable_state_feasibility": {
+      "threshold": "strictly pre-order active state without post-order events or discharge codes",
+      "observed": true,
+      "passed": true
+    }
+  },
+  "verdict": "PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE",
+  "elapsed_seconds": 528.2993974685669,
+  "execution_timestamp": "2026-09-07T04:34:50.491052+00:00"
+}
+[full output: "$HOME/Library/Application Support/rtk/tee/1788755718_ssh_-o_B_adfb16.log"]
