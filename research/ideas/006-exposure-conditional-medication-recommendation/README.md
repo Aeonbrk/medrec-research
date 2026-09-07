@@ -12,6 +12,7 @@
 - **Optimizer**: [`idea-optimization.md`](idea-optimization.md)
 - **Strict idea review**: [`idea-review.md`](idea-review.md) (`ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY`, `4.30/5`)
 - **Gate 01 protocol**: [`experiments/gate-01-exposure-conditioned-learning.md`](experiments/gate-01-exposure-conditioned-learning.md)
+- **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`)
 - **New R0 Dev**: authorized for Gate 01 evaluation only under the frozen protocol
 - **New R0 Holdout**: quarantined and not authorized
 - **Existing project test split**: untouched and not authorized
