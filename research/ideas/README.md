@@ -34,12 +34,12 @@ Every Idea must answer:
 | [`003-prescription-relative-confidence`](003-prescription-relative-confidence/README.md) | Prescription-Relative Confidence Residual | **Terminated** (`STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`) | Within-prescription rank/relative confidence failed after the expanded score/size/prevalence control. | None; no nonlinear same-information rescue. |
 | [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** (`STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY`) | Train-only NPMI co-selection compatibility did not add reliable routing value beyond the strongest simple control. | None; same-source relation-statistic substitutions are not authorized. |
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** (`STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`) | Predictive ATC sibling structure survived calibration but failed strict therapeutic semantic admission at current action resolution. | None; reopen only with materially different action semantics/evidence. |
-| [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Active** (`GATE_01_DESIGNED / NOT_EXECUTED`) | Can learned exposure-conditioned DDI optimization add value beyond direct exposure-aware reranking with identical risk information? | Execute the frozen [`Gate 01`](006-exposure-conditional-medication-recommendation/experiments/gate-01-exposure-conditioned-learning.md) only. |
+| [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** (`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`) | Exposure-localized training substantially reduced the frozen DDI surrogate, but failed the equal-entitlement learned-vs-direct-control gate: the direct exposure-aware reranker retained higher Recall@5. | None; no safety-loss/model rescue under the same active-exposure/DDI premise. |
 
 ## Current authoritative direction
 
-Idea 006 is the only active Idea.
+There is currently **no active Idea**.
 
-Its resource premise passed on raw MIMIC-IV 3.1 (`PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`), and its final closest-work check returned `NOVELTY_DELTA_SURVIVES_FOR_IDEA_CREATION`. Strict idea review returned `ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY` (`4.30/5`).
+Idea 006 closed at Gate 01 with a valid R0 resource result but no admitted learned-method contribution. Its execution-confirmed order/eMAR infrastructure remains reusable for materially different scientific questions.
 
-No multi-backbone expansion, Holdout/test evaluation, paper project, or architecture rescue is implied by Idea creation. Gate 01 must first determine whether end-to-end exposure-conditioned learning survives the equal-entitlement direct-control challenge.
+Next owner: `ccf-pipeline-orchestrator` for cross-idea consolidation and one bounded research-space reset. No Idea 007 is automatically authorized.
