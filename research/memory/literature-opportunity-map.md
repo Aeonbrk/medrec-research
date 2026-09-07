@@ -4,136 +4,105 @@
 
 ## Current status
 
-Refresh date: 2026-09-07.
+Refresh date: 2026-09-08.
 
-Current project state: `IDEA_006_GATE_01`.
+Current project stage:
 
-R0 Exposure Resource & Premise Admission passed on raw MIMIC-IV 3.1, the final closest-work delta check returned `NOVELTY_DELTA_SURVIVES_FOR_IDEA_CREATION`, and Idea 006 is now active under a single frozen learned-vs-direct-control gate.
+`PRE_IDEA_PRACTICE_SHIFT_S0`
 
-Active Idea:
+There is no active Idea. Idea 006 terminated at Gate 01 with:
 
-[`../ideas/006-exposure-conditional-medication-recommendation/README.md`](../ideas/006-exposure-conditional-medication-recommendation/README.md).
+`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`.
 
-Detailed reset/search packet:
+Current bounded reset packet:
 
-[`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/).
+[`literature-search-20260908-medication-practice-shift/`](literature-search-20260908-medication-practice-shift/).
 
-The user-maintained `xray-papers-innovation-summary.md` remains the primary supplied 64-paper prior. This file records the current decision-relevant opportunity map after the resource reset.
+## Closed or compressed spaces
 
-## Spaces already closed or compressed
-
-| Research family | Current judgment | Why |
+| Space | Current judgment | Main reason |
 | --- | --- | --- |
-| frozen-output score/rank/DDI/co-selection routing | `CLOSED` | Ideas 001--004 and EGSF failed under stronger simple controls |
-| count-mediated safety/coverage | `CLOSED` | B0 left pair-normalized DDI essentially unchanged under oracle count |
-| ATC sibling substitution | `CLOSED` | Idea 005 strict therapeutic semantic admission failed |
-| selective prescription supervision / uncertain negatives | `NOT ADMITTED` | latent acceptable-treatment target remains unidentifiable; strong KRAM/PU collision |
-| generic longitudinal/history modeling | `CROWDED / LOW PRIOR` | MR-DTR, DrugDoctor, HeteroMed, DMRNet, ChainCare and related work |
-| generic KG/RAG/agent safety | `CROWDED / LOW PRIOR` | KATMed, RES-MR, SafeRx-Agent, ATLAS and related work |
-| generic finer action mapping | `CROWDED / HIGH COST` | FineMed, GRAIN, SafeRx-Agent, RxEval and related work |
-| order-time medication prediction alone | `PRIOR ART` | Rough et al. 2020 already uses pre-order EHR and a 10-minute medication-order target |
+| Frozen-output feature/routing variants | `CLOSED` | Ideas 001--004 + EGSF; strong-control absorption |
+| ATC sibling therapeutic substitution | `CLOSED` | Idea 005 semantic admission failure |
+| Count-mediated safety/coverage | `CLOSED` | B0 normalized-DDI result |
+| Selective prescription supervision | `NOT ADMITTED` | latent acceptable-treatment target not identifiable |
+| Exposure-conditioned DDI learning | `CLOSED under Idea 006` | learned method failed equal-entitlement direct-reranker challenge |
+| Generic longitudinal modeling | `CROWDED` | MR-DTR, DrugDoctor, HeteroMed, ChainCare, DMRNet and related work |
+| Generic KG/RAG/agent safety | `CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS and related work |
+| Generic finer action granularity | `CROWDED / HIGH COST` | FineMed, GRAIN, SafeRx-Agent, RxEval |
+| Multi-dataset MIMIC/eICU results | `PRIOR ART` | HypeMed, KATMed, Rx-Expert, NLA-MMR |
+| Temporal/external validation itself | `PRIOR ART` | narrow clinical recommender studies already report it |
 
-## R0 evidence that changed the opportunity map
+## Idea 006 update
 
-R0 passed all frozen resource/premise floors on MIMIC-IV 3.1 Discovery:
+R0's resource result remains useful: actual order/eMAR timing demonstrates that static hospitalization DDI co-membership and execution-confirmed overlap differ materially.
 
-- order normalization: 81.9248%;
-- administration normalization: 81.8875%;
-- action vocabulary: 131 ATC-L4 concepts;
-- DDI-represented concepts: 91;
-- eMAR-observed visit-union DDI episodes: 1,050,523;
-- execution-confirmed overlap episodes: 829,366;
-- static-only episodes: 221,157;
-- `static_only_fraction = 21.0521%`;
-- contributing patients: 68,695;
-- unique DDI relations: 391;
-- relations with at least 20 static-only episodes: 280;
-- strictly pre-order active state: feasible.
+But Gate 01 showed that changing this safety-state semantic did not produce the required incremental learned value. The equal-entitlement direct exposure reranker retained higher medication-order fidelity than the learned ExposureConditional model at the frozen comparison.
 
-This makes the time scope of DDI applicability a project-local mechanism premise rather than a literature-only motivation.
+Therefore the project must not treat a valid measurement/premise as a method contribution.
 
-Boundary: R0 does not establish clinical harm, medication appropriateness, or learned value.
+## Current selected opportunity: medication-transition practice shift
 
-## Final closest-work subtraction
+### Source-supported background
 
-Final packet:
+Current MedRec papers increasingly report multiple datasets:
 
-[`resource-reset-20260905-exposure-localized-safety/final-closest-work-check.md`](resource-reset-20260905-exposure-localized-safety/final-closest-work-check.md).
+- HypeMed: MIMIC-III, MIMIC-IV, eICU; describes eICU as cross-institutional generalization.
+- KATMed: MIMIC-III/MIMIC-IV plus partial external eICU validation and acknowledges practice-pattern/case-mix/coding differences.
+- Rx-Expert: MIMIC-III/MIMIC-IV/eICU.
+- NLA-MMR: three public datasets.
 
-| Closest work | Already covered | Remaining delta |
-| --- | --- | --- |
-| Rough et al. 2020, DOI `10.1002/cpt.1826` | provider-order-time medication prediction using only pre-order EHR; 10-minute target | no execution-confirmed active-regimen DDI learning |
-| Wong et al. 2021, DOI `10.1093/jamiaopen/ooab023` | computable patient-context algorithms for selected DDIs | clinical alert contextualization, not general medication recommendation |
-| Wasylewicz et al. 2022, DOI `10.1002/cpt.2624` | contextualized DDI management using stopped medications, administration timing, route/dose/context | alert suppression/management, not learned order-time recommendation |
-| PIMNet 2023, DOI `10.1016/j.ymeth.2023.06.005` | medication-order/patient-condition evolution and conventional DDI rate | no actual-administration-derived active exposure objective |
-| KATMed 2026, DOI `10.1016/j.jbi.2026.104991` | drug-disease contraindication constraints in MedRec | rule applicability, not temporal pairwise exposure state |
-| RES-MR 2026, DOI `10.1145/3805712.3809604` | personalized safety boundaries | risk tolerance, not execution-confirmed DDI applicability |
-| GRAIN 2026, arXiv `2608.00098` | active-ingredient granularity and DDI objectives | finer identity, not order-time active exposure |
-| SafeRx-Agent 2026, arXiv `2605.29146` | fine-grained knowledge-grounded safety verification | no eMAR-derived active-regimen learning |
+This means "we also test on eICU" is not a publishable novelty delta.
 
-A final focused search did not find a direct medication-recommendation method jointly establishing:
+A 2025 schizophrenia-spectrum medication recommender additionally reports true temporal/geographic validation degradation, so temporal degradation itself is also not novel.
 
-1. provider-order-time prediction;
-2. strict pre-order feature semantics;
-3. actual prior administration used to define the currently active medication state;
-4. DDI optimization against that state rather than hospitalization/visit co-membership;
-5. end-to-end learned value evaluated against direct controls receiving the identical exposure-risk signal.
+MIMIC-IV, however, provides `anchor_year_group` specifically to enable analyses of changes in medical practice over time. This supplies a low-cost chronological environment for a premise test.
 
-This is search-scoped evidence, not a universal novelty proof.
+### Search-scoped gap
 
-## Surviving novelty delta
+Within the retained search, no close **general** medication-recommendation method was found whose central problem is:
 
-The defensible delta is the interaction:
+> source-era medication recommendation -> future prescribing environment -> distinguish marginal medication-prior shift from residual conditional medication-transition shift -> adapt the model only if that residual is real.
 
-> **order-time medication recommendation whose DDI objective is conditioned on a strictly pre-order, execution-confirmed active regimen derived from actual administration evidence, with learned value required to survive direct equal-entitlement exposure-aware controls.**
+This is not a universal novelty claim.
 
-Do not claim as novel:
+### Strongest trivial explanation
 
-- order-time prediction;
-- causal masking;
-- temporal EHR modeling;
-- static DDI regularization;
-- contextual DDI alerts;
-- ATC-L4/ingredient granularity.
+DMRNet and broader medication-frequency evidence make one control mandatory:
 
-## Strongest novelty-collapse objection
+> changed medication marginals alone may explain the apparent temporal degradation.
 
-A strict reviewer can characterize the route as:
+Therefore a per-medication target-prior/logit-bias adjustment must be tried before any adaptation method is admitted.
 
-> `Rough 2020 + contextual DDI CDS + SafeDrug-style regularization`.
+## Current gate
 
-This objection remains fatal unless the learned exposure-conditioned objective beats a direct exposure-aware greedy reranker/hard constraint that receives the same active-regimen state and DDI matrix.
+`S0 — Medication Practice-Shift Admission`
 
-Therefore the novelty question has moved from literature search to the frozen Idea-006 Gate 01.
+Protocol:
 
-## Current opportunity judgment
+[`literature-search-20260908-medication-practice-shift/s0-practice-shift-admission-protocol.md`](literature-search-20260908-medication-practice-shift/s0-practice-shift-admission-protocol.md).
 
-| Research axis | Judgment | Current action |
-| --- | --- | --- |
-| prior post-hoc families | `CLOSED` | none |
-| count-mediated safety | `CLOSED` | none |
-| substitution structure | `CLOSED` | none |
-| selective prescription supervision | `NOT ADMITTED` | none without changed supervision resource |
-| generic longitudinal/KG/finer-action directions | `CROWDED` | not current route |
-| **exposure-localized order-time DDI learning** | **`ACTIVE / IDEA 006`** | execute frozen Gate 01 only |
+S0 is not publication evidence. It is a single investment gate.
 
-## Current review status
+### PASS
 
-Idea-006 strict review:
+`PASS_S0_RESIDUAL_MEDICATION_PRACTICE_SHIFT`
 
-`ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY`
+Then route the single surviving family to `ccf-idea-optimizer`, followed by strict idea review. Generic fine-tuning, generic domain adaptation, and generic continual learning are mandatory collision/baseline families.
 
-Weighted development score: `4.30/5`.
+### FAIL
 
-Current conference readiness remains medium because no learned result exists yet. The score is an investment judgment, not an acceptance probability.
+`FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_SHIFT`
+
+Then return to `NO_HIGH_VALUE_DIRECTION_YET` without temporal-split rescue or Idea 007.
 
 ## Stable source links
 
-- Rough et al. 2020: https://doi.org/10.1002/cpt.1826
-- Contextualized DDI algorithms: https://doi.org/10.1093/jamiaopen/ooab023
-- Contextualized DDI management: https://doi.org/10.1002/cpt.2624
-- PIMNet: https://doi.org/10.1016/j.ymeth.2023.06.005
+- HypeMed: https://doi.org/10.1145/3803851
 - KATMed: https://doi.org/10.1016/j.jbi.2026.104991
-- RES-MR: https://doi.org/10.1145/3805712.3809604
-- GRAIN: https://arxiv.org/abs/2608.00098
-- SafeRx-Agent: https://arxiv.org/abs/2605.29146
+- NLA-MMR: https://doi.org/10.1145/3627673.3679529
+- DMRNet: https://doi.org/10.1016/j.neunet.2026.109168
+- Rough et al. order-time prediction: https://doi.org/10.1002/cpt.1826
+- MIMIC-IV data paper: https://doi.org/10.1038/s41597-022-01899-x
+- Temporal-leakage appraisal: https://doi.org/10.1016/j.jbi.2026.105016
+- Schizophrenia recommender temporal/external validation: https://doi.org/10.1186/s12888-025-07657-8
