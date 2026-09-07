@@ -7,14 +7,18 @@ The project has completed Ideas 001--005, B0 Cardinality Attribution, the reject
 - **R0**: `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
 - **R0 execution commit**: `ea134b7e75583186242bc72bc71eb2975b812edc`
 - **Final closest-work verdict**: `NOVELTY_DELTA_SURVIVES_FOR_IDEA_CREATION`
-- **Current Stage**: `IDEA_006_GATE_01`
+- **Current Stage**: `IDEA_006_GATE_01_COMPLETED`
 - **Current Active Idea**: `006-exposure-conditional-medication-recommendation`
+- **Gate 01 verdict**: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
+- **Gate 01 integrity audit**: `INTEGRITY_AUDIT_PASS`
+- **Pre-Dev Freeze SHA256**: `c7d5d7d19640e2aafdb41b98bdf58d4092cb82d4ddb44ae105450385813775c9`
 - **Idea review**: `ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY`, weighted score `4.30/5`
-- **Paper Objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family; likely 2027 cycle, final venue not frozen
 - **Gate 01 protocol**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-exposure-conditioned-learning.md`
-- **R0 Dev**: authorized for one frozen Gate-01 outer evaluation only
-- **R0 Holdout**: quarantined and not authorized
-- **Existing project test split**: untouched and not authorized
+- **Gate 01 summary**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-summary.json`
+- **Gate 01 decision**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-decision.md`
+- **R0 Dev**: evaluated strictly once under pre-Dev freeze manifest
+- **R0 Holdout**: quarantined and uninspected
+- **Existing project test split**: untouched and uninspected
 
 ## R0 evidence now admitted
 
@@ -127,6 +131,6 @@ Even on Gate-01 PASS, the project may claim only exposure-localized DDI **surrog
 
 ## Next owner
 
-Local repository Agent executes Gate 01 exactly from the frozen protocol, then runs `ccf-integrity-auditor`.
+`ccf-pipeline-orchestrator` owns post-Gate-01 routing under `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`.
 
-No other scientific execution is authorized in the same run.
+No rescue model or relaxed threshold is authorized. R0 Holdout and existing project test split remain quarantined.

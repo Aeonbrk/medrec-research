@@ -1,0 +1,350 @@
+{
+  "schema_version": "1.0",
+  "gate_id": "GATE01_EXPOSURE_CONDITIONED_LEARNING",
+  "verdict": "STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING",
+  "mimic_version": "3.1",
+  "ddi_asset_sha256": "dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7",
+  "ddi_sha256_match": true,
+  "execution_timestamp": "2026-09-07T16:05:29.589992+00:00",
+  "elapsed_seconds": 6626.203742027283,
+  "cohort_counts": {
+    "InnerTrain": {
+      "patients": 116383,
+      "bursts": 2761018,
+      "bursts_q": 1339520,
+      "patients_q": 65619
+    },
+    "InnerTune": {
+      "patients": 20556,
+      "bursts": 488992,
+      "bursts_q": 239831,
+      "patients_q": 11724
+    },
+    "Dev": {
+      "patients": 29350,
+      "bursts": 708785,
+      "bursts_q": 349839,
+      "patients_q": 16699
+    }
+  },
+  "training_contract": {
+    "backbone": "CommonOrderTimeBackbone (1-layer GRU hidden 128, MLP 260->128->131)",
+    "optimizer": "AdamW",
+    "lr": 0.001,
+    "weight_decay": 1e-05,
+    "max_epochs": 5,
+    "patience": 1,
+    "seed": 260907,
+    "frozen_batch_size": 2048
+  },
+  "freeze_manifest": {
+    "freeze_sha256": "c7d5d7d19640e2aafdb41b98bdf58d4092cb82d4ddb44ae105450385813775c9",
+    "frozen_r_base_tune": 0.09847289747342353,
+    "frozen_safety_budget_b": 0.08862560772608118,
+    "selected_lambda_static": 8.0,
+    "selected_lambda_ec": 2.0,
+    "selected_gamma": 0.5
+  },
+  "inner_tune_selection": {
+    "r_base_tune": 0.09847289747342353,
+    "safety_budget_b": 0.08862560772608118,
+    "static_loss_rows": [
+      {
+        "lambda": 8.0,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.051144222382097565,
+        "Recall@5": 0.5052366346317853,
+        "IncrementalExposureDDI@5": 0.09756492783324829,
+        "reaches_budget": false
+      },
+      {
+        "lambda": 0.1,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.05106335864343903,
+        "Recall@5": 0.5077932288271745,
+        "IncrementalExposureDDI@5": 0.09827635049812476,
+        "reaches_budget": false
+      },
+      {
+        "lambda": 2.0,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.05103305490321195,
+        "Recall@5": 0.5071961118591842,
+        "IncrementalExposureDDI@5": 0.1007977801614847,
+        "reaches_budget": false
+      },
+      {
+        "lambda": 0.5,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.05104726082236198,
+        "Recall@5": 0.506291901938901,
+        "IncrementalExposureDDI@5": 0.10112889881870057,
+        "reaches_budget": false
+      }
+    ],
+    "exposure_conditional_rows": [
+      {
+        "lambda": 0.1,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.05108119402408101,
+        "Recall@5": 0.5072283142431674,
+        "IncrementalExposureDDI@5": 0.09977067857595469,
+        "reaches_budget": false
+      },
+      {
+        "lambda": 0.5,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.051079302636524625,
+        "Recall@5": 0.5063472061971563,
+        "IncrementalExposureDDI@5": 0.09252967448087498,
+        "reaches_budget": false
+      },
+      {
+        "lambda": 2.0,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.05124463106673133,
+        "Recall@5": 0.5025481278564767,
+        "IncrementalExposureDDI@5": 0.07496871221580734,
+        "reaches_budget": true
+      },
+      {
+        "lambda": 8.0,
+        "best_epoch": 5,
+        "best_tune_lpred": 0.05208905047452599,
+        "Recall@5": 0.4777328211061456,
+        "IncrementalExposureDDI@5": 0.04409796964959278,
+        "reaches_budget": true
+      }
+    ],
+    "direct_rerank_rows": [
+      {
+        "gamma": 0.25,
+        "Recall@5": 0.5071417338025217,
+        "IncrementalExposureDDI@5": 0.09257248493565179,
+        "reaches_budget": false
+      },
+      {
+        "gamma": 0.5,
+        "Recall@5": 0.5067282007093098,
+        "IncrementalExposureDDI@5": 0.08741465580245028,
+        "reaches_budget": true
+      },
+      {
+        "gamma": 1.0,
+        "Recall@5": 0.5052585088634468,
+        "IncrementalExposureDDI@5": 0.0788098766585146,
+        "reaches_budget": true
+      },
+      {
+        "gamma": 2.0,
+        "Recall@5": 0.5005240524091281,
+        "IncrementalExposureDDI@5": 0.06510262567669324,
+        "reaches_budget": true
+      },
+      {
+        "gamma": 4.0,
+        "Recall@5": 0.4880208220780216,
+        "IncrementalExposureDDI@5": 0.04716407284970072,
+        "reaches_budget": true
+      },
+      {
+        "gamma": 8.0,
+        "Recall@5": 0.4625834329884877,
+        "IncrementalExposureDDI@5": 0.030220667344286526,
+        "reaches_budget": true
+      },
+      {
+        "gamma": 16.0,
+        "Recall@5": 0.41307709296981887,
+        "IncrementalExposureDDI@5": 0.014095242626082014,
+        "reaches_budget": true
+      }
+    ],
+    "hard_constraint_tune": {
+      "Recall@5": 0.3078064230871883,
+      "IncrementalExposureDDI@5": 0.0,
+      "ActiveDDI@5": 0.0,
+      "NewDDI@5": 0.0,
+      "NDCG@5": 0.23958749569960955,
+      "Hit@5": 0.36934758225583847,
+      "n_bursts": 239831
+    }
+  },
+  "dev_evaluation_k5": {
+    "GlobalFrequency": {
+      "Recall@5": 0.37805544692498194,
+      "IncrementalExposureDDI@5": 0.06293006860279203,
+      "ActiveDDI@5": 0.08108745729086951,
+      "NewDDI@5": 0.0,
+      "NDCG@5": 0.2583188786859209,
+      "Hit@5": 0.44356118100040304,
+      "n_bursts": 349839
+    },
+    "Base": {
+      "Recall@5": 0.5104422846188944,
+      "IncrementalExposureDDI@5": 0.09826867369229206,
+      "ActiveDDI@5": 0.10056231840105301,
+      "NewDDI@5": 0.09423048888202862,
+      "NDCG@5": 0.38473529486310987,
+      "Hit@5": 0.5754475630218472,
+      "n_bursts": 349839,
+      "MRR": 0.4019345376688268,
+      "micro_PRAUC": 0.1672201423039291
+    },
+    "StaticLoss": {
+      "Recall@5": 0.5084640590799175,
+      "IncrementalExposureDDI@5": 0.09729016677975387,
+      "ActiveDDI@5": 0.09893018065840711,
+      "NewDDI@5": 0.09401038763545519,
+      "NDCG@5": 0.38359619002503714,
+      "Hit@5": 0.5732522674716084,
+      "n_bursts": 349839,
+      "MRR": 0.40117277747304997,
+      "micro_PRAUC": 0.1663210770973787
+    },
+    "DirectExposureRerank": {
+      "Recall@5": 0.5098473731786454,
+      "IncrementalExposureDDI@5": 0.08730158661783344,
+      "ActiveDDI@5": 0.09157357865892002,
+      "NewDDI@5": 0.075465285459883,
+      "NDCG@5": 0.38424863675804277,
+      "Hit@5": 0.5749158898807737,
+      "n_bursts": 349839
+    },
+    "ExposureHardConstraint": {
+      "Recall@5": 0.3096512884888358,
+      "IncrementalExposureDDI@5": 0.0,
+      "ActiveDDI@5": 0.0,
+      "NewDDI@5": 0.0,
+      "NDCG@5": 0.24133214721116242,
+      "Hit@5": 0.37066479151838416,
+      "n_bursts": 349839
+    },
+    "ExposureConditional": {
+      "Recall@5": 0.5054848287102376,
+      "IncrementalExposureDDI@5": 0.07475556731001758,
+      "ActiveDDI@5": 0.0784639355713405,
+      "NewDDI@5": 0.060806256592318184,
+      "NDCG@5": 0.38054917691740736,
+      "Hit@5": 0.5703966681816492,
+      "n_bursts": 349839,
+      "MRR": 0.3983728089875102,
+      "micro_PRAUC": 0.16467964228565224
+    }
+  },
+  "dev_evaluation_k10_secondary": {
+    "GlobalFrequency": {
+      "Recall@10": 0.5874187114605991,
+      "IncrementalExposureDDI@10": 0.0854537995362281,
+      "ActiveDDI@10": 0.0973913752269745,
+      "NewDDI@10": 0.06666666666666672,
+      "NDCG@10": 0.3252852131270481,
+      "Hit@10": 0.6542609600416192,
+      "n_bursts": 349839
+    },
+    "Base": {
+      "Recall@10": 0.6971349390751614,
+      "IncrementalExposureDDI@10": 0.1007434621280925,
+      "ActiveDDI@10": 0.10170232067580999,
+      "NewDDI@10": 0.09758863680467617,
+      "NDCG@10": 0.44619494835887413,
+      "Hit@10": 0.750468072456187,
+      "n_bursts": 349839
+    },
+    "StaticLoss": {
+      "Recall@10": 0.6973035763000361,
+      "IncrementalExposureDDI@10": 0.10128073589099985,
+      "ActiveDDI@10": 0.10177744199487965,
+      "NewDDI@10": 0.09915386474603714,
+      "NDCG@10": 0.4456696947240201,
+      "Hit@10": 0.7506853152450127,
+      "n_bursts": 349839
+    },
+    "DirectExposureRerank": {
+      "Recall@10": 0.6968457340091598,
+      "IncrementalExposureDDI@10": 0.09091453288694035,
+      "ActiveDDI@10": 0.09443176087969843,
+      "NewDDI@10": 0.0843532786986776,
+      "NDCG@10": 0.4457635321821019,
+      "Hit@10": 0.7505538261886182,
+      "n_bursts": 349839
+    },
+    "ExposureHardConstraint": {
+      "Recall@10": 0.3934849608364254,
+      "IncrementalExposureDDI@10": 0.0,
+      "ActiveDDI@10": 0.0,
+      "NewDDI@10": 0.0,
+      "NDCG@10": 0.26749728505504833,
+      "Hit@10": 0.4551779532870835,
+      "n_bursts": 349839
+    },
+    "ExposureConditional": {
+      "Recall@10": 0.6941520055281901,
+      "IncrementalExposureDDI@10": 0.08034499648240111,
+      "ActiveDDI@10": 0.08149838126272688,
+      "NewDDI@10": 0.07354017768808571,
+      "NDCG@10": 0.4425547613916033,
+      "Hit@10": 0.7480097987931591,
+      "n_bursts": 349839
+    }
+  },
+  "bootstrap_results_k5": {
+    "ec_vs_base": {
+      "risk_delta": -0.023513106382274482,
+      "risk_delta_95ci": [
+        -0.02396149367282565,
+        -0.02306190909496203
+      ],
+      "recall_delta": -0.004957455908656816,
+      "recall_delta_95ci": [
+        -0.0060051294277669144,
+        -0.0039029352830083734
+      ]
+    },
+    "ec_vs_direct_rerank": {
+      "risk_delta": -0.012546019307815862,
+      "risk_delta_95ci": [
+        -0.012891151104327805,
+        -0.012204399731906587
+      ],
+      "recall_delta": -0.004362544468407781,
+      "recall_delta_95ci": [
+        -0.005329444401041175,
+        -0.0033772985147201826
+      ]
+    }
+  },
+  "decision_criteria": {
+    "condition_1_budget_feasibility": {
+      "passed": true,
+      "ec_budget_miss": false
+    },
+    "condition_2_safety_gain_over_base": {
+      "passed": true,
+      "point_pass": true,
+      "observed_ratio": 0.7607263281490815,
+      "threshold_ratio": 0.9,
+      "bootstrap_ci_upper": -0.02306190909496203
+    },
+    "condition_3_bounded_fidelity_loss": {
+      "passed": true,
+      "observed_recall_delta": -0.004957455908656816,
+      "threshold": -0.01
+    },
+    "condition_4_incremental_over_killer_control": {
+      "passed": false,
+      "risk_condition_pass": true,
+      "observed_risk_delta": -0.012546019307815862,
+      "threshold_risk_delta": 0.001,
+      "recall_condition_pass": false,
+      "observed_recall_delta": -0.004362544468407781,
+      "threshold_recall_delta": 0.005,
+      "bootstrap_ci_lower": -0.005329444401041175
+    },
+    "condition_5_no_weak_dominance": {
+      "passed": true,
+      "static_dominates": false,
+      "hard_dominates": false
+    }
+  }
+}
