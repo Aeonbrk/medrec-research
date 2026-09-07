@@ -3,178 +3,146 @@
 # Idea 006: Exposure-Conditional Medication Recommendation
 
 - **Idea ID**: `006-exposure-conditional-medication-recommendation`
-- **Status**: `ACTIVE / GATE_01_DESIGNED / NOT_EXECUTED`
-- **Scientific stage**: Idea / hypothesis selection
-- **Target venue assumption**: CCF-A Data/Mining/AI venue family, likely 2027 cycle; final venue not frozen
+- **Status**: `TERMINATED_AT_GATE_01`
+- **Formal verdict**: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
+- **Scientific stage**: Idea / hypothesis selection — completed and falsified
+- **Target venue assumption**: first formal method paper, CCF-A Data/Mining/AI venue family
 - **R0 resource gate**: `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
 - **R0 execution commit**: `ea134b7e75583186242bc72bc71eb2975b812edc`
+- **Gate 01 execution commit**: `3e51887a570bf8c4ef9503f7ffb852881c931130`
 - **Final closest-work verdict**: `NOVELTY_DELTA_SURVIVES_FOR_IDEA_CREATION`
-- **Optimizer**: [`idea-optimization.md`](idea-optimization.md)
 - **Strict idea review**: [`idea-review.md`](idea-review.md) (`ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY`, `4.30/5`)
 - **Gate 01 protocol**: [`experiments/gate-01-exposure-conditioned-learning.md`](experiments/gate-01-exposure-conditioned-learning.md)
 - **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`)
-- **New R0 Dev**: authorized for Gate 01 evaluation only under the frozen protocol
-- **New R0 Holdout**: quarantined and not authorized
-- **Existing project test split**: untouched and not authorized
+- **Gate 01 summary**: [`experiments/gate-01-summary.json`](experiments/gate-01-summary.json)
+- **Gate 01 decision**: [`experiments/gate-01-decision.md`](experiments/gate-01-decision.md)
+- **Gate 01 integrity audit**: [`experiments/gate-01-integrity-audit.md`](experiments/gate-01-integrity-audit.md) (`INTEGRITY_AUDIT_PASS`)
+- **Formal research decision**: [`research-decision.md`](research-decision.md)
+- **Cross-idea failure memory**: [`../../memory/failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md`](../../memory/failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md)
+- **R0 Holdout**: quarantined and uninspected
+- **Historical project test split**: untouched and uninspected
 
 ## Scientific question
 
-At an inpatient medication-order decision point, should DDI pressure be conditioned on the medications that are **actually execution-confirmed and still active before that order**, rather than treating every medication associated with the hospitalization or predicted set as equally relevant to the current safety state?
+At an inpatient provider medication-order decision point, can end-to-end DDI learning conditioned on a strictly pre-order, execution-confirmed active regimen create a reproducible safety/fidelity advantage beyond direct exposure-aware use of the same active-regimen DDI signal?
 
-The method-level question is stricter:
+The strongest null was:
 
-$$
-\boxed{\begin{aligned}
-&\text{Does end-to-end exposure-conditioned DDI learning improve the safety--fidelity frontier}\\
-&\text{beyond direct exposure-aware reranking when both receive the same active-regimen DDI signal?}
-\end{aligned}}
-$$
+> The dynamic exposure signal is useful, but learning is unnecessary; a direct exposure-aware reranker receiving the same active state and DDI matrix is sufficient.
 
-## Empirical premise from R0
+Gate 01 did not reject this null.
 
-On MIMIC-IV 3.1 Discovery, R0 admitted the new resource and minimum semantic premise:
+## Empirical premise that survived
 
-- all required order/eMAR tables were available and linkable;
-- order and administration normalization both exceeded 81%;
-- the shared action space retained all 131 ATC-L4 concepts and 91 DDI-represented concepts;
-- 1,050,523 eMAR-observed visit-union DDI patient-pair episodes were available;
-- 221,157 episodes were `static-only`;
+R0 remains a valid project-local result.
+
+On raw MIMIC-IV 3.1 Discovery:
+
+- order normalization coverage exceeded 81%;
+- administration normalization coverage exceeded 81%;
+- the action vocabulary contained 131 ATC-L4 concepts, with 91 represented in the frozen DDI asset;
+- 1,050,523 eMAR-observed visit-union DDI episodes were identified;
+- 221,157 were `static-only` under the frozen retrospective operational definition;
 - `static_only_fraction = 21.0521%`;
 - 280 DDI relations independently exceeded the distributed-support floor;
-- a strictly pre-order state was feasible without current-visit discharge coding or future administration events.
+- a strictly pre-order execution-confirmed active medication state was feasible.
 
-R0 does not establish clinical harm, clinical appropriateness, or model superiority.
+Therefore hospitalization-level DDI pair co-membership is not equivalent to current execution-confirmed temporal exposure under the frozen resource definition.
 
-## Problem formulation
+This is a state-semantics result, not proof of clinical safety or method value.
 
-### Decision unit
+## Gate 01 result
 
-A prediction is made immediately before a provider medication-order burst at time $t$.
+Primary Dev evaluation used fixed `K=5`, `Recall@5` as the primary fidelity metric, and `IncrementalExposureDDI@5` as the primary operational safety surrogate.
 
-The target is the normalized medication set ordered in the following frozen short window. Inputs are restricted to information available strictly before $t$.
+| Method | Recall@5 | IncrementalExposureDDI@5 |
+| --- | ---: | ---: |
+| Base | 0.510442 | 0.098269 |
+| StaticLoss | 0.508464 | 0.097290 |
+| DirectExposureRerank | 0.509797 | 0.087302 |
+| ExposureHardConstraint | 0.309724 | 0.000000 |
+| ExposureConditional | 0.505470 | 0.074756 |
 
-### Active exposure state
+`ExposureConditional` reduced the surrogate substantially versus Base:
 
-Let $A_t$ be the set of normalized medications with at least one pre-$t$ execution-confirmed administration attached to an order that has not been causally discontinued by a pre-$t$ provider D/C transaction.
+- risk delta: `-0.023513`;
+- 95% patient-clustered bootstrap CI: `[-0.023961, -0.023062]`;
+- Recall@5 delta versus Base: approximately `-0.004972`.
 
-The construction may use the prior discontinuation transaction itself (`transaction_type = D/C` with `discontinue_of_poe_id`) because it is an event that occurred before $t$.
+However, the preregistered primary killer comparison failed.
 
-It must not use:
+EC versus DirectExposureRerank:
 
-- `discontinued_by_poe_id` as a future pointer;
-- final `order_status` to reconstruct historical status;
-- prescription `stoptime` unless a later protocol proves that the stop time was known at the decision point;
-- any post-$t$ administration;
-- discharge-coded current-visit diagnosis/procedure information.
+- risk delta: `-0.012546`;
+- Recall@5 delta: approximately `-0.004327`;
+- Recall delta 95% CI: `[-0.005315, -0.003362]`.
 
-This is an operational active-order/execution state, not a pharmacokinetic concentration model.
+The protocol required at least `+0.005` Recall@5 over the direct reranker at near-equal-or-better risk, with CI lower bound above zero. The observed fidelity effect had the opposite sign.
 
-## Candidate method mechanism
+Conditions 1, 2, 3, and 5 passed. Condition 4 failed. The all-conditions Gate therefore returned:
 
-All Gate 01 variants use the same causal order-time backbone and the same active-state input.
+`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`.
 
-The prediction-only objective is $L_{pred}$.
+## Mechanistic interpretation
 
-A conventional new-set DDI term is:
+Two findings must be kept separate.
 
-$$
-L_{new}(t)
-=
-\frac{2}{|V|(|V|-1)}
-\sum_{i<j}p_t(i)p_t(j)D_{ij}.
-$$
+### Exposure semantics were nontrivial
 
-The exposure-specific term is:
+The conventional `StaticLoss` grid failed to reach the common InnerTune safety budget, while `ExposureConditional` reached it. The active-exposure term therefore changed optimization behavior relative to the tested static new-set DDI regularizer.
 
-$$
-L_{active}(t)
-=
-\frac{1}{|V|\max(1,|A_t|)}
-\sum_{m\in V}\sum_{a\in A_t}p_t(m)D_{ma}.
-$$
+### Learned method value was absent at the frozen Gate
 
-The candidate exposure-conditioned objective is:
+The same exposure-risk information could be used directly at inference time while retaining higher medication-order fidelity at the selected operating point. The project therefore cannot promote the valid R0 semantic mismatch into a learned-method contribution.
 
-$$
-L=L_{pred}+\lambda\left(L_{new}+L_{active}\right).
-$$
+This is the decisive scientific lesson of Idea 006.
 
-The method contribution is not the existence of a DDI matrix or a temporal encoder. It is the change in **which DDI relations are applicable at the decision point**, and whether learning under that state produces value beyond direct application of the same risk signal.
+## Exact closure boundary
 
-## Closest-work boundary
+The terminated route consists of:
 
-Do not claim as novel:
+- provider-order-time medication recommendation;
+- strictly pre-order execution-confirmed active regimen;
+- frozen 131 ATC-L4 action space;
+- frozen SafeDrug/MoleRec binary DDI matrix;
+- common causal order-time backbone;
+- exposure-conditioned differentiable DDI loss;
+- fixed-cardinality evaluation;
+- equal-entitlement direct reranking/hard-constraint controls;
+- the frozen Gate-01 selection and decision protocol.
 
-- order-time medication prediction — Rough et al. 2020 already establishes it;
-- contextual DDI alerting — established in clinical CDS literature;
-- temporal patient modeling — heavily covered;
-- static DDI loss — SafeDrug-family prior art;
-- contraindication-aware safety — KATMed;
-- personalized risk boundary — RES-MR;
-- fine medication granularity — GRAIN/SafeRx-Agent and related work.
+Do not rescue this route by adding a deeper risk encoder, another backbone, wider parameter search, personalized DDI weighting, LLM verification, new DDI knowledge, dose/route, labs/vitals, or subgroup mining while retaining the same central premise.
 
-Final search packet:
+## What remains reusable
 
-[`../../memory/resource-reset-20260905-exposure-localized-safety/final-closest-work-check.md`](../../memory/resource-reset-20260905-exposure-localized-safety/final-closest-work-check.md).
+The following may be reused by future, materially different Ideas:
 
-## Strongest simple killer control
+- raw MIMIC-IV order/eMAR normalization and linkage;
+- leakage-safe provider-order-time burst construction;
+- causal pre-order active-regimen instrumentation;
+- R0 exposure-state evidence;
+- fixed-cardinality operational exposure-DDI metrics;
+- equal-entitlement direct-control methodology.
 
-The learned route receives no privileged DDI information.
+Reusing infrastructure is allowed. Reusing the failed scientific claim is not.
 
-The primary killer control takes the prediction-only model's logits and performs deterministic greedy exposure-aware reranking with the **same** $A_t$ and DDI matrix.
+## Non-claims
 
-If the direct reranker reaches the same or better exposure-risk/fidelity point, Idea 006 terminates.
+Idea 006 does not establish that:
 
-A deterministic hard exposure constraint and a conventional static predicted-set DDI loss are additional required controls.
+- administration timing is clinically irrelevant;
+- exposure-localized DDI semantics are useless;
+- direct reranking dominates every possible frontier;
+- static-only DDI pairs are safe;
+- DDI overlap predicts ADEs;
+- every end-to-end safety method is inferior to post-hoc control.
 
-## Gate 01
+It establishes only that the preregistered Idea-006 learned route did not demonstrate the required incremental value beyond its strongest equal-entitlement direct control.
 
-Only Gate 01 is authorized.
+## Next research state
 
-Gate 01 asks whether a simple end-to-end exposure-conditioned objective produces reproducible incremental value over:
+Idea 006 is closed.
 
-1. prediction-only training;
-2. conventional static new-set DDI regularization;
-3. direct exposure-aware greedy reranking;
-4. deterministic exposure-aware hard constraint.
+Next owner: `ccf-pipeline-orchestrator` for cross-idea consolidation and a bounded research-space reset outside the current exposure-safety method family.
 
-The protocol freezes the task, patient partitions, backbone, tuning boundary, safety budget, metrics, bootstrap, and pass/fail logic before training.
-
-## PASS semantics
-
-A Gate 01 PASS means only:
-
-> Under the frozen MIMIC-IV order-time task, exposure-conditioned end-to-end DDI learning creates a reproducible active-exposure safety/fidelity advantage that is not absorbed by direct exposure-aware controls receiving the same DDI information.
-
-A PASS does not establish ADE reduction, prospective clinical safety, universal generalization, or final CCF-A readiness.
-
-## FAIL semantics
-
-A Gate 01 FAIL terminates the current method route.
-
-In particular, if direct reranking absorbs the gain, do not rescue the route with:
-
-- GNN risk encoders;
-- personalized risk-tolerance networks;
-- LLM agents;
-- new DDI databases;
-- subgroup mining;
-- labs/vitals;
-- dose/route modeling;
-- additional hidden gates on the same premise.
-
-## Publication path if Gate 01 passes
-
-Only after Gate 01 PASS may the project design broader claim-support evidence, likely including:
-
-- a second materially different causal predictor family;
-- full safety/fidelity frontiers;
-- robustness to active-state construction;
-- efficiency/scale reporting;
-- preserved quarantined Holdout for later claim support.
-
-No paper project is created at Idea selection.
-
-## Next owner
-
-Local repository Agent executes the frozen Gate 01 protocol. No other scientific execution is authorized in the same run.
+No Idea-006 Gate 02 or rescue experiment is authorized.
