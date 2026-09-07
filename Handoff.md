@@ -1,157 +1,132 @@
-# Handoff: Exposure-Localized Safety Resource Admission
+# Handoff: Idea 006 — Exposure-Conditional Medication Recommendation
 
 ## Current state
 
-The project completed Ideas 001--005, B0 Cardinality Attribution, and the rejected selective-prescription-supervision reset. A new resource-level reset has now identified one method-capable route that survives literature/optimizer/reviewer scrutiny **conditionally on raw-data admission**.
+The project has completed Ideas 001--005, B0 Cardinality Attribution, the rejected selective-prescription-supervision reset, and the exposure-localized resource reset.
 
-- **Previous Idea**: `005-safety-substitution-structure`
-- **Previous Idea Status**: `TERMINATED / STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`
-- **B0**: `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
-- **Rejected post-B0 seed**: selective prescription supervision / trajectory-privileged negative reliability
-- **Current Stage**: `RESOURCE_ADMISSION_R0`
-- **Selected resource route**: exposure-localized medication safety at provider order time
-- **Paper Objective**: first formal method paper, targeting at least a CCF-A venue family
-- **Current Active Idea**: none
-- **Idea 006**: not created; creation is conditional on R0 PASS
-- **Resource-reset folder**: `research/memory/resource-reset-20260905-exposure-localized-safety/`
-- **R0 Protocol**: `research/memory/resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`
-- **Strict pre-Idea review**: `ACCEPT_TO_DEVELOP / RESOURCE_ADMISSION_REQUIRED`, weighted score `4.04/5`
+- **R0**: `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
+- **R0 execution commit**: `ea134b7e75583186242bc72bc71eb2975b812edc`
+- **Final closest-work verdict**: `NOVELTY_DELTA_SURVIVES_FOR_IDEA_CREATION`
+- **Current Stage**: `IDEA_006_GATE_01`
+- **Current Active Idea**: `006-exposure-conditional-medication-recommendation`
+- **Idea review**: `ACCEPT_TO_DEVELOP / SELECT_FOR_GATE_01_ONLY`, weighted score `4.30/5`
+- **Paper Objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family; likely 2027 cycle, final venue not frozen
+- **Gate 01 protocol**: `research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-exposure-conditioned-learning.md`
+- **R0 Dev**: authorized for one frozen Gate-01 outer evaluation only
+- **R0 Holdout**: quarantined and not authorized
 - **Existing project test split**: untouched and not authorized
 
-## Why this reset is different
+## R0 evidence now admitted
 
-The route does not add another feature to the current 131-label visit-level benchmark.
+R0 used raw MIMIC-IV 3.1 Discovery only and passed all seven frozen resource/premise floors.
 
-It changes the scientific resource and the safety semantics:
+Key project-local evidence:
 
-> At a provider medication-order decision point, condition DDI pressure on the medications that are execution-confirmed and currently active before that order, rather than treating every medication that appears anywhere in the hospitalization as simultaneously relevant.
+- order normalization coverage: 81.9248%;
+- administration normalization coverage: 81.8875%;
+- shared vocabulary: 131 ATC-L4 concepts, 91 represented in the frozen DDI asset;
+- eMAR-observed visit-union DDI episodes: 1,050,523;
+- execution-confirmed overlapping episodes: 829,366;
+- static-only episodes: 221,157;
+- `static_only_fraction = 21.0521%`;
+- 391 unique DDI relations and 68,695 contributing patients;
+- 280 relations each contribute at least 20 static-only episodes;
+- strictly pre-order execution-confirmed medication state: feasible;
+- integrity audit: `PASS_ALL_AUDITS`.
 
-The new resource is raw MIMIC-IV medication request/order plus medication-administration data:
+R0 therefore establishes a material operational mismatch between hospitalization-level pair co-membership and execution-confirmed temporal overlap. It does **not** establish ADE reduction, clinical appropriateness, or method superiority.
 
-- `prescriptions` / `pharmacy` / `poe` for provider medication requests/orders;
-- `emar` / `emar_detail` for actual medication administration.
+## Final novelty boundary
 
-MIMIC-IV explicitly separates requested medications from administered medications and supplies medication/order linkage fields. Clinical DDI decision-support literature independently shows that concomitant exposure, administration timing, stopped-medication status, and other context can change whether a pairwise DDI alert is applicable.
+The final closest-work check explicitly subtracts:
 
-This route therefore changes **risk-state semantics**, not merely model architecture.
+- Rough et al. 2020: provider-order-time, pre-order-only medication prediction;
+- contextualized DDI-CDS: stopped-medication and administration-time-dependent alert applicability;
+- SafeDrug/PIMNet/KATMed/RES-MR: safe medication-recommendation objectives and contextual safety;
+- GRAIN/SafeRx-Agent: finer medication/safety granularity.
 
-## What is already prior art
+Do **not** claim any of those ingredients individually as novel.
 
-Do not claim any of the following as novelty:
+The surviving search-scoped delta is:
 
-- medication prediction at provider order time;
-- pre-order-only causal masking;
-- generic temporal EHR modeling;
-- static DDI regularization;
-- ATC-L4 or ingredient-level medication granularity;
-- contextual DDI alerting in clinical decision support.
+> **At provider-order time, condition DDI optimization on a strictly pre-order, execution-confirmed active regimen derived from actual administration evidence, and require the learned method to beat direct controls receiving the identical exposure-risk signal.**
 
-Rough et al. (2020) already predict inpatient medication orders from the EHR available before each order event. SafeDrug/KATMed/HeteroMed and related methods already provide static or rule-conditioned safety objectives. SafeRx-Agent/GRAIN/RxEval already increase action granularity.
+Final literature packet:
 
-The only currently defensible novelty delta is the interaction:
+`research/memory/resource-reset-20260905-exposure-localized-safety/final-closest-work-check.md`
 
-> **order-time medication recommendation whose DDI optimization is conditioned on a pre-order, execution-confirmed active medication state, with the same exposure-risk signal also given to direct reranking/filtering controls.**
+## Idea 006 scientific question
 
-This delta remains provisional until R0 passes and a final pre-Idea closest-work check is performed.
+The first learned method question is deliberately narrow:
 
-## Strict review result
+> Does end-to-end exposure-conditioned DDI learning create a reproducible active-exposure safety/fidelity advantage beyond direct exposure-aware reranking when both receive the same active-regimen state and the same DDI matrix?
 
-`ACCEPT_TO_DEVELOP / RESOURCE_ADMISSION_REQUIRED`
+The first candidate method is a simple common causal order-time predictor trained with:
 
-Weighted score: `4.04 / 5.00`.
+`prediction loss + conventional new-set DDI term + active-regimen DDI term`.
 
-Development potential: high.
+The method is not allowed a richer architecture or richer information than the controls.
 
-Current conference readiness: medium-low because the raw MIMIC-IV resource and premise have not yet been admitted.
+## Primary killer control
 
-The decisive reviewer risks are:
+The strongest null is:
 
-1. the raw order/eMAR linkage or medication normalization may be too incomplete or costly;
-2. static visit-union DDI may not differ materially from execution-confirmed overlap in this cohort;
-3. the eventual method may collapse to `Rough 2020 + dynamic SafeDrug loss`;
-4. a direct exposure-aware scalar reranker or hard filter may absorb the entire gain.
+> The dynamic exposure signal is useful, but learning is unnecessary; direct greedy reranking of Base logits with the same active-regimen DDI signal is sufficient.
 
-The third and fourth risks are method-stage gates. R0 handles only the first two.
+Gate 01 gives the identical `A_t` and frozen DDI matrix to:
 
-## R0 — only authorized local execution
+- `ExposureConditional`;
+- `DirectExposureRerank`;
+- `ExposureHardConstraint`.
 
-Run exactly:
+It also includes `Base` and conventional `StaticLoss`.
 
-`R0 — Exposure Resource & Premise Admission`
+If the direct reranker absorbs the learned gain, Idea 006 terminates. Do not rescue the route with a GNN, Transformer, personalized risk network, LLM, labs/vitals, dose/route, a new DDI database, subgroup mining, or extra hyperparameter searches.
+
+## Gate 01 — only authorized local execution
 
 Protocol SSOT:
 
-`research/memory/resource-reset-20260905-exposure-localized-safety/r0-resource-admission-protocol.md`
+`research/ideas/006-exposure-conditional-medication-recommendation/experiments/gate-01-exposure-conditioned-learning.md`
 
-R0 must not train a recommender.
+Gate 01 freezes:
 
-It must:
+- non-overlapping 10-minute medication-order bursts;
+- strict feature timestamps `< decision time`;
+- causal pre-order active-regimen construction using prior administration and pre-order D/C transactions only;
+- R0 Discovery -> patient-disjoint InnerTrain/InnerTune;
+- R0 Dev -> one frozen outer evaluation;
+- one small GRU backbone shared by all learned variants;
+- fixed `K=5` primary ranking evaluation;
+- `IncrementalExposureDDI@5` as primary safety surrogate;
+- `Recall@5` as primary fidelity metric;
+- a common InnerTune safety budget equal to 90% of Base risk;
+- fixed lambda/gamma grids;
+- 2,000-replicate paired patient-clustered bootstrap, seed `260907`;
+- an all-conditions PASS rule.
 
-1. verify local raw MIMIC-IV table availability and version;
-2. immediately create the frozen patient-level Discovery/Dev/Holdout split from `subject_id` only;
-3. use Discovery only for all scientific R0 aggregates;
-4. establish deterministic order-to-administration linkage and medication normalization;
-5. quantify eMAR-observed visit-union DDI episodes versus execution-confirmed overlapping DDI episodes;
-6. apply the frozen R0 decision floors without post-result relaxation;
-7. commit only aggregate public-safe artifacts.
+No Holdout/test access is authorized.
 
-The new Holdout is quarantined before hypothesis-selection experiments. Holdout membership may be assigned, but Holdout clinical/event aggregates are not inspected in R0.
+## Frozen decision routing
 
-This does not authorize any access to the existing project's untouched test split.
+### PASS
 
-## Routing
+`PASS_GATE01_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
 
-### If R0 passes
+Only then return to `ccf-pipeline-orchestrator` to design broader claim-support evidence. Do not automatically consume Holdout or test. A later stage should add at least one materially different causal predictor family before final claim support.
 
-Record:
+### FAIL
 
-`PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
+`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
 
-Then:
-
-1. return to `ccf-pipeline-orchestrator`;
-2. perform one final closest-work delta check;
-3. create Idea 006 around exposure-conditional medication recommendation;
-4. run `ccf-experiment-designer` before any model training;
-5. Gate 01 must pit end-to-end exposure-conditioned learning against the same exposure-risk signal used as a direct scalar reranker and hard filter.
-
-R0 PASS does not authorize Holdout/test evaluation.
-
-### If R0 fails
-
-Record:
-
-`FAIL_R0_EXPOSURE_RESOURCE_OR_PREMISE`
-
-Then return to:
-
-`NO_HIGH_VALUE_DIRECTION_YET`
-
-Do not:
-
-- relax mapping/mismatch floors;
-- hand-curate a small medication subgroup;
-- substitute inferred timing for missing eMAR only to save the route;
-- add richer labs/vitals to rescue it;
-- start R1/R2;
-- create Idea 006.
+Terminate Idea 006's current method route. Preserve R0 as a valid resource/semantic result, but do not turn that measurement into the target paper and do not add a rescue model in the same premise family.
 
 ## Publication boundary
 
-Even if R0 passes, the eventual paper may claim only what its evidence supports. eMAR administration is not proof of clinical appropriateness. Execution-confirmed DDI overlap is an operational exposure surrogate, not an ADE label.
-
-A CCF-A method paper would ultimately need:
-
-- a leakage-safe order-time task;
-- a simple architecture-agnostic exposure-conditioned mechanism;
-- direct exposure-aware reranker/filter controls with equal DDI entitlement;
-- matched-risk comparisons;
-- more than one materially different predictor family;
-- no clinical-safety overclaim;
-- untouched claim-support evidence after hypothesis selection.
+Even on Gate-01 PASS, the project may claim only exposure-localized DDI **surrogate** optimization and medication-order fidelity. eMAR administration is not proof of appropriate treatment, static-only is not proof of safety, and DDI overlap is not an ADE label.
 
 ## Next owner
 
-Local repository Agent executes R0 exactly from the frozen protocol.
+Local repository Agent executes Gate 01 exactly from the frozen protocol, then runs `ccf-integrity-auditor`.
 
-No other experiment, model, Idea creation, or literature expansion is authorized in the same run.
+No other scientific execution is authorized in the same run.
