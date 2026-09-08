@@ -34,23 +34,44 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`.
+- **Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`.
 - **Active Idea**: none.
 - **Ideas 001--006**: terminated.
 - **Idea 007**: not created / not authorized.
 - **Current family**: privileged physiological response supervision for medication recommendation.
-- **Optimizer status**: completed; strict review pending.
+- **Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
+- **Next owner**: bounded `ccf-idea-optimizer`, then strict `ccf-idea-reviewer`.
 - **Local scientific execution**: not authorized.
 
 Current packet:
 
 [`memory/model-reset-20260908-privileged-physiological-response/`](memory/model-reset-20260908-privileged-physiological-response/).
 
-The proposed mechanism uses post-administration physiology only during training as privileged response-associated supervision. A deployable student must operate strictly from pre-order state and candidate medication. No causal treatment-effect claim is permitted.
+Authoritative strict review:
 
-Mandatory future mechanism controls include generic future-state auxiliary learning and response-shuffle/misalignment. If these controls absorb the gain, the response-specific method is terminated rather than expanded architecturally.
+[`memory/model-reset-20260908-privileged-physiological-response/idea-review.md`](memory/model-reset-20260908-privileged-physiological-response/idea-review.md).
 
-## Latest completed failures
+Latest closest-work provenance:
+
+[`memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md`](memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md).
+
+## Current review boundary
+
+The route remains scientifically live, but it is not yet admitted as Idea 007.
+
+The exact search-scoped residual contribution is limited to:
+
+> medication-in-context post-administration physiological **values** used only as training-time privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that the gain is medication-specific and not explained by generic future-state learning, monitoring policy, static medication priors, response-independent regularization, sample weighting, or KD mechanics.
+
+Before Idea creation, the optimizer may revise only three items:
+
+1. freeze medication-specificity subtraction through a matched Generic Future-State Auxiliary / Medication-Ablated Future control;
+2. make Monitoring-Mask-Only mandatory and freeze physiological-value versus response-availability separation;
+3. freeze equal-support positive-only response semantics and a strictly pre-order student/deployment entitlement contract.
+
+No data inspection or experiment is authorized to resolve these revisions.
+
+## Latest completed empirical failures
 
 ### Event-Sourced Regimen Editing M0
 
@@ -59,10 +80,6 @@ Verdict:
 `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
 
 `Change` and `D/C` raw workflow actions failed the frozen active-before consistency floors (`0.1723` and `0.1593` versus `0.70`). No model was trained.
-
-Failure memory:
-
-[`memory/failures/event-sourced-regimen-editing-m0--workflow-action-state-inconsistency.md`](memory/failures/event-sourced-regimen-editing-m0--workflow-action-state-inconsistency.md).
 
 ### Medication Practice-Shift S0
 
@@ -80,19 +97,27 @@ Verdict:
 
 A real exposure-state semantic existed, but the learned method failed against an equal-entitlement direct reranker.
 
+These scoped failures constrain the current design but do not imply that future information, labs/vitals, or new models are universally useless.
+
 ## Routing
 
-Current next owner:
+Authorized now:
 
-`ccf-idea-reviewer`.
+```text
+ccf-idea-optimizer (bounded required revisions only)
+-> strict ccf-idea-reviewer
+```
 
-The reviewer must decide whether the privileged-response route has sufficient residual novelty, non-causal soundness, feasibility, and a decisive evidence plan to justify Idea 007.
+Only a later `ACCEPT_TO_CREATE_IDEA_007` verdict authorizes:
 
-Only on review admission:
+```text
+ccf-pipeline-orchestrator
+-> Idea 007
+-> ccf-experiment-designer
+-> Gate 01
+```
 
-`ccf-pipeline-orchestrator -> Idea 007 -> ccf-experiment-designer -> Gate 01`.
-
-No response-coverage audit or local Agent run is authorized before strict review.
+No response-coverage audit, Gate 01, or local Agent run is authorized now.
 
 ## Quarantine
 
