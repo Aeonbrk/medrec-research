@@ -1739,7 +1739,7 @@ def write_decision(summary: dict[str, Any], output_dir: Path) -> None:
         f"- Per-action support: `{all(row['passed'] for row in admission['per_action'].values())}`",
         f"- Change/D/C pre-order consistency: `{all(row['passed'] for row in admission['state_consistency'].values())}`",
         f"- Distributed action semantics: `{admission['distributed_action_semantics']['passed']}`",
-        f"- Phase A: `{phase_a['passed']}`",
+        f"- Phase A: `{admission['passed']}`",
         "",
         "| Partition | Patients | Bursts | Mapped target events | Mapped target marks |",
         "| :--- | ---: | ---: | ---: | ---: |",
