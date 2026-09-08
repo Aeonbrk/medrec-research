@@ -8,15 +8,13 @@ Refresh date: 2026-09-08.
 
 Current project stage:
 
-`NO_HIGH_VALUE_DIRECTION_YET`
+`PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`
 
 There is no active Idea. Ideas 001--006 are terminated. Idea 007 is not created or authorized.
 
-Completed bounded reset packet:
+Current packet:
 
-[`model-reset-20260908-event-sourced-regimen-editing/`](model-reset-20260908-event-sourced-regimen-editing/).
-
-M0 returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`; the route is not admitted and no Idea 007 exists.
+[`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/).
 
 ## Closed or compressed spaces
 
@@ -27,141 +25,133 @@ M0 returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`; the route is not admi
 | Count-mediated safety/coverage | `CLOSED` | B0 normalized-DDI result |
 | Selective prescription supervision | `NOT ADMITTED` | latent acceptable-treatment target not identifiable |
 | Exposure-conditioned DDI learning | `CLOSED under Idea 006` | learned method failed equal-entitlement direct-reranker challenge |
-| Residual temporal-practice adaptation | `CLOSED under S0` | no material forward degradation; target-era Recall was higher than source-era Recall |
-| Generic longitudinal modeling | `CROWDED` | MR-DTR, DrugDoctor, HeteroMed, ChainCare, DMRNet and related work |
-| Generic KG/RAG/agent safety | `CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS and related work |
+| Residual temporal-practice adaptation | `CLOSED under S0` | no material forward degradation |
+| Raw `New / Change / D/C` regimen-edit supervision | `NOT ADMITTED under M0` | action marks were inconsistent with frozen causal regimen state |
+| Generic longitudinal modeling | `CROWDED` | MR-DTR, DrugDoctor, HeteroMed, ChainCare, DMRNet |
+| Generic KG/RAG/agent safety | `CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS |
 | Generic finer action granularity | `CROWDED / HIGH COST` | FineMed, GRAIN, SafeRx-Agent, RxEval |
-| Multi-dataset MIMIC/eICU results | `PRIOR ART` | HypeMed, KATMed, Rx-Expert, NLA-MMR |
-| Temporal/external validation itself | `PRIOR ART` | prior clinical recommender studies already report it |
-| Visit-level medication-change modeling | `PRIOR ART` | MICRON, ARMR, HeteroMed |
-| Order-time medication-identity prediction | `PRIOR ART` | Rough et al. 2020 |
+| Generic labs/vitals fusion | `CROWDED` | REFINE, ChainCare, HIFINet, MedGCN |
+| Joint MedRec + lab prediction | `PRIOR ART` | MedGCN; Bhoi et al. AAAI Symposium 2023 |
+| Knowledge distillation for MedRec | `PRIOR ART` | LEADER |
+| Training-time privileged multimodal distillation | `PRIOR ART outside MedRec` | OC-Distill and broader LUPI/KD literature |
 
-## S0 closure
+## Current selected opportunity
 
-The prior selected opportunity, residual medication-transition practice shift, did not survive its project-local admission gate.
+**Privileged physiological response supervision for medication recommendation.**
 
-Under the frozen source/target protocol:
+### Source-backed boundary
 
-- `R_source = 0.4310427829`;
-- `R_target_base = 0.4403698933`;
-- `G_base = -0.0093271104`, 95% CI `[-0.0145853913, -0.0035238892]`;
-- `R_target_bias = 0.4441638446` after the frozen target-prior correction.
+#### REFINE — NeurIPS 2023
 
-There was no positive forward-degradation gap to adapt to. The route is therefore closed under the frozen setting without S0b, alternative year groups, or eICU rescue.
+REFINE uses dosage-titration trends and lab-test responses to characterize patient health and perform fine-grained medication recommendation.
 
-Failure memory:
+Therefore `use lab response in MedRec` is not novel.
 
-[`failures/medication-practice-shift-s0--no-material-forward-degradation.md`](failures/medication-practice-shift-s0--no-material-forward-degradation.md).
+Stable source:
+https://papers.nips.cc/paper_files/paper/2023/hash/4b7439a4ab0b8e4bcb4e2412c6a10a58-Abstract-Conference.html
 
-## Current selected opportunity: event-sourced regimen editing
+#### ChainCare — IPM 2026
 
-### Project-local structural evidence
+DOI: `10.1016/j.ipm.2026.104739`
 
-The existing raw order-time infrastructure already records provider-order transaction types `New`, `Change`, and `D/C`, reconstructs strictly pre-order medication state, and encodes transaction types in the historical sequence.
+ChainCare models bidirectional lab-test / medication-injection event chains and uses them for medication recommendation and disease prediction.
 
-The current supervised target nevertheless collapses present `New` and `Change` orders to medication-only labels and excludes present `D/C` from the target.
+Therefore monitoring execution chains are current prior art.
 
-This is a concrete candidate information/decision-structure loss rather than a request for a larger encoder.
+#### MedGCN and integrated lab-response prediction
 
-### Closest work
+MedGCN couples medication recommendation with lab-test imputation. Bhoi et al. 2023 explicitly integrate medication recommendation and lab-test response prediction.
 
-#### Rough et al. 2020
+Therefore generic lab auxiliary/multitask learning is prior art.
 
-Stable source: https://doi.org/10.1002/cpt.1826
+Stable sources:
 
-Rough et al. predict inpatient medication orders at the moment an order is placed using a 10-minute multilabel horizon and only information available before the order. This already covers order-time medication-identity prediction.
+- https://arxiv.org/abs/1904.00326
+- https://doi.org/10.1609/aaaiss.v1i1.27489
 
-It does not make explicit `New / Change / D/C` regimen-edit marks and causal state-valid action decoding the target method problem.
+#### DrugDoctor — BIB 2024
 
-#### MICRON — Change Matters
+DOI: `10.1093/bib/bbae464`
 
-Stable source: https://doi.org/10.24963/ijcai.2021/513
+DrugDoctor uses historical medications and the nearest downstream historical health condition to form effectiveness-aware historical information.
 
-MICRON predicts medication additions and removals from changes between consecutive visits. Medication change prediction itself is therefore prior art.
+Therefore using a later health state after prior medication as ordinary history is covered.
 
-Its change semantics are derived from visit snapshots rather than raw provider-order transaction marks, and the decision unit is visit-level rather than within-admission order-time.
+#### LEADER — 2024
 
-#### ARMR
+Stable source: https://arxiv.org/abs/2402.02803
 
-Stable source: https://doi.org/10.24963/ijcai.2025/871
+LEADER uses feature-level knowledge distillation for medication recommendation.
 
-ARMR adaptively balances new medications and reuse of historical medications at the visit level. New-versus-existing medication reasoning is therefore not a novelty claim by itself.
+Therefore `KD for MedRec` is not a novelty claim.
 
-It does not make raw `Change / D/C` order marks or event-sourced regimen editing the supervised decision object.
+#### OC-Distill — 2026
 
-#### HeteroMed
+Stable source: https://arxiv.org/abs/2604.16878
 
-Stable source: https://doi.org/10.1007/s13755-026-00430-5
+OC-Distill transfers training-time multimodal information into a deployable reduced-modality student for ICU risk prediction.
 
-HeteroMed models collaborative drug expansion/inheritance and prescription increases/decreases across visits. Expansion/inheritance is therefore also prior art.
+Therefore generic privileged-information distillation is an established mechanism primitive.
 
-Its action semantics are inferred from prescription-set evolution rather than the raw within-admission order transaction stream.
+#### Wu et al. — EMBC 2025
 
-### Search-scoped gap
+DOI: `10.1109/EMBC58623.2025.11254154`
 
-The retained closest work covers either:
+This work learns patient representations from transient physiological responses to vasoactive infusions.
 
-1. **visit-level medication changes**, or
-2. **order-time medication identity**.
+Therefore medication-conditioned physiological-response representation is also an established primitive, though not a general MedRec method.
 
-The under-tested intersection is:
+## Search-scoped residual delta
 
-> strictly causal, provider-order-time recommendation of explicit `(action, medication)` regimen edits from an event-sourced current medication state.
+Within the retained search, no close general MedRec method was found whose central mechanism is:
 
-This is a search-scoped opportunity, not a final novelty proof. A strict final closest-work search is mandatory after M0 PASS and before Idea 007.
+> use realized post-administration physiological monitoring only during training to supervise a strictly pre-order candidate-medication student, then deploy without future physiology.
 
-## Why a new model can be justified here
+The candidate is differentiated only if the future information is **medication-in-context response supervision**, not generic future-state prediction, and if mechanism controls demonstrate that the association matters.
 
-A new model is acceptable because the candidate contribution is not the backbone name. The potential method object is different:
+Novelty confidence:
 
-- irregular medication-order event stream;
-- explicit action-medication target marks;
-- causal regimen state;
-- state-valid action decoding;
-- structured parameter sharing across action types and medications.
+`MODERATE / STRICT REVIEW REQUIRED`.
 
-If that structure has incremental value, a later Idea may justify a purpose-built state-transition or marked-event architecture. If it does not, building such an architecture would be architecture fishing.
+This is not a novelty proof.
 
-## Strongest trivial explanation
+## Mandatory strongest alternatives
 
-A deterministic active-state mask may explain nearly all benefit from preserving action labels.
+Any later method gate must include:
 
-Therefore the mandatory killer control is:
+- same-input causal Base;
+- Base + pre-order labs/vitals;
+- capacity-matched generic future-state auxiliary task;
+- static medication response prototype;
+- response-shuffle/misalignment control;
+- compatible monitoring-aware MedRec baseline;
+- KD-mechanics control if needed.
 
-`SeparateHeads + DirectStateMask`.
+A response-specific method story is rejected if generic future-state auxiliary learning or shuffled response information performs comparably.
 
-It receives the same history, current regimen state, action labels, and deterministic state-valid mask as the structured probe.
+## Claim boundary
 
-## Current gate
+Post-administration physiology is observational and confounded by severity, co-medications, procedures, monitoring policy, and other interventions.
 
-`M0 — Event-Sourced Regimen-Edit Admission`.
+Allowed framing:
 
-Protocol:
+- response-associated physiological signature;
+- medication-in-context monitoring trajectory;
+- privileged response supervision.
 
-[`model-reset-20260908-event-sourced-regimen-editing/m0-event-edit-admission-protocol.md`](model-reset-20260908-event-sourced-regimen-editing/m0-event-edit-admission-protocol.md).
+Disallowed without stronger evidence:
 
-M0 is one bounded investment gate, not publication evidence.
+- causal drug response;
+- individual treatment effect;
+- drug efficacy;
+- counterfactual outcome.
 
-### PASS
+## Current routing
 
-`PASS_M0_EVENT_EDIT_STRUCTURE`.
+The optimizer has completed the current method formulation in:
 
-Then route only this surviving family to `ccf-idea-optimizer`, followed by strict `ccf-idea-reviewer`. Idea 007 may be created only after that review admits a genuine method contribution.
+[`model-reset-20260908-privileged-physiological-response/idea-optimization.md`](model-reset-20260908-privileged-physiological-response/idea-optimization.md).
 
-### FAIL
+Next owner: strict `ccf-idea-reviewer`.
 
-`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
-
-Then return to `NO_HIGH_VALUE_DIRECTION_YET` without M0b or deeper-encoder rescue.
-
-## Stable source links
-
-- Rough et al. order-time medication prediction: https://doi.org/10.1002/cpt.1826
-- MICRON: https://doi.org/10.24963/ijcai.2021/513
-- ARMR: https://doi.org/10.24963/ijcai.2025/871
-- HeteroMed: https://doi.org/10.1007/s13755-026-00430-5
-- HypeMed: https://doi.org/10.1145/3803851
-- KATMed: https://doi.org/10.1016/j.jbi.2026.104991
-- NLA-MMR: https://doi.org/10.1145/3627673.3679529
-- DMRNet: https://doi.org/10.1016/j.neunet.2026.109168
-- MIMIC-IV data paper: https://doi.org/10.1038/s41597-022-01899-x
+Idea 007 is created only if that review admits the residual novelty, method soundness, feasibility, and evidence path. No local experiment is authorized before review.
