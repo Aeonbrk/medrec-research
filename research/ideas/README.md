@@ -35,11 +35,11 @@ There is currently **no active Idea**.
 
 Stage:
 
-`PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`.
+`PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`.
 
-Idea 007 does **not** exist and is not authorized.
+Idea 007 does **not** yet exist, but its creation is explicitly authorized by the current strict review.
 
-The current pre-Idea method family is:
+The admitted pre-Idea method family is:
 
 **Privileged Physiological Response Supervision**
 
@@ -47,21 +47,35 @@ Packet:
 
 `research/memory/model-reset-20260908-privileged-physiological-response/`.
 
-Strict review verdict:
+Strict admission review:
 
-`ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
+`ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-The reviewer did not reject the family: no exact direct general-MedRec collision was found for the narrow training-only post-administration physiology contract, and the hypothesis has a bounded kill-first evidence path. At review time, the formulation did not yet distinguish medication-specific physiological response learning strongly enough from generic future-state supervision, monitoring policy, medication identity/prototypes, positive-event weighting, and KD mechanics; the bounded optimizer revision has now frozen the required subtraction and entitlement contract.
+The family is admitted because the bounded R1--R3 revision resolves the prior mechanism-identification blockers without data exploration or architecture expansion. The generic learning primitive is already prior art; the surviving scientific object is medication-in-context realized post-administration physiological values used only as training-time privileged supervision for a strictly pre-order candidate-medication student.
 
-Before Idea 007 may be created, exactly three formulation revisions must be frozen;
-the bounded optimizer pass has now frozen them:
+The future Idea remains valid only under prospective mechanism subtraction:
 
-1. matched medication-ablated future / Generic Future-State Auxiliary control;
-2. mandatory Monitoring-Mask-Only plus physiological-value versus response-availability separation;
-3. equal-support positive-only response semantics plus strictly pre-order student/deployment entitlement.
+1. matched Generic Future-State Auxiliary / Medication-Ablated Future;
+2. mandatory Monitoring-Mask-Only and physiology-value versus response-availability separation;
+3. equal-support positive-only response semantics and strictly pre-order student/deployment entitlement;
+4. Static Medication Response Prototype and Response Shuffle as pairing/identity killers;
+5. richer Pre-Order Physiology and Generic KD when needed to remove simple modality/KD explanations.
+
+Any comparable simple matched control terminates the response-specific mechanism. Deployment leakage or unequal support invalidates the Gate. No architecture, response-window, modality, subgroup, or repeated-definition rescue is permitted under the same Idea.
 
 Next owner:
 
-strict `ccf-idea-reviewer` for re-review of the frozen revisions.
+`ccf-pipeline-orchestrator`.
 
-No experiment, response-coverage diagnostic, Gate 01, or local Agent run is authorized now. A later reviewer must explicitly return `ACCEPT_TO_CREATE_IDEA_007` before any Idea 007 directory is created.
+Authorized next workflow:
+
+```text
+ccf-pipeline-orchestrator
+-> create/admit Idea 007
+-> ccf-experiment-designer
+-> Gate 01 design-integrity audit
+-> push
+-> stop before training
+```
+
+No Gate 01, response-coverage diagnostic, or local training is authorized before that workflow creates Idea 007 and freezes the design.
