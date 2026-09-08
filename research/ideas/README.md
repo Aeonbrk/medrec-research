@@ -2,62 +2,57 @@
 
 # Early-Stage Research Ideas
 
-This directory is the fundamental organizational unit for exploratory, early-stage medication recommendation research.
-
-## Purpose
-
-Each idea folder represents one focused scientific line before it graduates to a paper project or is terminated. The project optimizes expected scientific value per unit research time: every active Idea must expose its central uncertainty to a bounded falsification gate before architecture or publication expansion.
+Each Idea is one admitted, focused scientific line before it graduates to a paper project or is terminated. The project optimizes expected scientific value per unit research time.
 
 A genuinely new model/architecture is allowed when it instantiates an admitted scientific mechanism. A new backbone over a failed premise is not a new Idea.
 
-## Invariants for Each Idea
+## Invariants
 
-Every Idea must answer:
+Every active Idea must state:
 
-1. **Core Hypothesis**: What specific mechanism or behavior is proposed?
-2. **Key Uncertainty**: What strongest simple explanation could make the mechanism false or trivial?
-3. **Next Minimal Experiment**: What is the cheapest decisive test?
-4. **Existing Evidence**: What empirical or literature evidence supports/constrains it?
-5. **Current Verdict**: `active`, `revised`, `terminated`, or `graduated`.
+1. core hypothesis;
+2. strongest simple alternative;
+3. next minimal falsification experiment;
+4. existing literature/project evidence;
+5. current verdict.
 
-## Lifecycle & code promotion
-
-- Idea-stage prototypes and diagnostic code stay inside `research/ideas/<idea>/` until they demonstrate genuine reusable ownership.
-- Generalizable negative lessons are distilled into `research/memory/`; idea-local dead ends stay with the Idea.
-- A method graduates to `papers/<paper-name>/` only after hypothesis-selection gates establish a real method contribution and the project has a credible claim-support plan.
-- The existing project test split and any newly quarantined claim-support split remain inaccessible until an explicitly frozen later stage authorizes them.
+Idea-stage prototypes stay inside the Idea until stable reusable infrastructure is justified. Untouched holdout/test data remain inaccessible until a later frozen claim-support protocol authorizes them.
 
 ## Ideas index
 
-| ID | Title | Status | Core uncertainty / terminal reason | Next minimal experiment |
-| :--- | :--- | :--- | :--- | :--- |
-| [`001-tension-guided-verification`](001-tension-guided-verification/README.md) | Tension-Guided Verification | **Terminated** (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`) | DDI/tension pressure did not add routing information beyond recommender confidence and the strong scalar control. | None; route closed under recorded boundary. |
-| [`002-score-geometry-sufficiency`](002-score-geometry-sufficiency/README.md) | Score-Geometry Sufficiency | **Terminated** (`STOP_NO_INCREMENTAL_SCORE_GEOMETRY`) | Preregistered score geometry was ordering-equivalent to raw score and supplied no new routing information. | None; no cosmetic score remapping rescue. |
-| [`003-prescription-relative-confidence`](003-prescription-relative-confidence/README.md) | Prescription-Relative Confidence Residual | **Terminated** (`STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`) | Within-prescription rank/relative confidence failed after the expanded score/size/prevalence control. | None; no nonlinear same-information rescue. |
-| [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** (`STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY`) | Train-only NPMI co-selection compatibility did not add reliable routing value beyond the strongest simple control. | None; same-source relation-statistic substitutions are not authorized. |
-| [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** (`STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`) | Predictive ATC sibling structure survived calibration but failed strict therapeutic semantic admission at current action resolution. | None; reopen only with materially different action semantics/evidence. |
-| [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** (`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`) | Exposure-localized training reduced the frozen DDI surrogate, but failed the equal-entitlement learned-vs-direct-control gate. | None; no safety-loss/model rescue under the same active-exposure/DDI premise. |
+| ID | Title | Status | Terminal reason |
+| :--- | :--- | :--- | :--- |
+| [`001-tension-guided-verification`](001-tension-guided-verification/README.md) | Tension-Guided Verification | **Terminated** | no incremental constraint signal beyond recommender confidence / strong scalar control |
+| [`002-score-geometry-sufficiency`](002-score-geometry-sufficiency/README.md) | Score-Geometry Sufficiency | **Terminated** | score geometry was ordering-equivalent and supplied no new routing information |
+| [`003-prescription-relative-confidence`](003-prescription-relative-confidence/README.md) | Prescription-Relative Confidence Residual | **Terminated** | relative/rank features failed after expanded strong control |
+| [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** | NPMI co-selection scalar added no reliable incremental value |
+| [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
+| [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 
 ## Current authoritative direction
 
 There is currently **no active Idea**.
 
-Current stage:
+Stage:
 
-`NO_HIGH_VALUE_DIRECTION_YET`.
+`PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`.
 
-The post-Idea-006 temporal-practice-shift reset also failed at S0 because no material forward degradation was observed. It did not create Idea 007.
+Idea 007 does **not** exist and is not authorized.
 
-The latest pre-Idea family was the bounded **Event-Sourced Regimen Editing** reset:
+The latest completed M0 reset, Event-Sourced Regimen Editing, failed semantic admission because `Change` and `D/C` workflow labels were not compatible with the frozen causal regimen state at the required level. No model was trained and the route cannot be rescued by a deeper encoder.
 
-`research/memory/model-reset-20260908-event-sourced-regimen-editing/`.
+The current pre-Idea method family is:
 
-Its M0 gate returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` because the frozen `Change` and `D/C` state-consistency floors failed. No model was trained, EditAudit was not accessed, and the route is not admitted.
+**Privileged Physiological Response Supervision**
 
-Idea 007 may be created only after:
+Packet:
 
-1. `PASS_M0_EVENT_EDIT_STRUCTURE`;
-2. `ccf-idea-optimizer` develops the single surviving family;
-3. strict `ccf-idea-reviewer` admits a genuine method delta against the closest change-aware/order-time baselines.
+`research/memory/model-reset-20260908-privileged-physiological-response/`.
 
-Until then, no Idea 007 folder is authorized.
+The optimizer has developed a training-time privileged-response mechanism in which post-administration physiology teaches a strictly pre-order candidate-medication student. The route is explicitly non-causal and must beat generic future-state auxiliary learning, response-shuffle controls, and static response prototypes.
+
+Next owner:
+
+`ccf-idea-reviewer`.
+
+Idea 007 may be created only if strict review admits the method-level novelty, soundness, feasibility, and evidence package. No experiment or local Agent run is authorized before that review.
