@@ -1,272 +1,241 @@
 <!-- markdownlint-disable MD013 -->
 
-# Strict Idea Review — Privileged Physiological Response Supervision
+# Strict Idea Re-Review — Privileged Physiological Response Supervision
 
 ## Verdict
 
-`ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
+`ACCEPT_TO_CREATE_IDEA_007`
 
-**Weighted score**: `3.89 / 5.00`
+**Weighted score**: `4.17 / 5.00`
 
 **Reviewer confidence**: medium-high.
 
-**Idea 007**: not created / not authorized.
+**Current conference readiness**: medium. No method result exists yet; this verdict admits one kill-first Idea/Gate cycle, not a paper claim.
 
-**Local scientific execution**: not authorized.
+**Development potential**: high-conditional.
 
-**Current next CCFA owner**: strict `ccf-idea-reviewer`; the bounded R1--R3
-optimizer revision is now frozen in `idea-optimization.md`.
+**Idea 007**: not created in this review. Creation is now explicitly authorized for the next workflow owner.
 
-At the time of this review, the optimizer packet did not yet identify the
-claimed medication-specific response mechanism tightly enough to justify Idea
-creation. The remaining gap was protocol/formulation-level; the bounded
-optimizer pass has now frozen the repair without opening a diagnostic series.
+**Local scientific execution**: not authorized by this review.
 
-## Executive judgment
+**Next CCFA owner**: `ccf-pipeline-orchestrator`.
 
-The strongest defensible scientific object is not knowledge distillation, learning using privileged information, future-state prediction, lab modeling, or physiological-response representation individually. Those primitives are established prior art.
+## Scientific judgment
 
-The surviving candidate object is narrower:
+The bounded R1--R3 revision resolves the previous pre-Idea scientific-admission blockers. The candidate is now a coherent, falsifiable MedRec-specific learning object:
 
-> For an observed administered medication event, use the paired medication-in-context post-administration physiological trajectory only during training to supervise a strictly pre-order candidate-medication representation, and require evidence that the paired physiological values carry incremental medication-specific information beyond generic future-state learning, medication identity/prototypes, monitoring policy, and distillation mechanics.
+> use paired medication-in-context post-administration physiological values only during training to supervise a strictly pre-order candidate-medication student, and require the method to beat matched controls that preserve future access, support, capacity, optimization entitlement, and deployment inputs while removing medication-specific response construction, physiological values, individualized pairing, or response semantics.
 
-This is a predictive representation-learning claim. It is not a treatment-effect, efficacy, counterfactual-outcome, or clinically optimal medication claim.
+The method primitive is not novel: medication/lab response modeling, MedRec knowledge distillation, clinical privileged-modality distillation, and future-to-current privileged distillation all have prior art. Independent 2026 re-search additionally confirms a clinical future-aware teacher/student formulation for blood-glucose forecasting and an IJCAI-ECAI 2026 MedRec knowledge-distillation paper. These results further compress any KD/LUPI novelty claim.
 
-No direct closest work was found in the bounded 2023--2026 search whose central MedRec mechanism exactly matches this information-flow contract. However, the novelty margin is narrow because current prior work separately covers monitoring-level medication/lab event chains, lab-response MedRec, joint medication/lab-response prediction, historical downstream response representations, MedRec knowledge distillation, generic clinical privileged-modality distillation, medication-aware physiological-response representations, and generic future-privileged distillation.
+No direct searched work was found whose central general-MedRec mechanism matches the complete current object: realized post-administration physiological values from actually administered medication-positive events used only as privileged training supervision for a strictly pre-order candidate-medication recommender, with response-specific mechanism subtraction.
 
-## Strongest argument for admission
+The remaining contribution is therefore a **MedRec-specific scientific object and method formulation**, not a new generic distillation primitive. That is sufficient to justify one bounded Idea/Gate cycle because the mechanism can be killed cheaply and prospectively.
 
-Post-administration physiology is information that is unavailable at the medication-order decision but can be paired with an actually administered medication during training. If its medication-specific, patient-specific correspondence contains a predictable component that transfers into a strictly pre-order student and remains useful after matched generic-future and monitoring controls, that constitutes a meaningful MedRec-specific supervision object rather than another backbone change. The hypothesis is also unusually falsifiable: one bounded Gate 01 can terminate the route if simpler explanations absorb the gain.
+This is scientifically admissible.
 
-## Rejection-grade concern
+## R1 — Medication-specificity subtraction
 
-Without stronger subtraction, the paper can be accurately summarized as:
+`PASS / BLOCKER RESOLVED`.
 
-> established future-privileged/LUPI or teacher-student learning applied to a MedRec model using already-studied medication/lab response signals.
+The frozen Generic Future-State Auxiliary / Medication-Ablated Future control is equal-entitlement in the dimensions that matter for the scientific question:
 
-A gain over Base alone would not identify medication-specific physiological response as the cause of improvement. The gain could instead arise from generic future-state regularization, medication identity leakage, static medication response priors, monitoring/missingness policy, or positive-example reweighting caused by auxiliary supervision existing only on linked administered events.
+- identical recommendation example set `E_rec`;
+- identical administered-positive response support `A(e)`;
+- identical administration-time anchor and future window;
+- identical future physiological value tensor availability;
+- identical deployable student architecture and inference inputs `S(x_t, m)`;
+- matched latent dimensionality, teacher capacity, auxiliary weight, optimizer/update entitlement;
+- focal medication identity and medication-specific response construction removed only from the privileged teacher/target branch.
 
-This is a CCF-A-level blocker, not a cosmetic ablation request.
+This control does not need to remove the candidate medication from the deployable student; doing so would change the MedRec task and break equal entitlement. Its job is to ask whether the privileged target must be medication-conditioned rather than merely a generic future state paired with the same recommendation event.
 
-## Required revisions before Idea 007 (review findings; now frozen)
+The separate Response Shuffle and Static Medication Response Prototype controls cover the remaining pairing and static-identity explanations.
 
-Exactly three bounded revisions were required. They are formulation/protocol
-revisions only; no data inspection or model training was authorized to resolve
-them, and the optimizer has now frozen them in the packet.
+Future kill rule is binding:
 
-### R1 — Freeze medication-specificity subtraction
+`STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE`
 
-A future Gate 01 must include a matched **Medication-Ablated Future** control in addition to Generic Future-State Auxiliary.
+if medication ablation does not materially weaken the incremental gain. No teacher scaling, response-window change, modality expansion, backbone change, or subgroup rescue is allowed after that result.
 
-The control must use the same supported events, same post-administration window, comparable target/encoder capacity, and same student architecture, but the privileged target/teacher must not receive the focal medication identity or a medication-specific response construction.
+## R2 — Monitoring-policy separation
 
-Purpose:
+`PASS / BLOCKER RESOLVED`.
 
-> distinguish medication-in-context response supervision from ordinary future-physiology prediction.
+The packet now distinguishes future physiological values `r_e` from the measurement process `M_e`. The proposed branch may use the mask only to interpret missing values, while Monitoring-Mask-Only receives the same future measurement availability/frequency structure, response support, future window, student, capacity, and optimization entitlement but no future physiological values or value-derived summary.
 
-Failure condition:
+This directly tests whether the benefit comes from what was measured, how often it was measured, and when monitoring continued rather than from the measured physiological values.
 
-> if removing focal medication identity does not materially reduce the incremental gain, terminate the response-specific mechanism.
+Future kill rule is binding:
 
-Generic Future-State Auxiliary may satisfy this requirement only if its frozen design explicitly removes focal-medication conditioning while matching the response method's support, future window, and capacity closely enough to make the contrast interpretable.
+`STOP_MONITORING_POLICY_SUFFICIENCY`
 
-### R2 — Freeze physiology-value versus monitoring-policy separation
+if Monitoring-Mask-Only is comparable to Proposed. The physiological-response interpretation then terminates; the monitoring pattern cannot be relabeled as part of the response to save the claim.
 
-`Monitoring-Mask-Only` is mandatory, not optional.
+## R3 — Equal-support, positive-only, and deployment entitlement
 
-The protocol must additionally define the response-value branch so that measurement availability/frequency cannot silently become the claimed physiological value signal. Future measurement masks may be represented explicitly where needed for missing data, but the primary mechanism comparison must separate:
+`PASS / BLOCKER RESOLVED`.
 
-- response values given the observed measurement support;
-- measurement availability/frequency alone.
+The frozen objective makes the support contract explicit:
 
-Failure condition:
+```text
+A(e) = 1 iff e is an actually administered positive focal-medication event
+       with a valid linked future monitoring window; otherwise A(e) = 0.
+```
 
-> if Monitoring-Mask-Only performs comparably to the privileged-response method, the physiological-response interpretation terminates.
+For every privileged variant:
 
-This does not require estimating a causal medication effect. It only requires showing that measured physiological values contribute beyond the monitoring process itself.
+```text
+L_v = sum_{e in E_rec} ell_rec^v(e)
+      + lambda * sum_{e in E_rec} A(e) * ell_aux^v(e).
+```
 
-### R3 — Freeze equal-support, positive-only, and deployment-entitlement semantics
+Therefore:
 
-All privileged variants must use the same recommendation examples, same deployable student inputs, and the same linked-administration/future-window support mask. Auxiliary losses may be active only where the frozen support contract permits them.
+- response supervision exists only for observed administered positive events;
+- unchosen medications receive no invented response target;
+- every privileged control uses the same `A(e)` and the same full recommendation examples `E_rec`;
+- `A(e)=0` disables only the auxiliary term and does not drop or differentially reweight the recommendation example;
+- unsupported examples remain in the ordinary recommendation objective;
+- the student feature path and every statistic used by its normalization are strictly pre-order;
+- post-order medications, future administrations, future labs/vitals, future masks, discharge-coded information, and other future-derived variables are forbidden on the student path;
+- teacher features and privileged targets are absent at inference.
 
-The method must state explicitly:
+Any deployment leakage or unmatched support/sample entitlement invalidates the Gate. It is not a tunable implementation issue.
 
-- privileged response is supervision on **observed administered positive medication events** only;
-- unchosen medications do not receive invented counterfactual responses;
-- unsupported examples remain in the recommendation objective rather than being silently dropped or reweighted differently across controls;
-- student feature construction and normalization use no post-order, post-administration, future-lab, discharge-coded, or future-derived statistics;
-- the teacher and privileged targets are absent at inference.
+## Closest-work judgment
 
-Failure condition:
+Closest-work subtraction now yields the following boundary:
 
-> any material deployment-path future leakage or unmatched sample-selection/reweighting invalidates the Gate result rather than becoming a tunable implementation detail.
+- REFINE and ChainCare remove novelty from medication/lab-response and monitoring-chain modeling in MedRec.
+- MedGCN and Bhoi et al. remove novelty from generic lab auxiliary and joint MedRec/lab-response prediction.
+- DrugDoctor removes novelty from using downstream health condition after historical medication as ordinary historical evidence.
+- LEADER and the IJCAI-ECAI 2026 dual-channel MedRec paper remove novelty from KD for MedRec.
+- OC-Distill and other clinical train-rich/deploy-poor work remove novelty from generic privileged-modality transfer.
+- Future-aware blood-glucose forecasting and Privileged Foresight Distillation remove novelty from the future-information teacher to current/history-only student pattern.
+- Wu et al. EMBC 2025 removes novelty from medication-aware physiological-response representation itself.
 
-## Scientific soundness audit
+The search-scoped residual delta is:
 
-### Observational response identifiability
+> **Medication-in-context realized post-administration physiological values as positive-event, training-only privileged supervision for a strictly pre-order MedRec student, with matched subtraction proving that the useful signal is medication-specific, individualized, value-bearing, and not reducible to generic future state, monitoring policy, static medication priors, sample weighting, or KD mechanics.**
 
-Observed post-administration physiology is not an individual medication effect. It is jointly determined by baseline severity, focal and concurrent medications, dose/route, fluids, procedures, ventilation, spontaneous progression, clinician actions, and measurement policy.
+Novelty remains moderate rather than high. It becomes publication-worthy only if the proposed method survives the frozen controls.
 
-This does **not** by itself make the candidate unsound as a predictive privileged target. A model may learn an observational conditional association of the form
+## Scientific soundness
+
+Observed post-administration physiology is jointly affected by medication, baseline disease severity, co-medications, fluids, ventilation, procedures, dose/route, clinician actions, treatment timing, spontaneous progression, and monitoring policy.
+
+The admissible target is therefore an observational predictive object of the form
 
 $$
-P(r_{future}\mid x^-_t,m,c_t,\text{observational policy})
+P(r_{future}\mid x_t^-,m,c_t,\text{observational care policy}),
 $$
 
-and use its representation as training supervision.
+not an individual treatment effect.
 
-The admissible claim is therefore limited to response-associated representation learning under the observed care process. No effect, efficacy, benefit, or counterfactual interpretation is supported.
+This is sound for representation supervision. It does not support treatment-effect, efficacy, therapeutic-benefit, counterfactual-outcome, clinical-optimality, or individualized causal-benefit language.
 
-### Monitoring-policy confounding
+Positive-only support is also scientifically admissible because the method no longer pretends to know responses for unchosen medications and the same selective support is shared across privileged controls. Response Shuffle and the generic-future control test whether the gain is merely an auxiliary-gradient/sample-selection effect.
 
-This is the most important non-causal confounder. Future measurement frequency and missingness can encode illness severity, drug-specific monitoring practices, and clinician concern. A teacher can obtain apparent predictive value while learning primarily who is monitored.
+## Killer-control sufficiency
 
-`Monitoring-Mask-Only` plus the value/availability separation in R2 is therefore a mechanism gate. If mask-only supervision explains the gain, the response-value story is dead even if recommendation metrics improve.
+The frozen future Gate family is sufficient for admission:
 
-### Treatment-assignment confounding
+1. Strict Pre-Order Base;
+2. Base + richer Pre-Order Physiology;
+3. Generic Future-State Auxiliary / Medication-Ablated Future;
+4. Static Medication Response Prototype;
+5. Response Shuffle;
+6. Monitoring-Mask-Only;
+7. Generic KD only if the selected implementation otherwise leaves KD mechanics as an alternative explanation;
+8. Proposed privileged physiological response supervision.
 
-The focal medication is observationally assigned. The method therefore cannot claim that the physiological trajectory would change because of the medication under intervention.
+A compatible REFINE/ChainCare-style comparison may be added when task alignment makes it scientifically fair, but it is not a substitute for the matched mechanism controls.
 
-For the narrower predictive claim, assignment confounding is tolerable: the privileged target describes the observed medication-in-context trajectory under the historical care policy. It becomes a soundness failure only if the paper promotes that association into treatment-effect, efficacy, optimal-policy, or counterfactual semantics.
+No additional control family is a pre-Idea blocker. Gate 01 design must operationalize the words `materially` / `comparable` into a frozen practical-and-statistical decision rule before training; that is experiment-design ownership, not another pre-Idea revision.
 
-### Positive-only privileged support
+## Immediate future stop conditions
 
-Future response is observed for realized administrations, not for unchosen candidate medications. That means the auxiliary signal is positive-event representation supervision, not counterfactual response prediction over the full medication vocabulary.
+The response-specific Idea must terminate without rescue if any of the following occurs under the frozen Gate contract:
 
-This is admissible if all controls use the same support and the recommendation objective remains defined on the full frozen training task. Otherwise response supervision can degenerate into a sample-selection or positive-reweighting trick.
+- GenericFutureAux or MedicationAblatedFuture is comparable to Proposed;
+- ResponseShuffle is comparable to Proposed;
+- MonitoringMaskOnly is comparable to Proposed;
+- StaticResponsePrototype is comparable to Proposed;
+- Base + richer pre-order physiology is comparable to Proposed;
+- privileged-response support is insufficient or materially concentrated for the claimed general MedRec mechanism;
+- student-path future leakage is found;
+- privileged variants have unmatched recommendation examples, support, or reweighting.
 
-### Deployment legitimacy
+Do not rescue these outcomes with a larger teacher, Transformer-to-Mamba/GNN replacement, a different response window, extra modalities, subgroup mining, repeated response-definition search, or post-hoc feature expansion.
 
-The deployment contract is defensible only if the student path is strictly pre-order. The following are forbidden from student inference features and their normalization/statistics:
+## Weighted score
 
-- post-order medication events;
-- administration events after the decision point;
-- future labs/vitals;
-- future observation masks;
-- discharge-coded future information;
-- statistics fit using future information from validation/audit/test examples.
-
-Future physiology is legal only inside the training-time privileged branch.
-
-## Killer-control audit
-
-The following controls are mandatory for any later Gate 01:
-
-1. **Strict Pre-Order Base** — identical student/inference inputs, recommendation objective only.
-2. **Base + Pre-Order Physiology** — same pre-order labs/vitals capability at inference; rules out a simple physiology-modality explanation.
-3. **Generic Future-State Auxiliary / Medication-Ablated Future** — same future window/support/capacity but no focal-medication-specific response target. This is the primary medication-specificity killer control.
-4. **Static Medication Response Prototype** — train-only medication-level average response representation; tests whether patient-specific pairing is unnecessary.
-5. **Response Shuffle** — preserve medication labels, support, monitoring amount, and model capacity while breaking patient-medication-future-response correspondence.
-6. **Monitoring-Mask-Only** — retain future measurement availability/frequency without physiological values.
-7. **Generic KD** — required when the chosen implementation otherwise leaves open the explanation that teacher-student distillation mechanics, rather than the privileged response knowledge source, caused the gain.
-
-A compatible REFINE/ChainCare-style monitoring-aware baseline should be included later when task semantics permit, but it does not replace the mechanism controls above because those methods do not isolate the training-only privileged-response claim.
-
-## Immediate termination results
-
-Any one of the following is sufficient to terminate the method family under the frozen Gate rather than trigger architecture rescue:
-
-- `GenericFutureAux ~= PrivilegedResponse`;
-- `MedicationAblatedFuture ~= PrivilegedResponse`;
-- `ResponseShuffle ~= PrivilegedResponse`;
-- `MonitoringMaskOnly ~= PrivilegedResponse`;
-- `StaticResponsePrototype ~= PrivilegedResponse`;
-- `Base + richer pre-order physiology ~= PrivilegedResponse`;
-- privileged-response support is too sparse or materially concentrated in a small subset of medications/patients to support the claimed general MedRec mechanism;
-- any student-path future leakage or unmatched support/reweighting is detected.
-
-Do not respond to these outcomes with a deeper Transformer/Mamba/GNN, larger teacher, wider response window, extra modality, subgroup mining, or a second response definition under the same Idea.
-
-## Adversarial reviewer panel
-
-### Reviewer A — Medication Recommendation
-
-**Positive**: The bounded search did not identify a general MedRec method that uses the current realized post-administration trajectory only at training time to supervise a strictly pre-order candidate-medication student.
-
-**Rejection concern**: REFINE, ChainCare, MedGCN/Bhoi et al., and DrugDoctor already occupy much of the lab-response/monitoring/longitudinal-response space. Training-time information role alone is not enough if the learned signal is functionally generic future-state prediction.
-
-**Required evidence**: response-specific gains must survive Generic Future-State Auxiliary, medication ablation, prototype, shuffle, and monitoring controls.
-
-### Reviewer B — Representation / Distillation
-
-**Positive**: The knowledge source could be domain-specific enough to justify a new supervision mechanism.
-
-**Rejection concern**: LEADER establishes MedRec KD; OC-Distill establishes clinical training-time privileged modality distillation; 2026 Privileged Foresight Distillation explicitly establishes future-observation teacher to current-only student as a generic method primitive. Teacher/student or future-only training access is therefore not novelty.
-
-**Required evidence**: the contribution must be the medication-in-context physiological learning object and its mechanism identification, not KD architecture.
-
-### Reviewer C — Clinical ML Methodology
-
-**Positive**: Non-causal observational response-associated supervision is methodologically permissible when claims remain predictive.
-
-**Rejection concern**: severity, co-treatments, procedures, fluids, ventilation, and selective monitoring can dominate the future trajectory. Monitoring policy is especially capable of creating a false response story.
-
-**Required evidence**: value-versus-availability separation, strict chronology, and narrow observational language.
-
-### Reviewer D — Experiment / Statistics
-
-**Positive**: The hypothesis has strong kill-first controls and can be adjudicated with one bounded experiment rather than months of feature search.
-
-**Rejection concern**: `Ours > Base` proves at most that extra training supervision or regularization helped. It does not identify the claimed mechanism.
-
-**Required evidence**: paired held-out incremental comparisons against GenericFutureAux/MedicationAblatedFuture, Shuffle, MaskOnly, Prototype, and richer pre-order physiology under matched support and student capacity.
-
-### Reviewer E — CCF-A AC / Senior Reviewer
-
-A plausible rejection paragraph under the current un-revised formulation is:
-
-> The submission combines established future-privileged distillation with medication/laboratory response signals already studied in medication recommendation. Improvement over standard baselines does not establish that medication-specific post-administration physiology is the source of the gain rather than generic future-state regularization, monitoring policy, static medication priors, or positive-event sample weighting. Without matched mechanism controls, the method is better characterized as an application of LUPI/KD to MedRec than as a new CCF-A-level learning mechanism.
-
-If the required mechanism controls are frozen prospectively and the proposed method survives them, this objection becomes substantially weaker.
-
-## Rubric
-
-| Dimension | Weight | Score | Confidence | Main deduction | Repair condition |
-| --- | ---: | ---: | ---: | --- | --- |
-| Problem importance | 10 | 4.5 | 4.5 | Important deployment-information mismatch, but current benefit remains retrospective predictive fidelity | preserve strictly pre-order task and narrow claims |
-| Novelty vs closest work | 15 | 3.5 | 4.0 | every primitive is prior art; exact MedRec combination is search-scoped rather than proven unique | mechanism-specific subtraction must be central |
-| Conceptual innovation | 15 | 3.5 | 4.0 | potentially new scientific object, but currently compositional | isolate medication-in-context response semantics |
-| Methodological soundness | 15 | 3.5 | 4.0 | monitoring and support-selection explanations are not fully frozen out | R2 + R3 |
-| MedRec specificity | 10 | 3.5 | 4.0 | not yet separated from generic future-state learning | R1 |
-| Experimental falsifiability | 10 | 5.0 | 5.0 | no material deduction; strong kill-first design is available | freeze the controls prospectively |
-| Feasibility / infrastructure cost | 8 | 4.0 | 3.5 | exact response coverage is unknown | Gate-01 mechanical preflight only |
-| Expected scientific value per research month | 10 | 4.5 | 4.0 | high upside with a cheap decisive failure path | one bounded Gate, no rescue series |
-| CCF-A audience / venue fit | 7 | 3.5 | 3.5 | high risk of being read as domain KD/LUPI application | mechanism evidence must carry the paper |
+| Criterion | Weight | Score | Confidence | Main judgment |
+| --- | ---: | ---: | ---: | --- |
+| Problem importance | 10 | 4.5 | 4.5 | Real deployment-information mismatch with a method-level supervision question |
+| Novelty vs closest work | 15 | 3.5 | 4.0 | Exact object survives, but all generic primitives have direct prior art |
+| Conceptual innovation | 15 | 3.8 | 4.0 | New MedRec-specific training object; still composition-heavy |
+| Methodological soundness | 15 | 4.3 | 4.5 | R2/R3 and non-causal semantics resolve prior blockers |
+| Medication-recommendation specificity | 10 | 4.3 | 4.5 | R1 plus shuffle/prototype now makes MedRec-specificity falsifiable |
+| Experimental falsifiability | 10 | 5.0 | 5.0 | One bounded Gate can decisively kill the mechanism |
+| Feasibility / existing infrastructure | 8 | 4.0 | 3.5 | Order/eMAR infrastructure exists; exact response support remains unknown |
+| Expected scientific value per research month | 10 | 4.6 | 4.0 | High upside and cheap decisive failure path |
+| CCF-A venue fit | 7 | 3.8 | 3.5 | Viable only if mechanism evidence carries the paper rather than KD application framing |
 
 Weighted score:
 
 $$
-\frac{389}{100}=3.89/5.00.
+4.17/5.00.
 $$
 
-The score does not override the three required revisions.
+The score does not imply paper acceptance. It supports admission of one bounded Idea/Gate cycle.
 
-## Current readiness versus development potential
+## Five-reviewer panel
 
-- **Readiness at original review**: `REVISE BEFORE IDEA CREATION`.
-- **Post-optimizer status**: R1--R3 are frozen; pending strict re-review before Idea creation.
-- **Development potential**: `HIGH-CONDITIONAL`.
+### Reviewer A — Medication Recommendation specialist
 
-The route has completed its one bounded revision cycle because the fatal
-scientific uncertainty was clear and the repairs were prospective protocol
-changes rather than exploratory evidence gathering. Strict re-review can now
-terminate the family decisively if the response-specific mechanism is absent.
+No fatal MedRec collision was found. REFINE, ChainCare, MedGCN/Bhoi, and DrugDoctor make generic response/history modeling crowded, but none searched implements the complete training-only current-instance response supervision contract. R1 is now the decisive test: if medication ablation matches Proposed, the MedRec-specific claim is gone.
 
-## Final routing
+### Reviewer B — Representation / Distillation specialist
 
-```text
-PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS
--> ccf-idea-optimizer (bounded: R1--R3 only)
--> strict ccf-idea-reviewer
-```
+Teacher/student mechanics are not a contribution. LEADER, IJCAI-ECAI 2026 MedRec KD, OC-Distill, future-aware BGL forecasting, and PFD establish the primitive family. Admission is justified only because the packet relocates the contribution to the medication-in-context physiological learning object and pre-registers controls that can show whether that object adds information.
 
-Only a subsequent strict reviewer verdict of `ACCEPT_TO_CREATE_IDEA_007` authorizes:
+### Reviewer C — Clinical ML / EHR specialist
+
+The observational trajectory is not a causal medication response. Under the frozen language and support contract, that is not fatal: observational future physiology can be a predictive auxiliary representation. Monitoring policy is the most dangerous confounder, and R2 now tests it directly.
+
+### Reviewer D — Experimental methodology reviewer
+
+Equal entitlement is now sufficiently specified for Idea admission. The same full recommendation examples and positive-response support are used across privileged variants, unsupported examples remain in the recommendation objective, and deployment leakage is a Gate-invalidating event. The next design owner must freeze numerical comparability thresholds before any training.
+
+### Reviewer E — CCF-A Area Chair
+
+The main rejection risk remains that the method is a composition of known future-privileged distillation and already-studied medication/lab-response signals. The revision does not prove this objection false; it does something more appropriate at pre-Idea stage: it converts every competing explanation into a prospective killer control whose success terminates the response-specific claim. That is sufficient for one Gate-01 investment.
+
+## Most likely CCF-A rejection paragraph
+
+> The proposed method combines established privileged/future-information distillation with medication and physiological response signals already studied in clinical prediction and medication recommendation. Because post-administration trajectories are observational and highly coupled to monitoring and treatment policy, gains over a pre-order recommender do not by themselves establish a medication-specific physiological-response mechanism. Unless the method materially exceeds matched medication-ablated future, monitoring-mask, shuffled-response, static-prototype, richer-preorder, and generic-distillation controls under identical support and deployment entitlement, the contribution is better characterized as an application of existing KD/LUPI machinery than as a distinct CCF-A-level MedRec method.
+
+The current revision is sufficient to structurally answer this objection before experimentation: every clause is now a frozen future comparison or claim boundary. Whether the method actually survives remains an empirical Gate-01 question.
+
+## What would change this verdict
+
+Before Idea creation, only newly discovered direct prior art that already matches the full response-specific training contract, or evidence that the frozen R1--R3 controls are not implementably equal-entitlement, would reverse admission.
+
+After Idea creation, any frozen killer-control result listed above terminates the route. No additional pre-Idea diagnostic is authorized.
+
+## Routing
+
+Authorized next workflow only:
 
 ```text
 ccf-pipeline-orchestrator
--> Idea 007 creation
+-> create/admit Idea 007
 -> ccf-experiment-designer
--> Gate 01 design
+-> Gate 01 design-integrity audit
+-> push
+-> stop before training
 ```
 
-No Idea 007, Gate 01, coverage diagnostic, or local experiment is authorized by this review.
+This review does not create Idea 007, design Gate 01, inspect response coverage, or authorize training.
