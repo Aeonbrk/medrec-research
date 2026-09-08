@@ -55,7 +55,7 @@ Selected alpha: `1` (tie-break: smaller alpha).
 | Condition 2 — material base gap | False |
 | Condition 3 — residual after prior bias | False |
 
-S0 supports only a residual temporal deployment-shift statement. It does not establish causal practice drift, clinical benefit, or method superiority.
+S0 does not support a material forward temporal-deployment degradation or residual practice-shift premise under this frozen setting. It does not establish causal practice drift, clinical benefit, or method superiority.
 
 Next state: `NO_HIGH_VALUE_DIRECTION_YET`
 
