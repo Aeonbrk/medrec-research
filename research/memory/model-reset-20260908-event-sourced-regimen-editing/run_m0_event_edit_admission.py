@@ -622,6 +622,7 @@ def build_bursts(
                     (
                         admin_pharm_first[pharmacy_id]
                         for pharmacy_id in poe_to_pharms.get(poe_id, ())
+                        if pharmacy_id in admin_pharm_first
                     ),
                     default=None,
                 )
