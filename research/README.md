@@ -34,20 +34,21 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`.
+- **Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`.
 - **Active Idea**: none.
 - **Ideas 001--006**: terminated.
-- **Idea 007**: not created / not authorized.
+- **Idea 007**: not created / creation explicitly authorized.
 - **Current family**: privileged physiological response supervision for medication recommendation.
-- **Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
-- **Next owner**: strict `ccf-idea-reviewer` (bounded R1--R3 optimizer revision completed).
-- **Local scientific execution**: not authorized.
+- **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`).
+- **Reviewer confidence**: medium-high.
+- **Next owner**: `ccf-pipeline-orchestrator`.
+- **Local scientific execution**: not authorized by this state.
 
 Current packet:
 
 [`memory/model-reset-20260908-privileged-physiological-response/`](memory/model-reset-20260908-privileged-physiological-response/).
 
-Authoritative strict review:
+Authoritative strict admission review:
 
 [`memory/model-reset-20260908-privileged-physiological-response/idea-review.md`](memory/model-reset-20260908-privileged-physiological-response/idea-review.md).
 
@@ -55,21 +56,29 @@ Latest closest-work provenance:
 
 [`memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md`](memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md).
 
-## Current review boundary
+## Admitted pre-Idea boundary
 
-The route remains scientifically live, but it is not yet admitted as Idea 007.
+The exact search-scoped contribution is limited to:
 
-The exact search-scoped residual contribution is limited to:
+> medication-in-context realized post-administration physiological **values** used only as positive-event, training-time privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that the gain is medication-specific and not explained by generic future-state learning, monitoring policy, static medication priors, individualized-pairing artifacts, response-independent regularization, sample weighting, or KD mechanics.
 
-> medication-in-context post-administration physiological **values** used only as training-time privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that the gain is medication-specific and not explained by generic future-state learning, monitoring policy, static medication priors, response-independent regularization, sample weighting, or KD mechanics.
+The generic primitive is not novel. Current prior art covers response-aware MedRec, monitoring chains, MedRec KD, clinical privileged-modality KD, clinical future-aware teacher/student transfer, and medication-aware physiological-response representation. The remaining novelty is the MedRec-specific response-supervision object plus mechanism identification.
 
-The bounded optimizer revision has frozen exactly three items before Idea creation:
+## Frozen admission controls
 
-1. freeze medication-specificity subtraction through a matched Generic Future-State Auxiliary / Medication-Ablated Future control;
-2. make Monitoring-Mask-Only mandatory and freeze physiological-value versus response-availability separation;
-3. freeze equal-support positive-only response semantics and a strictly pre-order student/deployment entitlement contract.
+Before any training, the future Gate 01 must preserve:
 
-No data inspection or experiment is authorized to resolve these revisions.
+1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future.
+2. **Monitoring separation**: mandatory Monitoring-Mask-Only and physiological-value versus response-availability separation.
+3. **Equal entitlement**: positive-only observed response, identical privileged support/sample mask, unsupported examples retained in the recommendation objective, and strictly pre-order student features/normalization.
+
+Future killer controls also include Static Medication Response Prototype, Response Shuffle, richer Pre-Order Physiology, and Generic KD only when KD mechanics remain a plausible explanation.
+
+Any simple matched control performing comparably to Proposed terminates the response-specific mechanism. Deployment leakage or unequal support invalidates the Gate. No architecture, response-window, modality, subgroup, or feature rescue follows those outcomes.
+
+## Claim boundary
+
+Observed post-administration physiology may support a predictive response-associated representation under the historical care policy. It does not identify treatment effect, causal response, medication efficacy, therapeutic benefit, counterfactual outcome, clinical optimality, or individualized causal benefit.
 
 ## Latest completed empirical failures
 
@@ -101,22 +110,18 @@ These scoped failures constrain the current design but do not imply that future 
 
 ## Routing
 
-Authorized now:
-
-```text
-strict ccf-idea-reviewer
-```
-
-Only a later `ACCEPT_TO_CREATE_IDEA_007` verdict authorizes:
+Authorized next workflow:
 
 ```text
 ccf-pipeline-orchestrator
--> Idea 007
+-> create/admit Idea 007
 -> ccf-experiment-designer
--> Gate 01
+-> Gate 01 design-integrity audit
+-> push
+-> stop before training
 ```
 
-No response-coverage audit, Gate 01, or local Agent run is authorized now.
+No Idea 007 directory, Gate 01 protocol, response-coverage run, or local training is created or authorized by this document itself.
 
 ## Quarantine
 
