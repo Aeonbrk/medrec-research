@@ -15,7 +15,7 @@ This reset follows S0's terminal verdict `FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_
 
 ## Selected research question
 
-Can medication recommendation be reformulated as a strictly causal sequence of explicit regimen-edit actions at provider order time, and does learned action-state structure add predictive value beyond a flat action classifier with the same state-validity mask?
+Can medication recommendation be reformulated as a strictly causal sequence of explicit regimen-edit actions at provider order time, and does learned action-medication structure add predictive value beyond an equal-entitlement separate-head classifier with the same state-validity mask?
 
 The candidate decision object is the observed medication-order action mark:
 
@@ -54,7 +54,19 @@ The route must remain distinct from:
 - HeteroMed: visit-level collaborative drug expansion/inheritance;
 - Rough et al.: order-time medication prediction within a 10-minute horizon, but without explicit regimen-edit action modeling.
 
-Therefore the publishable delta cannot be "medication changes matter" or "predict at order time". It must be the combination of event-sourced action marks, causal regimen state, state-valid decoding, and a learned event-edit mechanism that beats equal-entitlement direct controls.
+Generic marked temporal point processes and continuous-time clinical action models are also established; a future method cannot claim novelty merely from using an MTPP or modeling irregular time.
+
+Therefore the publishable delta cannot be "medication changes matter", "predict at order time", or "use continuous time". It must be the combination of event-sourced action marks, causal regimen state, state-valid decoding, and a learned event-edit mechanism that beats equal-entitlement direct controls.
+
+Bounded pre-M0 collision check:
+
+[`pre-m0-closest-work-check.md`](pre-m0-closest-work-check.md)
+
+Verdict:
+
+`NO_CLOSE_COLLISION_FOUND_IN_BOUNDED_PRE_M0_SEARCH`.
+
+This is sufficient to justify M0 only; it is not a novelty proof.
 
 ## M0 routing
 
@@ -73,7 +85,7 @@ Grounding:
 Then return to `ccf-pipeline-orchestrator` and route to:
 
 1. `ccf-idea-optimizer` on this single event-sourced editing family;
-2. strict `ccf-idea-reviewer` against MICRON, ARMR, HeteroMed, Rough et al., COGNet, and generic marked temporal point-process baselines;
+2. strict `ccf-idea-reviewer` against MICRON, ARMR, HeteroMed, Rough et al., COGNet, and generic marked temporal point-process/state-transition baselines;
 3. Idea 007 may be created only if the final method delta survives that review.
 
 ### FAIL
