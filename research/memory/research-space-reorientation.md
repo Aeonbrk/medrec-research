@@ -4,21 +4,21 @@
 
 ## Current workflow state
 
-**Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`
+**Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
 **Current active Idea**: none.
 
-**Idea 007**: not created / not authorized.
+**Idea 007**: not created / creation explicitly authorized.
 
 **Current method family**: privileged physiological response supervision.
 
-**Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
+**Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-**Next owner**: strict `ccf-idea-reviewer` after the bounded R1--R3 optimizer revision.
+**Next owner**: `ccf-pipeline-orchestrator`.
 
-No local scientific execution is authorized. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
+No local scientific execution is authorized by the current state. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 
 ## Cumulative failure landscape
 
@@ -64,13 +64,11 @@ M0 had abundant `New / Change / D/C` support, but the frozen pre-order state-con
 
 No model was trained.
 
-### F10 — privileged future access does not identify the semantics of the privileged signal
+### F10 — privileged future access does not identify privileged semantics
 
-The 2026-09-08 strict privileged-response review did not empirically fail the direction. It established a pre-Idea admission constraint:
+A future-only clinical signal may be a legal predictive target while the gain still comes from generic future-state regularization, medication identity/static prototypes, monitoring policy, or positive-event sample weighting.
 
-> future-only supervision may legally improve a causal-input student while the gain still comes from generic future-state regularization, medication identity/static prototypes, monitoring policy, or support/sample reweighting rather than the claimed response semantics.
-
-The route therefore remains live only after matched mechanism-identification controls are frozen.
+This remains a reusable rule rather than an unresolved blocker. The current R1--R3 contract now supplies the prospective subtraction required to test it.
 
 Record:
 
@@ -86,9 +84,9 @@ A new statistic/function over an already failed frozen information premise is no
 
 Therapeutic alternatives, hidden positives, treatment obligations, clinical appropriateness, or action semantics require independent evidence.
 
-### C3 — direct-use sufficiency must be challenged first
+### C3 — direct-use or semantic-ablation sufficiency must be challenged first
 
-A new signal/state semantic supports a learned method only if learning adds value beyond direct use of the same signal.
+A new signal/state semantic supports a learned method only if the proposed mechanism adds value beyond the strongest equal-entitlement direct use or semantic-ablation control available for that information-flow setting.
 
 ### C4 — certification follows mechanism evidence
 
@@ -98,7 +96,7 @@ Do not make guarantees the first novelty investment.
 
 Absolute pair burden can move mechanically with output size.
 
-### C6 — admitted resource fact: hospitalization DDI co-membership is not current execution overlap
+### C6 — hospitalization DDI co-membership is not current execution overlap
 
 R0 remains reusable infrastructure/evidence, not the target paper.
 
@@ -116,12 +114,14 @@ Action-like database fields cannot be promoted into state transitions merely bec
 
 ### C10 — privileged-response semantics require subtraction, not only leakage safety
 
-Strictly pre-order deployment is necessary but insufficient. A response-specific method claim must also show that its benefit depends on:
+Strictly pre-order deployment is necessary but insufficient. A response-specific method claim must show that its benefit depends on:
 
 - focal-medication conditioning beyond generic future-state supervision;
 - patient-medication-response correspondence beyond shuffle/static prototypes;
 - physiological values beyond monitoring availability/frequency;
 - equal support/sample entitlement rather than positive-event reweighting.
+
+The current bounded optimizer revision now freezes these requirements strongly enough for Idea admission.
 
 ## Research-space boundary map
 
@@ -132,19 +132,21 @@ Strictly pre-order deployment is necessary but insufficient. A response-specific
 | Count-mediated safety/coverage | `CLOSED` | B0 | different mechanism |
 | Selective prescription supervision | `NOT ADMITTED` | supervision reset | identifiable multi-valid target |
 | Exposure-conditioned DDI learning | `CLOSED under Idea 006` | direct-control sufficiency | different safety target/action problem |
-| Residual medication-practice adaptation | `CLOSED under S0` | no material forward degradation | actual degradation in a different deployment setting |
+| Residual temporal-practice adaptation | `CLOSED under S0` | no material forward degradation | actual degradation in a different deployment setting |
 | Event-sourced `New/Change/D/C` regimen editing | `NOT ADMITTED under M0` | workflow/state inconsistency | independently valid action semantics / different decision object |
 | Generic longitudinal modeling | `CROWDED / LOW PRIOR` | MR-DTR, DrugDoctor, HeteroMed, ChainCare | specific non-generic mechanism |
 | Generic labs/vitals fusion | `CROWDED` | REFINE, ChainCare, HIFINet, MedGCN | different information-flow role |
 | Joint MedRec + lab prediction | `PRIOR ART` | MedGCN; Bhoi et al. 2023 | response-specific mechanism beyond generic auxiliary learning |
-| Knowledge distillation for MedRec | `PRIOR ART` | LEADER | different knowledge source + mechanism evidence |
-| Training-time privileged multimodal distillation | `PRIOR ART outside MedRec` | OC-Distill + LUPI/KD | MedRec-specific scientific object |
+| Knowledge distillation for MedRec | `PRIOR ART` | LEADER; IJCAI-ECAI 2026 dual-channel KD | different knowledge source + mechanism evidence |
+| Training-time privileged clinical modalities | `PRIOR ART outside MedRec` | OC-Distill and broader LUPI/KD | MedRec-specific scientific object |
+| Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting | future access itself cannot carry novelty |
 | Generic future-observation distillation | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 | future access itself cannot carry novelty |
-| **Privileged physiological response supervision** | **`REQUIRED REVISIONS BEFORE IDEA 007`** | strict review 2026-09-08 | freeze R1 medication specificity, R2 monitoring separation, R3 equal-support/deployment contract, then re-review |
+| Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 | response-supervision role + MedRec-specific evidence |
+| **Privileged physiological response supervision** | **`ADMITTED FOR IDEA 007 CREATION`** | strict re-review 2026-09-09 | create Idea 007; freeze one kill-first Gate 01; stop before training pending design-integrity audit |
 
 `CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
 
-## Current selected method family
+## Current admitted method family
 
 Packet:
 
@@ -162,29 +164,21 @@ Closest-work provenance:
 
 Physiological evidence observed after medication administration can be informative about the joint patient/treatment context, but it is unavailable at medication decision time and is observationally confounded.
 
-### Surviving insight
+### Admitted insight
 
 Use future post-administration physiology only as **privileged training supervision**. A teacher learns a response-associated patient-medication representation from realized treatment context and post-administration monitoring. A deployable student must anticipate that representation from strictly pre-order state and candidate medication.
 
-The scientific contribution survives closest-work subtraction only if the paired physiological **values** create incremental medication-specific information beyond generic future supervision and monitoring policy.
+The scientific contribution survives closest-work subtraction only if paired physiological **values** create incremental medication-specific information beyond generic future supervision and monitoring policy.
 
-### Non-causal boundary
+### R1--R3 admission contract
 
-Observed post-administration physiology is not an individual medication effect. It may reflect severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, monitoring policy, and selective measurement.
-
-Use `response-associated signature`, not `treatment effect`, `efficacy`, `benefit`, or `counterfactual outcome`.
-
-### Required pre-Idea revisions (frozen by the bounded optimizer pass)
-
-1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future control.
+1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future.
 2. **Monitoring separation**: Monitoring-Mask-Only plus physiology-value versus response-availability separation.
 3. **Equal entitlement**: positive-only observed response, same support/sample mask across privileged variants, unsupported examples retained in the recommendation objective, and strictly pre-order student features/normalization.
 
-No experiment is authorized during this revision cycle.
+### Future Gate 01 kill conditions
 
-### Future Gate 01 kill conditions after admission only
-
-If later admitted, terminate the response-specific family if any of the following occurs:
+Terminate the response-specific family if any of the following occurs:
 
 - GenericFutureAux or MedicationAblatedFuture performs comparably;
 - ResponseShuffle performs comparably;
@@ -194,12 +188,27 @@ If later admitted, terminate the response-specific family if any of the followin
 - response support is insufficient or materially concentrated;
 - deployment leakage or unmatched support/reweighting is detected.
 
-No architecture rescue follows these outcomes under the same Idea.
+No architecture, response-window, modality, subgroup, or response-definition rescue follows these outcomes under the same Idea.
+
+The future experiment designer must operationalize `materially` / `comparable` into a frozen practical-and-statistical decision rule before training.
+
+### Non-causal boundary
+
+Observed post-administration physiology is not an individual medication effect. It may reflect severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, treatment timing, monitoring policy, and selective measurement.
+
+Use `response-associated signature`, not treatment-effect, efficacy, therapeutic-benefit, counterfactual, clinical-optimality, or individualized-causal-benefit language.
 
 ## Publication boundary
 
-This strict review result is not an Idea and not publication evidence. The first paper remains method-first.
+This admission is not an empirical result and not publication evidence. The first paper remains method-first.
 
-Next owner: strict `ccf-idea-reviewer`.
+Authorized next workflow only:
 
-Idea 007 may be created only after a later explicit `ACCEPT_TO_CREATE_IDEA_007` verdict. No local Agent run or response-coverage research stage is authorized now.
+```text
+ccf-pipeline-orchestrator
+-> create/admit Idea 007
+-> ccf-experiment-designer
+-> Gate 01 design-integrity audit
+-> push
+-> stop before training
+```
