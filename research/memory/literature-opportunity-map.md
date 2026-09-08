@@ -4,29 +4,29 @@
 
 ## Current status
 
-Refresh date: 2026-09-08.
+Refresh date: 2026-09-09.
 
 Current project stage:
 
-`PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`
+`PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
 
-There is no active Idea. Ideas 001--006 are terminated. Idea 007 is not created or authorized.
+There is no active Idea. Ideas 001--006 are terminated. Idea 007 is not created, but its creation is explicitly authorized.
 
 Current packet:
 
 [`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/).
 
-Strict review:
+Strict admission review:
 
 [`model-reset-20260908-privileged-physiological-response/idea-review.md`](model-reset-20260908-privileged-physiological-response/idea-review.md).
 
-Latest closest-work provenance:
+Closest-work provenance:
 
 [`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md).
 
 Reviewer verdict:
 
-`ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
+`ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
 ## Closed or compressed spaces
 
@@ -44,131 +44,126 @@ Reviewer verdict:
 | Generic finer action granularity | `CROWDED / HIGH COST` | FineMed, GRAIN, SafeRx-Agent, RxEval |
 | Generic labs/vitals fusion | `CROWDED` | REFINE, ChainCare, HIFINet, MedGCN |
 | Joint MedRec + lab prediction | `PRIOR ART` | MedGCN; Bhoi et al. 2023 |
-| Knowledge distillation for MedRec | `PRIOR ART` | LEADER |
-| Training-time privileged multimodal distillation | `PRIOR ART outside MedRec` | OC-Distill and broader LUPI/KD literature |
-| True-future-observation teacher to current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
+| Knowledge distillation for MedRec | `PRIOR ART` | LEADER; IJCAI-ECAI 2026 dual-channel MedRec KD |
+| Training-time privileged multimodal distillation | `PRIOR ART outside MedRec` | OC-Distill and broader LUPI/KD |
+| Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting |
+| True-future-observation teacher → current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 |
+| **Privileged physiological response supervision** | **`ADMITTED FOR IDEA 007 CREATION`** | exact scientific object survives bounded closest-work search and R1--R3 now make its semantics falsifiable |
 
-## Current selected opportunity
+## Current admitted opportunity
 
 **Privileged physiological response supervision for medication recommendation.**
 
-The family survives strict review only conditionally. It is not yet an admitted Idea.
+The generic future-privileged KD mechanism is not the opportunity. The opportunity is the MedRec-specific scientific object:
+
+> use medication-in-context realized post-administration physiological **values** only as positive-event training supervision for a strictly pre-order candidate-medication student, then require matched evidence that focal medication conditioning, individualized response pairing, and physiological values matter beyond generic future supervision, monitoring policy, static medication priors, response-independent regularization, positive-event weighting, and KD mechanics.
+
+## Closest-work subtraction
 
 ### REFINE — NeurIPS 2023
 
-DOI: `10.52202/075280-1043`.
-
-REFINE uses dosage-titration trends and lab-test responses to characterize patient health and perform fine-grained medication recommendation.
+REFINE models dosage-titration trends and lab-test responses to characterize patient health for fine-grained medication recommendation.
 
 Therefore `use lab response in MedRec` is not novel.
 
 ### ChainCare — Information Processing & Management 2026
 
-DOI: `10.1016/j.ipm.2026.104739`.
+ChainCare models bidirectional lab-test / medication-injection event chains, including injection-first sequences where medication physiological effects are associated with follow-up lab tests, and uses the resulting monitoring representations for medication recommendation and disease prediction.
 
-ChainCare models bidirectional lab-test / medication-injection event chains, explicitly including injection-first sequences where physiological effects of medications are associated with follow-up laboratory tests, and uses the resulting monitoring-level representations for medication recommendation and disease prediction.
+Therefore medication-administration / follow-up-monitoring structure is prior art.
 
-Therefore medication-administration / follow-up-monitoring structure is current MedRec prior art.
+### MedGCN and Bhoi et al. 2023
 
-### MedGCN and integrated lab-response prediction
+MedGCN couples medication recommendation with lab-test imputation. Bhoi et al. explicitly integrate medication recommendation and lab-test response prediction.
 
-MedGCN couples medication recommendation with lab-test imputation (`10.1016/j.jbi.2022.104000`). Bhoi et al. 2023 explicitly integrate medication recommendation and lab-test response prediction (`10.1609/aaaiss.v1i1.27489`).
-
-Therefore generic lab auxiliary/multitask and future/lab-response prediction are prior art and form a primary killer baseline family.
+Therefore generic lab auxiliary, multitask, and future/lab-response prediction are prior art and primary killer-control families.
 
 ### DrugDoctor — Briefings in Bioinformatics 2024
 
-DOI: `10.1093/bib/bbae464`.
+DrugDoctor considers the impact of historical prescriptions on downstream patient condition at visit level.
 
-DrugDoctor uses historical medications and the nearest downstream historical health condition to form effectiveness-aware historical information.
-
-Therefore using a later health state after prior medication as ordinary historical response evidence is covered.
+Therefore downstream response evidence after prior medication is already part of MedRec prior art.
 
 ### MR-DTR — WWW 2025
 
-DOI: `10.1145/3696410.3714533`.
+MR-DTR establishes time-aware/dynamic-treatment-regime medication recommendation. Generic treatment-dynamics framing is crowded.
 
-MR-DTR establishes current time-aware/dynamic-treatment-regime medication recommendation work. Generic treatment-dynamics framing is therefore crowded; no collision was identified with current-instance future physiology used only during training.
+### LEADER and IJCAI-ECAI 2026 MedRec KD
 
-### LEADER — 2024
+LEADER uses feature-level knowledge distillation for medication recommendation. An accepted IJCAI-ECAI 2026 paper, `Dual-Channel Semantic-Enhanced Combinatorial Medication Recommendation via Knowledge Distillation`, independently confirms that MedRec KD is a current CCF-A-level method family.
 
-arXiv: `2402.02803`.
-
-LEADER uses feature-level knowledge distillation for medication recommendation.
-
-Therefore `KD for MedRec` is not a novelty claim.
+Therefore KD mechanics cannot carry novelty.
 
 ### OC-Distill — 2026
 
-arXiv: `2604.16878`.
+OC-Distill transfers complementary training-time clinical modality information into a reduced-modality ICU student.
 
-OC-Distill transfers training-time multimodal information into a deployable reduced-modality student for ICU risk prediction.
+Therefore generic clinical privileged-information distillation is established.
 
-Therefore generic clinical privileged-information distillation is an established mechanism primitive.
+### Future-aware blood-glucose forecasting — Scientific Reports 2026
+
+A teacher uses historical CGM plus future insulin/meal disturbances that are unavailable at deployment; a student learns from historical input only through knowledge distillation.
+
+Therefore `clinical future information during training -> deployable history-only student` is already explicit prior art.
 
 ### Wu et al. — IEEE EMBC 2025
 
-DOI: `10.1109/EMBC58623.2025.11254154`; PMID `41336312`.
-
 This work learns medicine-aware patient representations from transient physiological responses to vasoactive infusions.
 
-Therefore medication-conditioned physiological-response representation itself is also established, though not as a general MedRec privileged-student method.
+Therefore medication-conditioned physiological-response representation itself is established outside general MedRec.
 
 ### Privileged Foresight Distillation — 2026
 
-arXiv: `2604.25859`.
+PFD uses true future observations in a training-time teacher and distills a future-conditioned correction into a current-only student while explicitly testing capacity/regularization explanations.
 
-Privileged Foresight Distillation uses true future observations in a training-time teacher and distills a future-conditioned correction into a current-only student, while explicitly testing against generic regularization explanations.
-
-Therefore `future observation teacher -> current-only deployable student` is now a generic prior-art pattern. Future-only information flow cannot carry the candidate's novelty by itself.
+Therefore future observation access and future-to-current distillation are not novelty claims.
 
 ## Search-scoped residual delta
 
 Within the retained 2023--2026 search, no direct general-MedRec method was found whose central mechanism is exactly:
 
-> use paired realized post-administration physiological **values** only during training to supervise a strictly pre-order candidate-medication student, then deploy without future physiology.
+> use paired realized post-administration physiological **values** only during training to supervise a strictly pre-order candidate-medication student, with response-specific mechanism subtraction.
 
-However, this is a narrow composition of established primitives. The contribution is differentiated only if mechanism controls establish that the incremental signal is specifically carried by medication-in-context physiological values and pairing.
-
-The necessary surviving delta is:
-
-> medication-in-context post-administration physiological values as privileged response-associated supervision, with evidence that focal-medication conditioning, individualized patient-medication-response correspondence, and physiological values matter beyond generic future-state prediction, static medication priors, monitoring availability, sample weighting, and KD mechanics.
+This is a narrow composition of established primitives. It becomes a meaningful MedRec method contribution only if Gate 01 establishes that the signal is specifically carried by medication-in-context physiological values and pairing.
 
 Novelty status:
 
-`MODERATE / SEARCH-SCOPED / REQUIRED_REVISIONS_BEFORE_IDEA`.
+`MODERATE / SEARCH-SCOPED / ADMITTED_FOR_ONE_KILL_FIRST_GATE`.
 
-This is not a novelty proof.
+This is not a universal novelty proof.
 
-## Mandatory strongest alternatives (R1--R3 frozen)
+## Mandatory future alternatives
 
-The bounded optimizer pass freezes before Idea creation:
+The admitted R1--R3 contract freezes:
 
-- a matched Generic Future-State Auxiliary / Medication-Ablated Future control;
+- matched Generic Future-State Auxiliary / Medication-Ablated Future;
 - Monitoring-Mask-Only plus physiological-value versus response-availability separation;
 - equal-support positive-only response semantics and strictly pre-order deployment entitlement.
 
-If a later Idea is admitted, Gate 01 must additionally include:
+Gate 01 must additionally cover:
 
 - Strict Pre-Order Base;
 - Base + Pre-Order Physiology;
 - Static Medication Response Prototype;
 - Response Shuffle;
-- Generic KD when needed to isolate distillation mechanics;
-- a compatible monitoring-aware MedRec baseline when task alignment supports a fair comparison.
+- Generic KD only when needed to isolate distillation mechanics;
+- Proposed privileged physiological response supervision.
 
-A response-specific method story terminates if Generic Future-State Auxiliary, Medication-Ablated Future, Response Shuffle, Monitoring-Mask-Only, Static Response Prototype, or richer pre-order physiology performs comparably.
+A compatible monitoring-aware MedRec baseline may be included when task alignment supports a fair comparison.
+
+The response-specific story terminates if Generic Future-State Auxiliary, Medication-Ablated Future, Response Shuffle, Monitoring-Mask-Only, Static Response Prototype, or richer pre-order physiology performs comparably, or if response support is insufficient/materially concentrated, or if deployment leakage/unequal entitlement is detected.
 
 ## Claim boundary
 
-Post-administration physiology is observational and confounded by severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, monitoring policy, and selective measurement.
+Post-administration physiology is observational and confounded by severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, treatment timing, monitoring policy, and selective measurement.
 
 Allowed framing:
 
 - response-associated physiological signature;
-- medication-in-context monitoring trajectory;
-- privileged response supervision.
+- medication-in-context physiological trajectory;
+- privileged physiological response supervision;
+- future physiological supervision.
 
 Disallowed without independent causal identification:
 
@@ -177,14 +172,24 @@ Disallowed without independent causal identification:
 - drug efficacy;
 - therapeutic benefit;
 - counterfactual outcome;
-- clinically optimal medication.
+- clinically optimal medication;
+- individualized causal benefit.
 
 ## Current routing
 
 Next owner:
 
-strict `ccf-idea-reviewer` for re-review of the three frozen revisions.
+`ccf-pipeline-orchestrator`.
 
-Idea 007 is created only if the subsequent strict review explicitly returns `ACCEPT_TO_CREATE_IDEA_007`.
+Authorized next workflow:
 
-No local experiment, response-coverage diagnostic, Gate 01, or architecture work is authorized now.
+```text
+ccf-pipeline-orchestrator
+-> create/admit Idea 007
+-> ccf-experiment-designer
+-> Gate 01 design-integrity audit
+-> push
+-> stop before training
+```
+
+No local experiment, response-coverage diagnostic, Gate execution, or architecture work is authorized by this map.
