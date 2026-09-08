@@ -1,115 +1,126 @@
-# Handoff: Privileged Physiological Response Method Reset
+# Handoff: Privileged Physiological Response Required Revisions
 
 ## Current state
 
 Ideas 001--006 are terminated. There is currently no active Idea.
 
-- **Current Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`
+- **Current Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`
 - **Current active Idea**: none
 - **Idea 007**: not created / not authorized
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
-- **New-model policy**: a genuinely new model is allowed when it encodes a new falsifiable supervision, decision, state, or information-flow mechanism
 - **Current method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION`
-- **Optimizer status**: completed / strict review pending
+- **Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
+- **Strict review score**: `3.89 / 5.00`
+- **Next CCFA owner**: bounded `ccf-idea-optimizer`, then return to strict `ccf-idea-reviewer`
 - **Local scientific execution**: not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
 
-## Latest failure closure — Event-Sourced Regimen Editing M0
-
-M0 returned:
-
-`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
-
-The labels were abundant, but the state-semantic admission failed:
-
-- `Change` active-before: `0.17228553254342177` versus frozen floor `0.70`;
-- `D/C` active-before: `0.15933081187948597` versus frozen floor `0.70`.
-
-No model was trained and EditAudit was not accessed.
-
-Failure memory:
-
-`research/memory/failures/event-sourced-regimen-editing-m0--workflow-action-state-inconsistency.md`.
-
-Reusable constraint:
-
-> A workflow transaction label is not automatically a valid regimen-state transition label. High support does not repair semantic inconsistency.
-
-Do not run M0b or rescue the raw `New / Change / D/C` target with a deeper encoder.
-
-## Current method reset
-
-Packet:
+## Current packet
 
 `research/memory/model-reset-20260908-privileged-physiological-response/`
 
-Key artifacts:
+Authoritative artifacts:
 
 - `README.md`
 - `idea-grounding.md`
 - `idea-optimization.md`
+- `idea-review.md`
+- `closest-work-review.md`
 
-### Working hypothesis
+Reusable admission constraint:
 
-At medication decision time, a deployable model can observe only pre-order state. During training, however, some realized medication events are followed by high-frequency physiological monitoring.
+`research/memory/failures/privileged-response-preidea--response-specificity-not-yet-identified.md`.
 
-The candidate mechanism uses that **post-administration physiology only as privileged training supervision**:
+## Strict review result
 
-1. a teacher receives pre-order state, realized medication/treatment context, and a bounded post-administration monitoring window;
-2. it learns a response-associated patient-medication representation;
-3. a deployable student learns to anticipate that representation from pre-order state plus candidate medication;
-4. inference never sees future physiology or the teacher.
+The family is not rejected. No exact general-MedRec work was found in the bounded 2023--2026 search whose central mechanism is realized post-administration physiology used only during training to supervise a strictly pre-order candidate-medication student.
 
-This is predictive privileged learning, not causal treatment-effect estimation.
+However, the information-flow primitive itself is not novel. Current prior work separately covers:
 
-### Closest-work boundary
+- lab-response and monitoring-aware MedRec — REFINE, ChainCare;
+- joint medication recommendation and lab-response prediction — MedGCN / Bhoi et al.;
+- downstream historical response evidence — DrugDoctor;
+- MedRec knowledge distillation — LEADER;
+- clinical training-time privileged-modality distillation — OC-Distill;
+- medication-aware physiological-response representations — Wu et al. EMBC 2025;
+- generic future-observation teacher to current-only student distillation — Privileged Foresight Distillation 2026.
 
-The route must not claim novelty from any of the following individually:
+The search-scoped surviving delta is therefore only:
 
-- lab-response/titration modeling in MedRec — REFINE;
-- lab/injection event chains — ChainCare;
-- joint MedRec/lab prediction — MedGCN and prior AAAI Symposium work;
-- downstream historical condition after medication — DrugDoctor;
-- medication-recommendation knowledge distillation — LEADER;
-- generic training-time privileged multimodal distillation — OC-Distill;
-- medication-conditioned physiological-response representation — Wu et al. EMBC 2025.
+> medication-in-context post-administration physiological **values** as training-only privileged supervision for a strictly pre-order MedRec student, with mechanism controls proving that the gain depends on focal-medication conditioning and patient-medication-response correspondence rather than generic future prediction, monitoring policy, static medication priors, sample weighting, or KD mechanics.
 
-The current search-scoped delta is narrowly:
+## Three required revisions before Idea 007
 
-> medication-in-context post-administration physiology as training-only privileged supervision for a strictly pre-order candidate-medication student, with controls proving that response semantics add value beyond generic future-state regularization.
+### R1 — Medication-specificity subtraction
 
-### Mandatory killer controls for any later Gate 01
+Freeze a matched medication-ablated future / Generic Future-State Auxiliary control. It must use the same supported events, future window, student, and comparable capacity while removing focal-medication-specific response construction.
 
-A future protocol must at least challenge the candidate against:
+If removing focal medication identity does not materially weaken the gain, terminate the response-specific mechanism.
 
-- causal Base with identical deployment inputs;
-- Base + pre-order physiology;
-- capacity-matched generic future-state auxiliary learning;
-- static train-only medication-response prototypes;
-- response-shuffle/misalignment control;
-- compatible monitoring-aware MedRec baselines;
-- a KD control if needed to isolate the response knowledge source from distillation mechanics.
+### R2 — Monitoring-policy separation
 
-The route is not admitted if generic future-state supervision or shuffled responses explain the gain.
+Make `Monitoring-Mask-Only` mandatory and freeze response-value versus response-availability separation.
+
+If monitoring availability/frequency alone performs comparably to the privileged-response method, terminate the physiological-response interpretation.
+
+### R3 — Equal-support and deployment entitlement
+
+Freeze the following semantics:
+
+- response supervision applies only to observed administered positive events with valid linked future monitoring;
+- unchosen medications receive no invented counterfactual response;
+- all privileged controls use the same support mask and recommendation examples;
+- unsupported examples remain in the recommendation objective rather than being silently dropped/reweighted;
+- the student and its feature/normalization path use strictly pre-order information only;
+- future/post-order/discharge information is confined to the training-only privileged branch.
+
+Any deployment-path future leakage or unmatched sample-selection difference invalidates the later Gate result.
+
+## Killer controls reserved for a later Gate 01
+
+If a subsequent strict review admits Idea 007, Gate 01 must at least include:
+
+- Strict Pre-Order Base;
+- Base + Pre-Order Physiology;
+- Generic Future-State Auxiliary / Medication-Ablated Future;
+- Static Medication Response Prototype;
+- Response Shuffle;
+- Monitoring-Mask-Only;
+- Proposed privileged-response method;
+- Generic KD only if needed to isolate distillation mechanics.
+
+Immediate stop conditions include any of the simple controls performing comparably to the proposed method, insufficient/disproportionately concentrated privileged-response support, or any deployment leakage.
+
+Do not rescue a failed mechanism with a deeper Transformer/Mamba/GNN, larger teacher, wider response window, extra modalities, subgroup mining, or a second response definition under the same Idea.
+
+## Latest empirical failure closure
+
+The latest completed empirical reset remains Event-Sourced Regimen Editing M0:
+
+`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
+
+`Change` and `D/C` raw workflow actions failed the frozen active-before consistency floors (`0.1723` and `0.1593` versus `0.70`). No model was trained.
+
+This result remains separate from the privileged-response pre-Idea review.
 
 ## Routing
 
-The optimizer has completed a standard method-level formulation. **Do not create Idea 007 yet.**
+Authorized next sequence:
 
-Next owner:
+```text
+ccf-idea-optimizer (bounded R1--R3 only)
+-> strict ccf-idea-reviewer
+```
 
-`ccf-idea-reviewer`
+Only a later reviewer verdict of `ACCEPT_TO_CREATE_IDEA_007` may authorize:
 
-The strict review must decide whether the residual novelty, non-causal soundness, support feasibility, and evidence package justify creating Idea 007.
+```text
+ccf-pipeline-orchestrator
+-> Idea 007 creation
+-> ccf-experiment-designer
+-> Gate 01 design
+```
 
-If admitted:
-
-`ccf-pipeline-orchestrator -> Idea 007 -> ccf-experiment-designer -> Gate 01`.
-
-If rejected:
-
-return to `NO_HIGH_VALUE_DIRECTION_YET` without a new response-diagnostic series.
-
-No local Agent work is authorized before strict review.
+No Idea 007, Gate 01, response-coverage diagnostic, or local Agent experiment is authorized now.
