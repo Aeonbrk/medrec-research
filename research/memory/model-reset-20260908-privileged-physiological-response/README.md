@@ -4,21 +4,21 @@
 
 ## Status
 
-- Stage: `PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`
+- Stage: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
 - Current active Idea: none
-- Idea 007: not created / not authorized
+- Idea 007: not created / creation explicitly authorized
 - Paper objective: first formal method paper, target at least a CCF-A Data/Mining/AI venue family
 - Reset class: method-level supervision / information-flow reset
 - Optimizer formulation: completed
-- Strict review: completed
-- Strict review verdict: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
-- Strict review score: `3.89 / 5.00`
-- Next owner: strict `ccf-idea-reviewer` (bounded R1--R3 optimizer revision completed)
+- Strict re-review verdict: `ACCEPT_TO_CREATE_IDEA_007`
+- Strict re-review score: `4.17 / 5.00`
+- Reviewer confidence: medium-high
+- Next owner: `ccf-pipeline-orchestrator`
 - Local scientific execution: **not authorized**
 
 The Event-Sourced Regimen Editing M0 gate remains closed. Raw `New / Change / D/C` workflow marks are not reused as regimen-edit supervision.
 
-## Working research family
+## Admitted scientific family
 
 **Privileged physiological response supervision for medication recommendation.**
 
@@ -30,14 +30,14 @@ Can post-administration physiological monitoring that is available only during t
 
 The method must never require post-order/post-administration physiology at inference.
 
-## Core mechanism
+## Scientific object
 
 At a medication-order decision point `t`:
 
 1. a deployable student observes only strictly pre-order information;
-2. for training examples with a linked observed medication administration and valid bounded future monitoring, a privileged teacher additionally observes the realized medication-in-context and post-administration physiological window;
-3. the teacher encodes a response-associated patient-medication representation;
-4. the student learns to anticipate that representation from pre-order state and candidate medication;
+2. training examples with a linked observed administration and valid bounded future monitoring may receive privileged supervision;
+3. the teacher represents the realized medication-in-context post-administration physiological trajectory;
+4. the student must anticipate that representation from pre-order state and candidate medication;
 5. recommendation remains the downstream task.
 
 This is predictive privileged supervision, not causal treatment-effect estimation.
@@ -50,20 +50,21 @@ The route cannot claim novelty from any of the following individually:
 - lab/injection monitoring event chains — ChainCare;
 - joint MedRec/lab-response or lab-prediction tasks — MedGCN and Bhoi et al. 2023;
 - downstream historical health-state evidence after prior medications — DrugDoctor;
-- MedRec knowledge distillation — LEADER;
+- MedRec knowledge distillation — LEADER and an accepted IJCAI-ECAI 2026 dual-channel MedRec KD method;
 - generic clinical training-time privileged-modality distillation — OC-Distill;
+- clinical future-aware teacher/student transfer — 2026 future-aware blood-glucose forecasting;
 - medication-aware physiological-response representation — Wu et al. EMBC 2025;
 - generic true-future-observation teacher to current-only student distillation — Privileged Foresight Distillation 2026.
 
 The search-scoped residual delta is narrower:
 
-> paired medication-in-context post-administration physiological **values** as training-only privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that response semantics matter beyond generic future-state learning, medication identity/prototypes, monitoring availability, sample weighting, and KD mechanics.
+> paired medication-in-context post-administration physiological **values** as positive-event, training-only privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that response semantics matter beyond generic future-state learning, medication identity/prototypes, monitoring availability, sample weighting, individualized-pairing artifacts, and KD mechanics.
 
 Detailed provenance:
 
 [`closest-work-review.md`](closest-work-review.md).
 
-## Strict review
+## Strict admission review
 
 Authoritative review:
 
@@ -71,31 +72,45 @@ Authoritative review:
 
 Verdict:
 
-`ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
+`ACCEPT_TO_CREATE_IDEA_007`
 
-The family is preserved because no exact direct general-MedRec collision was found and the hypothesis has a cheap decisive falsification path. It was not yet an Idea at strict review time because the formulation did not fully isolate the claimed medication-specific physiological-response mechanism; the bounded optimizer pass has now frozen that formulation contract, pending strict re-review.
+The prior blocker was mechanism identification rather than empirical failure. The bounded optimizer pass has now frozen the required subtraction and deployment contracts strongly enough that one future Gate 01 can falsify the response-specific claim without post-hoc rescue.
 
-## Required revisions before Idea 007 (now frozen pending strict re-review)
+This is scientifically admissible for Idea creation.
+
+## Frozen R1--R3 admission contract
 
 ### R1 — Medication-specificity subtraction
 
-Freeze a matched Generic Future-State Auxiliary / Medication-Ablated Future control that removes focal-medication-specific response construction while matching support, future window, student, and capacity closely enough to isolate medication specificity.
+Generic Future-State Auxiliary / Medication-Ablated Future must use the same recommendation examples, support, administration anchor, future window, future-value availability, student, latent dimensionality, comparable teacher capacity, auxiliary weight, and update entitlement while removing focal-medication identity and medication-specific construction from the privileged target branch.
+
+If medication ablation is comparable to Proposed:
+
+`STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE`.
 
 ### R2 — Monitoring-policy separation
 
-Make `Monitoring-Mask-Only` mandatory and freeze response-value versus response-availability separation. Physiological values must show incremental value beyond whether/how often measurements occur.
+Monitoring-Mask-Only must receive the same response-support mask, future window, measurement availability/frequency structure, student, capacity, and update entitlement but no physiological values or value-derived summary.
 
-### R3 — Equal-support and deployment entitlement
+If Monitoring-Mask-Only is comparable to Proposed:
 
-Freeze positive-only observed-response semantics and identical support/sample entitlement across privileged controls. Unsupported examples remain in the recommendation objective. Student features and normalization remain strictly pre-order, and future/post-order/discharge information is confined to the training-only privileged branch.
+`STOP_MONITORING_POLICY_SUFFICIENCY`.
 
-Reusable constraint:
+### R3 — Equal-support positive-only supervision and deployment entitlement
 
-[`../failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](../failures/privileged-response-preidea--response-specificity-not-yet-identified.md).
+- response supervision exists only on actually administered positive medication events with valid linked future monitoring;
+- unchosen medications receive no invented counterfactual response;
+- all privileged variants use the same recommendation examples and response-support mask;
+- unsupported examples remain in the recommendation objective;
+- student features and normalization are strictly pre-order;
+- post-order medication, administration, future labs/vitals, future masks, discharge-coded information, and other future-derived statistics are forbidden on the student path;
+- the teacher and privileged targets are absent at inference.
 
-## Future killer controls after re-review only
+Deployment leakage or unmatched support/reweighting invalidates the future Gate.
 
-Any later Gate 01 must at least include:
+## Future Gate 01 killer family
+
+After Idea 007 is created and only after `ccf-experiment-designer` freezes the protocol, Gate 01 must at least cover:
 
 - Strict Pre-Order Base;
 - Base + Pre-Order Physiology;
@@ -104,11 +119,11 @@ Any later Gate 01 must at least include:
 - Response Shuffle;
 - Monitoring-Mask-Only;
 - Proposed privileged-response method;
-- Generic KD only if needed to isolate distillation mechanics.
+- Generic KD only if needed to isolate KD mechanics.
 
-A compatible monitoring-aware MedRec baseline should be included when task alignment makes it scientifically valid.
+A compatible REFINE/ChainCare-style comparison may be included when task alignment is scientifically valid.
 
-The mechanism terminates if a simple control performs comparably, if privileged-response support is insufficient/materially concentrated, or if deployment leakage is detected. Do not respond with architecture scaling or response-definition fishing.
+The mechanism terminates if a simple matched control performs comparably, if privileged-response support is insufficient/materially concentrated, or if deployment leakage or unequal entitlement is detected. Do not respond with architecture scaling, response-window search, additional modalities, subgroup mining, or a second response definition.
 
 ## Non-causal boundary
 
@@ -118,28 +133,33 @@ Allowed language:
 
 - `response-associated physiological signature`;
 - `medication-in-context physiological trajectory`;
-- `privileged physiological supervision`.
+- `privileged physiological response supervision`;
+- `future physiological supervision`.
 
 Disallowed without independent causal identification:
 
 - treatment effect;
+- causal response;
 - drug efficacy;
 - therapeutic benefit;
 - counterfactual outcome;
-- clinically optimal medication.
+- clinically optimal medication;
+- individualized causal benefit.
 
 ## Routing
 
-Completed bounded owner and current next owner:
+Authorized next workflow:
 
 ```text
-ccf-idea-optimizer (bounded R1--R3 only)
--> strict ccf-idea-reviewer
+ccf-pipeline-orchestrator
+-> create/admit Idea 007
+-> ccf-experiment-designer
+-> Gate 01 design-integrity audit
+-> push
+-> stop before training
 ```
 
-Idea 007 may be created only if the subsequent strict review returns `ACCEPT_TO_CREATE_IDEA_007`.
-
-No standalone response-coverage audit, P0/P1 diagnostic chain, Gate 01, or local Agent run is authorized now. Response coverage/linkage remains a future Gate-01 mechanical preflight if the Idea is later admitted.
+This packet does not itself create Idea 007, inspect response coverage, design Gate 01, or authorize local training.
 
 ## Quarantine
 
