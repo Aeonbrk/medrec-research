@@ -8,6 +8,8 @@ This directory is the fundamental organizational unit for exploratory, early-sta
 
 Each idea folder represents one focused scientific line before it graduates to a paper project or is terminated. The project optimizes expected scientific value per unit research time: every active Idea must expose its central uncertainty to a bounded falsification gate before architecture or publication expansion.
 
+A genuinely new model/architecture is allowed when it instantiates an admitted scientific mechanism. A new backbone over a failed premise is not a new Idea.
+
 ## Invariants for Each Idea
 
 Every Idea must answer:
@@ -34,12 +36,28 @@ Every Idea must answer:
 | [`003-prescription-relative-confidence`](003-prescription-relative-confidence/README.md) | Prescription-Relative Confidence Residual | **Terminated** (`STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`) | Within-prescription rank/relative confidence failed after the expanded score/size/prevalence control. | None; no nonlinear same-information rescue. |
 | [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** (`STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY`) | Train-only NPMI co-selection compatibility did not add reliable routing value beyond the strongest simple control. | None; same-source relation-statistic substitutions are not authorized. |
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** (`STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`) | Predictive ATC sibling structure survived calibration but failed strict therapeutic semantic admission at current action resolution. | None; reopen only with materially different action semantics/evidence. |
-| [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** (`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`) | Exposure-localized training substantially reduced the frozen DDI surrogate, but failed the equal-entitlement learned-vs-direct-control gate: the direct exposure-aware reranker retained higher Recall@5. | None; no safety-loss/model rescue under the same active-exposure/DDI premise. |
+| [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** (`STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`) | Exposure-localized training reduced the frozen DDI surrogate, but failed the equal-entitlement learned-vs-direct-control gate. | None; no safety-loss/model rescue under the same active-exposure/DDI premise. |
 
 ## Current authoritative direction
 
 There is currently **no active Idea**.
 
-Idea 006 closed at Gate 01 with a valid R0 resource result but no admitted learned-method contribution. Its execution-confirmed order/eMAR infrastructure remains reusable for materially different scientific questions.
+Current stage:
 
-Next owner: `ccf-pipeline-orchestrator` for cross-idea consolidation and one bounded research-space reset. No Idea 007 is automatically authorized.
+`PRE_IDEA_EVENT_EDIT_M0`.
+
+The post-Idea-006 temporal-practice-shift reset also failed at S0 because no material forward degradation was observed. It did not create Idea 007.
+
+The only current pre-Idea family is the bounded **Event-Sourced Regimen Editing** reset:
+
+`research/memory/model-reset-20260908-event-sourced-regimen-editing/`.
+
+Its M0 gate tests whether explicit raw provider-order `New / Change / D/C` action-medication structure creates incremental learned value beyond an equal-entitlement direct state-mask classifier.
+
+Idea 007 may be created only after:
+
+1. `PASS_M0_EVENT_EDIT_STRUCTURE`;
+2. `ccf-idea-optimizer` develops the single surviving family;
+3. strict `ccf-idea-reviewer` admits a genuine method delta against the closest change-aware/order-time baselines.
+
+Until then, no Idea 007 folder is authorized.
