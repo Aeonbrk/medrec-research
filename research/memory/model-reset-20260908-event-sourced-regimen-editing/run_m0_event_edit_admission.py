@@ -1712,6 +1712,7 @@ def build_summary(
 
 def write_decision(summary: dict[str, Any], output_dir: Path) -> None:
     phase_a = summary["phase_a"]
+    admission = phase_a["admission_checks"]
     lines = [
         "# M0 — Event-Sourced Regimen-Edit Admission",
         "",
@@ -1734,10 +1735,10 @@ def write_decision(summary: dict[str, Any], output_dir: Path) -> None:
         "## Phase A admission",
         "",
         f"- Visibility: `{phase_a['visibility']}`",
-        f"- Overall support: `{phase_a['overall']['passed']}`",
-        f"- Per-action support: `{all(row['passed'] for row in phase_a['per_action'].values())}`",
-        f"- Change/D/C pre-order consistency: `{all(row['passed'] for row in phase_a['state_consistency'].values())}`",
-        f"- Distributed action semantics: `{phase_a['distributed_action_semantics']['passed']}`",
+        f"- Overall support: `{admission['overall']['passed']}`",
+        f"- Per-action support: `{all(row['passed'] for row in admission['per_action'].values())}`",
+        f"- Change/D/C pre-order consistency: `{all(row['passed'] for row in admission['state_consistency'].values())}`",
+        f"- Distributed action semantics: `{admission['distributed_action_semantics']['passed']}`",
         f"- Phase A: `{phase_a['passed']}`",
         "",
         "| Partition | Patients | Bursts | Mapped target events | Mapped target marks |",
@@ -1749,20 +1750,20 @@ def write_decision(summary: dict[str, Any], output_dir: Path) -> None:
         )
     lines.extend(["", "## Phase A exact values", ""])
     lines.append(
-        f"- Overall mapped events/patients: `{phase_a['overall']['actual']['mapped_target_events']}` / `{phase_a['overall']['actual']['patients']}` (floor `250000` / `10000`; PASS `{phase_a['overall']['passed']}`)."
+        f"- Overall mapped events/patients: `{admission['overall']['actual']['mapped_target_events']}` / `{admission['overall']['actual']['patients']}` (floor `250000` / `10000`; PASS `{admission['overall']['passed']}`)."
     )
     for action in ACTIONS:
-        row = phase_a["per_action"][action]
+        row = admission["per_action"][action]
         lines.append(
             f"- `{action}` mapped events/patients: `{row['actual']['mapped_target_events']}` / `{row['actual']['patients']}` (floor `20000` / `2000`; PASS `{row['passed']}`)."
         )
     for action in ("Change", "D/C"):
-        row = phase_a["state_consistency"][action]
+        row = admission["state_consistency"][action]
         lines.append(
             f"- `{action}` active-before: `{row['actual']['active_before']}` / `{row['actual']['mapped_target_events']}` = `{fmt(row['actual']['fraction'])}` (floor `0.70`; PASS `{row['passed']}`)."
         )
     lines.append(
-        f"- Distributed concepts: `{phase_a['distributed_action_semantics']['actual_concepts']}` (floor `50`; PASS `{phase_a['distributed_action_semantics']['passed']}`)."
+        f"- Distributed concepts: `{admission['distributed_action_semantics']['actual_concepts']}` (floor `50`; PASS `{admission['distributed_action_semantics']['passed']}`)."
     )
 
     if summary["training"]["selections"]:
