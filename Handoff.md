@@ -4,12 +4,12 @@
 
 Ideas 001--006 are terminated. There is currently no active Idea.
 
-- **Current Stage**: `PRE_IDEA_EVENT_EDIT_M0`
+- **Current Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
 - **Current active Idea**: none
 - **Idea 007**: not created / not authorized
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
 - **New-model policy**: a genuinely new model/architecture is allowed, but only after its decision/mechanism premise survives the strongest simple same-information control
-- **Only authorized local scientific execution**: `M0_EVENT_SOURCED_EDIT_ADMISSION`
+- **Completed local scientific execution**: `M0_EVENT_SOURCED_EDIT_ADMISSION` → `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
@@ -133,8 +133,14 @@ Return to:
 
 Do not run M0b or rescue with a deeper encoder, DDI/safety, KG/LLM, labs/vitals, another vocabulary, or subgroup mining.
 
+Recorded result:
+
+`research/memory/model-reset-20260908-event-sourced-regimen-editing/m0-decision.md`
+
+The Phase-A state-consistency floors failed for both `Change` and `D/C`. No model was trained, no freeze manifest was written, and EditAudit was not accessed.
+
 ## Next owner
 
-Local repository Agent executes M0 exactly from the frozen protocol, followed by `ccf-integrity-auditor`.
+Next owner is `ccf-pipeline-orchestrator`. No further scientific execution is authorized until it routes a new, independently admitted direction.
 
 No other scientific execution is authorized in the same run.

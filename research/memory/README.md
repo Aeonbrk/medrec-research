@@ -8,13 +8,13 @@ This directory stores curated cross-idea constraints, decisive failures, literat
 
 Authoritative project stage:
 
-`PRE_IDEA_EVENT_EDIT_M0`
+`NO_HIGH_VALUE_DIRECTION_YET`
 
 There is currently **no active Idea**. Ideas 001--006 are terminated. Idea 007 does not exist and is not authorized.
 
 The paper objective remains a first formal **method paper** targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed when it encodes an admitted new scientific object or mechanism; architecture replacement by itself is not sufficient.
 
-The only authorized local scientific execution is the bounded Event-Sourced Regimen Editing M0 gate.
+The bounded Event-Sourced Regimen Editing M0 gate is complete with verdict `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`; no further scientific execution is authorized.
 
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 

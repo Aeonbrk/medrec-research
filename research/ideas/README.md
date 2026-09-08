@@ -44,15 +44,15 @@ There is currently **no active Idea**.
 
 Current stage:
 
-`PRE_IDEA_EVENT_EDIT_M0`.
+`NO_HIGH_VALUE_DIRECTION_YET`.
 
 The post-Idea-006 temporal-practice-shift reset also failed at S0 because no material forward degradation was observed. It did not create Idea 007.
 
-The only current pre-Idea family is the bounded **Event-Sourced Regimen Editing** reset:
+The latest pre-Idea family was the bounded **Event-Sourced Regimen Editing** reset:
 
 `research/memory/model-reset-20260908-event-sourced-regimen-editing/`.
 
-Its M0 gate tests whether explicit raw provider-order `New / Change / D/C` action-medication structure creates incremental learned value beyond an equal-entitlement direct state-mask classifier.
+Its M0 gate returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` because the frozen `Change` and `D/C` state-consistency floors failed. No model was trained, EditAudit was not accessed, and the route is not admitted.
 
 Idea 007 may be created only after:
 

@@ -8,13 +8,15 @@ Refresh date: 2026-09-08.
 
 Current project stage:
 
-`PRE_IDEA_EVENT_EDIT_M0`
+`NO_HIGH_VALUE_DIRECTION_YET`
 
 There is no active Idea. Ideas 001--006 are terminated. Idea 007 is not created or authorized.
 
-Current bounded reset packet:
+Completed bounded reset packet:
 
 [`model-reset-20260908-event-sourced-regimen-editing/`](model-reset-20260908-event-sourced-regimen-editing/).
+
+M0 returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`; the route is not admitted and no Idea 007 exists.
 
 ## Closed or compressed spaces
 

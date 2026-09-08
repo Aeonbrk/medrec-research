@@ -1,0 +1,401 @@
+{
+  "actual_counts": {
+    "EditAudit": {
+      "action_events": {
+        "Change": 0,
+        "D/C": 0,
+        "New": 0
+      },
+      "action_marks": {
+        "Change": 0,
+        "D/C": 0,
+        "New": 0
+      },
+      "action_patients": {
+        "Change": 0,
+        "D/C": 0,
+        "New": 0
+      },
+      "burst_patients": 0,
+      "bursts": 0,
+      "mapped_target_events": 0,
+      "mapped_target_marks": 0,
+      "mapped_target_patients": 0,
+      "patient_split_members": null,
+      "patients": 0,
+      "state_consistency": {
+        "Change": {
+          "active_before": 0,
+          "fraction": null,
+          "mapped_events": 0
+        },
+        "D/C": {
+          "active_before": 0,
+          "fraction": null,
+          "mapped_events": 0
+        }
+      }
+    },
+    "EditTrain": {
+      "action_events": {
+        "Change": 246922,
+        "D/C": 412321,
+        "New": 1830930
+      },
+      "action_marks": {
+        "Change": 247125,
+        "D/C": 412489,
+        "New": 1831690
+      },
+      "action_patients": {
+        "Change": 48346,
+        "D/C": 53598,
+        "New": 78149
+      },
+      "burst_patients": 78172,
+      "bursts": 1104963,
+      "mapped_target_events": 2490173,
+      "mapped_target_marks": 2242799,
+      "mapped_target_patients": 78172,
+      "patient_split_members": null,
+      "patients": 78172,
+      "state_consistency": {
+        "Change": {
+          "active_before": 43056,
+          "fraction": 0.17437085395388016,
+          "mapped_events": 246922
+        },
+        "D/C": {
+          "active_before": 66397,
+          "fraction": 0.1610323025021767,
+          "mapped_events": 412321
+        }
+      }
+    },
+    "EditTune": {
+      "action_events": {
+        "Change": 31337,
+        "D/C": 53019,
+        "New": 233177
+      },
+      "action_marks": {
+        "Change": 31369,
+        "D/C": 53043,
+        "New": 233267
+      },
+      "action_patients": {
+        "Change": 6173,
+        "D/C": 6919,
+        "New": 9903
+      },
+      "burst_patients": 9904,
+      "bursts": 140707,
+      "mapped_target_events": 317533,
+      "mapped_target_marks": 286133,
+      "mapped_target_patients": 9904,
+      "patient_split_members": null,
+      "patients": 9904,
+      "state_consistency": {
+        "Change": {
+          "active_before": 4884,
+          "fraction": 0.1558541021795322,
+          "mapped_events": 31337
+        },
+        "D/C": {
+          "active_before": 7746,
+          "fraction": 0.14609856843772986,
+          "mapped_events": 53019
+        }
+      }
+    }
+  },
+  "claims": {
+    "clinical_benefit_established": false,
+    "clinical_treatment_intent_verified": false,
+    "publishable_method_established": false,
+    "transaction_marks_are_provider_order_workflow_actions": true
+  },
+  "code": {
+    "protocol_sha256": "75170e69e0ccf1df83d61e5e20b629dca7d1ee536f039a93f2905443e5cc40eb",
+    "repository_revision": "62fd9ec383816d290d8ce0e214a1e8b0b222f8f3",
+    "runner_sha256": "df226a29afbc7b3b30572665869ef7ca30336486f280abfc0f0b94742e6d038c"
+  },
+  "conditions": {
+    "idea_007_not_created": true,
+    "m0b_not_run": true,
+    "models_trained": false,
+    "phase_a_all_admission_conditions": false
+  },
+  "edit_audit": {
+    "access_count": 0,
+    "model_rows": {},
+    "primary_deltas": {}
+  },
+  "execution_timestamp_utc": "2026-09-08T11:17:39.609663+00:00",
+  "freeze_manifest": {
+    "path": "m0-freeze-manifest.json",
+    "sha256": "N/A"
+  },
+  "gate_id": "M0_EVENT_SOURCED_EDIT_ADMISSION",
+  "integrity_audit_verdict": "INTEGRITY_AUDIT_PASS",
+  "integrity_findings": [],
+  "interpretation_boundary": {
+    "clinical_therapeutic_interpretation": "not evaluated or established",
+    "m0_pass_is_publishable_method": false,
+    "medication_recommendation_fidelity": "recall/PRAUC against observed mapped order marks",
+    "prediction_improvement_is_clinical_benefit": false,
+    "raw_provider_order_workflow_action": "transaction_type in {New, Change, D/C}; not verified clinical or therapeutic intent",
+    "reconstructed_pre_order_regimen_state": "execution-confirmed operational order state from prior eMAR evidence and causal D/C pointers"
+  },
+  "mimic_version": "3.1",
+  "next_ccfa_owner": "ccf-pipeline-orchestrator",
+  "next_state": "NO_HIGH_VALUE_DIRECTION_YET",
+  "phase_a": {
+    "admission_checks": {
+      "distributed_action_semantics": {
+        "actual_concepts": 103,
+        "minimum_action_classes": 2,
+        "minimum_concepts": 50,
+        "minimum_events_per_action": 50,
+        "passed": true
+      },
+      "overall": {
+        "actual": {
+          "mapped_target_events": 2807706,
+          "patients": 88076
+        },
+        "minimum": {
+          "mapped_target_events": 250000,
+          "patients": 10000
+        },
+        "passed": true
+      },
+      "passed": false,
+      "per_action": {
+        "Change": {
+          "actual": {
+            "mapped_target_events": 278259,
+            "patients": 54519
+          },
+          "minimum": {
+            "mapped_target_events": 20000,
+            "patients": 2000
+          },
+          "passed": true
+        },
+        "D/C": {
+          "actual": {
+            "mapped_target_events": 465340,
+            "patients": 60517
+          },
+          "minimum": {
+            "mapped_target_events": 20000,
+            "patients": 2000
+          },
+          "passed": true
+        },
+        "New": {
+          "actual": {
+            "mapped_target_events": 2064107,
+            "patients": 88052
+          },
+          "minimum": {
+            "mapped_target_events": 20000,
+            "patients": 2000
+          },
+          "passed": true
+        }
+      },
+      "state_consistency": {
+        "Change": {
+          "actual": {
+            "active_before": 47940,
+            "fraction": 0.17228553254342177,
+            "mapped_target_events": 278259
+          },
+          "minimum_fraction": 0.7,
+          "passed": false
+        },
+        "D/C": {
+          "actual": {
+            "active_before": 74143,
+            "fraction": 0.15933081187948597,
+            "mapped_target_events": 465340
+          },
+          "minimum_fraction": 0.7,
+          "passed": false
+        }
+      }
+    },
+    "partition_counts": {
+      "EditAudit": {
+        "action_events": {
+          "Change": 0,
+          "D/C": 0,
+          "New": 0
+        },
+        "action_marks": {
+          "Change": 0,
+          "D/C": 0,
+          "New": 0
+        },
+        "action_patients": {
+          "Change": 0,
+          "D/C": 0,
+          "New": 0
+        },
+        "burst_patients": 0,
+        "bursts": 0,
+        "mapped_target_events": 0,
+        "mapped_target_marks": 0,
+        "mapped_target_patients": 0,
+        "patient_split_members": null,
+        "patients": 0,
+        "state_consistency": {
+          "Change": {
+            "active_before": 0,
+            "fraction": null,
+            "mapped_events": 0
+          },
+          "D/C": {
+            "active_before": 0,
+            "fraction": null,
+            "mapped_events": 0
+          }
+        }
+      },
+      "EditTrain": {
+        "action_events": {
+          "Change": 246922,
+          "D/C": 412321,
+          "New": 1830930
+        },
+        "action_marks": {
+          "Change": 247125,
+          "D/C": 412489,
+          "New": 1831690
+        },
+        "action_patients": {
+          "Change": 48346,
+          "D/C": 53598,
+          "New": 78149
+        },
+        "burst_patients": 78172,
+        "bursts": 1104963,
+        "mapped_target_events": 2490173,
+        "mapped_target_marks": 2242799,
+        "mapped_target_patients": 78172,
+        "patient_split_members": null,
+        "patients": 78172,
+        "state_consistency": {
+          "Change": {
+            "active_before": 43056,
+            "fraction": 0.17437085395388016,
+            "mapped_events": 246922
+          },
+          "D/C": {
+            "active_before": 66397,
+            "fraction": 0.1610323025021767,
+            "mapped_events": 412321
+          }
+        }
+      },
+      "EditTune": {
+        "action_events": {
+          "Change": 31337,
+          "D/C": 53019,
+          "New": 233177
+        },
+        "action_marks": {
+          "Change": 31369,
+          "D/C": 53043,
+          "New": 233267
+        },
+        "action_patients": {
+          "Change": 6173,
+          "D/C": 6919,
+          "New": 9903
+        },
+        "burst_patients": 9904,
+        "bursts": 140707,
+        "mapped_target_events": 317533,
+        "mapped_target_marks": 286133,
+        "mapped_target_patients": 9904,
+        "patient_split_members": null,
+        "patients": 9904,
+        "state_consistency": {
+          "Change": {
+            "active_before": 4884,
+            "fraction": 0.1558541021795322,
+            "mapped_events": 31337
+          },
+          "D/C": {
+            "active_before": 7746,
+            "fraction": 0.14609856843772986,
+            "mapped_events": 53019
+          }
+        }
+      }
+    },
+    "visibility": "EditTrain+EditTune only; EditAudit withheld until freeze"
+  },
+  "preflight": {
+    "actual_batch_size": 2048,
+    "checks": {
+      "FlatMark_forward_backward": true,
+      "SeparateHeads+DirectStateMask_forward_backward": true,
+      "StateEditProbe_forward_backward": true,
+      "anchor_year_rule_exact": true,
+      "dc_target_resolves_to_referenced_medication": true,
+      "m0_split_deterministic": true,
+      "mark_vocabulary_exactly_393": true,
+      "state_mask_shape_preserved": true,
+      "target_interval_half_open_10_minutes": true,
+      "vocabulary_exactly_131_atc_l4": true
+    },
+    "passed": true
+  },
+  "quarantine": {
+    "edit_audit_access_count": 0,
+    "edit_audit_accessed_after_freeze": false,
+    "freeze_written_before_edit_audit": true,
+    "future_reserve_aggregate_inspected": false,
+    "future_reserve_inspected": false,
+    "historical_project_test_split_inspected": false,
+    "r0_holdout_inspected": false
+  },
+  "schema_version": "1.0",
+  "split": {
+    "partition_patient_counts": {
+      "EditAudit": 20919,
+      "EditTrain": 169586,
+      "EditTune": 21443
+    },
+    "patient_disjoint": true,
+    "salt": "event-edit-m0-20260908"
+  },
+  "stage": "PRE_IDEA_EVENT_EDIT_M0",
+  "temporal_assignment": {
+    "admitted_groups": {
+      "2008 - 2010": "G0",
+      "2011 - 2013": "G1",
+      "2014 - 2016": "G2"
+    },
+    "future_reserve": [
+      "G3",
+      "G4"
+    ],
+    "retained_rule": "year(decision_time) == patient.anchor_year"
+  },
+  "training": {
+    "batch_size": 2048,
+    "loss": "unweighted BCE over all 393 action-medication marks",
+    "selections": {},
+    "variants": [
+      "FlatMark",
+      "SeparateHeads+DirectStateMask",
+      "StateEditProbe"
+    ]
+  },
+  "verdict": "FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE"
+}

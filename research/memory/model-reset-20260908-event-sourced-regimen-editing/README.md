@@ -4,12 +4,12 @@
 
 ## Status
 
-- Stage: `PRE_IDEA_EVENT_EDIT_M0`
+- Stage: `NO_HIGH_VALUE_DIRECTION_YET` (M0 completed)
 - Current active Idea: none
 - Idea 007: not created / not authorized
 - Paper objective: first formal method paper, target at least a CCF-A Data/Mining/AI venue family
 - Reset class: architecture/model-level reset, not a feature-fishing continuation
-- Only authorized local scientific execution: `M0_EVENT_SOURCED_EDIT_ADMISSION`
+- Completed local scientific execution: `M0_EVENT_SOURCED_EDIT_ADMISSION`
 
 This reset follows S0's terminal verdict `FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_SHIFT`. The temporal-adaptation route is closed under its frozen boundary.
 
@@ -95,6 +95,8 @@ Then return to `ccf-pipeline-orchestrator` and route to:
 Then return to `NO_HIGH_VALUE_DIRECTION_YET`.
 
 Do not run M0b, add DDI/safety, add LLM/KG, ingest labs/vitals, change the action vocabulary, or rescue the route with a deeper encoder.
+
+Recorded result: `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`. Both frozen state-consistency floors failed (`Change = 0.17228553254342177`, `D/C = 0.15933081187948597`); no models were trained, no freeze manifest was written, and EditAudit was not accessed. See [`m0-decision.md`](m0-decision.md).
 
 ## Quarantine
 

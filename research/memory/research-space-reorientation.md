@@ -4,7 +4,7 @@
 
 ## Current workflow state
 
-**Stage**: `PRE_IDEA_EVENT_EDIT_M0`
+**Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
@@ -12,7 +12,7 @@
 
 **Idea 007**: not created / not authorized.
 
-**Only authorized empirical work**: [`model-reset-20260908-event-sourced-regimen-editing/m0-event-edit-admission-protocol.md`](model-reset-20260908-event-sourced-regimen-editing/m0-event-edit-admission-protocol.md).
+**Completed empirical gate**: [`model-reset-20260908-event-sourced-regimen-editing/m0-decision.md`](model-reset-20260908-event-sourced-regimen-editing/m0-decision.md) returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
 
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 
@@ -118,11 +118,11 @@ Transformer/Mamba/GNN/point-process architectures are allowed only when the prop
 | Generic KG/RAG/agent safety | `CROWDED / LOW PRIOR` | KATMed, RES-MR, SafeRx-Agent, ATLAS | contribution beyond rule injection/verifier assembly |
 | Multi-dataset MIMIC/eICU evaluation | `PRIOR ART / NOT A METHOD GAP` | HypeMed, KATMed, Rx-Expert, NLA-MMR | source-to-target method problem required |
 | Temporal/external validation itself | `PRIOR ART` | prior temporal/external validation work | method mechanism required |
-| **Event-sourced regimen editing** | **`SELECTED FOR M0`** | raw POE action marks + current order-time infrastructure | pass equal-entitlement structural probe M0 |
+| **Event-sourced regimen editing** | **`NOT ADMITTED`** | M0 failed the frozen `Change`/`D/C` state-consistency floors | no M0b, deeper-encoder rescue, or Idea 007 |
 
 `CLOSED` is conditional on the recorded scientific premise, not a universal ban on the noun.
 
-## Current reset: Event-Sourced Regimen Editing
+## Completed reset: Event-Sourced Regimen Editing
 
 Reset packet:
 
@@ -186,9 +186,11 @@ Only then may `ccf-idea-optimizer` design a full method within this single famil
 
 ### FAIL
 
-`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` returns the project to `NO_HIGH_VALUE_DIRECTION_YET`.
+`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` returned the project to `NO_HIGH_VALUE_DIRECTION_YET`.
 
 No M0b or deeper-encoder rescue is allowed.
+
+Recorded result: [`model-reset-20260908-event-sourced-regimen-editing/m0-summary.json`](model-reset-20260908-event-sourced-regimen-editing/m0-summary.json). Both frozen state-consistency floors failed (`Change = 0.17228553254342177`, `D/C = 0.15933081187948597`); no models were trained and EditAudit was not accessed.
 
 ## Publication boundary
 
@@ -198,4 +200,4 @@ The first paper remains method-first.
 
 ## Current next owner
 
-Local repository Agent executes M0 exactly as frozen, then runs `ccf-integrity-auditor`.
+`ccf-pipeline-orchestrator` owns the next routing decision. No further scientific execution is authorized until it admits a new direction.

@@ -41,7 +41,7 @@ Historical memory is based on `New-Search` commit `9971464253c556345262b22ed6d44
 
 ## Current scientific state
 
-- **Stage**: `PRE_IDEA_EVENT_EDIT_M0`.
+- **Stage**: `NO_HIGH_VALUE_DIRECTION_YET`.
 - **Active Idea**: none.
 - **Ideas 001--006**: terminated.
 - **Idea 007**: not created / not authorized.
@@ -64,13 +64,13 @@ Target-prior correction increased target Recall@5 further to `0.4441638446`.
 
 Therefore the temporal-adaptation family is closed under its frozen setting. No S0b, alternative year split, eICU rescue, feature expansion, or weakened prior control is authorized.
 
-### Current bounded reset: Event-Sourced Regimen Editing
+### Completed bounded reset: Event-Sourced Regimen Editing
 
 The raw order-time infrastructure records `New`, `Change`, and `D/C` provider-order transactions and reconstructs a strictly pre-order medication state. The existing supervised target nevertheless collapses current `New` and `Change` orders to medication-only labels and excludes current `D/C` as a target.
 
 The current reset asks whether explicit `(action, medication)` marks create a genuinely useful decision structure at provider-order time.
 
-Only one local gate is authorized:
+The only authorized local gate was:
 
 `M0_EVENT_SOURCED_EDIT_ADMISSION`.
 
@@ -80,7 +80,7 @@ Protocol:
 
 M0 first tests action support/state consistency. Only if that passes does it compare a fixed structured `StateEditProbe` against the mandatory equal-entitlement `SeparateHeads + DirectStateMask` control under a shared lightweight causal encoder.
 
-No architecture grid is permitted. M0 is designed to answer whether the structural premise deserves a full new model.
+No architecture grid was permitted. M0 returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` because both frozen `Change` and `D/C` state-consistency floors failed; no model or EditAudit was run.
 
 ### M0 routing
 
@@ -91,7 +91,7 @@ On `PASS_M0_EVENT_EDIT_STRUCTURE`:
 3. run strict `ccf-idea-reviewer` against the closest change-aware/order-time/marked-event work;
 4. create Idea 007 only if the method delta survives review.
 
-On `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`:
+On `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` (the recorded result):
 
 return to `NO_HIGH_VALUE_DIRECTION_YET` with no M0b or deeper-encoder rescue.
 
