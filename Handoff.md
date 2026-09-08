@@ -1,146 +1,115 @@
-# Handoff: Event-Sourced Regimen-Edit Premise Admission
+# Handoff: Privileged Physiological Response Method Reset
 
 ## Current state
 
 Ideas 001--006 are terminated. There is currently no active Idea.
 
-- **Current Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
+- **Current Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`
 - **Current active Idea**: none
 - **Idea 007**: not created / not authorized
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
-- **New-model policy**: a genuinely new model/architecture is allowed, but only after its decision/mechanism premise survives the strongest simple same-information control
-- **Completed local scientific execution**: `M0_EVENT_SOURCED_EDIT_ADMISSION` → `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`
+- **New-model policy**: a genuinely new model is allowed when it encodes a new falsifiable supervision, decision, state, or information-flow mechanism
+- **Current method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION`
+- **Optimizer status**: completed / strict review pending
+- **Local scientific execution**: not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
 
-## Latest completed reset: Medication Practice Shift S0
+## Latest failure closure — Event-Sourced Regimen Editing M0
 
-Packet:
+M0 returned:
 
-`research/memory/literature-search-20260908-medication-practice-shift/`
+`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
 
-Final verdict:
+The labels were abundant, but the state-semantic admission failed:
 
-`FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_SHIFT`.
+- `Change` active-before: `0.17228553254342177` versus frozen floor `0.70`;
+- `D/C` active-before: `0.15933081187948597` versus frozen floor `0.70`.
 
-The temporal-adaptation premise failed more fundamentally than simple prior-drift sufficiency: the frozen SourceOnly model did not degrade on the G2 target era.
-
-- `R_source = 0.4310427829`;
-- `R_target_base = 0.4403698933`;
-- `G_base = R_source - R_target_base = -0.0093271104`;
-- 95% CI `[-0.0145853913, -0.0035238892]`.
-
-The target-prior logit-bias control improved target Recall@5 further:
-
-- selected `alpha = 1.0`;
-- `R_target_bias = 0.4441638446`;
-- `G_bias = -0.0131210617`;
-- 95% CI `[-0.0183542549, -0.0074505314]`.
-
-Therefore do not rescue this route by changing temporal groups, removing anchor-year matching, adding features, switching to eICU, weakening the bias control, or running S0b.
+No model was trained and EditAudit was not accessed.
 
 Failure memory:
 
-`research/memory/failures/medication-practice-shift-s0--no-material-forward-degradation.md`.
+`research/memory/failures/event-sourced-regimen-editing-m0--workflow-action-state-inconsistency.md`.
 
-## Current bounded model reset
+Reusable constraint:
+
+> A workflow transaction label is not automatically a valid regimen-state transition label. High support does not repair semantic inconsistency.
+
+Do not run M0b or rescue the raw `New / Change / D/C` target with a deeper encoder.
+
+## Current method reset
 
 Packet:
 
-`research/memory/model-reset-20260908-event-sourced-regimen-editing/`
+`research/memory/model-reset-20260908-privileged-physiological-response/`
 
-Selected family:
+Key artifacts:
 
-`EVENT_SOURCED_REGIMEN_EDITING`.
+- `README.md`
+- `idea-grounding.md`
+- `idea-optimization.md`
 
-### Scientific premise
+### Working hypothesis
 
-The existing raw order-time pipeline already observes historical medication transaction types and a causal pre-order regimen state. However, its current supervised target collapses present `New` and `Change` orders to medication-only labels and excludes present `D/C` as a target.
+At medication decision time, a deployable model can observe only pre-order state. During training, however, some realized medication events are followed by high-frequency physiological monitoring.
 
-M0 asks whether preserving the actual provider-order action mark:
+The candidate mechanism uses that **post-administration physiology only as privileged training supervision**:
 
-`(transaction_type, medication)`
+1. a teacher receives pre-order state, realized medication/treatment context, and a bounded post-administration monitoring window;
+2. it learns a response-associated patient-medication representation;
+3. a deployable student learns to anticipate that representation from pre-order state plus candidate medication;
+4. inference never sees future physiology or the teacher.
 
-with `transaction_type in {New, Change, D/C}` creates incremental learnable structure beyond a simple equal-entitlement control.
-
-This is an architecture/model-level reset because it changes the decision object and decoder structure. It is not another feature over frozen medication scores.
+This is predictive privileged learning, not causal treatment-effect estimation.
 
 ### Closest-work boundary
 
-Do not claim novelty from medication changes or order-time prediction alone.
+The route must not claim novelty from any of the following individually:
 
-- MICRON already predicts medication additions/removals across visits.
-- ARMR already distinguishes historical reuse from new medications at the visit level.
-- HeteroMed already models medication expansion/inheritance across visits.
-- Rough et al. already predict inpatient medication identity at order time with a 10-minute horizon.
+- lab-response/titration modeling in MedRec — REFINE;
+- lab/injection event chains — ChainCare;
+- joint MedRec/lab prediction — MedGCN and prior AAAI Symposium work;
+- downstream historical condition after medication — DrugDoctor;
+- medication-recommendation knowledge distillation — LEADER;
+- generic training-time privileged multimodal distillation — OC-Distill;
+- medication-conditioned physiological-response representation — Wu et al. EMBC 2025.
 
-The candidate delta is narrowly the event-sourced intersection: explicit raw order-action marks + strictly causal regimen state + state-valid decoding + a learned structured action-medication mechanism that must beat an equal-entitlement direct state-mask control.
+The current search-scoped delta is narrowly:
 
-Grounding:
+> medication-in-context post-administration physiology as training-only privileged supervision for a strictly pre-order candidate-medication student, with controls proving that response semantics add value beyond generic future-state regularization.
 
-`research/memory/model-reset-20260908-event-sourced-regimen-editing/idea-grounding.md`.
+### Mandatory killer controls for any later Gate 01
 
-## M0 — only authorized local scientific execution
+A future protocol must at least challenge the candidate against:
 
-Protocol SSOT:
+- causal Base with identical deployment inputs;
+- Base + pre-order physiology;
+- capacity-matched generic future-state auxiliary learning;
+- static train-only medication-response prototypes;
+- response-shuffle/misalignment control;
+- compatible monitoring-aware MedRec baselines;
+- a KD control if needed to isolate the response knowledge source from distillation mechanics.
 
-`research/memory/model-reset-20260908-event-sourced-regimen-editing/m0-event-edit-admission-protocol.md`.
-
-M0 is one bounded gate with two phases.
-
-### Phase A — semantic/support admission
-
-Before model training, verify that mapped `New / Change / D/C` targets are sufficiently supported and that `Change`/`D/C` are sufficiently consistent with the strictly pre-order regimen state.
-
-If Phase A fails, stop without model training.
-
-### Phase B — fixed structural probe
-
-Only on Phase-A PASS, compare three fixed variants under one common lightweight causal encoder:
-
-1. `FlatMark`;
-2. `SeparateHeads + DirectStateMask` — strongest simple control;
-3. `StateEditProbe` — fixed rank-32 structured action-medication decoder using the same state-validity mask.
-
-No architecture grid is allowed.
-
-The primary learned-value comparison is:
-
-`StateEditProbe - (SeparateHeads + DirectStateMask)`.
-
-The frozen M0 PASS rule requires all preregistered support conditions, at least `+0.010` MacroActionRecall@5 with CI lower bound above zero, at least `+0.005` JointMarkRecall@5 with CI lower bound above zero, medication-level non-inferiority, no material action-specific regression, and integrity-audit PASS.
+The route is not admitted if generic future-state supervision or shuffled responses explain the gain.
 
 ## Routing
 
-### M0 PASS
+The optimizer has completed a standard method-level formulation. **Do not create Idea 007 yet.**
 
-Return to `ccf-pipeline-orchestrator`.
+Next owner:
 
-Then:
+`ccf-idea-reviewer`
 
-1. run `ccf-idea-optimizer` on the single event-sourced regimen-editing family;
-2. run strict `ccf-idea-reviewer` against the closest change-aware/order-time/marked-event baselines;
-3. create Idea 007 only if that review admits a genuine method contribution.
+The strict review must decide whether the residual novelty, non-causal soundness, support feasibility, and evidence package justify creating Idea 007.
 
-A PASS does not itself create Idea 007.
+If admitted:
 
-### M0 FAIL
+`ccf-pipeline-orchestrator -> Idea 007 -> ccf-experiment-designer -> Gate 01`.
 
-Return to:
+If rejected:
 
-`NO_HIGH_VALUE_DIRECTION_YET`.
+return to `NO_HIGH_VALUE_DIRECTION_YET` without a new response-diagnostic series.
 
-Do not run M0b or rescue with a deeper encoder, DDI/safety, KG/LLM, labs/vitals, another vocabulary, or subgroup mining.
-
-Recorded result:
-
-`research/memory/model-reset-20260908-event-sourced-regimen-editing/m0-decision.md`
-
-The Phase-A state-consistency floors failed for both `Change` and `D/C`. No model was trained, no freeze manifest was written, and EditAudit was not accessed.
-
-## Next owner
-
-Next owner is `ccf-pipeline-orchestrator`. No further scientific execution is authorized until it routes a new, independently admitted direction.
-
-No other scientific execution is authorized in the same run.
+No local Agent work is authorized before strict review.
