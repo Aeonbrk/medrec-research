@@ -2,31 +2,33 @@
 
 # Cross-Idea Research Memory
 
-This directory stores curated cross-idea constraints, decisive failures, literature-space admission evidence, and resource resets. It is not a dumping ground for idea-local scratch work.
+This directory stores curated cross-idea constraints, decisive failures, literature-space admission evidence, and bounded resets. It is not a dumping ground for idea-local scratch work.
 
 ## Current state
 
 Authoritative project stage:
 
-`PRE_IDEA_PRACTICE_SHIFT_S0`
+`PRE_IDEA_EVENT_EDIT_M0`
 
-There is currently **no active Idea**. Idea 006 terminated at Gate 01 with `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`.
+There is currently **no active Idea**. Ideas 001--006 are terminated. Idea 007 does not exist and is not authorized.
 
-The only authorized local scientific execution is the bounded Medication-Transition Practice Shift S0 gate.
+The paper objective remains a first formal **method paper** targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed when it encodes an admitted new scientific object or mechanism; architecture replacement by itself is not sufficient.
 
-Idea 007 does not exist and is not authorized.
+The only authorized local scientific execution is the bounded Event-Sourced Regimen Editing M0 gate.
 
-The MIMIC-IV `2017 - 2019` and `2020 - 2022` future-period groups, R0 Holdout, and the historical project test split remain quarantined.
+MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 
 ## Navigation
 
-- **[`research-space-reorientation.md`](research-space-reorientation.md)**: current cross-idea SSOT, cumulative failure landscape, reusable constraints, and S0 routing.
-- **[`literature-search-20260908-medication-practice-shift/`](literature-search-20260908-medication-practice-shift/)**: active bounded reset packet: literature ledger, search notes, idea grounding, and frozen S0 protocol.
-- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: prior opportunity map; current authoritative routing is the reorientation SSOT and 2026-09-08 practice-shift packet.
+- **[`research-space-reorientation.md`](research-space-reorientation.md)**: current cross-idea SSOT, cumulative failure landscape, reusable constraints, and live routing.
+- **[`model-reset-20260908-event-sourced-regimen-editing/`](model-reset-20260908-event-sourced-regimen-editing/)**: active bounded architecture-level reset; contains grounding and the frozen M0 protocol.
+- **[`literature-search-20260908-medication-practice-shift/`](literature-search-20260908-medication-practice-shift/)**: completed temporal-practice-shift packet; S0 failed with no material forward degradation.
+- **[`literature-opportunity-map.md`](literature-opportunity-map.md)**: current literature-space map and closest-work boundary for the active reset.
 - **[`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/)**: completed resource reset whose R0 exposure-state evidence remains reusable.
 - **[`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/)**: rejected selective-supervision reset and identifiability boundary.
 - **[`reusable-lessons.md`](reusable-lessons.md)**: durable methodological guardrails.
-- **`failures/`**: decisive cross-idea failures:
+- **`failures/`**: decisive cross-idea failures, including:
+  - [`medication-practice-shift-s0--no-material-forward-degradation.md`](failures/medication-practice-shift-s0--no-material-forward-degradation.md): the frozen source-era model did not degrade on the target era; target-prior correction improved it further.
   - [`exposure-conditioned-learning-gate-01--direct-control-sufficiency.md`](failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md): a real new exposure-state semantic failed to create incremental learned value beyond direct equal-entitlement use.
   - [`cardinality-attribution-b0--no-material-count-safety-tradeoff.md`](failures/cardinality-attribution-b0--no-material-count-safety-tradeoff.md): cardinality changed absolute DDI burden but not normalized DDI propensity.
   - [`safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md`](failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md): predictive ATC structure failed therapeutic semantic admission.
@@ -43,10 +45,12 @@ The MIMIC-IV `2017 - 2019` and `2020 - 2022` future-period groups, R0 Holdout, a
 
 ## Current cross-idea lesson
 
-Idea 006 adds a durable rule:
+Two durable controls now govern new-model work:
 
-> A newly observable state/risk semantic is not sufficient evidence for a learned method. The learned component must create value beyond the strongest direct control receiving the same signal.
+> A new observable state or signal must beat its strongest equal-entitlement direct use.
 
-The current S0 applies the analogous discipline to temporal deployment shift:
+and
 
-> A future-period performance gap does not justify an adaptation method until medication marginal-prior drift has been given a strong direct correction baseline.
+> A new architecture must encode a genuinely different decision object, supervision structure, state transition, or information flow; changing the backbone over a failed premise is not a new direction.
+
+M0 applies both rules to explicit provider-order edit actions.
