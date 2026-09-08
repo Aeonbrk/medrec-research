@@ -56,7 +56,10 @@ The only search-scoped residual delta is:
 
 > **paired medication-in-context post-administration physiological values as training-only privileged supervision for a strictly pre-order candidate-medication recommender, where matched controls establish that the incremental value depends on focal medication identity, patient-medication-response correspondence, individualized physiological values, and not merely generic future prediction, monitoring availability, static medication priors, or KD mechanics.**
 
-This delta is credible enough for one bounded revision/re-review cycle, but not yet strong enough for Idea 007 creation because the current optimizer packet has not frozen all mechanism-identification controls.
+This delta is credible enough for one bounded revision/re-review cycle. The
+bounded optimizer packet now freezes the mechanism-identification controls in
+`idea-optimization.md`; it is still not strong enough for Idea 007 creation
+until strict re-review accepts the frozen contract.
 
 ## Collision classes
 

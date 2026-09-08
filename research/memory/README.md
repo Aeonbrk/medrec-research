@@ -18,7 +18,7 @@ The current family is **privileged physiological response supervision**. The opt
 
 `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
 
-Next owner: bounded `ccf-idea-optimizer`, then strict `ccf-idea-reviewer`.
+Next owner: strict `ccf-idea-reviewer`; bounded R1--R3 optimizer revision is complete.
 
 No local scientific execution is authorized. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 

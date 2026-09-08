@@ -141,9 +141,9 @@ Novelty status:
 
 This is not a novelty proof.
 
-## Mandatory strongest alternatives
+## Mandatory strongest alternatives (R1--R3 frozen)
 
-Before Idea creation, freeze:
+The bounded optimizer pass freezes before Idea creation:
 
 - a matched Generic Future-State Auxiliary / Medication-Ablated Future control;
 - Monitoring-Mask-Only plus physiological-value versus response-availability separation;
@@ -183,7 +183,7 @@ Disallowed without independent causal identification:
 
 Next owner:
 
-`ccf-idea-optimizer` for the three bounded required revisions only, followed by strict `ccf-idea-reviewer`.
+strict `ccf-idea-reviewer` for re-review of the three frozen revisions.
 
 Idea 007 is created only if the subsequent strict review explicitly returns `ACCEPT_TO_CREATE_IDEA_007`.
 

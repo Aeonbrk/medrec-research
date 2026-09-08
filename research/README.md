@@ -40,7 +40,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **Idea 007**: not created / not authorized.
 - **Current family**: privileged physiological response supervision for medication recommendation.
 - **Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
-- **Next owner**: bounded `ccf-idea-optimizer`, then strict `ccf-idea-reviewer`.
+- **Next owner**: strict `ccf-idea-reviewer` (bounded R1--R3 optimizer revision completed).
 - **Local scientific execution**: not authorized.
 
 Current packet:
@@ -63,7 +63,7 @@ The exact search-scoped residual contribution is limited to:
 
 > medication-in-context post-administration physiological **values** used only as training-time privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that the gain is medication-specific and not explained by generic future-state learning, monitoring policy, static medication priors, response-independent regularization, sample weighting, or KD mechanics.
 
-Before Idea creation, the optimizer may revise only three items:
+The bounded optimizer revision has frozen exactly three items before Idea creation:
 
 1. freeze medication-specificity subtraction through a matched Generic Future-State Auxiliary / Medication-Ablated Future control;
 2. make Monitoring-Mask-Only mandatory and freeze physiological-value versus response-availability separation;
@@ -104,8 +104,7 @@ These scoped failures constrain the current design but do not imply that future 
 Authorized now:
 
 ```text
-ccf-idea-optimizer (bounded required revisions only)
--> strict ccf-idea-reviewer
+strict ccf-idea-reviewer
 ```
 
 Only a later `ACCEPT_TO_CREATE_IDEA_007` verdict authorizes:

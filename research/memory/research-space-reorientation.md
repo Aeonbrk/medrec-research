@@ -16,7 +16,7 @@
 
 **Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
 
-**Next owner**: bounded `ccf-idea-optimizer`, then return to strict `ccf-idea-reviewer`.
+**Next owner**: strict `ccf-idea-reviewer` after the bounded R1--R3 optimizer revision.
 
 No local scientific execution is authorized. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 
@@ -174,7 +174,7 @@ Observed post-administration physiology is not an individual medication effect. 
 
 Use `response-associated signature`, not `treatment effect`, `efficacy`, `benefit`, or `counterfactual outcome`.
 
-### Required pre-Idea revisions
+### Required pre-Idea revisions (frozen by the bounded optimizer pass)
 
 1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future control.
 2. **Monitoring separation**: Monitoring-Mask-Only plus physiology-value versus response-availability separation.
@@ -200,6 +200,6 @@ No architecture rescue follows these outcomes under the same Idea.
 
 This strict review result is not an Idea and not publication evidence. The first paper remains method-first.
 
-Next owner: bounded `ccf-idea-optimizer`, then strict `ccf-idea-reviewer`.
+Next owner: strict `ccf-idea-reviewer`.
 
 Idea 007 may be created only after a later explicit `ACCEPT_TO_CREATE_IDEA_007` verdict. No local Agent run or response-coverage research stage is authorized now.

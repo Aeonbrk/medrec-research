@@ -11,7 +11,8 @@ Ideas 001--006 are terminated. There is currently no active Idea.
 - **Current method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION`
 - **Strict review verdict**: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
 - **Strict review score**: `3.89 / 5.00`
-- **Next CCFA owner**: bounded `ccf-idea-optimizer`, then return to strict `ccf-idea-reviewer`
+- **Optimizer revision**: bounded R1--R3 freeze completed in `research/memory/model-reset-20260908-privileged-physiological-response/idea-optimization.md`
+- **Next CCFA owner**: strict `ccf-idea-reviewer`
 - **Local scientific execution**: not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
@@ -51,7 +52,7 @@ The search-scoped surviving delta is therefore only:
 
 > medication-in-context post-administration physiological **values** as training-only privileged supervision for a strictly pre-order MedRec student, with mechanism controls proving that the gain depends on focal-medication conditioning and patient-medication-response correspondence rather than generic future prediction, monitoring policy, static medication priors, sample weighting, or KD mechanics.
 
-## Three required revisions before Idea 007
+## Three required revisions before Idea 007 (now frozen pending strict re-review)
 
 ### R1 — Medication-specificity subtraction
 
@@ -107,7 +108,7 @@ This result remains separate from the privileged-response pre-Idea review.
 
 ## Routing
 
-Authorized next sequence:
+Completed bounded owner and current next owner:
 
 ```text
 ccf-idea-optimizer (bounded R1--R3 only)

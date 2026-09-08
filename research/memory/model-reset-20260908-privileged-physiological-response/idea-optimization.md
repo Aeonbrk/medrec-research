@@ -7,7 +7,7 @@
 - Target: first formal method paper, at least a CCF-A Data/Mining/AI venue family.
 - Likely audience: KDD / WWW / AAAI-style machine learning, data mining, recommender, or clinical-AI method tracks; exact venue is not frozen.
 - Data resource: raw MIMIC-IV 3.1 plus already admitted causal order-time medication infrastructure.
-- Current stage: pre-Idea method optimization.
+- Current stage: `PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`.
 - Active Idea: none.
 - Idea 007: not created / not authorized.
 
@@ -18,6 +18,11 @@
 Development stance: **promising method seed, strict-review required**.
 
 Do not open another standalone premise-audit stage. Basic response coverage/linkage is a future Gate-01 mechanical preflight; insufficient coverage should stop the method before training.
+
+This bounded optimizer pass freezes R1--R3 below. It does not create Idea 007,
+inspect response coverage, design Gate 01, run a model, or authorize local
+scientific execution. After this pass the next owner is strict
+`ccf-idea-reviewer`.
 
 ## Raw idea diagnosis
 
@@ -160,32 +165,151 @@ The student receives only pre-order state and candidate medication. At inference
 
 The student's candidate interaction contributes to medication ranking alongside the standard recommendation representation. The mechanism should remain compact enough that the paper's contribution is the privileged supervision, not an oversized architecture.
 
+## Bounded revision freeze: R1--R3
+
+The following contract is frozen for the next strict review. It is a formulation
+constraint, not a Gate-01 design or an invitation to inspect data. Every
+privileged-response control must receive the same recommendation examples,
+supported-event mask, future window, deployable student, and auxiliary
+optimization entitlement. A control may remove the claimed semantic signal;
+it may not receive less or different training opportunity in a way that makes
+the comparison uninterpretable.
+
+Let `E_rec` be the full frozen set of recommendation training examples. Define
+the response-support indicator:
+
+```text
+A(e) = 1 iff e is an actually administered positive focal-medication event
+       with a valid linked future monitoring window; otherwise A(e) = 0.
+```
+
+For every privileged variant `v`, the objective is conceptually:
+
+```text
+L_v = sum_{e in E_rec} ell_rec^v(e)
+      + lambda * sum_{e in E_rec} A(e) * ell_aux^v(e).
+```
+
+The recommendation term is therefore evaluated on the same `E_rec` for every
+variant. `A(e) = 0` disables only the auxiliary response term; it never drops,
+reweights, or changes the normalization of that example in the recommendation
+objective. No response target is constructed for an unchosen medication.
+
+### R1 — Medication-specificity subtraction (mandatory)
+
+Freeze **Generic Future-State Auxiliary / Medication-Ablated Future** as a
+matched killer control. For every `e` with `A(e) = 1`, the proposed branch may
+form a response-associated target from the focal medication and the observed
+future physiological window, while the ablated branch must use the same
+supported event, administration-time anchor, future window, and observed value
+tensor without receiving focal medication identity or any medication-specific
+response construction. In particular, the ablated teacher/target may not use a
+focal-medication embedding, label, medication-coded event identifier,
+medication-conditioned delta, or per-medication response prototype. Non-focal
+context is allowed only when it is defined identically for the matched
+comparison and cannot recover the focal identity.
+
+The two variants must use the same deployable student architecture and
+inference inputs `S(x_t, m)`, the same supported-event mask `A`, future window,
+latent/auxiliary dimensionality, comparable teacher parameter budget, auxiliary
+loss weight, and optimizer/update entitlement. The exact implementation may be
+chosen later, but these quantities cannot be changed to rescue a failed
+contrast.
+
+Future Gate stop rule:
+
+> If removing focal medication identity does not materially decrease the
+> proposed gain, stop with `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE` and
+> terminate the response-specific mechanism.
+
+### R2 — Monitoring-policy separation (mandatory)
+
+Freeze **Monitoring-Mask-Only** as a mandatory killer control and separate
+physiological values from response availability. Let `r_e` denote future
+physiological values and `M_e` the corresponding future measurement
+availability/missingness mask over the same window. The proposed teacher may
+use `(r_e, M_e)` where the mask is structurally required to interpret missing
+values, but `M_e` is not itself physiological response evidence. Any
+mask-derived availability/frequency representation used by the proposed branch
+must be supplied identically to `Monitoring-Mask-Only` and cannot be claimed as
+the value contribution.
+
+`Monitoring-Mask-Only` receives `M_e` and the same `A`, future window,
+deployable student, auxiliary capacity, and optimization entitlement as the
+proposed branch, but no future physiological values or value-derived summary.
+Thus the control tests whether measurement availability/frequency alone is
+sufficient, while preserving the missing-data structure needed by the task.
+
+Future Gate stop rule:
+
+> If `MonitoringMaskOnly ~= Proposed`, stop with
+> `STOP_MONITORING_POLICY_SUFFICIENCY` and terminate the physiological-value
+> interpretation.
+
+This failure cannot be rescued by a larger teacher, a different future window,
+or an additional modality. Those changes would alter the frozen comparison
+rather than identify physiological value.
+
+### R3 — Equal-support, positive-only, and deployment entitlement (mandatory)
+
+Response supervision exists only on actually administered positive medication
+events with a valid linked future monitoring window (`A(e) = 1`). Unchosen
+medications have no observed response target, and the method must not invent a
+counterfactual response for them. Every privileged-response control reuses the
+identical `A` support mask and the identical `E_rec` recommendation examples;
+unsupported examples stay in the recommendation objective and are not
+dropped or reweighted differently by any method.
+
+The deployable student feature and normalization contract is strictly
+pre-order. Student construction and all statistics used by it may depend only
+on information available before the medication-order decision, such as
+pre-order regimen/state, pre-order labs/vitals and their pre-order missingness,
+and pre-order timing/context. The following are forbidden on the student path
+or in its normalization/statistics: post-order medication, future
+administration, future labs/vitals, future monitoring masks, and discharge-coded
+or otherwise future-derived information. Normalization parameters must be fit
+from strictly pre-order training information only. The teacher, privileged
+targets, future values, and future masks are completely absent at inference.
+
+Future Gate validity rule:
+
+> If deployment leakage or unmatched sample/support entitlement is found, the
+> Gate result is invalid. It is not repaired and then read as an Audit; the
+> proposed mechanism remains unadmitted.
+
 ## Strongest simple / mechanism controls
 
-Any future Gate 01 must include, at minimum:
+After the R1--R3 freeze, any later Gate 01 must include, at minimum:
 
-1. **Causal Base** — same deployable pre-order inputs, ordinary recommendation objective.
+1. **Strict Pre-Order Base** — same deployable pre-order inputs, ordinary recommendation objective.
 2. **Base + Pre-order Physiology** — proves gains are not just from adding labs/vitals to inference.
-3. **Generic Future-State Auxiliary** — matched encoder/capacity and future-window access during training, but predicts/aligns generic future physiology without conditioning the privileged target on medication-specific response semantics.
+3. **Generic Future-State Auxiliary / Medication-Ablated Future** — the R1 control above.
 4. **Static Medication Response Prototype** — train-only per-medication average/prototype response signal, testing whether patient-specific privileged response is unnecessary.
-5. **Response Shuffle Control** — preserve recommendation labels and overall response availability while disrupting the patient–medication–response association. A suitable stratified shuffle should be frozen by the experiment designer.
-6. **Closest reproducible monitoring-aware MedRec baseline** — REFINE/ChainCare-style comparison where compatible with the frozen task, without misrepresenting task mismatch.
-7. **Knowledge-distillation control** — if needed, a same-capacity KD variant whose teacher lacks future physiological response, to isolate the knowledge source from KD mechanics.
+5. **Response Shuffle Control** — preserve recommendation labels, `A`, and monitoring amount while disrupting patient--medication--response correspondence.
+6. **Monitoring-Mask-Only** — the R2 control above.
+7. **Closest reproducible monitoring-aware MedRec baseline** — REFINE/ChainCare-style comparison where compatible with the frozen task, without misrepresenting task mismatch.
+8. **Knowledge-distillation control** — if needed, a same-capacity KD variant whose teacher lacks future physiological response, to isolate the knowledge source from KD mechanics.
 
 ## Killer decision logic for a future Gate 01
 
-A method-level result is not admitted merely because the proposed model beats Base.
+A method-level result is not admitted merely because the proposed model beats
+Base. The proposed response-specific gain must survive the frozen support and
+deployment contract and materially beat the matched controls that remove the
+claimed semantic component. The immediate stop rules are:
 
-The critical evidence must show all of the following:
+- Generic Future-State Auxiliary / Medication-Ablated Future comparable to
+  Proposed -> `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE`;
+- Monitoring-Mask-Only comparable to Proposed ->
+  `STOP_MONITORING_POLICY_SUFFICIENCY`;
+- Response Shuffle, Static Medication Response Prototype, or richer pre-order
+  physiology comparable to Proposed -> terminate the response-specific
+  mechanism;
+- deployment leakage or unmatched support/sample entitlement -> Gate invalid,
+  with no repair-and-read-Audit path.
 
-- privileged-response method beats the strongest deployable same-input Base;
-- it materially beats the generic future-state auxiliary control;
-- response-shuffle destroys or materially reduces the incremental gain;
-- static medication response prototypes do not absorb the gain;
-- benefit is not explained only by a tiny set of heavily monitored medications/patients;
-- no future/post-order information enters student inference.
-
-If generic future auxiliary or shuffled response performs comparably, terminate the mechanism rather than adding architecture.
+No deeper Transformer/Mamba/GNN, larger teacher, different future window,
+extra modality, subgroup mining, or second response definition may rescue one
+of these outcomes under the same Idea.
 
 ## Evidence challenge
 
@@ -288,7 +412,7 @@ The reviewer should decide whether the current route is strong enough to create 
 - mechanism: explicit;
 - strongest controls: explicit;
 - causal claim boundary: explicit;
-- experiment discriminators: explicit at method level, not frozen protocol;
+- R1--R3 control semantics and stop rules: frozen; full Gate protocol not designed;
 - data feasibility: partly known from MIMIC-IV infrastructure; exact response support remains a future Gate-01 preflight;
 - novelty: uncertain pending strict review;
 - Idea 007: not created.

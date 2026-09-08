@@ -14,9 +14,13 @@
 
 **Local scientific execution**: not authorized.
 
-**Next CCFA owner**: bounded `ccf-idea-optimizer`, followed by return to strict `ccf-idea-reviewer`.
+**Current next CCFA owner**: strict `ccf-idea-reviewer`; the bounded R1--R3
+optimizer revision is now frozen in `idea-optimization.md`.
 
-The candidate is scientifically plausible and worth preserving, but the current optimizer packet does not yet identify the claimed medication-specific response mechanism tightly enough to justify Idea creation. The remaining gap is protocol/formulation-level and can be repaired once without opening a diagnostic series.
+At the time of this review, the optimizer packet did not yet identify the
+claimed medication-specific response mechanism tightly enough to justify Idea
+creation. The remaining gap was protocol/formulation-level; the bounded
+optimizer pass has now frozen the repair without opening a diagnostic series.
 
 ## Executive judgment
 
@@ -44,9 +48,11 @@ A gain over Base alone would not identify medication-specific physiological resp
 
 This is a CCF-A-level blocker, not a cosmetic ablation request.
 
-## Required revisions before Idea 007
+## Required revisions before Idea 007 (review findings; now frozen)
 
-Exactly three bounded revisions are required. They are formulation/protocol revisions only; no data inspection or model training is authorized to resolve them.
+Exactly three bounded revisions were required. They are formulation/protocol
+revisions only; no data inspection or model training was authorized to resolve
+them, and the optimizer has now frozen them in the packet.
 
 ### R1 — Freeze medication-specificity subtraction
 
@@ -237,10 +243,14 @@ The score does not override the three required revisions.
 
 ## Current readiness versus development potential
 
-- **Current readiness**: `REVISE BEFORE IDEA CREATION`.
+- **Readiness at original review**: `REVISE BEFORE IDEA CREATION`.
+- **Post-optimizer status**: R1--R3 are frozen; pending strict re-review before Idea creation.
 - **Development potential**: `HIGH-CONDITIONAL`.
 
-The route deserves one bounded revision cycle because the fatal scientific uncertainty is clear, the repairs are prospective protocol changes rather than exploratory evidence gathering, and a later Gate can terminate the family decisively if the response-specific mechanism is absent.
+The route has completed its one bounded revision cycle because the fatal
+scientific uncertainty was clear and the repairs were prospective protocol
+changes rather than exploratory evidence gathering. Strict re-review can now
+terminate the family decisively if the response-specific mechanism is absent.
 
 ## Final routing
 

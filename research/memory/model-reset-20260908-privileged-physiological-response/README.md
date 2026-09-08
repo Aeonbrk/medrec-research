@@ -13,7 +13,7 @@
 - Strict review: completed
 - Strict review verdict: `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
 - Strict review score: `3.89 / 5.00`
-- Next owner: bounded `ccf-idea-optimizer`, then return to strict `ccf-idea-reviewer`
+- Next owner: strict `ccf-idea-reviewer` (bounded R1--R3 optimizer revision completed)
 - Local scientific execution: **not authorized**
 
 The Event-Sourced Regimen Editing M0 gate remains closed. Raw `New / Change / D/C` workflow marks are not reused as regimen-edit supervision.
@@ -73,9 +73,9 @@ Verdict:
 
 `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007`
 
-The family is preserved because no exact direct general-MedRec collision was found and the hypothesis has a cheap decisive falsification path. It is not yet an Idea because the current formulation does not fully isolate the claimed medication-specific physiological-response mechanism.
+The family is preserved because no exact direct general-MedRec collision was found and the hypothesis has a cheap decisive falsification path. It was not yet an Idea at strict review time because the formulation did not fully isolate the claimed medication-specific physiological-response mechanism; the bounded optimizer pass has now frozen that formulation contract, pending strict re-review.
 
-## Required revisions before Idea 007
+## Required revisions before Idea 007 (now frozen pending strict re-review)
 
 ### R1 — Medication-specificity subtraction
 
@@ -130,7 +130,7 @@ Disallowed without independent causal identification:
 
 ## Routing
 
-Authorized next sequence:
+Completed bounded owner and current next owner:
 
 ```text
 ccf-idea-optimizer (bounded R1--R3 only)

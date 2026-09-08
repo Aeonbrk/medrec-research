@@ -51,9 +51,10 @@ Strict review verdict:
 
 `ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
 
-The reviewer did not reject the family: no exact direct general-MedRec collision was found for the narrow training-only post-administration physiology contract, and the hypothesis has a bounded kill-first evidence path. However, the current formulation does not yet distinguish medication-specific physiological response learning strongly enough from generic future-state supervision, monitoring policy, medication identity/prototypes, positive-event weighting, and KD mechanics.
+The reviewer did not reject the family: no exact direct general-MedRec collision was found for the narrow training-only post-administration physiology contract, and the hypothesis has a bounded kill-first evidence path. At review time, the formulation did not yet distinguish medication-specific physiological response learning strongly enough from generic future-state supervision, monitoring policy, medication identity/prototypes, positive-event weighting, and KD mechanics; the bounded optimizer revision has now frozen the required subtraction and entitlement contract.
 
-Before Idea 007 may be created, exactly three formulation revisions must be frozen:
+Before Idea 007 may be created, exactly three formulation revisions must be frozen;
+the bounded optimizer pass has now frozen them:
 
 1. matched medication-ablated future / Generic Future-State Auxiliary control;
 2. mandatory Monitoring-Mask-Only plus physiological-value versus response-availability separation;
@@ -61,6 +62,6 @@ Before Idea 007 may be created, exactly three formulation revisions must be froz
 
 Next owner:
 
-`ccf-idea-optimizer` for those bounded revisions only, then return to strict `ccf-idea-reviewer`.
+strict `ccf-idea-reviewer` for re-review of the frozen revisions.
 
 No experiment, response-coverage diagnostic, Gate 01, or local Agent run is authorized now. A later reviewer must explicitly return `ACCEPT_TO_CREATE_IDEA_007` before any Idea 007 directory is created.

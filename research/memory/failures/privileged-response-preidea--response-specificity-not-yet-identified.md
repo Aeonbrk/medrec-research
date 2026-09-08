@@ -31,9 +31,9 @@ The durable rule is:
 
 > **Privileged future information is method evidence only when the claimed semantics survive matched controls that remove the semantic component while preserving future access, support, capacity, and deployment entitlement as closely as possible.**
 
-## Required admission conditions
+## Required admission conditions (frozen by the bounded optimizer pass)
 
-Before Idea creation, freeze:
+Before Idea creation, the optimizer freezes:
 
 - a medication-ablated future / generic future-state control with matched future window, support, and capacity;
 - a monitoring-mask-only control and explicit physiological-value versus response-availability separation;
@@ -57,6 +57,6 @@ This is a formulation constraint, not authorization for a diagnostic or experime
 
 Next owner:
 
-`ccf-idea-optimizer` for the bounded required revisions, then strict `ccf-idea-reviewer`.
+strict `ccf-idea-reviewer` for re-review of the frozen required revisions.
 
 Idea 007, Gate 01, and local scientific execution remain unauthorized.
