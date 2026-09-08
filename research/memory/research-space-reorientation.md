@@ -4,7 +4,7 @@
 
 ## Current workflow state
 
-**Stage**: `NO_HIGH_VALUE_DIRECTION_YET`
+**Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
@@ -12,60 +12,57 @@
 
 **Idea 007**: not created / not authorized.
 
-**Completed empirical gate**: [`model-reset-20260908-event-sourced-regimen-editing/m0-decision.md`](model-reset-20260908-event-sourced-regimen-editing/m0-decision.md) returned `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`.
+**Current method family**: privileged physiological response supervision.
 
-MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
+**Next owner**: strict `ccf-idea-reviewer` after completed optimizer formulation.
+
+No local scientific execution is authorized. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
 
 ## Cumulative failure landscape
 
 ### F1 — post-hoc same-information routes are compressed
 
-Ideas 001--004 and EGSF repeatedly showed that low-dimensional transformations or selectors over already available frozen information do not establish incremental value once the strongest simple controls are supplied.
+Ideas 001--004 and EGSF showed that low-dimensional transformations/selectors over frozen information do not establish incremental value after strong controls.
 
 ### F2 — statistical structure is not clinical action semantics
 
-Idea 005 found reproducible ATC output structure but failed strict therapeutic-substitution admission. Taxonomy/shared indication cannot be promoted into clinical interchangeability without independent semantic evidence.
+Idea 005 found reproducible ATC output structure but failed therapeutic-substitution admission.
 
 ### F3 — equal information/rule entitlement is mandatory
 
-EG-TER and Idea 006 establish the same higher-order control principle in two settings:
-
-> if a learned method receives an external rule, risk relation, operational state, or deterministic feasibility signal, the strongest direct control must receive the identical information.
+EG-TER and Idea 006 require the strongest direct control to receive the same external rule/state/risk information as a learned method.
 
 ### F4 — certification is a separate burden
 
-CRC-PS showed empirical feasibility does not imply finite-sample certifiability. Guarantees remain downstream of mechanism evidence.
+CRC-PS showed empirical feasibility does not imply finite-sample certifiability.
 
 ### F5 — medication cardinality is not normalized interaction propensity
 
-B0 showed that changing medication count altered absolute DDI burden but not pair-normalized DDI propensity. Count-mediated treatment-preserving safety is closed under the tested premise.
+B0 changed medication count without producing the required normalized-DDI trade-off.
 
 ### F6 — latent acceptable-treatment supervision is not identified
 
-The selective-prescription-supervision reset found a plausible problem but no defensible latent clinical target under current retrospective labels. Generic PU/noisy-label learning is not enough for the first method paper.
+The selective-prescription-supervision reset could not distinguish hidden clinically valid alternatives from ordinary retrospective label uncertainty.
 
 ### F7 — new state semantics do not imply learned-method value
 
-Idea 006 established a real execution-exposure state mismatch, but the learned ExposureConditional model failed its equal-entitlement direct-reranker challenge. A valid new state representation is not itself a method contribution.
+Idea 006 established a real exposure-state mismatch, but the learned method lost to an equal-entitlement direct reranker.
 
 ### F8 — chronology does not imply harmful deployment shift
 
-The Medication Practice-Shift S0 gate returned:
+S0 found no forward degradation; the later target era had higher Recall@5 than the source audit era, and medication-prior bias improved it further.
 
-`FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_SHIFT`.
+### F9 — workflow action labels do not automatically define regimen edits
 
-Under the frozen G0+G1 source versus G2 target protocol:
+M0 had abundant `New / Change / D/C` support, but the frozen pre-order state-consistency floors failed badly:
 
-- `R_source = 0.4310427829`;
-- `R_target_base = 0.4403698933`;
-- `G_base = -0.0093271104`;
-- 95% CI `[-0.0145853913, -0.0035238892]`.
+- `Change = 0.17228553254342177` active-before;
+- `D/C = 0.15933081187948597` active-before;
+- required floor: `0.70` for each.
 
-The source-era predictor therefore performed better, not worse, on the target era. Target-prior logit correction improved target Recall@5 further to `0.4441638446`.
+No model was trained.
 
-Chronological separation by itself is not evidence for a temporal-adaptation method.
-
-Failure memory: [`failures/medication-practice-shift-s0--no-material-forward-degradation.md`](failures/medication-practice-shift-s0--no-material-forward-degradation.md).
+Failure memory: [`failures/event-sourced-regimen-editing-m0--workflow-action-state-inconsistency.md`](failures/event-sourced-regimen-editing-m0--workflow-action-state-inconsistency.md).
 
 ## Higher-order reusable constraints
 
@@ -75,11 +72,11 @@ A new statistic/function over an already failed frozen information premise is no
 
 ### C2 — semantic admission precedes clinical interpretation
 
-Therapeutic alternatives, hidden positives, treatment obligations, clinical appropriateness, or patient-specific harm require independently grounded semantics.
+Therapeutic alternatives, hidden positives, treatment obligations, clinical appropriateness, or action semantics require independent evidence.
 
 ### C3 — direct-use sufficiency must be challenged first
 
-A new external signal or decision-state semantic can justify a learned method only if the learned method creates incremental value beyond direct use of the same signal.
+A new signal/state semantic supports a learned method only if learning adds value beyond direct use of the same signal.
 
 ### C4 — certification follows mechanism evidence
 
@@ -91,113 +88,86 @@ Absolute pair burden can move mechanically with output size.
 
 ### C6 — admitted resource fact: hospitalization DDI co-membership is not current execution overlap
 
-Idea-006 R0 remains valid as infrastructure/evidence, but not as the target paper.
+R0 remains reusable infrastructure/evidence, not the target paper.
 
 ### C7 — deployment adaptation requires actual degradation
 
-Do not invest in adaptation because two periods differ. First establish a material forward loss after giving simple target-marginal correction a fair chance.
+Do not build adaptation because periods differ; first establish a material deployment loss.
 
-### C8 — a new model must encode a new scientific object, not merely a new backbone
+### C8 — a new model must encode a new scientific object
 
-Transformer/Mamba/GNN/point-process architectures are allowed only when the proposed mechanism changes the decision object, supervision, state transition, or information flow in a way that can be independently falsified. A deeper encoder over the same failed target is not a reset.
+Transformer/Mamba/GNN/point-process architectures are allowed only when they instantiate a new falsifiable decision object, supervision structure, state transition, or information flow.
+
+### C9 — workflow labels must survive state-semantic admission
+
+Action-like database fields cannot be promoted into state transitions merely because they are frequent and named `Change` or `D/C`.
 
 ## Research-space boundary map
 
 | Route / premise | Status | Evidence boundary | Reopen / advance condition |
 | --- | --- | --- | --- |
-| Frozen-output DDI/tension scalar routing | `CLOSED` | Idea 001 | genuinely new information/state/action semantics |
-| Score geometry | `CLOSED` | Idea 002 | changed decision information |
-| Prescription-relative/rank features | `CLOSED` | Idea 003 | new pre-prediction mechanism/supervision |
-| Static co-selection scalar | `CLOSED` | Idea 004 | materially different relational semantics |
+| Frozen-output feature/routing families | `CLOSED` | Ideas 001--004 + EGSF | genuinely new information/objective |
 | ATC sibling substitution | `CLOSED` | Idea 005 | new action resolution + admitted therapeutic semantics |
-| Count-mediated safety/coverage | `CLOSED` | B0 | different safety/coverage mechanism |
+| Count-mediated safety/coverage | `CLOSED` | B0 | different mechanism |
 | Selective prescription supervision | `NOT ADMITTED` | supervision reset | identifiable multi-valid target |
-| Exposure-conditioned DDI learning | `CLOSED` | Idea 006 Gate 01 | genuinely different safety target/action problem |
-| Residual medication-practice adaptation | `CLOSED` | S0 | actual material forward degradation under a materially different deployment setting |
-| Generic longitudinal modeling | `CROWDED / LOW PRIOR` | MR-DTR, DrugDoctor, HeteroMed, DMRNet, ChainCare | specific non-generic decision mechanism |
-| Generic KG/RAG/agent safety | `CROWDED / LOW PRIOR` | KATMed, RES-MR, SafeRx-Agent, ATLAS | contribution beyond rule injection/verifier assembly |
-| Multi-dataset MIMIC/eICU evaluation | `PRIOR ART / NOT A METHOD GAP` | HypeMed, KATMed, Rx-Expert, NLA-MMR | source-to-target method problem required |
-| Temporal/external validation itself | `PRIOR ART` | prior temporal/external validation work | method mechanism required |
-| **Event-sourced regimen editing** | **`NOT ADMITTED`** | M0 failed the frozen `Change`/`D/C` state-consistency floors | no M0b, deeper-encoder rescue, or Idea 007 |
+| Exposure-conditioned DDI learning | `CLOSED` | Idea 006 | different safety target/action problem |
+| Residual medication-practice adaptation | `CLOSED` | S0 | actual material degradation in a different deployment setting |
+| Event-sourced `New/Change/D/C` regimen editing | `NOT ADMITTED` | M0 | independently valid action semantics / different decision object |
+| Generic longitudinal modeling | `CROWDED / LOW PRIOR` | MR-DTR, DrugDoctor, HeteroMed, ChainCare | specific non-generic mechanism |
+| Generic labs/vitals fusion | `CROWDED` | REFINE, ChainCare, HIFINet, MedGCN | different information-flow role |
+| Generic KD in MedRec | `PRIOR ART` | LEADER | different knowledge source + mechanism evidence |
+| **Privileged physiological response supervision** | **`SELECTED FOR STRICT REVIEW`** | current optimizer reset | reviewer admits novelty/soundness/evidence feasibility |
 
-`CLOSED` is conditional on the recorded scientific premise, not a universal ban on the noun.
+`CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
 
-## Completed reset: Event-Sourced Regimen Editing
+## Current selected method family
 
-Reset packet:
+Packet:
 
-[`model-reset-20260908-event-sourced-regimen-editing/`](model-reset-20260908-event-sourced-regimen-editing/).
+[`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/).
 
-### Structural observation
+### Problem
 
-The existing order-time model already consumes historical medication transaction types and a pre-order active regimen. Its current target nevertheless collapses present `New` and `Change` transactions into medication-only labels and excludes present `D/C` from the target.
+Physiological evidence observed after medication administration can be informative about the joint patient/treatment context, but it is unavailable at medication decision time and is observationally confounded.
 
-This means the pipeline observes action semantics in the past while discarding those semantics at the current supervised decision.
+### Optimized insight
 
-The candidate reset makes the target an explicit provider-order mark:
+Use future post-administration physiology only as **privileged training supervision**. A teacher learns a response-associated patient–medication representation from realized treatment context and post-administration monitoring. A deployable student must anticipate that representation from strictly pre-order state and candidate medication.
 
-`(action, medication)`, where `action in {New, Change, D/C}`.
+Future monitoring never enters inference.
 
-This is not a claim of therapeutic intent. It is an EHR order-workflow action.
+### Closest-work subtraction
 
-### Closest-work boundary
+The route does not claim novelty from labs, response modeling, event chains, auxiliary lab prediction, or knowledge distillation individually. REFINE, ChainCare, MedGCN, DrugDoctor, LEADER, OC-Distill, and physiological-response representation work already cover those primitives.
 
-Change-aware MedRec is not new: MICRON predicts visit-level additions/removals; ARMR models new versus historical medications; HeteroMed models expansion/inheritance. Order-time prediction is also not new: Rough et al. predict medication identities in a 10-minute order horizon.
+The search-scoped residual delta is:
 
-The search-scoped opportunity is their intersection:
+> medication-in-context post-administration physiology as training-only privileged supervision for a causal pre-order candidate-medication student, with mechanism controls proving that response semantics matter beyond generic future-state regularization.
 
-> strictly causal provider-order-time prediction of explicit regimen-edit marks over an event-sourced medication state.
+### Non-causal boundary
 
-The eventual method, if admitted, must derive value from that explicit edit structure rather than from a larger encoder.
+Observed post-administration physiology is not an individual medication effect. It may reflect severity, co-medications, procedures, fluids, monitoring policy, and selective measurement.
 
-### Strongest trivial explanation
+Use `response-associated signature`, not `treatment effect`, `efficacy`, or `causal response`.
 
-The action labels may appear useful only because a deterministic state mask rules out impossible `Change` and `D/C` actions for inactive medications.
+### Mandatory future killer controls
 
-Therefore M0 gives the same state mask and the same inputs to the mandatory killer control:
+Any Gate 01 admitted after strict review must include:
 
-`SeparateHeads + DirectStateMask`.
+- same-input causal Base;
+- Base + pre-order physiology;
+- capacity-matched generic future-state auxiliary learning;
+- static medication response prototype;
+- response-shuffle/misalignment control;
+- compatible monitoring-aware MedRec baselines;
+- KD-mechanics control where needed.
 
-The fixed `StateEditProbe` must beat this control. It does not receive extra information.
-
-## M0 admission question
-
-> Are raw `New / Change / D/C` marks sufficiently supported and state-consistent, and does a fixed structured action-medication decoder create incremental predictive value beyond the strongest equal-entitlement direct state-mask classifier?
-
-### Phase A
-
-Before training, test support and state consistency. Failure stops the route immediately.
-
-### Phase B
-
-Only on Phase-A PASS, compare:
-
-1. `FlatMark`;
-2. `SeparateHeads + DirectStateMask`;
-3. fixed rank-32 `StateEditProbe` with the identical mask.
-
-No architecture grid is authorized.
-
-### PASS
-
-`PASS_M0_EVENT_EDIT_STRUCTURE` requires all frozen conditions in the M0 protocol, including statistically positive gains over the direct masked control and medication-level non-inferiority.
-
-Only then may `ccf-idea-optimizer` design a full method within this single family, followed by strict `ccf-idea-reviewer` before Idea 007 exists.
-
-### FAIL
-
-`FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` returned the project to `NO_HIGH_VALUE_DIRECTION_YET`.
-
-No M0b or deeper-encoder rescue is allowed.
-
-Recorded result: [`model-reset-20260908-event-sourced-regimen-editing/m0-summary.json`](model-reset-20260908-event-sourced-regimen-editing/m0-summary.json). Both frozen state-consistency floors failed (`Change = 0.17228553254342177`, `D/C = 0.15933081187948597`); no models were trained and EditAudit was not accessed.
+If generic future-state learning or shuffled responses explain the gain, terminate the mechanism rather than add architecture.
 
 ## Publication boundary
 
-M0 is premise-selection evidence, not the paper. Even on PASS, the project must still demonstrate a genuine method contribution, novelty delta, multi-baseline claim support, and later untouched evaluation before promotion to a paper directory.
+This optimizer result is not an Idea and not publication evidence. The first paper remains method-first.
 
-The first paper remains method-first.
+Next owner: `ccf-idea-reviewer`.
 
-## Current next owner
-
-`ccf-pipeline-orchestrator` owns the next routing decision. No further scientific execution is authorized until it admits a new direction.
+Idea 007 may be created only if strict review admits the residual method delta and evidence path. No local Agent run or response-coverage research stage is authorized before that review.
