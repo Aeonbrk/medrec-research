@@ -35,11 +35,9 @@ There is currently **no active Idea**.
 
 Stage:
 
-`PRE_IDEA_PRIVILEGED_RESPONSE_OPTIMIZATION`.
+`PRE_IDEA_PRIVILEGED_RESPONSE_REQUIRED_REVISIONS`.
 
 Idea 007 does **not** exist and is not authorized.
-
-The latest completed M0 reset, Event-Sourced Regimen Editing, failed semantic admission because `Change` and `D/C` workflow labels were not compatible with the frozen causal regimen state at the required level. No model was trained and the route cannot be rescued by a deeper encoder.
 
 The current pre-Idea method family is:
 
@@ -49,10 +47,20 @@ Packet:
 
 `research/memory/model-reset-20260908-privileged-physiological-response/`.
 
-The optimizer has developed a training-time privileged-response mechanism in which post-administration physiology teaches a strictly pre-order candidate-medication student. The route is explicitly non-causal and must beat generic future-state auxiliary learning, response-shuffle controls, and static response prototypes.
+Strict review verdict:
+
+`ACCEPT_WITH_REQUIRED_REVISIONS_BEFORE_IDEA_007` (`3.89 / 5.00`).
+
+The reviewer did not reject the family: no exact direct general-MedRec collision was found for the narrow training-only post-administration physiology contract, and the hypothesis has a bounded kill-first evidence path. However, the current formulation does not yet distinguish medication-specific physiological response learning strongly enough from generic future-state supervision, monitoring policy, medication identity/prototypes, positive-event weighting, and KD mechanics.
+
+Before Idea 007 may be created, exactly three formulation revisions must be frozen:
+
+1. matched medication-ablated future / Generic Future-State Auxiliary control;
+2. mandatory Monitoring-Mask-Only plus physiological-value versus response-availability separation;
+3. equal-support positive-only response semantics plus strictly pre-order student/deployment entitlement.
 
 Next owner:
 
-`ccf-idea-reviewer`.
+`ccf-idea-optimizer` for those bounded revisions only, then return to strict `ccf-idea-reviewer`.
 
-Idea 007 may be created only if strict review admits the method-level novelty, soundness, feasibility, and evidence package. No experiment or local Agent run is authorized before that review.
+No experiment, response-coverage diagnostic, Gate 01, or local Agent run is authorized now. A later reviewer must explicitly return `ACCEPT_TO_CREATE_IDEA_007` before any Idea 007 directory is created.
