@@ -8,9 +8,10 @@ Refresh date: 2026-09-09.
 
 Current project stage:
 
-`PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
+`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
 
-There is no active Idea. Ideas 001--006 are terminated. Idea 007 is not created, but its creation is explicitly authorized.
+`007-privileged-physiological-response-supervision` is the active admitted Idea.
+Ideas 001--006 are terminated. Idea 007 has been formally created/admitted.
 
 Current packet:
 
@@ -27,6 +28,11 @@ Closest-work provenance:
 Reviewer verdict:
 
 `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
+
+Gate-01 protocol and independent design audit:
+
+[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md),
+[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md).
 
 ## Closed or compressed spaces
 
@@ -49,7 +55,7 @@ Reviewer verdict:
 | Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting |
 | True-future-observation teacher → current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 |
-| **Privileged physiological response supervision** | **`ADMITTED FOR IDEA 007 CREATION`** | exact scientific object survives bounded closest-work search and R1--R3 now make its semantics falsifiable |
+| **Privileged physiological response supervision** | **`IDEA 007 ACTIVE / GATE 01 DESIGN FROZEN AND AUDITED`** | exact scientific object survives bounded closest-work search; R1--R3 and the audited kill-first protocol make its semantics falsifiable |
 
 ## Current admitted opportunity
 
@@ -147,12 +153,19 @@ Gate 01 must additionally cover:
 - Base + Pre-Order Physiology;
 - Static Medication Response Prototype;
 - Response Shuffle;
-- Generic KD only when needed to isolate distillation mechanics;
+- Generic KD (included because the proposed implementation has a live
+  teacher/student-alignment alternative);
 - Proposed privileged physiological response supervision.
 
 A compatible monitoring-aware MedRec baseline may be included when task alignment supports a fair comparison.
 
-The response-specific story terminates if Generic Future-State Auxiliary, Medication-Ablated Future, Response Shuffle, Monitoring-Mask-Only, Static Response Prototype, or richer pre-order physiology performs comparably, or if response support is insufficient/materially concentrated, or if deployment leakage/unequal entitlement is detected.
+The audited protocol fixes the practical/statistical meaning of `materially`,
+`comparable`, and `≈` before any result. The response-specific story terminates if
+Generic Future-State Auxiliary, Medication-Ablated Future, Response Shuffle,
+Monitoring-Mask-Only, Static Response Prototype, or richer pre-order physiology
+performs comparably, or if response support is insufficient/materially
+concentrated, the interval is inconclusive, or deployment leakage/unequal
+entitlement is detected.
 
 ## Claim boundary
 
@@ -177,19 +190,15 @@ Disallowed without independent causal identification:
 
 ## Current routing
 
-Next owner:
-
-`ccf-pipeline-orchestrator`.
-
-Authorized next workflow:
+Current authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-No local experiment, response-coverage diagnostic, Gate execution, or architecture work is authorized by this map.
+No local experiment, response-coverage diagnostic, Gate execution, or architecture
+work is authorized by this map. A separate explicit execution transition must
+consume the audited protocol unchanged.

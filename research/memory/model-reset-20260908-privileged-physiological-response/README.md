@@ -4,25 +4,33 @@
 
 ## Status
 
-- Stage: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
-- Current active Idea: none
-- Idea 007: not created / creation explicitly authorized
+- Stage: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+- Current active Idea: `007-privileged-physiological-response-supervision`
+- Idea 007: created/admitted
 - Paper objective: first formal method paper, target at least a CCF-A Data/Mining/AI venue family
 - Reset class: method-level supervision / information-flow reset
 - Optimizer formulation: completed
 - Strict re-review verdict: `ACCEPT_TO_CREATE_IDEA_007`
 - Strict re-review score: `4.17 / 5.00`
 - Reviewer confidence: medium-high
-- Next owner: `ccf-pipeline-orchestrator`
-- Local scientific execution: **not authorized**
+- Admission owner: `ccf-pipeline-orchestrator` (completed)
+- Gate 01 design owner: `ccf-experiment-designer` (completed)
+- Gate 01 design audit: `DESIGN_INTEGRITY_PASS`
+- Local scientific execution / training: **not authorized**
 
 The Event-Sourced Regimen Editing M0 gate remains closed. Raw `New / Change / D/C` workflow marks are not reused as regimen-edit supervision.
 
-## Admitted scientific family
+## Admitted scientific family and Idea 007
 
 **Privileged physiological response supervision for medication recommendation.**
 
 Working shorthand `RPD-MR` remains provisional and is not a novelty claim.
+
+Canonical Idea-007 artifacts:
+
+- [`../../ideas/007-privileged-physiological-response-supervision/`](../../ideas/007-privileged-physiological-response-supervision/)
+- [`../../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](../../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md)
+- [`../../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](../../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md)
 
 ## Central scientific question
 
@@ -110,7 +118,7 @@ Deployment leakage or unmatched support/reweighting invalidates the future Gate.
 
 ## Future Gate 01 killer family
 
-After Idea 007 is created and only after `ccf-experiment-designer` freezes the protocol, Gate 01 must at least cover:
+The audited Gate 01 protocol covers:
 
 - Strict Pre-Order Base;
 - Base + Pre-Order Physiology;
@@ -119,11 +127,17 @@ After Idea 007 is created and only after `ccf-experiment-designer` freezes the p
 - Response Shuffle;
 - Monitoring-Mask-Only;
 - Proposed privileged-response method;
-- Generic KD only if needed to isolate KD mechanics.
+- Generic KD (included because the proposed implementation has a live
+  teacher/student-alignment alternative).
 
 A compatible REFINE/ChainCare-style comparison may be included when task alignment is scientifically valid.
 
-The mechanism terminates if a simple matched control performs comparably, if privileged-response support is insufficient/materially concentrated, or if deployment leakage or unequal entitlement is detected. Do not respond with architecture scaling, response-window search, additional modalities, subgroup mining, or a second response definition.
+The mechanism terminates if a simple matched control performs comparably, if
+privileged-response support is insufficient/materially concentrated, if the
+statistical rule is inconclusive, or if deployment leakage or unequal entitlement
+is detected. Do not respond with architecture scaling, response-window search,
+additional modalities, subgroup mining, post-hoc feature expansion, favorable-seed
+selection, a new split, or a second response definition.
 
 ## Non-causal boundary
 
@@ -148,18 +162,18 @@ Disallowed without independent causal identification:
 
 ## Routing
 
-Authorized next workflow:
+Current authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-This packet does not itself create Idea 007, inspect response coverage, design Gate 01, or authorize local training.
+This historical packet records the admission inputs. The current Idea-007 artifacts
+record the frozen protocol and audit. Neither artifact authorizes response-coverage
+execution, Gate execution, Audit access, or local training.
 
 ## Quarantine
 

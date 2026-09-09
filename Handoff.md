@@ -1,19 +1,21 @@
-# Handoff: Privileged Physiological Response Admitted for Idea 007 Creation
+# Handoff: Idea 007 Gate 01 Design Frozen and Audited
 
 ## Current state
 
-Ideas 001--006 are terminated. There is currently no active Idea.
+Ideas 001--006 are terminated. Idea 007 is now the active admitted Idea.
 
-- **Current Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
-- **Current active Idea**: none
-- **Idea 007**: not created / creation explicitly authorized
+- **Current Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+- **Current active Idea**: `007-privileged-physiological-response-supervision`
+- **Idea 007**: created/admitted
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
 - **Current method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION`
 - **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007`
 - **Strict re-review score**: `4.17 / 5.00`
 - **Reviewer confidence**: medium-high
-- **Next CCFA owner**: `ccf-pipeline-orchestrator`
-- **Local scientific execution**: not authorized
+- **Admission owner**: `ccf-pipeline-orchestrator` (completed)
+- **Gate 01 design owner**: `ccf-experiment-designer` (completed)
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS`
+- **Local scientific execution / training**: not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
@@ -22,7 +24,13 @@ Ideas 001--006 are terminated. There is currently no active Idea.
 
 `research/memory/model-reset-20260908-privileged-physiological-response/`
 
-Authoritative artifacts:
+Admission and Gate-01 artifacts:
+
+- `research/ideas/007-privileged-physiological-response-supervision/README.md`
+- `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`
+- `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`
+
+Historical authoritative packet:
 
 - `README.md`
 - `idea-grounding.md`
@@ -34,9 +42,12 @@ The earlier reusable admission constraint remains useful as a methodological rul
 
 `research/memory/failures/privileged-response-preidea--response-specificity-not-yet-identified.md`.
 
-## Admission decision
+## Admission decision and current gate state
 
-The strict re-review accepts the family for one kill-first Idea/Gate cycle.
+The strict re-review accepted the family for one kill-first Idea/Gate cycle. The
+pipeline orchestrator formally created/admitted Idea 007; the experiment designer
+then froze Gate 01 and the independent design-integrity audit passed. No response
+outcomes or model results exist.
 
 The generic learning primitive is not novel. Current prior work separately covers:
 
@@ -53,7 +64,8 @@ The search-scoped surviving delta is therefore:
 
 > medication-in-context realized post-administration physiological **values** as positive-event, training-only privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that the gain depends on focal-medication conditioning, patient-medication-response correspondence, and physiological values rather than generic future prediction, monitoring policy, static medication priors, positive-event weighting, or KD mechanics.
 
-This is scientifically admissible for Idea creation. It is not publication evidence.
+This was scientifically admissible for Idea creation. The admission and Gate-01
+design are not publication evidence.
 
 ## Frozen R1--R3 contract
 
@@ -85,9 +97,9 @@ If Monitoring-Mask-Only is comparable to Proposed:
 
 Any deployment leakage or unmatched sample/support entitlement invalidates the future Gate.
 
-## Killer controls reserved for Gate 01
+## Killer controls frozen for Gate 01
 
-After Idea 007 creation, `ccf-experiment-designer` must freeze a Gate 01 that at least covers:
+The canonical Gate 01 protocol freezes at least:
 
 - Strict Pre-Order Base;
 - Base + Pre-Order Physiology;
@@ -95,16 +107,22 @@ After Idea 007 creation, `ccf-experiment-designer` must freeze a Gate 01 that at
 - Static Medication Response Prototype;
 - Response Shuffle;
 - Monitoring-Mask-Only;
-- Proposed privileged-response method;
-- Generic KD only if needed to isolate distillation mechanics.
+- Proposed privileged-response method.
+- Generic KD (included because the proposed implementation has a live alignment
+  alternative).
 
 A compatible monitoring-aware MedRec baseline may be included when task alignment permits a fair comparison.
 
-Immediate stop conditions include any simple matched control performing comparably to Proposed, insufficient/materially concentrated response support, student-path leakage, or unequal support/reweighting.
+The protocol operationalizes `materially` / `comparable` / `≈` before training with
+fixed practical and statistical thresholds. Immediate stop conditions include any
+simple matched control performing comparably to Proposed,
+insufficient/materially concentrated response support, student-path leakage,
+unequal support/reweighting, or an inconclusive interval. The independent audit
+record is `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`.
 
-Do not rescue a failed mechanism with a deeper Transformer/Mamba/GNN, larger teacher, wider response window, extra modalities, subgroup mining, or a second response definition under the same Idea.
-
-The experiment designer must turn `materially` / `comparable` into a frozen practical-and-statistical decision rule before training. That is Gate-design work, not another pre-Idea revision.
+Do not rescue a failed mechanism with a deeper Transformer/Mamba/GNN, larger teacher,
+wider response window, extra modalities, subgroup mining, post-hoc feature
+expansion, or a second response definition under the same Idea.
 
 ## Claim boundary
 
@@ -131,15 +149,14 @@ This result remains separate from the privileged-response admission decision.
 
 ## Routing
 
-Authorized next workflow only:
+Authorized next state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-This handoff does not create Idea 007, authorize response-coverage inspection outside the future Gate preflight, or authorize local training.
+This handoff records the completed admission/design workflow. It does not authorize
+response-coverage inspection, Gate execution, Audit access, or local training.

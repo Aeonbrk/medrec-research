@@ -4,21 +4,25 @@
 
 ## Current workflow state
 
-**Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
+**Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
-**Current active Idea**: none.
+**Current active Idea**: `007-privileged-physiological-response-supervision`.
 
-**Idea 007**: not created / creation explicitly authorized.
+**Idea 007**: created/admitted.
 
 **Current method family**: privileged physiological response supervision.
 
 **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-**Next owner**: `ccf-pipeline-orchestrator`.
+**Admission/design owners**: `ccf-pipeline-orchestrator` (admission complete) ->
+`ccf-experiment-designer` (Gate 01 design complete) -> independent design audit
+(`DESIGN_INTEGRITY_PASS`).
 
-No local scientific execution is authorized by the current state. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
+No local scientific execution or training is authorized by the current state.
+MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
+remain quarantined.
 
 ## Cumulative failure landscape
 
@@ -142,15 +146,22 @@ The current bounded optimizer revision now freezes these requirements strongly e
 | Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting | future access itself cannot carry novelty |
 | Generic future-observation distillation | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 | future access itself cannot carry novelty |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 | response-supervision role + MedRec-specific evidence |
-| **Privileged physiological response supervision** | **`ADMITTED FOR IDEA 007 CREATION`** | strict re-review 2026-09-09 | create Idea 007; freeze one kill-first Gate 01; stop before training pending design-integrity audit |
+| **Privileged physiological response supervision** | **`IDEA 007 ACTIVE / GATE 01 DESIGN FROZEN AND AUDITED`** | strict re-review 2026-09-09; protocol and audit in `research/ideas/007-privileged-physiological-response-supervision/` | stop before training; any execution requires a separate explicit authorization |
 
 `CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
 
-## Current admitted method family
+## Current admitted method family: Idea 007
 
 Packet:
 
 [`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/).
+
+Canonical Idea-007 protocol and audit:
+
+[`../ideas/007-privileged-physiological-response-supervision/`](../ideas/007-privileged-physiological-response-supervision/),
+[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md),
+and
+[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md).
 
 Strict review:
 
@@ -176,7 +187,7 @@ The scientific contribution survives closest-work subtraction only if paired phy
 2. **Monitoring separation**: Monitoring-Mask-Only plus physiology-value versus response-availability separation.
 3. **Equal entitlement**: positive-only observed response, same support/sample mask across privileged variants, unsupported examples retained in the recommendation objective, and strictly pre-order student features/normalization.
 
-### Future Gate 01 kill conditions
+### Gate 01 kill conditions
 
 Terminate the response-specific family if any of the following occurs:
 
@@ -188,9 +199,13 @@ Terminate the response-specific family if any of the following occurs:
 - response support is insufficient or materially concentrated;
 - deployment leakage or unmatched support/reweighting is detected.
 
-No architecture, response-window, modality, subgroup, or response-definition rescue follows these outcomes under the same Idea.
+No architecture, response-window, modality, subgroup, post-hoc feature, favorable
+seed, split, or response-definition rescue follows these outcomes under the same
+Idea.
 
-The future experiment designer must operationalize `materially` / `comparable` into a frozen practical-and-statistical decision rule before training.
+The audited protocol operationalizes `materially` / `comparable` / `≈` with fixed
+practical and statistical rules before training. An inconclusive interval is also
+a stop; it cannot be rescued by changing the threshold.
 
 ### Non-causal boundary
 
@@ -202,13 +217,11 @@ Use `response-associated signature`, not treatment-effect, efficacy, therapeutic
 
 This admission is not an empirical result and not publication evidence. The first paper remains method-first.
 
-Authorized next workflow only:
+Current authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```

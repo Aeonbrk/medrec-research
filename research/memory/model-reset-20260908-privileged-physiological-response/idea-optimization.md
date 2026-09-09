@@ -11,6 +11,13 @@
 - Active Idea: none.
 - Idea 007: not created / not authorized.
 
+The three lines above are the historical state of this optimizer artifact before
+the subsequent strict admission. The current canonical state is
+`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`; see
+[`research/ideas/007-privileged-physiological-response-supervision/`](../../ideas/007-privileged-physiological-response-supervision/)
+for the admitted Idea and audited Gate 01. The R1--R3 contract below remains
+frozen and is not reopened by this historical label.
+
 ## Mode and development stance
 
 `ccf-idea-optimizer / standard`

@@ -28,18 +28,20 @@ Idea-stage prototypes stay inside the Idea until stable reusable infrastructure 
 | [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** | NPMI co-selection scalar added no reliable incremental value |
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
+| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Admitted — Gate 01 design frozen/audited; training not authorized** | pending kill-first Gate 01 execution |
 
 ## Current authoritative direction
 
-There is currently **no active Idea**.
+Idea 007 is the current active admitted Idea.
 
 Stage:
 
-`PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`.
+`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`.
 
-Idea 007 does **not** yet exist, but its creation is explicitly authorized by the current strict review.
+Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
+the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
 
-The admitted pre-Idea method family is:
+The admitted method family is:
 
 **Privileged Physiological Response Supervision**
 
@@ -51,7 +53,12 @@ Strict admission review:
 
 `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-The family is admitted because the bounded R1--R3 revision resolves the prior mechanism-identification blockers without data exploration or architecture expansion. The generic learning primitive is already prior art; the surviving scientific object is medication-in-context realized post-administration physiological values used only as training-time privileged supervision for a strictly pre-order candidate-medication student.
+The family was admitted because the bounded R1--R3 revision resolves the prior
+mechanism-identification blockers without data exploration or architecture
+expansion. The generic learning primitive is already prior art; the surviving
+scientific object is medication-in-context realized post-administration
+physiological values used only as training-time privileged supervision for a
+strictly pre-order candidate-medication student.
 
 The future Idea remains valid only under prospective mechanism subtraction:
 
@@ -61,21 +68,32 @@ The future Idea remains valid only under prospective mechanism subtraction:
 4. Static Medication Response Prototype and Response Shuffle as pairing/identity killers;
 5. richer Pre-Order Physiology and Generic KD when needed to remove simple modality/KD explanations.
 
-Any comparable simple matched control terminates the response-specific mechanism. Deployment leakage or unequal support invalidates the Gate. No architecture, response-window, modality, subgroup, or repeated-definition rescue is permitted under the same Idea.
+Any comparable simple matched control terminates the response-specific mechanism.
+Deployment leakage or unequal support invalidates the Gate. Gate 01 now freezes
+practical/statistical definitions of `materially`, `comparable`, and `≈` before
+training. No architecture, response-window, modality, subgroup,
+post-hoc-feature, favorable-seed, split, or repeated-definition rescue is
+permitted under the same Idea.
 
-Next owner:
+Canonical artifacts:
 
-`ccf-pipeline-orchestrator`.
+- [`007-privileged-physiological-response-supervision/README.md`](007-privileged-physiological-response-supervision/README.md)
+- [`007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md)
+- [`007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md)
 
-Authorized next workflow:
+Current owner state:
+
+`ccf-pipeline-orchestrator` admission and `ccf-experiment-designer` Gate-01 design
+are complete; independent design-integrity audit passed.
+
+Authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-No Gate 01, response-coverage diagnostic, or local training is authorized before that workflow creates Idea 007 and freezes the design.
+No response-coverage run, Gate execution, or local training is authorized before a
+separate explicit execution transition consumes the audited protocol unchanged.

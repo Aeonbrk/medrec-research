@@ -34,15 +34,17 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`.
-- **Active Idea**: none.
+- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`.
+- **Active Idea**: `007-privileged-physiological-response-supervision`.
 - **Ideas 001--006**: terminated.
-- **Idea 007**: not created / creation explicitly authorized.
+- **Idea 007**: created/admitted.
 - **Current family**: privileged physiological response supervision for medication recommendation.
 - **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`).
 - **Reviewer confidence**: medium-high.
-- **Next owner**: `ccf-pipeline-orchestrator`.
-- **Local scientific execution**: not authorized by this state.
+- **Admission owner**: `ccf-pipeline-orchestrator` (completed).
+- **Gate 01 design owner**: `ccf-experiment-designer` (completed).
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS`.
+- **Local scientific execution / training**: not authorized by this state.
 
 Current packet:
 
@@ -56,7 +58,7 @@ Latest closest-work provenance:
 
 [`memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md`](memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md).
 
-## Admitted pre-Idea boundary
+## Admitted Idea 007 boundary
 
 The exact search-scoped contribution is limited to:
 
@@ -64,9 +66,9 @@ The exact search-scoped contribution is limited to:
 
 The generic primitive is not novel. Current prior art covers response-aware MedRec, monitoring chains, MedRec KD, clinical privileged-modality KD, clinical future-aware teacher/student transfer, and medication-aware physiological-response representation. The remaining novelty is the MedRec-specific response-supervision object plus mechanism identification.
 
-## Frozen admission controls
+## Frozen Gate 01 controls
 
-Before any training, the future Gate 01 must preserve:
+Before any training, the audited Gate 01 protocol preserves:
 
 1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future.
 2. **Monitoring separation**: mandatory Monitoring-Mask-Only and physiological-value versus response-availability separation.
@@ -74,7 +76,13 @@ Before any training, the future Gate 01 must preserve:
 
 Future killer controls also include Static Medication Response Prototype, Response Shuffle, richer Pre-Order Physiology, and Generic KD only when KD mechanics remain a plausible explanation.
 
-Any simple matched control performing comparably to Proposed terminates the response-specific mechanism. Deployment leakage or unequal support invalidates the Gate. No architecture, response-window, modality, subgroup, or feature rescue follows those outcomes.
+Any simple matched control performing comparably to Proposed terminates the response-specific mechanism. Deployment leakage or unequal support invalidates the Gate. The protocol freezes practical/statistical rules for `materially`, `comparable`, and `≈` before training. No architecture, response-window, modality, subgroup, feature, favorable-seed, or split rescue follows those outcomes.
+
+Canonical Idea and Gate-01 artifacts:
+
+- [`ideas/007-privileged-physiological-response-supervision/`](ideas/007-privileged-physiological-response-supervision/)
+- [`ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md)
+- [`ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md)
 
 ## Claim boundary
 
@@ -110,18 +118,18 @@ These scoped failures constrain the current design but do not imply that future 
 
 ## Routing
 
-Authorized next workflow:
+Current authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-No Idea 007 directory, Gate 01 protocol, response-coverage run, or local training is created or authorized by this document itself.
+No response-coverage run, Gate execution, or local training is authorized by this
+state. A future execution transition must be explicit and must consume the audited
+protocol unchanged.
 
 ## Quarantine
 
@@ -136,6 +144,7 @@ Until explicitly authorized by a later frozen claim-support protocol, do not ins
 - [Research-Space Reorientation](memory/research-space-reorientation.md)
 - [Literature Opportunity Map](memory/literature-opportunity-map.md)
 - [Current Privileged-Response Reset](memory/model-reset-20260908-privileged-physiological-response/)
+- [Idea 007](ideas/007-privileged-physiological-response-supervision/)
 - [Cross-Idea Memory](memory/README.md)
 - [Reusable Lessons](memory/reusable-lessons.md)
 - [Ideas Index](ideas/README.md)

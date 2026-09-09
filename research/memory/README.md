@@ -8,9 +8,10 @@ This directory stores curated cross-Idea constraints, decisive failures, literat
 
 Authoritative project stage:
 
-`PRE_IDEA_PRIVILEGED_RESPONSE_ADMITTED_FOR_IDEA_007`
+`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
 
-There is currently **no active Idea**. Ideas 001--006 are terminated. Idea 007 does not yet exist, but creation is explicitly authorized.
+`007-privileged-physiological-response-supervision` is the active admitted Idea.
+Ideas 001--006 are terminated. Idea 007 has been created/admitted.
 
 The paper objective remains a first formal **method paper** targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed when it encodes an admitted scientific mechanism; architecture replacement by itself is insufficient.
 
@@ -20,17 +21,21 @@ Strict re-review verdict:
 
 `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-Next owner:
+Admission and design owners:
 
-`ccf-pipeline-orchestrator`.
+`ccf-pipeline-orchestrator` (admission complete) -> `ccf-experiment-designer`
+(Gate 01 design complete) -> independent design-integrity audit (pass).
 
-No local scientific execution is authorized by the current state. MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split remain quarantined.
+No local scientific execution or training is authorized by the current state.
+MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
+remain quarantined.
 
 ## Current privileged-response records
 
 - [`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/): current method-reset packet.
 - [`model-reset-20260908-privileged-physiological-response/idea-review.md`](model-reset-20260908-privileged-physiological-response/idea-review.md): current strict admission review, `ACCEPT_TO_CREATE_IDEA_007`.
 - [`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md): 2026-09-09 independent closest-work refresh and novelty subtraction.
+- [`../ideas/007-privileged-physiological-response-supervision/`](../ideas/007-privileged-physiological-response-supervision/): admitted Idea and audited Gate-01 design.
 - [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md): reusable mechanism-identification constraint from the prior pre-Idea state; not an empirical failure.
 
 ## Admitted response-supervision boundary
@@ -84,18 +89,18 @@ Failure records include:
 
 ## Routing
 
-Authorized next workflow:
+Current authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-No response-coverage run, Gate execution, or local training is authorized before the Idea/Gate protocol is created and audited.
+No response-coverage run, Gate execution, or local training is authorized before a
+separate explicit execution transition consumes the audited Idea-007 protocol
+unchanged.
 
 ## Navigation
 

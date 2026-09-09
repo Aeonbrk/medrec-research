@@ -4,7 +4,7 @@
 
 ## Status
 
-`REUSABLE_PRE_IDEA_CONSTRAINT / SATISFIED_FOR_IDEA_007_ADMISSION / NOT_AN_EMPIRICAL_FAILURE`
+`REUSABLE_PRE_IDEA_CONSTRAINT / SATISFIED_FOR_IDEA_007_ADMISSION / ROUTED_TO_GATE_01 / NOT_AN_EMPIRICAL_FAILURE`
 
 Source admission review:
 
@@ -14,7 +14,12 @@ Current reviewer verdict:
 
 `ACCEPT_TO_CREATE_IDEA_007`
 
-This record does not terminate the privileged physiological response family. It preserves the mechanism-identification rule that was required before the family could become an Idea. The bounded R1--R3 optimizer revision now satisfies this admission condition prospectively; whether the mechanism survives remains a future Gate-01 empirical question.
+This record does not terminate the privileged physiological response family. It
+preserves the mechanism-identification rule that was required before the family
+could become an Idea. The bounded R1--R3 optimizer revision satisfied this
+admission condition prospectively, Idea 007 was then created, and the audited
+Gate-01 protocol now tests whether the mechanism survives. No empirical result is
+recorded here.
 
 ## Constraint
 
@@ -65,19 +70,19 @@ Observed post-administration physiology remains observational and confounded. It
 
 ## Routing
 
-Next owner:
+Current Gate-01 artifact:
 
-`ccf-pipeline-orchestrator`.
+`research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`
 
-Authorized next workflow:
+Current authorized terminal state:
 
 ```text
-ccf-pipeline-orchestrator
--> create/admit Idea 007
--> ccf-experiment-designer
--> Gate 01 design-integrity audit
--> push
--> stop before training
+Idea 007 created/admitted
+Gate 01 design frozen/audited
+Training not authorized
+STOP
 ```
 
-This constraint record does not itself authorize local response-coverage inspection, Gate execution, or training.
+This constraint record does not authorize response-coverage inspection, Gate
+execution, Audit access, or training. The Gate-01 protocol and its independent
+design audit are the only current design artifacts.

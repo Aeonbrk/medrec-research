@@ -1,5 +1,15 @@
 # Plans
 
+## Active: Idea 007 — Privileged Physiological Response Supervision Gate 01 Design
+
+- **Admission**: `ACCEPT_TO_CREATE_IDEA_007`; Idea 007 was created/admitted by `ccf-pipeline-orchestrator`.
+- **Protocol**: `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`.
+- **Design audit**: `DESIGN_INTEGRITY_PASS` in `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`.
+- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`.
+- **Scope**: kill-first R1/R2/R3 mechanism controls, fixed support/concentration preflight, strict pre-order deployment contract, and frozen practical/statistical `materially` / `comparable` / `≈` rules.
+- **Decision boundary**: no response outcomes, model training, Audit access, G3/G4, R0 Holdout, or historical test access in this workflow; any future execution requires a separate explicit authorization and must stop on the frozen no-rescue rules.
+- **Current state**: design frozen/audited; training not authorized; stop.
+
 ## Completed: Semantic Admission — Safety-Preserving Substitution Structure (Idea 005)
 
 - **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-protocol.md`.
