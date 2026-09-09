@@ -21,6 +21,7 @@ import importlib.util
 import json
 import math
 import statistics
+import sys
 import tempfile
 from bisect import bisect_right
 from collections.abc import Iterable
@@ -298,6 +299,7 @@ def _load_existing_order_time_module(repo_root: Path) -> Any:
     if spec is None or spec.loader is None:
         raise ProtocolFailure("Unable to load existing order-time implementation")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
