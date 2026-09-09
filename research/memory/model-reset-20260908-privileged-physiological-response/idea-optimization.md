@@ -13,7 +13,7 @@
 
 The three lines above are the historical state of this optimizer artifact before
 the subsequent strict admission. The current canonical state is
-`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`; see
+`IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`; see
 [`research/ideas/007-privileged-physiological-response-supervision/`](../../ideas/007-privileged-physiological-response-supervision/)
 for the admitted Idea and audited Gate 01. The R1--R3 contract below remains
 frozen and is not reopened by this historical label.
@@ -121,7 +121,9 @@ $$
 L=L_{rec}+\lambda L_{resp-align},
 $$
 
-with an optional tightly scoped contrastive term only if needed to prevent representation collapse.
+The historical optimizer sketch allowed an optional contrastive term, but the
+canonical Gate-01 protocol freezes the sole alignment loss as latent MSE and
+does not permit a contrastive, reconstruction, cosine, or KL term.
 
 The exact encoder, response window, and loss coefficients are **not frozen at optimizer stage**.
 

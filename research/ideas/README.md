@@ -28,7 +28,7 @@ Idea-stage prototypes stay inside the Idea until stable reusable infrastructure 
 | [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** | NPMI co-selection scalar added no reliable incremental value |
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
-| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Admitted — Gate 01 design frozen/audited; training not authorized** | pending kill-first Gate 01 execution |
+| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Admitted — Gate 01 design frozen/implementability-closed; training not authorized** | pending kill-first Gate 01 execution |
 
 ## Current authoritative direction
 
@@ -36,14 +36,12 @@ Idea 007 is the current active admitted Idea.
 
 Stage:
 
-`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`.
+`IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`.
 
 Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
 the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
 
-The admitted method family is:
-
-**Privileged Physiological Response Supervision**
+The admitted method family is `Privileged Physiological Response Supervision`.
 
 Packet:
 
@@ -83,14 +81,15 @@ Canonical artifacts:
 
 Current owner state:
 
-`ccf-pipeline-orchestrator` admission and `ccf-experiment-designer` Gate-01 design
-are complete; independent design-integrity audit passed.
+`ccf-pipeline-orchestrator` admission is complete. The prior Gate-01
+implementation-readiness verdict was superseded after underspecification was
+found; `ccf-experiment-designer` owns the repair and re-audit.
 
 Authorized terminal state:
 
 ```text
 Idea 007 created/admitted
-Gate 01 design frozen/audited
+Gate 01 design frozen / implementability closed / independently audited
 Training not authorized
 STOP
 ```

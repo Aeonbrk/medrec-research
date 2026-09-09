@@ -7,9 +7,9 @@
 - **Idea**: `007-privileged-physiological-response-supervision`
 - **Owner**: `ccf-experiment-designer`
 - **Mode**: `ccf-experiment-designer / design`
-- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`
 - **Status**: `DESIGNED_NOT_EXECUTED`
-- **Design revision**: `v1.0`
+- **Design revision**: `v1.1`
 - **Design date**: `2026-09-09`
 - **Admission source revision**: `e301a0dbc8f511da038cad115ac80b108907f264`
 - **Training**: `NOT_AUTHORIZED`
@@ -61,7 +61,8 @@ The following symbols are fixed before any execution:
 - `P`: the fixed six-channel physiological set
   `{heart_rate, systolic_blood_pressure, diastolic_blood_pressure,
   respiratory_rate, oxygen_saturation, temperature}`. Source-specific item IDs
-  are mapped to these names by the existing public-safe Dataset Manifest; no
+  are mapped by the Idea-local source specification
+  [`gate-01-physiology-source-spec.md`](gate-01-physiology-source-spec.md); no
   seventh channel or substitute channel may be added after the preflight.
 - `r_e`: the six-channel physiological value tensor in `W(e)` for `P`.
 - `M_e`: the value-availability/missingness mask for exactly `P` and `W(e)`.
@@ -81,6 +82,34 @@ is constructed for an unchosen medication.
 The administration anchor, 24-hour window, channel set, validity rule, and support
 indicator are immutable after the mechanical preflight begins. A different window,
 anchor, or response definition is a new Idea, not a Gate-01 repair.
+
+### 2.1 Exact physiology tensorization
+
+For every event with its fixed anchor, define `W(e) = (a(e), a(e)+24 hours]`.
+The grid is 24 consecutive one-hour bins `(a(e)+(j-1)h, a(e)+jh]`, for
+`j = 1,...,24`. Values are ordered by `(bin_index, channel_order)` using the
+channel order in the source specification, so `r_e` and `M_e` have fixed shapes
+`[24, 6]`.
+
+For each bin and channel, retain every valid source observation after the source
+specification's unit and duplicate rules. If at least one valid observation exists,
+`r_e[j,c]` is their arithmetic median (the middle value after numeric sort; for an
+even count, the mean of the two middle values) and `M_e[j,c] = 1`. If none exists,
+`r_e[j,c] = 0` and `M_e[j,c] = 0`. Zero is a storage sentinel only; the mask is
+always a separate input. No forward-fill, back-fill, LOCF, interpolation,
+extrapolation, padding, truncation, or variable-length sequence is permitted.
+
+### 2.2 Future-value normalization
+
+For each channel `c`, compute `mu_c` and `sigma_c` only from observed cells
+`r_e[j,c]` with `M_e[j,c]=1` in `Gate01-Train` events with `A(e)=1`. The
+statistics are the arithmetic mean and population standard deviation over those
+cells; Dev and Audit never re-estimate them. If `sigma_c = 0`, set the frozen
+scale to `1`. Standardized observed cells are `(r_e-mu_c)/sigma_c`; cells with
+`M_e=0` are filled with `0` after standardization. The mask remains an independent
+input, so a zero-filled cell is never interpreted as a measured zero. These teacher
+statistics are disjoint from the Train-only pre-order statistics used by `S_pre`;
+no patient-, medication-, or future-evaluation normalization is allowed.
 
 ## 3. Mechanical response-linkage and support preflight
 
@@ -197,6 +226,38 @@ and `V7` supplies the future-free pre-order teacher through the same shell. Thus
 "comparable teacher capacity" means identical teacher architecture and parameter
 count, not an informal attempt to match total FLOPs after results are seen.
 
+### 5.2.1 Frozen teacher inputs and latent
+
+No non-focal treatment-context feature is admitted in Gate 01: its exact source
+and schema are the empty vector. At each of 24 steps the teacher input is
+`[z_r(j,:) (6), M_e(j,:) (6)]`; the seven monitoring-policy summaries from
+Section 5.4 are concatenated once to the sequence projection. `z_r` is normalized
+physiology. V8 additionally concatenates the focal-medication embedding (64
+dimensions) after that projection; V3 uses an all-zero vector in that slot. No
+other teacher feature, context table, treatment code, or outcome is allowed.
+
+The teacher GRU's projected hidden state at step 24 is `h_T(e)`; there is no
+pooling or attention. The student latent `h_S(e)` is the 64-dimensional
+interaction-MLP output immediately before the recommendation layer. The target
+is `stopgrad(h_T(e))`; the teacher receives no gradient from alignment. Every
+privileged branch also has one non-deployed teacher recommendation head from
+`h_T(e)` to the same candidate universe. Its cross-entropy loss is evaluated on
+the full `E_rec` with the same labels and batches as the student loss. This is
+the teacher's only independent objective; no reconstruction or other teacher
+loss exists.
+
+```text
+ell_aux^v(e) = (1/64) * || h_S(e) - stopgrad(h_T^v(e)) ||_2^2
+```
+
+This MSE is the sole student-teacher alignment loss: no cosine, KL, contrastive,
+reconstruction, or optional alignment term exists. The deployed recommendation
+head consumes `h_S(e)` only; it never consumes `h_T`, `r_e`, `M_e`, or
+future-derived features. V7 uses the same shell
+and alignment but its teacher input is the strictly pre-order student sequence,
+with the future value/mask positions set to frozen zeros and no focal-medication
+embedding in the teacher branch.
+
 ### 5.3 Allowed and forbidden student information
 
 The student may use only information available strictly before `t(e)`:
@@ -220,15 +281,25 @@ are completely absent at inference. A violation is
 `STOP_STUDENT_PATH_LEAKAGE` and invalidates the Gate rather than becoming an
 implementation issue.
 
+### 5.4 Monitoring-policy features
+
+Monitoring-policy features are only `M_e`, six occupied-bin fractions
+`sum_j M_e[j,c]/24`, and total occupied channel-bin fraction
+`sum_{j,c} M_e[j,c]/144`. They are deterministic functions of `M_e` and are
+supplied identically to V6 and V8 (and to V3 in the corresponding shell slots).
+Raw timestamps, raw counts, interval lengths, and value-derived masks are
+forbidden.
+
 ## 6. Objective and equal entitlement
 
 Every variant uses the same recommendation labels, candidate universe, batches,
-optimizer family, update budget, and evaluation code. The recommendation loss is
-the mean over the full `E_rec` set. Privileged variants add a single fixed-weight
-auxiliary term:
+optimizer family, update budget, and evaluation code. The student and
+non-deployed teacher recommendation heads each use the mean loss over the full
+`E_rec` set. Privileged variants add a single fixed-weight alignment term:
 
 ```text
-L_v = mean_{e in E_rec} ell_rec^v(e)
+L_v = mean_{e in E_rec} ell_rec_student^v(e)
+      + mean_{e in E_rec} ell_rec_teacher^v(e)
       + 1.0 * mean_{e in E_rec, A(e)=1} ell_aux^v(e).
 ```
 
@@ -256,10 +327,10 @@ subtractions are frozen before training.
 | `V2` | Base + Pre-Order Physiology | no privileged branch; adds only pre-order physiology/masks | whether ordinary richer pre-order physiology explains the gain |
 | `V3` | Generic Future-State Auxiliary / Medication-Ablated Future | same `r_e`, `M_e`, `a(e)`, `W(e)`, `A`, `S_pre`, `d_resp`, capacity, `lambda`, optimizer, and updates as Proposed; removes focal-medication identity and medication-specific response construction from the target branch | R1 medication-specificity subtraction |
 | `V4` | Static Medication Response Prototype | Train-only per-medication average future trajectory projected through the same `d_resp` target shell; no patient-specific future values; same `E_rec`, `A`, support, student, capacity, and updates | static medication identity/prototype explanation |
-| `V5` | Response Shuffle | Proposed value/mask tensors permuted within focal-medication and measurement-availability strata with frozen seed `70070`; same `E_rec`, `A`, window, capacity, and updates | patient–medication–response correspondence |
+| `V5` | Response Shuffle | normalized value trajectories permuted within focal-medication and measurement-availability strata with frozen seed `70070`; recipient masks remain fixed; same `E_rec`, `A`, window, capacity, and updates | patient–medication–response correspondence |
 | `V6` | Monitoring-Mask-Only | receives exactly `M_e` and fixed availability/frequency summaries over `W(e)` but no physiological values or value-derived summary; all other entitlement matches Proposed | R2 monitoring-policy sufficiency |
 | `V7` | Generic KD | same student, latent dimension, loss, and update entitlement; teacher sees no future physiology or response target and is trained only from the ordinary pre-order recommendation task | whether generic teacher–student/KD mechanics suffice |
-| `V8` | Proposed Privileged Physiological Response Supervision | teacher receives focal medication, allowed non-focal treatment context, `r_e`, and `M_e`; target is the medication-in-context response-associated latent; student remains `S_pre` | admitted response-specific method |
+| `V8` | Proposed Privileged Physiological Response Supervision | teacher receives focal medication, `r_e`, and `M_e`; target is the medication-in-context response-associated latent; student remains `S_pre` | admitted response-specific method |
 
 `V7` is required in this protocol because the admitted implementation has an
 explicit teacher/student alignment term, so distillation mechanics are a live
@@ -272,8 +343,7 @@ are seen.
 
 `V3` uses the identical observed future value tensor and mask as `V8`, the identical
 administration anchor and future window, and the identical supported event set.
-Its privileged branch may use only non-focal context defined in the Dataset
-Manifest. It must not use a focal-medication embedding, medication-coded event
+Its privileged branch uses no non-focal context. It must not use a focal-medication embedding, medication-coded event
 identifier, medication-conditioned delta, medication-specific label, or
 per-medication response prototype. The candidate medication remains in `S_pre` in
 both rows because removing it would change the recommendation task rather than
@@ -282,6 +352,29 @@ test the privileged target semantics.
 If `V3` is comparable to `V8`, the frozen stop is:
 
 `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE`.
+
+### 7.4 V4 static medication response prototype
+
+For each focal medication `m`, bin `j`, and channel `c`, V4 uses the arithmetic
+mean of normalized observed `r_e[j,c]` values from `Gate01-Train` events with
+`A(e)=1` and `m(e)=m`, restricted to cells with `M_e[j,c]=1`. If no Train cell
+exists, the prototype cell is `0` (the normalized Train channel mean). The
+prototype is constructed once from Train only, never from Dev/Audit, and is
+passed through the identical teacher shell. The recipient event supplies its own
+`M_e`; no patient-specific future value is read and no coverage-dependent rule
+change is allowed.
+
+### 7.5 V5 response shuffle
+
+The stratum key is `(m(e), b_e)`, where bit `c` of `b_e` is 1 iff
+`sum_j M_e[j,c] > 0`. Within each stratum, supported events are ordered by
+`(patient_id, admission_id, t(e), event_id)` and receive a seeded Fisher-Yates
+permutation with seed `70070`. The permutation unit is the complete normalized
+`24x6` value trajectory; `M_e` stays attached to the recipient. A singleton
+stratum is a fixed point. Recipient masking hides donor values where recipient
+`M_e=0`. This preserves focal-medication marginal and channel-level monitoring
+availability while destroying patient-medication-value correspondence. No
+outcome-based or additional stratum key is permitted.
 
 ### 7.2 R2 exact subtraction
 

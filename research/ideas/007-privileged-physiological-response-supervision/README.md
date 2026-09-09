@@ -3,15 +3,16 @@
 # Idea 007: Privileged Physiological Response Supervision
 
 - **Idea ID**: `007-privileged-physiological-response-supervision`
-- **Status**: `ADMITTED_GATE_01_DESIGN_FROZEN_AUDITED`
-- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+- **Status**: `ADMITTED_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED`
+- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_007`
 - **Admission owner**: `ccf-pipeline-orchestrator`
 - **Admission source revision**: `e301a0dbc8f511da038cad115ac80b108907f264`
 - **Strict review score**: `4.17 / 5.00` (medium-high confidence)
 - **Gate 01 owner**: `ccf-experiment-designer`
-- **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`)
+- **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`, implementability-closed revision)
 - **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md) (`DESIGNED_NOT_EXECUTED`)
+- **Physiology source spec**: [`experiments/gate-01-physiology-source-spec.md`](experiments/gate-01-physiology-source-spec.md)
 - **Training**: `NOT_AUTHORIZED`
 - **Response outcomes**: not accessed
 
@@ -139,10 +140,10 @@ audited design state.
 ## Current state
 
 ```text
-Stage: IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED
+Stage: IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED
 Active Idea: 007-privileged-physiological-response-supervision
 Idea 007: created/admitted
-Gate 01: design frozen / integrity audit passed / not executed
+Gate 01: design frozen / implementability closed / independently audited
 Training: NOT AUTHORIZED
-Next action: stop; await an explicitly authorized future execution workflow
+Next action: stop; await explicit future execution authorization
 ```

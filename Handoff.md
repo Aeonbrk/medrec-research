@@ -1,10 +1,10 @@
-# Handoff: Idea 007 Gate 01 Design Frozen and Audited
+# Handoff: Idea 007 Gate 01 Implementability Repair and Audit
 
 ## Current state
 
 Ideas 001--006 are terminated. Idea 007 is now the active admitted Idea.
 
-- **Current Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+- **Current Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`
 - **Current active Idea**: `007-privileged-physiological-response-supervision`
 - **Idea 007**: created/admitted
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
@@ -14,7 +14,7 @@ Ideas 001--006 are terminated. Idea 007 is now the active admitted Idea.
 - **Reviewer confidence**: medium-high
 - **Admission owner**: `ccf-pipeline-orchestrator` (completed)
 - **Gate 01 design owner**: `ccf-experiment-designer` (completed)
-- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS`
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after revision `v1.1` implementability closure
 - **Local scientific execution / training**: not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
@@ -29,6 +29,7 @@ Admission and Gate-01 artifacts:
 - `research/ideas/007-privileged-physiological-response-supervision/README.md`
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`
+- `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-physiology-source-spec.md`
 
 Historical authoritative packet:
 
@@ -45,9 +46,11 @@ The earlier reusable admission constraint remains useful as a methodological rul
 ## Admission decision and current gate state
 
 The strict re-review accepted the family for one kill-first Idea/Gate cycle. The
-pipeline orchestrator formally created/admitted Idea 007; the experiment designer
-then froze Gate 01 and the independent design-integrity audit passed. No response
-outcomes or model results exist.
+pipeline orchestrator formally created/admitted Idea 007. The first
+implementation-readiness check found underspecification and superseded its
+readiness verdict. Revision `v1.1` freezes source identity, tensorization,
+normalization, variants, teacher/student latents, and auxiliary loss; the
+independent audit now passes. No response outcomes or model results exist.
 
 The generic learning primitive is not novel. Current prior work separately covers:
 
@@ -153,10 +156,10 @@ Authorized next state:
 
 ```text
 Idea 007 created/admitted
-Gate 01 design frozen/audited
+Gate 01 design frozen / implementability-closed / independently audited
 Training not authorized
 STOP
 ```
 
-This handoff records the completed admission/design workflow. It does not authorize
+This handoff records the completed design repair and audit. It does not authorize
 response-coverage inspection, Gate execution, Audit access, or local training.

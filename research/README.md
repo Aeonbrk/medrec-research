@@ -34,7 +34,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`.
+- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`.
 - **Active Idea**: `007-privileged-physiological-response-supervision`.
 - **Ideas 001--006**: terminated.
 - **Idea 007**: created/admitted.
@@ -43,7 +43,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **Reviewer confidence**: medium-high.
 - **Admission owner**: `ccf-pipeline-orchestrator` (completed).
 - **Gate 01 design owner**: `ccf-experiment-designer` (completed).
-- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS`.
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after implementability closure.
 - **Local scientific execution / training**: not authorized by this state.
 
 Current packet:
@@ -122,7 +122,7 @@ Current authorized terminal state:
 
 ```text
 Idea 007 created/admitted
-Gate 01 design frozen/audited
+Gate 01 design frozen / implementability closed / independently audited
 Training not authorized
 STOP
 ```
