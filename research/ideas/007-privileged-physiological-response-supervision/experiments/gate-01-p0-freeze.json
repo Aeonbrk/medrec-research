@@ -1,0 +1,90 @@
+{
+  "record_type": "IDEA_007_GATE_01_P0_FREEZE",
+  "status": "PASS",
+  "starting_git_revision": "9c00461a708c46c601e52b13b16fbe7d531166fc",
+  "stage": "IDEA_007_GATE_01_MECHANICAL_PREFLIGHT_AUTHORIZED",
+  "protocol": {
+    "path": "research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md",
+    "design_revision": "v1.2",
+    "identity": "IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED"
+  },
+  "physiology_source_spec": {
+    "path": "research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-physiology-source-spec.md",
+    "spec_id": "idea007-gate01-physiology-mimiciv-v1",
+    "source": "MIMIC-IV icu.chartevents joined to icu.d_items"
+  },
+  "recommendation_universe": {
+    "definition": "existing causal MIMIC-IV order-time recommendation-example construction",
+    "authorized_pool": "all patients outside the existing R0 Holdout; Gate-01 partitions are assigned before response-linked aggregates",
+    "order_time_semantics": "existing non-overlapping positive medication-order bursts with a ten-minute half-open target horizon",
+    "candidate_universe": "the already frozen 131 ATC-L4 medication concepts"
+  },
+  "patient_split": {
+    "salt": "idea007-gate01-v1",
+    "intervals": {
+      "Gate01-Train": "[0.00, 0.70)",
+      "Gate01-Dev": "[0.70, 0.85)",
+      "Gate01-Audit": "[0.85, 1.00)"
+    },
+    "assignment_unit": "subject_id",
+    "assignment_order": "before any response-linked aggregate"
+  },
+  "administration_anchor": {
+    "same_admission": true,
+    "definition": "first actual positive eMAR administration of the focal medication after t(e)",
+    "allowed_delay": "0 < a(e)-t(e) <= 6 hours",
+    "later_administration_replaces_anchor": false,
+    "route_or_dose_rescue": false
+  },
+  "response_tensor": {
+    "window": "(a(e), a(e)+24 hours]",
+    "bins": "24 consecutive one-hour right-closed bins",
+    "shape": "[24, 6]",
+    "aggregation": "within-bin arithmetic median",
+    "interpolation": false,
+    "forward_fill": false,
+    "back_fill": false,
+    "channels": [
+      "heart_rate",
+      "systolic_blood_pressure",
+      "diastolic_blood_pressure",
+      "respiratory_rate",
+      "oxygen_saturation",
+      "temperature"
+    ]
+  },
+  "support_definition": "A(e)=1 iff e is an actually administered positive focal-medication event with a(e) satisfying the anchor rule and a valid linked W(e) containing at least two observed physiological timestamps and at least one valid value in the predeclared channel set; otherwise A(e)=0.",
+  "support_floors": {
+    "global": {
+      "E_rec": 10000,
+      "N_A": 5000,
+      "coverage": 0.1,
+      "distinct_supported_patients": 500,
+      "supported_focal_medications": 20,
+      "minimum_supported_events_per_counted_medication": 25
+    },
+    "partition": {
+      "E_rec": 1000,
+      "N_A": 500,
+      "coverage": 0.05,
+      "distinct_supported_patients": 100,
+      "supported_focal_medications": 10,
+      "minimum_supported_events_per_counted_medication": 10
+    }
+  },
+  "concentration_floors": {
+    "maximum_medication_share": 0.25,
+    "top_5_medication_share": 0.6,
+    "maximum_patient_share": 0.01,
+    "top_20_patient_share": 0.1,
+    "scope": "global and each Gate01 partition"
+  },
+  "quarantine": {
+    "MIMIC-IV G3/G4 future reserve": "untouched",
+    "R0 Holdout": "untouched",
+    "historical project test split": "untouched",
+    "recommendation_outcomes_predictions_and_training": "not accessed and not authorized"
+  },
+  "training": "NOT_AUTHORIZED",
+  "next_owner": "ccf-pipeline-orchestrator"
+}
