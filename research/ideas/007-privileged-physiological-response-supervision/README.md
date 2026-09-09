@@ -3,22 +3,25 @@
 # Idea 007: Privileged Physiological Response Supervision
 
 - **Idea ID**: `007-privileged-physiological-response-supervision`
-- **Status**: `ADMITTED_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED`
-- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`
+- **Status**: `TERMINATED_AT_GATE_01_P1`
+- **Stage**: `IDEA_007_TERMINATED_AT_GATE_01_P1`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_007`
 - **Admission owner**: `ccf-pipeline-orchestrator`
 - **Admission source revision**: `e301a0dbc8f511da038cad115ac80b108907f264`
 - **Strict review score**: `4.17 / 5.00` (medium-high confidence)
 - **Gate 01 owner**: `ccf-experiment-designer`
 - **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`, objective-domain closed / V7 executable)
-- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md) (`DESIGNED_NOT_EXECUTED`)
+- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md) (frozen `v1.2`)
 - **Physiology source spec**: [`experiments/gate-01-physiology-source-spec.md`](experiments/gate-01-physiology-source-spec.md)
+- **P0 freeze**: [`experiments/gate-01-p0-freeze.json`](experiments/gate-01-p0-freeze.json) (`PASS`)
+- **P1 mechanical preflight**: [`experiments/gate-01-mechanical-preflight.json`](experiments/gate-01-mechanical-preflight.json) (`STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`)
+- **P1 integrity audit**: [`experiments/gate-01-p1-integrity-audit.md`](experiments/gate-01-p1-integrity-audit.md) (`INTEGRITY_AUDIT_PASS`)
 - **Training**: `NOT_AUTHORIZED`
-- **Response outcomes**: not accessed
+- **Response outcomes / model metrics**: not accessed
 
-Idea 007 was formally created/admitted after the completed strict review. This is
-one bounded kill-first Gate-01 cycle, not a claim that the method works and not
-publication evidence.
+Idea 007 was formally created/admitted after the completed strict review. Its
+bounded kill-first Gate-01 cycle ended at the P1 mechanical support preflight;
+this is not a claim that the method works and not publication evidence.
 
 ## Scientific question
 
@@ -116,13 +119,38 @@ No rescue is allowed with a larger teacher, Transformer-to-Mamba/GNN replacement
 different response window, extra modalities, subgroup mining, post-hoc feature
 expansion, second response definition, favorable seed selection, or new split.
 
+## Gate 01 P0/P1 result
+
+P0 froze the protocol identity, source specification, `idea007-gate01-v1` patient
+split, administration anchor, six-channel response tensor, `A(e)` support rule,
+and all support/concentration floors. The P1 runner then assigned patient
+partitions before any response-linked aggregate and used only the existing causal
+order-time recommendation-example universe.
+
+The public-safe aggregate record is:
+
+| Scope | `E_rec` | `N_A` | Coverage | Supported patients | Supported meds | Min events/med |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Global | 5,553,455 | 163,610 | 0.029461 | 12,372 | 116 | 1 |
+| Gate01-Train | 3,907,607 | 114,350 | 0.029263 | 8,686 | 114 | 1 |
+| Gate01-Dev | 826,301 | 25,091 | 0.030365 | 1,796 | 103 | 1 |
+| Gate01-Audit | 819,547 | 24,169 | 0.029491 | 1,890 | 103 | 1 |
+
+Coverage fails the frozen global (`0.10`) and partition (`0.05`) floors in every
+scope, and the minimum supported-events-per-counted-medication floor fails in
+every scope. Medication concentration passes; patient concentration passes
+globally and in Train but fails both frozen patient checks in Dev and Audit.
+Therefore the frozen decision is
+`STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`. No rescue is
+authorized, and the response-specific mechanism terminates at Gate 01 P1.
+
 ## Data and authorization boundary
 
-The protocol permits a future mechanical response-linkage/coverage preflight only
-to determine whether the already admitted method has enough non-concentrated
-support. It is not exploratory research and it cannot inspect recommendation
-outcomes or tune the protocol. The preflight has fixed count, coverage, medication
-concentration, and patient-concentration floors; failure stops before training.
+The protocol permitted one mechanical response-linkage/coverage preflight only to
+determine whether the already admitted method had enough non-concentrated support.
+That preflight is complete and stopped before training. It did not inspect
+recommendation outcomes or tune the protocol; the fixed count, coverage,
+medication-concentration, and patient-concentration floors were applied as frozen.
 
 `Gate01-Train`, `Gate01-Dev`, and `Gate01-Audit` are patient-disjoint and ordered
 by a frozen hash split. Dev can select only among fixed checkpoints using the
@@ -130,10 +158,9 @@ predeclared rule. Audit is read once after every choice is frozen. MIMIC-IV G3/G
 R0 Holdout, and the historical project test split remain quarantined and
 uninspected.
 
-No response coverage run, training run, Audit evaluation, result table, patient
-record, prediction, weight, or private trace is created by this admission/design
-workflow. A later execution requires a new explicit authorization after the
-audited design state.
+No model training, Gate01 Dev/Audit model evaluation, result table, patient record,
+prediction, weight, or private trace was created. G3/G4, R0 Holdout, and the
+historical project test remain quarantined.
 
 ## Provenance
 
@@ -145,13 +172,16 @@ audited design state.
 ## Current state
 
 ```text
-Stage: IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED
-Active Idea: 007-privileged-physiological-response-supervision
-Idea 007: created/admitted
+Stage: IDEA_007_TERMINATED_AT_GATE_01_P1
+Idea 007: TERMINATED_AT_GATE_01_P1
+Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+P0 freeze: PASS
 Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-Mechanical preflight: NOT RUN
-Implementation: NOT STARTED
+P1 mechanical preflight: STOP
+Implementation: P1 runner only; full V1-V8 NOT STARTED
+Formal training: NOT RUN
 Training: NOT AUTHORIZED
+No rescue authorized
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```

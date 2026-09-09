@@ -83,7 +83,7 @@
     "MIMIC-IV G3/G4 future reserve": "untouched",
     "R0 Holdout": "untouched",
     "historical project test split": "untouched",
-    "recommendation_outcomes_predictions_and_training": "not accessed and not authorized"
+    "recommendation_outcomes_and_training": "not accessed and not authorized"
   },
   "training": "NOT_AUTHORIZED",
   "next_owner": "ccf-pipeline-orchestrator"

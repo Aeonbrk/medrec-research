@@ -28,15 +28,15 @@ Idea-stage prototypes stay inside the Idea until stable reusable infrastructure 
 | [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** | NPMI co-selection scalar added no reliable incremental value |
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
-| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Admitted — Gate 01 objective-domain closed / V7 executable / independently audited; training not authorized** | next owner: `ccf-pipeline-orchestrator` |
+| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
 
 ## Current authoritative direction
 
-Idea 007 is the current active admitted Idea.
+Idea 007 is the latest admitted Idea and is now terminated at Gate 01 P1.
 
 Stage:
 
-`IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`.
+`IDEA_007_TERMINATED_AT_GATE_01_P1`.
 
 Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
 the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
@@ -58,7 +58,7 @@ scientific object is medication-in-context realized post-administration
 physiological values used only as training-time privileged supervision for a
 strictly pre-order candidate-medication student.
 
-The future Idea remains valid only under prospective mechanism subtraction:
+The admitted method family was valid only under prospective mechanism subtraction:
 
 1. matched Generic Future-State Auxiliary / Medication-Ablated Future;
 2. mandatory Monitoring-Mask-Only and physiology-value versus response-availability separation;
@@ -78,25 +78,34 @@ Canonical artifacts:
 - [`007-privileged-physiological-response-supervision/README.md`](007-privileged-physiological-response-supervision/README.md)
 - [`007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md)
 - [`007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md)
+- [`007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json`](007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json)
+- [`007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json)
+- [`007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md`](007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md)
 
 Current owner state:
 
 `ccf-pipeline-orchestrator` admission is complete. `ccf-experiment-designer`
 closed the teacher-objective domain and froze the exact V7 Generic Pre-Order KD
-mapping; `ccf-integrity-auditor` returned `DESIGN_INTEGRITY_PASS`. The next owner
-is `ccf-pipeline-orchestrator`.
+mapping; `ccf-integrity-auditor` returned `DESIGN_INTEGRITY_PASS`. The P0 freeze
+passed, but the P1 mechanical preflight failed the frozen support floors and
+patient-concentration checks. The next owner is `ccf-pipeline-orchestrator`.
 
-Authorized terminal state:
+Terminal state:
 
 ```text
-Idea 007: created/admitted
+Idea 007: TERMINATED_AT_GATE_01_P1
+Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+P0 freeze: PASS
 Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-Mechanical preflight: NOT RUN
-Implementation: NOT STARTED
+P1 mechanical preflight: STOP
+Implementation: P1 runner only; full V1-V8 NOT STARTED
+Formal training: NOT RUN
 Training: NOT AUTHORIZED
+No rescue authorized
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```
 
-No response-coverage run, Gate execution, or local training is authorized before a
-separate explicit execution transition consumes the audited protocol unchanged.
+The public-safe P1 report and integrity audit are complete. No model
+implementation, Gate execution, recommendation-outcome evaluation, or local
+training is authorized after this terminal support failure.

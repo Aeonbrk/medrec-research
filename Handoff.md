@@ -1,12 +1,13 @@
-# Handoff: Idea 007 Gate 01 Implementability Repair and Audit
+# Handoff: Idea 007 Gate 01 P1 Support Termination
 
 ## Current state
 
-Ideas 001--006 are terminated. Idea 007 is now the active admitted Idea.
+Ideas 001--006 are terminated. Idea 007 was terminated at Gate 01 P1 after the
+frozen mechanical response-support preflight failed.
 
-- **Current Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`
-- **Current active Idea**: `007-privileged-physiological-response-supervision`
-- **Idea 007**: created/admitted
+- **Current Stage**: `IDEA_007_TERMINATED_AT_GATE_01_P1`
+- **Current Idea**: `007-privileged-physiological-response-supervision` (terminated)
+- **Idea 007**: terminated at Gate 01 P1
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
 - **Current method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION`
 - **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007`
@@ -15,9 +16,10 @@ Ideas 001--006 are terminated. Idea 007 is now the active admitted Idea.
 - **Admission owner**: `ccf-pipeline-orchestrator` (completed)
 - **Gate 01 design owner**: `ccf-experiment-designer` (completed)
 - **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after revision `v1.2` objective-domain and V7 implementability closure
-- **Mechanical preflight**: not run
-- **Implementation**: not started
-- **Local scientific execution / training**: not authorized
+- **P0 freeze**: `PASS` at starting revision `9c00461a708c46c601e52b13b16fbe7d531166fc`
+- **P1 mechanical preflight**: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`
+- **Implementation**: P1 runner only; full V1--V8 not started
+- **Local scientific execution / training**: not run / not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
@@ -32,6 +34,9 @@ Admission and Gate-01 artifacts:
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-physiology-source-spec.md`
+- `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json`
+- `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`
+- `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md`
 
 Historical authoritative packet:
 
@@ -45,7 +50,7 @@ The earlier reusable admission constraint remains useful as a methodological rul
 
 `research/memory/failures/privileged-response-preidea--response-specificity-not-yet-identified.md`.
 
-## Admission decision and current gate state
+## Admission decision and superseded design state
 
 The strict re-review accepted the family for one kill-first Idea/Gate cycle. The
 pipeline orchestrator formally created/admitted Idea 007. The first
@@ -71,7 +76,33 @@ The search-scoped surviving delta is therefore:
 > medication-in-context realized post-administration physiological **values** as positive-event, training-only privileged supervision for a strictly pre-order candidate-medication student, with matched controls proving that the gain depends on focal-medication conditioning, patient-medication-response correspondence, and physiological values rather than generic future prediction, monitoring policy, static medication priors, positive-event weighting, or KD mechanics.
 
 This was scientifically admissible for Idea creation. The admission and Gate-01
-design are not publication evidence.
+design were not publication evidence. The subsequent P0/P1 mechanical preflight
+is the terminal result for this Idea.
+
+## Gate 01 P0/P1 result
+
+P0 froze the admitted protocol, source specification, patient split, causal
+order-time recommendation universe, administration anchor, six-channel tensor,
+support definition, and support/concentration floors. The P1 runner assigned
+partitions before response-linked aggregation and produced only public-safe
+aggregates.
+
+The frozen support gate failed in every scope:
+
+| Scope | `E_rec` | `N_A` | Coverage | Supported patients | Supported meds | Min events/med |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Global | 5,553,455 | 163,610 | 0.029461 | 12,372 | 116 | 1 |
+| Gate01-Train | 3,907,607 | 114,350 | 0.029263 | 8,686 | 114 | 1 |
+| Gate01-Dev | 826,301 | 25,091 | 0.030365 | 1,796 | 103 | 1 |
+| Gate01-Audit | 819,547 | 24,169 | 0.029491 | 1,890 | 103 | 1 |
+
+Coverage is below the frozen global (`0.10`) and partition (`0.05`) floors, and
+the minimum supported-events-per-counted-medication floor fails globally and in
+every partition. Medication concentration passes; patient concentration passes
+globally and in Train but fails both frozen patient checks in Dev and Audit.
+The terminal decision is
+`STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`. No rescue is
+authorized.
 
 ## Frozen R1--R3 contract
 
@@ -161,18 +192,22 @@ This result remains separate from the privileged-response admission decision.
 
 ## Routing
 
-Authorized next state:
+Current terminal state:
 
 ```text
-Idea 007: created/admitted
+Idea 007: TERMINATED_AT_GATE_01_P1
+Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+P0 freeze: PASS
+P1 mechanical preflight: STOP
 Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-Mechanical preflight: NOT RUN
-Implementation: NOT STARTED
+Implementation: P1 runner only; full V1-V8 NOT STARTED
+Formal training: NOT RUN
 Training: NOT AUTHORIZED
+No rescue authorized
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```
 
-This handoff records the completed design repair and audit. It does not authorize
-response-coverage inspection, implementation, Gate execution, Audit access, or
-training.
+This handoff records the completed P0 freeze, P1 support failure, and integrity
+audit. It authorizes no model implementation, Gate execution, Audit evaluation,
+or training, and the frozen no-rescue boundary is terminal for this Idea.

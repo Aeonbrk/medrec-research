@@ -1,0 +1,194 @@
+{
+  "G3_G4_R0_holdout_historical_test_accessed": false,
+  "access_order": [
+    "assign patient partitions",
+    "construct existing causal order-time E_rec",
+    "link positive eMAR administration anchors",
+    "tensorize six-channel future windows and compute A(e)",
+    "compute aggregate support and concentration"
+  ],
+  "authorized_pool_metadata": {
+    "authorized_subjects": 211948,
+    "candidate_universe_identity": "frozen 131 ATC-L4 vocabulary",
+    "candidate_universe_size": 131,
+    "examples": 5553455,
+    "examples_with_administration_anchor": 1176752,
+    "partition_subjects": {
+      "Gate01-Audit": 31771,
+      "Gate01-Dev": 31750,
+      "Gate01-Train": 148427
+    }
+  },
+  "global": {
+    "E_rec": 5553455,
+    "N_A": 163610,
+    "concentration_checks": {
+      "maximum_medication_share": true,
+      "maximum_patient_share": true,
+      "top_20_patient_share": true,
+      "top_5_medication_share": true
+    },
+    "coverage": 0.029460939181104377,
+    "distinct_supported_patients": 12372,
+    "medication_concentration": {
+      "maximum_share": 0.1322107450644826,
+      "top_5_share": 0.4108245217285007
+    },
+    "medications_below_per_medication_floor": 33,
+    "minimum_supported_events_per_counted_medication": 1,
+    "pass": false,
+    "patient_concentration": {
+      "maximum_share": 0.0020597762972923415,
+      "top_20_share": 0.027614448994560236
+    },
+    "support_floor_checks": {
+      "E_rec": true,
+      "N_A": true,
+      "coverage": false,
+      "distinct_supported_patients": true,
+      "minimum_supported_events_per_counted_medication": false,
+      "supported_focal_medications": true
+    },
+    "supported_focal_medications": 116
+  },
+  "next_owner": "ccf-pipeline-orchestrator",
+  "partition_intervals": {
+    "Gate01-Audit": "[0.85, 1.00)",
+    "Gate01-Dev": "[0.70, 0.85)",
+    "Gate01-Train": "[0.00, 0.70)"
+  },
+  "partitions": {
+    "Gate01-Audit": {
+      "E_rec": 819547,
+      "N_A": 24169,
+      "concentration_checks": {
+        "maximum_medication_share": true,
+        "maximum_patient_share": false,
+        "top_20_patient_share": false,
+        "top_5_medication_share": true
+      },
+      "coverage": 0.029490682047521373,
+      "distinct_supported_patients": 1890,
+      "medication_concentration": {
+        "maximum_share": 0.13322851586743348,
+        "top_5_share": 0.4079192353841698
+      },
+      "medications_below_per_medication_floor": 29,
+      "minimum_supported_events_per_counted_medication": 1,
+      "pass": false,
+      "patient_concentration": {
+        "maximum_share": 0.011750589598245686,
+        "top_20_share": 0.10459679755058132
+      },
+      "support_floor_checks": {
+        "E_rec": true,
+        "N_A": true,
+        "coverage": false,
+        "distinct_supported_patients": true,
+        "minimum_supported_events_per_counted_medication": false,
+        "supported_focal_medications": true
+      },
+      "supported_focal_medications": 103
+    },
+    "Gate01-Dev": {
+      "E_rec": 826301,
+      "N_A": 25091,
+      "concentration_checks": {
+        "maximum_medication_share": true,
+        "maximum_patient_share": false,
+        "top_20_patient_share": false,
+        "top_5_medication_share": true
+      },
+      "coverage": 0.03036544794209374,
+      "distinct_supported_patients": 1796,
+      "medication_concentration": {
+        "maximum_share": 0.13088358375513132,
+        "top_5_share": 0.4069586704395999
+      },
+      "medications_below_per_medication_floor": 29,
+      "minimum_supported_events_per_counted_medication": 1,
+      "pass": false,
+      "patient_concentration": {
+        "maximum_share": 0.011518074209876052,
+        "top_20_share": 0.11390538440078116
+      },
+      "support_floor_checks": {
+        "E_rec": true,
+        "N_A": true,
+        "coverage": false,
+        "distinct_supported_patients": true,
+        "minimum_supported_events_per_counted_medication": false,
+        "supported_focal_medications": true
+      },
+      "supported_focal_medications": 103
+    },
+    "Gate01-Train": {
+      "E_rec": 3907607,
+      "N_A": 114350,
+      "concentration_checks": {
+        "maximum_medication_share": true,
+        "maximum_patient_share": true,
+        "top_20_patient_share": true,
+        "top_5_medication_share": true
+      },
+      "coverage": 0.029263434117095193,
+      "distinct_supported_patients": 8686,
+      "medication_concentration": {
+        "maximum_share": 0.13228683865325755,
+        "top_5_share": 0.41228683865325755
+      },
+      "medications_below_per_medication_floor": 23,
+      "minimum_supported_events_per_counted_medication": 1,
+      "pass": false,
+      "patient_concentration": {
+        "maximum_share": 0.0029470922606034105,
+        "top_20_share": 0.03539134236991692
+      },
+      "support_floor_checks": {
+        "E_rec": true,
+        "N_A": true,
+        "coverage": false,
+        "distinct_supported_patients": true,
+        "minimum_supported_events_per_counted_medication": false,
+        "supported_focal_medications": true
+      },
+      "supported_focal_medications": 114
+    }
+  },
+  "physiology_source_spec_id": "idea007-gate01-physiology-mimiciv-v1",
+  "protocol_revision": "v1.2",
+  "quarantine": "intact",
+  "recommendation_outcomes_accessed": false,
+  "record_type": "IDEA_007_GATE_01_P1_MECHANICAL_PREFLIGHT",
+  "schema_version": "1.0",
+  "split_salt": "idea007-gate01-v1",
+  "tensorization": {
+    "aggregation": "within-bin median",
+    "back_fill": false,
+    "bins": "24 one-hour right-closed bins",
+    "channel_order": [
+      "heart_rate",
+      "systolic_blood_pressure",
+      "diastolic_blood_pressure",
+      "respiratory_rate",
+      "oxygen_saturation",
+      "temperature"
+    ],
+    "forward_fill": false,
+    "interpolation": false,
+    "scan": {
+      "canonical_source_keys": 5026865,
+      "chartevent_rows_seen": 432997491,
+      "examples_with_observed_timestamp": 164197,
+      "examples_with_two_or_more_observed_timestamps": 163610,
+      "examples_with_valid_tensor_cell": 164197,
+      "supported_examples": 163610,
+      "valid_admitted_rows": 8610481,
+      "valid_rows_in_response_windows": 5041406
+    },
+    "shape": "[24,6]",
+    "window": "(a(e), a(e)+24 hours]"
+  },
+  "training": "NOT_RUN",
+  "verdict": "STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT"
+}
