@@ -8,39 +8,42 @@ This directory stores curated cross-Idea constraints, decisive failures, literat
 
 Authoritative project stage:
 
-`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+`PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
 
-`007-privileged-physiological-response-supervision` is the active admitted Idea.
-Ideas 001--006 are terminated. Idea 007 has been created/admitted.
+**Active Idea**: none. Ideas 001--007 are terminated; Idea 007 was formally
+closed at Gate 01 P1. No Idea 008 has been created or pre-allocated.
 
 The paper objective remains a first formal **method paper** targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed when it encodes an admitted scientific mechanism; architecture replacement by itself is insufficient.
 
-The admitted family is **privileged physiological response supervision**.
+The latest admitted family was **privileged physiological response supervision**;
+it is closed under Idea 007 after the Gate 01 P1 support failure.
 
 Strict re-review verdict:
 
 `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-Admission and design owners:
+Admission, design, and closure owners:
 
 `ccf-pipeline-orchestrator` (admission complete) -> `ccf-experiment-designer`
 (teacher-objective domain closed; exact V7 Generic Pre-Order KD frozen) ->
 `ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
-`ccf-pipeline-orchestrator` (next owner).
+`ccf-pipeline-orchestrator` (P0/P1 routing and closure complete) ->
+`ccf-idea-optimizer / exploratory` (next owner).
 
 No local scientific execution or training is authorized by the current state.
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
 remain quarantined.
 
-## Current privileged-response records
+## Historical privileged-response records
 
 - [`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/): current method-reset packet.
 - [`model-reset-20260908-privileged-physiological-response/idea-review.md`](model-reset-20260908-privileged-physiological-response/idea-review.md): current strict admission review, `ACCEPT_TO_CREATE_IDEA_007`.
 - [`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md): 2026-09-09 independent closest-work refresh and novelty subtraction.
 - [`../ideas/007-privileged-physiological-response-supervision/`](../ideas/007-privileged-physiological-response-supervision/): admitted Idea and audited Gate-01 design.
+- [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md): canonical Gate-01 P1 support failure and closure boundary.
 - [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md): reusable mechanism-identification constraint from the prior pre-Idea state; not an empirical failure.
 
-## Admitted response-supervision boundary
+## Closed Idea-007 response-supervision boundary
 
 The generic primitive is prior art. The search-scoped surviving object is:
 
@@ -53,7 +56,7 @@ The frozen admission contract requires:
 3. equal-support positive-only response semantics, full-`E_rec` student recommendation, supported-only teacher/alignment branches, and strictly pre-order student/deployment entitlement;
 4. future Gate killers including Response Shuffle, Static Medication Response Prototype, richer Pre-Order Physiology, and exact future-free Generic Pre-Order KD.
 
-If a simple matched control performs comparably, terminate the response-specific mechanism. If leakage or unequal support is detected, invalidate the Gate. Do not rescue with architecture scaling, another future window, extra modalities, subgroup mining, or repeated response-definition search.
+If a simple matched control performs comparably, terminate the response-specific mechanism. The P1 support gate did fail before training. Do not rescue with architecture scaling, another future window, extra modalities, subgroup mining, or repeated response-definition search under Idea 007.
 
 ## Cross-Idea failure memory
 
@@ -76,36 +79,39 @@ Failure records include:
 - [`failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md`](failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md)
 - [`failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md`](failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md)
 - [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md)
+- [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md)
 
 ## Current cross-Idea rules for new-model work
 
 > A new signal/state must beat its strongest equal-entitlement direct or semantic-ablation control.
-
 > A new architecture must encode a genuinely different decision object, supervision structure, state transition, or information flow.
-
 > Workflow action labels must survive state-semantic admission before being interpreted as regimen edits.
-
 > Privileged future information is admissible only for training when deployment inputs remain strictly pre-order and the proposed semantics survive matched generic-future, shuffle, prototype, monitoring, and support-entitlement controls.
-
+> For a method whose claimed mechanism depends on a realized-event subset, run a
+> cheap outcome-free supportability check before detailed model design when failure
+> would terminate the method rather than trigger threshold or window tuning.
 > Observational post-administration physiology may support a response-associated predictive representation, but it does not identify treatment effect, efficacy, therapeutic benefit, counterfactual outcome, clinical optimality, or individualized causal benefit.
 
 ## Routing
 
-Current authorized terminal state:
+Current project state:
 
 ```text
-Idea 007: created/admitted
-Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-Mechanical preflight: NOT RUN
-Implementation: NOT STARTED
+Idea 007: TERMINATED_AT_GATE_01_P1
+Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Active Idea: none
+Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Experiment: NOT AUTHORIZED
 Training: NOT AUTHORIZED
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+Next owner: ccf-idea-optimizer / exploratory
 ```
 
-No response-coverage run, Gate execution, or local training is authorized before a
-separate explicit execution transition consumes the audited Idea-007 protocol
-unchanged.
+Idea 007's P1 support record is complete and its no-rescue boundary is terminal.
+The next owner may scout a materially different direction, but this state does not
+authorize Idea 008, experiment design, feature exploration, or response-protocol
+relaxation.
 
 ## Navigation
 

@@ -1,14 +1,16 @@
 # Plans
 
-## Active: Idea 007 — Privileged Physiological Response Supervision Gate 01 Design
+## Completed: Idea 007 — Gate 01 P1 Support Termination and Closure
 
-- **Admission**: `ACCEPT_TO_CREATE_IDEA_007`; Idea 007 was created/admitted by `ccf-pipeline-orchestrator`.
+- **Admission**: `ACCEPT_TO_CREATE_IDEA_007`; Idea 007 was created/admitted and is now formally closed.
 - **Protocol**: `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`.
 - **Design audit**: `DESIGN_INTEGRITY_PASS` after teacher-objective domain closure and exact Generic Pre-Order KD re-audit in `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`.
-- **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`.
-- **Scope**: kill-first R1/R2/R3 mechanism controls, fixed support/concentration preflight, strict pre-order deployment contract, and frozen practical/statistical `materially` / `comparable` / `≈` rules.
-- **Decision boundary**: no response outcomes, model training, Audit access, G3/G4, R0 Holdout, or historical test access in this workflow; any future execution requires a separate explicit authorization and must stop on the frozen no-rescue rules.
-- **Current state**: design frozen / objective-domain closed / V7 executable / independently audited; mechanical preflight not run; implementation not started; training not authorized; quarantine intact; next owner `ccf-pipeline-orchestrator`.
+- **P0 freeze**: `PASS`; P1 verdict: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`.
+- **Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`.
+- **Scope**: frozen response-linkage/support preflight only; no V1--V8 implementation, model training, recommendation-outcome evaluation, or rescue.
+- **Failure record**: `research/memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`.
+- **Project state**: active Idea none; Idea 008 not created or pre-allocated; quarantine intact.
+- **Next owner**: `ccf-idea-optimizer / exploratory` for materially different method-paper direction scouting.
 
 ## Completed: Semantic Admission — Safety-Preserving Substitution Structure (Idea 005)
 

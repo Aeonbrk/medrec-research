@@ -36,6 +36,16 @@ When a preregistered gate returns no accepted action, tuning the risk budget, gr
 
 Failed routes can leave useful assets: EGSF left a strong-control diagnostic package, EG-TER left a continuous distortion metric and a leveled hard-filter protocol, and CRC-PS left a calibration stop rule and guarantee boundary. Reuse those assets as controls or diagnostics until new evidence supports a new claim. Archive evidence: `ARCHITECTURE.md`, `docs/PROJECT_SENSE.md`, and the three Failure Records under `failures/` ([CRC-PS](failures/crc-ps-r006--conformal-risk-certificate-exhaustion.md), [EG-TER](failures/eg-ter-repair--hard-safety-filter-baseline-trap.md), [EGSF](failures/egsf-selector--global-scalar-reranking-dominance.md)).
 
+## Check supportability before designing sparse realized-event supervision
+
+For a method whose claimed mechanism depends on supervision available only on a
+realized-event subset, run a cheap, outcome-free supportability check before
+committing to detailed model design. This check is useful only when failure would
+stop the method rather than trigger threshold or window tuning. The rule applies to
+privileged, post-action, realized-response, and similarly sparse auxiliary labels;
+it is not a general diagnostic checklist for every Idea.
+Evidence: `research/memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`.
+
 ## Keep archive logistics out of active research records
 
 Portable operational lessons are limited to the current repository's remote-execution and privacy contracts. Do not copy archive-specific hosts, paths, sockets, environment names, raw results, or traces into research evidence. Archive evidence: `findings.md` and the source-boundary exclusions in `archive-evidence-index.md`.

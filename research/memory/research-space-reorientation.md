@@ -4,26 +4,31 @@
 
 ## Current workflow state
 
-**Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+**Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
-**Current active Idea**: `007-privileged-physiological-response-supervision`.
+**Active Idea**: none.
 
-**Idea 007**: created/admitted.
+**Idea 007**: terminated at Gate 01 P1 with insufficient and materially
+concentrated response support.
 
-**Current method family**: privileged physiological response supervision.
+**Latest closed method family**: privileged physiological response supervision.
 
 **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
-**Admission/design owners**: `ccf-pipeline-orchestrator` (admission complete) ->
+**Admission/design/closure owners**: `ccf-pipeline-orchestrator` (admission complete) ->
 `ccf-experiment-designer` (teacher-objective domain closed; exact V7 Generic
 Pre-Order KD frozen) -> `ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
-`ccf-pipeline-orchestrator` (next owner).
+`ccf-pipeline-orchestrator` (P0/P1 routing and closure complete) ->
+`ccf-idea-optimizer / exploratory` (next owner).
 
 No local scientific execution or training is authorized by the current state.
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
 remain quarantined.
+
+No Idea 008 has been created or pre-allocated, and no literature search was run
+for this closure update.
 
 ## Cumulative failure landscape
 
@@ -79,6 +84,18 @@ Record:
 
 [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md).
 
+### F11 — realized-event privileged supervision can fail before modeling
+
+Idea 007's frozen six-channel, administered-positive, 24-hour response
+supervision object failed the Gate 01 P1 support contract before any model was
+trained. Coverage was below the global and partition floors, supported events per
+counted medication were too sparse, and Dev/Audit patient concentration also
+failed. The medication concentration checks passed.
+
+Record:
+
+[`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
+
 ## Higher-order reusable constraints
 
 ### C1 — cosmetic post-hoc resurrection is closed
@@ -129,6 +146,14 @@ Strictly pre-order deployment is necessary but insufficient. A response-specific
 
 The current bounded optimizer revision now freezes these requirements strongly enough for Idea admission.
 
+### C11 — sparse realized-event supervision requires supportability first
+
+When a claimed mechanism depends on supervision available only on a realized-event
+subset, a cheap outcome-free supportability check should precede detailed model
+design if failure would terminate the method rather than invite threshold or
+window tuning. This is a constraint on that supervision pattern, not a universal
+diagnostic checklist.
+
 ## Research-space boundary map
 
 | Route / premise | Status | Evidence boundary | Reopen / advance condition |
@@ -148,11 +173,11 @@ The current bounded optimizer revision now freezes these requirements strongly e
 | Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting | future access itself cannot carry novelty |
 | Generic future-observation distillation | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 | future access itself cannot carry novelty |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 | response-supervision role + MedRec-specific evidence |
-| **Privileged physiological response supervision** | **`IDEA 007 ACTIVE / OBJECTIVE DOMAIN CLOSED / V7 EXECUTABLE / AUDITED`** | strict re-review 2026-09-09; protocol and audit in `research/ideas/007-privileged-physiological-response-supervision/` | next owner `ccf-pipeline-orchestrator`; stop before training; any execution requires separate explicit authorization |
+| **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen P1 report and integrity audit in `research/ideas/007-privileged-physiological-response-supervision/` | do not relax the failed support contract; reopen only with a materially different object, source, setting, or independently motivated response definition |
 
 `CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
 
-## Current admitted method family: Idea 007
+## Closed method family record: Idea 007
 
 Packet:
 
@@ -209,6 +234,14 @@ The audited protocol operationalizes `materially` / `comparable` / `≈` with fi
 practical and statistical rules before training. An inconclusive interval is also
 a stop; it cannot be rescued by changing the threshold.
 
+The authorized P1 preflight reached the support stop before any model training:
+global coverage was `0.029461` against the `0.10` floor; Train, Dev, and Audit
+coverage was `0.029263`, `0.030365`, and `0.029491` against the `0.05` floor.
+Minimum supported events per counted medication failed in every scope, and Dev/Audit
+patient concentration also failed. The support record and integrity audit are the
+canonical closure evidence; no model comparison or physiology-wide conclusion
+follows from them.
+
 ### Non-causal boundary
 
 Observed post-administration physiology is not an individual medication effect. It may reflect severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, treatment timing, monitoring policy, and selective measurement.
@@ -219,14 +252,21 @@ Use `response-associated signature`, not treatment-effect, efficacy, therapeutic
 
 This admission is not an empirical result and not publication evidence. The first paper remains method-first.
 
-Current authorized terminal state:
+Current project state:
 
 ```text
-Idea 007: created/admitted
-Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-Mechanical preflight: NOT RUN
-Implementation: NOT STARTED
+Idea 007: TERMINATED_AT_GATE_01_P1
+Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Active Idea: none
+Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Experiment: NOT AUTHORIZED
 Training: NOT AUTHORIZED
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+Next owner: ccf-idea-optimizer / exploratory
 ```
+
+No new experiment, Gate execution, architecture work, response-protocol rescue, or
+Idea 008 creation is authorized by this map. The next owner may scout a materially
+different method-paper direction using the accumulated failures and literature
+memory; this closure update did not run a literature search.

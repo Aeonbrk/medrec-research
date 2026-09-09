@@ -1,15 +1,15 @@
-# Handoff: Idea 007 Gate 01 P1 Support Termination
+# Handoff: Idea 007 Closure and PRE_IDEA Reset
 
 ## Current state
 
-Ideas 001--006 are terminated. Idea 007 was terminated at Gate 01 P1 after the
-frozen mechanical response-support preflight failed.
+Ideas 001--007 are terminated. Idea 007 is formally closed after the frozen Gate
+01 P1 mechanical response-support preflight failed.
 
-- **Current Stage**: `IDEA_007_TERMINATED_AT_GATE_01_P1`
-- **Current Idea**: `007-privileged-physiological-response-supervision` (terminated)
-- **Idea 007**: terminated at Gate 01 P1
+- **Current Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
+- **Active Idea**: none
+- **Idea 007**: `TERMINATED_AT_GATE_01_P1` (historical, closed)
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
-- **Current method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION`
+- **Latest method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION` (closed)
 - **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007`
 - **Strict re-review score**: `4.17 / 5.00`
 - **Reviewer confidence**: medium-high
@@ -20,9 +20,12 @@ frozen mechanical response-support preflight failed.
 - **P1 mechanical preflight**: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`
 - **Implementation**: P1 runner only; full V1--V8 not started
 - **Local scientific execution / training**: not run / not authorized
+- **Idea 007 failure memory**: `research/memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
+- **New Idea 008**: not created / not pre-allocated
+- **Next owner**: `ccf-idea-optimizer / exploratory`
 
 ## Current packet
 
@@ -37,6 +40,7 @@ Admission and Gate-01 artifacts:
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json`
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`
 - `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md`
+- `research/memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`
 
 Historical authoritative packet:
 
@@ -103,6 +107,20 @@ globally and in Train but fails both frozen patient checks in Dev and Audit.
 The terminal decision is
 `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`. No rescue is
 authorized.
+
+## Formal Idea 007 closure
+
+The P1 result is a supportability failure for the frozen supervision object, not a
+model or optimization result. It does not show that physiology has no predictive
+information, that physiological response is universally useless, or that there is
+causal evidence against medication response. The dedicated failure memory records
+the narrow interpretation and the non-revival boundary.
+
+The project therefore returns to a pre-Idea state. The next owner may scout a
+materially different method-paper direction using failures 001--007, reusable
+lessons, the current research-space reorientation, the literature opportunity map,
+and first-paper constraints. This closure does not authorize Idea 008, a new
+experiment, feature exploration, or literature search in this round.
 
 ## Frozen R1--R3 contract
 
@@ -192,22 +210,22 @@ This result remains separate from the privileged-response admission decision.
 
 ## Routing
 
-Current terminal state:
+Current project state:
 
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
-P0 freeze: PASS
-P1 mechanical preflight: STOP
-Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-Implementation: P1 runner only; full V1-V8 NOT STARTED
-Formal training: NOT RUN
+Active Idea: none
+Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Experiment: NOT AUTHORIZED
 Training: NOT AUTHORIZED
-No rescue authorized
+No rescue authorized for Idea 007
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+Next owner: ccf-idea-optimizer / exploratory
 ```
 
-This handoff records the completed P0 freeze, P1 support failure, and integrity
-audit. It authorizes no model implementation, Gate execution, Audit evaluation,
-or training, and the frozen no-rescue boundary is terminal for this Idea.
+This handoff records the completed P0 freeze, P1 support failure, integrity audit,
+canonical failure memory, and project-level PRE_IDEA reset. It authorizes no model
+implementation, Gate execution, Audit evaluation, training, Idea 008 creation, or
+new experiment in this round.

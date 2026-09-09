@@ -34,11 +34,11 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `IDEA_007_TERMINATED_AT_GATE_01_P1`.
-- **Current Idea**: `007-privileged-physiological-response-supervision` (terminated at Gate 01 P1).
-- **Ideas 001--006**: terminated.
-- **Idea 007**: created/admitted, then terminated at Gate 01 P1.
-- **Current family**: privileged physiological response supervision for medication recommendation.
+- **Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`.
+- **Active Idea**: none.
+- **Ideas 001--007**: terminated.
+- **Latest Idea**: `007-privileged-physiological-response-supervision` (closed at Gate 01 P1).
+- **Latest family**: privileged physiological response supervision for medication recommendation (closed under Idea 007).
 - **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`).
 - **Reviewer confidence**: medium-high.
 - **Admission owner**: `ccf-pipeline-orchestrator` (completed).
@@ -47,6 +47,8 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **P0 freeze**: `PASS` at starting revision `9c00461a708c46c601e52b13b16fbe7d531166fc`.
 - **P1 mechanical preflight**: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`.
 - **Full V1--V8 implementation / training**: not started / not run.
+- **Idea 007 failure memory**: [`memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
+- **Next owner**: `ccf-idea-optimizer / exploratory`.
 
 Current packet:
 
@@ -60,7 +62,7 @@ Latest closest-work provenance:
 
 [`memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md`](memory/model-reset-20260908-privileged-physiological-response/closest-work-review.md).
 
-## Admitted Idea 007 boundary
+## Closed Idea 007 boundary
 
 The exact search-scoped contribution is limited to:
 
@@ -88,6 +90,7 @@ Canonical Idea and Gate-01 artifacts:
 - [`ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json`](ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json)
 - [`ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json)
 - [`ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md`](ideas/007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md)
+- [`memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md)
 
 ## Claim boundary
 
@@ -123,26 +126,26 @@ These scoped failures constrain the current design but do not imply that future 
 
 ## Routing
 
-Current terminal state:
+Current project state:
 
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
-P0 freeze: PASS
-Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-P1 mechanical preflight: STOP
-Implementation: P1 runner only; full V1-V8 NOT STARTED
-Formal training: NOT RUN
+Active Idea: none
+Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Experiment: NOT AUTHORIZED
 Training: NOT AUTHORIZED
-No rescue authorized
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+No rescue authorized for Idea 007
+Next owner: ccf-idea-optimizer / exploratory
 ```
 
-The P1 support record and integrity audit are complete. No model implementation,
-Gate execution, recommendation-outcome evaluation, or local training is
-authorized after this terminal support failure. The frozen no-rescue boundary
-applies to the Idea.
+The P1 support record, integrity audit, and canonical failure memory are complete.
+No model implementation, Gate execution, recommendation-outcome evaluation, or
+local training is authorized after this terminal support failure. The next owner
+may scout a materially different method-paper direction; this state does not
+create or pre-allocate Idea 008.
 
 ## Quarantine
 

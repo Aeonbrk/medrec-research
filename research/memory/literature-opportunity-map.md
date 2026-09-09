@@ -6,12 +6,15 @@
 
 Refresh date: 2026-09-09.
 
+Closure update: 2026-09-10, using existing protocol/P1 records only; no new
+literature search was run.
+
 Current project stage:
 
-`IDEA_007_GATE_01_DESIGN_FROZEN_AUDITED_TRAINING_NOT_AUTHORIZED`
+`PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
 
-`007-privileged-physiological-response-supervision` is the active admitted Idea.
-Ideas 001--006 are terminated. Idea 007 has been formally created/admitted.
+**Active Idea**: none. Ideas 001--007 are terminated. Idea 007 was formally
+created/admitted and then closed at Gate 01 P1.
 
 Current packet:
 
@@ -34,6 +37,11 @@ Gate-01 protocol and independent design audit:
 [`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md),
 [`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md).
 
+P1 closure evidence:
+
+[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json),
+[`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
+
 ## Closed or compressed spaces
 
 | Space | Current judgment | Main reason |
@@ -55,15 +63,21 @@ Gate-01 protocol and independent design audit:
 | Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting |
 | True-future-observation teacher → current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 |
-| **Privileged physiological response supervision** | **`IDEA 007 ACTIVE / GATE 01 DESIGN FROZEN AND AUDITED`** | exact scientific object survives bounded closest-work search; R1--R3 and the audited kill-first protocol make its semantics falsifiable |
+| **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen six-channel administered-positive formulation failed supportability before training; P1 report and integrity audit are canonical |
 
-## Current admitted opportunity
+## Closed Idea-007 opportunity record
 
-**Privileged physiological response supervision for medication recommendation.**
+**Privileged physiological response supervision for medication recommendation** was
+the bounded Idea-007 opportunity; it is now closed before training.
 
-The generic future-privileged KD mechanism is not the opportunity. The opportunity is the MedRec-specific scientific object:
+The generic future-privileged KD mechanism was not the opportunity. The tested
+MedRec-specific scientific object was:
 
 > use medication-in-context realized post-administration physiological **values** only as positive-event training supervision for a strictly pre-order candidate-medication student, then require matched evidence that focal medication conditioning, individualized response pairing, and physiological values matter beyond generic future supervision, monitoring policy, static medication priors, response-independent regularization, positive-event weighting, and KD mechanics.
+
+The frozen formulation did not have sufficient, sufficiently distributed support
+for Gate-01 mechanism learning. This closes the formulation under Idea 007; it does
+not establish that physiology or response supervision is universally uninformative.
 
 ## Closest-work subtraction
 
@@ -133,9 +147,13 @@ Within the retained 2023--2026 search, no direct general-MedRec method was found
 
 This is a narrow composition of established primitives. It becomes a meaningful MedRec method contribution only if Gate 01 establishes that the signal is specifically carried by medication-in-context physiological values and pairing.
 
-Novelty status:
+Novelty status at admission:
 
 `MODERATE / SEARCH-SCOPED / ADMITTED_FOR_ONE_KILL_FIRST_GATE`.
+
+Current status:
+
+`CLOSED_UNDER_IDEA_007_P1_SUPPORT_TERMINATION`.
 
 This is not a universal novelty proof.
 
@@ -190,15 +208,20 @@ Disallowed without independent causal identification:
 
 ## Current routing
 
-Current authorized terminal state:
+Current project state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen/audited
-Training not authorized
-STOP
+Idea 007: TERMINATED_AT_GATE_01_P1
+Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Active Idea: none
+Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Experiment: NOT AUTHORIZED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-idea-optimizer / exploratory
 ```
 
-No local experiment, response-coverage diagnostic, Gate execution, or architecture
-work is authorized by this map. A separate explicit execution transition must
-consume the audited protocol unchanged.
+No new experiment, response-coverage rescue, Gate execution, architecture work, or
+Idea 008 creation is authorized by this map. The next owner may scout a materially
+different method-paper direction; no literature search was run for this closure.

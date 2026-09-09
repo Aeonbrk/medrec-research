@@ -30,18 +30,19 @@ Idea-stage prototypes stay inside the Idea until stable reusable infrastructure 
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
 
-## Current authoritative direction
+## Current project state
 
-Idea 007 is the latest admitted Idea and is now terminated at Gate 01 P1.
+Idea 007 is the latest admitted Idea and is now formally closed at Gate 01 P1.
+There is no active Idea, and Idea 008 has not been created or pre-allocated.
 
 Stage:
 
-`IDEA_007_TERMINATED_AT_GATE_01_P1`.
+`PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`.
 
 Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
 the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
 
-The admitted method family is `Privileged Physiological Response Supervision`.
+The closed method family was `Privileged Physiological Response Supervision`.
 
 Packet:
 
@@ -73,7 +74,7 @@ training. No architecture, response-window, modality, subgroup,
 post-hoc-feature, favorable-seed, split, or repeated-definition rescue is
 permitted under the same Idea.
 
-Canonical artifacts:
+Historical Idea-007 artifacts:
 
 - [`007-privileged-physiological-response-supervision/README.md`](007-privileged-physiological-response-supervision/README.md)
 - [`007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md)
@@ -81,16 +82,18 @@ Canonical artifacts:
 - [`007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json`](007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json)
 - [`007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json)
 - [`007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md`](007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md)
+- [`../memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](../memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md)
 
 Current owner state:
 
-`ccf-pipeline-orchestrator` admission is complete. `ccf-experiment-designer`
-closed the teacher-objective domain and froze the exact V7 Generic Pre-Order KD
-mapping; `ccf-integrity-auditor` returned `DESIGN_INTEGRITY_PASS`. The P0 freeze
-passed, but the P1 mechanical preflight failed the frozen support floors and
-patient-concentration checks. The next owner is `ccf-pipeline-orchestrator`.
+`ccf-pipeline-orchestrator` admission and closure are complete.
+`ccf-experiment-designer` closed the teacher-objective domain and froze the exact
+V7 Generic Pre-Order KD mapping; `ccf-integrity-auditor` returned
+`DESIGN_INTEGRITY_PASS` for design and `INTEGRITY_AUDIT_PASS` for P1. The P0
+freeze passed, but the P1 mechanical preflight failed the frozen support floors and
+patient-concentration checks. The next owner is `ccf-idea-optimizer / exploratory`.
 
-Terminal state:
+Idea-007 terminal state and project routing:
 
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
@@ -103,9 +106,12 @@ Formal training: NOT RUN
 Training: NOT AUTHORIZED
 No rescue authorized
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+Active Idea: none
+Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Next owner: ccf-idea-optimizer / exploratory
 ```
 
-The public-safe P1 report and integrity audit are complete. No model
-implementation, Gate execution, recommendation-outcome evaluation, or local
-training is authorized after this terminal support failure.
+The public-safe P1 report, integrity audit, and failure memory are complete. No
+model implementation, Gate execution, recommendation-outcome evaluation, local
+training, Idea 008 creation, or new experiment design is authorized in this state.

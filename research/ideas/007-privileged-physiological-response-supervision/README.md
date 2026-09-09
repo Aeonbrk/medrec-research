@@ -16,6 +16,7 @@
 - **P0 freeze**: [`experiments/gate-01-p0-freeze.json`](experiments/gate-01-p0-freeze.json) (`PASS`)
 - **P1 mechanical preflight**: [`experiments/gate-01-mechanical-preflight.json`](experiments/gate-01-mechanical-preflight.json) (`STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`)
 - **P1 integrity audit**: [`experiments/gate-01-p1-integrity-audit.md`](experiments/gate-01-p1-integrity-audit.md) (`INTEGRITY_AUDIT_PASS`)
+- **Canonical failure memory**: [`../../memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](../../memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md)
 - **Training**: `NOT_AUTHORIZED`
 - **Response outcomes / model metrics**: not accessed
 
@@ -183,5 +184,8 @@ Formal training: NOT RUN
 Training: NOT AUTHORIZED
 No rescue authorized
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+Project Active Idea: none
+Project Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+New Idea: NOT CREATED
+Next owner: ccf-idea-optimizer / exploratory
 ```
