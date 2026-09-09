@@ -9,7 +9,7 @@
 - **Mode**: `ccf-experiment-designer / design`
 - **Stage**: `IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED`
 - **Status**: `DESIGNED_NOT_EXECUTED`
-- **Design revision**: `v1.1`
+- **Design revision**: `v1.2`
 - **Design date**: `2026-09-09`
 - **Admission source revision**: `e301a0dbc8f511da038cad115ac80b108907f264`
 - **Training**: `NOT_AUTHORIZED`
@@ -75,9 +75,11 @@ The following symbols are fixed before any execution:
          value in the predeclared channel set; otherwise A(e) = 0.
   ```
 
-`A(e)=0` disables only the auxiliary term. It never drops, changes, or
-differentially reweights `e` in the recommendation objective. No response target
-is constructed for an unchosen medication.
+`A(e)=0` disables the teacher branch and auxiliary branch only. It never drops,
+changes, resamples, or differentially reweights `e` in the student recommendation
+objective. No teacher input, synthetic future tensor, fake anchor, fake mask,
+zero-response target, or other response target is constructed for an unsupported
+example or an unchosen medication. All `V3`--`V8` use this same `A(e)`.
 
 The administration anchor, 24-hour window, channel set, validity rule, and support
 indicator are immutable after the mechanical preflight begins. A different window,
@@ -213,38 +215,44 @@ their pre-order missingness indicators. `S_pre` for every privileged variant is 
 same architecture as Base + Pre-Order Physiology and receives the same candidate
 medication input `m(e)`.
 
-### 5.2 Teacher capacity contract
+### 5.2 Privileged teacher families and shared entitlement
 
-Every trainable privileged branch uses one fixed teacher shell: a one-layer GRU
-with hidden size `128`, a fixed input projection, LayerNorm, and a linear projection
-to `d_resp = 64`. The input schema, sequence length, parameter count, optimizer,
-and update budget are identical for `V3`–`V8`. An ablated signal is represented by
-the predeclared zero/constant channel in that same schema; it never removes a
-module or gives a control a smaller network. `V4` supplies the Train-only static
-prototype through this shell, `V5` supplies the frozen within-stratum permutation,
-and `V7` supplies the future-free pre-order teacher through the same shell. Thus
-"comparable teacher capacity" means identical teacher architecture and parameter
+`V3`, `V4`, `V5`, `V6`, and `V8` use one identical response-teacher shell: a
+one-layer GRU with hidden size `128`, a fixed input projection, LayerNorm, and a
+linear projection to `d_resp = 64`. Their response-teacher input schema, sequence
+length, parameter count, optimizer, and update budget are identical. An ablated
+signal is represented by the predeclared zero/constant channel in that same schema;
+it never removes a module or gives a response-family control a smaller network.
+`V4` supplies the Train-only static prototype through this shell, and `V5` supplies
+the frozen within-stratum permutation. Thus "comparable teacher capacity" within
+the response-family comparison means identical teacher architecture and parameter
 count, not an informal attempt to match total FLOPs after results are seen.
 
-### 5.2.1 Frozen teacher inputs and latent
+`V7` does not use or emulate this physiology shell. It uses the exact Generic
+Pre-Order KD teacher frozen in Section 5.2.2. All `V3`--`V8` nevertheless share the
+same deployable student, 64-dimensional alignment latent, `A(e)` support,
+alignment loss, optimizer family, batch schedule, seeds, epoch/update entitlement,
+checkpoint rule, and evaluation contract.
+
+### 5.2.1 Frozen response-teacher inputs and latent
 
 No non-focal treatment-context feature is admitted in Gate 01: its exact source
-and schema are the empty vector. At each of 24 steps the teacher input is
+and schema are the empty vector. For an `A(e)=1` example, at each of 24 steps the
+response-teacher input is
 `[z_r(j,:) (6), M_e(j,:) (6)]`; the seven monitoring-policy summaries from
 Section 5.4 are concatenated once to the sequence projection. `z_r` is normalized
 physiology. V8 additionally concatenates the focal-medication embedding (64
 dimensions) after that projection; V3 uses an all-zero vector in that slot. No
 other teacher feature, context table, treatment code, or outcome is allowed.
 
-The teacher GRU's projected hidden state at step 24 is `h_T(e)`; there is no
+The response-teacher GRU's projected hidden state at step 24 is `h_T(e)`; there is no
 pooling or attention. The student latent `h_S(e)` is the 64-dimensional
 interaction-MLP output immediately before the recommendation layer. The target
-is `stopgrad(h_T(e))`; the teacher receives no gradient from alignment. Every
-privileged branch also has one non-deployed teacher recommendation head from
-`h_T(e)` to the same candidate universe. Its cross-entropy loss is evaluated on
-the full `E_rec` with the same labels and batches as the student loss. This is
-the teacher's only independent objective; no reconstruction or other teacher
-loss exists.
+is `stopgrad(h_T(e))`; the teacher receives no gradient from alignment. Each
+response-family branch has one non-deployed teacher recommendation head from
+`h_T(e)` to the same candidate universe and labels as the student head. Its
+cross-entropy loss is evaluated only on `A(e)=1` examples. This is the teacher's
+only independent objective; no reconstruction or other teacher loss exists.
 
 ```text
 ell_aux^v(e) = (1/64) * || h_S(e) - stopgrad(h_T^v(e)) ||_2^2
@@ -253,10 +261,45 @@ ell_aux^v(e) = (1/64) * || h_S(e) - stopgrad(h_T^v(e)) ||_2^2
 This MSE is the sole student-teacher alignment loss: no cosine, KL, contrastive,
 reconstruction, or optional alignment term exists. The deployed recommendation
 head consumes `h_S(e)` only; it never consumes `h_T`, `r_e`, `M_e`, or
-future-derived features. V7 uses the same shell
-and alignment but its teacher input is the strictly pre-order student sequence,
-with the future value/mask positions set to frozen zeros and no focal-medication
-embedding in the teacher branch.
+future-derived features. For `A(e)=0`, no response-teacher tensor or latent is
+constructed and neither the response-teacher recommendation loss nor alignment
+loss is evaluated.
+
+### 5.2.2 V7 Generic Pre-Order KD teacher
+
+`V7`, **Generic Pre-Order KD**, uses a parameter-independent, non-deployed teacher
+`T_pre` that is exactly isomorphic to the deployable `S_pre`:
+
+- its input is the exact same strict pre-order event/state sequence, pre-order
+  physiology and missingness inputs, timing context, and candidate medication
+  schema used by `S_pre`;
+- it uses the same one-layer causal pre-order GRU with hidden size `128`;
+- its candidate-medication embedding has the same `64` dimensions;
+- its interaction MLP is the same `256 -> 128 -> 64` architecture;
+- `h_T^V7(e)` is exactly that teacher interaction MLP's final 64-dimensional
+  output;
+- its recommendation head uses the same candidate universe and labels as the
+  student recommendation head.
+
+The V7 teacher has independent parameters and is absent at deployment. It uses no
+future physiology, future mask, future administration, future normalization,
+discharge-coded feature, or other future-coded feature. It is not inserted into,
+zero-filled for, or otherwise mapped onto the response-teacher shell. On
+`A(e)=1` examples only, its recommendation head receives its sole independent
+objective and its detached latent supplies
+`mean((h_S(e)-stopgrad(h_T^V7(e)))^2)` over the 64 coordinates with
+`lambda_aux=1.0`. No KL, cosine, contrastive, reconstruction, or temperature
+tuning is permitted. The teacher receives gradients only from its supported-example
+recommendation loss; the student receives its full-`E_rec` recommendation gradient
+and its supported-example alignment gradient.
+
+V7 uses the same seeds, AdamW optimizer family, batch schedule, maximum epochs,
+overall student-update entitlement, supported teacher/alignment update entitlement,
+and Dev checkpoint rule as the other privileged variants. For `A(e)=0`, V7 runs
+only the student recommendation path: no teacher latent, teacher recommendation
+loss, or alignment target is constructed. V7 tests whether ordinary pre-order
+teacher/student distillation mechanics explain the gain without any privileged
+future-response information.
 
 ### 5.3 Allowed and forbidden student information
 
@@ -286,25 +329,35 @@ implementation issue.
 Monitoring-policy features are only `M_e`, six occupied-bin fractions
 `sum_j M_e[j,c]/24`, and total occupied channel-bin fraction
 `sum_{j,c} M_e[j,c]/144`. They are deterministic functions of `M_e` and are
-supplied identically to V6 and V8 (and to V3 in the corresponding shell slots).
+supplied identically to V3, V4, V5, V6, and V8 in the corresponding response-shell
+slots.
 Raw timestamps, raw counts, interval lengths, and value-derived masks are
 forbidden.
 
 ## 6. Objective and equal entitlement
 
 Every variant uses the same recommendation labels, candidate universe, batches,
-optimizer family, update budget, and evaluation code. The student and
-non-deployed teacher recommendation heads each use the mean loss over the full
-`E_rec` set. Privileged variants add a single fixed-weight alignment term:
+optimizer family, update budget, and evaluation code. For every privileged variant
+`v` in `V3`--`V8`, the objective is uniquely:
 
 ```text
 L_v = mean_{e in E_rec} ell_rec_student^v(e)
-      + mean_{e in E_rec} ell_rec_teacher^v(e)
+      + mean_{e in E_rec, A(e)=1} ell_rec_teacher^v(e)
       + 1.0 * mean_{e in E_rec, A(e)=1} ell_aux^v(e).
 ```
 
-The auxiliary mean is defined as zero when `sum_e A(e)=0`, but the preflight floors
-make that case a stop before training. `lambda_aux = 1.0`, latent dimension
+The student recommendation mean always covers the complete `E_rec`. Teacher
+recommendation support and auxiliary support are exactly the same set
+`{e in E_rec : A(e)=1}`, and each mean is normalized only over those currently
+supported examples. The minibatch objective applies the same domains within the
+current frozen batch. A batch with no supported example executes only its student
+term and does not update teacher parameters; it does not synthesize teacher inputs
+or targets. A development pool with `sum_e A(e)=0` stops under the Section-3
+preflight rule and never enters training, so no empty teacher or auxiliary mean is
+defined for training.
+
+Unsupported examples remain in the student recommendation objective without
+deletion, reweighting, or resampling. `lambda_aux = 1.0`, latent dimension
 `d_resp = 64`, AdamW (`lr=1e-3`, `weight_decay=1e-4`, `beta1=0.9`, `beta2=0.999`),
 batch size `256`, maximum `50` epochs, and fixed seeds `7007`, `7008`, and `7009`
 are frozen for every trainable variant. Every seed trains for the same maximum
@@ -312,9 +365,10 @@ updates; Dev checkpoint selection uses the same rule in Section 8 and cannot
 change these quantities.
 
 The student, latent dimension, auxiliary weight, optimizer/update entitlement,
-administration anchor, future window, value/mask availability, `E_rec`, and `A`
-are therefore equal across all privileged variants. Unsupported examples remain
-in the recommendation objective for every variant.
+`E_rec`, and `A` are therefore equal across all privileged variants. The response
+family `V3`, `V4`, `V5`, `V6`, and `V8` additionally shares the identical
+administration anchor, future window, value/mask availability, and response-teacher
+shell. V7 is strictly pre-order and future-free by construction.
 
 ## 7. Required variant family
 
@@ -329,15 +383,16 @@ subtractions are frozen before training.
 | `V4` | Static Medication Response Prototype | Train-only per-medication average future trajectory projected through the same `d_resp` target shell; no patient-specific future values; same `E_rec`, `A`, support, student, capacity, and updates | static medication identity/prototype explanation |
 | `V5` | Response Shuffle | normalized value trajectories permuted within focal-medication and measurement-availability strata with frozen seed `70070`; recipient masks remain fixed; same `E_rec`, `A`, window, capacity, and updates | patient–medication–response correspondence |
 | `V6` | Monitoring-Mask-Only | receives exactly `M_e` and fixed availability/frequency summaries over `W(e)` but no physiological values or value-derived summary; all other entitlement matches Proposed | R2 monitoring-policy sufficiency |
-| `V7` | Generic KD | same student, latent dimension, loss, and update entitlement; teacher sees no future physiology or response target and is trained only from the ordinary pre-order recommendation task | whether generic teacher–student/KD mechanics suffice |
+| `V7` | Generic Pre-Order KD | parameter-independent non-deployed teacher exactly isomorphic to `S_pre`; same strict pre-order schema, causal GRU, candidate embedding, interaction MLP, 64-d latent, and recommendation head; no future information; teacher recommendation and MSE alignment only on `A=1`, student recommendation on full `E_rec` | whether ordinary pre-order teacher/student distillation mechanics explain the gain without privileged future-response information |
 | `V8` | Proposed Privileged Physiological Response Supervision | teacher receives focal medication, `r_e`, and `M_e`; target is the medication-in-context response-associated latent; student remains `S_pre` | admitted response-specific method |
 
 `V7` is required in this protocol because the admitted implementation has an
 explicit teacher/student alignment term, so distillation mechanics are a live
-alternative explanation. It uses the same `E_rec`, `A`, student, latent dimension,
-loss weight, optimizer, and update entitlement as the other privileged variants;
-only its teacher information source is changed. It cannot be omitted after results
-are seen.
+alternative explanation. Its complete mapping is Section 5.2.2. It shares
+`E_rec`, `A`, student, latent dimension, alignment loss, optimizer, batch schedule,
+seeds, update entitlement, checkpoint rule, and evaluation contract with the other
+privileged variants, but it does not share or emulate their response-teacher shell.
+It cannot be omitted after results are seen.
 
 ### 7.1 R1 exact subtraction
 
@@ -388,10 +443,12 @@ comparable to `V8`, the frozen stop is:
 
 ### 7.3 R3 positive-only and equal-support rule
 
-All of `V3`–`V8` use the same `E_rec` and the same `A(e)`. No unchosen medication
-receives a counterfactual response target. No unsupported example is silently
-dropped, reweighted, or normalized differently. Any mismatch in support, sample
-entitlement, recommendation weighting, or update budget is:
+All of `V3`--`V8` use the same `E_rec` and the same `A(e)`. Their teacher
+recommendation and alignment branches both use exactly `A(e)=1`; neither branch is
+constructed for `A(e)=0`. No unchosen medication receives a counterfactual
+response target. No unsupported example is dropped, reweighted, resampled, or
+normalized differently in the student recommendation objective. Any mismatch in
+support, sample entitlement, recommendation weighting, or update budget is:
 
 `STOP_UNMATCHED_SUPPORT_OR_SAMPLE_ENTITLEMENT`.
 
@@ -410,9 +467,10 @@ audit.
    fixed seeds. No variant may receive a different number of examples, updates, or
    optimizer steps.
 4. **P3 — Dev checkpoint rule.** For each method/seed, choose the earliest epoch
-   among the fixed set `{10, 20, 30, 40, 50}` with the lowest full-`E_rec`
-   recommendation loss on `Gate01-Dev`; break ties by the smaller epoch. No Dev
-   metric, subgroup, response definition, or control result may alter the rule.
+   among the fixed set `{10, 20, 30, 40, 50}` with the lowest student
+   recommendation loss over the full `E_rec` on `Gate01-Dev`; break ties by the
+   smaller epoch. No Dev metric, subgroup, response definition, or control result
+   may alter the rule.
 5. **P4 — Evaluation freeze.** Freeze the selected checkpoint, normalization
    parameters, candidate universe, `K=5`, metric implementation, bootstrap seed,
    and all stop rules. Record the exact configuration before reading any Audit
@@ -475,7 +533,7 @@ Any `C ≈ Proposed` result immediately terminates the response-specific mechani
 | `V3` Generic Future-State Auxiliary / Medication-Ablated Future | `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE` |
 | `V6` Monitoring-Mask-Only | `STOP_MONITORING_POLICY_SUFFICIENCY` |
 | `V4`, `V5`, or `V2` | `STOP_RESPONSE_SPECIFIC_MECHANISM_CONTROL_SUFFICIENCY` |
-| `V7` Generic KD | `STOP_GENERIC_KD_MECHANICS_SUFFICIENCY` |
+| `V7` Generic Pre-Order KD | `STOP_GENERIC_KD_MECHANICS_SUFFICIENCY` |
 
 No result may be relabeled `comparable` or `materially better` using a secondary
 metric, subgroup, favorable seed, or post-hoc confidence interval.
@@ -490,7 +548,7 @@ rescued under Idea 007:
 - `V5` Response Shuffle is comparable to Proposed;
 - `V4` Static Medication Response Prototype is comparable to Proposed;
 - `V2` Base + richer pre-order physiology is comparable to Proposed;
-- `V7` Generic KD is comparable when applicable;
+- `V7` Generic Pre-Order KD is comparable when applicable;
 - support is insufficient or materially concentrated;
 - any student-path leakage is found;
 - any unmatched support, recommendation sample entitlement, or differential
@@ -518,11 +576,12 @@ The current audited design-state record is:
 
 ```text
 Idea 007: created/admitted
-Gate 01: design frozen and independently audited; not executed
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
 Training: NOT AUTHORIZED
-Response outcomes: not accessed
-G3/G4, R0 Holdout, historical project test: untouched
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```
 
-The next owner is a future explicitly authorized execution workflow. No execution
-owner is authorized by this document.
+No execution owner is authorized by this document.

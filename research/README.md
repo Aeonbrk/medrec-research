@@ -43,7 +43,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **Reviewer confidence**: medium-high.
 - **Admission owner**: `ccf-pipeline-orchestrator` (completed).
 - **Gate 01 design owner**: `ccf-experiment-designer` (completed).
-- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after implementability closure.
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after teacher-objective domain closure and exact V7 Generic Pre-Order KD freeze.
 - **Local scientific execution / training**: not authorized by this state.
 
 Current packet:
@@ -72,9 +72,9 @@ Before any training, the audited Gate 01 protocol preserves:
 
 1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future.
 2. **Monitoring separation**: mandatory Monitoring-Mask-Only and physiological-value versus response-availability separation.
-3. **Equal entitlement**: positive-only observed response, identical privileged support/sample mask, unsupported examples retained in the recommendation objective, and strictly pre-order student features/normalization.
+3. **Equal entitlement**: positive-only observed response, identical privileged support/sample mask, student recommendation on full `E_rec`, teacher recommendation and alignment on exactly `A(e)=1`, and strictly pre-order student features/normalization.
 
-Future killer controls also include Static Medication Response Prototype, Response Shuffle, richer Pre-Order Physiology, and Generic KD only when KD mechanics remain a plausible explanation.
+Future killer controls also include Static Medication Response Prototype, Response Shuffle, richer Pre-Order Physiology, and exact Generic Pre-Order KD without any privileged future-response information.
 
 Any simple matched control performing comparably to Proposed terminates the response-specific mechanism. Deployment leakage or unequal support invalidates the Gate. The protocol freezes practical/statistical rules for `materially`, `comparable`, and `≈` before training. No architecture, response-window, modality, subgroup, feature, favorable-seed, or split rescue follows those outcomes.
 
@@ -121,10 +121,13 @@ These scoped failures constrain the current design but do not imply that future 
 Current authorized terminal state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen / implementability closed / independently audited
-Training not authorized
-STOP
+Idea 007: created/admitted
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```
 
 No response-coverage run, Gate execution, or local training is authorized by this

@@ -24,7 +24,9 @@ Strict re-review verdict:
 Admission and design owners:
 
 `ccf-pipeline-orchestrator` (admission complete) -> `ccf-experiment-designer`
-(Gate 01 design complete) -> independent design-integrity audit (pass).
+(teacher-objective domain closed; exact V7 Generic Pre-Order KD frozen) ->
+`ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
+`ccf-pipeline-orchestrator` (next owner).
 
 No local scientific execution or training is authorized by the current state.
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
@@ -48,8 +50,8 @@ The frozen admission contract requires:
 
 1. medication-specificity subtraction through matched Generic Future-State Auxiliary / Medication-Ablated Future;
 2. Monitoring-Mask-Only plus explicit physiological-value versus response-availability separation;
-3. equal-support positive-only response semantics and strictly pre-order student/deployment entitlement;
-4. future Gate killers including Response Shuffle, Static Medication Response Prototype, and richer Pre-Order Physiology.
+3. equal-support positive-only response semantics, full-`E_rec` student recommendation, supported-only teacher/alignment branches, and strictly pre-order student/deployment entitlement;
+4. future Gate killers including Response Shuffle, Static Medication Response Prototype, richer Pre-Order Physiology, and exact future-free Generic Pre-Order KD.
 
 If a simple matched control performs comparably, terminate the response-specific mechanism. If leakage or unequal support is detected, invalidate the Gate. Do not rescue with architecture scaling, another future window, extra modalities, subgroup mining, or repeated response-definition search.
 
@@ -92,10 +94,13 @@ Failure records include:
 Current authorized terminal state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen/audited
-Training not authorized
-STOP
+Idea 007: created/admitted
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```
 
 No response-coverage run, Gate execution, or local training is authorized before a

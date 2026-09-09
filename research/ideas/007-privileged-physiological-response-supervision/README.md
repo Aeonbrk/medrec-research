@@ -10,7 +10,7 @@
 - **Admission source revision**: `e301a0dbc8f511da038cad115ac80b108907f264`
 - **Strict review score**: `4.17 / 5.00` (medium-high confidence)
 - **Gate 01 owner**: `ccf-experiment-designer`
-- **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`, implementability-closed revision)
+- **Gate 01 design audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md) (`DESIGN_INTEGRITY_PASS`, objective-domain closed / V7 executable)
 - **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md) (`DESIGNED_NOT_EXECUTED`)
 - **Physiology source spec**: [`experiments/gate-01-physiology-source-spec.md`](experiments/gate-01-physiology-source-spec.md)
 - **Training**: `NOT_AUTHORIZED`
@@ -73,10 +73,13 @@ contracts are summarized here:
 3. **R3 — Equal support and deployment entitlement.**
    `A(e)=1` only for an actually administered positive focal-medication event with
    a valid linked future window. All privileged variants share the same `E_rec` and
-   `A`; unsupported examples remain in the full recommendation objective; no
-   unchosen medication receives a counterfactual response; the student and all
-   normalization statistics are strictly pre-order. Any leakage, unmatched
-   support, or differential recommendation reweighting invalidates the Gate.
+   `A`; student recommendation loss covers full `E_rec`, while teacher
+   recommendation and alignment both use exactly `A(e)=1`. Unsupported examples
+   never construct a teacher branch and remain in the student objective without
+   deletion, reweighting, or resampling; no unchosen medication receives a
+   counterfactual response. The student and all student normalization statistics
+   are strictly pre-order. Any leakage, unmatched support, or differential
+   recommendation reweighting invalidates the Gate.
 
 The Gate-01 family is fixed as:
 
@@ -86,8 +89,10 @@ The Gate-01 family is fixed as:
 - Static Medication Response Prototype;
 - Response Shuffle;
 - Monitoring-Mask-Only;
-- Generic KD (required because the proposed implementation contains a
-  teacher/student alignment term);
+- Generic Pre-Order KD: a parameter-independent non-deployed teacher exactly
+  isomorphic to `S_pre`, using the same strict pre-order schema, causal GRU,
+  candidate embedding, interaction MLP, and 64-d latent, with no future input
+  (required because the proposed method contains a teacher/student alignment term);
 - Proposed Privileged Physiological Response Supervision.
 
 An aligned REFINE/ChainCare-style comparison may be added only when task semantics
@@ -143,7 +148,10 @@ audited design state.
 Stage: IDEA_007_GATE_01_DESIGN_FROZEN_IMPLEMENTABILITY_CLOSED_TRAINING_NOT_AUTHORIZED
 Active Idea: 007-privileged-physiological-response-supervision
 Idea 007: created/admitted
-Gate 01: design frozen / implementability closed / independently audited
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
 Training: NOT AUTHORIZED
-Next action: stop; await explicit future execution authorization
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```

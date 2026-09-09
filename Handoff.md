@@ -14,7 +14,9 @@ Ideas 001--006 are terminated. Idea 007 is now the active admitted Idea.
 - **Reviewer confidence**: medium-high
 - **Admission owner**: `ccf-pipeline-orchestrator` (completed)
 - **Gate 01 design owner**: `ccf-experiment-designer` (completed)
-- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after revision `v1.1` implementability closure
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after revision `v1.2` objective-domain and V7 implementability closure
+- **Mechanical preflight**: not run
+- **Implementation**: not started
 - **Local scientific execution / training**: not authorized
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
@@ -48,9 +50,10 @@ The earlier reusable admission constraint remains useful as a methodological rul
 The strict re-review accepted the family for one kill-first Idea/Gate cycle. The
 pipeline orchestrator formally created/admitted Idea 007. The first
 implementation-readiness check found underspecification and superseded its
-readiness verdict. Revision `v1.1` freezes source identity, tensorization,
-normalization, variants, teacher/student latents, and auxiliary loss; the
-independent audit now passes. No response outcomes or model results exist.
+readiness verdict. Revision `v1.2` preserves the frozen source identity,
+tensorization, normalization, and R1--R3 semantics while closing the teacher-loss
+domain and replacing V7 with an exact Generic Pre-Order KD control. The independent
+audit now passes. No response outcomes or model results exist.
 
 The generic learning primitive is not novel. Current prior work separately covers:
 
@@ -93,7 +96,11 @@ If Monitoring-Mask-Only is comparable to Proposed:
 - response supervision applies only to actually administered positive medication events with valid linked future monitoring;
 - unchosen medications receive no invented counterfactual response;
 - all privileged variants use the same support mask and recommendation examples;
-- unsupported examples remain in the recommendation objective;
+- student recommendation loss covers every example in `E_rec`;
+- teacher recommendation and alignment use exactly the common `A(e)=1` support;
+- `A(e)=0` constructs no teacher input, latent, loss, or synthetic response;
+- unsupported examples remain in the student recommendation objective without
+  deletion, reweighting, or resampling;
 - student features and normalization are strictly pre-order;
 - future/post-order/discharge information is confined to the training-only privileged branch;
 - teacher and privileged targets are absent at inference.
@@ -111,7 +118,9 @@ The canonical Gate 01 protocol freezes at least:
 - Response Shuffle;
 - Monitoring-Mask-Only;
 - Proposed privileged-response method.
-- Generic KD (included because the proposed implementation has a live alignment
+- Generic Pre-Order KD: a parameter-independent, non-deployed teacher exactly
+  isomorphic to `S_pre`, using only the same strict pre-order schema and no future
+  information (included because the proposed method has a live alignment
   alternative).
 
 A compatible monitoring-aware MedRec baseline may be included when task alignment permits a fair comparison.
@@ -155,11 +164,15 @@ This result remains separate from the privileged-response admission decision.
 Authorized next state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen / implementability-closed / independently audited
-Training not authorized
-STOP
+Idea 007: created/admitted
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```
 
 This handoff records the completed design repair and audit. It does not authorize
-response-coverage inspection, Gate execution, Audit access, or local training.
+response-coverage inspection, implementation, Gate execution, Audit access, or
+training.

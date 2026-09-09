@@ -28,7 +28,7 @@ Idea-stage prototypes stay inside the Idea until stable reusable infrastructure 
 | [`004-co-selection-compatibility`](004-co-selection-compatibility/README.md) | Frequency-Corrected Co-Selection Compatibility | **Terminated** | NPMI co-selection scalar added no reliable incremental value |
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
-| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Admitted — Gate 01 design frozen/implementability-closed; training not authorized** | pending kill-first Gate 01 execution |
+| [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Admitted — Gate 01 objective-domain closed / V7 executable / independently audited; training not authorized** | next owner: `ccf-pipeline-orchestrator` |
 
 ## Current authoritative direction
 
@@ -64,7 +64,7 @@ The future Idea remains valid only under prospective mechanism subtraction:
 2. mandatory Monitoring-Mask-Only and physiology-value versus response-availability separation;
 3. equal-support positive-only response semantics and strictly pre-order student/deployment entitlement;
 4. Static Medication Response Prototype and Response Shuffle as pairing/identity killers;
-5. richer Pre-Order Physiology and Generic KD when needed to remove simple modality/KD explanations.
+5. richer Pre-Order Physiology and exact Generic Pre-Order KD to remove simple modality/KD explanations.
 
 Any comparable simple matched control terminates the response-specific mechanism.
 Deployment leakage or unequal support invalidates the Gate. Gate 01 now freezes
@@ -81,17 +81,21 @@ Canonical artifacts:
 
 Current owner state:
 
-`ccf-pipeline-orchestrator` admission is complete. The prior Gate-01
-implementation-readiness verdict was superseded after underspecification was
-found; `ccf-experiment-designer` owns the repair and re-audit.
+`ccf-pipeline-orchestrator` admission is complete. `ccf-experiment-designer`
+closed the teacher-objective domain and froze the exact V7 Generic Pre-Order KD
+mapping; `ccf-integrity-auditor` returned `DESIGN_INTEGRITY_PASS`. The next owner
+is `ccf-pipeline-orchestrator`.
 
 Authorized terminal state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen / implementability closed / independently audited
-Training not authorized
-STOP
+Idea 007: created/admitted
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```
 
 No response-coverage run, Gate execution, or local training is authorized before a

@@ -17,8 +17,9 @@
 **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
 **Admission/design owners**: `ccf-pipeline-orchestrator` (admission complete) ->
-`ccf-experiment-designer` (Gate 01 design complete) -> independent design audit
-(`DESIGN_INTEGRITY_PASS`).
+`ccf-experiment-designer` (teacher-objective domain closed; exact V7 Generic
+Pre-Order KD frozen) -> `ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
+`ccf-pipeline-orchestrator` (next owner).
 
 No local scientific execution or training is authorized by the current state.
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
@@ -123,7 +124,8 @@ Strictly pre-order deployment is necessary but insufficient. A response-specific
 - focal-medication conditioning beyond generic future-state supervision;
 - patient-medication-response correspondence beyond shuffle/static prototypes;
 - physiological values beyond monitoring availability/frequency;
-- equal support/sample entitlement rather than positive-event reweighting.
+- equal support/sample entitlement rather than positive-event reweighting;
+- privileged future-response information beyond ordinary pre-order KD mechanics.
 
 The current bounded optimizer revision now freezes these requirements strongly enough for Idea admission.
 
@@ -146,7 +148,7 @@ The current bounded optimizer revision now freezes these requirements strongly e
 | Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting | future access itself cannot carry novelty |
 | Generic future-observation distillation | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 | future access itself cannot carry novelty |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 | response-supervision role + MedRec-specific evidence |
-| **Privileged physiological response supervision** | **`IDEA 007 ACTIVE / GATE 01 DESIGN FROZEN AND AUDITED`** | strict re-review 2026-09-09; protocol and audit in `research/ideas/007-privileged-physiological-response-supervision/` | stop before training; any execution requires a separate explicit authorization |
+| **Privileged physiological response supervision** | **`IDEA 007 ACTIVE / OBJECTIVE DOMAIN CLOSED / V7 EXECUTABLE / AUDITED`** | strict re-review 2026-09-09; protocol and audit in `research/ideas/007-privileged-physiological-response-supervision/` | next owner `ccf-pipeline-orchestrator`; stop before training; any execution requires separate explicit authorization |
 
 `CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
 
@@ -220,8 +222,11 @@ This admission is not an empirical result and not publication evidence. The firs
 Current authorized terminal state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen/audited
-Training not authorized
-STOP
+Idea 007: created/admitted
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```

@@ -15,7 +15,7 @@
 - Reviewer confidence: medium-high
 - Admission owner: `ccf-pipeline-orchestrator` (completed)
 - Gate 01 design owner: `ccf-experiment-designer` (completed)
-- Gate 01 design audit: `DESIGN_INTEGRITY_PASS` after implementability closure
+- Gate 01 design audit: `DESIGN_INTEGRITY_PASS` after teacher-objective domain closure and exact V7 Generic Pre-Order KD freeze
 - Local scientific execution / training: **not authorized**
 
 The Event-Sourced Regimen Editing M0 gate remains closed. Raw `New / Change / D/C` workflow marks are not reused as regimen-edit supervision.
@@ -109,7 +109,11 @@ If Monitoring-Mask-Only is comparable to Proposed:
 - response supervision exists only on actually administered positive medication events with valid linked future monitoring;
 - unchosen medications receive no invented counterfactual response;
 - all privileged variants use the same recommendation examples and response-support mask;
-- unsupported examples remain in the recommendation objective;
+- student recommendation covers full `E_rec`, while teacher recommendation and
+  alignment both use exactly the common `A(e)=1` support;
+- `A(e)=0` constructs no teacher input, latent, loss, or synthetic response, and
+  unsupported examples remain in the student objective without deletion,
+  reweighting, or resampling;
 - student features and normalization are strictly pre-order;
 - post-order medication, administration, future labs/vitals, future masks, discharge-coded information, and other future-derived statistics are forbidden on the student path;
 - the teacher and privileged targets are absent at inference.
@@ -127,7 +131,9 @@ The audited Gate 01 protocol covers:
 - Response Shuffle;
 - Monitoring-Mask-Only;
 - Proposed privileged-response method;
-- Generic KD (included because the proposed implementation has a live
+- Generic Pre-Order KD with a parameter-independent teacher exactly isomorphic to
+  `S_pre`, using only the same strict pre-order schema and no privileged future
+  information (included because the proposed method has a live
   teacher/student-alignment alternative).
 
 A compatible REFINE/ChainCare-style comparison may be included when task alignment is scientifically valid.
@@ -165,10 +171,13 @@ Disallowed without independent causal identification:
 Current authorized terminal state:
 
 ```text
-Idea 007 created/admitted
-Gate 01 design frozen / implementability closed / independently audited
-Training not authorized
-STOP
+Idea 007: created/admitted
+Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
+Mechanical preflight: NOT RUN
+Implementation: NOT STARTED
+Training: NOT AUTHORIZED
+Quarantine: intact
+Next owner: ccf-pipeline-orchestrator
 ```
 
 This historical packet records the admission inputs. The current Idea-007 artifacts
