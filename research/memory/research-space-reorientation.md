@@ -4,11 +4,15 @@
 
 ## Current workflow state
 
-**Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
+**Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
 **Active Idea**: none.
+
+The current bounded pre-Idea object is the strict drug-changing order-revision
+Pair/Context Incremental Value test. Semantic admission and strict-trace
+supportability passed with `N_strict = 1,040`; no Idea 008 has been created.
 
 **Idea 007**: terminated at Gate 01 P1 with insufficient and materially
 concentrated response support.
@@ -174,6 +178,7 @@ diagnostic checklist.
 | Generic future-observation distillation | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 | future access itself cannot carry novelty |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 | response-supervision role + MedRec-specific evidence |
 | **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen P1 report and integrity audit in `research/ideas/007-privileged-physiological-response-supervision/` | do not relax the failed support contract; reopen only with a materially different object, source, setting, or independently motivated response definition |
+| **Strict drug-changing order-revision Pair/Context value** | **`FROZEN PRE-IDEA EXECUTION`** | `PASS_SEMANTIC_ADMISSION`; `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY` | complete only the frozen Pair/Context test; no semantic or threshold rescue |
 
 `CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
 
@@ -258,15 +263,13 @@ Current project state:
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
 Active Idea: none
-Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
 New Idea: NOT CREATED
-Experiment: NOT AUTHORIZED
-Training: NOT AUTHORIZED
+Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
+Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
 Quarantine: intact
-Next owner: ccf-idea-optimizer / exploratory
+Next owner: ccf-pipeline-orchestrator
 ```
 
-No new experiment, Gate execution, architecture work, response-protocol rescue, or
-Idea 008 creation is authorized by this map. The next owner may scout a materially
-different method-paper direction using the accumulated failures and literature
-memory; this closure update did not run a literature search.
+No Idea 008 creation, Gate 01, or work outside the frozen Pair/Context packet is
+authorized by this map. This update did not run a literature search.

@@ -1,0 +1,62 @@
+{
+  "protocol": "STRICT_DRUG_CHANGING_SUPPORTABILITY",
+  "starting_revision": "15b3cffe42dd08cbfc9e2d8bf34ee766520a67a2",
+  "semantic_admission": "PASS_SEMANTIC_ADMISSION",
+  "semantic_object_integrity": {
+    "strict_events_expected": 1040,
+    "strict_events_observed": 1040,
+    "frozen_invariant_violations": 0
+  },
+  "support": {
+    "strict_events": 1040,
+    "unique_patients": 1011,
+    "effective_patients": 981.4882032667877,
+    "unique_admissions": 1031,
+    "unique_source_actions": 72,
+    "recurrent_source_actions_ge_10_patients": 28,
+    "effective_source_actions": 22.441696406340775,
+    "unique_destination_actions": 74,
+    "effective_destination_actions": 27.5960606215237
+  },
+  "temporal_support": {
+    "G0": {
+      "strict_events": 508,
+      "unique_patients": 495,
+      "event_share": 0.48846153846153845,
+      "patient_share": 0.4896142433234421
+    },
+    "G1": {
+      "strict_events": 280,
+      "unique_patients": 274,
+      "event_share": 0.2692307692307692,
+      "patient_share": 0.27101879327398615
+    },
+    "G2": {
+      "strict_events": 252,
+      "unique_patients": 242,
+      "event_share": 0.2423076923076923,
+      "patient_share": 0.23936696340257171
+    },
+    "second_largest_event_share": 0.2692307692307692,
+    "second_largest_patient_share": 0.27101879327398615
+  },
+  "criteria": {
+    "C1_total_support": true,
+    "C2_patient_breadth": true,
+    "C3_patient_concentration": true,
+    "C4_admission_contexts": true,
+    "C5_source_breadth": true,
+    "C6_source_recurrence": true,
+    "C7_source_concentration": true,
+    "C8_destination_breadth": true,
+    "C9_destination_concentration": true,
+    "C10_temporal_event_width": true,
+    "C11_temporal_patient_width": true
+  },
+  "verdict": "PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY",
+  "quarantine": {
+    "G3_G4_accessed": false,
+    "R0_holdout_accessed": false,
+    "historical_project_test_accessed": false
+  }
+}

@@ -6,12 +6,12 @@
 
 Refresh date: 2026-09-09.
 
-Closure update: 2026-09-10, using existing protocol/P1 records only; no new
-literature search was run.
+Current update: 2026-09-11, using the existing strict semantic-admission and
+supportability records; no new literature search was run.
 
 Current project stage:
 
-`PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
+`PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
 
 **Active Idea**: none. Ideas 001--007 are terminated. Idea 007 was formally
 created/admitted and then closed at Gate 01 P1.
@@ -42,6 +42,10 @@ P1 closure evidence:
 [`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json),
 [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
 
+Current frozen packet:
+
+[`model-reset-20260910-strict-drug-changing-order-revision/`](model-reset-20260910-strict-drug-changing-order-revision/).
+
 ## Closed or compressed spaces
 
 | Space | Current judgment | Main reason |
@@ -64,6 +68,7 @@ P1 closure evidence:
 | True-future-observation teacher → current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 |
 | **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen six-channel administered-positive formulation failed supportability before training; P1 report and integrity audit are canonical |
+| **Strict drug-changing order-revision Pair/Context value** | **`FROZEN PRE-IDEA EXECUTION`** | semantic admission and strict-trace supportability passed; incremental-value evidence is bounded to the current packet |
 
 ## Closed Idea-007 opportunity record
 
@@ -214,14 +219,13 @@ Current project state:
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
 Active Idea: none
-Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
 New Idea: NOT CREATED
-Experiment: NOT AUTHORIZED
-Training: NOT AUTHORIZED
+Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
+Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
 Quarantine: intact
-Next owner: ccf-idea-optimizer / exploratory
+Next owner: ccf-pipeline-orchestrator
 ```
 
-No new experiment, response-coverage rescue, Gate execution, architecture work, or
-Idea 008 creation is authorized by this map. The next owner may scout a materially
-different method-paper direction; no literature search was run for this closure.
+No Idea 008 creation, Gate 01, or work outside the frozen Pair/Context packet is
+authorized by this map. No new literature search was run for this update.

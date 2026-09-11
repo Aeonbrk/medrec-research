@@ -1,33 +1,40 @@
-# Handoff: Idea 007 Closure and PRE_IDEA Reset
+# Handoff: Pair/Context Incremental Value Pre-Idea Execution
 
 ## Current state
 
-Ideas 001--007 are terminated. Idea 007 is formally closed after the frozen Gate
-01 P1 mechanical response-support preflight failed.
+Ideas 001--007 are terminated. Idea 007 remains formally closed after the frozen
+Gate 01 P1 mechanical response-support preflight failed.
 
-- **Current Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`
+- **Current Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
 - **Active Idea**: none
 - **Idea 007**: `TERMINATED_AT_GATE_01_P1` (historical, closed)
+- **Idea 008**: not created / not pre-allocated
 - **Paper objective**: first formal method paper, targeting at least a CCF-A Data/Mining/AI venue family
 - **Latest method family**: `PRIVILEGED_PHYSIOLOGICAL_RESPONSE_SUPERVISION` (closed)
 - **Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007`
 - **Strict re-review score**: `4.17 / 5.00`
 - **Reviewer confidence**: medium-high
-- **Admission owner**: `ccf-pipeline-orchestrator` (completed)
-- **Gate 01 design owner**: `ccf-experiment-designer` (completed)
-- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after revision `v1.2` objective-domain and V7 implementability closure
-- **P0 freeze**: `PASS` at starting revision `9c00461a708c46c601e52b13b16fbe7d531166fc`
-- **P1 mechanical preflight**: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`
-- **Implementation**: P1 runner only; full V1--V8 not started
-- **Local scientific execution / training**: not run / not authorized
+- **Admission / Gate 01 ownership**: `ccf-pipeline-orchestrator` and `ccf-experiment-designer` (completed)
+- **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS`; P0/P1 closure is historical
+- **Strict semantic admission**: `PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`)
+- **Strict supportability**: `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`
+- **Pair/Context owner**: `ccf-experiment-designer / standard`
+- **Pair/Context execution**: frozen protocol and implementation committed; remote execution is the only current experiment
+- **Formal Gate 01 / recommendation-model work**: not authorized
 - **Idea 007 failure memory**: `research/memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
-- **New Idea 008**: not created / not pre-allocated
-- **Next owner**: `ccf-idea-optimizer / exploratory`
+- **Next routing after this bounded stage**: `ccf-pipeline-orchestrator`
 
-## Current packet
+## Current packets
+
+`research/memory/model-reset-20260910-strict-drug-changing-order-revision/`
+
+The packet contains the frozen strict supportability record and the Pair/Context
+Incremental Value protocol, runner, and targeted tests.
+
+Historical Idea-007 packet:
 
 `research/memory/model-reset-20260908-privileged-physiological-response/`
 
@@ -119,8 +126,9 @@ the narrow interpretation and the non-revival boundary.
 The project therefore returns to a pre-Idea state. The next owner may scout a
 materially different method-paper direction using failures 001--007, reusable
 lessons, the current research-space reorientation, the literature opportunity map,
-and first-paper constraints. This closure does not authorize Idea 008, a new
-experiment, feature exploration, or literature search in this round.
+and first-paper constraints. At that closure, no Idea 008, feature exploration,
+or literature search was authorized; the current Pair/Context packet is a
+separate frozen pre-Idea execution.
 
 ## Frozen R1--R3 contract
 
@@ -216,16 +224,15 @@ Current project state:
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
 Active Idea: none
-Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
 New Idea: NOT CREATED
-Experiment: NOT AUTHORIZED
-Training: NOT AUTHORIZED
-No rescue authorized for Idea 007
+Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
+Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
+No Idea 008 or Gate 01 authorized
 Quarantine: intact
-Next owner: ccf-idea-optimizer / exploratory
+Next owner: ccf-pipeline-orchestrator
 ```
 
-This handoff records the completed P0 freeze, P1 support failure, integrity audit,
-canonical failure memory, and project-level PRE_IDEA reset. It authorizes no model
-implementation, Gate execution, Audit evaluation, training, Idea 008 creation, or
-new experiment in this round.
+This handoff records the completed Idea-007 closure, the strict semantic and
+supportability passes, and the frozen Pair/Context pre-Idea execution boundary.
+It authorizes no Idea 008 creation, Gate 01, or work outside this packet.

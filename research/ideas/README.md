@@ -37,7 +37,7 @@ There is no active Idea, and Idea 008 has not been created or pre-allocated.
 
 Stage:
 
-`PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`.
+`PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`.
 
 Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
 the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
@@ -46,11 +46,15 @@ The closed method family was `Privileged Physiological Response Supervision`.
 
 Packet:
 
-`research/memory/model-reset-20260908-privileged-physiological-response/`.
+`research/memory/model-reset-20260910-strict-drug-changing-order-revision/`.
 
 Strict admission review:
 
 `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
+
+Strict drug-changing semantic admission and supportability both passed:
+`PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`) and
+`PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`.
 
 The family was admitted because the bounded R1--R3 revision resolves the prior
 mechanism-identification blockers without data exploration or architecture
@@ -87,11 +91,9 @@ Historical Idea-007 artifacts:
 Current owner state:
 
 `ccf-pipeline-orchestrator` admission and closure are complete.
-`ccf-experiment-designer` closed the teacher-objective domain and froze the exact
-V7 Generic Pre-Order KD mapping; `ccf-integrity-auditor` returned
-`DESIGN_INTEGRITY_PASS` for design and `INTEGRITY_AUDIT_PASS` for P1. The P0
-freeze passed, but the P1 mechanical preflight failed the frozen support floors and
-patient-concentration checks. The next owner is `ccf-idea-optimizer / exploratory`.
+`ccf-experiment-designer` owns the frozen Pair/Context Incremental Value execution
+under the strict trace packet. `ccf-pipeline-orchestrator` receives routing after
+this bounded stage.
 
 Idea-007 terminal state and project routing:
 
@@ -103,15 +105,16 @@ Gate 01: design frozen / objective-domain closed / V7 executable / independently
 P1 mechanical preflight: STOP
 Implementation: P1 runner only; full V1-V8 NOT STARTED
 Formal training: NOT RUN
-Training: NOT AUTHORIZED
+Gate 01 training: NOT AUTHORIZED
 No rescue authorized
 Quarantine: intact
 Active Idea: none
-Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
 New Idea: NOT CREATED
-Next owner: ccf-idea-optimizer / exploratory
+Pair/Context: FROZEN PRE-IDEA EXECUTION ONLY
+Next owner: ccf-pipeline-orchestrator
 ```
 
-The public-safe P1 report, integrity audit, and failure memory are complete. No
-model implementation, Gate execution, recommendation-outcome evaluation, local
-training, Idea 008 creation, or new experiment design is authorized in this state.
+The public-safe P1 report, integrity audit, and failure memory are complete. The
+only current experiment is the frozen Pair/Context pre-Idea packet; Idea 008,
+Gate 01, and work outside that packet are not authorized in this state.

@@ -1,5 +1,19 @@
 # Plans
 
+## Active: Pre-Idea — Pair/Context Incremental Value
+
+- **Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`.
+- **Scientific object**: the already admitted directional strict drug-changing order-revision trace; no clinical-correctness or superiority semantics.
+- **Semantic admission**: `PASS_SEMANTIC_ADMISSION`, `N_strict = 1,040`.
+- **Supportability**: `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`.
+- **Protocol**: `research/memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-protocol.md`.
+- **Implementation**: the paired frozen runner plus targeted synthetic integrity tests in the same packet.
+- **Scope**: Discovery-only fitting, one R0 Dev evaluation, seven fixed variants, five frozen gate comparisons, and 5,000-replicate patient-cluster bootstrap.
+- **Boundary**: no Idea 008, Gate 01, G3/G4, R0 Holdout, historical project test, or scientific redesign.
+- **Active Idea**: none.
+- **Current owner**: `ccf-experiment-designer / standard`.
+- **Post-run routing**: `ccf-pipeline-orchestrator`.
+
 ## Completed: Idea 007 — Gate 01 P1 Support Termination and Closure
 
 - **Admission**: `ACCEPT_TO_CREATE_IDEA_007`; Idea 007 was created/admitted and is now formally closed.

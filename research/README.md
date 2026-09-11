@@ -34,7 +34,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION`.
+- **Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`.
 - **Active Idea**: none.
 - **Ideas 001--007**: terminated.
 - **Latest Idea**: `007-privileged-physiological-response-supervision` (closed at Gate 01 P1).
@@ -46,13 +46,16 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS` after teacher-objective domain closure and exact V7 Generic Pre-Order KD freeze.
 - **P0 freeze**: `PASS` at starting revision `9c00461a708c46c601e52b13b16fbe7d531166fc`.
 - **P1 mechanical preflight**: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`.
+- **Strict drug-changing semantic admission**: `PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`).
+- **Strict drug-changing supportability**: `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`.
 - **Full V1--V8 implementation / training**: not started / not run.
+- **Pair/Context execution**: frozen pre-Idea protocol and implementation; current owner `ccf-experiment-designer / standard`.
 - **Idea 007 failure memory**: [`memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
-- **Next owner**: `ccf-idea-optimizer / exploratory`.
+- **Next routing**: `ccf-pipeline-orchestrator`.
 
 Current packet:
 
-[`memory/model-reset-20260908-privileged-physiological-response/`](memory/model-reset-20260908-privileged-physiological-response/).
+[`memory/model-reset-20260910-strict-drug-changing-order-revision/`](memory/model-reset-20260910-strict-drug-changing-order-revision/).
 
 Authoritative strict admission review:
 
@@ -132,20 +135,20 @@ Current project state:
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
 Active Idea: none
-Stage: PRE_IDEA_AFTER_IDEA_007_SUPPORT_TERMINATION
+Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
 New Idea: NOT CREATED
-Experiment: NOT AUTHORIZED
-Training: NOT AUTHORIZED
+Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
+Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
 Quarantine: intact
-No rescue authorized for Idea 007
-Next owner: ccf-idea-optimizer / exploratory
+No Idea 008 or Gate 01 authorized
+Next owner: ccf-pipeline-orchestrator
 ```
 
 The P1 support record, integrity audit, and canonical failure memory are complete.
-No model implementation, Gate execution, recommendation-outcome evaluation, or
-local training is authorized after this terminal support failure. The next owner
-may scout a materially different method-paper direction; this state does not
-create or pre-allocate Idea 008.
+No Gate 01, recommendation-outcome evaluation, or model work outside the frozen
+Pair/Context packet is authorized after this terminal support failure. The current
+bounded probe training is limited to that packet; this state does not create or
+pre-allocate Idea 008.
 
 ## Quarantine
 
@@ -159,7 +162,7 @@ Until explicitly authorized by a later frozen claim-support protocol, do not ins
 
 - [Research-Space Reorientation](memory/research-space-reorientation.md)
 - [Literature Opportunity Map](memory/literature-opportunity-map.md)
-- [Current Privileged-Response Reset](memory/model-reset-20260908-privileged-physiological-response/)
+- [Strict Drug-Changing Order-Revision Packet](memory/model-reset-20260910-strict-drug-changing-order-revision/)
 - [Idea 007](ideas/007-privileged-physiological-response-supervision/)
 - [Cross-Idea Memory](memory/README.md)
 - [Reusable Lessons](memory/reusable-lessons.md)
