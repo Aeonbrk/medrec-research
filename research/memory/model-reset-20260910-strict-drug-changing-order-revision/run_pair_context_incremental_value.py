@@ -11,6 +11,7 @@ import argparse
 import collections
 import hashlib
 import importlib.util
+import itertools
 import json
 import math
 import re
@@ -111,6 +112,20 @@ MIMIC_ACCESS_CONTRACT = {
 
 class InvalidExecution(RuntimeError):
     """Raised when implementation or execution integrity is not frozen-correct."""
+
+
+def zip_strict(*iterables: Any) -> Any:
+    """Python 3.8-compatible equivalent of ``zip(..., strict=True)``."""
+    sentinel = object()
+    for values in itertools.zip_longest(*iterables, fillvalue=sentinel):
+        if any(value is sentinel for value in values):
+            raise InvalidExecution("internal iterable length mismatch")
+        yield values
+
+
+def zip_nonstrict(*iterables: Any) -> Any:
+    """Python 3.8-compatible equivalent of ``zip(..., strict=False)``."""
+    return zip(*iterables)  # noqa: B905
 
 
 # These helpers intentionally use only the standard library so targeted unit tests
@@ -332,9 +347,7 @@ def parse_epochs(pd: Any, series: Any) -> list[int | None]:
     parsed = pd.to_datetime(series, errors="coerce")
     valid = (~parsed.isna()).to_numpy()
     values = parsed.astype("int64").to_numpy()
-    return [
-        int(value // 1_000_000_000) if ok else None for value, ok in zip(values, valid, strict=True)
-    ]
+    return [int(value // 1_000_000_000) if ok else None for value, ok in zip_strict(values, valid)]
 
 
 def read_admissions(
@@ -356,7 +369,7 @@ def read_admissions(
         if selected.empty:
             continue
         epochs = parse_epochs(pd, selected["admittime"])
-        for row, admit_epoch in zip(selected.itertuples(index=False), epochs, strict=False):
+        for row, admit_epoch in zip_nonstrict(selected.itertuples(index=False), epochs):
             sid = as_int(row.subject_id)
             hid = as_int(row.hadm_id)
             if sid is not None and hid is not None and admit_epoch is not None:
@@ -410,7 +423,7 @@ def read_context_orders(
         if selected.empty:
             continue
         epochs = parse_epochs(pd, selected["ordertime"])
-        for row, order_epoch in zip(selected.itertuples(index=False), epochs, strict=False):
+        for row, order_epoch in zip_nonstrict(selected.itertuples(index=False), epochs):
             if clean_text(row.order_type) != "Medications":
                 continue
             transaction = clean_text(row.transaction_type)
@@ -528,7 +541,7 @@ def read_administrations(
         if selected.empty:
             continue
         epochs = parse_epochs(pd, selected["charttime"])
-        for row, chart_epoch in zip(selected.itertuples(index=False), epochs, strict=False):
+        for row, chart_epoch in zip_nonstrict(selected.itertuples(index=False), epochs):
             hid = as_int(row.hadm_id)
             if hid is None or chart_epoch is None:
                 continue
@@ -964,7 +977,7 @@ def _build_priors(np: Any, sources: Sequence[int], destinations: Sequence[int]) 
     p_destination = (destination_counts + 1.0) / (len(destinations) + N_CLASSES)
     pair_counts = np.zeros((N_CLASSES, N_CLASSES), dtype=np.float64)
     source_counts = np.zeros(N_CLASSES, dtype=np.float64)
-    for source, destination in zip(sources, destinations, strict=False):
+    for source, destination in zip_nonstrict(sources, destinations):
         pair_counts[source, destination] += 1.0
         source_counts[source] += 1.0
     p_source = (pair_counts + p_destination[None, :]) / (source_counts[:, None] + 1.0)
@@ -1102,11 +1115,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if set(event_partitions) - {"Discovery", "Dev"}:
         raise InvalidExecution("unexpected experiment partition")
     discovery_events = [
-        item for item, part in zip(strict, event_partitions, strict=False) if part == "Discovery"
+        item for item, part in zip_nonstrict(strict, event_partitions) if part == "Discovery"
     ]
-    dev_events = [
-        item for item, part in zip(strict, event_partitions, strict=False) if part == "Dev"
-    ]
+    dev_events = [item for item, part in zip_nonstrict(strict, event_partitions) if part == "Dev"]
     if not discovery_events or not dev_events:
         raise InvalidExecution("Discovery or Dev strict partition is empty")
     if set(
@@ -1169,13 +1180,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     discovery_examples = [
         example
-        for example, part in zip(all_examples, event_partitions, strict=False)
+        for example, part in zip_nonstrict(all_examples, event_partitions)
         if part == "Discovery"
     ]
     dev_examples = [
-        example
-        for example, part in zip(all_examples, event_partitions, strict=False)
-        if part == "Dev"
+        example for example, part in zip_nonstrict(all_examples, event_partitions) if part == "Dev"
     ]
     try:
         assert_sample_identity(

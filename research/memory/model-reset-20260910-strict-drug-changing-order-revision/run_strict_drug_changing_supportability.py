@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import collections
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -75,6 +76,15 @@ EXPECTED_CRITERIA = {
 
 class ImplementationMismatch(RuntimeError):
     """Raised when re-materialization is not the frozen semantic object."""
+
+
+def zip_strict(*iterables: Any) -> Any:
+    """Python 3.8-compatible equivalent of ``zip(..., strict=True)``."""
+    sentinel = object()
+    for values in itertools.zip_longest(*iterables, fillvalue=sentinel):
+        if any(value is sentinel for value in values):
+            raise ImplementationMismatch("internal iterable length mismatch")
+        yield values
 
 
 def clean_text(value: Any) -> str:
@@ -306,9 +316,7 @@ def parse_time_series(series: pd.Series) -> list[int | None]:
     parsed = pd.to_datetime(series, errors="coerce")
     valid = (~parsed.isna()).to_numpy()
     values = parsed.astype("int64").to_numpy()
-    return [
-        int(value // 1_000_000_000) if ok else None for value, ok in zip(values, valid, strict=True)
-    ]
+    return [int(value // 1_000_000_000) if ok else None for value, ok in zip_strict(values, valid)]
 
 
 def read_poe_orders(
@@ -344,7 +352,7 @@ def read_poe_orders(
         if selected.empty:
             continue
         epochs = parse_time_series(selected["ordertime"])
-        for row, order_time in zip(selected.itertuples(index=False), epochs, strict=True):
+        for row, order_time in zip_strict(selected.itertuples(index=False), epochs):
             order_type = clean_text(row.order_type)
             transaction_type = clean_text(row.transaction_type)
             record_index = row_index
@@ -409,7 +417,7 @@ def read_referenced_old_rows(
         if selected.empty:
             continue
         epochs = parse_time_series(selected["ordertime"])
-        for row, order_time in zip(selected.itertuples(index=False), epochs, strict=True):
+        for row, order_time in zip_strict(selected.itertuples(index=False), epochs):
             poe_id = clean_text(row.poe_id)
             old_rows[poe_id].append(
                 {
