@@ -48,7 +48,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **P1 mechanical preflight**: `STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT`.
 - **Strict drug-changing semantic admission**: `PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`).
 - **Strict drug-changing supportability**: `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`.
-- **Full V1--V8 implementation / training**: not started / not run.
+- **Full Idea-007 V1--V8 implementation / training**: not started / not run.
 - **Pair/Context execution**: `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`; semantic identity `1,040`, zero frozen integrity violations, and all five control comparisons failed.
 - **Pair/Context failure memory**: [`memory/failures/strict-drug-changing-pair-context--no-incremental-value.md`](memory/failures/strict-drug-changing-pair-context--no-incremental-value.md).
 - **Pair/Context result**: [`memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-summary.json`](memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-summary.json) and decision record in the same packet.
