@@ -34,7 +34,7 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 
 ## Current scientific state
 
-- **Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`.
+- **Stage**: `PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`.
 - **Active Idea**: none.
 - **Ideas 001--007**: terminated.
 - **Latest Idea**: `007-privileged-physiological-response-supervision` (closed at Gate 01 P1).
@@ -49,7 +49,9 @@ The strongest simple/equal-entitlement control precedes method storytelling.
 - **Strict drug-changing semantic admission**: `PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`).
 - **Strict drug-changing supportability**: `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`.
 - **Full V1--V8 implementation / training**: not started / not run.
-- **Pair/Context execution**: frozen pre-Idea protocol and implementation; current owner `ccf-experiment-designer / standard`.
+- **Pair/Context execution**: `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`; semantic identity `1,040`, zero frozen integrity violations, and all five control comparisons failed.
+- **Pair/Context failure memory**: [`memory/failures/strict-drug-changing-pair-context--no-incremental-value.md`](memory/failures/strict-drug-changing-pair-context--no-incremental-value.md).
+- **Pair/Context result**: [`memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-summary.json`](memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-summary.json) and decision record in the same packet.
 - **Idea 007 failure memory**: [`memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
 - **Next routing**: `ccf-pipeline-orchestrator`.
 
@@ -134,21 +136,22 @@ Current project state:
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 Active Idea: none
-Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
+Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
 New Idea: NOT CREATED
-Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
-Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
+Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
+Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
 Quarantine: intact
-No Idea 008 or Gate 01 authorized
+No Idea 008, Gate 01, or rescue authorized
 Next owner: ccf-pipeline-orchestrator
 ```
 
 The P1 support record, integrity audit, and canonical failure memory are complete.
-No Gate 01, recommendation-outcome evaluation, or model work outside the frozen
-Pair/Context packet is authorized after this terminal support failure. The current
-bounded probe training is limited to that packet; this state does not create or
-pre-allocate Idea 008.
+The frozen Pair/Context packet is also closed after its five-control incremental-
+value failure. No Gate 01, recommendation-outcome evaluation, rescue, or model
+work outside that packet is authorized; this state does not create or pre-allocate
+Idea 008.
 
 ## Quarantine
 

@@ -1,11 +1,11 @@
-# Handoff: Pair/Context Incremental Value Pre-Idea Execution
+# Handoff: Pair/Context Incremental Value Pre-Idea Closure
 
 ## Current state
 
 Ideas 001--007 are terminated. Idea 007 remains formally closed after the frozen
 Gate 01 P1 mechanical response-support preflight failed.
 
-- **Current Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
+- **Current Stage**: `PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
 - **Active Idea**: none
 - **Idea 007**: `TERMINATED_AT_GATE_01_P1` (historical, closed)
 - **Idea 008**: not created / not pre-allocated
@@ -18,10 +18,11 @@ Gate 01 P1 mechanical response-support preflight failed.
 - **Gate 01 design audit**: `DESIGN_INTEGRITY_PASS`; P0/P1 closure is historical
 - **Strict semantic admission**: `PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`)
 - **Strict supportability**: `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`
-- **Pair/Context owner**: `ccf-experiment-designer / standard`
-- **Pair/Context execution**: frozen protocol and implementation committed; remote execution is the only current experiment
-- **Formal Gate 01 / recommendation-model work**: not authorized
+- **Pair/Context owner**: `ccf-pipeline-orchestrator` (routing after termination)
+- **Pair/Context execution**: `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`; frozen remote run completed with public-safe aggregate evidence
+- **Formal Gate 01 / recommendation-model work**: not authorized; only the bounded frozen pre-Idea probes ran
 - **Idea 007 failure memory**: `research/memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`
+- **Pair/Context failure memory**: `research/memory/failures/strict-drug-changing-pair-context--no-incremental-value.md`
 - **G3/G4 future reserve**: quarantined / uninspected
 - **R0 Holdout**: quarantined / uninspected
 - **Historical project test split**: untouched / uninspected
@@ -31,8 +32,8 @@ Gate 01 P1 mechanical response-support preflight failed.
 
 `research/memory/model-reset-20260910-strict-drug-changing-order-revision/`
 
-The packet contains the frozen strict supportability record and the Pair/Context
-Incremental Value protocol, runner, and targeted tests.
+The packet contains the frozen strict supportability record, the Pair/Context
+Incremental Value protocol, runner, targeted tests, and public-safe result.
 
 Historical Idea-007 packet:
 
@@ -216,6 +217,19 @@ The latest completed empirical reset remains Event-Sourced Regimen Editing M0:
 
 This result remains separate from the privileged-response admission decision.
 
+## Pair/Context result
+
+The admitted strict identity re-materialized as `1,040` events with zero frozen
+semantic or execution-integrity violations. The frozen Pair/Context run failed
+all five control comparisons under the preregistered relative-gain,
+patient-cluster bootstrap, and per-seed NLL rules. This is a bounded failure of
+the tested incremental-value premise, not a clinical or causal conclusion.
+
+The public-safe result package is:
+
+- `research/memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-summary.json`
+- `research/memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-decision.md`
+
 ## Routing
 
 Current project state:
@@ -223,16 +237,17 @@ Current project state:
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 Active Idea: none
-Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
+Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
 New Idea: NOT CREATED
-Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
-Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
+Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
+Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
 No Idea 008 or Gate 01 authorized
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```
 
 This handoff records the completed Idea-007 closure, the strict semantic and
-supportability passes, and the frozen Pair/Context pre-Idea execution boundary.
-It authorizes no Idea 008 creation, Gate 01, or work outside this packet.
+supportability passes, and the terminal Pair/Context pre-Idea result. It
+authorizes no Idea 008 creation, Gate 01, rescue, or work outside this packet.

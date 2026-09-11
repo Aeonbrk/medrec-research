@@ -6,19 +6,20 @@
 
 Refresh date: 2026-09-09.
 
-Current update: 2026-09-11, using the existing strict semantic-admission and
-supportability records; no new literature search was run.
+Current update: 2026-09-11, using the existing strict semantic-admission,
+supportability, and Pair/Context execution records; no new literature search was
+run.
 
 Current project stage:
 
-`PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
+`PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
 
 **Active Idea**: none. Ideas 001--007 are terminated. Idea 007 was formally
 created/admitted and then closed at Gate 01 P1.
 
 Current packet:
 
-[`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/).
+[`model-reset-20260910-strict-drug-changing-order-revision/`](model-reset-20260910-strict-drug-changing-order-revision/).
 
 Strict admission review:
 
@@ -68,7 +69,19 @@ Current frozen packet:
 | True-future-observation teacher → current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
 | Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 |
 | **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen six-channel administered-positive formulation failed supportability before training; P1 report and integrity audit are canonical |
-| **Strict drug-changing order-revision Pair/Context value** | **`FROZEN PRE-IDEA EXECUTION`** | semantic admission and strict-trace supportability passed; incremental-value evidence is bounded to the current packet |
+| **Strict drug-changing order-revision Pair/Context value** | **`CLOSED UNDER PRE-IDEA INCREMENTAL-VALUE FAILURE`** | strict identity re-materialized, but all five frozen control comparisons failed; no rescue |
+
+## Strict Pair/Context closure
+
+The frozen strict trace contained `1,040` events with zero semantic or execution-
+integrity violations. PairContext did not meet the preregistered relative-gain,
+patient-cluster bootstrap, and per-seed NLL conditions against any of the five
+controls. This closes the tested context-dependent incremental-value route; it
+does not establish a universal claim about workflow or longitudinal information.
+
+Record:
+
+[`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md).
 
 ## Closed Idea-007 opportunity record
 
@@ -217,15 +230,16 @@ Current project state:
 
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
-Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 Active Idea: none
-Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
+Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
 New Idea: NOT CREATED
-Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
-Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
+Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
+Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```
 
-No Idea 008 creation, Gate 01, or work outside the frozen Pair/Context packet is
-authorized by this map. No new literature search was run for this update.
+No Idea 008 creation, Gate 01, rescue, or work outside the closed Pair/Context
+packet is authorized by this map. No new literature search was run for this
+update.

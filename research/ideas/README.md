@@ -37,7 +37,7 @@ There is no active Idea, and Idea 008 has not been created or pre-allocated.
 
 Stage:
 
-`PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`.
+`PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`.
 
 Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
 the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
@@ -48,13 +48,19 @@ Packet:
 
 `research/memory/model-reset-20260910-strict-drug-changing-order-revision/`.
 
+Pair/Context failure memory:
+
+`research/memory/failures/strict-drug-changing-pair-context--no-incremental-value.md`.
+
 Strict admission review:
 
 `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
 
 Strict drug-changing semantic admission and supportability both passed:
 `PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`) and
-`PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`.
+`PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`. The bounded Pair/Context execution
+then returned `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`; its semantic identity
+was exact and all five frozen control comparisons failed.
 
 The family was admitted because the bounded R1--R3 revision resolves the prior
 mechanism-identification blockers without data exploration or architecture
@@ -91,15 +97,16 @@ Historical Idea-007 artifacts:
 Current owner state:
 
 `ccf-pipeline-orchestrator` admission and closure are complete.
-`ccf-experiment-designer` owns the frozen Pair/Context Incremental Value execution
-under the strict trace packet. `ccf-pipeline-orchestrator` receives routing after
-this bounded stage.
+The frozen Pair/Context Incremental Value execution is terminated under its
+strict trace packet. `ccf-pipeline-orchestrator` receives routing after this
+bounded stage.
 
 Idea-007 terminal state and project routing:
 
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 P0 freeze: PASS
 Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
 P1 mechanical preflight: STOP
@@ -109,12 +116,12 @@ Gate 01 training: NOT AUTHORIZED
 No rescue authorized
 Quarantine: intact
 Active Idea: none
-Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
+Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
 New Idea: NOT CREATED
-Pair/Context: FROZEN PRE-IDEA EXECUTION ONLY
+Pair/Context: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 Next owner: ccf-pipeline-orchestrator
 ```
 
-The public-safe P1 report, integrity audit, and failure memory are complete. The
-only current experiment is the frozen Pair/Context pre-Idea packet; Idea 008,
-Gate 01, and work outside that packet are not authorized in this state.
+The public-safe P1 report, integrity audit, Pair/Context result, and bounded
+failure memory are complete. Idea 008, Gate 01, rescue, and work outside the
+closed packet are not authorized in this state.

@@ -8,7 +8,7 @@ This directory stores curated cross-Idea constraints, decisive failures, literat
 
 Authoritative project stage:
 
-`PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
+`PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
 
 **Active Idea**: none. Ideas 001--007 are terminated; Idea 007 was formally
 closed at Gate 01 P1. No Idea 008 has been created or pre-allocated.
@@ -16,9 +16,9 @@ closed at Gate 01 P1. No Idea 008 has been created or pre-allocated.
 The paper objective remains a first formal **method paper** targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed when it encodes an admitted scientific mechanism; architecture replacement by itself is insufficient.
 
 The latest admitted family was **privileged physiological response supervision**;
-it is closed under Idea 007 after the Gate 01 P1 support failure. The current
-bounded pre-Idea packet is the strict drug-changing order-revision
-Pair/Context Incremental Value test.
+it is closed under Idea 007 after the Gate 01 P1 support failure. The strict
+drug-changing order-revision Pair/Context Incremental Value packet is also
+closed after its frozen five-control failure.
 
 Strict re-review verdict:
 
@@ -29,12 +29,13 @@ Admission, design, and closure owners:
 `ccf-pipeline-orchestrator` (admission complete) -> `ccf-experiment-designer`
 (teacher-objective domain closed; exact V7 Generic Pre-Order KD frozen) ->
 `ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
-`ccf-pipeline-orchestrator` (P0/P1 routing and closure complete) ->
-`ccf-idea-optimizer / exploratory` (next owner).
+`ccf-pipeline-orchestrator` (P0/P1 routing and Pair/Context closure complete)
+(current owner for the next routing decision).
 
-Only the frozen Pair/Context pre-Idea execution is authorized by the current
-state. Gate 01 and unrelated model work are not authorized. MIMIC-IV G3/G4 future
-groups, R0 Holdout, and the historical project test split remain quarantined.
+The frozen Pair/Context pre-Idea execution is complete and terminated with
+`ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`. Gate 01, rescue, and unrelated model
+work are not authorized. MIMIC-IV G3/G4 future groups, R0 Holdout, and the
+historical project test split remain quarantined.
 
 ## Historical privileged-response records
 
@@ -43,6 +44,7 @@ groups, R0 Holdout, and the historical project test split remain quarantined.
 - [`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md): 2026-09-09 independent closest-work refresh and novelty subtraction.
 - [`../ideas/007-privileged-physiological-response-supervision/`](../ideas/007-privileged-physiological-response-supervision/): admitted Idea and audited Gate-01 design.
 - [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md): canonical Gate-01 P1 support failure and closure boundary.
+- [`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md): bounded Pair/Context incremental-value failure and no-rescue boundary.
 - [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md): reusable mechanism-identification constraint from the prior pre-Idea state; not an empirical failure.
 
 ## Closed Idea-007 response-supervision boundary
@@ -101,18 +103,20 @@ Current project state:
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 Active Idea: none
-Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
+Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
 New Idea: NOT CREATED
-Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
-Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
+Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
+Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```
 
 Idea 007's P1 support record is complete and its no-rescue boundary is terminal.
-The current packet contains only the frozen Pair/Context pre-Idea execution; this
-state does not authorize Idea 008, Gate 01, or protocol/feature rescue.
+The current packet's Pair/Context run is also terminal after all five frozen
+control comparisons failed. This state does not authorize Idea 008, Gate 01, or
+protocol/feature rescue.
 
 ## Navigation
 
@@ -124,3 +128,4 @@ state does not authorize Idea 008, Gate 01, or protocol/feature rescue.
 - [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/): rejected selective-supervision reset and identifiability boundary.
 - [`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/): completed exposure-state resource reset; reusable infrastructure only.
 - [`model-reset-20260910-strict-drug-changing-order-revision/`](model-reset-20260910-strict-drug-changing-order-revision/): frozen strict Pair/Context Incremental Value pre-Idea packet.
+- [`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md): terminal Pair/Context failure memory.

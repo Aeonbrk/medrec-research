@@ -4,15 +4,16 @@
 
 ## Current workflow state
 
-**Stage**: `PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE`
+**Stage**: `PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
 
 **Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
 
 **Active Idea**: none.
 
-The current bounded pre-Idea object is the strict drug-changing order-revision
-Pair/Context Incremental Value test. Semantic admission and strict-trace
-supportability passed with `N_strict = 1,040`; no Idea 008 has been created.
+The strict drug-changing order-revision Pair/Context Incremental Value test is
+closed. Semantic admission and strict-trace supportability passed with
+`N_strict = 1,040`, but all five frozen control comparisons failed; no Idea 008
+has been created.
 
 **Idea 007**: terminated at Gate 01 P1 with insufficient and materially
 concentrated response support.
@@ -24,15 +25,16 @@ concentrated response support.
 **Admission/design/closure owners**: `ccf-pipeline-orchestrator` (admission complete) ->
 `ccf-experiment-designer` (teacher-objective domain closed; exact V7 Generic
 Pre-Order KD frozen) -> `ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
-`ccf-pipeline-orchestrator` (P0/P1 routing and closure complete) ->
-`ccf-idea-optimizer / exploratory` (next owner).
+`ccf-pipeline-orchestrator` (P0/P1 and Pair/Context routing/closure complete)
+(current owner for the next routing decision).
 
-No local scientific execution or training is authorized by the current state.
+No further scientific execution or formal training is authorized by the current
+state.
 MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
 remain quarantined.
 
 No Idea 008 has been created or pre-allocated, and no literature search was run
-for this closure update.
+for this Pair/Context closure.
 
 ## Cumulative failure landscape
 
@@ -99,6 +101,19 @@ failed. The medication concentration checks passed.
 Record:
 
 [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
+
+### F12 — a valid workflow trace can still lack incremental context value
+
+The strict drug-changing order-revision trace re-materialized exactly (`1,040`
+events; zero frozen integrity violations), but PairContext failed every frozen
+comparison against destination marginal, source transition, flattened-base
+plus-source-prior, trace-context-only, and permuted-context controls. This
+closes the tested context-dependent incremental-value route, not every possible
+workflow or longitudinal information object.
+
+Record:
+
+[`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md).
 
 ## Higher-order reusable constraints
 
@@ -262,14 +277,15 @@ Current project state:
 ```text
 Idea 007: TERMINATED_AT_GATE_01_P1
 Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
+Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
 Active Idea: none
-Stage: PRE_IDEA_PAIR_CONTEXT_INCREMENTAL_VALUE
+Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
 New Idea: NOT CREATED
-Experiment: FROZEN PAIR/CONTEXT PRE-IDEA EXECUTION ONLY
-Training: ONLY WITHIN THIS FROZEN PRE-IDEA PROTOCOL
+Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
+Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
 Quarantine: intact
 Next owner: ccf-pipeline-orchestrator
 ```
 
-No Idea 008 creation, Gate 01, or work outside the frozen Pair/Context packet is
-authorized by this map. This update did not run a literature search.
+No Idea 008 creation, Gate 01, rescue, or work outside the closed Pair/Context
+packet is authorized by this map. This update did not run a literature search.
