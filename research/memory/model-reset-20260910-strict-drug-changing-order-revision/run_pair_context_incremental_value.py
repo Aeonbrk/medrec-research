@@ -459,9 +459,7 @@ def build_relevant_prescription_linkage(
     expected_poe_to_atcs: Mapping[str, set[str]],
 ) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
     """Reproduce the frozen mapping lineage and retain pharmacy links only for context POEs."""
-    mapping = support.build_ndc_mapping(
-        mapping_dir / "ndc2atc_level4.csv", mapping_dir / "drug_codes_mapping.csv"
-    )
+    mapping = support.build_ndc_mapping(mapping_dir)
     usecols = ["subject_id", "poe_id", "pharmacy_id", "ndc", "formulary_drug_cd"]
     counts: dict[str, collections.Counter[str]] = collections.defaultdict(collections.Counter)
     for chunk in support.iter_prescription_chunks(mimic_dir, discovery_subjects, usecols):
@@ -1080,9 +1078,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     verify_execution_checkout(args.repo_root, execution_revision)
 
     patients, allowed_subjects, discovery_subjects = support.load_population(args.mimic_dir)
-    mapping = support.build_ndc_mapping(
-        args.mapping_dir / "ndc2atc_level4.csv", args.mapping_dir / "drug_codes_mapping.csv"
-    )
+    mapping = support.build_ndc_mapping(args.mapping_dir)
     _codes, concept_to_idx, vocabulary = load_vocab_codes(args.vocab_dir)
     source_dc, new_orders, old_refs = support.read_poe_orders(
         args.mimic_dir, patients, allowed_subjects
