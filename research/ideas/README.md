@@ -29,99 +29,57 @@ Idea-stage prototypes stay inside the Idea until stable reusable infrastructure 
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Gate 01 design pending** | — |
 
 ## Current project state
 
-Idea 007 is the latest admitted Idea and is now formally closed at Gate 01 P1.
-There is no active Idea, and Idea 008 has not been created or pre-allocated.
+Idea 008 is the active admitted Idea.
 
-Stage:
+- **Stage**: `IDEA_008_ADMITTED_PENDING_GATE_01_DESIGN`.
+- **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
+- **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`.
+- **Reviewer confidence**: medium-high.
+- **Admission owner**: `ccf-pipeline-orchestrator`.
+- **Admission source revision**: `0be7c5c30762b232cd47a0c2ccf9b08aee1b23b5`.
+- **Ideas 001--007**: terminated.
+- **Pair/Context**: `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`.
+- **Gate 01 design**: not yet frozen.
+- **Formal training**: `NOT_AUTHORIZED`.
+- **Quarantine**: intact.
+- **Next owner**: `ccf-experiment-designer / design`.
 
-`PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`.
+The admitted claim is narrow:
 
-Idea 007 has been formally created/admitted by `ccf-pipeline-orchestrator` after
-the strict review verdict `ACCEPT_TO_CREATE_IDEA_007`.
+> At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
 
-The closed method family was `Privileged Physiological Response Supervision`.
-
-Packet:
-
-`research/memory/model-reset-20260910-strict-drug-changing-order-revision/`.
-
-Pair/Context failure memory:
-
-`research/memory/failures/strict-drug-changing-pair-context--no-incremental-value.md`.
-
-Strict admission review:
-
-`ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
-
-Strict drug-changing semantic admission and supportability both passed:
-`PASS_SEMANTIC_ADMISSION` (`N_strict = 1,040`) and
-`PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY`. The bounded Pair/Context execution
-then returned `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`; its semantic identity
-was exact and all five frozen control comparisons failed.
-
-The family was admitted because the bounded R1--R3 revision resolves the prior
-mechanism-identification blockers without data exploration or architecture
-expansion. The generic learning primitive is already prior art; the surviving
-scientific object is medication-in-context realized post-administration
-physiological values used only as training-time privileged supervision for a
-strictly pre-order candidate-medication student.
-
-The admitted method family was valid only under prospective mechanism subtraction:
-
-1. matched Generic Future-State Auxiliary / Medication-Ablated Future;
-2. mandatory Monitoring-Mask-Only and physiology-value versus response-availability separation;
-3. equal-support positive-only response semantics and strictly pre-order student/deployment entitlement;
-4. Static Medication Response Prototype and Response Shuffle as pairing/identity killers;
-5. richer Pre-Order Physiology and exact Generic Pre-Order KD to remove simple modality/KD explanations.
-
-Any comparable simple matched control terminates the response-specific mechanism.
-Deployment leakage or unequal support invalidates the Gate. Gate 01 now freezes
-practical/statistical definitions of `materially`, `comparable`, and `≈` before
-training. No architecture, response-window, modality, subgroup,
-post-hoc-feature, favorable-seed, split, or repeated-definition rescue is
-permitted under the same Idea.
-
-Historical Idea-007 artifacts:
-
-- [`007-privileged-physiological-response-supervision/README.md`](007-privileged-physiological-response-supervision/README.md)
-- [`007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md)
-- [`007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md)
-- [`007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json`](007-privileged-physiological-response-supervision/experiments/gate-01-p0-freeze.json)
-- [`007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json)
-- [`007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md`](007-privileged-physiological-response-supervision/experiments/gate-01-p1-integrity-audit.md)
-- [`../memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](../memory/failures/privileged-physiological-response-gate-01-p1--insufficient-support.md)
-
-Current owner state:
-
-`ccf-pipeline-orchestrator` admission and closure are complete.
-The frozen Pair/Context Incremental Value execution is terminated under its
-strict trace packet. `ccf-pipeline-orchestrator` receives routing after this
-bounded stage.
-
-Idea-007 terminal state and project routing:
+The scientific interaction under test is:
 
 ```text
-Idea 007: TERMINATED_AT_GATE_01_P1
-Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
-Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
-P0 freeze: PASS
-Gate 01: design frozen / objective-domain closed / V7 executable / independently audited
-P1 mechanical preflight: STOP
-Implementation: P1 runner only; full V1-V8 NOT STARTED
-Formal training: NOT RUN
-Gate 01 training: NOT AUTHORIZED
-No rescue authorized
-Quarantine: intact
-Active Idea: none
-Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
-New Idea: NOT CREATED
-Pair/Context: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
-Next owner: ccf-pipeline-orchestrator
+requested residual constraint slack
+× composition-dependent marginal DDI cost
+× iterative fixed-K set refinement
 ```
 
-The public-safe P1 report, integrity audit, Pair/Context result, and bounded
-failure memory are complete. Idea 008, Gate 01, rescue, and work outside the
-closed packet are not authorized in this state.
+The next Gate 01 must challenge this interaction before any architecture expansion or training story.
+
+## Frozen Idea 008 killers
+
+1. **Fixed-K Budget-Aware Greedy + 1-Swap** receives identical frozen recommendation scores, DDI information, candidate pool, requested DDI target, and exact per-patient cardinality. `Greedy+1Swap ≈ BudgetSet` terminates the method with `KILL_BUDGETSET`.
+2. **Budget-Conditioned Independent Scorer** receives the same information entitlement. A comparable result terminates the joint-set interaction claim.
+
+Exact MILP/MIQP is not a replacement for the first Gate-01 killer. It may be considered later only if the method survives and a paper-level efficiency/optimality comparison becomes necessary.
+
+The residual budget signal on relaxed `q` is a surrogate constraint slack, not a clinical safety guarantee. Final hard-set achieved DDI is the operating-point quantity. The `K_x < 2` pair-risk domain remains for the Gate 01 protocol to define before execution.
+
+## Routing
+
+```text
+Idea 008: ADMITTED
+Active Idea: 008-budgetset-residual-budget-marginal-ddi-set-refinement
+Stage: IDEA_008_ADMITTED_PENDING_GATE_01_DESIGN
+Gate 01: NOT YET DESIGNED / NOT FROZEN
+Training: NOT_AUTHORIZED
+Quarantine: intact
+Next owner: ccf-experiment-designer / design
+Next task: freeze cheapest falsifiable Gate 01
+```
