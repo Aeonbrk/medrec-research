@@ -19,17 +19,19 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 
 ## Current scientific state
 
-- **Stage**: `IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT`.
+- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`.
 - **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`.
-- **Gate 01 design**: `DESIGN_READY`, frozen and not executed.
+- **Gate 01 protocol v1.0**: `DESIGN_INTEGRITY_FAIL`, frozen and not executed.
 - **Gate 01 protocol**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md).
+- **Integrity audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md).
+- **Implementation**: `NOT_STARTED`.
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`.
 - **Experiment execution**: `NOT_AUTHORIZED`.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate.
-- **Next routing**: `ccf-integrity-auditor` for independent Gate-01 design/integrity audit.
+- **Next routing**: `ccf-experiment-designer / design` for bounded protocol correction of audit blockers B1--B7 only, followed by `ccf-integrity-auditor` re-audit.
 
-Idea 008 is admitted for one bounded kill-first method cycle. Gate design is a workflow artifact, not empirical evidence.
+Idea 008 remains admitted for one bounded kill-first method cycle. No empirical Gate result exists. Protocol v1.0 failed pre-execution integrity audit and may not be executed until the bounded correction is independently re-audited.
 
 ## Active Idea 008 boundary
 
@@ -39,7 +41,7 @@ The admitted claim is:
 
 > At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
 
-The scientific interaction under test is:
+The scientific interaction under test remains:
 
 ```text
 requested residual constraint slack
@@ -47,7 +49,7 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The frozen Gate uses one comparison-ready MoleRec backbone, the complete 131-medication candidate vocabulary, Frozen-Base cardinality `K_x`, three Train-calibrated requested budgets, and `T=2` as the minimum actual composition-feedback loop.
+The integrity audit does not authorize a stronger method. Its bounded correction is limited to restoring the admitted frozen-score residual anchor and making the existing backbone representation, patient split, low-cardinality Greedy branch, learned selection rule, aggregation/statistics semantics, and terminal precedence mechanically unique.
 
 Primary killers remain:
 
@@ -73,11 +75,14 @@ Until a later explicit authorization, do not inspect or use:
 ## Routing
 
 ```text
-Idea 008: ADMITTED / GATE_01_DESIGN_FROZEN
-Stage: IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT
-Gate 01: DESIGN_READY / NOT EXECUTED
+Idea 008: ADMITTED
+Gate 01 protocol v1.0: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
+Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
+Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
 Quarantine: intact
-Next owner: ccf-integrity-auditor
+Next owner: ccf-experiment-designer / design
+After bounded correction: ccf-integrity-auditor re-audit
+After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```

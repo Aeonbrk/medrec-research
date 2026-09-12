@@ -3,19 +3,20 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `ADMITTED / GATE_01_DESIGN_FROZEN`
-- **Stage**: `IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT`
+- **Status**: `ADMITTED / GATE_01_DESIGN_INTEGRITY_FAIL`
+- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
-- **Gate 01 owner**: `ccf-experiment-designer / design`
-- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md)
-- **Gate 01 design verdict**: `DESIGN_READY`
+- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), v1.0 failed pre-execution integrity audit
+- **Integrity audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md)
+- **Implementation**: `NOT_STARTED`
 - **Training**: `NOT_AUTHORIZED`
+- **Execution**: `NOT_AUTHORIZED`
 - **Quarantine**: intact
-- **Next owner**: `ccf-integrity-auditor`
+- **Next owner**: `ccf-experiment-designer / design`
 
-Idea 008 remains one bounded kill-first method cycle. The Gate 01 design is frozen, but no experiment has been executed and no recommendation-model training is authorized until independent design/integrity audit and subsequent pipeline authorization.
+Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 experiment has been executed. Protocol v1.0 is not execution-ready and may only receive the bounded corrections identified by the integrity audit before independent re-audit.
 
 ## Scientific question
 
@@ -25,7 +26,7 @@ The admitted claim remains:
 
 > At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
 
-The surviving scientific interaction is:
+The surviving scientific interaction remains:
 
 ```text
 requested residual constraint slack
@@ -35,9 +36,9 @@ requested residual constraint slack
 
 Generic joint set prediction, Pareto medication recommendation, DDI-aware loss, a DDI target by itself, one-model/many-objectives, list-wise refinement, training-time safety coefficients, and generic preference conditioning are not novelty claims.
 
-## Mechanism
+## Admitted mechanism identity
 
-For a patient-specific fixed cardinality `K_x`, the hard-set DDI rate is
+For a patient-specific fixed cardinality `K_x`, define the hard-set DDI rate
 
 $$
 R_{DDI}(S)=\frac{\sum_{i<j}D_{ij}\mathbf{1}[i\in S]\mathbf{1}[j\in S]}{\binom{K_x}{2}}.
@@ -66,13 +67,19 @@ $$
 $$
 
 $$
-z_i^{(t+1)}=u_i-\lambda_i^{(t)}c_i^{(t)}.
+\Delta_i^{(t)}=u_i-\lambda_i^{(t)}c_i^{(t)},
 $$
 
-The frozen Gate uses `T=2`, the smallest value that creates one actual composition-feedback cycle. The final hard prescription is
+with the admitted explicit frozen-score residual anchor
 
 $$
-S_b=\operatorname{TopK}_{K_x}(z^{(2)}).
+z_i^{(t+1)}=s_i+\Delta_i^{(t)}.
+$$
+
+The final hard prescription preserves exact cardinality:
+
+$$
+S_b=\operatorname{TopK}_{K_x}(z^{(T)}).
 $$
 
 For symmetric `D`,
@@ -83,27 +90,29 @@ $$
 
 `rho` is surrogate residual slack on relaxed `q`; it is not a hard DDI or clinical safety guarantee. Final hard-set achieved DDI is the operating-point quantity.
 
-## Frozen Gate 01 design
+Protocol v1.0 omitted the explicit `+s_i` residual anchor in its learned update. The integrity audit classifies that as scientific drift, not an accepted redefinition of the Idea.
 
-The authoritative protocol is [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md). Its central choices are:
+## Gate 01 v1.0 integrity result
 
-- frozen backbone: `MoleRec / molerec-embedding`;
-- candidate pool: complete 131-medication vocabulary for every method;
-- `K_x`: frozen MoleRec threshold-0.5 output cardinality, not ground-truth count;
-- `K_x < 2`: pairwise DDI risk and candidate marginal DDI are both zero;
-- deterministic initialization: `z^(0)=s`, `q^(0)=sigmoid(s)`;
-- refinement depth: `T=2`, no depth sweep;
-- budgets: Train-calibrated `{0.60, 0.80, 1.00} * r_train`, with no extra targets;
-- conditional training support: uniform over those three targets;
-- primary utility metric: Jaccard; F1 and PRAUC are supporting;
-- learned seeds: `{2002, 2003, 2004}`;
-- patient-clustered Audit bootstrap: 1000 resamples, seed `80081`;
-- practical margins: `0.005` absolute Jaccard and `0.005` absolute hard-set DDI rate;
-- exact fixed-cardinality compliance: `100%`.
+`DESIGN_INTEGRITY_FAIL`.
+
+Execution is blocked only by the seven bounded protocol-definition findings recorded in the authoritative audit:
+
+1. restore the admitted explicit frozen-score residual anchor for both learned families;
+2. freeze the exact pinned MoleRec representation used as `e_i` and its extraction point;
+3. freeze the exact patient-only Dev/Audit hash formula;
+4. define Greedy+1Swap for `K_x=0` and `K_x=1`;
+5. freeze checkpoint-selection and patience semantics;
+6. freeze target/composition aggregation, frontier bootstrap, and seed semantics;
+7. freeze one primary terminal-verdict precedence order.
+
+These are execution-readiness corrections only. They do not authorize new methods, extra solvers, losses, targets, seeds, datasets, encoders, or backbone changes.
+
+## Frozen killer roles
 
 ### Killer 1 — Fixed-K Budget-Aware Greedy + 1-Swap
 
-This deterministic solver receives the same frozen scores, DDI matrix, candidate pool, requested target, and exact `K_x`. It constructs a budget-aware fixed-K set, repairs budget violation with deterministic 1-swaps, then performs feasible utility-improving 1-swaps until no improving feasible swap remains.
+This deterministic solver must receive the same frozen scores, DDI matrix, complete candidate pool, requested target, and exact `K_x` as BudgetSet.
 
 ```text
 Greedy+1Swap comparable to or better than BudgetSet
@@ -114,7 +123,7 @@ No exact-solver zoo is part of Gate 01.
 
 ### Killer 2 — Budget-Conditioned Independent Scorer
 
-This learned control receives the same frozen patient-conditioned score `s_i`, medication embedding `e_i`, requested `b`, and Train-only static DDI summaries. It has comparable learned head capacity but cannot access provisional set composition, `q^(t)`, candidate-to-current-set marginal DDI, residual relaxed slack, or iterative feedback.
+This learned control must receive the same frozen patient-conditioned score and the same frozen medication representation plus requested `b` and Train-only static DDI summaries, with comparable learned capacity but no provisional-set composition, current-set marginal DDI, residual relaxed slack, or iterative feedback.
 
 ```text
 Independent Conditional Scorer comparable to or better than BudgetSet
@@ -123,43 +132,40 @@ Independent Conditional Scorer comparable to or better than BudgetSet
 
 ### Fixed-lambda family
 
-A six-value deterministic fixed-lambda support is calibrated on Gate01-Train to the three requested targets. It is supporting evidence for conditional amortization versus separately tuned fixed operating points and is not a third primary killer.
+The six-value fixed-lambda family remains supporting evidence for conditional amortization versus separately calibrated fixed operating points. It is not a third primary killer.
 
 ## Gate 01 pass boundary
 
-`PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` requires all of the following:
+A future corrected and re-audited Gate may return `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` only under the frozen all-conditions logic: exact cardinality, all-target compliance, material DDI responsiveness, hard-set composition response, two separated frontier wins against both killers, and non-one-seed-only support.
 
-1. exact `|S_b|=K_x` for every method and visit;
-2. BudgetSet target compliance at all three requested budgets;
-3. materially ordered hard-set achieved DDI across the three budgets;
-4. actual hard-set medication substitutions across adjacent budgets;
-5. BudgetSet materially outside the Greedy+1Swap frontier at both primary regions;
-6. BudgetSet materially outside the Independent Conditional frontier at both primary regions;
-7. neither required effect is carried by one favorable seed only.
-
-A single isolated operating-point win does not pass. Inconclusive practical intervals stop the route; they do not authorize more seeds, more budgets, a different `T`, additional losses, another backbone, or architecture rescue.
+A single isolated operating-point win does not pass. Inconclusive practical evidence does not authorize protocol rescue.
 
 ## Authorization boundary
 
-Current authorization is design only. Do not perform:
+Current authorization is protocol correction only. Do not perform:
 
+- model implementation for Gate execution;
 - model training or Gate execution;
-- G3/G4, R0 Holdout, or historical test access;
+- G3/G4, R0 Holdout, or historical project test access;
 - subgroup mining or feature fishing;
 - new patient, drug, ingredient, or molecular encoders;
 - Transformer, Mamba, MoE, RL, LLM, retrieval, or unrelated architecture expansion;
 - exact-solver families;
-- paper-level SOTA benchmarking;
-- a second formulation rescue.
+- new losses, targets, seeds, or budget sweeps;
+- paper-level SOTA benchmarking.
 
 ## Routing
 
 ```text
-Idea 008: ADMITTED / GATE_01_DESIGN_FROZEN
-Stage: IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT
-Gate 01 protocol: DESIGN_READY / NOT EXECUTED
+Idea 008: ADMITTED
+Gate 01 protocol v1.0: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
+Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
+Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
+Execution: NOT_AUTHORIZED
 Quarantine: intact
-Next owner: ccf-integrity-auditor
-Next task: independent Gate-01 design/integrity audit
+Next owner: ccf-experiment-designer / design
+Next task: bounded protocol correction for audit blockers B1-B7 only
+After correction: ccf-integrity-auditor re-audit
+After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```
