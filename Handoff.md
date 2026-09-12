@@ -1,137 +1,93 @@
-# Handoff: Idea 008 BudgetSet Admission
+# Handoff: Idea 008 Gate 01 Design Frozen
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_ADMITTED_PENDING_GATE_01_DESIGN`
+- **Current Stage**: `IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
-- **Reviewer confidence**: medium-high
-- **Admission owner**: `ccf-pipeline-orchestrator`
-- **Admission source revision**: `0be7c5c30762b232cd47a0c2ccf9b08aee1b23b5`
-- **Ideas 001--007**: terminated
-- **Idea 007**: `TERMINATED_AT_GATE_01_P1`
-- **Pair/Context**: `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`
+- **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
+- **Gate 01 owner completed**: `ccf-experiment-designer / design`
+- **Gate 01 design verdict**: `DESIGN_READY`
+- **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`
-- **Quarantine**: intact; G3/G4, R0 Holdout, and historical test remain uninspected
-- **Next owner**: `ccf-experiment-designer / design`
-- **Next task**: freeze the cheapest falsifiable Gate 01; do not train
+- **Experiment execution**: `NOT_AUTHORIZED`
+- **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate
+- **Next owner**: `ccf-integrity-auditor`
+- **Next task**: independent design/integrity audit; do not train
 
-Idea 008 is formally admitted as one bounded kill-first method cycle. Admission is not empirical evidence and does not authorize recommendation-model training.
+## Frozen scientific question
 
-## Idea 008
+> Under identical frozen recommendation scores, DDI information, candidate pool, requested DDI target, and exact per-patient medication cardinality, does residual-budget marginal-DDI joint set refinement provide incremental utility–DDI frontier value beyond cheap equal-information direct optimization and independent budget conditioning?
 
-Working name:
-
-**BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement**
-
-Canonical path:
-
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/`
-
-The admitted scientific claim is deliberately narrow:
+The admitted claim remains narrow:
 
 > At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
 
-For exact per-patient cardinality `K_x`, the admitted mechanism is based on
+`rho` is surrogate relaxed slack, not a hard DDI or clinical safety guarantee. Final hard-set achieved DDI is the operating-point quantity.
 
-$$
-R_{DDI}(S)=\frac{\sum_{i<j}D_{ij}\mathbf{1}[i\in S]\mathbf{1}[j\in S]}{\binom{K_x}{2}},
-$$
-
-$$
-c_i^{(t)}=\frac{1}{K_x-1}\sum_{j\neq i}D_{ij}q_j^{(t)},
-$$
-
-$$
-\rho^{(t)}=b-R_{DDI}(q^{(t)}),
-$$
-
-$$
-u_i=u_\phi(s_i,e_i),
-$$
-
-$$
-\lambda_i^{(t)}=\operatorname{softplus}(g_\phi(s_i,e_i,\rho^{(t)})),
-$$
-
-$$
-\Delta_i^{(t)}=u_i-\lambda_i^{(t)}c_i^{(t)},
-$$
-
-and the final hard set is
-
-$$
-S_b=\operatorname{TopK}_{K_x}(z^{(T)}).
-$$
-
-With a symmetric DDI matrix and the current normalization,
-
-$$
-\frac{\partial R_{DDI}(q)}{\partial q_i}=\frac{2}{K_x}c_i(q).
-$$
-
-## Claim boundary
-
-- `\rho` is a surrogate residual-constraint slack defined on relaxed `q`; it is not a clinical safety guarantee.
-- The achieved DDI of the final hard set is the operating-point quantity.
-- The pair-risk domain for `K_x < 2` is not decided at admission and must be frozen by the Gate 01 protocol before execution.
-- Admission does not claim clinical optimality, safety certification, treatment effect, or causal benefit.
-
-The following are not novelty claims:
-
-- joint set prediction;
-- Pareto medication recommendation;
-- DDI-aware loss;
-- DDI target alone;
-- one model / many objectives;
-- list-wise refinement;
-- training-time safety coefficients;
-- generic preference conditioning.
-
-The surviving interaction is:
+## Gate 01 frozen choices
 
 ```text
-requested residual constraint slack
-× composition-dependent marginal DDI cost
-× iterative fixed-K set refinement
+Backbone:
+MoleRec / molerec-embedding, frozen
+
+Candidate pool:
+complete 131-medication vocabulary for every method
+
+K_x:
+frozen MoleRec threshold-0.5 output count; never ground-truth count
+
+K_x < 2:
+R_DDI = 0 and c_i = 0
+
+Initialization:
+z^(0) = s; q^(0) = sigmoid(s)
+
+Refinement:
+T = 2; no T sweep
+
+Budget support:
+b_L = 0.60 * r_train
+b_M = 0.80 * r_train
+b_H = 1.00 * r_train
+P_B = Uniform{b_L, b_M, b_H}
+
+Primary utility:
+Jaccard
+
+Supporting utility:
+F1, PRAUC
+
+Seeds:
+2002, 2003, 2004
+
+Practical margins:
+0.005 Jaccard
+0.005 hard-set DDI rate
 ```
 
-## Frozen killer controls
+`T=2` is frozen because `T=1` would never recompute marginal DDI and residual slack after a changed provisional composition and therefore would not test the admitted iterative interaction.
 
-Gate 01 must include these equal-information controls:
+## Frozen killers
 
-1. **Fixed-K Budget-Aware Greedy + 1-Swap**.
-   If `Greedy+1Swap ≈ BudgetSet`, terminate with `KILL_BUDGETSET`.
-2. **Budget-Conditioned Independent Scorer**.
-   If the independent conditional scorer is comparable to BudgetSet, terminate the joint-set interaction claim.
+1. **Fixed-K Budget-Aware Greedy + 1-Swap** receives identical `s`, `D`, candidate pool, `b`, and `K_x`. If it is comparable to or better than BudgetSet at either required primary region, or BudgetSet wins only one isolated region: `KILL_BUDGETSET`.
+2. **Budget-Conditioned Independent Scorer** receives the same frozen patient-conditioned score and medication embedding plus requested `b` and Train-only static DDI summaries, with comparable learned capacity but no provisional-set composition or iterative feedback. Comparable/better performance terminates the joint-set interaction claim.
 
-The first killer remains a deterministic fixed-K direct solver. Exact MILP/MIQP is not a substitute for this first killer; an exact solver may be considered later for paper-level efficiency or optimality comparison only if the Idea survives Gate 01.
+The supporting Fixed-lambda family uses six fixed lambda values and Train-only target calibration; it does not expand into a solver family.
 
-## Gate 01 hypothesis to freeze next
+## Pass boundary
 
-> Under identical frozen recommendation scores, DDI information, candidate pool, requested DDI target, and exact per-patient cardinality, a residual-budget marginal-DDI joint set refiner provides incremental utility–DDI frontier value beyond an equal-information deterministic fixed-K direct solver and a budget-conditioned independent scorer.
+A Gate pass requires exact cardinality, target compliance, material budget responsiveness, actual hard-set substitutions, two separated frontier wins against both killers, and non-one-seed-only support. The exact decision rules are authoritative only in the Gate protocol.
 
-`ccf-experiment-designer / design` owns the next stage. Its job is to freeze the cheapest falsifiable protocol, not to execute it.
-
-## Authorization boundary
-
-Until Gate 01 is frozen, do not perform:
-
-- recommendation-model training or experiment execution;
-- budget-grid tuning;
-- quarantine access, including G3/G4, R0 Holdout, or historical test;
-- architecture expansion or new patient/molecular/ingredient encoders;
-- RL, MoE, LLM, retrieval, or unrelated candidate search;
-- new BudgetSet strict review or alternate-Idea brainstorming.
+No pass means clinical safety, CCF-A readiness, or paper completion.
 
 ## Routing
 
 ```text
-Idea 008: ADMITTED
-Active Idea: 008-budgetset-residual-budget-marginal-ddi-set-refinement
-Stage: IDEA_008_ADMITTED_PENDING_GATE_01_DESIGN
+Idea 008: ADMITTED / GATE_01_DESIGN_FROZEN
+Stage: IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT
 Training: NOT_AUTHORIZED
+Execution: NOT_AUTHORIZED
 Quarantine: intact
-Next owner: ccf-experiment-designer / design
-Next task: freeze cheapest falsifiable Gate 01
+Next owner: ccf-integrity-auditor
+After integrity pass: ccf-pipeline-orchestrator for explicit execution authorization
 ```
