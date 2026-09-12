@@ -1,30 +1,31 @@
-# Handoff: Idea 008 Gate 01 Design Integrity Failed
+# Handoff: Idea 008 Gate 01 Protocol Corrected, Pending Integrity Re-audit
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`
+- **Current Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
-- **Gate 01 owner completed**: `ccf-experiment-designer / design`
-- **Gate 01 design verdict**: `DESIGN_INTEGRITY_FAIL`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
-- **Integrity audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`
+- **Protocol revision**: `v1.1`
+- **Protocol state**: `DESIGNED_NOT_EXECUTED / PENDING_INTEGRITY_REAUDIT`
+- **Historical integrity audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`
 - **Implementation**: `NOT_STARTED`
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`
 - **Experiment execution**: `NOT_AUTHORIZED`
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate
-- **Next owner**: `ccf-experiment-designer / design`
-- **Next task**: bounded protocol correction for audit blockers B1--B7 only; do not train
+- **Gate01-Audit**: unopened
+- **Next owner**: `ccf-integrity-auditor`
+- **Next task**: independent pre-execution integrity re-audit of corrected protocol v1.1
 
 ## Frozen scientific question
 
 > Under identical frozen recommendation scores, DDI information, candidate pool, requested DDI target, and exact per-patient medication cardinality, does residual-budget marginal-DDI joint set refinement provide incremental utility–DDI frontier value beyond cheap equal-information direct optimization and independent budget conditioning?
 
-The admitted claim remains narrow:
+The admitted claim remains:
 
 > At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
 
-The surviving scientific interaction remains:
+The scientific interaction remains:
 
 ```text
 requested residual constraint slack
@@ -32,46 +33,46 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-No empirical Gate result exists. Protocol v1.0 failed pre-execution integrity audit because execution-relevant semantics remain underdetermined or drifted from the admitted formulation.
+## Corrected protocol boundary
 
-## Required bounded correction
+Protocol v1.1 contains only the bounded pre-execution corrections authorized after the prior integrity audit:
 
-Only the following audit blockers may be corrected before re-audit:
+1. explicit frozen-score residual anchor restored for BudgetSet and Independent;
+2. `e_i(x)` frozen to the pinned MoleRec `molecule_embeddings[i]` immediately before `score_extractor`, from the same no-grad forward as `s_i`;
+3. Idea-local Dev/Audit patient split frozen to one SHA-256 membership formula using namespace `idea008-gate01-v1`;
+4. deterministic Greedy branches frozen for `K_x=0` and `K_x=1`;
+5. per-seed checkpoint, patience, and configuration-selection nesting frozen;
+6. visit observation, patient-cluster bootstrap, learned-seed aggregation, composition response, frontier recomputation, and favorable-seed semantics frozen;
+7. one top-to-bottom primary terminal-verdict precedence frozen.
 
-1. restore the admitted explicit frozen-score residual anchor for both learned families;
-2. freeze the exact MoleRec medication representation used as `e_i` and its extraction point;
-3. freeze a mechanically reproducible Gate01-Dev / Gate01-Audit patient hash formula;
-4. define Greedy+1Swap behavior for `K_x=0` and `K_x=1`;
-5. freeze learned checkpoint-selection and patience semantics;
-6. freeze target/composition aggregation, bootstrap frontier recomputation, and seed semantics;
-7. freeze one primary terminal-verdict precedence order.
-
-This is a protocol correction, not a method redesign. Do not add a backbone, solver family, loss, budget, seed, dataset, encoder, or rescue mechanism.
+No backbone, architecture, solver, loss, budget, seed, dataset, tuning dimension, or scientific claim has been added.
 
 ## Authorization boundary
 
 Do not perform:
 
-- model implementation for Gate execution;
+- Gate implementation;
 - recommendation-model training or Gate execution;
+- Gate01-Audit access before re-audit authorization;
 - G3/G4, R0 Holdout, or historical project test access;
 - subgroup mining or feature fishing;
 - architecture expansion;
-- extra solver families, losses, targets, or seeds;
+- extra solver families, losses, targets, seeds, or tuning dimensions;
 - paper-level SOTA benchmarking.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.0: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
-Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
+Gate 01 protocol v1.1: CORRECTED / DESIGNED_NOT_EXECUTED
+Integrity state: PENDING_REAUDIT
+Stage: IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT
 Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
 Quarantine: intact
-Next owner: ccf-experiment-designer / design
-Next task: bounded protocol correction for B1-B7 only
-After correction: ccf-integrity-auditor re-audit
+Gate01-Audit: UNOPENED
+Next owner: ccf-integrity-auditor
+Next task: independent re-audit of protocol v1.1
 After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```

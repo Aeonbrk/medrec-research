@@ -15,19 +15,20 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Gate 01 design integrity failed** | protocol correction required before execution |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Gate 01 protocol corrected pending integrity re-audit** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`.
+- **Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
-- **Gate 01 protocol v1.0**: `DESIGN_INTEGRITY_FAIL`, not executed.
+- **Gate 01 protocol v1.1**: corrected, `DESIGNED_NOT_EXECUTED`, pending independent integrity re-audit.
 - **Protocol**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md).
-- **Integrity audit**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md).
+- **Historical integrity audit**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md), which remains unchanged.
 - **Implementation**: `NOT_STARTED`.
 - **Training / execution**: `NOT_AUTHORIZED`.
+- **Gate01-Audit**: unopened.
 - **Quarantine**: intact.
-- **Next owner**: `ccf-experiment-designer / design` for bounded correction of audit blockers B1--B7 only.
+- **Next owner**: `ccf-integrity-auditor`.
 
 The admitted interaction remains:
 
@@ -37,18 +38,20 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The audit failure does not reopen candidate search or authorize architecture expansion. The protocol must first restore the admitted frozen-score residual anchor and mechanically freeze the existing representation, split, low-cardinality branch, learned selection, aggregation/statistics, and terminal-decision semantics.
+Protocol v1.1 contains only bounded execution-semantics corrections and restoration of the admitted frozen-score residual anchor. Candidate search, scientific claim scope, architecture, solvers, losses, budgets, seeds, datasets, and tuning dimensions remain frozen.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.0: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
-Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
+Gate 01 protocol v1.1: CORRECTED / DESIGNED_NOT_EXECUTED
+Integrity state: PENDING_REAUDIT
+Stage: IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT
 Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
+Gate01-Audit: UNOPENED
 Quarantine: intact
-Next owner: ccf-experiment-designer / design
-After bounded correction: ccf-integrity-auditor re-audit
+Next owner: ccf-integrity-auditor
+After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```

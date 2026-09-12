@@ -7,47 +7,102 @@
 - **Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Owner**: `ccf-experiment-designer`
 - **Mode**: `ccf-experiment-designer / design`
-- **Stage**: `IDEA_008_GATE_01_DESIGN_FROZEN_PENDING_INTEGRITY_AUDIT`
+- **Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
 - **Status**: `DESIGNED_NOT_EXECUTED`
-- **Design revision**: `v1.0`
+- **Design revision**: `v1.1`
 - **Design date**: `2026-09-12`
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
+- **Integrity state**: `PENDING_REAUDIT`
+- **Implementation**: `NOT_STARTED`
 - **Training**: `NOT_AUTHORIZED`
+- **Execution**: `NOT_AUTHORIZED`
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test are outside this Gate
+- **Gate01-Audit**: unopened
 - **Results**: none
 
-This is the single cheapest falsification protocol for Idea 008. It freezes the method, equal-information killers, budget support, validation-only selection, uncertainty, practical margins, and stop rules before any model training or Gate-01 outcome is observed. It is hypothesis-selection evidence only, not publication claim-support evidence.
+This is the single cheapest falsification protocol for Idea 008. It freezes the admitted method, equal-information killers, budget support, validation-only selection, uncertainty, practical margins, and terminal rules before any Gate-01 model training or outcome is observed. It is hypothesis-selection evidence only, not publication claim-support evidence.
 
 ## 1. Gate 01 hypothesis
 
 > Under identical frozen recommendation scores, DDI information, candidate pool, requested DDI target, and exact per-patient medication cardinality, does residual-budget marginal-DDI joint set refinement provide incremental utility–DDI frontier value beyond cheap equal-information direct optimization and independent budget conditioning?
 
-A pass requires the claimed joint-set interaction to add value beyond both frozen killers over at least two separated non-trivial operating regions. A Base-only gain is insufficient.
+A pass requires the claimed joint-set interaction to add value beyond both frozen killers over both separated primary operating regions. A Base-only gain is insufficient.
 
 ## 2. Frozen scientific setting
 
-### 2.1 Backbone
+### 2.1 Backbone and exact candidate representation
 
 Use one already-qualified frozen backbone only:
 
 - method: `MoleRec`;
 - profile: `molerec-embedding`;
+- upstream repository: `yangnianzu0515/MoleRec`;
 - upstream revision: `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`;
 - prediction threshold used only to define Frozen Base cardinality: `0.5`;
 - medication vocabulary size: `131`;
 - all MoleRec parameters are frozen;
 - no backbone retraining is permitted inside Gate 01.
 
-Use the frozen per-medication embedding tensor already consumed by the `molerec-embedding` predictor as `e_i`. It is read from the qualified checkpoint and receives no gradient. No new medication, molecular, ingredient, or patient encoder is allowed.
+For visit/patient instance `x`, define `e_i(x)` exactly as the candidate-specific `molecule_embeddings[i]` tensor produced inside the pinned MoleRec `MoleRecModel.forward` immediately before the tensor is consumed by `self.score_extractor`.
+
+The deterministic extraction contract is:
+
+```text
+pinned MoleRec src/modules/MoleRec.py
+MoleRecModel.forward
+-> patient_repr
+-> query
+-> substruct_weight
+-> global_embeddings / substruct_embeddings
+-> molecule_embeddings = self.aggregator(...)
+-> score = self.score_extractor(molecule_embeddings).t()
+```
+
+The same no-gradient frozen MoleRec forward pass produces both:
+
+- `s_i(x)`: the candidate pre-threshold logit from `score`;
+- `e_i(x)`: the corresponding row of `molecule_embeddings` immediately before `score_extractor`.
+
+Therefore:
+
+- all MoleRec parameters are frozen;
+- no gradient enters MoleRec;
+- `e_i(x)` is patient/visit-conditioned because the forward pass conditions `molecule_embeddings` through the patient-derived `substruct_weight`;
+- there is no separate embedding training;
+- no global molecular embedding, substructure embedding, checkpoint parameter, or other MoleRec internal tensor may substitute for `e_i(x)`;
+- BudgetSet and Independent receive the same `s_i(x)` and `e_i(x)` from the same frozen forward.
+
+No new medication, molecular, ingredient, or patient encoder is allowed.
 
 ### 2.2 Dataset and access boundary
 
-Reuse the repository's Comparison Mode dataset identity `molerec-table1-comparison-v1-1` and its existing medication vocabulary and DDI asset. Gate 01 may use only the canonical benchmark Train and Validation partitions.
+Reuse the repository Comparison Mode dataset identity `molerec-table1-comparison-v1-1` and its existing medication vocabulary and DDI asset. Gate 01 may use only the canonical benchmark Train and Validation partitions.
 
 - canonical Train -> `Gate01-Train`;
-- canonical Validation patients -> deterministic patient-disjoint `Gate01-Dev` / `Gate01-Audit` split using hash salt `idea008-gate01-v1`, with the lower half of the hash range assigned to Dev and the upper half to Audit;
+- canonical Validation -> deterministic patient-disjoint `Gate01-Dev` / `Gate01-Audit`;
+- the Dev/Audit ratio remains exactly `0.5 / 0.5`;
 - one patient's visits may appear in only one of Dev or Audit;
-- Audit is opened once, only after hyperparameters, checkpoints, budget calibration, and all Idea-008 selection rules are frozen from Train/Dev. The upstream frozen MoleRec checkpoint may have been selected previously under repository baseline infrastructure; it is never reselected using Gate01-Audit.
+- no labels, outcomes, predictions, model results, or DDI values enter split assignment;
+- Audit remains unopened until all Train/Dev selection is frozen.
+
+The unique split procedure is:
+
+```text
+namespace = "idea008-gate01-v1"
+patient_id = zero-based integer patient index in the pinned records_final.pkl
+             canonical Comparison split ordering
+patient key = ASCII decimal representation of patient_id
+              with no leading or trailing whitespace
+message = namespace + ":" + patient key
+digest = SHA-256(message encoded as UTF-8)
+value = first 8 digest bytes interpreted as unsigned big-endian integer
+u = value / 2^64
+
+Gate01-Dev   iff u < 0.5
+Gate01-Audit iff u >= 0.5
+```
+
+All visits belonging to one patient inherit that patient's assignment. The upstream frozen MoleRec checkpoint may have been selected previously under repository baseline infrastructure; it is never reselected using Gate01-Audit.
 
 Zero permission in this Gate:
 
@@ -58,7 +113,7 @@ Zero permission in this Gate:
 
 Patient-level rows, memberships, logits, predictions, and checkpoints remain outside Git.
 
-## 3. Candidate pool and cardinality
+## 3. Candidate pool and exact cardinality
 
 For every visit `x`, every method receives the same candidate pool:
 
@@ -68,27 +123,27 @@ C_x = complete 131-medication vocabulary
 
 No method-specific filtering, retrieval, ground-truth membership filter, test-derived filter, or extra feasible candidate is permitted.
 
-Define Frozen Base set
+Define the Frozen Base set
 
 $$
 S_{base}(x)=\{i:\sigma(s_i)\ge 0.5\},
 $$
 
-with medication-code ascending used only to resolve exact threshold ties if needed, and freeze
+and freeze
 
 $$
 K_x=|S_{base}(x)|.
 $$
 
-`K_x` is therefore determined only by the frozen backbone, never by the ground-truth medication count and never by requested budget `b`.
+`K_x` is determined only by the frozen backbone, never by ground-truth medication count and never by requested budget `b`.
 
-Every hard output from Frozen Base, Greedy+1Swap, the Independent Conditional Scorer, the Fixed-lambda family, and BudgetSet must satisfy
+Every hard output from Frozen Base, Greedy+1Swap, Independent, Fixed-lambda, and BudgetSet must satisfy
 
 $$
 |S_b(x)|=K_x
 $$
 
-exactly. For methods that produce scores, the final set is `TopK_{K_x}` with medication-code ascending as the final tie-break.
+exactly. For score-producing methods, the final set is `TopK_{K_x}`. Any score tie is resolved by ascending medication code according to the repository's canonical vocabulary ordering; implementation must use that canonical vocabulary order rather than introduce a second ordering.
 
 For `K_x < 2`:
 
@@ -96,25 +151,25 @@ $$
 R_{DDI}(S)=0,\qquad R_{DDI}(q)=0,\qquad c_i(q)=0.
 $$
 
-These visits remain in utility and cardinality reporting but contribute zero pairwise DDI risk by definition.
+These visits remain in utility and exact-cardinality reporting.
 
 ## 4. Budget calibration and support
 
-Let `r_train` be the mean hard-set DDI rate of Frozen Base on `Gate01-Train`, computed after `K_x` is frozen:
+Let `r_train` be the visit-mean hard-set DDI rate of Frozen Base on `Gate01-Train`, computed after `K_x` is frozen:
 
 $$
-r_{train}=\mathbb E_{x\in Train}[R_{DDI}(S_{base}(x))].
+r_{train}=\operatorname{mean}_{x\in Gate01\text{-}Train}R_{DDI}(S_{base}(x)).
 $$
 
-If `r_train = 0`, stop with `STOP_NO_BASE_DDI_HEADROOM`; the admitted budget-refinement mechanism has no non-trivial DDI operating range in this development pool.
+If `r_train = 0`, the primary terminal condition is `STOP_NO_BASE_DDI_HEADROOM`.
 
-Freeze exactly three requested targets:
+Freeze exactly:
 
 $$
 b_L=0.60r_{train},\qquad b_M=0.80r_{train},\qquad b_H=1.00r_{train}.
 $$
 
-No clipping, extra target, denser sweep, interpolation target, or extrapolation target is allowed in Gate 01.
+No clipping, extra target, denser sweep, interpolation target, or extrapolation target is allowed.
 
 Training support for conditional learned methods is
 
@@ -122,21 +177,19 @@ $$
 P_B=\operatorname{Uniform}\{b_L,b_M,b_H\},
 $$
 
-sampled independently per recommendation example. Evaluation reports all three targets. `b_L` and `b_M` are the two primary operating regions; `b_H` is the loose anchor needed for responsiveness and composition-change checks.
+sampled independently per recommendation example. Evaluation reports all three targets. `b_L` and `b_M` are the two primary regions; `b_H` is the loose anchor for responsiveness and composition response.
 
 ## 5. BudgetSet definition
 
-### 5.1 Relaxed state and initialization
+### 5.1 Relaxed state
 
-Use frozen MoleRec pre-threshold logits `s_i` and define
+Use frozen MoleRec logits:
 
 $$
 z_i^{(0)}=s_i,\qquad q_i^{(0)}=\sigma(z_i^{(0)}).
 $$
 
-This initialization is deterministic, budget-independent, and DDI-independent. It performs no hidden safety optimization.
-
-For `K_x >= 2`, define
+For `K_x >= 2`:
 
 $$
 R_{DDI}(q)=\frac{\sum_{i<j}D_{ij}q_iq_j}{\binom{K_x}{2}},
@@ -150,16 +203,16 @@ $$
 \rho^{(t)}=b-R_{DDI}(q^{(t)}).
 $$
 
-`rho` is surrogate relaxed constraint slack only.
+`rho` is relaxed surrogate constraint slack only.
 
-### 5.2 Learned heads
+### 5.2 Learned heads and residual anchor
 
 BudgetSet contains only two shared candidate heads:
 
 - utility head `u_phi([s_i,e_i])`: MLP `input -> 64 -> 32 -> 1`;
 - residual-conditioned risk-price head `g_phi([s_i,e_i,rho])`: MLP `input -> 64 -> 32 -> 1`.
 
-Both use GELU activations and no dropout. The MoleRec logits and medication embeddings are frozen inputs.
+Both use GELU and no dropout. `s_i` and `e_i(x)` are frozen MoleRec inputs.
 
 At iteration `t`:
 
@@ -172,36 +225,43 @@ $$
 $$
 
 $$
-z_i^{(t+1)}=u_i-\lambda_i^{(t)}c_i^{(t)},
+\Delta_i^{(t)}=u_i-\lambda_i^{(t)}c_i^{(t)},
+$$
+
+$$
+z_i^{(t+1)}=s_i+\Delta_i^{(t)}
+=s_i+u_\phi(s_i,e_i)
+-\operatorname{softplus}(g_\phi(s_i,e_i,\rho^{(t)}))c_i^{(t)},
 $$
 
 $$
 q_i^{(t+1)}=\sigma(z_i^{(t+1)}).
 $$
 
-Freeze `T=2`.
+The explicit frozen base score `s_i` is the residual anchor. The learned utility head refines that scorer; it does not replace it.
 
-`T=2` is the minimum value that actually instantiates one composition-feedback cycle: iteration 0 changes the provisional relaxed set; iteration 1 then recomputes both marginal DDI cost and residual slack from that changed composition. `T=1` would reduce the Gate to a one-shot reranker on the frozen initialization and would not test the admitted iterative interaction. No `T` sweep is permitted.
+Freeze `T=2`. Iteration 1 must recompute both `c_i(q^(1))` and `rho^(1)` from the changed relaxed composition. No `T` sweep is permitted.
 
-The final hard set is
+Final hard output:
 
 $$
 S_b=\operatorname{TopK}_{K_x}(z^{(2)}).
 $$
 
-## 6. Training objective
+## 6. Training objective and learned selection
 
-For BudgetSet and the Independent Conditional Scorer, use the same multi-label objective and the same label set:
+BudgetSet and Independent use the same multi-label objective and the same labels:
 
 $$
-\mathcal L = \mathbb E_{b\sim P_B}\left[
+\mathcal L =
+\mathbb E_{b\sim P_B}\left[
 \mathcal L_{rec}(z_b,y)
 +\eta[R_{DDI}(q_b)-b]_+
 +\gamma\left(\sum_iq_{b,i}-K_x\right)^2
 \right],
 $$
 
-where `L_rec` is mean binary cross-entropy with logits over the 131 medications and `q_b = sigmoid(z_b)`.
+where `L_rec` is mean binary cross-entropy with logits over all 131 medications and `q_b=sigmoid(z_b)`.
 
 Frozen common training shell:
 
@@ -210,25 +270,60 @@ Frozen common training shell:
 - maximum epochs: `30`;
 - early-stopping patience: `5` Dev evaluations;
 - `gamma = 1e-3`, not tuned;
-- learning-rate entitlement: `{3e-4, 1e-3}`;
-- `eta` entitlement: `{5, 10}`;
-- total candidate configurations: exactly `4` per learned family;
-- no other optimizer, width, depth, dropout, auxiliary loss, monotonic loss, frontier loss, contrastive loss, distillation loss, or rescue loss.
+- learning rate: `{3e-4, 1e-3}`;
+- `eta`: `{5, 10}`;
+- learned seeds: `{2002, 2003, 2004}`;
+- exactly `4` configurations per learned family;
+- no additional optimizer, width, depth, dropout, auxiliary loss, monotonic loss, frontier loss, contrastive loss, distillation loss, or rescue loss.
 
-Use the same hyperparameter grid and the same model-selection rule for BudgetSet and the Independent Conditional Scorer.
+BudgetSet and Independent use exactly the same selection procedure.
 
-For each configuration, Train fitting uses all three frozen seeds. Dev selection is based on seed-mean results and is lexicographic:
+### 6.1 Per-seed checkpoint selection
 
-1. maximize the number of requested budgets satisfying the Dev compliance rule in Section 10.2;
-2. among ties, maximize mean Jaccard over `b_L` and `b_M`;
-3. then minimize mean positive budget violation over all three budgets;
-4. then prefer the smaller learning rate, smaller `eta`, and earlier checkpoint in that order.
+Each `family × hyperparameter configuration × seed` is trained independently. At the end of every epoch, evaluate that run once on Gate01-Dev at all three requested budgets.
 
-Audit is not used for checkpoint or hyperparameter selection.
+For each epoch compute, from that seed's visit-level predictions:
+
+1. `n_compliant`: number of requested budgets satisfying the Dev compliance rule in Section 10.2;
+2. `U_primary`: arithmetic mean of Dev Jaccard at `b_L` and `b_M`;
+3. `V_all`: arithmetic mean over `b_L,b_M,b_H` of mean positive budget violation.
+
+The checkpoint key is lexicographic:
+
+```text
+higher n_compliant
+then higher U_primary
+then lower V_all
+then earlier epoch
+```
+
+The current epoch becomes the new best checkpoint only when it is strictly better under this exact key. The patience counter is local to that seed/configuration, resets only when the current epoch becomes the new best checkpoint, otherwise increments by one, and stops training after `5` consecutive non-improving Dev evaluations or at the 30-epoch ceiling.
+
+Retain exactly one best checkpoint for each `seed × configuration`.
+
+### 6.2 Configuration selection
+
+For a configuration, evaluate the three retained seed checkpoints and first form the seed-aggregate Dev quantities using Section 10's learned-family aggregation rules. From those aggregate operating points compute:
+
+1. `n_compliant_config`: number of requested budgets satisfying the aggregate Dev compliance rule;
+2. `U_primary_config`: arithmetic mean of aggregate Jaccard at `b_L` and `b_M`;
+3. `V_all_config`: arithmetic mean over all three budgets of aggregate mean positive violation.
+
+Select one configuration per learned family lexicographically:
+
+```text
+higher n_compliant_config
+then higher U_primary_config
+then lower V_all_config
+then smaller learning rate
+then smaller eta
+```
+
+After the configuration is selected, Audit uses exactly the three retained checkpoints belonging to that single configuration. Gate01-Audit never selects epoch, seed, configuration, or hyperparameter.
 
 ## 7. Killer 1 — Fixed-K Budget-Aware Greedy + 1-Swap
 
-This control receives exactly `s`, `D`, `C_x`, `b`, and `K_x`. It has no learned parameters.
+This deterministic control receives exactly `s`, `D`, `C_x`, `b`, and `K_x`. It has no learned parameters.
 
 Objective:
 
@@ -242,26 +337,35 @@ $$
 |S|=K_x,\qquad R_{DDI}(S)\le b.
 $$
 
-Deterministic construction for `K_x >= 2`:
-
-1. set `S = empty` and total pair budget `B=b*binom(K_x,2)`;
-2. until `|S|=K_x`, among remaining candidates whose addition keeps the current DDI-pair count no larger than `B`, add the highest-`s_i` candidate; if none exists, add the candidate with the smallest incremental DDI-pair count, breaking ties by higher `s_i` and then medication code ascending;
-3. if the completed set violates `b`, repeatedly apply the selected/unselected 1-swap that most reduces `max(0,R_DDI(S)-b)`; break ties by larger retained `sum s_i`, then medication codes ascending; stop when feasible or when no swap reduces violation;
-4. once feasible, repeatedly apply the feasible 1-swap with the largest positive increase in `sum s_i`; break ties by lower resulting DDI rate and then medication codes ascending;
-5. stop when no improving feasible 1-swap exists.
-
-If Step 3 cannot reach feasibility, return the locally minimum-violation fixed-K set and record the violation; do not add another solver, restart family, MILP, MIQP, beam search, or evolutionary method.
-
-Core killer:
+Low-cardinality branches are frozen:
 
 ```text
-Greedy+1Swap comparable to or better than BudgetSet
--> KILL_BUDGETSET
+K_x = 0 -> return the empty set
+K_x = 1 -> return the single candidate with maximum frozen s_i
+           using ascending medication code / canonical vocabulary order as tie-break
 ```
 
-## 8. Killer 2 — Budget-Conditioned Independent Scorer
+For both branches:
 
-This control is intentionally strong and budget-aware but cannot inspect provisional set composition.
+```text
+hard DDI = 0
+relaxed pair risk = 0 where applicable
+budget violation = 0
+```
+
+Do not invoke ordinary pair-budget Greedy logic for `K_x < 2`.
+
+For `K_x >= 2`, deterministic construction is:
+
+1. set `S = empty` and total pair budget `B=b*binom(K_x,2)`;
+2. until `|S|=K_x`, among remaining candidates whose addition keeps current DDI-pair count no larger than `B`, add the highest-`s_i` candidate; if none exists, add the candidate with smallest incremental DDI-pair count, breaking ties by higher `s_i` and then canonical medication order;
+3. if the completed set violates `b`, repeatedly apply the selected/unselected 1-swap that most reduces `max(0,R_DDI(S)-b)`; break ties by larger retained `sum s_i`, then canonical medication order; stop when feasible or when no swap reduces violation;
+4. once feasible, repeatedly apply the feasible 1-swap with the largest positive increase in `sum s_i`; break ties by lower resulting DDI rate and then canonical medication order;
+5. stop when no improving feasible 1-swap exists.
+
+If Step 3 cannot reach feasibility, return the locally minimum-violation fixed-K set and record the violation. Do not add another solver, restart family, MILP, MIQP, beam search, or evolutionary method.
+
+## 8. Killer 2 — Budget-Conditioned Independent Scorer
 
 Train-only static DDI summaries for medication `i` are:
 
@@ -269,56 +373,53 @@ $$
 d_i=\frac{1}{|C|-1}\sum_{j\ne i}D_{ij},
 $$
 
-and
-
 $$
-p_i=\frac{\#\{x\in Train:i\in y_x\ \land\ \exists j\in y_x,D_{ij}=1\}}
+p_i=
+\frac{\#\{x\in Train:i\in y_x\land \exists j\in y_x,D_{ij}=1\}}
 {\max(1,\#\{x\in Train:i\in y_x\})}.
 $$
 
 `d_i` and `p_i` are frozen before Dev/Audit evaluation.
 
-The independent scorer uses no less patient-conditioned information than BudgetSet: `s_i` is the same complete frozen patient-conditioned candidate score supplied to BudgetSet; neither Gate-01 method receives an additional patient encoder. Its inputs are:
+Independent receives:
 
-- frozen `s_i`;
-- frozen medication embedding `e_i`;
+- the same frozen `s_i(x)`;
+- the same frozen patient/visit-conditioned `e_i(x)`;
 - requested `b`;
 - static `d_i`;
 - static `p_i`.
 
-It uses the same utility head architecture as BudgetSet and a risk-price head with the same `64 -> 32 -> 1` hidden widths:
+It uses the same utility-head architecture as BudgetSet and a risk-price head with the same `64 -> 32 -> 1` hidden widths:
 
 $$
 u_i=u_\psi(s_i,e_i),
 $$
 
 $$
-\lambda_i^{ind}=\operatorname{softplus}(g_\psi(s_i,e_i,b,d_i,p_i)),
+\lambda_i^{ind}=
+\operatorname{softplus}(g_\psi(s_i,e_i,b,d_i,p_i)),
 $$
 
 $$
-z_i^{ind}=u_i-\lambda_i^{ind}d_i.
+z_i^{ind}
+=s_i+u_\psi(s_i,e_i)
+-\operatorname{softplus}(g_\psi(s_i,e_i,b,d_i,p_i))d_i.
 $$
 
-The independent scorer may not access `q^(t)`, `c_i(q)`, `R_DDI(q)`, `rho`, a current provisional prescription, pairwise candidate-to-current-set features, or any iterative set feedback. It uses exact `TopK_{K_x}`.
+The explicit `+s_i` anchor is mandatory. Independent may not access `q^(t)`, `c_i(q)`, `R_DDI(q)`, `rho`, current provisional prescription, pairwise candidate-to-current-set features, or iterative set feedback. Final output is exact `TopK_{K_x}`.
 
-Its optimizer, objective, seeds, tuning grid, early stopping, and selection rule are identical to BudgetSet. The extra static scalar inputs make its learnable capacity slightly larger, not smaller, than the BudgetSet heads; no parameter-count rescue is needed.
+Its optimizer, objective, seeds, tuning grid, early stopping, checkpoint rule, and configuration-selection rule are identical to BudgetSet. Static scalar inputs make the control no weaker in learned input capacity; no parameter-count rescue is allowed.
 
-Core killer:
+## 9. Fixed-lambda supporting family
 
-```text
-Independent Conditional Scorer comparable to or better than BudgetSet
--> KILL_JOINT_SET_INTERACTION
-```
+This family is supporting evidence only.
 
-## 9. Fixed-lambda family
-
-This family is supporting evidence only. It asks whether one conditional model adds value beyond separately calibrated fixed operating points; it is not a third primary killer.
-
-For each visit, standardize frozen logits by an order-preserving affine transform
+For each visit, standardize frozen logits by the order-preserving affine transform
 
 $$
-\tilde s_i=\frac{s_i-\operatorname{mean}(s)}{\max(\operatorname{std}(s),10^{-6})}.
+\tilde s_i=
+\frac{s_i-\operatorname{mean}(s)}
+{\max(\operatorname{std}(s),10^{-6})}.
 $$
 
 For each
@@ -330,246 +431,313 @@ lambda in {0, 0.25, 0.5, 1, 2, 4}
 run two deterministic refinement steps:
 
 $$
-z^{(0)}=\tilde s,\quad q^{(0)}=\sigma(z^{(0)}),
+z^{(0)}=\tilde s,\qquad q^{(0)}=\sigma(z^{(0)}),
 $$
 
 $$
-z_i^{(t+1)}=\tilde s_i-\lambda c_i(q^{(t)}),\quad q^{(t+1)}=\sigma(z_i^{(t+1)}),
+z_i^{(t+1)}=\tilde s_i-\lambda c_i(q^{(t)}),\qquad
+q_i^{(t+1)}=\sigma(z_i^{(t+1)}),
 $$
 
 then exact `TopK_{K_x}`.
 
-For each requested target `b`, choose one `lambda_b` using `Gate01-Train` only by minimizing
+For each requested target `b`, choose one `lambda_b` using Gate01-Train only by minimizing
 
 $$
-|\operatorname{mean}R_{DDI}(S_{\lambda})-b|.
+|\operatorname{mean}R_{DDI}(S_\lambda)-b|.
 $$
 
-Ties prefer larger mean frozen `sum s_i` and then smaller `lambda`. Freeze the selected `lambda_b` values before Dev/Audit. Different targets may map to the same lambda; do not expand the support if they do.
+Ties prefer larger mean frozen `sum s_i` and then smaller `lambda`. Freeze the selected values before Dev/Audit. Different targets may map to the same lambda; support must not expand.
 
-## 10. Metrics and target semantics
+## 10. Metrics, observation unit, and target semantics
 
-### 10.1 Utility
+### 10.1 Base observation and utility
 
-Primary utility metric:
+The metric observation unit is `visit`. The bootstrap cluster unit is `patient`.
+
+Primary utility:
 
 ```text
 Jaccard
 ```
 
-Supporting utility metrics:
+Supporting utility:
 
 ```text
 F1
 PRAUC
 ```
 
-Jaccard and F1 are computed from the final hard set. PRAUC uses each method's final candidate ranking. For Greedy+1Swap, selected medications rank above unselected medications and each group is ordered by frozen `s_i`, with medication code as final tie-break.
+Jaccard, F1, hard-set DDI, budget violation, and composition response are computed first at visit level. PRAUC uses each method's final candidate ranking. For Greedy+1Swap, selected medications rank above unselected medications; within each group use frozen `s_i` and then canonical medication order.
 
-No Gate decision may switch the primary utility metric after results are seen.
+### 10.2 Learned-seed aggregation and compliance
 
-### 10.2 DDI target and cardinality metrics
+For BudgetSet or Independent, each `seed × requested budget` produces its own visit-level predictions and aggregate operating point:
+
+$$
+(R_{seed,b},U_{seed,b}).
+$$
+
+Do not average logits or predictions across seeds.
+
+The learned-family operating point is:
+
+$$
+R_b=\frac{1}{3}\sum_{seed}R_{seed,b},
+\qquad
+U_b=\frac{1}{3}\sum_{seed}U_{seed,b}.
+$$
+
+For every seed and requested budget, compute across visits:
+
+$$
+V_{seed,b}=
+\operatorname{mean}_{visits}
+[\max(0,R_x-b)],
+$$
+
+$$
+A_{seed,b}=
+\operatorname{mean}_{visits}R_x.
+$$
+
+Family-level compliance quantities are arithmetic means over the three seeds:
+
+$$
+V_b=\frac{1}{3}\sum_{seed}V_{seed,b},
+\qquad
+A_b=\frac{1}{3}\sum_{seed}A_{seed,b}.
+$$
+
+A learned-family target is Gate-compliant iff:
+
+```text
+V_b <= 0.005
+A_b <= b + 0.005
+```
+
+BudgetSet must satisfy this at all three requested budgets. Per-seed values must also be retained for seed-robustness reporting.
+
+For deterministic Greedy and Fixed-lambda, compute the same visit-mean quantities once; do not duplicate the predictions into artificial seeds.
 
 For every method and budget report:
 
 - requested `b`;
-- mean hard-set achieved `R_DDI(S_b)`;
-- mean positive violation `mean(max(0,R_DDI(S_b)-b))`;
-- mean absolute achieved-vs-requested deviation;
+- visit-mean hard-set achieved DDI;
+- visit-mean positive violation;
+- visit-mean absolute achieved-vs-requested deviation;
 - conventional pooled pairwise DDI rate as supporting context;
 - mean medication count;
 - exact per-visit `K_x` agreement rate.
 
-A requested target is Gate-compliant iff both hold:
+Exact cardinality compliance must be `100%` for every compared method.
 
-```text
-mean positive violation <= 0.005
-mean achieved DDI <= b + 0.005
-```
+### 10.3 Responsiveness
 
-BudgetSet must satisfy this rule at all three requested targets. This is an operating-target tolerance, not a hard clinical guarantee.
-
-Exact cardinality compliance must be `100%` for every compared method. Any cardinality mismatch invalidates the run and stops the Gate rather than being interpreted as scientific evidence.
-
-### 10.3 Budget responsiveness and composition response
-
-For BudgetSet, report the achieved-DDI slope against requested `b` and the adjacent ordering.
+For BudgetSet, define `R_L`, `R_M`, and `R_H` as the family-level mean-across-seeds achieved hard-DDI rates from Section 10.2.
 
 Material responsiveness requires:
 
+$$
+R_L+0.005\le R_M,
+$$
+
+$$
+R_M+0.005\le R_H.
+$$
+
+### 10.4 Composition response
+
+For a seed and two budgets, a visit changes composition iff the hard sets are literally unequal:
+
 ```text
-R_L + 0.005 <= R_M
-R_M + 0.005 <= R_H
+S_b1(x) != S_b2(x)
 ```
 
-where `R_L`, `R_M`, and `R_H` are Audit mean hard-set DDI rates at the three targets.
+The denominator is all evaluated visits with `K_x >= 1`. Visits with `K_x=0` are excluded because prescription composition cannot change.
 
-For set composition, report adjacent-budget hard-set Jaccard and the fraction of visits whose prescription changes. Material composition response requires at least `10%` of visits to change hard set for both `b_L -> b_M` and `b_M -> b_H`.
+For each learned seed, compute the fraction of eligible visits whose hard set changes. Gate-level composition response is the arithmetic mean over the three BudgetSet seeds.
 
-If the scores move but the hard Top-K sets do not satisfy this change rule, BudgetSet has not demonstrated controllable set refinement.
+Both transitions must satisfy:
 
-## 11. Frontier comparison and statistical rule
+```text
+b_L -> b_M: change rate >= 10%
+b_M -> b_H: change rate >= 10%
+```
 
-Use `Gate01-Audit` only after all selection is frozen.
+Retain per-seed change rates. Set-overlap statistics may be reported as supporting context, but no overlap threshold replaces literal set inequality.
 
-Uncertainty:
+## 11. Frontier comparison
 
-- patient-clustered bootstrap;
-- `1000` resamples;
-- bootstrap seed `80081`;
-- patient is the resampling unit;
-- for learned methods, aggregate each patient's metric contributions across the three frozen seeds before computing the bootstrap statistic;
-- no model is refit inside bootstrap replicates.
-
-Practical margins are frozen as
+Practical margins are frozen:
 
 ```text
 delta_U = 0.005 absolute Jaccard
 delta_R = 0.005 absolute hard-set DDI rate
 ```
 
-For a control family `C`, form its three Audit operating points. For a BudgetSet point with achieved risk `R_B`, define the control frontier utility
+For a control family `C`, form its three operating points. For a BudgetSet point with achieved risk `R_B`, define:
 
 $$
-F_C(R_B)=\max\{U_C: R_C\le R_B+\delta_R\}.
+F_C(R_B)=\max\{U_C:R_C\le R_B+\delta_R\}.
 $$
 
-If the set is non-empty, define
+When this set is non-empty:
 
 $$
 G_C=U_B-F_C(R_B).
 $$
 
-BudgetSet is **materially outside** that control frontier at the region iff
+BudgetSet is materially outside that control frontier at a primary region iff:
 
 ```text
-mean(G_C) >= 0.005
-and 95% bootstrap CI lower bound(G_C) > 0
+mean aggregate G_C >= 0.005
+and bootstrap 95% CI lower bound(G_C) > 0
 ```
 
-If no control point satisfies `R_C <= R_B + delta_R`, BudgetSet is safer than the entire sampled control family. That region counts as materially outside only if, against the control's safest point,
+If no control point satisfies `R_C <= R_B + delta_R`, compare against the control's safest point. The region counts as materially outside only if:
 
 ```text
 R_control - R_B >= 0.005
-and U_B - U_control >= -0.005
-and 95% CI lower bound(U_B - U_control) > -0.005
+U_B - U_control >= -0.005
+bootstrap 95% CI lower bound(U_B - U_control) > -0.005
 ```
 
-This is the sole Gate-01 meaning of a practical utility–DDI frontier win.
+For a killer control, `comparable / ≈` means the evidence does not establish BudgetSet's practical frontier advantage and the control is within the practical margin or better. Operationally, if the relevant utility-gap 95% CI upper bound is `<= 0.005`, the control is comparable. If the interval straddles the practical boundary without proving either material superiority or comparability, the comparison is inconclusive.
 
-For a killer control, `comparable / ≈` means the evidence does not establish BudgetSet's practical frontier advantage and the control is within the practical margin or better. Operationally, if the relevant utility-gap 95% CI upper bound is `<= 0.005`, the control is comparable. If the interval straddles the practical boundary without proving either material superiority or comparability, return `INCONCLUSIVE_STOP`; do not tune the protocol.
+The two required separated primary regions are exactly `b_L` and `b_M`, and they count only if BudgetSet is target-compliant and the responsiveness rule separates achieved risk by at least `0.005`.
 
-The two required separated regions are exactly `b_L` and `b_M`. They count only if BudgetSet is target-compliant and the responsiveness rule confirms their achieved DDI values are separated by at least `0.005`.
+Aggregate learned-family frontiers use the Section 10.2 seed-mean operating points. The Independent aggregate control frontier is therefore constructed from its three seed-mean operating points at `b_L,b_M,b_H`.
 
-## 12. Seeds and one-seed protection
+## 12. Bootstrap and seed robustness
 
-Frozen learned-model seeds:
+### 12.1 Patient-clustered bootstrap
+
+Use exactly:
+
+```text
+1000 patient-clustered bootstrap resamples
+seed = 80081
+95% CI = empirical 2.5th and 97.5th percentiles
+```
+
+For each bootstrap replicate:
+
+1. sample patients with replacement from Gate01-Audit;
+2. include all visits belonging to each sampled patient;
+3. preserve multiplicity when a patient is sampled more than once;
+4. recompute visit-level aggregate metrics from the fixed predictions;
+5. recompute every sampled operating point;
+6. for learned families, first compute each seed's operating point and then apply the frozen arithmetic mean across seeds;
+7. recompute the control frontier `F_C(R_B)` inside that replicate;
+8. recompute `G_C` or the safer-than-entire-frontier utility difference inside that replicate.
+
+Do not bootstrap an already-computed scalar gap. Do not refit models inside bootstrap replicates. The deterministic Greedy and Fixed-lambda families remain one deterministic prediction set each.
+
+For BudgetSet-vs-Independent aggregate comparisons, each replicate forms the Independent family control frontier from the replicate's three seed-mean Independent operating points before computing the BudgetSet gap.
+
+### 12.2 Favorable-seed rule
+
+Frozen learned seeds are:
 
 ```text
 {2002, 2003, 2004}
 ```
 
-BudgetSet and the Independent Conditional Scorer use matched seeds and identical tuning entitlement. Greedy+1Swap and the Fixed-lambda family are deterministic and do not receive artificial seeds.
+For BudgetSet seed `r` and a deterministic control `C`, define the seed-specific frontier from that control's three deterministic operating points and:
 
-A frontier effect is not allowed to survive on one favorable seed only. At each primary region and against each killer, at least `2 of 3` BudgetSet seed-specific frontier utility gaps must have the favorable sign in addition to the pooled bootstrap rule in Section 11.
+$$
+G_{r,C}=U_{B,r}-F_C(R_{B,r}).
+$$
 
-## 13. Formal decision tree
-
-### 13.1 Mechanical invalidation
-
-If any method fails exact `K_x` compliance, or any method receives a different candidate pool, DDI matrix, frozen logits, requested target, or cardinality:
+Seed `r` is favorable iff:
 
 ```text
-STOP_INVALID_GATE_IMPLEMENTATION
+G_{r,C} > 0
 ```
 
-No scientific conclusion follows.
-
-### 13.2 Budget semantics
-
-If BudgetSet fails target compliance at any requested target:
+For Independent, use matched seeds only:
 
 ```text
-KILL_TARGET_SEMANTICS
+BudgetSet 2002 <-> Independent 2002
+BudgetSet 2003 <-> Independent 2003
+BudgetSet 2004 <-> Independent 2004
 ```
 
-If the adjacent achieved-DDI responsiveness rule fails:
+For matched seed `r`, construct the Independent seed-`r` frontier from its own three budget operating points and apply the same `G_{r,C} > 0` favorable rule.
 
-```text
-KILL_BUDGET_RESPONSE
-```
+At each required `killer × primary-region` comparison, at least `2/3` BudgetSet seeds must be favorable. The `0.005` material-win threshold remains an aggregate frontier criterion and is not reused as the favorable-seed threshold.
 
-If either adjacent composition-change rate is below `10%`:
+## 13. Formal terminal decision precedence
 
-```text
-KILL_COMPOSITION_RESPONSE
-```
+Evaluate the following conditions in this exact top-to-bottom order. The first triggered condition is the primary verdict. Any later condition that is also true is recorded only as a secondary reason and never changes the primary verdict.
 
-No monotonic, budget-response, frontier, or rescue loss may be added afterward under Idea 008.
+1. `STOP_INVALID_GATE_IMPLEMENTATION`
+2. `STOP_NO_BASE_DDI_HEADROOM`
+3. `KILL_TARGET_SEMANTICS`
+4. `KILL_BUDGET_RESPONSE`
+5. `KILL_COMPOSITION_RESPONSE`
+6. `KILL_BUDGETSET`
+7. `KILL_JOINT_SET_INTERACTION`
+8. `KILL_SEED_FRAGILITY`
+9. `INCONCLUSIVE_STOP`
+10. `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES`
 
-### 13.3 Greedy killer
+### 13.1 STOP_INVALID_GATE_IMPLEMENTATION
 
-BudgetSet must be materially outside the Greedy+1Swap frontier at both `b_L` and `b_M`.
+Trigger if any compared method fails exact `K_x` compliance or any method receives a different candidate pool, DDI matrix, frozen logits, requested target, or frozen cardinality. No scientific conclusion follows.
 
-If Greedy is comparable/better at either region, or BudgetSet wins only one isolated primary region:
+### 13.2 STOP_NO_BASE_DDI_HEADROOM
 
-```text
-KILL_BUDGETSET
-```
+Trigger if `r_train = 0`.
 
-### 13.4 Independent-scorer killer
+### 13.3 KILL_TARGET_SEMANTICS
 
-BudgetSet must be materially outside the Independent Conditional Scorer frontier at both `b_L` and `b_M`.
+Trigger if BudgetSet fails the Section 10.2 target-compliance rule at any of the three requested targets.
 
-If the Independent scorer is comparable/better at either region, or BudgetSet wins only one isolated primary region:
+### 13.4 KILL_BUDGET_RESPONSE
 
-```text
-KILL_JOINT_SET_INTERACTION
-```
+Trigger if either responsiveness inequality in Section 10.3 fails.
 
-This terminates Idea 008 as currently claimed.
+### 13.5 KILL_COMPOSITION_RESPONSE
 
-### 13.5 Seed fragility
+Trigger if either adjacent composition-change rate in Section 10.4 is below `10%`.
 
-If either required primary-region advantage is carried by only one favorable BudgetSet seed:
+### 13.6 KILL_BUDGETSET
 
-```text
-KILL_SEED_FRAGILITY
-```
+BudgetSet must be materially outside the Greedy+1Swap frontier at both `b_L` and `b_M`. Trigger if Greedy is comparable/better at either primary region or BudgetSet establishes a material aggregate win at only one primary region.
 
-### 13.6 Inconclusive evidence
+### 13.7 KILL_JOINT_SET_INTERACTION
 
-If a primary comparison interval straddles the frozen practical boundary and neither a material win nor comparability is established:
+BudgetSet must be materially outside the Independent frontier at both `b_L` and `b_M`. Trigger if Independent is comparable/better at either primary region or BudgetSet establishes a material aggregate win at only one primary region.
 
-```text
-INCONCLUSIVE_STOP
-```
+### 13.8 KILL_SEED_FRAGILITY
 
-Do not increase seeds, change thresholds, add budgets, alter `T`, expand model capacity, add losses, or switch backbones as an Idea-008 rescue.
+Trigger if any required `killer × primary-region` comparison has fewer than `2/3` favorable BudgetSet seeds under Section 12.2.
 
-### 13.7 Pass
+### 13.9 INCONCLUSIVE_STOP
 
-Return
+Use only when all prior explicit stop/kill conditions are false, PASS requirements are not fully satisfied, and the frozen protocol provides no authorized further discriminator. It cannot override an already-triggered stop or killer. Do not increase seeds, change thresholds, add budgets, alter `T`, expand model capacity, add losses, or switch backbones.
 
-```text
-PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES
-```
+### 13.10 PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES
 
-only if all of the following hold:
+Return PASS only if all hold:
 
 1. every compared hard output has exact `|S_b|=K_x`;
 2. BudgetSet is target-compliant at all three budgets;
-3. requested `b` materially changes hard-set achieved DDI in the frozen order;
-4. adjacent budgets induce material hard-set medication substitutions;
-5. BudgetSet is materially outside the Greedy+1Swap frontier at both `b_L` and `b_M`;
-6. BudgetSet is materially outside the Independent Conditional frontier at both `b_L` and `b_M`;
-7. both required frontier effects satisfy the one-seed protection rule.
+3. `R_L+0.005<=R_M` and `R_M+0.005<=R_H`;
+4. both adjacent composition transitions change hard set on at least `10%` of eligible visits;
+5. BudgetSet is materially outside the Greedy+1Swap frontier at `b_L`;
+6. BudgetSet is materially outside the Greedy+1Swap frontier at `b_M`;
+7. BudgetSet is materially outside the Independent frontier at `b_L`;
+8. BudgetSet is materially outside the Independent frontier at `b_M`;
+9. all four required killer-region comparisons satisfy the `>=2/3` favorable-seed rule.
 
-A pass means only that the admitted mechanism survives its cheapest equal-information falsification gate. It does not establish clinical safety, clinical optimality, CCF-A readiness, or paper completion.
+A pass means only that the admitted mechanism survives its cheapest equal-information falsification gate.
 
 ## 14. Reporting schema
 
-The Gate report must contain, with no fabricated values:
+The Gate report must contain real values only:
 
 | Method | Budget / lambda | Seed | Jaccard | F1 | PRAUC | Hard-set DDI | Mean violation | Abs deviation | Mean meds | Exact-K rate |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -582,27 +750,28 @@ The Gate report must contain, with no fabricated values:
 Also report:
 
 - `r_train`, `b_L`, `b_M`, `b_H`;
-- the three selected Fixed-lambda values;
+- selected Fixed-lambda values;
+- per-seed and family-level target/compliance quantities;
 - BudgetSet adjacent achieved-DDI gaps;
-- adjacent set-change rates and set overlap;
-- frontier gaps and 95% bootstrap intervals for both killers at both primary regions;
-- seed-specific sign table for the four required killer-region comparisons;
-- selected learned hyperparameters and checkpoint epoch from Dev only;
+- per-seed and family-level adjacent set-change rates;
+- aggregate frontier gaps and 95% patient-clustered bootstrap intervals for both killers at both primary regions;
+- seed-specific favorable-sign table for all four required killer-region comparisons;
+- selected learned configuration plus each retained seed checkpoint epoch from Dev only;
 - quarantine confirmation.
 
-## 15. No-rescue boundary and next routing
+## 15. Authorization boundary and routing
 
 Gate 01 does not authorize:
 
 - another backbone;
 - another candidate pool;
-- exact-solver zoo;
+- another solver family;
 - denser budget sweep;
 - `T` search;
-- new encoder, Transformer, Mamba, MoE, RL, LLM, retrieval, ingredient, or molecular branch;
-- additional losses;
+- a new encoder, Transformer, Mamba, MoE, RL, LLM, retrieval, ingredient, or molecular branch;
+- additional losses or regularizers;
 - subgroup mining;
 - G3/G4, R0 Holdout, or historical test access;
 - paper-level SOTA benchmarking.
 
-The protocol is `DESIGN_READY` but training remains `NOT_AUTHORIZED` until an independent `ccf-integrity-auditor` verifies design consistency, equal information entitlement, access boundaries, implementability, and decision-rule completeness. After an integrity pass, routing returns to `ccf-pipeline-orchestrator` for explicit execution authorization.
+Protocol v1.1 is corrected but not yet integrity-approved. Implementation remains `NOT_STARTED`; training and execution remain `NOT_AUTHORIZED`; Gate01-Audit remains unopened. The next owner is `ccf-integrity-auditor` for independent pre-execution re-audit. Only a future integrity pass may return routing to `ccf-pipeline-orchestrator` for an execution-authorization decision.
