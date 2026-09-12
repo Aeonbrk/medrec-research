@@ -3,21 +3,22 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `ADMITTED / GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
-- **Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
+- **Status**: `ADMITTED / GATE_01_V1_1_DESIGN_INTEGRITY_FAIL`
+- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
-- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), v1.1 corrected and not executed
-- **Historical integrity audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL` on v1.0
+- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), v1.1 not executed
+- **Historical v1.0 audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL`
+- **v1.1 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.1.md`](experiments/gate-01-design-integrity-reaudit-v1.1.md), verdict `DESIGN_INTEGRITY_FAIL`
 - **Implementation**: `NOT_STARTED`
 - **Training**: `NOT_AUTHORIZED`
 - **Execution**: `NOT_AUTHORIZED`
 - **Gate01-Audit**: unopened
 - **Quarantine**: intact
-- **Next owner**: `ccf-integrity-auditor`
+- **Next owner**: `ccf-experiment-designer / design`
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 experiment has been executed. Protocol v1.1 is corrected but not integrity-approved; implementation, training, and execution remain blocked until independent re-audit and subsequent pipeline authorization.
+Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 experiment has been executed. Protocol v1.1 closes the original B1–B5 and B7 integrity defects but still has one B6 execution-semantic blocker; implementation, training, and execution remain blocked until that correction passes independent re-audit and the pipeline explicitly authorizes execution.
 
 ## Scientific question
 
@@ -111,7 +112,20 @@ The authoritative protocol is [`experiments/gate-01-protocol.md`](experiments/ga
 - practical margins: `delta_U=0.005`, `delta_R=0.005`;
 - bootstrap: `1000` patient-clustered resamples, seed `80081`.
 
-Protocol v1.1 uniquely specifies the admitted residual anchor, exact patient-conditioned MoleRec `e_i(x)`, deterministic Idea-local split, low-cardinality Greedy branches, learned checkpoint/configuration selection, visit/seed/bootstrap/frontier semantics, favorable-seed rule, and terminal precedence. No scientific design choice has been expanded.
+The v1.1 re-audit passes:
+
+- B1 residual scientific identity;
+- B2 exact patient-conditioned MoleRec `e_i(x)`;
+- B3 deterministic Idea-local patient split;
+- B4 low-cardinality execution;
+- B5 learned checkpoint/patience/configuration selection;
+- B7 terminal precedence.
+
+Most B6 semantics also pass: visit-level observations, patient-cluster bootstrap, learned-seed aggregation, target compliance, responsiveness, literal composition response, deterministic controls, matched Independent seeds, and within-replicate frontier recomputation.
+
+The remaining B6 blocker is narrow: Section 11 permits the case where no control operating point satisfies `R_C <= R_B + delta_R`, but Section 12.2 defines seed favorability only through `G_{r,C}=U_{B,r}-F_C(R_{B,r})`. For a seed whose eligible control frontier is empty, `F_C` and therefore the favorable-seed gap are undefined. Because the `>=2/3` rule can then change `KILL_SEED_FRAGILITY` and PASS, protocol v1.1 is not yet mechanically unique.
+
+The next correction may only define one deterministic sign-only seed-level comparator for that empty-frontier case, for deterministic controls and matched Independent seeds. It must not change the aggregate material-frontier rule or reopen any other design choice.
 
 ## Frozen killer roles
 
@@ -141,13 +155,13 @@ The six-value fixed-lambda family remains supporting evidence for conditional am
 
 ## Gate 01 pass boundary
 
-A future re-audited and explicitly authorized Gate may return `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` only under the frozen all-conditions logic: exact cardinality, all-target compliance, material DDI responsiveness, both hard-set composition transitions, frontier wins against both killers at both `b_L` and `b_M`, and the required `>=2/3` favorable-seed support for every killer-region comparison.
+A future corrected, re-audited, and explicitly authorized Gate may return `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` only under the frozen all-conditions logic: exact cardinality, all-target compliance, material DDI responsiveness, both hard-set composition transitions, frontier wins against both killers at both `b_L` and `b_M`, and the required `>=2/3` favorable-seed support for every killer-region comparison.
 
 A single isolated operating-point win does not pass. Inconclusive evidence does not authorize protocol rescue.
 
 ## Authorization boundary
 
-Current authorization is integrity re-audit only. Do not perform:
+Current authorization is bounded protocol correction only. Do not perform:
 
 - Gate implementation;
 - model training or Gate execution;
@@ -164,14 +178,15 @@ Current authorization is integrity re-audit only. Do not perform:
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.1: CORRECTED / DESIGNED_NOT_EXECUTED
-Integrity state: PENDING_REAUDIT
-Stage: IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT
+Gate 01 protocol v1.1: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
+Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
 Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Next owner: ccf-integrity-auditor
+Next owner: ccf-experiment-designer / design
+Next task: bounded B6 empty-frontier favorable-seed correction only
+After correction: ccf-integrity-auditor re-audit
 After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```

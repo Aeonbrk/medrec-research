@@ -1,21 +1,22 @@
-# Handoff: Idea 008 Gate 01 Protocol Corrected, Pending Integrity Re-audit
+# Handoff: Idea 008 Gate 01 v1.1 Integrity Re-audit Failed
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
+- **Current Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.1`
-- **Protocol state**: `DESIGNED_NOT_EXECUTED / PENDING_INTEGRITY_REAUDIT`
-- **Historical integrity audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`
+- **Historical v1.0 audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`
+- **v1.1 re-audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md`
+- **Integrity verdict**: `DESIGN_INTEGRITY_FAIL`
 - **Implementation**: `NOT_STARTED`
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`
 - **Experiment execution**: `NOT_AUTHORIZED`
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate
 - **Gate01-Audit**: unopened
-- **Next owner**: `ccf-integrity-auditor`
-- **Next task**: independent pre-execution integrity re-audit of corrected protocol v1.1
+- **Next owner**: `ccf-experiment-designer / design`
+- **Next task**: bounded B6 empty-frontier favorable-seed correction only; do not train
 
 ## Frozen scientific question
 
@@ -33,19 +34,11 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-## Corrected protocol boundary
+## Re-audit result
 
-Protocol v1.1 contains only the bounded pre-execution corrections authorized after the prior integrity audit:
+Protocol v1.1 closes B1–B5 and B7. B6 still contains one execution-blocking ambiguity: Section 11 permits a safer-than-entire-control-frontier case when the eligible control set is empty, while Section 12.2 defines seed favorability only through `G_{r,C}=U_{B,r}-F_C(R_{B,r})`. In the empty-set case `F_C` is undefined, so the `>=2/3` favorable-seed rule can produce different `KILL_SEED_FRAGILITY` / PASS outcomes across otherwise compliant implementations.
 
-1. explicit frozen-score residual anchor restored for BudgetSet and Independent;
-2. `e_i(x)` frozen to the pinned MoleRec `molecule_embeddings[i]` immediately before `score_extractor`, from the same no-grad forward as `s_i`;
-3. Idea-local Dev/Audit patient split frozen to one SHA-256 membership formula using namespace `idea008-gate01-v1`;
-4. deterministic Greedy branches frozen for `K_x=0` and `K_x=1`;
-5. per-seed checkpoint, patience, and configuration-selection nesting frozen;
-6. visit observation, patient-cluster bootstrap, learned-seed aggregation, composition response, frontier recomputation, and favorable-seed semantics frozen;
-7. one top-to-bottom primary terminal-verdict precedence frozen.
-
-No backbone, architecture, solver, loss, budget, seed, dataset, tuning dimension, or scientific claim has been added.
+The only authorized correction is to define one deterministic sign-only seed-level comparator for that empty-frontier case for deterministic controls and matched Independent seeds. Do not alter the aggregate material-frontier criterion or reopen B1–B5/B7.
 
 ## Authorization boundary
 
@@ -53,26 +46,26 @@ Do not perform:
 
 - Gate implementation;
 - recommendation-model training or Gate execution;
-- Gate01-Audit access before re-audit authorization;
+- Gate01-Audit access;
 - G3/G4, R0 Holdout, or historical project test access;
 - subgroup mining or feature fishing;
 - architecture expansion;
-- extra solver families, losses, targets, seeds, or tuning dimensions;
+- extra solver families, losses, targets, seeds, budgets, or tuning dimensions;
 - paper-level SOTA benchmarking.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.1: CORRECTED / DESIGNED_NOT_EXECUTED
-Integrity state: PENDING_REAUDIT
-Stage: IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT
+Gate 01 protocol v1.1: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
+Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
 Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
 Quarantine: intact
 Gate01-Audit: UNOPENED
-Next owner: ccf-integrity-auditor
-Next task: independent re-audit of protocol v1.1
+Next owner: ccf-experiment-designer / design
+Next task: bounded B6 empty-frontier favorable-seed correction only
+After correction: ccf-integrity-auditor re-audit
 After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```
