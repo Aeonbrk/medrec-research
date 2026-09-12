@@ -9,8 +9,8 @@
 - **Mode**: `ccf-experiment-designer / design`
 - **Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
 - **Status**: `DESIGNED_NOT_EXECUTED`
-- **Design revision**: `v1.1`
-- **Design date**: `2026-09-12`
+- **Design revision**: `v1.2`
+- **Design date**: `2026-09-13`
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
 - **Integrity state**: `PENDING_REAUDIT`
 - **Implementation**: `NOT_STARTED`
@@ -644,17 +644,67 @@ Frozen learned seeds are:
 {2002, 2003, 2004}
 ```
 
-For BudgetSet seed `r` and a deterministic control `C`, define the seed-specific frontier from that control's three deterministic operating points and:
+For every BudgetSet seed `r`, required primary budget region, and killer control `C`, let the sampled control operating points be indexed by `j` and define
 
 $$
-G_{r,C}=U_{B,r}-F_C(R_{B,r}).
+E_{r,C}=\{j:R_{C,j}\le R_{B,r}+\delta_R\}.
 $$
 
-Seed `r` is favorable iff:
+The seed-level comparator is total whenever the required control family contains at least one sampled operating point.
+
+**Branch A — non-empty eligible frontier.** If $E_{r,C}\ne\varnothing$, define
+
+$$
+F_{r,C}=\max_{j\in E_{r,C}}U_{C,j},
+$$
+
+$$
+G_{r,C}=U_{B,r}-F_{r,C}.
+$$
+
+Seed `r` is favorable iff
 
 ```text
 G_{r,C} > 0
 ```
+
+This is the existing ordinary-frontier rule.
+
+**Branch B — empty eligible frontier.** If $E_{r,C}=\varnothing$, every sampled control point satisfies $R_{C,j}>R_{B,r}+\delta_R$. Select one unique control reference endpoint
+
+$$
+j^\star=\operatorname*{arg\,min}_j\left(R_{C,j},-U_{C,j},o_j\right)
+$$
+
+under lexicographic ordering:
+
+1. lower hard-set DDI $R_{C,j}$;
+2. then higher Jaccard $U_{C,j}$;
+3. then lower canonical control-point order $o_j$.
+
+Canonical control-point order follows the already-frozen requested-budget order
+
+```text
+b_L < b_M < b_H
+```
+
+and any other sampled point already defined by a control family retains that family's existing deterministic protocol order. No performance-dependent ordering is introduced.
+
+Define
+
+$$
+H_{r,C}=U_{B,r}-U_{C,j^\star}.
+$$
+
+In this empty-frontier branch only, seed `r` is favorable iff
+
+$$
+H_{r,C}\ge 0.
+$$
+
+Thus `H_{r,C}>0` is favorable, `H_{r,C}<0` is non-favorable, and `H_{r,C}=0` is favorable because this branch already guarantees the strict lower-risk direction $R_{B,r}+\delta_R<R_{C,j^\star}$. This is a zero-margin, direction-only seed-robustness test. Do not apply an additional `0.005` utility threshold, bootstrap interval, composite scalar, or hypervolume criterion at seed level; material sufficiency remains solely the aggregate Section 11 frontier test.
+
+For deterministic Greedy, each BudgetSet seed is compared against the same single deterministic Greedy family. Use Branch A when its eligible set is non-empty and Branch B otherwise. Do not manufacture Greedy seeds.
 
 For Independent, use matched seeds only:
 
@@ -664,9 +714,11 @@ BudgetSet 2003 <-> Independent 2003
 BudgetSet 2004 <-> Independent 2004
 ```
 
-For matched seed `r`, construct the Independent seed-`r` frontier from its own three budget operating points and apply the same `G_{r,C} > 0` favorable rule.
+For BudgetSet seed `r`, the control points used in either branch are only the sampled operating points of matched Independent seed `r`; do not mix Independent seeds in the seed-robustness comparator. Aggregate Independent frontier and bootstrap semantics remain those of Sections 11 and 12.1.
 
-At each required `killer × primary-region` comparison, at least `2/3` BudgetSet seeds must be favorable. The `0.005` material-win threshold remains an aggregate frontier criterion and is not reused as the favorable-seed threshold.
+At each required `killer × primary-region` comparison, at least `2/3` BudgetSet seeds must be favorable under this two-branch rule. Otherwise trigger `KILL_SEED_FRAGILITY`. The `0.005` material-win threshold remains an aggregate frontier criterion and is not reused as a favorable-seed threshold.
+
+If a required killer control family contains zero sampled operating points, the Gate implementation is invalid and Section 13.1 applies; the case is not assigned a seed-favorable status.
 
 ## 13. Formal terminal decision precedence
 
@@ -685,7 +737,7 @@ Evaluate the following conditions in this exact top-to-bottom order. The first t
 
 ### 13.1 STOP_INVALID_GATE_IMPLEMENTATION
 
-Trigger if any compared method fails exact `K_x` compliance or any method receives a different candidate pool, DDI matrix, frozen logits, requested target, or frozen cardinality. No scientific conclusion follows.
+Trigger if any compared method fails exact `K_x` compliance, any method receives a different candidate pool, DDI matrix, frozen logits, requested target, or frozen cardinality, or any required killer control family has zero sampled operating points. No scientific conclusion follows.
 
 ### 13.2 STOP_NO_BASE_DDI_HEADROOM
 
@@ -774,4 +826,4 @@ Gate 01 does not authorize:
 - G3/G4, R0 Holdout, or historical test access;
 - paper-level SOTA benchmarking.
 
-Protocol v1.1 is corrected but not yet integrity-approved. Implementation remains `NOT_STARTED`; training and execution remain `NOT_AUTHORIZED`; Gate01-Audit remains unopened. The next owner is `ccf-integrity-auditor` for independent pre-execution re-audit. Only a future integrity pass may return routing to `ccf-pipeline-orchestrator` for an execution-authorization decision.
+Protocol v1.2 is corrected but not yet integrity-approved. Implementation remains `NOT_STARTED`; training and execution remain `NOT_AUTHORIZED`; Gate01-Audit remains unopened. The next owner is `ccf-integrity-auditor` for independent pre-execution re-audit. Only a future integrity pass may return routing to `ccf-pipeline-orchestrator` for an execution-authorization decision.

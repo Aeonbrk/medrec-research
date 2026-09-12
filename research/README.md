@@ -19,21 +19,21 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 
 ## Current scientific state
 
-- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION`.
+- **Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`.
 - **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`.
-- **Gate 01 protocol v1.1**: `DESIGN_INTEGRITY_FAIL`, not executed.
+- **Gate 01 protocol v1.2**: corrected, `DESIGNED_NOT_EXECUTED`, pending independent integrity re-audit.
 - **Gate 01 protocol**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md).
-- **Historical v1.0 audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md).
-- **v1.1 re-audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md).
+- **Historical v1.0 audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL`.
+- **Historical v1.1 re-audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md), verdict `DESIGN_INTEGRITY_FAIL`.
 - **Implementation**: `NOT_STARTED`.
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`.
 - **Experiment execution**: `NOT_AUTHORIZED`.
 - **Gate01-Audit**: unopened.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate.
-- **Next routing**: `ccf-experiment-designer / design` for one bounded B6 empty-frontier favorable-seed correction, followed by `ccf-integrity-auditor` re-audit.
+- **Next routing**: `ccf-integrity-auditor` for independent pre-execution re-audit of protocol v1.2.
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No empirical Gate result exists. Protocol v1.1 must not be implemented, trained, or executed until the remaining B6 blocker is corrected, independently re-audited, and execution is explicitly authorized.
+Idea 008 remains admitted for one bounded kill-first method cycle. No empirical Gate result exists. Protocol v1.2 closes only the remaining B6 empty-frontier seed-comparator ambiguity and must not be implemented, trained, or executed until independent integrity re-audit and subsequent pipeline authorization.
 
 ## Active Idea 008 boundary
 
@@ -51,7 +51,7 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The v1.1 re-audit passes the residual anchor, exact MoleRec representation, deterministic patient split, low-cardinality execution, learned checkpoint/configuration selection, and terminal precedence. The sole remaining blocker is within seed-robustness semantics when a seed-specific eligible control frontier is empty; `F_C(R_{B,r})` is then undefined while favorable seed is still defined through `G_{r,C}=U_{B,r}-F_C(R_{B,r})`.
+The v1.1 re-audit already closed B1–B5 and B7. Protocol v1.2 changes only the remaining B6 seed-robustness branch: when the seed-specific eligible control frontier is empty, one unique safest sampled control endpoint is selected by lower hard DDI, then higher Jaccard, then existing deterministic control-point order, and the favorable sign is determined by a zero-margin utility comparison. Section 11 aggregate frontier semantics, bootstrap semantics, and all frozen scientific choices remain unchanged.
 
 Primary killers remain:
 
@@ -74,21 +74,20 @@ Until a later explicit authorization, do not inspect or use:
 - R0 Holdout;
 - historical project test split.
 
-Gate01-Audit remains unopened.
+Gate01-Audit remains unopened pending integrity re-audit.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.1: DESIGN_INTEGRITY_FAIL / NOT EXECUTED
-Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_FAIL_PENDING_PROTOCOL_CORRECTION
+Gate 01 protocol v1.2: CORRECTED / DESIGNED_NOT_EXECUTED
+Integrity state: PENDING_REAUDIT
+Stage: IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT
 Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Next owner: ccf-experiment-designer / design
-Next task: bounded B6 empty-frontier favorable-seed correction only
-After correction: ccf-integrity-auditor re-audit
+Next owner: ccf-integrity-auditor
 After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
 ```
