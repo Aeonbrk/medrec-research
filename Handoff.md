@@ -1,23 +1,54 @@
-# Handoff: Idea 008 Gate 01 Train/Dev Authorized / Not Yet Executed
+# Handoff: Idea 008 Gate 01 Train/Dev Complete / Audit Not Authorized
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION`
+- **Current Stage**: `IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.2`
-- **Protocol state**: `DESIGNED_NOT_EXECUTED / DESIGN_INTEGRITY_PASS`
+- **Protocol state**: `DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_NOT_EXECUTED`
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`
 - **Implementation integrity**: `IMPLEMENTATION_INTEGRITY_PASS`
 - **Runner integrity**: `RUNNER_INTEGRITY_PASS`
 - **Formal Gate 01 execution phase**: `AUTHORIZED`
-- **Gate01-Train + Gate01-Dev execution**: `AUTHORIZED_NOT_RUN`
+- **Gate01-Train + Gate01-Dev execution**: `COMPLETE`
 - **Gate01-Audit**: `UNOPENED / NOT_AUTHORIZED`
 - **G3/G4**: `UNTOUCHED`
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
 - **Quarantine**: intact
-- **Next owner**: local execution agent
+- **Next owner**: ccf-pipeline-orchestrator
+
+## Frozen Train/Dev execution record
+
+The authorized Train/Dev phase completed on harness revision
+`5752596a16a57390dffe96538fa39f7b82fd051f` in the approved
+`medrec-molerec-table1` environment on `cuda:0`. The exact frozen MoleRec
+identity was preserved: upstream revision
+`dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, profile `molerec-embedding`,
+checkpoint SHA-256
+`5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca`,
+dataset `molerec-table1-comparison-v1-1`, and 131 candidate medications.
+The historical recovery identity was `formal-20260828-a09fcab-u8-b` /
+`molerec-embedding` / `u5-recover-20260829-molerec-embedding`, selected
+backbone epoch 44; no MoleRec retraining or checkpoint substitution occurred.
+
+Train-only calibration froze:
+
+- `r_train = 0.07728988868497694`;
+- `b_L = 0.04637393321098616`, `b_M = 0.06183191094798155`,
+  `b_H = 0.07728988868497694`;
+- fixed-lambda choices `b_L -> 1.0`, `b_M -> 0.5`, `b_H -> 0.0`.
+
+BudgetSet selected learning rate `0.001`, `eta = 5.0`, with retained
+checkpoint epochs `{2002: 6, 2003: 10, 2004: 6}`. Independent selected
+learning rate `0.001`, `eta = 5.0`, with retained checkpoint epochs
+`{2002: 7, 2003: 6, 2004: 6}`. Each family completed exactly 12 runs
+(`4 configurations x 3 seeds`) and retained exactly one Dev checkpoint for
+each of the three learned seeds. Independent static summaries were frozen
+from Gate01-Train only.
+
+No scientific Gate verdict was generated. Gate01-Audit was not opened.
 
 ## Runner integrity result
 
@@ -55,15 +86,15 @@ After both learned families have one Dev-selected configuration and exactly thre
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
+Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Runner integrity: RUNNER_INTEGRITY_PASS
 Formal Gate execution phase: AUTHORIZED
-Gate01-Train + Gate01-Dev: AUTHORIZED_NOT_RUN
+Gate01-Train + Gate01-Dev: COMPLETE
 Gate01-Audit: UNOPENED / NOT_AUTHORIZED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION
-Next owner: local execution agent
-Next task: execute only the frozen Train/Dev phase, freeze all selections, then stop before Gate01-Audit
+Stage: IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION
+Next owner: ccf-pipeline-orchestrator
+Next task: obtain separate Gate01-Audit authorization; do not open Audit in this state
 ```

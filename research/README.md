@@ -19,20 +19,20 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 
 ## Current scientific state
 
-- **Stage**: `IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION`.
+- **Stage**: `IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION`.
 - **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`.
-- **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
+- **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`; Train/Dev complete and Audit not executed.
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`.
 - **Independent implementation verification**: `IMPLEMENTATION_INTEGRITY_PASS`.
 - **Runner integrity re-verification**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-runner-integrity-reverification.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-runner-integrity-reverification.md), verdict `RUNNER_INTEGRITY_PASS`.
 - **Formal execution authorization**: `FORMAL_GATE_01_EXECUTION_AUTHORIZED`.
-- **Gate01-Train + Gate01-Dev**: `AUTHORIZED_NOT_RUN`.
+- **Gate01-Train + Gate01-Dev**: `COMPLETE`.
 - **Gate01-Audit**: `UNOPENED / NOT_AUTHORIZED`.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate.
-- **Next owner**: local execution agent.
+- **Next owner**: `ccf-pipeline-orchestrator`.
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No scientific Gate result exists yet. Protocol v1.2, design integrity, the mechanical-preflight surface, implementation integrity, and the corrected execution runner are now execution-ready.
+Idea 008 remains admitted for one bounded kill-first method cycle. The authorized Train/Dev selections are frozen; no scientific Gate result exists yet. Protocol v1.2, design integrity, the mechanical-preflight surface, implementation integrity, and the corrected execution runner remain unchanged.
 
 ## Active Idea 008 boundary
 
@@ -59,7 +59,7 @@ Primary killers remain:
 
 ## Execution routing
 
-The Train/Dev phase is formally authorized by the Idea-local training authorization. Gate01-Train may be used only for the frozen training/calibration roles; Gate01-Dev may be used only for the frozen epoch/checkpoint/configuration selection procedure. All learned selections must be frozen before any Gate01-Audit access.
+The Train/Dev phase completed under the Idea-local training authorization. Gate01-Train and Gate01-Dev were used only for the frozen training/calibration and epoch/checkpoint/configuration selection procedures. All learned selections are frozen before any Gate01-Audit access.
 
 Gate01-Audit remains unopened and unauthorized. After Train/Dev completion, execution must stop and return to the pipeline coordinator for a separate Audit authorization.
 
@@ -82,13 +82,13 @@ Do not inspect or use:
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
+Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Runner integrity: RUNNER_INTEGRITY_PASS
-Gate01-Train + Gate01-Dev: AUTHORIZED_NOT_RUN
+Gate01-Train + Gate01-Dev: COMPLETE
 Gate01-Audit: UNOPENED / NOT_AUTHORIZED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION
-Next owner: local execution agent
+Stage: IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION
+Next owner: ccf-pipeline-orchestrator
 ```
