@@ -15,22 +15,21 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / runner corrected pending integrity reverification** | — |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Train+Dev authorized** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION`.
+- **Stage**: `IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`.
 - **Independent implementation verification**: `IMPLEMENTATION_INTEGRITY_PASS`.
+- **Runner integrity**: `RUNNER_INTEGRITY_PASS`.
 - **Formal Gate execution phase**: `AUTHORIZED`.
-- **Execution-specific learned runner**: `CORRECTED / PENDING_INTEGRITY_REVERIFICATION`.
-- **Runner integrity**: `PENDING_REVERIFICATION`.
-- **Formal recommendation-model training**: `NOT_AUTHORIZED`.
-- **Gate01-Audit**: unopened.
+- **Gate01-Train + Gate01-Dev**: `AUTHORIZED_NOT_RUN`.
+- **Gate01-Audit**: `UNOPENED / NOT_AUTHORIZED`.
 - **Quarantine**: intact.
-- **Next owner**: independent runner-integrity verifier / pipeline coordinator.
+- **Next owner**: local execution agent.
 
 The admitted interaction remains:
 
@@ -40,9 +39,9 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The formal execution authorization remains valid. The bounded runner correction closes device-consistent learned execution and the exact `4 configurations × 3 seeds` Dev aggregate/configuration-selection path. Independent runner-integrity reverification is still pending.
+The corrected runner now owns device-consistent learned execution and the exact `4 configurations × 3 seeds` Dev aggregate/configuration-selection path. Train/Dev execution is authorized under protocol v1.2. Gate01-Audit remains sealed until every Train/Dev selection is frozen.
 
-No recommendation-model training or scientific Gate evidence exists. Gate01-Audit, G3/G4, R0 Holdout, and historical project test remain untouched.
+No scientific Gate verdict exists yet. G3/G4, R0 Holdout, and historical project test remain untouched.
 
 ## Routing
 
@@ -51,11 +50,10 @@ Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
-Formal Gate execution phase: AUTHORIZED
-Runner integrity: PENDING_REVERIFICATION
-Formal training: NOT_AUTHORIZED
-Gate01-Audit: UNOPENED
+Runner integrity: RUNNER_INTEGRITY_PASS
+Gate01-Train + Gate01-Dev: AUTHORIZED_NOT_RUN
+Gate01-Audit: UNOPENED / NOT_AUTHORIZED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION
-Next owner: independent runner-integrity verifier / pipeline coordinator
+Stage: IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION
+Next owner: local execution agent
 ```

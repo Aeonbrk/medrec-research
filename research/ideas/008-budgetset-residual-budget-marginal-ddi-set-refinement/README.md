@@ -3,8 +3,8 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `ADMITTED / RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION`
-- **Stage**: `IDEA_008_GATE_01_RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION`
+- **Status**: `ADMITTED / TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION`
+- **Stage**: `IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
@@ -13,15 +13,14 @@
 - **Mechanical preflight**: [`experiments/gate-01-mechanical-preflight.json`](experiments/gate-01-mechanical-preflight.json), verdict `MECHANICAL_PREFLIGHT_PASS`
 - **Independent implementation verification**: [`experiments/gate-01-implementation-integrity-verification.md`](experiments/gate-01-implementation-integrity-verification.md), verdict `IMPLEMENTATION_INTEGRITY_PASS`
 - **Formal execution authorization**: [`experiments/gate-01-execution-authorization.md`](experiments/gate-01-execution-authorization.md), verdict `FORMAL_GATE_01_EXECUTION_AUTHORIZED`
-- **Runner integrity verification**: [`experiments/gate-01-runner-integrity-verification.md`](experiments/gate-01-runner-integrity-verification.md), verdict `RUNNER_INTEGRITY_FAIL`
-- **Execution-specific learned runner**: `CORRECTED / PENDING_INTEGRITY_REVERIFICATION`
-- **Runner integrity**: `PENDING_REVERIFICATION`
-- **Formal training**: `NOT_AUTHORIZED`
-- **Gate01-Audit**: unopened
+- **Historical runner integrity verification**: [`experiments/gate-01-runner-integrity-verification.md`](experiments/gate-01-runner-integrity-verification.md), verdict `RUNNER_INTEGRITY_FAIL`
+- **Runner integrity re-verification**: [`experiments/gate-01-runner-integrity-reverification.md`](experiments/gate-01-runner-integrity-reverification.md), verdict `RUNNER_INTEGRITY_PASS`
+- **Train/Dev authorization**: [`experiments/gate-01-training-authorization.md`](experiments/gate-01-training-authorization.md), state `AUTHORIZED_NOT_RUN`
+- **Gate01-Audit**: unopened / not authorized
 - **Quarantine**: intact
-- **Next owner**: independent runner-integrity verifier / pipeline coordinator
+- **Next owner**: local execution agent
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 scientific experiment has been executed. Protocol v1.2 and the existing design/mechanical integrity results remain valid. The runner-integrity failure is limited to execution implementation and does not reopen Idea review or Gate design.
+Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 scientific result has been generated. Protocol v1.2 and all pre-execution integrity gates now pass; only the frozen Train/Dev phase is authorized at the current stage.
 
 ## Scientific question
 
@@ -109,19 +108,36 @@ The six-value fixed-lambda family remains supporting evidence rather than a thir
 
 ## Runner integrity boundary
 
-The corrected runner preserves the frozen BudgetSet and Independent architectures, residual anchors, objective, optimizer family, seed/LR/eta constants, checkpoint key, patience semantics, deterministic protocol helpers, and Audit-after-Dev boundary. Independent runner-integrity reverification is still pending.
+The corrected runner at `4c3ac46365ade339f307be449b8a7dca3c8bb16c` passes the narrow runner-integrity re-verification.
 
-The bounded correction closes two runner responsibilities before independent reverification:
+The prior blockers are closed:
 
-1. device ownership now moves ordinary frozen CPU/list features and all learned inputs to the model device consistently;
-2. the runner now owns the complete learned Dev-selection path: exactly four configurations × three frozen seeds, retained per-seed checkpoints, seed-aggregate Dev quantities, and the frozen configuration-selection key. Aggregate selection quantities are derived from retained checkpoints rather than supplied as free caller inputs.
+1. one runner-owned device covers detached scores, embeddings, budgets, DDI inputs, labels, `K_x`, and Independent static summaries before learned execution;
+2. the exact `4 configurations × 3 seeds` learned-family selection graph is runner-owned, with configuration quantities derived from the three retained seed checkpoints rather than injected by the caller.
 
-Local and approved-319 synthetic targeted runner and mechanical-preflight checks now pass, including the CUDA device-path smoke. This is implementation verification only; independent runner-integrity reverification remains pending, and no Gate01-Train or Gate01-Audit access is authorized.
+Approved 319 synthetic targeted verification reports `44 passed` across the execution and mechanical-preflight files, including the CUDA device path with no PyTorch-dependent skips. This evidence does not constitute scientific Gate execution.
+
+## Train/Dev execution boundary
+
+Gate01-Train and Gate01-Dev are now authorized exactly under [`experiments/gate-01-training-authorization.md`](experiments/gate-01-training-authorization.md).
+
+Gate01-Train may be used for:
+
+- frozen MoleRec `s_i(x)` / `e_i(x)` extraction;
+- `r_train` and the three frozen budget targets;
+- Train-only Independent `d_i,p_i` summaries;
+- Train-only fixed-lambda selection;
+- BudgetSet and Independent training over exactly four configurations and three learned seeds.
+
+Gate01-Dev may be used only for the frozen per-epoch checkpoint/patience rule and the frozen three-seed configuration selection. No Audit quantity may enter those decisions.
+
+After both learned families and all Train-only choices are frozen, execution must stop. Gate01-Audit remains unopened and requires a separate pipeline authorization.
 
 ## Quarantine
 
 Do not access:
 
+- Gate01-Audit at the current stage;
 - G3/G4;
 - R0 Holdout;
 - historical project test;
@@ -136,11 +152,10 @@ Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
-Formal Gate execution phase: AUTHORIZED
-Runner integrity: PENDING_REVERIFICATION
-Formal training: NOT_AUTHORIZED
-Gate01-Audit: UNOPENED
+Runner integrity: RUNNER_INTEGRITY_PASS
+Gate01-Train + Gate01-Dev: AUTHORIZED_NOT_RUN
+Gate01-Audit: UNOPENED / NOT_AUTHORIZED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION
-Next owner: independent runner-integrity verifier / pipeline coordinator
+Stage: IDEA_008_GATE_01_TRAIN_DEV_AUTHORIZED_PENDING_EXECUTION
+Next owner: local execution agent
 ```
