@@ -179,6 +179,17 @@ def test_independent_has_no_current_set_feedback_and_keeps_anchor() -> None:
     assert torch.allclose(output, scores)
 
 
+def test_frozen_molerec_inputs_are_detached_from_learned_backpropagation() -> None:
+    torch = _torch()
+    model = MODULE.BudgetSet(embedding_dim=3)
+    scores = torch.zeros(MODULE.CANDIDATE_COUNT, requires_grad=True)
+    embeddings = torch.zeros((MODULE.CANDIDATE_COUNT, 3), requires_grad=True)
+    ddi = torch.tensor(_zero_ddi(), dtype=torch.float32)
+    model(scores, embeddings, 0.2, ddi, 3).sum().backward()
+    assert scores.grad is None
+    assert embeddings.grad is None
+
+
 def test_objective_contains_exact_bce_hinge_and_cardinality_terms() -> None:
     torch = _torch()
     logits = torch.zeros((2, MODULE.CANDIDATE_COUNT), dtype=torch.float32)

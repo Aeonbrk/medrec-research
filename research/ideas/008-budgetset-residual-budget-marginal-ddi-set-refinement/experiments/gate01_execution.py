@@ -246,8 +246,10 @@ def _as_float_tensor(value: Any, *, device: Any = None) -> Any:
 
 def _prepare_scores_embeddings(scores: Any, embeddings: Any) -> tuple[Any, Any, bool]:
     _require_torch()
-    score_tensor = _as_float_tensor(scores)
-    embedding_tensor = _as_float_tensor(embeddings, device=score_tensor.device)
+    # MoleRec is frozen; learned-family backpropagation must stop at both
+    # representations even if a caller accidentally passes grad-carrying tensors.
+    score_tensor = _as_float_tensor(scores).detach()
+    embedding_tensor = _as_float_tensor(embeddings, device=score_tensor.device).detach()
     squeezed = score_tensor.ndim == 1
     if squeezed:
         score_tensor = score_tensor.unsqueeze(0)
@@ -265,7 +267,7 @@ def _prepare_scores_embeddings(scores: Any, embeddings: Any) -> tuple[Any, Any, 
 
 
 def _prepare_ddi(ddi: Any, *, device: Any) -> Any:
-    matrix = _as_float_tensor(ddi, device=device)
+    matrix = _as_float_tensor(ddi, device=device).detach()
     if matrix.ndim != 2 or tuple(matrix.shape) != (CANDIDATE_COUNT, CANDIDATE_COUNT):
         raise ProtocolMismatch("Gate 01 DDI matrix must be 131 by 131")
     return matrix
@@ -526,8 +528,8 @@ if nn is not None:
             budget_tensor = _prepare_batch_scalar(
                 budget, batch_size, device=score_tensor.device, name="budget"
             )
-            d_tensor = _as_float_tensor(d_static, device=score_tensor.device)
-            p_tensor = _as_float_tensor(p_static, device=score_tensor.device)
+            d_tensor = _as_float_tensor(d_static, device=score_tensor.device).detach()
+            p_tensor = _as_float_tensor(p_static, device=score_tensor.device).detach()
             if d_tensor.ndim == 1:
                 d_tensor = d_tensor.unsqueeze(0).expand(batch_size, -1)
             if p_tensor.ndim == 1:
