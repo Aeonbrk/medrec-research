@@ -15,19 +15,19 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Gate 01 execution phase authorized** | — |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / runner bounded correction required** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION`.
+- **Stage**: `IDEA_008_GATE_01_RUNNER_INTEGRITY_FAIL_PENDING_BOUNDED_CORRECTION`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`.
 - **Independent implementation verification**: `IMPLEMENTATION_INTEGRITY_PASS`.
 - **Formal Gate execution phase**: `AUTHORIZED`.
-- **Execution-specific learned runner**: `REQUIRED / NOT_YET_IMPLEMENTED`.
-- **Runner implementation**: `AUTHORIZED`.
-- **Formal recommendation-model training**: `NOT_YET_AUTHORIZED`.
+- **Execution-specific learned runner**: `IMPLEMENTED / BOUNDED_CORRECTION_REQUIRED`.
+- **Runner integrity**: `RUNNER_INTEGRITY_FAIL`.
+- **Formal recommendation-model training**: `NOT_AUTHORIZED`.
 - **Gate01-Audit**: unopened.
 - **Quarantine**: intact.
 - **Next owner**: local coding agent.
@@ -40,9 +40,9 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The formal execution authorization is recorded in [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-execution-authorization.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-execution-authorization.md). It freezes the downstream runner and data boundary without changing protocol v1.2.
+The formal execution authorization remains valid. The runner-integrity audit found only bounded execution-implementation defects: the device path is not closed for ordinary CPU-extracted frozen features, and the exact `4 configurations × 3 seeds` Dev aggregate/configuration-selection path is not yet runner-owned.
 
-No recommendation-model training or scientific Gate evidence exists yet. The next task is bounded Idea-local runner implementation only. Gate01-Audit, G3/G4, R0 Holdout, and historical project test remain untouched.
+No recommendation-model training or scientific Gate evidence exists. Gate01-Audit, G3/G4, R0 Holdout, and historical project test remain untouched.
 
 ## Routing
 
@@ -52,10 +52,10 @@ Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Formal Gate execution phase: AUTHORIZED
-Runner implementation: AUTHORIZED / REQUIRED
-Formal training: NOT_YET_AUTHORIZED
+Runner integrity: RUNNER_INTEGRITY_FAIL
+Formal training: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION
+Stage: IDEA_008_GATE_01_RUNNER_INTEGRITY_FAIL_PENDING_BOUNDED_CORRECTION
 Next owner: local coding agent
 ```

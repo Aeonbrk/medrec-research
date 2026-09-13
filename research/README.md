@@ -19,23 +19,21 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 
 ## Current scientific state
 
-- **Stage**: `IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION`.
+- **Stage**: `IDEA_008_GATE_01_RUNNER_INTEGRITY_FAIL_PENDING_BOUNDED_CORRECTION`.
 - **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`.
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
 - **Mechanical preflight**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-mechanical-preflight.json`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-mechanical-preflight.json), verdict `MECHANICAL_PREFLIGHT_PASS`.
 - **Independent implementation verification**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-integrity-verification.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-integrity-verification.md), verdict `IMPLEMENTATION_INTEGRITY_PASS`.
 - **Formal execution authorization**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-execution-authorization.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-execution-authorization.md), verdict `FORMAL_GATE_01_EXECUTION_AUTHORIZED`.
-- **Execution-specific learned runner**: required and not yet implemented.
-- **Runner implementation**: `AUTHORIZED`.
-- **Formal recommendation-model training**: `NOT_YET_AUTHORIZED`.
+- **Runner integrity verification**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-runner-integrity-verification.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-runner-integrity-verification.md), verdict `RUNNER_INTEGRITY_FAIL`.
+- **Execution-specific learned runner**: `IMPLEMENTED / BOUNDED_CORRECTION_REQUIRED`.
+- **Formal recommendation-model training**: `NOT_AUTHORIZED`.
 - **Gate01-Audit**: unopened.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate.
 - **Next owner**: local coding agent.
 
-Idea 008 remains admitted for one bounded kill-first method cycle. Protocol v1.2 and the existing mechanical-preflight surface are already integrity-approved. No scientific Gate result exists.
-
-The pipeline has now authorized the formal Gate-execution phase because no scientific-design blocker remains. The remaining pre-training work is narrower: implement the execution-specific learned runner under the frozen protocol, verify that new code, then activate training. This does not reopen design review.
+Idea 008 remains admitted for one bounded kill-first method cycle. No scientific Gate result exists. Protocol v1.2, design integrity, the mechanical-preflight surface, and the formal execution authorization remain valid. The runner-integrity failure is implementation-local and does not reopen the scientific design.
 
 ## Active Idea 008 boundary
 
@@ -62,9 +60,9 @@ Primary killers remain:
 
 ## Execution routing
 
-The missing execution-specific code is not an invitation to expand the method. The local coding agent may add only the Idea-local runner and its targeted tests needed to realize protocol v1.2. It may reuse the mechanically verified pure functions and frozen MoleRec extraction surface. It may not change the protocol, registry, backbone, budgets, seeds, architectures, losses, controls, or data boundary.
+The current correction is limited to two runner responsibilities: device-consistent learned execution and runner-owned closure of the exact four-configuration/three-seed Dev-selection procedure. No protocol, architecture, objective, seed, budget, control, metric, or data-boundary change is authorized.
 
-Recommendation-model training remains withheld until that new runner passes a narrow implementation-integrity check. Gate01-Audit remains unopened until all Train/Dev selection is frozen, after which it may be used only for terminal evaluation under the protocol.
+Recommendation-model training remains withheld until the corrected runner passes independent integrity verification. Gate01-Audit remains unopened until all Train/Dev selection is frozen, after which it may be used only for terminal evaluation under protocol v1.2.
 
 ## Historical closed state
 
@@ -90,10 +88,10 @@ Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Formal Gate execution phase: AUTHORIZED
-Runner implementation: AUTHORIZED / REQUIRED
-Formal training: NOT_YET_AUTHORIZED
+Runner integrity: RUNNER_INTEGRITY_FAIL
+Formal training: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION
+Stage: IDEA_008_GATE_01_RUNNER_INTEGRITY_FAIL_PENDING_BOUNDED_CORRECTION
 Next owner: local coding agent
 ```
