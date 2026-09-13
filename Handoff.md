@@ -1,100 +1,73 @@
-# Handoff: Idea 008 Gate 01 Train/Dev Complete / Audit Not Authorized
+# Handoff: Idea 008 Gate 01 Audit Authorized / Not Yet Executed
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION`
+- **Current Stage**: `IDEA_008_GATE_01_AUDIT_AUTHORIZED_PENDING_EXECUTION`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.2`
-- **Protocol state**: `DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_NOT_EXECUTED`
+- **Protocol state**: `DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_AUTHORIZED_NOT_RUN`
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`
 - **Implementation integrity**: `IMPLEMENTATION_INTEGRITY_PASS`
 - **Runner integrity**: `RUNNER_INTEGRITY_PASS`
 - **Formal Gate 01 execution phase**: `AUTHORIZED`
 - **Gate01-Train + Gate01-Dev execution**: `COMPLETE`
-- **Gate01-Audit**: `UNOPENED / NOT_AUTHORIZED`
+- **Gate01-Audit**: `AUTHORIZED_NOT_RUN`
 - **G3/G4**: `UNTOUCHED`
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
 - **Quarantine**: intact
-- **Next owner**: ccf-pipeline-orchestrator
+- **Next owner**: local execution agent
 
 ## Frozen Train/Dev execution record
 
-The authorized Train/Dev phase completed on harness revision
-`5752596a16a57390dffe96538fa39f7b82fd051f` in the approved
-`medrec-molerec-table1` environment on `cuda:0`. The exact frozen MoleRec
-identity was preserved: upstream revision
+The completed Train/Dev phase preserved the frozen MoleRec identity: upstream revision
 `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, profile `molerec-embedding`,
 checkpoint SHA-256
 `5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca`,
-dataset `molerec-table1-comparison-v1-1`, and 131 candidate medications.
-The historical recovery identity was `formal-20260828-a09fcab-u8-b` /
-`molerec-embedding` / `u5-recover-20260829-molerec-embedding`, selected
-backbone epoch 44; no MoleRec retraining or checkpoint substitution occurred.
+dataset `molerec-table1-comparison-v1-1`, and 131 candidate medications. No MoleRec
+retraining or checkpoint substitution occurred.
 
-Train-only calibration froze:
+Train-only calibration is frozen as:
 
 - `r_train = 0.07728988868497694`;
-- `b_L = 0.04637393321098616`, `b_M = 0.06183191094798155`,
-  `b_H = 0.07728988868497694`;
+- `b_L = 0.04637393321098616`;
+- `b_M = 0.06183191094798155`;
+- `b_H = 0.07728988868497694`;
 - fixed-lambda choices `b_L -> 1.0`, `b_M -> 0.5`, `b_H -> 0.0`.
 
-BudgetSet selected learning rate `0.001`, `eta = 5.0`, with retained
-checkpoint epochs `{2002: 6, 2003: 10, 2004: 6}`. Independent selected
+BudgetSet is frozen at learning rate `0.001`, `eta = 5.0`, with retained
+checkpoint epochs `{2002: 6, 2003: 10, 2004: 6}`. Independent is frozen at
 learning rate `0.001`, `eta = 5.0`, with retained checkpoint epochs
-`{2002: 7, 2003: 6, 2004: 6}`. Each family completed exactly 12 runs
-(`4 configurations x 3 seeds`) and retained exactly one Dev checkpoint for
-each of the three learned seeds. Independent static summaries were frozen
-from Gate01-Train only.
+`{2002: 7, 2003: 6, 2004: 6}`. Independent static summaries remain the
+Train-only frozen values used during training.
 
-No scientific Gate verdict was generated. Gate01-Audit was not opened.
+No Audit quantity entered any of these selections.
 
-## Runner integrity result
+## Audit authorization boundary
 
-The corrected runner at `4c3ac46365ade339f307be449b8a7dca3c8bb16c` passes the narrow re-verification recorded in:
+Gate01-Audit is now authorized by:
 
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-runner-integrity-reverification.md`
+`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-authorization.md`
 
-The previous R1 and R2 blockers are closed without changing Gate 01 protocol v1.2:
+The authorization permits only terminal evaluation under protocol v1.2 using the already-frozen Train/Dev selections. Audit may compute the frozen operating-point metrics, both primary-killer comparisons, fixed-lambda supporting evidence, budget/composition-response checks, the patient-clustered bootstrap, seed robustness, and the protocol-defined terminal classification.
 
-1. learned execution owns one device and materializes detached scores, embeddings, budgets, DDI inputs, labels, `K_x`, and Independent static summaries on that device;
-2. `train_learned_family` owns the exact `4 configurations × 3 seeds` graph, derives configuration-level Dev quantities from retained seed checkpoints, applies the frozen selection key, and returns only the selected configuration's three retained checkpoints.
+Audit must not select or change checkpoints, hyperparameters, budgets, fixed lambdas, controls, seeds, thresholds, architecture, objective, or data partitions. Any runtime problem requiring an implementation or protocol change stops execution and returns to the pipeline coordinator.
 
-The committed verification record includes the approved 319 synthetic evidence: `44 passed` across the execution-runner and mechanical-preflight targeted files, with the CUDA device path executed and no PyTorch-dependent skips. GitHub has no separate CI status attached to the verified revision.
-
-## Training authorization boundary
-
-The Train/Dev activation is frozen in:
-
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-training-authorization.md`
-
-Authorized now:
-
-- Gate01-Train for frozen MoleRec feature/logit extraction, `r_train`/budget calibration, Train-only Independent static summaries, Train-only fixed-lambda selection, and BudgetSet/Independent training;
-- Gate01-Dev for epoch/checkpoint/configuration selection exactly under protocol v1.2.
-
-Not authorized now:
-
-- Gate01-Audit;
-- any Audit-derived metric, bootstrap, frontier result, seed-robustness result, or terminal Gate verdict;
-- G3/G4, R0 Holdout, historical project test, or paper-level SOTA expansion.
-
-After both learned families have one Dev-selected configuration and exactly three retained checkpoints, and all Train-only selections are frozen, execution must stop and return to the pipeline coordinator for a separate Gate01-Audit authorization.
+G3/G4, R0 Holdout, and the historical project test remain outside Gate 01.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_NOT_EXECUTED
+Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_AUTHORIZED_NOT_RUN
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Runner integrity: RUNNER_INTEGRITY_PASS
-Formal Gate execution phase: AUTHORIZED
 Gate01-Train + Gate01-Dev: COMPLETE
-Gate01-Audit: UNOPENED / NOT_AUTHORIZED
+Gate01-Audit: AUTHORIZED_NOT_RUN
 Quarantine: intact
-Stage: IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION
-Next owner: ccf-pipeline-orchestrator
-Next task: obtain separate Gate01-Audit authorization; do not open Audit in this state
+Stage: IDEA_008_GATE_01_AUDIT_AUTHORIZED_PENDING_EXECUTION
+Next owner: local execution agent
+Next task: execute the frozen Gate01-Audit once, generate the protocol terminal verdict, then stop for independent integrity audit
 ```

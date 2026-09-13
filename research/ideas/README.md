@@ -15,21 +15,20 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Train+Dev complete / Audit pending authorization** | — |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Train+Dev complete / Audit authorized** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION`.
+- **Stage**: `IDEA_008_GATE_01_AUDIT_AUTHORIZED_PENDING_EXECUTION`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
-- **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`; Train/Dev complete and Audit not executed.
+- **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`; Train/Dev complete, Audit authorized but not executed.
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`.
 - **Independent implementation verification**: `IMPLEMENTATION_INTEGRITY_PASS`.
 - **Runner integrity**: `RUNNER_INTEGRITY_PASS`.
-- **Formal Gate execution phase**: `AUTHORIZED`.
 - **Gate01-Train + Gate01-Dev**: `COMPLETE`.
-- **Gate01-Audit**: `UNOPENED / NOT_AUTHORIZED`.
+- **Gate01-Audit**: `AUTHORIZED_NOT_RUN`.
 - **Quarantine**: intact.
-- **Next owner**: `ccf-pipeline-orchestrator`.
+- **Next owner**: local execution agent.
 
 The admitted interaction remains:
 
@@ -39,7 +38,7 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The corrected runner owns device-consistent learned execution and the exact `4 configurations × 3 seeds` Dev aggregate/configuration-selection path. Train/Dev execution is complete under protocol v1.2, with every Train-only and Dev selection frozen. Gate01-Audit remains sealed pending separate authorization.
+Every Train-only and Dev selection is frozen. Gate01-Audit may now evaluate only those frozen artifacts and controls under protocol v1.2 and produce the terminal Gate classification. It cannot select, tune, retrain, or rescue the method.
 
 No scientific Gate verdict exists yet. G3/G4, R0 Holdout, and historical project test remain untouched.
 
@@ -47,13 +46,13 @@ No scientific Gate verdict exists yet. G3/G4, R0 Holdout, and historical project
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_NOT_EXECUTED
+Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / TRAIN_DEV_COMPLETE / AUDIT_AUTHORIZED_NOT_RUN
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Runner integrity: RUNNER_INTEGRITY_PASS
 Gate01-Train + Gate01-Dev: COMPLETE
-Gate01-Audit: UNOPENED / NOT_AUTHORIZED
+Gate01-Audit: AUTHORIZED_NOT_RUN
 Quarantine: intact
-Stage: IDEA_008_GATE_01_TRAIN_DEV_COMPLETE_PENDING_AUDIT_AUTHORIZATION
-Next owner: ccf-pipeline-orchestrator
+Stage: IDEA_008_GATE_01_AUDIT_AUTHORIZED_PENDING_EXECUTION
+Next owner: local execution agent
 ```
