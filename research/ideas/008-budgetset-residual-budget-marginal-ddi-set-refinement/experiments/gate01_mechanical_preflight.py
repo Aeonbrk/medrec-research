@@ -263,9 +263,7 @@ def extract_frozen_molerec_features(
     extractor_scores = _score_vector(captured["score_extractor_output"])
     if len(scores) != len(extractor_scores) or any(
         not math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-7)
-        for a, b in (
-            (scores[index], extractor_scores[index]) for index in range(len(scores))
-        )
+        for a, b in ((scores[index], extractor_scores[index]) for index in range(len(scores)))
     ):
         raise ProtocolMismatch("MoleRec returned scores inconsistent with score_extractor")
 

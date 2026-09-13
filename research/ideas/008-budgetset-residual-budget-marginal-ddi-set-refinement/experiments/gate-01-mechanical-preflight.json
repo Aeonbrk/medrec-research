@@ -1,0 +1,51 @@
+{
+  "checks": {
+    "deterministic_controls_no_seeds": true,
+    "deterministic_greedy_1swap": true,
+    "embedding_candidate_dimension": true,
+    "empty_frontier": true,
+    "exact_k_hard_outputs": true,
+    "exact_v12_split_hash": true,
+    "explicit_residual_anchor": true,
+    "independent_no_current_set_feedback": true,
+    "low_cardinality_semantics": true,
+    "matched_independent_seeds": true,
+    "ordinary_frontier": true,
+    "patient_bootstrap_recomputes_frontier": true,
+    "same_frozen_no_grad_forward": true,
+    "t_two_recomputes_state": true,
+    "terminal_precedence": true
+  },
+  "formal_gate_execution": "NOT_RUN",
+  "frozen_molerec_integration": {
+    "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+    "dataset_id": "molerec-table1-comparison-v1-1",
+    "embedding_candidate_dimension": 131,
+    "embedding_rank": 2,
+    "embedding_shape": [
+      131,
+      64
+    ],
+    "integration_status": "PASS",
+    "model_eval": true,
+    "no_gradient": true,
+    "partition": "canonical Comparison Train only",
+    "profile": "molerec-embedding",
+    "same_forward": true,
+    "score_candidate_dimension": 131,
+    "score_extractor_consistent": true,
+    "score_shape": [
+      131
+    ],
+    "source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "validated_real": true
+  },
+  "gate01_audit": "UNOPENED",
+  "protocol_revision": "v1.2",
+  "quarantine": "INTACT",
+  "record_type": "IDEA_008_GATE_01_MECHANICAL_PREFLIGHT",
+  "schema_version": "1.0",
+  "scientific_metrics_generated": false,
+  "training": "NOT_RUN",
+  "verdict": "MECHANICAL_PREFLIGHT_PASS"
+}
