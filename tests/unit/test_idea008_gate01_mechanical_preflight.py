@@ -550,6 +550,30 @@ def test_public_record_distinguishes_mechanical_status_from_gate_status() -> Non
         ]
         == "STOP_IMPLEMENTATION_MISMATCH"
     )
+    malformed_boolean = _validated_integration()
+    malformed_boolean["model_eval"] = "false"
+    assert (
+        MODULE.build_mechanical_preflight_record(synthetic_checks, integration=malformed_boolean)[
+            "verdict"
+        ]
+        == "STOP_IMPLEMENTATION_MISMATCH"
+    )
+    malformed_width = _validated_integration()
+    malformed_width["embedding_shape"] = [131, True]
+    assert (
+        MODULE.build_mechanical_preflight_record(synthetic_checks, integration=malformed_width)[
+            "verdict"
+        ]
+        == "STOP_IMPLEMENTATION_MISMATCH"
+    )
+    malformed_check = dict(synthetic_checks)
+    malformed_check["ordinary_frontier"] = "false"
+    assert (
+        MODULE.build_mechanical_preflight_record(
+            malformed_check, integration=_validated_integration()
+        )["verdict"]
+        == "STOP_IMPLEMENTATION_MISMATCH"
+    )
     assert (
         MODULE.build_mechanical_preflight_record({"a": True})["verdict"]
         == "STOP_IMPLEMENTATION_MISMATCH"

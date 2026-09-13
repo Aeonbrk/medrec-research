@@ -1196,7 +1196,7 @@ def build_mechanical_preflight_record(
 ) -> dict[str, Any]:
     """Build a public-safe record with a mandatory real-backbone gate."""
 
-    check_values = {str(name): bool(value) for name, value in checks.items()}
+    check_values = {str(name): value is True for name, value in checks.items()}
     synthetic_passed = SYNTHETIC_MECHANICAL_CHECKS.issubset(check_values) and all(
         check_values[name] for name in SYNTHETIC_MECHANICAL_CHECKS
     )
@@ -1319,7 +1319,7 @@ def validate_frozen_molerec_integration_result(
     if integration.get("partition") != "canonical Comparison Train only":
         return False
     if not all(
-        bool(integration.get(name, False))
+        integration.get(name) is True
         for name in ("model_eval", "no_gradient", "same_forward", "score_extractor_consistent")
     ):
         return False
@@ -1338,7 +1338,7 @@ def validate_frozen_molerec_integration_result(
         return False
     if len(embedding_shape) != 2 or embedding_shape[0] != CANDIDATE_COUNT:
         return False
-    return isinstance(embedding_shape[1], int) and embedding_shape[1] > 0
+    return type(embedding_shape[1]) is int and embedding_shape[1] > 0
 
 
 def write_public_record(path: Path, record: Mapping[str, Any]) -> None:
