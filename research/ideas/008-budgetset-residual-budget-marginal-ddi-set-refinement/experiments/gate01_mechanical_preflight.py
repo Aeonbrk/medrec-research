@@ -263,7 +263,9 @@ def extract_frozen_molerec_features(
     extractor_scores = _score_vector(captured["score_extractor_output"])
     if len(scores) != len(extractor_scores) or any(
         not math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-7)
-        for a, b in zip(scores, extractor_scores)
+        for a, b in (
+            (scores[index], extractor_scores[index]) for index in range(len(scores))
+        )
     ):
         raise ProtocolMismatch("MoleRec returned scores inconsistent with score_extractor")
 
@@ -1201,11 +1203,12 @@ def build_mechanical_preflight_record(
         check_values[name] for name in SYNTHETIC_MECHANICAL_CHECKS
     )
     integration_mapping = integration if isinstance(integration, Mapping) else None
-    integration_status = (
-        "MISSING"
-        if integration_mapping is None
-        else str(integration_mapping.get("integration_status", "MALFORMED"))
-    )
+    if integration is None:
+        integration_status = "MISSING"
+    elif integration_mapping is None:
+        integration_status = "MALFORMED"
+    else:
+        integration_status = str(integration_mapping.get("integration_status", "MALFORMED"))
     integration_passed = validate_frozen_molerec_integration_result(integration_mapping)
     if not synthetic_passed:
         verdict = "STOP_IMPLEMENTATION_MISMATCH"
@@ -1375,7 +1378,7 @@ def _self_check_record() -> dict[str, Any]:
     def close_sequence(left: Sequence[float], right: Sequence[float]) -> bool:
         return len(left) == len(right) and all(
             math.isclose(float(a), float(b), rel_tol=1e-9, abs_tol=1e-9)
-            for a, b in zip(left, right)
+            for a, b in ((left[index], right[index]) for index in range(len(left)))
         )
 
     class _Hook:

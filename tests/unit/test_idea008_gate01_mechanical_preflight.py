@@ -545,6 +545,12 @@ def test_public_record_distinguishes_mechanical_status_from_gate_status() -> Non
         == "STOP_IMPLEMENTATION_MISMATCH"
     )
     assert (
+        MODULE.build_mechanical_preflight_record(synthetic_checks, integration="malformed")[
+            "verdict"
+        ]
+        == "STOP_IMPLEMENTATION_MISMATCH"
+    )
+    assert (
         MODULE.build_mechanical_preflight_record({"a": True})["verdict"]
         == "STOP_IMPLEMENTATION_MISMATCH"
     )
