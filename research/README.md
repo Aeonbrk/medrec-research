@@ -19,22 +19,25 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 
 ## Current scientific state
 
-- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING`.
+- **Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED`.
 - **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`.
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
 - **Gate 01 protocol**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md).
+- **Implementation authorization**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md).
 - **Historical v1.0 audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL`.
 - **Historical v1.1 re-audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md), verdict `DESIGN_INTEGRITY_FAIL`.
 - **v1.2 re-audit**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.2.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.2.md), verdict `DESIGN_INTEGRITY_PASS`.
-- **Implementation**: `NOT_STARTED`.
+- **Implementation**: `AUTHORIZED_NOT_STARTED`.
+- **Mechanical preflight**: `AUTHORIZED_NOT_RUN`.
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`.
-- **Experiment execution**: `NOT_AUTHORIZED`.
+- **Formal Gate execution**: `NOT_AUTHORIZED`.
 - **Gate01-Audit**: unopened.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate.
-- **Next routing**: `ccf-pipeline-orchestrator` to route implementation / mechanical preflight only.
+- **Current implementation owner**: local coding agent.
+- **Next routing after successful preflight**: independent implementation/protocol verification, then `ccf-pipeline-orchestrator`.
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No empirical Gate result exists. Protocol v1.2 is independently integrity-approved, but this design pass does not itself authorize model training, Gate01-Audit access, or formal Gate execution.
+Idea 008 remains admitted for one bounded kill-first method cycle. No empirical Gate result exists. Protocol v1.2 is independently integrity-approved. The only newly authorized phase is implementation plus mechanical preflight; this does not authorize model training, Gate01-Audit access, or formal Gate execution.
 
 ## Active Idea 008 boundary
 
@@ -82,13 +85,14 @@ Gate01-Audit remains unopened.
 ```text
 Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
-Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING
-Implementation: NOT_STARTED
-Training: NOT_AUTHORIZED
-Execution: NOT_AUTHORIZED
+Stage: IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED
+Implementation: AUTHORIZED_NOT_STARTED
+Mechanical preflight: AUTHORIZED_NOT_RUN
+Formal training: NOT_AUTHORIZED
+Formal Gate execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
-Next phase to route: implementation / mechanical preflight only
-Formal Gate execution: NOT_AUTHORIZED
+Current implementation owner: local coding agent
+After successful preflight: independent implementation/protocol verification
+Then: ccf-pipeline-orchestrator
 ```

@@ -1,73 +1,78 @@
-# Handoff: Idea 008 Gate 01 v1.2 Design Integrity Passed
+# Handoff: Idea 008 Gate 01 Implementation / Mechanical Preflight Authorized
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING`
+- **Current Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.2`
 - **Protocol state**: `DESIGNED_NOT_EXECUTED / DESIGN_INTEGRITY_PASS`
-- **Historical v1.0 audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`
-- **Historical v1.1 re-audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md`
-- **v1.2 re-audit**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.2.md`
-- **Integrity verdict**: `DESIGN_INTEGRITY_PASS`
-- **Implementation**: `NOT_STARTED`
+- **Implementation authorization**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`
+- **Implementation**: `AUTHORIZED_NOT_STARTED`
+- **Mechanical preflight**: `AUTHORIZED_NOT_RUN`
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`
-- **Experiment execution**: `NOT_AUTHORIZED`
-- **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate
-- **Gate01-Audit**: unopened
-- **Next owner**: `ccf-pipeline-orchestrator`
-- **Next task**: route to implementation / mechanical preflight only; do not execute Gate 01
+- **Formal Gate execution**: `NOT_AUTHORIZED`
+- **Gate01-Audit**: `UNOPENED`
+- **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside this phase
+- **Implementation owner**: local coding agent
+- **Next owner after successful preflight**: independent implementation/protocol verifier, then `ccf-pipeline-orchestrator`
 
-## Frozen scientific question
+## Routing decision
 
-> Under identical frozen recommendation scores, DDI information, candidate pool, requested DDI target, and exact per-patient medication cardinality, does residual-budget marginal-DDI joint set refinement provide incremental utility–DDI frontier value beyond cheap equal-information direct optimization and independent budget conditioning?
+Protocol v1.2 has already passed independent design-integrity re-audit. The pipeline therefore advances only to bounded implementation and mechanical preflight. The design and integrity review are not reopened.
 
-The admitted claim remains:
+The local coding agent is authorized to implement the minimum Idea-local code needed to realize protocol v1.2 and to run mechanical tests that establish deterministic implementation faithfulness. It is not authorized to train BudgetSet or Independent, select real-run checkpoints or hyperparameters, open Gate01-Audit, produce scientific Gate evidence, or issue a PASS/KILL Gate verdict.
 
-> At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
+The exact implementation and access boundary is frozen in:
 
-The scientific interaction remains:
+`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`
+
+## Frozen implementation boundary
+
+The implementation must preserve the protocol's admitted scientific identity, including:
 
 ```text
-requested residual constraint slack
-× composition-dependent marginal DDI cost
-× iterative fixed-K set refinement
+q0
+-> c0, rho0
+-> z1, q1
+-> c1, rho1
+-> z2
+-> exact TopK(K_x)
 ```
 
-## Integrity re-audit result
+with the explicit `+s_i` residual anchor and recomputation after the first update. BudgetSet and Independent must receive `s_i(x)` and `e_i(x)` from the same pinned frozen MoleRec forward, where `e_i(x)` is `molecule_embeddings[i]` immediately before `score_extractor`.
 
-Protocol v1.2 closes the sole remaining v1.1 B6 blocker. For every required seed × primary-region × killer comparison, Section 12.2 now returns exactly one favorable/non-favorable boolean whenever the sampled killer family is valid and non-empty.
+A narrow frozen-backbone integration check may use the existing Comparison-qualified `molerec-embedding` checkpoint on canonical Comparison Train only, strictly to establish shared-forward provenance, `eval()` / no-gradient behavior, and 131-candidate tensor alignment. It may not generate scientific utility/DDI evidence.
 
-- ordinary eligible frontier: unchanged `G_{r,C} > 0` favorable rule;
-- empty eligible frontier: unique safest endpoint by lower hard DDI, then higher Jaccard, then canonical control-point order; `H_{r,C} >= 0` is favorable;
-- required killer family with zero sampled points: `STOP_INVALID_GATE_IMPLEMENTATION`;
-- Greedy remains deterministic with no artificial seeds;
-- Independent remains matched seed-by-seed;
-- each required killer-region comparison still requires `>=2/3` favorable BudgetSet seeds;
-- aggregate material-frontier semantics, `delta_U=0.005`, `delta_R=0.005`, and patient-clustered bootstrap requirements are unchanged.
+## Mechanical preflight result semantics
 
-B1–B5 and B7 remain PASS. No design regression or new execution blocker was found. Scientific identity and PASS/KILL determinism are preserved.
+Successful implementation faithfulness may be recorded only as:
 
-## Authorization boundary
+```text
+MECHANICAL_PREFLIGHT_PASS
+```
 
-Do not perform formal Gate execution or recommendation-model training. Do not open Gate01-Audit or access G3/G4, R0 Holdout, or historical project test until a later explicitly authorized phase requires it.
+A frozen-contract mismatch yields:
 
-The next phase is implementation / mechanical preflight routing, not formal Gate execution.
+```text
+STOP_IMPLEMENTATION_MISMATCH
+```
+
+Neither state is a scientific Gate result.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
-Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING
-Implementation: NOT_STARTED
-Training: NOT_AUTHORIZED
-Execution: NOT_AUTHORIZED
-Quarantine: intact
-Gate01-Audit: UNOPENED
-Next owner: ccf-pipeline-orchestrator
-Next phase to route: implementation / mechanical preflight only
+Stage: IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED
+Implementation: AUTHORIZED_NOT_STARTED
+Mechanical preflight: AUTHORIZED_NOT_RUN
+Formal training: NOT_AUTHORIZED
 Formal Gate execution: NOT_AUTHORIZED
+Gate01-Audit: UNOPENED
+Quarantine: intact
+Current implementation owner: local coding agent
+After successful preflight: independent implementation/protocol verification
+Then: ccf-pipeline-orchestrator
 ```
