@@ -1,8 +1,8 @@
-# Handoff: Idea 008 Gate 01 Execution Authorized Pending Runner Implementation
+# Handoff: Idea 008 Gate 01 Runner Implemented / Integrity Verification Pending
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION`
+- **Current Stage**: `IDEA_008_GATE_01_RUNNER_IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.2`
@@ -10,23 +10,24 @@
 - **Mechanical preflight**: `COMPLETE / MECHANICAL_PREFLIGHT_PASS`
 - **Implementation integrity**: `IMPLEMENTATION_INTEGRITY_PASS`
 - **Formal Gate 01 execution phase**: `AUTHORIZED`
-- **Execution-specific training runner**: `REQUIRED / NOT_YET_IMPLEMENTED`
-- **Runner implementation**: `AUTHORIZED`
+- **Execution-specific training runner**: `IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
+- **Runner implementation**: `IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
 - **Formal recommendation-model training**: `NOT_YET_AUTHORIZED`
+- **Implementation authorization**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`
 - **Gate01-Audit**: `UNOPENED`
 - **G3/G4**: `UNTOUCHED`
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
 - **Quarantine**: intact
-- **Next owner**: local coding agent
+- **Next owner**: independent runner-integrity verifier / pipeline coordinator
 
 ## Routing decision
 
 Gate 01 v1.2 is scientifically execution-ready. No design-integrity or mechanical-preflight blocker remains.
 
-The repository does not yet contain the execution-specific learned training runner required to realize the frozen BudgetSet and Independent MLPs, objective, optimizer, seed/hyperparameter sweep, Dev-only checkpoint/configuration selection, and Audit-only terminal evaluation. The existing `gate01_mechanical_preflight.py` intentionally provides protocol semantics and frozen MoleRec extraction but does not train either learned family.
+The repository now contains the execution-specific learned training runner and targeted tests required to realize the frozen BudgetSet and Independent MLPs, objective, optimizer, seed/hyperparameter sweep, Dev-only checkpoint/configuration selection, and Audit-only terminal evaluation. The existing `gate01_mechanical_preflight.py` remains the owner of protocol semantics and frozen MoleRec extraction.
 
-Therefore the pipeline enters the formal Gate-execution phase, while actual recommendation-model training remains withheld until the new runner is implemented and checked against protocol v1.2. This is bounded downstream implementation, not a protocol redesign or a new experiment-design cycle.
+The runner and tests are implemented, but independent runner-integrity verification is still required before any recommendation-model training. This remains bounded downstream implementation, not a protocol redesign or a new experiment-design cycle.
 
 The complete authorization boundary is frozen in:
 
@@ -52,11 +53,12 @@ Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Formal Gate execution phase: AUTHORIZED
-Runner implementation: AUTHORIZED / REQUIRED
+Execution-specific learned runner: IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
+Runner implementation: IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
 Formal recommendation-model training: NOT_YET_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION
-Next owner: local coding agent
-Next task: implement and mechanically verify the frozen execution runner only; do not train or open Gate01-Audit
+Stage: IDEA_008_GATE_01_RUNNER_IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
+Next owner: independent runner-integrity verifier / pipeline coordinator
+Next task: verify the execution runner against protocol v1.2; do not train or open Gate01-Audit
 ```

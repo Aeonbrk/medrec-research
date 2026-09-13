@@ -3,8 +3,8 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `ADMITTED / GATE_01_EXECUTION_PHASE_AUTHORIZED`
-- **Stage**: `IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION`
+- **Status**: `ADMITTED / IDEA_008_GATE_01_RUNNER_IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
+- **Stage**: `IDEA_008_GATE_01_RUNNER_IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
@@ -13,16 +13,22 @@
 - **Mechanical preflight**: [`experiments/gate-01-mechanical-preflight.json`](experiments/gate-01-mechanical-preflight.json), verdict `MECHANICAL_PREFLIGHT_PASS`
 - **Independent implementation verification**: [`experiments/gate-01-implementation-integrity-verification.md`](experiments/gate-01-implementation-integrity-verification.md), verdict `IMPLEMENTATION_INTEGRITY_PASS`
 - **Formal execution authorization**: [`experiments/gate-01-execution-authorization.md`](experiments/gate-01-execution-authorization.md), verdict `FORMAL_GATE_01_EXECUTION_AUTHORIZED`
-- **Execution-specific learned runner**: `REQUIRED / NOT_YET_IMPLEMENTED`
-- **Runner implementation**: `AUTHORIZED`
+- **Execution-specific learned runner**: `IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
+- **Runner implementation**: `IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION`
 - **Formal training**: `NOT_YET_AUTHORIZED`
+- **Implementation authorization**: [`experiments/gate-01-implementation-authorization.md`](experiments/gate-01-implementation-authorization.md)
+- **Historical v1.0 audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL`
+- **Historical v1.1 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.1.md`](experiments/gate-01-design-integrity-reaudit-v1.1.md), verdict `DESIGN_INTEGRITY_FAIL`
+- **v1.2 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.2.md`](experiments/gate-01-design-integrity-reaudit-v1.2.md), verdict `DESIGN_INTEGRITY_PASS`
+- **Integrity state**: `DESIGN_INTEGRITY_PASS`
+- **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`
+- **Formal training**: `NOT_YET_AUTHORIZED`
+- **Formal Gate execution**: `AUTHORIZED / RUNNER_INTEGRITY_PENDING`
 - **Gate01-Audit**: unopened
 - **Quarantine**: intact
-- **Next owner**: local coding agent
+- **Next owner**: independent runner-integrity verifier / pipeline coordinator
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No scientific Gate result exists. Protocol v1.2 and the existing mechanical-preflight implementation surface are already integrity-approved.
-
-The formal Gate-execution phase is now authorized because there is no remaining design or protocol blocker. The repository still lacks the execution-specific learned runner, so recommendation-model training remains withheld until that runner is implemented and checked against the frozen protocol. This is downstream implementation only; it does not reopen design review.
+Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 scientific experiment has been executed. Protocol v1.2, the existing mechanical-preflight implementation surface, and the formal execution authorization are integrity-approved. The bounded Idea-local runner and targeted tests are implemented; independent runner-integrity verification is now pending under the exact scope in `experiments/gate-01-execution-authorization.md`. Recommendation-model training and Gate01-Audit access remain unauthorized.
 
 ## Scientific question
 
@@ -112,9 +118,9 @@ The six-value fixed-lambda family remains supporting evidence rather than a thir
 
 The execution contract is frozen in [`experiments/gate-01-execution-authorization.md`](experiments/gate-01-execution-authorization.md).
 
-The immediate next step is an Idea-local `gate01_execution.py` runner plus targeted unit tests. It must realize the already-frozen BudgetSet and Independent MLPs, objective, optimizer, seed/LR/eta grid, checkpoint selection, configuration selection, deterministic controls, metrics, bootstrap, seed-robustness rule, and terminal precedence. It may reuse `gate01_mechanical_preflight.py`; it must not redesign the protocol.
+The Idea-local `gate01_execution.py` runner and targeted unit tests now realize the already-frozen BudgetSet and Independent MLPs, objective, optimizer, seed/LR/eta grid, checkpoint selection, configuration selection, deterministic controls, metrics, bootstrap, seed-robustness rule, and terminal precedence. It reuses `gate01_mechanical_preflight.py` for verified protocol semantics; it does not redesign the protocol.
 
-Formal learned-family training is not yet authorized. After the new runner passes a narrow implementation-integrity check, the pipeline may separately activate training on `Gate01-Train` and Dev-only selection on `Gate01-Dev`.
+Formal learned-family training is not yet authorized. After the new runner passes a narrow independent runner-integrity check, the pipeline may separately activate training on `Gate01-Train` and Dev-only selection on `Gate01-Dev`.
 
 `Gate01-Audit` remains unopened until all Train/Dev selections are frozen. When later opened, it is evaluation-only and may not influence epoch, seed, checkpoint, configuration, or hyperparameter selection.
 
@@ -137,10 +143,13 @@ Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Formal Gate execution phase: AUTHORIZED
-Runner implementation: AUTHORIZED / REQUIRED
+Execution-specific learned runner: IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
+Runner implementation: IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
 Formal training: NOT_YET_AUTHORIZED
+Integrity state: DESIGN_INTEGRITY_PASS
+Implementation: IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_EXECUTION_AUTHORIZED_PENDING_RUNNER_IMPLEMENTATION
-Next owner: local coding agent
+Stage: IDEA_008_GATE_01_RUNNER_IMPLEMENTED_PENDING_INTEGRITY_VERIFICATION
+Next owner: independent runner-integrity verifier / pipeline coordinator
 ```
