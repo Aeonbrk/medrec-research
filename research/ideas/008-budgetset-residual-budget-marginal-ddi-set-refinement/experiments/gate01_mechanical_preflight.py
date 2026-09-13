@@ -1265,6 +1265,8 @@ def frozen_molerec_integration_summary(
     mechanical preflight verdict.
     """
 
+    if type(validated_real) is not bool:
+        raise ProtocolMismatch("validated_real must be a boolean")
     validate_frozen_molerec_identity(
         source_revision=features.source_revision,
         profile=features.profile,

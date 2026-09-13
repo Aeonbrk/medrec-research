@@ -162,6 +162,9 @@ def test_frozen_forward_produces_s_and_e_from_one_eval_no_grad_forward() -> None
         )
         is True
     )
+    for malformed_validation in ("false", 1):
+        with pytest.raises(MODULE.ProtocolMismatch):
+            MODULE.frozen_molerec_integration_summary(features, validated_real=malformed_validation)
     with pytest.raises(MODULE.ProtocolMismatch):
         MODULE.frozen_molerec_integration_summary(replace(features, dataset_id="not-authorized"))
 
