@@ -1,78 +1,46 @@
-# Handoff: Idea 008 Gate 01 Implementation / Mechanical Preflight Authorized
+# Handoff: Idea 008 Gate 01 Implementation Integrity Passed
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED`
+- **Current Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.2`
 - **Protocol state**: `DESIGNED_NOT_EXECUTED / DESIGN_INTEGRITY_PASS`
 - **Implementation authorization**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`
-- **Implementation**: `AUTHORIZED_NOT_STARTED`
-- **Mechanical preflight**: `AUTHORIZED_NOT_RUN`
+- **Mechanical preflight record**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-mechanical-preflight.json`
+- **Independent implementation verification**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-integrity-verification.md`
+- **Implementation / mechanical preflight**: `COMPLETE / MECHANICAL_PREFLIGHT_PASS`
+- **Implementation integrity**: `IMPLEMENTATION_INTEGRITY_PASS`
+- **Frozen MoleRec mechanical integration**: `PASS`
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`
 - **Formal Gate execution**: `NOT_AUTHORIZED`
 - **Gate01-Audit**: `UNOPENED`
-- **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside this phase
-- **Implementation owner**: local coding agent
-- **Next owner after successful preflight**: independent implementation/protocol verifier, then `ccf-pipeline-orchestrator`
+- **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain outside the Gate
+- **Next owner**: `ccf-pipeline-orchestrator`
+
+## Verification result
+
+The authorized Idea-local mechanical implementation has been independently checked against Gate 01 protocol v1.2.
+
+The prior false-PASS path is closed: a synthetic-only self-check now returns `MECHANICAL_PREFLIGHT_INCOMPLETE`, while final `MECHANICAL_PREFLIGHT_PASS` requires a validated real frozen-MoleRec integration result. The canonical record contains the pinned upstream revision/checkpoint identity, canonical Comparison Train-only boundary, `eval()` / no-gradient execution, one-forward `s_i/e_i(x)` provenance, and 131-candidate shape alignment.
+
+The verified implementation also preserves the frozen recurrence, exact `K_x`, low-cardinality semantics, deterministic Greedy+1Swap and fixed-lambda controls, Independent no-current-set-feedback boundary, ordinary and empty-frontier comparators, matched-seed logic, patient-cluster bootstrap semantics, learned-selection keys, and terminal precedence.
+
+No scientific Gate result exists. No recommendation-model training occurred. Gate01-Audit and all quarantined partitions remain unopened.
 
 ## Routing decision
-
-Protocol v1.2 has already passed independent design-integrity re-audit. The pipeline therefore advances only to bounded implementation and mechanical preflight. The design and integrity review are not reopened.
-
-The local coding agent is authorized to implement the minimum Idea-local code needed to realize protocol v1.2 and to run mechanical tests that establish deterministic implementation faithfulness. It is not authorized to train BudgetSet or Independent, select real-run checkpoints or hyperparameters, open Gate01-Audit, produce scientific Gate evidence, or issue a PASS/KILL Gate verdict.
-
-The exact implementation and access boundary is frozen in:
-
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`
-
-## Frozen implementation boundary
-
-The implementation must preserve the protocol's admitted scientific identity, including:
-
-```text
-q0
--> c0, rho0
--> z1, q1
--> c1, rho1
--> z2
--> exact TopK(K_x)
-```
-
-with the explicit `+s_i` residual anchor and recomputation after the first update. BudgetSet and Independent must receive `s_i(x)` and `e_i(x)` from the same pinned frozen MoleRec forward, where `e_i(x)` is `molecule_embeddings[i]` immediately before `score_extractor`.
-
-A narrow frozen-backbone integration check may use the existing Comparison-qualified `molerec-embedding` checkpoint on canonical Comparison Train only, strictly to establish shared-forward provenance, `eval()` / no-gradient behavior, and 131-candidate tensor alignment. It may not generate scientific utility/DDI evidence.
-
-## Mechanical preflight result semantics
-
-Successful implementation faithfulness may be recorded only as:
-
-```text
-MECHANICAL_PREFLIGHT_PASS
-```
-
-A frozen-contract mismatch yields:
-
-```text
-STOP_IMPLEMENTATION_MISMATCH
-```
-
-Neither state is a scientific Gate result.
-
-## Routing
 
 ```text
 Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
-Stage: IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED
-Implementation: AUTHORIZED_NOT_STARTED
-Mechanical preflight: AUTHORIZED_NOT_RUN
+Stage: IDEA_008_GATE_01_IMPLEMENTATION_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING
+Implementation/mechanical preflight: COMPLETE / MECHANICAL_PREFLIGHT_PASS
+Independent implementation verification: IMPLEMENTATION_INTEGRITY_PASS
 Formal training: NOT_AUTHORIZED
 Formal Gate execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Current implementation owner: local coding agent
-After successful preflight: independent implementation/protocol verification
-Then: ccf-pipeline-orchestrator
+Next owner: ccf-pipeline-orchestrator
+Next task: decide formal Gate-execution authorization only; do not execute Gate 01 automatically
 ```

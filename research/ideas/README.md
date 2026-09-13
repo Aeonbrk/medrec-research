@@ -15,25 +15,25 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Gate 01 v1.2 implementation + mechanical preflight authorized** | — |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / Gate 01 v1.2 implementation integrity pass** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED`.
+- **Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
 - **Protocol**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md).
 - **Implementation authorization**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-authorization.md).
+- **Mechanical preflight**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-mechanical-preflight.json`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-mechanical-preflight.json), verdict `MECHANICAL_PREFLIGHT_PASS`.
+- **Independent implementation verification**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-integrity-verification.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-implementation-integrity-verification.md), verdict `IMPLEMENTATION_INTEGRITY_PASS`.
 - **Historical v1.0 audit**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-audit.md), preserved unchanged.
 - **Historical v1.1 re-audit**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.1.md), preserved unchanged.
 - **v1.2 re-audit**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.2.md`](008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-design-integrity-reaudit-v1.2.md), verdict `DESIGN_INTEGRITY_PASS`.
-- **Implementation**: `AUTHORIZED_NOT_STARTED`.
-- **Mechanical preflight**: `AUTHORIZED_NOT_RUN`.
+- **Implementation / mechanical preflight**: `COMPLETE / MECHANICAL_PREFLIGHT_PASS`.
 - **Formal training / Gate execution**: `NOT_AUTHORIZED`.
 - **Gate01-Audit**: unopened.
 - **Quarantine**: intact.
-- **Current implementation owner**: local coding agent.
-- **Next owner after successful preflight**: independent implementation/protocol verifier, then `ccf-pipeline-orchestrator`.
+- **Next owner**: `ccf-pipeline-orchestrator`.
 
 The admitted interaction remains:
 
@@ -43,21 +43,20 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-B1–B7 pass independent pre-execution design-integrity audit. The pipeline now authorizes only Idea-local implementation and mechanical verification of protocol v1.2. No scientific Gate evidence exists yet.
+B1–B7 pass independent pre-execution design-integrity audit. The authorized implementation/mechanical-preflight surface also passes independent verification, including the real frozen-MoleRec Train-only extraction check. No scientific Gate evidence exists yet.
 
 ## Routing
 
 ```text
 Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
-Stage: IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED
-Implementation: AUTHORIZED_NOT_STARTED
-Mechanical preflight: AUTHORIZED_NOT_RUN
+Stage: IDEA_008_GATE_01_IMPLEMENTATION_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING
+Implementation/mechanical preflight: COMPLETE / MECHANICAL_PREFLIGHT_PASS
+Independent implementation verification: IMPLEMENTATION_INTEGRITY_PASS
 Formal training: NOT_AUTHORIZED
 Formal Gate execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Current implementation owner: local coding agent
-After successful preflight: independent implementation/protocol verification
-Then: ccf-pipeline-orchestrator
+Next owner: ccf-pipeline-orchestrator
+Next task: decide formal Gate-execution authorization only; do not execute Gate 01 automatically
 ```

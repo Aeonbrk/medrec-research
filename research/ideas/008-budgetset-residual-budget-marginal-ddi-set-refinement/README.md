@@ -3,37 +3,35 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `ADMITTED / GATE_01_V1_2_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED`
-- **Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED`
+- **Status**: `ADMITTED / GATE_01_V1_2_IMPLEMENTATION_INTEGRITY_PASS`
+- **Stage**: `IDEA_008_GATE_01_IMPLEMENTATION_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
 - **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), v1.2 designed and not executed
 - **Implementation authorization**: [`experiments/gate-01-implementation-authorization.md`](experiments/gate-01-implementation-authorization.md)
+- **Mechanical preflight**: [`experiments/gate-01-mechanical-preflight.json`](experiments/gate-01-mechanical-preflight.json), verdict `MECHANICAL_PREFLIGHT_PASS`
+- **Independent implementation verification**: [`experiments/gate-01-implementation-integrity-verification.md`](experiments/gate-01-implementation-integrity-verification.md), verdict `IMPLEMENTATION_INTEGRITY_PASS`
 - **Historical v1.0 audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL`
 - **Historical v1.1 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.1.md`](experiments/gate-01-design-integrity-reaudit-v1.1.md), verdict `DESIGN_INTEGRITY_FAIL`
 - **v1.2 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.2.md`](experiments/gate-01-design-integrity-reaudit-v1.2.md), verdict `DESIGN_INTEGRITY_PASS`
-- **Integrity state**: `DESIGN_INTEGRITY_PASS`
-- **Implementation**: `AUTHORIZED_NOT_STARTED`
-- **Mechanical preflight**: `AUTHORIZED_NOT_RUN`
 - **Formal training**: `NOT_AUTHORIZED`
 - **Formal Gate execution**: `NOT_AUTHORIZED`
 - **Gate01-Audit**: unopened
 - **Quarantine**: intact
-- **Current implementation owner**: local coding agent
-- **Next owner after successful preflight**: independent implementation/protocol verifier, then `ccf-pipeline-orchestrator`
+- **Next owner**: `ccf-pipeline-orchestrator`
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 scientific experiment has been executed. Protocol v1.2 is independently integrity-approved. The pipeline now authorizes only Idea-local implementation and mechanical preflight under the exact scope in `experiments/gate-01-implementation-authorization.md`; recommendation-model training, Gate01-Audit access, and formal Gate execution remain unauthorized.
+Idea 008 remains admitted for one bounded kill-first method cycle. Protocol v1.2 is independently design-integrity approved. The authorized implementation/mechanical-preflight surface is complete and independently verified, including the real frozen-MoleRec Train-only extraction check. No scientific Gate result exists, and recommendation-model training, Gate01-Audit access, and formal Gate execution remain unauthorized.
 
 ## Scientific question
 
 At exact per-patient prescription cardinality, does an iterative joint-set refiner obtain utility–DDI frontier value that cannot be absorbed by an equal-information deterministic fixed-K solver or by a budget-conditioned independent medication scorer?
 
-The admitted claim remains:
+The admitted claim is:
 
 > At fixed prescription cardinality, a medication-set refiner amortizes target-conditioned utility–DDI optimization by repeatedly pricing each candidate’s composition-dependent marginal DDI cost as a function of the current relaxed constraint slack.
 
-The scientific interaction remains:
+The scientific interaction under test is:
 
 ```text
 requested residual constraint slack
@@ -74,13 +72,7 @@ $$
 $$
 
 $$
-\Delta_i^{(t)}=u_i-\lambda_i^{(t)}c_i^{(t)},
-$$
-
-with the explicit frozen-score residual anchor
-
-$$
-z_i^{(t+1)}=s_i+\Delta_i^{(t)}.
+z_i^{(t+1)}=s_i+u_i-\lambda_i^{(t)}c_i^{(t)}.
 $$
 
 The final hard prescription preserves exact cardinality:
@@ -89,41 +81,26 @@ $$
 S_b=\operatorname{TopK}_{K_x}(z^{(T)}).
 $$
 
-`rho` is surrogate residual slack on relaxed `q`; it is not a hard DDI or clinical safety guarantee. Final hard-set achieved DDI is the operating-point quantity.
+`rho` is relaxed surrogate slack, not a clinical guarantee. Final hard-set achieved DDI is the operating-point quantity.
 
 ## Gate 01 protocol v1.2
 
-The authoritative scientific protocol is [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md). Its frozen scientific choices remain:
+The authoritative scientific protocol is [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md). Frozen choices include:
 
-- backbone: `MoleRec / molerec-embedding` at `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`;
-- candidate pool: complete `131` medication vocabulary;
-- `K_x`: count of Frozen Base probabilities `>= 0.5`;
-- initialization: `q^(0)=sigmoid(s)`;
-- `T=2`;
-- budgets: `0.60`, `0.80`, and `1.00` times `r_train`;
-- learned seeds: `{2002, 2003, 2004}`;
-- LR: `{3e-4, 1e-3}`;
-- `eta`: `{5, 10}`;
-- `gamma=1e-3`;
-- primary utility: Jaccard; supporting F1 and PRAUC;
-- primary killers: Fixed-K Budget-Aware Greedy + 1-Swap and Budget-Conditioned Independent Scorer;
-- fixed-lambda support: `{0, 0.25, 0.5, 1, 2, 4}`;
-- practical margins: `delta_U=0.005`, `delta_R=0.005`;
-- bootstrap: `1000` patient-clustered resamples, seed `80081`.
+- backbone `MoleRec / molerec-embedding` at `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`;
+- complete `131`-medication candidate vocabulary;
+- `K_x` from Frozen Base probability threshold `0.5`;
+- `q^(0)=sigmoid(s)` and `T=2`;
+- budgets `0.60`, `0.80`, `1.00` times `r_train`;
+- learned seeds `{2002, 2003, 2004}`;
+- LR `{3e-4, 1e-3}`, `eta` `{5, 10}`, `gamma=1e-3`;
+- primary utility Jaccard, supporting F1 and PRAUC;
+- primary killers Fixed-K Budget-Aware Greedy + 1-Swap and Budget-Conditioned Independent Scorer;
+- fixed-lambda support `{0, 0.25, 0.5, 1, 2, 4}`;
+- practical margins `delta_U=0.005`, `delta_R=0.005`;
+- `1000` patient-clustered bootstrap resamples with seed `80081`.
 
-The v1.2 re-audit confirms:
-
-- B1 residual scientific identity: PASS;
-- B2 MoleRec representation: PASS;
-- B3 deterministic patient split: PASS;
-- B4 low-cardinality execution: PASS;
-- B5 checkpoint/patience/configuration selection: PASS;
-- B6 aggregation/frontier/bootstrap/seed semantics: PASS;
-- B7 terminal precedence: PASS.
-
-For B6, a non-empty seed-specific eligible control frontier retains the existing positive utility-gap rule. An empty eligible frontier selects one unique safest sampled control endpoint by lower hard DDI, then higher Jaccard, then existing deterministic control-point order; because the branch already guarantees a strict lower-risk direction, utility equality remains favorable. This seed-level rule is zero-margin and directional only. It does not alter aggregate material-frontier or bootstrap criteria.
-
-For Greedy, the same deterministic control family is compared against each BudgetSet seed; no Greedy seeds are manufactured. For Independent, seed robustness remains matched `2002↔2002`, `2003↔2003`, `2004↔2004`, and only the matched Independent seed's sampled operating points enter the seed-level comparator. Each required killer-region comparison still requires at least `2/3` favorable BudgetSet seeds.
+The v1.2 design re-audit passes B1–B7: scientific identity, MoleRec representation, deterministic patient split, low-cardinality execution, checkpoint/patience/configuration selection, aggregation/frontier/bootstrap/seed semantics, and terminal precedence.
 
 ## Frozen killer roles
 
@@ -147,33 +124,38 @@ Independent Conditional Scorer comparable to or better than BudgetSet
 
 ### Fixed-lambda family
 
-The six-value fixed-lambda family remains supporting evidence for conditional amortization versus separately calibrated fixed operating points. It is not a third primary killer.
+The six-value fixed-lambda family is supporting evidence for conditional amortization versus separately calibrated fixed operating points. It is not a third primary killer.
+
+## Implementation / mechanical-preflight verification
+
+The verified Idea-local implementation preserves:
+
+```text
+q0
+-> c0, rho0
+-> z1, q1
+-> c1, rho1
+-> z2
+-> exact TopK(K_x)
+```
+
+The synthetic-only self-check cannot emit PASS; it returns `MECHANICAL_PREFLIGHT_INCOMPLETE` without validated real frozen-MoleRec evidence. The canonical public-safe record establishes a Train-only pinned integration with `eval()` / no-gradient execution, same-forward score/representation provenance, 131 score candidates, and a `[131, 64]` candidate-representation tensor immediately before `score_extractor`.
+
+The independent verifier also confirmed exact-cardinality and `K_x=0/1` behavior, deterministic Greedy+1Swap and fixed-lambda controls, Independent no-current-set-feedback semantics, ordinary and empty-frontier comparators, matched Independent seeds, deterministic-control seed handling, patient-cluster bootstrap multiplicity/frontier recomputation, learned-selection ordering, and terminal precedence.
+
+Mechanical success means only:
+
+```text
+MECHANICAL_PREFLIGHT_PASS
+```
+
+It is not `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES`.
 
 ## Gate 01 pass boundary
 
 A future explicitly authorized Gate may return `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` only under the frozen all-conditions logic: exact cardinality, all-target compliance, material DDI responsiveness, both hard-set composition transitions, frontier wins against both killers at both `b_L` and `b_M`, and the required `>=2/3` favorable-seed support for every killer-region comparison.
 
 A single isolated operating-point win does not pass. Inconclusive evidence does not authorize protocol rescue.
-
-## Implementation / mechanical-preflight boundary
-
-The current phase is governed by [`experiments/gate-01-implementation-authorization.md`](experiments/gate-01-implementation-authorization.md). It authorizes the minimum Idea-local code and deterministic tests needed to establish that protocol v1.2 can be implemented faithfully.
-
-Mechanical success may be recorded only as:
-
-```text
-MECHANICAL_PREFLIGHT_PASS
-```
-
-and a frozen-contract mismatch as:
-
-```text
-STOP_IMPLEMENTATION_MISMATCH
-```
-
-Neither state is a scientific Gate outcome.
-
-A narrow frozen-backbone mechanical integration check may use the existing Comparison-qualified `molerec-embedding` checkpoint on canonical Comparison Train only to establish exact `s_i/e_i(x)` provenance, `eval()` / no-gradient execution, and 131-candidate alignment. It may not produce scientific utility/DDI evidence.
 
 ## Authorization boundary
 
@@ -189,20 +171,21 @@ Also do not access:
 - new losses, targets, seeds, budgets, or tuning dimensions;
 - paper-level SOTA benchmarking.
 
+If a later formal-execution phase introduces execution-specific training runner code beyond the mechanically verified surface, that code must satisfy protocol v1.2 before it is used for Gate evidence.
+
 ## Routing
 
 ```text
 Idea 008: ADMITTED
 Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Integrity state: DESIGN_INTEGRITY_PASS
-Stage: IDEA_008_GATE_01_IMPLEMENTATION_MECHANICAL_PREFLIGHT_AUTHORIZED
-Implementation: AUTHORIZED_NOT_STARTED
-Mechanical preflight: AUTHORIZED_NOT_RUN
+Stage: IDEA_008_GATE_01_IMPLEMENTATION_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING
+Implementation/mechanical preflight: COMPLETE / MECHANICAL_PREFLIGHT_PASS
+Independent implementation verification: IMPLEMENTATION_INTEGRITY_PASS
 Formal training: NOT_AUTHORIZED
 Formal Gate execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Current implementation owner: local coding agent
-After successful preflight: independent implementation/protocol verification
-Then: ccf-pipeline-orchestrator
+Next owner: ccf-pipeline-orchestrator
+Next task: decide formal Gate-execution authorization only; do not execute Gate 01 automatically
 ```
