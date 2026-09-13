@@ -70,6 +70,31 @@ REQUIRED_MECHANICAL_CHECKS = frozenset(
         "terminal_precedence",
     }
 )
+REAL_MOLEREC_INTEGRATION_CHECKS = frozenset(
+    {
+        "same_frozen_no_grad_forward",
+        "embedding_candidate_dimension",
+    }
+)
+SYNTHETIC_MECHANICAL_CHECKS = REQUIRED_MECHANICAL_CHECKS - REAL_MOLEREC_INTEGRATION_CHECKS
+INTEGRATION_PUBLIC_FIELDS = (
+    "integration_status",
+    "validated_real",
+    "source_revision",
+    "profile",
+    "checkpoint_sha256",
+    "dataset_id",
+    "partition",
+    "model_eval",
+    "no_gradient",
+    "same_forward",
+    "score_candidate_dimension",
+    "embedding_candidate_dimension",
+    "score_shape",
+    "embedding_shape",
+    "embedding_rank",
+    "score_extractor_consistent",
+)
 
 
 class ProtocolMismatch(RuntimeError):
@@ -1169,33 +1194,75 @@ def terminal_verdict(conditions: Mapping[str, bool]) -> str:
 def build_mechanical_preflight_record(
     checks: Mapping[str, bool], *, integration: Mapping[str, Any] | None = None
 ) -> dict[str, Any]:
-    """Build a public-safe machine-readable mechanical record."""
+    """Build a public-safe record with a mandatory real-backbone gate."""
 
     check_values = {str(name): bool(value) for name, value in checks.items()}
-    passed = REQUIRED_MECHANICAL_CHECKS.issubset(check_values) and all(
-        check_values[name] for name in REQUIRED_MECHANICAL_CHECKS
+    synthetic_passed = SYNTHETIC_MECHANICAL_CHECKS.issubset(check_values) and all(
+        check_values[name] for name in SYNTHETIC_MECHANICAL_CHECKS
+    )
+    integration_mapping = integration if isinstance(integration, Mapping) else None
+    integration_status = (
+        "MISSING"
+        if integration_mapping is None
+        else str(integration_mapping.get("integration_status", "MALFORMED"))
+    )
+    integration_passed = validate_frozen_molerec_integration_result(integration_mapping)
+    if not synthetic_passed:
+        verdict = "STOP_IMPLEMENTATION_MISMATCH"
+    elif integration_passed:
+        verdict = "MECHANICAL_PREFLIGHT_PASS"
+    elif integration_status in {"MISSING", "BLOCKED", "INCOMPLETE", "UNVALIDATED"}:
+        verdict = "MECHANICAL_PREFLIGHT_INCOMPLETE"
+    else:
+        verdict = "STOP_IMPLEMENTATION_MISMATCH"
+    final_checks = {
+        name: bool(check_values.get(name, False)) for name in REQUIRED_MECHANICAL_CHECKS
+    }
+    final_checks["same_frozen_no_grad_forward"] = (
+        bool(integration_passed and integration_mapping.get("same_forward", False))
+        if integration_mapping is not None
+        else False
+    )
+    final_checks["embedding_candidate_dimension"] = (
+        bool(
+            integration_passed
+            and integration_mapping.get("embedding_candidate_dimension") == CANDIDATE_COUNT
+        )
+        if integration_mapping is not None
+        else False
     )
     record: dict[str, Any] = {
         "schema_version": "1.0",
         "record_type": "IDEA_008_GATE_01_MECHANICAL_PREFLIGHT",
         "protocol_revision": PROTOCOL_VERSION,
-        "checks": check_values,
-        "verdict": "MECHANICAL_PREFLIGHT_PASS" if passed else "STOP_IMPLEMENTATION_MISMATCH",
+        "checks": final_checks,
+        "verdict": verdict,
         "training": "NOT_RUN",
         "formal_gate_execution": "NOT_RUN",
         "gate01_audit": "UNOPENED",
         "quarantine": "INTACT",
         "scientific_metrics_generated": False,
     }
-    if integration is not None:
-        record["frozen_molerec_integration"] = dict(integration)
+    if integration_mapping is not None:
+        record["frozen_molerec_integration"] = {
+            field: integration_mapping[field]
+            for field in INTEGRATION_PUBLIC_FIELDS
+            if field in integration_mapping
+        }
     return record
 
 
 def frozen_molerec_integration_summary(
     features: FrozenMoleRecFeatures,
+    *,
+    validated_real: bool = False,
 ) -> dict[str, Any]:
-    """Return the identity/shape/boolean-only integration summary."""
+    """Return an identity/shape/boolean-only integration summary.
+
+    ``validated_real`` is deliberately explicit.  Synthetic hook fixtures may
+    exercise this extraction utility, but they cannot authorize the final
+    mechanical preflight verdict.
+    """
 
     validate_frozen_molerec_identity(
         source_revision=features.source_revision,
@@ -1204,6 +1271,8 @@ def frozen_molerec_integration_summary(
         dataset_id=features.dataset_id,
     )
     return {
+        "integration_status": "PASS" if validated_real else "UNVALIDATED",
+        "validated_real": bool(validated_real),
         "source_revision": features.source_revision,
         "profile": features.profile,
         "checkpoint_sha256": features.checkpoint_sha256,
@@ -1219,6 +1288,56 @@ def frozen_molerec_integration_summary(
         "embedding_rank": 2,
         "score_extractor_consistent": True,
     }
+
+
+def validate_frozen_molerec_integration_result(
+    integration: Mapping[str, Any] | None,
+) -> bool:
+    """Return whether a public-safe result proves the real frozen integration."""
+
+    if integration is None:
+        return False
+    if not isinstance(integration, Mapping):
+        return False
+    if integration.get("integration_status") != "PASS":
+        return False
+    if integration.get("validated_real") is not True:
+        return False
+    if {
+        "source_revision": integration.get("source_revision"),
+        "profile": integration.get("profile"),
+        "checkpoint_sha256": integration.get("checkpoint_sha256"),
+        "dataset_id": integration.get("dataset_id"),
+    } != {
+        "source_revision": UPSTREAM_MOLEREC_REVISION,
+        "profile": MOLEREC_PROFILE,
+        "checkpoint_sha256": MOLEREC_CHECKPOINT_SHA256,
+        "dataset_id": DATASET_ID,
+    }:
+        return False
+    if integration.get("partition") != "canonical Comparison Train only":
+        return False
+    if not all(
+        bool(integration.get(name, False))
+        for name in ("model_eval", "no_gradient", "same_forward", "score_extractor_consistent")
+    ):
+        return False
+    if integration.get("score_candidate_dimension") != CANDIDATE_COUNT:
+        return False
+    if integration.get("embedding_candidate_dimension") != CANDIDATE_COUNT:
+        return False
+    if integration.get("embedding_rank") != 2:
+        return False
+    try:
+        score_shape = tuple(integration.get("score_shape", ()))
+        embedding_shape = tuple(integration.get("embedding_shape", ()))
+    except TypeError:
+        return False
+    if score_shape != (CANDIDATE_COUNT,):
+        return False
+    if len(embedding_shape) != 2 or embedding_shape[0] != CANDIDATE_COUNT:
+        return False
+    return isinstance(embedding_shape[1], int) and embedding_shape[1] > 0
 
 
 def write_public_record(path: Path, record: Mapping[str, Any]) -> None:
@@ -1301,7 +1420,7 @@ def _self_check_record() -> dict[str, Any]:
             rows = [[float(index), 1.0] for index in range(CANDIDATE_COUNT)]
             return self.score_extractor(rows), None
 
-    features = extract_frozen_molerec_features(
+    _synthetic_features = extract_frozen_molerec_features(
         _Model(),
         source_revision=UPSTREAM_MOLEREC_REVISION,
         profile=MOLEREC_PROFILE,
@@ -1345,10 +1464,6 @@ def _self_check_record() -> dict[str, Any]:
         and close_sequence(
             independent.score(scores, embeddings, 0.2, [0.0] * 131, [0.0] * 131), scores
         ),
-        "same_frozen_no_grad_forward": features.same_forward
-        and features.eval_mode
-        and features.no_grad,
-        "embedding_candidate_dimension": len(features.embeddings) == CANDIDATE_COUNT,
         "t_two_recomputes_state": state_trace.q_before_update[0] != state_trace.q_before_update[1]
         and state_trace.c_before_update[1]
         == tuple(marginal_ddi(state_trace.q_before_update[1], ddi, 2)),

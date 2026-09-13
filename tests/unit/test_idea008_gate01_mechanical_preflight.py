@@ -34,6 +34,27 @@ def _ddi() -> list[list[float]]:
     ]
 
 
+def _validated_integration() -> dict[str, object]:
+    return {
+        "integration_status": "PASS",
+        "validated_real": True,
+        "source_revision": MODULE.UPSTREAM_MOLEREC_REVISION,
+        "profile": MODULE.MOLEREC_PROFILE,
+        "checkpoint_sha256": MODULE.MOLEREC_CHECKPOINT_SHA256,
+        "dataset_id": MODULE.DATASET_ID,
+        "partition": "canonical Comparison Train only",
+        "model_eval": True,
+        "no_gradient": True,
+        "same_forward": True,
+        "score_candidate_dimension": MODULE.CANDIDATE_COUNT,
+        "embedding_candidate_dimension": MODULE.CANDIDATE_COUNT,
+        "score_shape": [MODULE.CANDIDATE_COUNT],
+        "embedding_shape": [MODULE.CANDIDATE_COUNT, 64],
+        "embedding_rank": 2,
+        "score_extractor_consistent": True,
+    }
+
+
 def test_explicit_residual_anchor_in_budgetset_and_independent() -> None:
     scores = _scores()
     embeddings = _embeddings()
@@ -133,6 +154,14 @@ def test_frozen_forward_produces_s_and_e_from_one_eval_no_grad_forward() -> None
     summary = MODULE.frozen_molerec_integration_summary(features)
     assert summary["source_revision"] == MODULE.UPSTREAM_MOLEREC_REVISION
     assert summary["embedding_candidate_dimension"] == 131
+    assert summary["integration_status"] == "UNVALIDATED"
+    assert MODULE.validate_frozen_molerec_integration_result(summary) is False
+    assert (
+        MODULE.validate_frozen_molerec_integration_result(
+            MODULE.frozen_molerec_integration_summary(features, validated_real=True)
+        )
+        is True
+    )
     with pytest.raises(MODULE.ProtocolMismatch):
         MODULE.frozen_molerec_integration_summary(replace(features, dataset_id="not-authorized"))
 
@@ -486,13 +515,35 @@ def test_terminal_precedence_is_frozen_top_to_bottom() -> None:
 
 
 def test_public_record_distinguishes_mechanical_status_from_gate_status() -> None:
+    synthetic_checks = {name: True for name in MODULE.SYNTHETIC_MECHANICAL_CHECKS}
+    missing_integration = MODULE.build_mechanical_preflight_record(synthetic_checks)
+    assert missing_integration["verdict"] == "MECHANICAL_PREFLIGHT_INCOMPLETE"
+    assert missing_integration["checks"]["same_frozen_no_grad_forward"] is False
     record = MODULE.build_mechanical_preflight_record(
-        {name: True for name in MODULE.REQUIRED_MECHANICAL_CHECKS}
+        synthetic_checks,
+        integration=_validated_integration(),
     )
     assert record["verdict"] == "MECHANICAL_PREFLIGHT_PASS"
     assert record["formal_gate_execution"] == "NOT_RUN"
     assert record["gate01_audit"] == "UNOPENED"
     assert record["scientific_metrics_generated"] is False
+    assert record["checks"]["same_frozen_no_grad_forward"] is True
+    assert record["checks"]["embedding_candidate_dimension"] is True
+    assert "patient_id" not in record["frozen_molerec_integration"]
+    wrong_identity = _validated_integration()
+    wrong_identity["source_revision"] = "wrong"
+    assert (
+        MODULE.build_mechanical_preflight_record(synthetic_checks, integration=wrong_identity)[
+            "verdict"
+        ]
+        == "STOP_IMPLEMENTATION_MISMATCH"
+    )
+    malformed = _validated_integration()
+    malformed["embedding_shape"] = [130, 64]
+    assert (
+        MODULE.build_mechanical_preflight_record(synthetic_checks, integration=malformed)["verdict"]
+        == "STOP_IMPLEMENTATION_MISMATCH"
+    )
     assert (
         MODULE.build_mechanical_preflight_record({"a": True})["verdict"]
         == "STOP_IMPLEMENTATION_MISMATCH"
