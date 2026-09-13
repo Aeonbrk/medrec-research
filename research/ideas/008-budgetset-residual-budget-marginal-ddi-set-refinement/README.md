@@ -3,23 +3,24 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `ADMITTED / GATE_01_V1_2_CORRECTED_PENDING_INTEGRITY_REAUDIT`
-- **Stage**: `IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT`
+- **Status**: `ADMITTED / GATE_01_V1_2_DESIGN_INTEGRITY_PASS`
+- **Stage**: `IDEA_008_GATE_01_DESIGN_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Admission revision**: `f9ae328f1d46bc7146454678bce34a9176213788`
-- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), v1.2 corrected and not executed
+- **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), v1.2 designed and not executed
 - **Historical v1.0 audit**: [`experiments/gate-01-design-integrity-audit.md`](experiments/gate-01-design-integrity-audit.md), verdict `DESIGN_INTEGRITY_FAIL`
 - **Historical v1.1 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.1.md`](experiments/gate-01-design-integrity-reaudit-v1.1.md), verdict `DESIGN_INTEGRITY_FAIL`
-- **Integrity state**: `PENDING_REAUDIT`
+- **v1.2 re-audit**: [`experiments/gate-01-design-integrity-reaudit-v1.2.md`](experiments/gate-01-design-integrity-reaudit-v1.2.md), verdict `DESIGN_INTEGRITY_PASS`
+- **Integrity state**: `DESIGN_INTEGRITY_PASS`
 - **Implementation**: `NOT_STARTED`
 - **Training**: `NOT_AUTHORIZED`
 - **Execution**: `NOT_AUTHORIZED`
 - **Gate01-Audit**: unopened
 - **Quarantine**: intact
-- **Next owner**: `ccf-integrity-auditor`
+- **Next owner**: `ccf-pipeline-orchestrator`
 
-Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 experiment has been executed. Protocol v1.2 closes only the remaining B6 empty-frontier favorable-seed definition and remains blocked from implementation, training, and execution until independent integrity re-audit and subsequent pipeline authorization.
+Idea 008 remains admitted for one bounded kill-first method cycle. No Gate-01 experiment has been executed. Protocol v1.2 is independently integrity-approved. The next phase is pipeline routing to implementation / mechanical preflight only; recommendation-model training, Gate01-Audit access, and formal Gate execution remain unauthorized.
 
 ## Scientific question
 
@@ -107,9 +108,17 @@ The authoritative protocol is [`experiments/gate-01-protocol.md`](experiments/ga
 - practical margins: `delta_U=0.005`, `delta_R=0.005`;
 - bootstrap: `1000` patient-clustered resamples, seed `80081`.
 
-The v1.1 re-audit closed B1 residual identity, B2 MoleRec representation, B3 deterministic split, B4 low-cardinality behavior, B5 checkpoint/patience/configuration selection, and B7 verdict precedence. Those definitions are unchanged in v1.2.
+The v1.2 re-audit confirms:
 
-The v1.2 change is limited to B6 seed robustness. For each BudgetSet seed and killer-region comparison, the protocol first forms the seed-specific control points satisfying the frozen `delta_R` risk allowance. A non-empty eligible set uses the existing positive frontier-gap favorable rule. An empty eligible set selects the unique safest sampled control point by lower hard DDI, then higher Jaccard, then existing deterministic control-point order; because BudgetSet is strictly safer by construction in this branch, the seed is favorable when its Jaccard is greater than or equal to the selected endpoint's Jaccard. This seed-level test remains zero-margin and direction-only. It does not alter the aggregate material-frontier or bootstrap criteria.
+- B1 residual scientific identity: PASS;
+- B2 MoleRec representation: PASS;
+- B3 deterministic patient split: PASS;
+- B4 low-cardinality execution: PASS;
+- B5 checkpoint/patience/configuration selection: PASS;
+- B6 aggregation/frontier/bootstrap/seed semantics: PASS;
+- B7 terminal precedence: PASS.
+
+For B6, a non-empty seed-specific eligible control frontier retains the existing positive utility-gap rule. An empty eligible frontier selects one unique safest sampled control endpoint by lower hard DDI, then higher Jaccard, then existing deterministic control-point order; because the branch already guarantees a strict lower-risk direction, utility equality remains favorable. This seed-level rule is zero-margin and directional only. It does not alter aggregate material-frontier or bootstrap criteria.
 
 For Greedy, the same deterministic control family is compared against each BudgetSet seed; no Greedy seeds are manufactured. For Independent, seed robustness remains matched `2002↔2002`, `2003↔2003`, `2004↔2004`, and only the matched Independent seed's sampled operating points enter the seed-level comparator. Each required killer-region comparison still requires at least `2/3` favorable BudgetSet seeds.
 
@@ -139,18 +148,17 @@ The six-value fixed-lambda family remains supporting evidence for conditional am
 
 ## Gate 01 pass boundary
 
-A future integrity-approved and explicitly authorized Gate may return `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` only under the frozen all-conditions logic: exact cardinality, all-target compliance, material DDI responsiveness, both hard-set composition transitions, frontier wins against both killers at both `b_L` and `b_M`, and the required `>=2/3` favorable-seed support for every killer-region comparison.
+A future explicitly authorized Gate may return `PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES` only under the frozen all-conditions logic: exact cardinality, all-target compliance, material DDI responsiveness, both hard-set composition transitions, frontier wins against both killers at both `b_L` and `b_M`, and the required `>=2/3` favorable-seed support for every killer-region comparison.
 
 A single isolated operating-point win does not pass. Inconclusive evidence does not authorize protocol rescue.
 
 ## Authorization boundary
 
-Current authorization is integrity re-audit only. Do not perform:
+Current authorization is pipeline routing after design-integrity pass. Do not perform formal Gate execution or recommendation-model training, and do not open Gate01-Audit until a later route explicitly authorizes those actions.
 
-- Gate implementation;
-- model training or Gate execution;
-- Gate01-Audit access;
-- G3/G4, R0 Holdout, or historical project test access;
+Also do not access:
+
+- G3/G4, R0 Holdout, or historical project test;
 - subgroup mining or feature fishing;
 - new patient, drug, ingredient, or molecular encoders;
 - Transformer, Mamba, MoE, RL, LLM, retrieval, or unrelated architecture expansion;
@@ -158,18 +166,21 @@ Current authorization is integrity re-audit only. Do not perform:
 - new losses, targets, seeds, budgets, or tuning dimensions;
 - paper-level SOTA benchmarking.
 
+The next phase is implementation / mechanical preflight only.
+
 ## Routing
 
 ```text
 Idea 008: ADMITTED
-Gate 01 protocol v1.2: CORRECTED / DESIGNED_NOT_EXECUTED
-Integrity state: PENDING_REAUDIT
-Stage: IDEA_008_GATE_01_PROTOCOL_CORRECTED_PENDING_INTEGRITY_REAUDIT
+Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
+Integrity state: DESIGN_INTEGRITY_PASS
+Stage: IDEA_008_GATE_01_DESIGN_INTEGRITY_PASS_PENDING_PIPELINE_ROUTING
 Implementation: NOT_STARTED
 Training: NOT_AUTHORIZED
 Execution: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Next owner: ccf-integrity-auditor
-After a future integrity pass only: ccf-pipeline-orchestrator may decide execution authorization
+Next owner: ccf-pipeline-orchestrator
+Next phase to route: implementation / mechanical preflight only
+Formal Gate execution: NOT_AUTHORIZED
 ```
