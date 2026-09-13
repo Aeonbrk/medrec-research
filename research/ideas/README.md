@@ -15,22 +15,22 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / runner bounded correction required** | — |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Admitted / runner corrected pending integrity reverification** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_RUNNER_INTEGRITY_FAIL_PENDING_BOUNDED_CORRECTION`.
+- **Stage**: `IDEA_008_GATE_01_RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`, `DESIGNED_NOT_EXECUTED`.
 - **Mechanical preflight**: `MECHANICAL_PREFLIGHT_PASS`.
 - **Independent implementation verification**: `IMPLEMENTATION_INTEGRITY_PASS`.
 - **Formal Gate execution phase**: `AUTHORIZED`.
-- **Execution-specific learned runner**: `IMPLEMENTED / BOUNDED_CORRECTION_REQUIRED`.
-- **Runner integrity**: `RUNNER_INTEGRITY_FAIL`.
+- **Execution-specific learned runner**: `CORRECTED / PENDING_INTEGRITY_REVERIFICATION`.
+- **Runner integrity**: `PENDING_REVERIFICATION`.
 - **Formal recommendation-model training**: `NOT_AUTHORIZED`.
 - **Gate01-Audit**: unopened.
 - **Quarantine**: intact.
-- **Next owner**: local coding agent.
+- **Next owner**: independent runner-integrity verifier / pipeline coordinator.
 
 The admitted interaction remains:
 
@@ -40,7 +40,7 @@ requested residual constraint slack
 × iterative fixed-K set refinement
 ```
 
-The formal execution authorization remains valid. The runner-integrity audit found only bounded execution-implementation defects: the device path is not closed for ordinary CPU-extracted frozen features, and the exact `4 configurations × 3 seeds` Dev aggregate/configuration-selection path is not yet runner-owned.
+The formal execution authorization remains valid. The bounded runner correction closes device-consistent learned execution and the exact `4 configurations × 3 seeds` Dev aggregate/configuration-selection path. Independent runner-integrity reverification is still pending.
 
 No recommendation-model training or scientific Gate evidence exists. Gate01-Audit, G3/G4, R0 Holdout, and historical project test remain untouched.
 
@@ -52,10 +52,10 @@ Gate 01 protocol v1.2: DESIGN_INTEGRITY_PASS / DESIGNED_NOT_EXECUTED
 Mechanical preflight: MECHANICAL_PREFLIGHT_PASS
 Implementation integrity: IMPLEMENTATION_INTEGRITY_PASS
 Formal Gate execution phase: AUTHORIZED
-Runner integrity: RUNNER_INTEGRITY_FAIL
+Runner integrity: PENDING_REVERIFICATION
 Formal training: NOT_AUTHORIZED
 Gate01-Audit: UNOPENED
 Quarantine: intact
-Stage: IDEA_008_GATE_01_RUNNER_INTEGRITY_FAIL_PENDING_BOUNDED_CORRECTION
-Next owner: local coding agent
+Stage: IDEA_008_GATE_01_RUNNER_CORRECTED_PENDING_INTEGRITY_REVERIFICATION
+Next owner: independent runner-integrity verifier / pipeline coordinator
 ```

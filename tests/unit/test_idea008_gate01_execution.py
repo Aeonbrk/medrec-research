@@ -42,6 +42,46 @@ def _one_edge_ddi() -> list[list[float]]:
     return ddi
 
 
+def _budget_targets() -> tuple[float, float, float]:
+    return (0.60, 0.80, 1.00)
+
+
+def _dev_budget_metrics(
+    *,
+    jaccards: tuple[float, float, float] = (0.5, 0.5, 0.5),
+    violations: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    hard_ddi_values: tuple[float, float, float] | None = None,
+) -> tuple[dict[str, float], ...]:
+    hard = hard_ddi_values or _budget_targets()
+    return tuple(
+        {
+            "jaccard": float(jaccards[index]),
+            "positive_violation": float(violations[index]),
+            "hard_ddi": float(hard[index]),
+        }
+        for index in range(3)
+    )
+
+
+def _seed_result(
+    configuration: object,
+    seed: int,
+    budget_metrics: tuple[dict[str, float], ...],
+    *,
+    family: str = "BudgetSet",
+) -> object:
+    return MODULE.SeedTrainingResult(
+        family=family,
+        seed=seed,
+        configuration=configuration,
+        model=object(),
+        best_epoch=1,
+        stop_epoch=1,
+        best_evaluation={"budget_metrics": budget_metrics, "audit_u_primary": -100.0},
+        evaluations=(),
+    )
+
+
 def test_frozen_architecture_grid_and_execution_identity() -> None:
     assert MODULE.LEARNING_RATES == (3e-4, 1e-3)
     assert MODULE.ETAS == (5.0, 10.0)
@@ -265,42 +305,46 @@ def test_checkpoint_patience_and_configuration_selection_are_dev_only() -> None:
     assert selected.best["epoch"] == 1
     assert selected.stop_epoch == 6
 
-    configs = {
-        configuration: {
-            "n_compliant_config": 2,
-            "u_primary_config": 0.9,
-            "v_all_config": 0.2,
-            # An audit-shaped field is deliberately irrelevant to this API.
-            "audit_u_primary": -100.0,
-        }
-        for configuration in MODULE.CONFIGURATION_GRID
-    }
-    chosen = MODULE.select_configuration(configs)
-    assert chosen.eta == 5.0
-    assert chosen.learning_rate == 3e-4
+    budgets = _budget_targets()
+    config_results = []
+    for index, configuration in enumerate(MODULE.CONFIGURATION_GRID):
+        if index == 1:
+            metrics = _dev_budget_metrics(jaccards=(0.9, 0.9, 0.9))
+        elif index == 0:
+            metrics = _dev_budget_metrics(hard_ddi_values=(0.6, 0.81, 1.01))
+        else:
+            metrics = _dev_budget_metrics(jaccards=(0.8, 0.8, 0.8))
+        config_results.append(
+            MODULE.ConfigurationDevResult(
+                configuration=configuration,
+                seed_results=tuple(
+                    _seed_result(configuration, seed, metrics) for seed in MODULE.LEARNED_SEEDS
+                ),
+                budget_targets=budgets,
+            )
+        )
+    chosen_result = MODULE.select_configuration_result(config_results)
+    assert chosen_result.configuration.eta == 10.0
+    assert chosen_result.configuration.learning_rate == 3e-4
+    assert chosen_result.n_compliant_config == 3
+    assert chosen_result.u_primary_config == 0.9
+    assert chosen_result.v_all_config == 0.0
+    assert MODULE.select_configuration(config_results) == chosen_result.configuration
     with pytest.raises(MODULE.ProtocolMismatch):
-        MODULE.select_configuration(dict(list(configs.items())[:-1]))
+        MODULE.select_configuration(config_results[:-1])
+    with pytest.raises(MODULE.ProtocolMismatch):
+        MODULE.select_configuration(
+            {
+                configuration: {
+                    "n_compliant_config": 2,
+                    "u_primary_config": 0.9,
+                    "v_all_config": 0.2,
+                }
+                for configuration in MODULE.CONFIGURATION_GRID
+            }
+        )
     assert "audit" not in inspect.signature(MODULE.select_configuration).parameters
 
-    chosen_result = MODULE.ConfigurationDevResult(
-        configuration=chosen,
-        n_compliant_config=2,
-        u_primary_config=0.9,
-        v_all_config=0.2,
-        seed_results=tuple(
-            MODULE.SeedTrainingResult(
-                family="BudgetSet",
-                seed=seed,
-                configuration=chosen,
-                model=object(),
-                best_epoch=1,
-                stop_epoch=1,
-                best_evaluation={},
-                evaluations=(),
-            )
-            for seed in MODULE.LEARNED_SEEDS
-        ),
-    )
     seen: list[int] = []
 
     def audit(model: object, seed: int) -> dict[str, object]:
@@ -314,6 +358,223 @@ def test_checkpoint_patience_and_configuration_selection_are_dev_only() -> None:
     assert seen == list(MODULE.LEARNED_SEEDS)
 
 
+def test_configuration_records_reject_missing_and_duplicate_seed_checkpoints() -> None:
+    configuration = MODULE.CONFIGURATION_GRID[0]
+    metrics = _dev_budget_metrics()
+    with pytest.raises(MODULE.ProtocolMismatch):
+        MODULE.ConfigurationDevResult(
+            configuration=configuration,
+            seed_results=tuple(_seed_result(configuration, seed, metrics) for seed in (2002, 2003)),
+            budget_targets=_budget_targets(),
+        )
+    with pytest.raises(MODULE.ProtocolMismatch):
+        MODULE.ConfigurationDevResult(
+            configuration=configuration,
+            seed_results=tuple(
+                _seed_result(configuration, seed, metrics) for seed in (2002, 2002, 2004)
+            ),
+            budget_targets=_budget_targets(),
+        )
+
+
+def test_device_placement_supports_cpu_lists_and_detaches_frozen_features() -> None:
+    torch = _torch()
+    model = MODULE.BudgetSet(embedding_dim=3)
+    scores = torch.tensor(_scores(), dtype=torch.float32, requires_grad=True)
+    embeddings = torch.tensor(_embeddings(), dtype=torch.float32, requires_grad=True)
+    prepared = MODULE.prepare_learned_execution_inputs(
+        {
+            "scores": scores.tolist(),
+            "embeddings": embeddings.tolist(),
+            "targets": [0.0] * MODULE.CANDIDATE_COUNT,
+            "k_x": 3,
+        },
+        device=MODULE.execution_device_for_model(model, "cpu"),
+        ddi=_zero_ddi(),
+        budget=0.2,
+    )
+    assert all(value.device.type == "cpu" for value in prepared.values())
+    assert not prepared["scores"].requires_grad
+    assert not prepared["embeddings"].requires_grad
+    assert MODULE.execution_device_for_model(model).type == "cpu"
+    logits = model(
+        prepared["scores"],
+        prepared["embeddings"],
+        prepared["budget"],
+        prepared["ddi"],
+        prepared["k_x"],
+    )
+    MODULE.compute_objective(
+        logits,
+        prepared["targets"],
+        prepared["ddi"],
+        prepared["budget"],
+        prepared["k_x"],
+        eta=5.0,
+    ).backward()
+    detached = MODULE.prepare_learned_execution_inputs(
+        {
+            "scores": scores,
+            "embeddings": embeddings,
+            "targets": [0.0] * MODULE.CANDIDATE_COUNT,
+            "k_x": 3,
+        },
+        device="cpu",
+        ddi=_zero_ddi(),
+        budget=0.2,
+    )
+    detached_logits = model(
+        detached["scores"],
+        detached["embeddings"],
+        detached["budget"],
+        detached["ddi"],
+        detached["k_x"],
+    )
+    MODULE.compute_objective(
+        detached_logits,
+        detached["targets"],
+        detached["ddi"],
+        detached["budget"],
+        detached["k_x"],
+        eta=5.0,
+    ).backward()
+    assert scores.grad is None
+    assert embeddings.grad is None
+
+
+def test_independent_device_placement_moves_static_inputs_without_feedback() -> None:
+    torch = _torch()
+    model = MODULE.IndependentScorer(embedding_dim=3)
+    prepared = MODULE.prepare_learned_execution_inputs(
+        {
+            "scores": _scores(),
+            "embeddings": _embeddings(),
+            "targets": [0.0] * MODULE.CANDIDATE_COUNT,
+            "k_x": 1,
+        },
+        device="cpu",
+        ddi=_zero_ddi(),
+        budget=0.2,
+        static_d=[0.0] * MODULE.CANDIDATE_COUNT,
+        static_p=[0.0] * MODULE.CANDIDATE_COUNT,
+        independent=True,
+    )
+    assert prepared["d_static"].device == torch.device("cpu")
+    assert prepared["p_static"].device == torch.device("cpu")
+    assert not prepared["d_static"].requires_grad
+    assert not prepared["p_static"].requires_grad
+    logits = model(
+        prepared["scores"],
+        prepared["embeddings"],
+        prepared["budget"],
+        prepared["d_static"],
+        prepared["p_static"],
+    )
+    assert logits.shape == (1, MODULE.CANDIDATE_COUNT)
+
+
+def test_cuda_device_path_runs_one_synthetic_forward_backward_step() -> None:
+    torch = _torch()
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA unavailable")
+    model = MODULE.BudgetSet(embedding_dim=3).to("cuda")
+    prepared = MODULE.prepare_learned_execution_inputs(
+        {
+            "scores": _scores(),
+            "embeddings": _embeddings(),
+            "targets": [0.0] * MODULE.CANDIDATE_COUNT,
+            "k_x": 3,
+        },
+        device=MODULE.execution_device_for_model(model),
+        ddi=_zero_ddi(),
+        budget=0.2,
+    )
+    assert all(value.device.type == "cuda" for value in prepared.values())
+    optimizer = MODULE.make_adamw(model, MODULE.TrainingConfiguration(3e-4, 5.0))
+    optimizer.zero_grad(set_to_none=True)
+    logits = model(
+        prepared["scores"],
+        prepared["embeddings"],
+        prepared["budget"],
+        prepared["ddi"],
+        prepared["k_x"],
+    )
+    loss = MODULE.compute_objective(
+        logits,
+        prepared["targets"],
+        prepared["ddi"],
+        prepared["budget"],
+        prepared["k_x"],
+        eta=5.0,
+    )
+    loss.backward()
+    optimizer.step()
+    assert all(parameter.device.type == "cuda" for parameter in model.parameters())
+
+
+def test_learned_family_orchestration_runs_exact_grid_and_derives_selection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, object, int]] = []
+    budgets = _budget_targets()
+
+    def fake_train(family: str, configuration: object, seed: int, **kwargs: object) -> object:
+        del kwargs
+        calls.append((family, configuration, seed))
+        if configuration == MODULE.CONFIGURATION_GRID[1]:
+            metrics = _dev_budget_metrics(jaccards=(0.9, 0.9, 0.9))
+        else:
+            metrics = _dev_budget_metrics(hard_ddi_values=(0.7, 0.9, 1.1))
+        return _seed_result(configuration, seed, metrics, family=family)
+
+    monkeypatch.setattr(MODULE, "train_seed_configuration", fake_train)
+    selection = MODULE.train_learned_family(
+        "BudgetSet",
+        embedding_dim=3,
+        ddi=_zero_ddi(),
+        budget_targets=budgets,
+        train_batches=(),
+        dev_evaluator=lambda model: {"budget_metrics": _dev_budget_metrics()},
+    )
+    assert len(calls) == 4 * 3
+    assert {(configuration, seed) for _, configuration, seed in calls} == {
+        (configuration, seed)
+        for configuration in MODULE.CONFIGURATION_GRID
+        for seed in MODULE.LEARNED_SEEDS
+    }
+    assert len(selection.configuration_results) == 4
+    assert all(
+        tuple(result.seed for result in record.seed_results) == MODULE.LEARNED_SEEDS
+        for record in selection.configuration_results
+    )
+    assert selection.selected_configuration == MODULE.CONFIGURATION_GRID[1]
+    assert selection.selected_result.n_compliant_config == 3
+    assert selection.selected_result.u_primary_config == 0.9
+    assert len(selection.retained_checkpoints) == 3
+    assert tuple(result.seed for result in selection.retained_checkpoints) == MODULE.LEARNED_SEEDS
+    assert len(selection.runs) == 12
+
+
+def test_learned_family_orchestration_rejects_wrong_duplicate_run(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_train(family: str, configuration: object, seed: int, **kwargs: object) -> object:
+        del kwargs
+        returned_seed = 2002 if seed == 2003 else seed
+        return _seed_result(configuration, returned_seed, _dev_budget_metrics(), family=family)
+
+    monkeypatch.setattr(MODULE, "train_seed_configuration", fake_train)
+    with pytest.raises(MODULE.ProtocolMismatch):
+        MODULE.train_learned_family(
+            "BudgetSet",
+            embedding_dim=3,
+            ddi=_zero_ddi(),
+            budget_targets=_budget_targets(),
+            train_batches=(),
+            dev_evaluator=lambda model: {"budget_metrics": _dev_budget_metrics()},
+        )
+
+
 def test_exact_k_output_uses_preflight_topk_tie_breaking() -> None:
     torch = _torch()
     model = MODULE.BudgetSet(embedding_dim=3)
@@ -323,7 +584,7 @@ def test_exact_k_output_uses_preflight_topk_tie_breaking() -> None:
     with torch.no_grad():
         for parameter in model.parameters():
             parameter.zero_()
-    vocabulary = tuple(reversed(f"M{index:03d}" for index in range(131)))
+    vocabulary = tuple(reversed(tuple(f"M{index:03d}" for index in range(131))))
     assert model.hard_set(scores, embeddings, 0.2, ddi, 0, vocabulary) == ()
     assert model.hard_set(scores, embeddings, 0.2, ddi, 1, vocabulary) == MODULE.exact_topk(
         [0.0] * 131, 1, vocabulary

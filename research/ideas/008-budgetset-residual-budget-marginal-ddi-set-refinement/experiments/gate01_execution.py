@@ -17,14 +17,16 @@ from __future__ import annotations
 import argparse
 import copy
 import importlib.util
+import inspect
 import json
 import math
 import random
 import sys
-from collections.abc import Callable, Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from collections.abc import Mapping as MappingABC
+from collections.abc import Sequence as SequenceABC
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Callable, Iterable, Literal, Mapping, Sequence  # noqa: UP035
 
 
 def _load_mechanical_preflight() -> Any:
@@ -275,7 +277,7 @@ def _prepare_ddi(ddi: Any, *, device: Any) -> Any:
 
 def _prepare_batch_scalar(value: Any, batch_size: int, *, device: Any, name: str) -> Any:
     _require_torch()
-    tensor = _as_float_tensor(value, device=device)
+    tensor = _as_float_tensor(value, device=device).detach()
     if tensor.ndim == 0:
         tensor = tensor.expand(batch_size)
     elif tensor.ndim != 1 or tensor.shape[0] != batch_size:
@@ -297,6 +299,89 @@ def _prepare_k(k_x: Any, batch_size: int, *, device: Any) -> Any:
     ):
         raise ValueError("K_x must lie in [0, 131]")
     return tensor
+
+
+def execution_device_for_model(model: Any, requested_device: Any = None) -> Any:
+    """Resolve the one device owned by a learned runner invocation.
+
+    A requested device is authoritative.  When it is omitted, the device of
+    the model's first parameter is used, which keeps a caller-created model and
+    its execution inputs on one device without introducing another wrapper.
+    """
+
+    torch_module = _require_torch()
+    if requested_device is not None:
+        return torch_module.device(requested_device)
+    try:
+        return next(model.parameters()).device
+    except StopIteration as error:  # pragma: no cover - all frozen models have parameters.
+        raise ValueError(
+            "learned model has no parameters from which to resolve a device"
+        ) from error
+
+
+def prepare_learned_execution_inputs(
+    batch: Mapping[str, Any],
+    *,
+    device: Any,
+    ddi: Any,
+    budget: Any = None,
+    static_d: Any = None,
+    static_p: Any = None,
+    independent: bool = False,
+) -> dict[str, Any]:
+    """Materialize every learned-execution input on one runner-owned device.
+
+    The frozen MoleRec score and embedding tensors are detached here, before a
+    learned forward pass can build a graph.  The same placement path handles
+    CPU lists, CPU tensors, CUDA tensors, DDI, targets, budgets, ``K_x``, and
+    the Independent static summaries.
+    """
+
+    torch_module = _require_torch()
+    target_device = torch_module.device(device)
+    if "scores" not in batch or "embeddings" not in batch or "targets" not in batch:
+        raise ValueError("learned execution batches require scores, embeddings, and targets")
+    score_tensor, embedding_tensor, _ = _prepare_scores_embeddings(
+        _as_float_tensor(batch["scores"], device=target_device).detach(),
+        _as_float_tensor(batch["embeddings"], device=target_device).detach(),
+    )
+    batch_size = score_tensor.shape[0]
+    targets_tensor = _as_float_tensor(batch["targets"], device=target_device).detach()
+    if targets_tensor.ndim == 1:
+        targets_tensor = targets_tensor.unsqueeze(0)
+    if tuple(targets_tensor.shape) != tuple(score_tensor.shape):
+        raise ValueError("targets must align with the [batch, 131] frozen scores")
+    if budget is None:
+        if "budget" not in batch:
+            raise ValueError("learned execution requires a budget tensor")
+        budget = batch["budget"]
+    budget_tensor = _prepare_batch_scalar(budget, batch_size, device=target_device, name="budget")
+    if "k_x" not in batch:
+        raise ValueError("learned execution batches require K_x")
+    k_tensor = _prepare_k(batch["k_x"], batch_size, device=target_device)
+    ddi_tensor = _prepare_ddi(ddi, device=target_device)
+    prepared: dict[str, Any] = {
+        "scores": score_tensor,
+        "embeddings": embedding_tensor,
+        "targets": targets_tensor,
+        "budget": budget_tensor,
+        "ddi": ddi_tensor,
+        "k_x": k_tensor,
+    }
+    if independent:
+        d_values = batch.get("d_static", static_d)
+        p_values = batch.get("p_static", static_p)
+        if d_values is None or p_values is None:
+            raise ValueError("Independent training requires frozen d_static and p_static")
+        for name, value in (("d_static", d_values), ("p_static", p_values)):
+            tensor = _as_float_tensor(value, device=target_device).detach()
+            if tensor.ndim == 1:
+                tensor = tensor.unsqueeze(0).expand(batch_size, -1)
+            if tuple(tensor.shape) != tuple(score_tensor.shape):
+                raise ValueError(f"Independent {name} must align with the [batch, 131] scores")
+            prepared[name] = tensor
+    return prepared
 
 
 def relaxed_ddi_tensor(q: Any, ddi: Any, k_x: Any) -> Any:
@@ -665,7 +750,7 @@ def compute_objective_terms(
     if not math.isclose(float(gamma), GAMMA, rel_tol=0.0, abs_tol=0.0):
         raise ProtocolMismatch(f"Gate 01 fixes gamma at {GAMMA}")
     logits_tensor = _as_float_tensor(logits)
-    targets_tensor = _as_float_tensor(targets, device=logits_tensor.device)
+    targets_tensor = _as_float_tensor(targets, device=logits_tensor.device).detach()
     squeezed = logits_tensor.ndim == 1
     if squeezed:
         logits_tensor = logits_tensor.unsqueeze(0)
@@ -753,6 +838,7 @@ CONFIGURATION_GRID = tuple(
     for eta in ETAS
 )
 LEARNED_CONFIGURATION_GRID = CONFIGURATION_GRID
+_FROZEN_CONFIGURATION_GRID = tuple(CONFIGURATION_GRID)
 
 
 def validate_training_seed(seed: int) -> int:
@@ -853,11 +939,128 @@ def _batch_factory(batches: BatchFactory | Iterable[Mapping[str, Any]]) -> Batch
     return lambda: iter(materialized)
 
 
-def _required_dev_values(evaluation: Mapping[str, Any], epoch: int) -> dict[str, Any]:
-    missing = [name for name in ("n_compliant", "u_primary", "v_all") if name not in evaluation]
-    if missing:
-        raise ValueError(f"Dev evaluator omitted checkpoint fields: {missing}")
+_DEV_BUDGET_FIELDS = ("jaccard", "positive_violation", "hard_ddi")
+
+
+def _normalize_budget_targets(budget_targets: Sequence[float]) -> tuple[float, float, float]:
+    try:
+        targets = tuple(float(value) for value in budget_targets)
+    except (TypeError, ValueError) as error:
+        raise ValueError("training budgets must be exactly b_L, b_M, and b_H") from error
+    if len(targets) != 3 or not all(math.isfinite(value) for value in targets):
+        raise ValueError("training budgets must be exactly b_L, b_M, and b_H")
+    return targets  # type: ignore[return-value]
+
+
+def _normalize_budget_metrics(
+    budget_metrics: Any, budget_targets: Sequence[float]
+) -> tuple[Mapping[str, float], ...]:
+    """Normalize the three existing protocol operating points in budget order."""
+
+    targets = _normalize_budget_targets(budget_targets)
+    rows: list[Mapping[str, float] | None] = [None, None, None]
+    if isinstance(budget_metrics, MappingABC):
+        for raw_budget, raw_metrics in budget_metrics.items():
+            try:
+                budget = float(raw_budget)
+            except (TypeError, ValueError) as error:
+                raise ValueError("Dev budget metric keys must be numeric budgets") from error
+            matches = [
+                index
+                for index, target in enumerate(targets)
+                if math.isclose(budget, target, rel_tol=0.0, abs_tol=1e-12)
+            ]
+            if len(matches) != 1 or rows[matches[0]] is not None:
+                raise ProtocolMismatch("Dev budget metrics must identify b_L, b_M, and b_H once")
+            row_index = matches[0]
+            row = raw_metrics
+            if not isinstance(row, MappingABC):
+                raise ValueError("each Dev budget metric must be a mapping")
+            rows[row_index] = row
+    elif isinstance(budget_metrics, SequenceABC) and not isinstance(
+        budget_metrics, (str, bytes, bytearray)
+    ):
+        if len(budget_metrics) != 3:
+            raise ValueError("Dev budget metrics must contain exactly b_L, b_M, and b_H")
+        rows = list(budget_metrics)
+    else:
+        raise ValueError("Dev evaluator must provide budget_metrics for all three budgets")
+    if any(row is None for row in rows):
+        raise ProtocolMismatch("Dev budget metrics must contain b_L, b_M, and b_H exactly once")
+
+    normalized: list[Mapping[str, float]] = []
+    for row in rows:
+        assert row is not None
+        missing = [name for name in _DEV_BUDGET_FIELDS if name not in row]
+        if missing:
+            raise ValueError(f"Dev budget metric omitted fields: {missing}")
+        copied = dict(row)
+        for name in _DEV_BUDGET_FIELDS:
+            try:
+                value = float(copied[name])
+            except (TypeError, ValueError) as error:
+                raise ValueError(f"Dev budget metric {name!r} must be numeric") from error
+            if not math.isfinite(value):
+                raise ValueError(f"Dev budget metric {name!r} must be finite")
+            copied[name] = value
+        normalized.append(copied)
+    return tuple(normalized)
+
+
+def _dev_quantities_from_budget_metrics(
+    budget_metrics: Sequence[Mapping[str, float]], budget_targets: Sequence[float]
+) -> dict[str, float | int]:
+    targets = _normalize_budget_targets(budget_targets)
+    rows = _normalize_budget_metrics(budget_metrics, targets)
+    n_compliant = sum(target_compliant(rows[index], targets[index]) for index in range(3))
+    u_primary = (float(rows[0]["jaccard"]) + float(rows[1]["jaccard"])) / 2.0
+    v_all = sum(float(row["positive_violation"]) for row in rows) / 3.0
+    return {
+        "n_compliant": int(n_compliant),
+        "u_primary": float(u_primary),
+        "v_all": float(v_all),
+    }
+
+
+def derive_seed_dev_quantities(
+    evaluation: Mapping[str, Any], budget_targets: Sequence[float]
+) -> dict[str, float | int]:
+    """Derive the frozen per-seed checkpoint quantities from its Dev points."""
+
+    if "budget_metrics" not in evaluation:
+        raise ValueError("Dev evaluator must provide budget_metrics for all three budgets")
+    rows = _normalize_budget_metrics(evaluation["budget_metrics"], budget_targets)
+    return _dev_quantities_from_budget_metrics(rows, budget_targets)
+
+
+def _required_dev_values(
+    evaluation: Mapping[str, Any], epoch: int, budget_targets: Sequence[float]
+) -> dict[str, Any]:
+    if not isinstance(evaluation, MappingABC):
+        raise ValueError("Dev evaluator must return a mapping")
+    if "budget_metrics" not in evaluation:
+        missing = [name for name in ("n_compliant", "u_primary", "v_all") if name not in evaluation]
+        if missing:
+            raise ValueError(f"Dev evaluator omitted checkpoint fields: {missing}")
+        result = dict(evaluation)
+        result["epoch"] = int(epoch)
+        return result
+    quantities = derive_seed_dev_quantities(evaluation, budget_targets)
     result = dict(evaluation)
+    for name, expected in quantities.items():
+        if name in result:
+            try:
+                supplied = float(result[name])
+            except (TypeError, ValueError) as error:
+                raise ProtocolMismatch(f"Dev checkpoint field {name!r} must be numeric") from error
+            if not math.isclose(supplied, float(expected), rel_tol=0.0, abs_tol=1e-12):
+                raise ProtocolMismatch(
+                    f"Dev checkpoint field {name!r} disagrees with its budget metrics"
+                )
+        result[name] = expected
+    result["budget_metrics"] = _normalize_budget_metrics(
+        evaluation["budget_metrics"], budget_targets
+    )
     result["epoch"] = int(epoch)
     return result
 
@@ -885,14 +1088,15 @@ def train_seed_configuration(
 
     torch_module = _require_torch()
     validate_training_seed(seed)
-    if len(budget_targets) != 3:
-        raise ValueError("training budgets must be exactly b_L, b_M, and b_H")
+    normalized_budget_targets = _normalize_budget_targets(budget_targets)
     if float(configuration.eta) not in ETAS:
         raise ProtocolMismatch("training configuration eta is outside the frozen grid")
     set_frozen_seed(seed)
     model = _make_model(family, embedding_dim)
     if device is not None:
         model = model.to(device)
+    execution_device = execution_device_for_model(model, device)
+    execution_ddi = _prepare_ddi(ddi, device=execution_device)
     optimizer = make_adamw(model, configuration)
     batch_source = _batch_factory(train_batches)
     budget_rng = random.Random(seed)
@@ -908,29 +1112,52 @@ def train_seed_configuration(
         for batch in batch_source():
             optimizer.zero_grad(set_to_none=True)
             scores = batch["scores"]
-            embeddings = batch["embeddings"]
-            targets = batch["targets"]
-            k_x = batch["k_x"]
-            scores_tensor = _as_float_tensor(scores)
+            scores_tensor = _as_float_tensor(scores, device=execution_device).detach()
             batch_size = scores_tensor.shape[0] if scores_tensor.ndim > 1 else 1
-            budgets = sample_training_budgets_tensor(budget_targets, batch_size, rng=budget_rng).to(
-                scores_tensor.device
+            budgets = sample_training_budgets_tensor(
+                normalized_budget_targets, batch_size, rng=budget_rng
+            ).to(execution_device)
+            prepared = prepare_learned_execution_inputs(
+                batch,
+                device=execution_device,
+                ddi=execution_ddi,
+                budget=budgets,
+                static_d=static_d,
+                static_p=static_p,
+                independent=family == "Independent",
             )
             if family == "BudgetSet":
-                logits = model(scores, embeddings, budgets, ddi, k_x)
+                logits = model(
+                    prepared["scores"],
+                    prepared["embeddings"],
+                    prepared["budget"],
+                    prepared["ddi"],
+                    prepared["k_x"],
+                )
             else:
-                d_values = batch.get("d_static", static_d)
-                p_values = batch.get("p_static", static_p)
-                if d_values is None or p_values is None:
-                    raise ValueError("Independent training requires frozen d_static and p_static")
-                logits = model(scores, embeddings, budgets, d_values, p_values)
-            loss = compute_objective(logits, targets, ddi, budgets, k_x, configuration.eta)
+                logits = model(
+                    prepared["scores"],
+                    prepared["embeddings"],
+                    prepared["budget"],
+                    prepared["d_static"],
+                    prepared["p_static"],
+                )
+            loss = compute_objective(
+                logits,
+                prepared["targets"],
+                prepared["ddi"],
+                prepared["budget"],
+                prepared["k_x"],
+                configuration.eta,
+            )
             loss.backward()
             optimizer.step()
 
         model.eval()
         with torch_module.no_grad():
-            evaluation = _required_dev_values(dev_evaluator(model), epoch)
+            evaluation = _required_dev_values(
+                dev_evaluator(model), epoch, normalized_budget_targets
+            )
         evaluations.append(evaluation)
         key = checkpoint_selection_key(
             evaluation["n_compliant"], evaluation["u_primary"], evaluation["v_all"], epoch
@@ -967,34 +1194,121 @@ def train_seed_configuration(
     )
 
 
+def _canonical_seed_results(
+    seed_results: Sequence[SeedTrainingResult],
+    configuration: TrainingConfiguration | None = None,
+) -> tuple[SeedTrainingResult, ...]:
+    if len(seed_results) != len(LEARNED_SEEDS):
+        raise ProtocolMismatch(
+            "each configuration requires exactly the three learned seed checkpoints"
+        )
+    expected_configuration = configuration or seed_results[0].configuration
+    by_seed: dict[int, SeedTrainingResult] = {}
+    for result in seed_results:
+        if not isinstance(result, SeedTrainingResult):
+            raise TypeError("configuration selection requires SeedTrainingResult checkpoints")
+        if result.configuration != expected_configuration:
+            raise ProtocolMismatch("seed checkpoint configuration does not match its record")
+        validate_training_seed(result.seed)
+        if result.seed in by_seed:
+            raise ProtocolMismatch("configuration selection received a duplicate learned seed")
+        by_seed[result.seed] = result
+    if set(by_seed) != set(LEARNED_SEEDS):
+        raise ProtocolMismatch("configuration selection requires seeds 2002, 2003, and 2004")
+    families = {result.family for result in by_seed.values()}
+    if len(families) != 1:
+        raise ProtocolMismatch("configuration selection cannot mix learned families")
+    return tuple(by_seed[seed] for seed in LEARNED_SEEDS)
+
+
+def _derive_configuration_dev_data(
+    seed_results: Sequence[SeedTrainingResult], budget_targets: Sequence[float]
+) -> tuple[tuple[SeedTrainingResult, ...], tuple[Mapping[str, float], ...], dict[str, float | int]]:
+    targets = _normalize_budget_targets(budget_targets)
+    if not seed_results:
+        raise ValueError("configuration Dev results are empty")
+    ordered = _canonical_seed_results(seed_results)
+    rows_by_seed = {
+        result.seed: _normalize_budget_metrics(
+            result.best_evaluation.get("budget_metrics"), targets
+        )
+        for result in ordered
+    }
+    aggregate_rows = tuple(
+        aggregate_seed_metrics({seed: rows_by_seed[seed][budget_index] for seed in LEARNED_SEEDS})
+        for budget_index in range(3)
+    )
+    n_compliant = sum(target_compliant(aggregate_rows[index], targets[index]) for index in range(3))
+    quantities: dict[str, float | int] = {
+        "n_compliant_config": int(n_compliant),
+        "u_primary_config": float(
+            (aggregate_rows[0]["jaccard"] + aggregate_rows[1]["jaccard"]) / 2.0
+        ),
+        "v_all_config": float(sum(row["positive_violation"] for row in aggregate_rows) / 3.0),
+    }
+    return ordered, aggregate_rows, quantities
+
+
+def derive_configuration_dev_quantities(
+    seed_results: Sequence[SeedTrainingResult], budget_targets: Sequence[float]
+) -> dict[str, float | int]:
+    """Derive config-selection quantities from retained seed Dev checkpoints."""
+
+    return _derive_configuration_dev_data(seed_results, budget_targets)[2]
+
+
 @dataclass(frozen=True)
 class ConfigurationDevResult:
-    """Dev-only aggregate used to choose one configuration per learned family."""
+    """Dev-only aggregate derived from exactly three retained seed checkpoints."""
 
     configuration: TrainingConfiguration
-    n_compliant_config: int
-    u_primary_config: float
-    v_all_config: float
-    seed_results: tuple[SeedTrainingResult, ...] = ()
+    seed_results: tuple[SeedTrainingResult, ...]
+    budget_targets: tuple[float, float, float]
+    n_compliant_config: int = field(init=False)
+    u_primary_config: float = field(init=False)
+    v_all_config: float = field(init=False)
+    aggregate_budget_metrics: tuple[Mapping[str, float], ...] = field(init=False)
+
+    def __post_init__(self) -> None:
+        ordered, aggregate_rows, quantities = _derive_configuration_dev_data(
+            self.seed_results, self.budget_targets
+        )
+        object.__setattr__(self, "seed_results", ordered)
+        object.__setattr__(self, "budget_targets", _normalize_budget_targets(self.budget_targets))
+        object.__setattr__(self, "aggregate_budget_metrics", aggregate_rows)
+        object.__setattr__(self, "n_compliant_config", quantities["n_compliant_config"])
+        object.__setattr__(self, "u_primary_config", quantities["u_primary_config"])
+        object.__setattr__(self, "v_all_config", quantities["v_all_config"])
 
 
 def _configuration_records(
-    dev_results: Mapping[TrainingConfiguration, Mapping[str, Any]]
+    dev_results: Mapping[TrainingConfiguration, ConfigurationDevResult | Mapping[str, Any]]
     | Iterable[ConfigurationDevResult],
 ) -> tuple[ConfigurationDevResult, ...]:
-    if isinstance(dev_results, Mapping):
+    if isinstance(dev_results, MappingABC):
         records_list: list[ConfigurationDevResult] = []
         for configuration, values in dev_results.items():
             if isinstance(values, ConfigurationDevResult):
                 records_list.append(values)
                 continue
+            if not isinstance(values, MappingABC):
+                raise TypeError(
+                    "configuration Dev records must be mappings or ConfigurationDevResult"
+                )
+            unsupported = set(values) - {"seed_results", "budget_targets"}
+            if unsupported:
+                raise ProtocolMismatch(
+                    "configuration aggregate quantities must be derived from seed checkpoints"
+                )
+            if "seed_results" not in values or "budget_targets" not in values:
+                raise ValueError(
+                    "configuration Dev records require seed_results and budget_targets"
+                )
             records_list.append(
                 ConfigurationDevResult(
                     configuration=configuration,
-                    n_compliant_config=int(values["n_compliant_config"]),
-                    u_primary_config=float(values["u_primary_config"]),
-                    v_all_config=float(values["v_all_config"]),
-                    seed_results=tuple(values.get("seed_results", ())),
+                    seed_results=tuple(values["seed_results"]),
+                    budget_targets=tuple(values["budget_targets"]),
                 )
             )
         records = tuple(records_list)
@@ -1002,19 +1316,25 @@ def _configuration_records(
         records = tuple(dev_results)
     if not records:
         raise ValueError("Dev configuration results are empty")
-    allowed = set(CONFIGURATION_GRID)
+    allowed = set(_FROZEN_CONFIGURATION_GRID)
     if any(record.configuration not in allowed for record in records):
         raise ProtocolMismatch("configuration selection received a non-frozen hyperparameter")
     configurations = tuple(record.configuration for record in records)
-    if len(records) != len(CONFIGURATION_GRID) or set(configurations) != allowed:
+    if len(records) != len(_FROZEN_CONFIGURATION_GRID) or set(configurations) != allowed:
         raise ProtocolMismatch(
             "configuration selection requires exactly the frozen four configurations"
         )
+    families = {record.seed_results[0].family for record in records}
+    if len(families) != 1:
+        raise ProtocolMismatch("configuration selection cannot mix learned families")
+    budget_sets = {record.budget_targets for record in records}
+    if len(budget_sets) != 1:
+        raise ProtocolMismatch("configuration selection requires one shared b_L, b_M, and b_H grid")
     return records
 
 
 def select_configuration_result(
-    dev_results: Mapping[TrainingConfiguration, Mapping[str, Any]]
+    dev_results: Mapping[TrainingConfiguration, ConfigurationDevResult | Mapping[str, Any]]
     | Iterable[ConfigurationDevResult],
 ) -> ConfigurationDevResult:
     """Select one configuration using Dev aggregate values only."""
@@ -1033,12 +1353,177 @@ def select_configuration_result(
 
 
 def select_configuration(
-    dev_results: Mapping[TrainingConfiguration, Mapping[str, Any]]
+    dev_results: Mapping[TrainingConfiguration, ConfigurationDevResult | Mapping[str, Any]]
     | Iterable[ConfigurationDevResult],
 ) -> TrainingConfiguration:
     """Return the Dev-selected configuration; Audit is intentionally absent."""
 
     return select_configuration_result(dev_results).configuration
+
+
+@dataclass(frozen=True)
+class LearnedFamilySelection:
+    """Complete Dev selection result for one learned family."""
+
+    family: FamilyName
+    selected_configuration: TrainingConfiguration
+    selected_result: ConfigurationDevResult
+    configuration_results: tuple[ConfigurationDevResult, ...]
+    runs: tuple[SeedTrainingResult, ...]
+    retained_checkpoints: tuple[SeedTrainingResult, ...]
+
+    @property
+    def configuration(self) -> TrainingConfiguration:
+        """Compatibility alias for callers that ask for the selected config."""
+
+        return self.selected_configuration
+
+    @property
+    def checkpoints(self) -> tuple[SeedTrainingResult, ...]:
+        """Exactly the three retained checkpoints of the selected config."""
+
+        return self.retained_checkpoints
+
+
+FamilyDevEvaluator = Callable[..., Mapping[str, Any]]
+
+
+def _invoke_family_dev_evaluator(
+    evaluator: FamilyDevEvaluator,
+    model: Any,
+    seed: int,
+    configuration: TrainingConfiguration,
+) -> Mapping[str, Any]:
+    """Call a Dev evaluator with optional run context without an Audit channel."""
+
+    try:
+        signature = inspect.signature(evaluator)
+    except (TypeError, ValueError):
+        return evaluator(model)
+    parameters = tuple(signature.parameters.values())
+    positional = tuple(
+        parameter
+        for parameter in parameters
+        if parameter.kind
+        in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+    )
+    if any(parameter.kind == inspect.Parameter.VAR_POSITIONAL for parameter in parameters):
+        return evaluator(model, seed, configuration)
+    if len(positional) >= 3:
+        second_name = positional[1].name.lower()
+        third_name = positional[2].name.lower()
+        if "config" in second_name and "seed" in third_name:
+            return evaluator(model, configuration, seed)
+        return evaluator(model, seed, configuration)
+    if len(positional) == 2:
+        if "config" in positional[1].name.lower():
+            return evaluator(model, configuration)
+        return evaluator(model, seed)
+    return evaluator(model)
+
+
+def train_learned_family(
+    family: FamilyName,
+    *,
+    embedding_dim: int,
+    ddi: Any,
+    budget_targets: Sequence[float],
+    train_batches: BatchFactory | Iterable[Mapping[str, Any]],
+    dev_evaluator: FamilyDevEvaluator,
+    static_d: Any = None,
+    static_p: Any = None,
+    device: Any = None,
+) -> LearnedFamilySelection:
+    """Train all frozen runs and own the complete Dev selection graph.
+
+    Exactly four configurations and three learned seeds are executed.  The
+    configuration quantities are computed only from the retained per-seed Dev
+    checkpoints; no caller-supplied aggregate performance values are accepted.
+    """
+
+    if family not in ("BudgetSet", "Independent"):
+        raise ValueError(f"unknown learned family {family!r}")
+    if tuple(LEARNED_SEEDS) != (2002, 2003, 2004):
+        raise ProtocolMismatch("learned-family orchestration requires seeds 2002, 2003, and 2004")
+    if tuple(_FROZEN_CONFIGURATION_GRID) != tuple(CONFIGURATION_GRID):
+        raise ProtocolMismatch("learned-family orchestration requires exactly four configurations")
+    normalized_budget_targets = _normalize_budget_targets(budget_targets)
+    batch_source = _batch_factory(train_batches)
+    expected_keys = {
+        (configuration, seed)
+        for configuration in _FROZEN_CONFIGURATION_GRID
+        for seed in LEARNED_SEEDS
+    }
+    runs_by_key: dict[tuple[TrainingConfiguration, int], SeedTrainingResult] = {}
+    for configuration in _FROZEN_CONFIGURATION_GRID:
+        for seed in LEARNED_SEEDS:
+            expected_key = (configuration, seed)
+            if expected_key in runs_by_key:
+                raise ProtocolMismatch("duplicate learned seed/configuration run")
+
+            def run_dev_evaluator(
+                model: Any,
+                *,
+                _seed: int = seed,
+                _configuration: TrainingConfiguration = configuration,
+            ) -> Mapping[str, Any]:
+                return _invoke_family_dev_evaluator(dev_evaluator, model, _seed, _configuration)
+
+            result = train_seed_configuration(
+                family,
+                configuration,
+                seed,
+                embedding_dim=embedding_dim,
+                ddi=ddi,
+                budget_targets=normalized_budget_targets,
+                train_batches=batch_source,
+                dev_evaluator=run_dev_evaluator,
+                static_d=static_d,
+                static_p=static_p,
+                device=device,
+            )
+            if not isinstance(result, SeedTrainingResult):
+                raise TypeError("learned-family training must return SeedTrainingResult")
+            actual_key = (result.configuration, result.seed)
+            if (
+                result.family != family
+                or result.configuration != configuration
+                or result.seed != seed
+            ):
+                raise ProtocolMismatch(
+                    "learned run returned the wrong family, configuration, or seed"
+                )
+            if actual_key in runs_by_key:
+                raise ProtocolMismatch("duplicate learned seed/configuration run")
+            runs_by_key[actual_key] = result
+
+    if set(runs_by_key) != expected_keys:
+        raise ProtocolMismatch("learned-family orchestration has a missing seed/configuration run")
+
+    configuration_results = tuple(
+        ConfigurationDevResult(
+            configuration=configuration,
+            seed_results=tuple(runs_by_key[(configuration, seed)] for seed in LEARNED_SEEDS),
+            budget_targets=normalized_budget_targets,
+        )
+        for configuration in _FROZEN_CONFIGURATION_GRID
+    )
+    selected_result = select_configuration_result(configuration_results)
+    retained = retained_checkpoints_for_audit(selected_result)
+    if tuple(result.seed for result in retained) != LEARNED_SEEDS:
+        raise ProtocolMismatch("selected learned configuration did not retain all three seeds")
+    return LearnedFamilySelection(
+        family=family,
+        selected_configuration=selected_result.configuration,
+        selected_result=selected_result,
+        configuration_results=configuration_results,
+        runs=tuple(
+            runs_by_key[(configuration, seed)]
+            for configuration in _FROZEN_CONFIGURATION_GRID
+            for seed in LEARNED_SEEDS
+        ),
+        retained_checkpoints=retained,
+    )
 
 
 def retained_checkpoints_for_audit(
@@ -1156,6 +1641,7 @@ __all__ = (
     "ConfigurationDevResult",
     "IndependentModel",
     "IndependentScorer",
+    "LearnedFamilySelection",
     "MLPArchitecture",
     "MLPHead",
     "ObjectiveTerms",
@@ -1176,10 +1662,13 @@ __all__ = (
     "compute_objective",
     "compute_objective_terms",
     "configuration_selection_key",
+    "derive_configuration_dev_quantities",
+    "derive_seed_dev_quantities",
     "deterministic_ranking",
     "evaluate_selected_audit",
     "exact_objective",
     "exact_topk",
+    "execution_device_for_model",
     "extract_frozen_molerec_features",
     "extract_molerec_features",
     "fixed_lambda_family",
@@ -1202,6 +1691,7 @@ __all__ = (
     "marginal_ddi_tensor",
     "matched_independent_frontier",
     "patient_cluster_bootstrap",
+    "prepare_learned_execution_inputs",
     "relaxed_ddi",
     "relaxed_ddi_tensor",
     "retained_checkpoints_for_audit",
@@ -1217,6 +1707,7 @@ __all__ = (
     "static_ddi_summaries",
     "target_compliant",
     "terminal_verdict",
+    "train_learned_family",
     "train_seed_configuration",
     "validate_frozen_molerec_identity",
     "validate_training_seed",
