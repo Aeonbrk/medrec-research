@@ -261,9 +261,9 @@ def extract_frozen_molerec_features(
     model_output = output[0] if isinstance(output, (tuple, list)) else output
     scores = _score_vector(model_output)
     extractor_scores = _score_vector(captured["score_extractor_output"])
-    if any(
+    if len(scores) != len(extractor_scores) or any(
         not math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-7)
-        for a, b in zip(scores, extractor_scores, strict=True)
+        for a, b in zip(scores, extractor_scores)
     ):
         raise ProtocolMismatch("MoleRec returned scores inconsistent with score_extractor")
 
@@ -1375,7 +1375,7 @@ def _self_check_record() -> dict[str, Any]:
     def close_sequence(left: Sequence[float], right: Sequence[float]) -> bool:
         return len(left) == len(right) and all(
             math.isclose(float(a), float(b), rel_tol=1e-9, abs_tol=1e-9)
-            for a, b in zip(left, right, strict=True)
+            for a, b in zip(left, right)
         )
 
     class _Hook:
