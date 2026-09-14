@@ -3,8 +3,8 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `TRAIN_DEV_COMPLETE / AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`
-- **Stage**: `IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`
+- **Status**: `TERMINATED_AT_GATE_01`
+- **Stage**: `TERMINATED_AT_GATE_01`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), revision v1.2
@@ -17,9 +17,16 @@
 - **Controller re-verification**: [`experiments/gate-01-audit-controller-reverification.md`](experiments/gate-01-audit-controller-reverification.md), verdict `CONTROLLER_REVERIFICATION_PASS`
 - **Fresh Audit execution**: [`experiments/gate-01-audit-result.json`](experiments/gate-01-audit-result.json), terminal classification `KILL_TARGET_SEMANTICS`
 - **Quarantine**: intact
-- **Next owner**: `ccf-integrity-auditor`
+- **Next owner**: none
 
-Idea 008 remains admitted for the same bounded kill-first method cycle. The first Audit attempt stopped before a successful frozen MoleRec forward and generated no scientific evidence. The corrected controller path was exercised end to end, and the fresh Audit completed under the unchanged protocol with terminal classification `KILL_TARGET_SEMANTICS`. The independent integrity audit must review the public-safe result before any research continuation or termination decision.
+Idea 008:
+TERMINATED_AT_GATE_01
+
+Terminal result:
+KILL_TARGET_SEMANTICS
+
+Reusable observation:
+Budget-conditioned learned refinement collapsed to nearly identical medication sets across requested budgets, while explicit optimization produced a visible utility–DDI trade-off.
 
 ## Scientific question
 
@@ -75,7 +82,7 @@ No retraining, reselection, protocol change, new control, solver expansion, or p
 
 ## Fresh Audit result
 
-The completed fresh Audit covered 1,113 patients and 2,413 visits, evaluated the frozen controls and retained checkpoints at all three budgets, and ran 1,000 patient-clustered bootstrap replicates with seed 80081. Public-safe aggregate metrics, frontier comparisons, compliance/response quantities, matched-seed counts, and the single runner-produced classification are recorded in [`experiments/gate-01-audit-result.json`](experiments/gate-01-audit-result.json). The classification is `KILL_TARGET_SEMANTICS`; no continuation or termination decision is recorded here.
+The completed fresh Audit covered 1,113 patients and 2,413 visits, evaluated the frozen controls and retained checkpoints at all three budgets, and ran 1,000 patient-clustered bootstrap replicates with seed 80081. Public-safe aggregate metrics, frontier comparisons, compliance/response quantities, matched-seed counts, and the single runner-produced classification are recorded in [`experiments/gate-01-audit-result.json`](experiments/gate-01-audit-result.json). The classification is `KILL_TARGET_SEMANTICS` and is the terminal Gate 01 result.
 
 ## Quarantine
 
@@ -84,14 +91,14 @@ G3/G4, R0 Holdout, the historical project test, and paper-level SOTA benchmarkin
 ## Routing
 
 ```text
-Idea 008: ADMITTED
+Idea 008: TERMINATED_AT_GATE_01
 Gate01-Train + Gate01-Dev: COMPLETE
 First Gate01-Audit attempt: BLOCKED_NO_RESULT
 Controller re-verification: CONTROLLER_REVERIFICATION_PASS
 Fresh Gate01-Audit attempt: COMPLETE
 Protocol revision: v1.2 unchanged
 Runner-produced terminal classification: KILL_TARGET_SEMANTICS
-Scientific Gate verdict: NONE
-Stage: IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT
-Next owner: ccf-integrity-auditor
+Scientific Gate verdict: KILL_TARGET_SEMANTICS
+Stage: TERMINATED_AT_GATE_01
+Next owner: none
 ```

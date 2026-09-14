@@ -1,9 +1,9 @@
-# Handoff: Idea 008 Gate 01 Audit Executed / Pending Integrity Audit
+# Handoff: Idea 008 Terminated / HyperEdit-MR Screen Stopped
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`
-- **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
+- **Current Stage**: `TERMINATED_AT_GATE_01`
+- **Active Idea**: none; HyperEdit-MR remains a prototype
 - **Gate 01 protocol**: v1.2, unchanged
 - **Gate01-Train + Gate01-Dev**: `COMPLETE`
 - **First Gate01-Audit attempt**: `OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT`
@@ -11,11 +11,22 @@
 - **Controller re-verification**: `CONTROLLER_REVERIFICATION_PASS`
 - **Fresh Gate01-Audit attempt**: `COMPLETE`
 - **Runner-produced terminal classification**: `KILL_TARGET_SEMANTICS`
-- **Scientific Gate verdict**: none; decision pending integrity audit
+- **Scientific Gate verdict**: `KILL_TARGET_SEMANTICS`
 - **G3/G4**: `UNTOUCHED`
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
-- **Next owner**: `ccf-integrity-auditor`
+- **Next owner**: none
+
+Idea 008:
+TERMINATED_AT_GATE_01
+
+Terminal result:
+KILL_TARGET_SEMANTICS
+
+Reusable observation:
+Budget-conditioned learned refinement collapsed to nearly identical medication sets across requested budgets, while explicit optimization produced a visible utility–DDI trade-off.
+
+HyperEdit-MR screen: `STOP_HYPEREDIT` (weak effect; Train/Dev only).
 
 ## Frozen scientific state
 
@@ -51,22 +62,21 @@ Public-safe aggregate evidence is recorded in:
 
 `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-result.json`
 
-The run covered 1,113 Audit patients and 2,413 Audit visits, used 1,000 patient-clustered bootstrap replicates with seed 80081, and produced exactly one protocol classification: `KILL_TARGET_SEMANTICS`. No research continuation or termination decision has been made.
+The run covered 1,113 Audit patients and 2,413 Audit visits, used 1,000 patient-clustered bootstrap replicates with seed 80081, and produced exactly one protocol classification: `KILL_TARGET_SEMANTICS`. Idea 008 is terminated at Gate 01.
 
 No training, reselection, protocol change, new control, or post-hoc rescue is authorized. If another implementation/runtime change is required, stop and return to the pipeline coordinator.
 
 ## Routing
 
 ```text
-Idea 008: ADMITTED
+Idea 008: TERMINATED_AT_GATE_01
 Gate01-Train + Gate01-Dev: COMPLETE
 First Gate01-Audit attempt: BLOCKED_NO_RESULT
 Controller re-verification: CONTROLLER_REVERIFICATION_PASS
 Fresh Gate01-Audit attempt: COMPLETE
 Runner-produced terminal classification: KILL_TARGET_SEMANTICS
-Scientific Gate verdict: NONE
+Scientific Gate verdict: KILL_TARGET_SEMANTICS
 Quarantine: intact
-Stage: IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT
-Next owner: ccf-integrity-auditor
-Next task: independently audit the public-safe Gate01 result against protocol v1.2 and frozen identities
+Stage: TERMINATED_AT_GATE_01
+Next owner: none
 ```
