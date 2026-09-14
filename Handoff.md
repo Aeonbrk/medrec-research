@@ -16,6 +16,7 @@
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
 - **Next owner**: none
+- **Modern-backbone calibration**: [`research/memory/modern-backbone-calibration.md`](research/memory/modern-backbone-calibration.md), terminal state `MODERN_BACKBONE_CALIBRATION_COMPLETE`; comparison-only, with no Idea 009 or additional backbone hunting.
 
 Idea 008:
 TERMINATED_AT_GATE_01

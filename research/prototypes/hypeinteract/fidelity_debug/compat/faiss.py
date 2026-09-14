@@ -46,8 +46,12 @@ class GpuIndexFlatL2:
             ).clamp_min_(0.0)
             return torch.topk(distances, int(k), dim=1, largest=False, sorted=True)
         array = np.asarray(queries)
-        memory = self._memory.detach().cpu().numpy() if torch.is_tensor(self._memory) else self._memory
+        memory = (
+            self._memory.detach().cpu().numpy() if torch.is_tensor(self._memory) else self._memory
+        )
         distances = ((array[:, None, :] - memory[None, :, :]) ** 2).sum(axis=-1)
         order = np.argsort(distances, axis=1, kind="mergesort")[:, : int(k)]
         selected = np.take_along_axis(distances, order, axis=1)
-        return torch.from_numpy(selected.astype(np.float32)), torch.from_numpy(order.astype(np.int64))
+        return torch.from_numpy(selected.astype(np.float32)), torch.from_numpy(
+            order.astype(np.int64)
+        )

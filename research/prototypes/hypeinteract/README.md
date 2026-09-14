@@ -1,7 +1,9 @@
-# HypeMed / HypeInteract v0
+# HypeMed / HypeInteract v0 (superseded adapter screen)
 
-Bounded Train/Gate01-Dev prototype screen.  This is not an Idea, CCFA Gate,
-audit record, or paper claim.
+Bounded Train/Gate01-Dev prototype screen. This is not an Idea, CCFA Gate,
+audit record, or paper claim. The adapter metrics in this file are historical
+only; the faithful-source results and current canonical comparison surface are
+in [`fidelity_debug/README.md`](fidelity_debug/README.md).
 
 ## Source and protocol
 
@@ -39,19 +41,24 @@ medication interaction module over the HypeMed medication representations,
 with EHR co-prescription and DDI relations.  It was not executed because Stage
 A did not pass the health criterion.
 
-## Results
+## Historical adapter result (superseded)
+
+The initial adapter was not faithful to the official HypeMed implementation.
+Its result is retained for provenance but must not be read as canonical HypeMed
+performance:
 
 | surface | Jaccard | F1 | PRAUC | DDI | mean medications |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| HypeMed | 0.431689 | 0.594725 | 0.721035 | 0.072674 | 13.463850 |
-| HypeMed-SameK | 0.431689 | 0.594725 | 0.721035 | 0.072674 | 13.463850 |
+| HypeMed adapter | 0.431689 | 0.594725 | 0.721035 | 0.072674 | 13.463850 |
+| HypeMed-SameK adapter | 0.431689 | 0.594725 | 0.721035 | 0.072674 | 13.463850 |
+
+Status: `SUPERSEDED_NON_FAITHFUL_HYPEMED_ADAPTER`.
 
 HypeMed-SameK uses the HypeMed threshold prediction's per-visit cardinality;
 therefore its cardinality matches the standalone HypeMed surface exactly.
 
-Stage-A health criterion (`Jaccard >= 0.540` with no catastrophic PRAUC/DDI
-regression) was not met.  Stage B was skipped, with no interaction-module
-metrics or set-change diagnostics claimed.
+The old Stage-A health result is superseded by the fidelity audit. No
+interaction-module metrics or set-change diagnostics are claimed.
 
 ## Focused validation
 
@@ -63,6 +70,8 @@ Passed before the real-data run:
 - medication-interaction permutation/shape check;
 - finite CUDA forward/backward smoke.
 
-## Decision
+## Superseded decision and current terminal interpretation
 
-`STOP_HYPEMED_BACKBONE_RESET`
+- Prior adapter decision: `STOP_HYPEMED_BACKBONE_RESET` (superseded).
+- Current fidelity interpretation: `HYPEMED_PREVIOUS_ADAPTER_INVALIDATED`.
+- Faithful-source terminal verdict: `HYPEMED_CANONICAL_WEAK`.

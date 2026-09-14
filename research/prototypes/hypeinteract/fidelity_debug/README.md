@@ -51,6 +51,9 @@ matched control was run without changing the model, optimizer, or epoch count.
 
 Metrics are visit-macro and use the project's 131-medication DDI resource.
 MoleRec and GraphRefine-SameK are the existing comparison references.
+For the unified phase comparison, `HypeMed-LeakageSafe` is the canonical
+HypeMed surface; the official-semantics row is retained as a faithful
+sensitivity/reference run.
 
 | Surface | Jaccard | F1 | PRAUC | DDI | AvgMed |
 | --- | ---: | ---: | ---: | ---: | ---: |

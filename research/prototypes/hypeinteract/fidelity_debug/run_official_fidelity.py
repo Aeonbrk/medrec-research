@@ -14,7 +14,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import random
 import sys
 import time
@@ -22,7 +21,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-
 
 GATE01_SPLIT_NAMESPACE = "idea008-gate01-v1"
 DEFAULT_SEED = 20260914
@@ -63,14 +61,13 @@ def _official_imports(official_root: Path, compat_root: Path) -> dict[str, Any]:
     sys.argv = [sys.argv[0]]
     import torch
     import torch.nn.functional as F
-    from torch.optim import Adam
-    from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
-    from torch.utils.data import DataLoader
-
     from dataloader import MIMICDataset, collate_fn
     from graph_construction import construct_graphs
     from layers import HGTDecoder
     from layers.ehr_memory_attn import EHRMemoryAttention
+    from torch.optim import Adam
+    from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+    from torch.utils.data import DataLoader
     from util import multihot2idx, replace_with_padding_woken, seed_torch
 
     return {
@@ -137,7 +134,7 @@ def metrics(targets: np.ndarray, logits: np.ndarray, ddi: np.ndarray) -> dict[st
     jaccard = 0.0
     f1 = 0.0
     prauc = 0.0
-    for target_row, prediction, score_row in zip(targets, predictions, probabilities):
+    for target_row, prediction, score_row in zip(targets, predictions, probabilities, strict=True):
         target = set(int(index) for index in np.flatnonzero(target_row > 0.5))
         predicted = set(int(index) for index in prediction)
         intersection = len(target & predicted)
@@ -163,8 +160,18 @@ class RetrievalAudit:
     def __init__(self, train_edge_patient: np.ndarray) -> None:
         self.train_edge_patient = train_edge_patient
         self.records: dict[str, dict[str, int]] = {
-            "train": {"queries": 0, "top1_exact_self": 0, "top10_exact_self": 0, "top10_same_patient": 0},
-            "dev": {"queries": 0, "top1_exact_self": 0, "top10_exact_self": 0, "top10_same_patient": 0},
+            "train": {
+                "queries": 0,
+                "top1_exact_self": 0,
+                "top10_exact_self": 0,
+                "top10_same_patient": 0,
+            },
+            "dev": {
+                "queries": 0,
+                "top1_exact_self": 0,
+                "top10_exact_self": 0,
+                "top10_same_patient": 0,
+            },
         }
 
     def observe(
@@ -179,7 +186,7 @@ class RetrievalAudit:
         if neighbors.shape[0] != len(query_edges):
             raise RuntimeError("official retrieval returned a different number of rows")
         stats = self.records[split]
-        for query_edge, patient, row in zip(query_edges, query_patients, neighbors):
+        for query_edge, patient, row in zip(query_edges, query_patients, neighbors, strict=True):
             row = np.asarray(row, dtype=np.int64)
             stats["queries"] += 1
             stats["top1_exact_self"] += int(len(row) > 0 and int(row[0]) == int(query_edge))
@@ -231,15 +238,20 @@ def install_retrieval_hook(EHRMemoryAttention: Any, audit: RetrievalAudit) -> No
         split = getattr(self, "_audit_split", None)
         query_patients = getattr(self, "_audit_query_patients", None)
         if split is not None and query_edges is not None and query_patients is not None:
-            index_array = indices.detach().cpu().numpy() if hasattr(indices, "detach") else np.asarray(indices)
+            index_array = (
+                indices.detach().cpu().numpy()
+                if hasattr(indices, "detach")
+                else np.asarray(indices)
+            )
             audit.observe(split, np.asarray(query_edges), np.asarray(query_patients), index_array)
         return distances, indices
 
     EHRMemoryAttention.neighbour_search = wrapped
 
 
-def _prepare_batch(batch: Any, modules: dict[str, Any], device: Any, padding: dict[str, int]) -> tuple[Any, ...]:
-    torch = modules["torch"]
+def _prepare_batch(
+    batch: Any, modules: dict[str, Any], device: Any, padding: dict[str, int]
+) -> tuple[Any, ...]:
     replace = modules["replace_with_padding_woken"]
     records, masks, targets, visit2edge = batch
     records = {key: replace(value, -1, padding[key]).to(device) for key, value in records.items()}
@@ -247,7 +259,7 @@ def _prepare_batch(batch: Any, modules: dict[str, Any], device: Any, padding: di
     targets = {key: value.to(device) for key, value in targets.items()}
     visit2edge = visit2edge.to(device)
     bsz, max_visit, _ = targets["loss_bce_target"].shape
-    valid = (masks["key_padding_mask"] == False).reshape(bsz * max_visit)
+    valid = (~masks["key_padding_mask"]).reshape(bsz * max_visit)
     return records, masks, targets, visit2edge, valid, bsz, max_visit
 
 
@@ -356,10 +368,15 @@ def train_recommendation(
             result, side_loss = model(records, masks, valid, visit2edge)
             target_bce = targets["loss_bce_target"].reshape(bsz * max_visit, -1)[valid]
             target_multi = targets["loss_multi_target"].reshape(bsz * max_visit, -1)[valid]
-            loss_bce = F.binary_cross_entropy_with_logits(result, target_bce, reduction="none").mean()
-            loss_multi = F.multilabel_margin_loss(
-                torch.sigmoid(result), target_multi, reduction="none"
-            ).mean() * args.multi_weight
+            loss_bce = F.binary_cross_entropy_with_logits(
+                result, target_bce, reduction="none"
+            ).mean()
+            loss_multi = (
+                F.multilabel_margin_loss(
+                    torch.sigmoid(result), target_multi, reduction="none"
+                ).mean()
+                * args.multi_weight
+            )
             probabilities = torch.sigmoid(result).detach().cpu().numpy()
             labels = multihot2idx((probabilities >= 0.5).astype(np.float32))
             current_ddi = _batch_ddi(labels, ddi)
@@ -367,7 +384,9 @@ def train_recommendation(
             if current_ddi <= args.target_ddi:
                 loss_ddi = loss_ddi * 0.0
             else:
-                loss_ddi = loss_ddi * (((current_ddi - args.target_ddi) / args.kp) * args.ddi_weight)
+                loss_ddi = loss_ddi * (
+                    ((current_ddi - args.target_ddi) / args.kp) * args.ddi_weight
+                )
             loss_ssl = side_loss["ssl"] * args.ssl_weight
             loss = loss_bce + loss_multi + loss_ssl + loss_ddi
             optimizer.zero_grad()
@@ -393,7 +412,14 @@ def train_recommendation(
 
         if epoch in checkpoints or epoch == args.epochs:
             dev_metrics, _scores, _targets = evaluate_split(
-                model, eval_loader, modules, device, padding, dev_edge_patient, "dev", ddi,
+                model,
+                eval_loader,
+                modules,
+                device,
+                padding,
+                dev_edge_patient,
+                "dev",
+                ddi,
                 record_audit=False,
             )
             record = {
@@ -457,11 +483,19 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     train_visits = sum(len(visits) for visits in train_data)
     dev_visits = sum(len(visits) for visits in dev_data)
     train_edge_patient = np.asarray(
-        [patient_id for patient_id, visits in zip(train_patient_ids, train_data) for _ in visits],
+        [
+            patient_id
+            for patient_id, visits in zip(train_patient_ids, train_data, strict=True)
+            for _ in visits
+        ],
         dtype=np.int64,
     )
     dev_edge_patient = np.asarray(
-        [patient_id for patient_id, visits in zip(dev_patient_ids, dev_data) for _ in visits],
+        [
+            patient_id
+            for patient_id, visits in zip(dev_patient_ids, dev_data, strict=True)
+            for _ in visits
+        ],
         dtype=np.int64,
     )
     if len(train_edge_patient) != train_visits or len(dev_edge_patient) != dev_visits:
@@ -475,7 +509,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     }
     if voc_size_dict["med"] != 131:
         raise RuntimeError("canonical medication vocabulary is not 131 entries")
-    idx2word_dict = {name: _idx2word(vocabulary[f"{name}_voc"]) if name != "proc" else _idx2word(vocabulary["pro_voc"]) for name in name_lst}
+    idx2word_dict = {
+        name: _idx2word(vocabulary[f"{name}_voc"])
+        if name != "proc"
+        else _idx2word(vocabulary["pro_voc"])
+        for name in name_lst
+    }
     idx2word_dict["diag"] = _idx2word(vocabulary["diag_voc"])
     idx2word_dict["proc"] = _idx2word(vocabulary["pro_voc"])
     idx2word_dict["med"] = _idx2word(vocabulary["med_voc"])
@@ -553,8 +592,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         snapshot / "ddi_A_final.pkl",
         args,
     )
-    final_metrics, final_scores, final_targets = evaluate_split(
-        model, eval_loader, modules, device, padding, dev_edge_patient, "dev", ddi,
+    final_metrics, _final_scores, _final_targets = evaluate_split(
+        model,
+        eval_loader,
+        modules,
+        device,
+        padding,
+        dev_edge_patient,
+        "dev",
+        ddi,
         record_audit=True,
     )
     # The final evaluate_split above already populated the Dev audit.  Run one
@@ -614,7 +660,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if args.output is not None:
         output = args.output.resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(json.dumps(result_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        output.write_text(
+            json.dumps(result_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
     print(json.dumps(result_payload, sort_keys=True), flush=True)
     return result_payload
 

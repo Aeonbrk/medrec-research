@@ -7,7 +7,6 @@ import argparse
 from pathlib import Path
 
 import numpy as np
-
 from run_official_fidelity import _idx2word, _load, _official_imports, _prepare_batch
 
 
@@ -33,11 +32,7 @@ def main() -> None:
     adjacency = modules["construct_graphs"](train_data, nums_dict=voc_size)
     n_edges = int(adjacency["diag"].shape[1])
     embedding_path = (
-        args.official_root.resolve()
-        / "pretrain"
-        / "embed"
-        / "hgt"
-        / "hgt_embed_mimic_3_3.pkl"
+        args.official_root.resolve() / "pretrain" / "embed" / "hgt" / "hgt_embed_mimic_3_3.pkl"
     )
     embeddings = torch.load(str(embedding_path), map_location="cpu")
     device = torch.device(f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")

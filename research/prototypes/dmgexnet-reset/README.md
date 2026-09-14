@@ -84,7 +84,7 @@ unrun or inadmissible path from being presented as a faithful result.
 | --- | ---: | ---: | ---: | ---: | ---: |
 | MoleRec (existing canonical reference) | 0.529174 | 0.683480 | 0.773576 | 0.072223 | 21.5451 |
 | GraphRefine-SameK (existing canonical reference) | 0.533650 | 0.687394 | 0.784240 | 0.073328 | 21.5451 |
-| HypeMed (existing canonical reference) | 0.431689 | 0.594725 | 0.721035 | 0.072674 | 13.463850 |
+| HypeMed-LeakageSafe (canonical comparison reference) | 0.512112 | 0.668091 | 0.753822 | 0.059404 | 23.6549 |
 | DMGExNet | **NOT RUN** | **NOT RUN** | **NOT RUN** | **NOT RUN** | **NOT RUN** |
 | DMGExNet-MoleRecK | **NOT RUN** | **NOT RUN** | **NOT RUN** | **NOT RUN** | **NOT RUN** |
 
@@ -93,6 +93,11 @@ Implementation fidelity: `DMGEXNET_ADAPTATION_FIDELITY_UNRESOLVED`.
 Canonical performance: no scientific STOP/HEALTHY verdict is issued because
 fidelity is unresolved. Terminal decision: **`DMGEXNET_INFORMATION_BUDGET_MISMATCH`**.
 No threshold, layer, learning-rate, epoch, or cardinality rescue was run.
+
+The previous HypeMed adapter row (`0.431689`) is not a canonical reference;
+it is `SUPERSEDED_NON_FAITHFUL_HYPEMED_ADAPTER`. Use the leakage-safe HypeMed
+surface above and the unified phase record at
+[`research/memory/modern-backbone-calibration.md`](../../memory/modern-backbone-calibration.md).
 
 `audit-report.json` is machine-readable and contains no patient rows,
 predictions, checkpoints, or held-out resources. No Audit/test resource was

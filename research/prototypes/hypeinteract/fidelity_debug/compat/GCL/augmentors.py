@@ -7,6 +7,7 @@ class Compose:
             x, edge_index, edge_weight = augmentor(x, edge_index, edge_weight)
         return x, edge_index, edge_weight
 
+
 class EdgeRemoving:
     def __init__(self, pe=0.0):
         self.pe = pe
