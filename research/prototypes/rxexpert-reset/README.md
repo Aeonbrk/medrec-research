@@ -114,6 +114,12 @@ post-run metadata-only correction that names the four supplied GRUs per path
 as `gru_experts_per_path` and separately records the official 16-gate router;
 the numeric run and model computation are unchanged.
 
+Source sanity was limited to loading the pinned upstream modules and supplied
+feature files, constructing the official graphs, and passing finite CPU/CUDA
+forward/backward probes.  The upstream positional-split/test loop was not run:
+it would access noncanonical/held-out resources and is not evidence for this
+screen; the README checkpoint was not used as a tuning target.
+
 | Method | Jaccard | F1 | PRAUC | DDI | AvgMed |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | MoleRec | 0.529174 | 0.683480 | 0.773576 | 0.072223 | 21.5451 |
