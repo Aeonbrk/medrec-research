@@ -55,7 +55,7 @@ The real-data command is intentionally explicit and should be launched on
 CUDA_VISIBLE_DEVICES=0 \
   python research/prototypes/medstate/run_medstate.py \
   --snapshot-root /root/zhb/medrec-data/snapshots/molerec-table1-c721-www23 \
-  --train-dev-root /root/zhb/medrec-data/idea008/gate01-train-dev-5752596a-20260913 \
+  --train-dev-root /root/zhb/medrec-data/idea008/gate01-train-dev-5752596a-20260913a \
   --source-revision <clean-commit> \
   --output /root/zhb/medrec-data/prototypes/medstate/screen.json
 ```
@@ -74,5 +74,44 @@ GlobalStrong accuracy/safety bar. No tuning or rescue is permitted.
 
 ### Result record
 
-The single configured run and its terminal recommendation will be recorded
-here after execution. No Idea 009 or formal Gate will be created.
+- Run-code revision: `b2ec9ece7b42816ba60d8bf7daf65221fdfcbde0`
+- Device: CUDA GPU 0, seed `20260914`
+- Train: 4,233 patients / 10,489 visits
+- Gate01-Dev: 1,004 patients / 2,130 visits
+
+| Surface | Jaccard | F1 | PRAUC | Precision | Recall | DDI rate | Mean count | Count std |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GlobalStrong (MoleRec) | 0.529174 | 0.683480 | 0.773576 | 0.661221 | 0.736513 | 0.072223 | 21.545070 | 5.762196 |
+| StatelessRelational | 0.482689 | 0.640719 | 0.757210 | 0.749771 | 0.588991 | 0.080348 | 15.402347 | 5.873238 |
+| PersistentIndependent | 0.459072 | 0.619027 | 0.746542 | 0.759243 | 0.549090 | 0.073197 | 14.048826 | 5.003141 |
+| PersistentRelational | 0.475019 | 0.634257 | 0.752642 | 0.748652 | 0.575903 | 0.082448 | 15.047887 | 5.393489 |
+
+PersistentRelational is the best persistent surface. Its Jaccard deltas are
+`-0.007670` versus StatelessRelational and `-0.054155` versus GlobalStrong.
+The PersistentIndependent DDI delta versus GlobalStrong is `+0.000974`; the
+PersistentRelational delta is `+0.010225`. Mean medication counts are lower
+than GlobalStrong by `7.496244` and `6.497183`, respectively, so the result is
+not a prescription-size inflation effect. The permitted small-positive-delta
+diagnostic was not run because the best persistent mechanism delta is already
+below the `0.002` kill boundary.
+
+### State dynamics
+
+| Surface | Mean `||s_pre-s_prev||` | Std | Consecutive cosine mean | Cosine std | Active change | Never-prescribed change | Near-zero fraction |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| StatelessRelational | 6.210677 | 1.572081 | 1.000000 | 0.000000 | 8.395403 | 5.995529 | 0.000000 |
+| PersistentIndependent | 3.327794 | 1.656173 | 0.719075 | 0.123486 | 2.013642 | 3.457210 | 0.000000 |
+| PersistentRelational | 4.308252 | 1.639575 | 0.669727 | 0.163641 | 2.966901 | 4.440346 | 0.000000 |
+
+The PersistentRelational-versus-StatelessRelational per-visit Jaccard delta is
+mean `-0.007670`, std `0.075093`, positive on `40.0%` of the 2,130 visits.
+Persistent diagnostics contain 147,506 consecutive medication-state
+transitions; no state changes were at or below the `1e-3` near-zero threshold.
+
+The targeted contracts all passed before the data run: current-target leakage,
+previous-visit causal effect, stateless reset, persistent identity carry,
+medication-index permutation equivariance, and finite CUDA forward/backward.
+The aggregate scope flags are all false for heldout, test, Audit, G3, and G4
+resources. No Idea 009 or formal Gate was created, and no push was performed.
+
+Terminal recommendation: `KILL_PERSISTENT_MED_STATE`
