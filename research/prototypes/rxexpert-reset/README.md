@@ -151,6 +151,14 @@ utilization:
  0.062500, 0.020833, 0.000000, 0.125000]
 ```
 
+Post-training mean routing weights were:
+
+```text
+[0.054752, 0.051145, 0.069341, 0.061392, 0.058788, 0.080485,
+ 0.055927, 0.071581, 0.061603, 0.071426, 0.058640, 0.055148,
+ 0.066556, 0.051598, 0.064666, 0.066950]
+```
+
 The feature gate passed: the canonical-to-official medication mapping was
 identity with mapping checksum
 `55362ad63c61cc4b91f7583d455ae5ab0dbac991b1a14a6cf835a8e46fb98d2b`;
