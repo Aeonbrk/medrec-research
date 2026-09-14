@@ -60,5 +60,71 @@ is no rescue, target collapse, model training, or hyperparameter search.
 
 ## Result
 
-The aggregate result is recorded in `result.json` after the one authorized
-Train/Gate01-Dev run. This surface does not create Idea 009 or a formal Gate.
+The aggregate result is recorded in [`result.json`](result.json) from one
+authorized Train/Gate01-Dev run. The run-code revision was
+`8ad4c599bb464c539e6641d75c776cdb79efce7f`; the repository state before this
+prototype was `a85c12a4171d1536d0339001dbe13990f94ceb78`, and
+`origin/main` remained `530f4d22111f385c8f735454cde36155363d7292`.
+
+### Alignment
+
+| Measure | All selected admissions | Train | Gate01-Dev |
+| --- | ---: | ---: | ---: |
+| Raw prescription rows | 1,238,801 | 1,016,153 | 222,648 |
+| Rows with valid NDC | 1,068,492 | 880,681 | 187,811 |
+| Rows mapped to any ATC4 | 811,208 | 663,035 | 148,173 |
+| Canonical 131-vocabulary rows | 786,818 | 643,033 | 143,785 |
+| Rows outside canonical vocabulary | 24,390 | 20,002 | 4,388 |
+| Unmapped rows | 427,593 | 353,118 | 74,475 |
+| Normalized route classes | 66 | 62 | 51 |
+| Route observed | 99.999873% | 100% | 99.999305% |
+| Numeric dose plus unit | 93.516417% | 93.576379% | 93.248253% |
+
+NDC alignment follows the existing SafeDrug c721 NDC → RxNorm → ATC4 lineage
+with no ambiguous mapping keys. Routes are only trimmed, uppercased, and
+whitespace-normalized; clinically distinct values are retained. `PROD_STRENGTH`
+is present on all canonical rows but is not used to infer doses. Dose kinds in
+the selected rows are 735,804 single-numeric, 41,234 numeric-range, 9,775
+otherwise-unparsable, and 5 textual values.
+
+### Admission and episode semantics
+
+| Diagnostic | Train | Gate01-Dev |
+| --- | ---: | ---: |
+| Canonical admission-medication pairs | 198,844 | 41,946 |
+| One unique dose-route pair | 55.9207% | 54.4843% |
+| Multiple doses, same route | 18.9923% | 17.5344% |
+| Same dose, multiple routes | 3.3524% | 3.1421% |
+| Multiple doses and routes | 21.7346% | 24.8391% |
+| Pairs with temporally supported config change | 69,716 (79.5400% of multi-config) | 15,463 (80.9920% of multi-config) |
+| Route-temporally-distinct fraction of multi-route pairs | 73.4524% | 75.0596% |
+| Duplicate order-row fraction | 6.2536% | 6.5083% |
+| Episode ordering ambiguity rate | 54.3878% | 55.4995% |
+
+Stable complete admission units number 103,848 in Train and 21,615 in
+Gate01-Dev (10,480 and 2,129 supported cases; mean sizes 9.91 and 10.15).
+Complete temporal episodes would yield 565,311 and 125,551 units (10,485 and
+2,129 cases; mean sizes 53.92 and 58.97), but the canonical diagnosis and
+procedure inputs are admission-level and have no event timestamps. All 4,231
+Train and 1,004 Gate01-Dev patients with at least two prescription decision
+points therefore have zero episodes with proven strictly preceding clinical
+context under the causal contract.
+
+Admission-unit concentration is top-10/top-25/bottom-half share
+31.9765%/61.3859%/6.2197% in Train and 32.7504%/63.1506%/6.5279% in
+Gate01-Dev. Episode-unit concentration is
+56.6851%/78.5672%/2.6209% and 56.5420%/79.9675%/2.5464%, respectively.
+
+### Decision
+
+The predeclared floors require causal episode context, or otherwise at least
+90% stable complete admission pairs, 90% observed routes, and 80% numeric
+dose-plus-unit rows. Observed values are episode context `0`, stable admission
+pair fraction `0.521047`, route fraction `0.999999`, and dose fraction
+`0.935164`. No model was trained, no target collapse or rescue was attempted,
+and no Idea 009, formal Gate, heldout/Audit/G3/G4/historical-test resource, or
+push was used.
+
+### Terminal decision
+
+`KILL_RXUNIT_UNSUPPORTABLE_TARGET`
