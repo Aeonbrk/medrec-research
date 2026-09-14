@@ -25,7 +25,12 @@ The official coarse path therefore retains:
 
 The adaptation changes only the data root, the patient-disjoint Train and
 Gate01-Dev partition, target-free history construction, explicit medication
-index alignment, and canonical evaluation.  It uses the official defaults:
+index alignment, canonical evaluation, and one bounded execution optimization:
+the patient-independent GIN branches are evaluated once per 32-visit
+gradient-accumulation batch rather than once per single-visit update.  This
+keeps the official modules, dropout, loss, and 50-epoch budget but is reported
+as `RXEXPERT_MINOR_EXECUTION_PATCHES_ONLY`, not byte-for-byte upstream
+optimizer scheduling.  It uses the official defaults:
 dimension 64, dropout 0.7, Adam at `5e-4`, no weight decay, 50 epochs,
 threshold 0.5, DDI coefficient `0.0005`, and the upstream
 `0.95 BCE + 0.05 multilabel-margin + MoE auxiliary + DDI` loss.  The primary
@@ -86,6 +91,7 @@ patient-conditioned router.
 | DDI substructure mask | Official `ddi_mask_H.pkl`, explicitly remapped by code | Exact | Official mask has 492 substructures |
 | Cross-feature fusion and history attention | Upstream `CFM` and `patient_data[:-1]` semantics | Exact | Current target is masked at adapter boundary |
 | Recommendation head and DDI penalty | Upstream head and `0.0005` penalty | Exact | Official loss preserved |
+| Static GIN execution schedule | One training-mode graph result replayed per 32-visit accumulation batch | Minor execution patch | Makes the official 50-epoch screen tractable; all graph parameters remain trainable |
 | Dataset/split/evaluation | Canonical snapshot and Train/Gate01-Dev | Changed | Required comparison protocol adaptation |
 | Python identifier spelling | `Rx-Expert` mechanically renamed to `RxExpert` | Minor execution patch | Published source is syntactically invalid otherwise |
 
