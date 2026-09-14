@@ -7,7 +7,6 @@ import argparse
 import hashlib
 import json
 import sys
-from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +42,17 @@ DEFAULT_EPOCHS = 6
 DEFAULT_BATCH_SIZE = 64
 DEFAULT_LEARNING_RATE = 1e-3
 DEFAULT_WEIGHT_DECAY = 1e-4
+
+
+def _adjacent_pairs(values: tuple[np.ndarray, ...]) -> Any:
+    iterator = iter(values)
+    try:
+        previous = next(iterator)
+    except StopIteration:
+        return
+    for current in iterator:
+        yield previous, current
+        previous = current
 
 
 def gate01_dev(patient_id: int) -> bool:
@@ -220,15 +230,16 @@ def _predict(
     one_step_cardinality = first_cardinality_logits.argmax(axis=1).astype(np.int64)
     standalone = tuple(
         topk_set(row, int(cardinality))
-        for row, cardinality in zip(final_logits, predicted_cardinality, strict=True)
+        for row, cardinality in zip(final_logits, predicted_cardinality)  # noqa: B905
     )
     one_step = tuple(
         topk_set(row, int(cardinality))
-        for row, cardinality in zip(first_logits, one_step_cardinality, strict=True)
+        for row, cardinality in zip(first_logits, one_step_cardinality)  # noqa: B905
     )
     base = backbone_sets(scores)
     same_k = tuple(
-        topk_set(row, len(base_set)) for row, base_set in zip(final_logits, base, strict=True)
+        topk_set(row, len(base_set))
+        for row, base_set in zip(final_logits, base)  # noqa: B905
     )
     return {
         "final_logits": final_logits,
@@ -268,7 +279,7 @@ def _reverse_change_summary(states: tuple[np.ndarray, ...]) -> dict[str, Any]:
     if len(states) < 2:
         raise RuntimeError("reverse trace did not contain enough states")
     changed_any = np.zeros(states[0].shape[0], dtype=bool)
-    for before, after in pairwise(states):
+    for before, after in _adjacent_pairs(states):
         changed_any |= np.any(before != after, axis=1)
     return {
         "changed_fraction_initial_to_final": float(np.any(states[0] != states[-1], axis=1).mean()),

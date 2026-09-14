@@ -14,7 +14,6 @@ import math
 import random
 from collections.abc import Sequence
 from dataclasses import dataclass
-from itertools import pairwise
 from typing import Any
 
 CANDIDATE_COUNT = 131
@@ -53,6 +52,19 @@ def _require_torch() -> Any:
     return torch
 
 
+def _adjacent_pairs(values: Sequence[Any]) -> Any:
+    """Yield adjacent pairs on both the Python 3.8 baseline and core runtimes."""
+
+    iterator = iter(values)
+    try:
+        previous = next(iterator)
+    except StopIteration:
+        return
+    for current in iterator:
+        yield previous, current
+        previous = current
+
+
 def validate_noise_schedule(alpha_bars: Sequence[float]) -> tuple[float, ...]:
     """Validate a monotone prevalence-preserving schedule once at the boundary."""
 
@@ -63,7 +75,7 @@ def validate_noise_schedule(alpha_bars: Sequence[float]) -> tuple[float, ...]:
         raise ValueError("noise schedule values must be finite probabilities")
     if values[0] != 1.0:
         raise ValueError("the first noise level must be clean (alpha_bar=1)")
-    if any(left < right for left, right in pairwise(values)):
+    if any(left < right for left, right in _adjacent_pairs(values)):
         raise ValueError("alpha_bar must be non-increasing with noise level")
     return values
 
@@ -104,8 +116,8 @@ def corrupt_membership_with_uniforms(
     if any(len(row) != medication_count for row in replacement_uniforms):
         raise ValueError("replacement uniforms must match prevalence width")
     rows: list[tuple[float, ...]] = []
-    for clean_row, preserve_row, replacement_row in zip(
-        clean, preserve_uniforms, replacement_uniforms, strict=True
+    for clean_row, preserve_row, replacement_row in zip(  # noqa: B905
+        clean, preserve_uniforms, replacement_uniforms
     ):
         rows.append(
             tuple(
@@ -113,7 +125,7 @@ def corrupt_membership_with_uniforms(
                 if float(preserve_value) < float(alpha_bar)
                 else float(float(replacement_value) < float(prevalence[index]))
                 for index, (clean_value, preserve_value, replacement_value) in enumerate(
-                    zip(clean_row, preserve_row, replacement_row, strict=True)
+                    zip(clean_row, preserve_row, replacement_row)  # noqa: B905
                 )
             )
         )
@@ -163,7 +175,7 @@ def reverse_sample_state(
     if any(len(row) != len(prevalence) for row in uniforms):
         raise ValueError("reverse uniforms must match prevalence width")
     rows: list[tuple[float, ...]] = []
-    for probability_row, uniform_row in zip(clean_probability, uniforms, strict=True):
+    for probability_row, uniform_row in zip(clean_probability, uniforms):  # noqa: B905
         rows.append(
             tuple(
                 float(
@@ -172,7 +184,7 @@ def reverse_sample_state(
                     + (1.0 - float(alpha_bar_previous)) * float(prevalence[index])
                 )
                 for index, (probability, uniform) in enumerate(
-                    zip(probability_row, uniform_row, strict=True)
+                    zip(probability_row, uniform_row)  # noqa: B905
                 )
             )
         )
@@ -232,19 +244,19 @@ def trace_change_summary(
         raise ValueError("reverse states must have equal non-zero medication width")
     flips_per_step = []
     changed_any = [False] * rows
-    for before, after in pairwise(states):
+    for before, after in _adjacent_pairs(states):
         flips = [
-            sum(float(left) != float(right) for left, right in zip(row_a, row_b, strict=True))
-            for row_a, row_b in zip(before, after, strict=True)
+            sum(float(left) != float(right) for left, right in zip(row_a, row_b))  # noqa: B905
+            for row_a, row_b in zip(before, after)  # noqa: B905
         ]
         flips_per_step.append(sum(flips) / rows)
-        changed_any = [old or value > 0 for old, value in zip(changed_any, flips, strict=True)]
+        changed_any = [old or value > 0 for old, value in zip(changed_any, flips)]  # noqa: B905
     initial = states[0]
     final = states[-1]
     changed_fraction = (
         sum(
-            any(float(left) != float(right) for left, right in zip(row_a, row_b, strict=True))
-            for row_a, row_b in zip(initial, final, strict=True)
+            any(float(left) != float(right) for left, right in zip(row_a, row_b))  # noqa: B905
+            for row_a, row_b in zip(initial, final)  # noqa: B905
         )
         / rows
     )
