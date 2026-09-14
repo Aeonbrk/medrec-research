@@ -90,10 +90,13 @@ PersistentRelational is the best persistent surface. Its Jaccard deltas are
 `-0.007670` versus StatelessRelational and `-0.054155` versus GlobalStrong.
 The PersistentIndependent DDI delta versus GlobalStrong is `+0.000974`; the
 PersistentRelational delta is `+0.010225`. Mean medication counts are lower
-than GlobalStrong by `7.496244` and `6.497183`, respectively, so the result is
-not a prescription-size inflation effect. The permitted small-positive-delta
-diagnostic was not run because the best persistent mechanism delta is already
-below the `0.002` kill boundary.
+than GlobalStrong by `6.142723` (StatelessRelational), `7.496244`
+(PersistentIndependent), and `6.497183` (PersistentRelational), so the result
+is not a prescription-size inflation effect. Relative to StatelessRelational,
+the DDI deltas are `-0.007152` (PersistentIndependent) and `+0.002100`
+(PersistentRelational). The permitted small-positive-delta diagnostic was not
+run because the best persistent mechanism delta is already below the `0.002`
+kill boundary.
 
 ### State dynamics
 
