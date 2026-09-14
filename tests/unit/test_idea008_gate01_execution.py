@@ -230,6 +230,107 @@ def test_frozen_molerec_inputs_are_detached_from_learned_backpropagation() -> No
     assert embeddings.grad is None
 
 
+def test_gate01_molerec_path_uses_all_keyword_forward_and_same_forward_capture(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    torch = _torch()
+
+    class _ScoreExtractor(torch.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.calls = 0
+
+        def forward(self, molecule_embeddings: object) -> object:
+            self.calls += 1
+            return molecule_embeddings[:, 0]
+
+    class _SignatureFaithfulMoleRec(torch.nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.score_extractor = _ScoreExtractor()
+            self.forward_calls = 0
+            self.seen_inputs: dict[str, object] = {}
+            self.grad_enabled: list[bool] = []
+            self.embedding_requires_grad: bool | None = None
+
+        def forward(
+            self,
+            substruct_data: object,
+            mol_data: object,
+            patient_data: object,
+            ddi_mask_H: object,
+            tensor_ddi_adj: object,
+            average_projection: object,
+        ) -> tuple[object, None]:
+            self.forward_calls += 1
+            self.seen_inputs = {
+                "substruct_data": substruct_data,
+                "mol_data": mol_data,
+                "patient_data": patient_data,
+                "ddi_mask_H": ddi_mask_H,
+                "tensor_ddi_adj": tensor_ddi_adj,
+                "average_projection": average_projection,
+            }
+            self.grad_enabled.append(torch.is_grad_enabled())
+            embeddings = torch.arange(MODULE.CANDIDATE_COUNT * 2, dtype=torch.float32).reshape(
+                MODULE.CANDIDATE_COUNT, 2
+            )
+            self.embedding_requires_grad = embeddings.requires_grad
+            return self.score_extractor(embeddings), None
+
+    model = _SignatureFaithfulMoleRec()
+    forward_inputs = {
+        "substruct_data": object(),
+        "mol_data": object(),
+        "patient_data": object(),
+        "ddi_mask_H": object(),
+        "tensor_ddi_adj": object(),
+        "average_projection": object(),
+    }
+
+    # Reproduce the original controller defect against the pinned signature:
+    # the positional value binds ``substruct_data`` and the keyword repeats it.
+    with pytest.raises(TypeError, match="multiple values for argument 'substruct_data'"):
+        MODULE.extract_frozen_molerec_features(
+            model,
+            source_revision=MODULE.UPSTREAM_MOLEREC_REVISION,
+            profile=MODULE.MOLEREC_PROFILE,
+            checkpoint_sha256=MODULE.MOLEREC_CHECKPOINT_SHA256,
+            dataset_id=MODULE.DATASET_ID,
+            forward_args=(forward_inputs["patient_data"],),
+            forward_kwargs=forward_inputs,
+        )
+    assert model.forward_calls == 0
+
+    original = MODULE.extract_frozen_molerec_features
+    observed_calls: list[dict[str, object]] = []
+
+    def spy(model_arg: object, **kwargs: object) -> object:
+        observed_calls.append(kwargs)
+        return original(model_arg, **kwargs)
+
+    monkeypatch.setattr(MODULE, "extract_frozen_molerec_features", spy)
+    features = MODULE.extract_gate01_molerec_features(model, **forward_inputs)
+
+    assert len(observed_calls) == 1
+    assert observed_calls[0]["forward_args"] == ()
+    assert observed_calls[0]["forward_kwargs"] == forward_inputs
+    assert model.forward_calls == 1
+    assert model.score_extractor.calls == 1
+    assert model.seen_inputs == forward_inputs
+    assert model.grad_enabled == [False]
+    assert model.training is False
+    assert model.embedding_requires_grad is False
+    assert features.same_forward is True
+    assert features.eval_mode is True
+    assert features.no_grad is True
+    assert len(features.scores) == MODULE.CANDIDATE_COUNT
+    assert features.scores == tuple(float(2 * index) for index in range(131))
+    assert features.embeddings == tuple(
+        (float(2 * index), float(2 * index + 1)) for index in range(131)
+    )
+
+
 def test_objective_contains_exact_bce_hinge_and_cardinality_terms() -> None:
     torch = _torch()
     logits = torch.zeros((2, MODULE.CANDIDATE_COUNT), dtype=torch.float32)

@@ -144,6 +144,42 @@ MOLEREC_UPSTREAM_ROOT = "/root/zhb/MoleRec"
 MOLEREC_DATASET_SUBDIRECTORY = "snapshots/molerec-table1-c721-www23"
 
 
+def extract_gate01_molerec_features(
+    model: Any,
+    *,
+    substruct_data: Any,
+    mol_data: Any,
+    patient_data: Any,
+    ddi_mask_H: Any,
+    tensor_ddi_adj: Any,
+    average_projection: Any,
+) -> FrozenMoleRecFeatures:
+    """Extract one Gate 01 feature record through the pinned MoleRec contract.
+
+    MoleRec's pinned ``forward`` takes six positional-or-keyword parameters,
+    but the formal execution path supplies every one by keyword.  Keeping this
+    assembly in the Idea-local runner prevents an external controller from
+    accidentally binding ``patient_data`` to ``substruct_data``.
+    """
+
+    return extract_frozen_molerec_features(
+        model,
+        source_revision=UPSTREAM_MOLEREC_REVISION,
+        profile=MOLEREC_PROFILE,
+        checkpoint_sha256=MOLEREC_CHECKPOINT_SHA256,
+        dataset_id=DATASET_ID,
+        forward_args=(),
+        forward_kwargs={
+            "substruct_data": substruct_data,
+            "mol_data": mol_data,
+            "patient_data": patient_data,
+            "ddi_mask_H": ddi_mask_H,
+            "tensor_ddi_adj": tensor_ddi_adj,
+            "average_projection": average_projection,
+        },
+    )
+
+
 def frozen_base_from_logits(
     logits: Sequence[float], vocabulary: Sequence[str] | None = None
 ) -> tuple[int, ...]:
@@ -1670,6 +1706,7 @@ __all__ = (
     "exact_topk",
     "execution_device_for_model",
     "extract_frozen_molerec_features",
+    "extract_gate01_molerec_features",
     "extract_molerec_features",
     "fixed_lambda_family",
     "fixed_lambda_scores",
