@@ -65,8 +65,10 @@ must not be presented as candidate performance.
 
 - Run-code revision: `31fb90a0a006775427cfdb76a5575d488658e2af`
 - Starting local and origin/main: `3fa399c6238a1a30e1ec10066bdeb0ac697b76bd`
-- Final local HEAD: `31fb90a0a006775427cfdb76a5575d488658e2af`; no push was
-  performed. The remote run used a bundle checkout at the same revision.
+- Final local HEAD after recording results: `ba4c377c27b8d4b498e388d44b2e6f5d218d8159`;
+  final verified origin/main remains `3fa399c6238a1a30e1ec10066bdeb0ac697b76bd`.
+  No push was performed. The remote run used a bundle checkout at the run-code
+  revision.
 - Device: CUDA (GPU 1), seed `20260914`; Train-only prevalence was used for
   centering.
 
