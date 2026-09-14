@@ -50,7 +50,7 @@ from torch.nn.functional import binary_cross_entropy_with_logits, multilabel_mar
 DEFAULT_SEED = 20260914
 DEFAULT_EPOCHS = 50
 CHECKPOINT_EPOCHS = (10, 20, 30, 40, 50)
-EXECUTION_BATCH_SIZE = 32
+EXECUTION_BATCH_SIZE = 256
 OFFICIAL_DIM = 64
 OFFICIAL_LR = 5e-4
 OFFICIAL_DROPOUT = 0.7
@@ -678,7 +678,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "loss": "0.95 BCE + 0.05 multilabel-margin + MoE auxiliary + DDI penalty",
             "epochs": args.epochs,
             "execution_batch_size": EXECUTION_BATCH_SIZE,
-            "execution_patch": "static patient-independent GIN results replayed within 32-visit gradient-accumulation batches",
+            "execution_patch": "static patient-independent GIN results replayed within 256-visit gradient-accumulation batches",
             "threshold": 0.5,
             "inference": "sigmoid(logit) >= 0.5",
         },
