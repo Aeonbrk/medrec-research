@@ -64,7 +64,9 @@ The aggregate result is recorded in [`result.json`](result.json) from one
 authorized Train/Gate01-Dev run. The run-code revision was
 `8ad4c599bb464c539e6641d75c776cdb79efce7f`; the repository state before this
 prototype was `a85c12a4171d1536d0339001dbe13990f94ceb78`, and
-`origin/main` remained `530f4d22111f385c8f735454cde36155363d7292`.
+`origin/main` was `530f4d22111f385c8f735454cde36155363d7292`. It advanced
+externally to `9474b6abf5c8556d9152bd94505270453277533f` while this task was
+running; this task did not push.
 
 ### Alignment
 
