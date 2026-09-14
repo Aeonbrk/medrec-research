@@ -16,6 +16,8 @@ need assigned to each explicit current diagnosis problem.
   matrices. No diagnosis–medication prior is used.
 - The frozen MoleRec threshold surface is `GlobalStrong`; it does not use
   ground-truth cardinality.
+- The earlier `GraphRefine-SameK` number is a prior diagnostic without a
+  persisted checkpoint, so it is not treated as a reproducible baseline here.
 - Heldout, test, Audit, G3, and G4 resources are not read. HypeMed is not an
   input or required backbone.
 
