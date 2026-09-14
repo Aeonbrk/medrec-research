@@ -421,7 +421,7 @@ if nn is not None:
         ) -> tuple[Any, Any, Any]:
             diagnosis = self.diagnosis_embedding(diagnosis_codes) + self.diagnosis_type
             procedures = self.procedure_embedding(procedure_codes) + self.procedure_type
-            tokens = self.norm(torch.cat((diagnosis, procedures), dim=2))
+            tokens = self.norm(torch.cat((diagnosis, procedures), dim=1))
             token_mask = torch.cat((diagnosis_mask, procedure_mask), dim=1).to(dtype=torch.bool)
             tokens = tokens * token_mask.unsqueeze(-1).to(dtype=tokens.dtype)
             pooled = self.pool(_masked_mean(tokens, token_mask, dim=1))
