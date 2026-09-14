@@ -63,7 +63,7 @@ conda run --no-capture-output -n medrec-molerec-table1 \
   python run_rxexpert.py \
   --snapshot-root /root/zhb/medrec-data/snapshots/molerec-table1-c721-www23 \
   --train-dev-root /root/zhb/medrec-data/idea008/gate01-train-dev-5752596a-20260913a \
-  --official-source-root /root/zhb/medrec-data/external/rx-expert-source-0750f92cfbf51988d78693ef7797a82ead0ea585/src/coarse-grained \
+  --official-source-root /root/zhb/medrec-data/external/rx-expert-source-20260914/src/coarse-grained \
   --device 1 \
   --output /root/zhb/medrec-data/prototypes/rxexpert-reset/rxexpert-screen.json
 ```
