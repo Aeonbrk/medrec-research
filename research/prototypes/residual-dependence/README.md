@@ -57,9 +57,50 @@ The interpretation is made once from the full pattern, not tuned to Dev:
 - a roughly `+0.008` ScoreOnly-over-MoleRec gain with little interaction signal
   identifies the decision surface as the bottleneck.
 
-The terminal recommendation and aggregate numbers are appended below after
-the one remote run.
+The terminal recommendation and aggregate numbers below come from the one
+remote run. `OracleCoLabel` rows are diagnostic upper-bound evidence only and
+must not be presented as candidate performance.
 
 ### Result record
 
-_Pending the single fixed Train/Gate01-Dev run._
+- Run-code revision: `31fb90a0a006775427cfdb76a5575d488658e2af`
+- Starting local and origin/main: `3fa399c6238a1a30e1ec10066bdeb0ac697b76bd`
+- Final local HEAD: `31fb90a0a006775427cfdb76a5575d488658e2af`; no push was
+  performed. The remote run used a bundle checkout at the same revision.
+- Device: CUDA (GPU 1), seed `20260914`; Train-only prevalence was used for
+  centering.
+
+| Surface | BCE / NLL | PRAUC | Jaccard | F1 | Precision | Recall | Mean count | Count std | Status |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| MoleRec | 0.246618 | 0.773576 | 0.529174 | 0.683480 | 0.661221 | 0.736513 | 21.545071 | 5.762196 | deployable frozen comparator |
+| ScoreOnly | 0.223217 | 0.762376 | 0.498969 | 0.655857 | 0.740243 | 0.613936 | 16.266197 | 6.053830 | deployable |
+| ShuffledCoLabel | 0.255080 | 0.739166 | 0.468939 | 0.629616 | 0.709492 | 0.601317 | 16.426291 | 5.153008 | privileged diagnostic; non-deployable |
+| OracleCoLabel | 0.216182 | 0.763757 | 0.515021 | 0.669693 | 0.735967 | 0.623099 | 16.719719 | 6.432374 | privileged oracle; non-deployable |
+| MeanField | 0.227172 | 0.764049 | 0.501691 | 0.658982 | 0.741872 | 0.616222 | 16.111736 | 5.354187 | deployable diagnostic |
+
+The four required deltas (Oracle and Shuffled remain privileged diagnostics)
+are:
+
+| Comparison | Jaccard delta | NLL delta | PRAUC delta |
+| --- | ---: | ---: | ---: |
+| OracleCoLabel − ScoreOnly | +0.016051 | −0.007035 | +0.001380 |
+| OracleCoLabel − ShuffledCoLabel | +0.046081 | −0.038898 | +0.024590 |
+| MeanField − ScoreOnly | +0.002721 | +0.003955 | +0.001673 |
+| ScoreOnly − MoleRec | −0.030204 | −0.023401 | −0.011200 |
+
+The conditional fit has a finite symmetric `W` (Frobenius norm `97.859123`,
+maximum absolute entry `3.317461`, symmetry residual `0`, diagonal residual
+`0`). The seeded Dev derangement is a cyclic shift of `1382` rows and was
+verified to have no fixed points. The current-target leakage check perturbed
+each context coordinate on eight Dev rows: maximum change to that medication's
+own logit was `0.0` (tolerance `1e-6`). The five mean-field updates used no
+true Dev labels and reduced mean count by `0.154461` versus ScoreOnly, so the
+small operational gain is not count inflation.
+
+The Oracle gains over both ScoreOnly and its row-shuffled control establish
+residual conditional dependence in this frozen-score setting, but the fixed
+five-step deployable MeanField gain is only `+0.002721` Jaccard (with worse NLL
+than ScoreOnly). Under the pre-registered interpretation this is an inference
+gap, not evidence for a new recommendation architecture.
+
+Terminal recommendation: `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP`
