@@ -96,8 +96,12 @@ The 2,130 Dev visits contributed 33,456 explicit diagnosis problem states.
 | NeedCover | 0.193676 ± 0.181950 | 0.806324 ± 0.181950 | 0.167892 | 0.167892 |
 
 Near-boundary means `c_k <= 0.05` or `c_k >= 0.95` (and analogously for
-`r_k`). NeedCover's residual signal was not a constant collapse, but it still
-failed the decisive matched-depth comparison.
+`r_k`). For NeedCover, the separate coverage `(near-zero, near-one)` fractions
+were `(0.167892, 0.000000)` and residual fractions were `(0.000000,
+0.167892)`; the corresponding pairs were `(0.158238, 0.000030)` and
+`(0.000030, 0.158238)` for StaticTwoPass, and `(0.058226, 0.000329)` and
+`(0.000329, 0.058226)` for ProblemDrug. NeedCover's residual signal was not a
+constant collapse, but it still failed the decisive matched-depth comparison.
 
 The run used code revision
 `28eb0270cf18c48507abd3d0e7642cd702415de2`, CUDA, and the fixed configuration
