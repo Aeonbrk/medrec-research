@@ -58,3 +58,32 @@ the allowed safety trade-off.
 | HyperEdit-MR | 0.4975 | 0.6545 | 0.7842 | 0.0647 | 14.3085 |
 
 Recommendation: `STOP_HYPEREDIT`.
+
+## Cardinality-controlled graph diagnostic
+
+The prior checkpoint was not persisted, so the exact v0 configuration was
+retrained once with seed `20260914`; retrieval, graph layers, losses, and all
+optimizer settings were unchanged. The diagnostic used 10,489 Train visits and
+2,130 Gate01-Dev visits only. `GraphRefine-SameK` ranks the existing graph
+`set_head` logits at each frozen MoleRec cardinality; it does not call the
+sequential editor or use ground-truth cardinality.
+
+| Surface | Jaccard | F1 | PRAUC | DDI | Mean medications |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Frozen MoleRec | 0.529174 | 0.683480 | 0.773576 | 0.072223 | 21.5451 |
+| HyperEdit-MR sequential | 0.497527 | 0.654454 | 0.784240 | 0.064668 | 14.3085 |
+| GraphRefine-SameK | 0.533650 | 0.687394 | 0.784240 | 0.073328 | 21.5451 |
+
+GraphRefine-SameK preserved the MoleRec cardinality exactly (`YES`), changed
+32.02% of Dev sets, and had mean symmetric difference `0.8197`. The optional
+retrieval-pregraph SameK surface scored `0.529825 / 0.684076 / 0.776350 /
+0.072906` (Jaccard / F1 / PRAUC / DDI), changed 13.19% of sets, and had mean
+symmetric difference `0.2761`.
+
+The graph-refined ranking surface therefore shows a moderate accuracy/ranking
+movement (Jaccard `+0.004476`, F1 `+0.003914`, PRAUC `+0.010664`) at fixed
+cardinality, while DDI changes slightly upward (`+0.001105`). The sequential
+editor remains rejected; the representation signal survives for a redesigned
+cardinality-aware score refinement and explicit set decoder.
+
+Diagnostic decision: `SURVIVE_GRAPH_REFINEMENT`.

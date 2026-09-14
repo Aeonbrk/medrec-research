@@ -273,6 +273,29 @@ def backbone_sets(scores: Any) -> tuple[frozenset[int], ...]:
     return tuple(frozenset(int(index) for index in numpy.flatnonzero(row >= 0.0)) for row in values)
 
 
+def same_cardinality_topk(
+    logits: Sequence[float],
+    baseline_set: Iterable[int],
+    *,
+    candidate_count: int = CANDIDATE_COUNT,
+) -> frozenset[int]:
+    """Select the highest-scoring medications while preserving baseline size.
+
+    This is a diagnostic decoder only: the baseline set supplies ``K`` and the
+    graph-refined logits supply the ranking.  Ties resolve by medication index
+    so the result is deterministic across runtimes.
+    """
+
+    values = tuple(float(value) for value in logits)
+    if len(values) != candidate_count:
+        raise ValueError("graph logits must have the 131-candidate shape")
+    baseline = {int(item) for item in baseline_set}
+    if any(item < 0 or item >= candidate_count for item in baseline):
+        raise ValueError("baseline set contains an out-of-range medication index")
+    ranked = sorted(range(candidate_count), key=lambda index: (-values[index], index))
+    return frozenset(ranked[: len(baseline)])
+
+
 def retrieval_fusion_scores(
     scores: Any,
     support: Any,
@@ -720,6 +743,7 @@ __all__ = (
     "metric_average_precision",
     "retrieval_fusion_scores",
     "retrieve_features",
+    "same_cardinality_topk",
     "select_neighbors",
     "set_change_summary",
     "visit_projections",

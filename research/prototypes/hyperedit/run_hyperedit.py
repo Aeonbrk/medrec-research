@@ -27,6 +27,7 @@ from hyperedit import (
     hyperedit_loss,
     retrieval_fusion_scores,
     retrieve_features,
+    same_cardinality_topk,
     set_change_summary,
 )
 
@@ -255,6 +256,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         dev_scores, dev_retrieval.support, alpha=args.fusion_alpha
     )
     retrieval_predictions = backbone_sets(fusion_scores)
+    diagnostic_same_k = bool(getattr(args, "diagnostic_same_k", False))
+    graph_same_k_predictions: tuple[frozenset[int], ...] = ()
+    retrieval_same_k_predictions: tuple[frozenset[int], ...] = ()
+    if diagnostic_same_k:
+        graph_same_k_predictions = tuple(
+            same_cardinality_topk(score_row, base_set)
+            for score_row, base_set in zip(hyper_scores, dev_base)  # noqa: B905
+        )
+        retrieval_same_k_predictions = tuple(
+            same_cardinality_topk(score_row, base_set)
+            for score_row, base_set in zip(fusion_scores, dev_base)  # noqa: B905
+        )
     results = {
         "Frozen MoleRec": _metrics(dev_targets, dev_base, dev_scores, ddi),
         "MoleRec + retrieval-only score fusion": _metrics(
@@ -308,6 +321,28 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         else "STOP_HYPEREDIT",
         "last_train_loss": train_detail,
     }
+    if diagnostic_same_k:
+        graph_same_k_metrics = _metrics(dev_targets, graph_same_k_predictions, hyper_scores, ddi)
+        retrieval_same_k_metrics = _metrics(
+            dev_targets, retrieval_same_k_predictions, fusion_scores, ddi
+        )
+        base_cardinalities = tuple(len(item) for item in dev_base)
+        graph_cardinalities = tuple(len(item) for item in graph_same_k_predictions)
+        result["diagnostic_same_k"] = {
+            "graph_logits_source": "HyperEditMR.set_head output before sequential editing",
+            "GraphRefine-SameK": graph_same_k_metrics,
+            "Optional retrieval-pregraph SameK": retrieval_same_k_metrics,
+            "exact_molerec_cardinality_preserved": base_cardinalities == graph_cardinalities,
+            "graph_refine_change": set_change_summary(dev_base, graph_same_k_predictions),
+            "retrieval_pregraph_change": set_change_summary(dev_base, retrieval_same_k_predictions),
+            "mean_cardinality_difference": (
+                sum(
+                    abs(left - right)
+                    for left, right in zip(base_cardinalities, graph_cardinalities)  # noqa: B905
+                )
+                / len(base_cardinalities)
+            ),
+        }
     if args.output is not None:
         output = args.output.resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -330,6 +365,11 @@ def main() -> None:
     parser.add_argument("--lambda-set", type=float, default=DEFAULT_LAMBDA_SET)
     parser.add_argument("--lambda-ddi", type=float, default=DEFAULT_LAMBDA_DDI)
     parser.add_argument("--fusion-alpha", type=float, default=DEFAULT_FUSION_ALPHA)
+    parser.add_argument(
+        "--diagnostic-same-k",
+        action="store_true",
+        help="also decode graph and retrieval logits at the frozen MoleRec cardinality",
+    )
     args = parser.parse_args()
     result = run(args)
     print(json.dumps(result, sort_keys=True))

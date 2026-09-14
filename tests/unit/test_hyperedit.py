@@ -53,3 +53,16 @@ def test_editor_rejects_invalid_add_and_remove_actions() -> None:
 def test_stop_action_is_idempotent() -> None:
     state = MODULE.apply_edit_action({1, 2}, 2 * MODULE.CANDIDATE_COUNT)
     assert state == frozenset({1, 2})
+
+
+def test_same_cardinality_topk_uses_logits_and_preserves_baseline_size() -> None:
+    logits = tuple(float(index) for index in range(MODULE.CANDIDATE_COUNT))
+    selected = MODULE.same_cardinality_topk(logits, {1, 4, 9})
+    assert selected == frozenset({128, 129, 130})
+    assert len(selected) == 3
+
+
+def test_same_cardinality_topk_resolves_ties_by_medication_index() -> None:
+    logits = (1.0, 1.0, 1.0) + (0.0,) * (MODULE.CANDIDATE_COUNT - 3)
+    selected = MODULE.same_cardinality_topk(logits, {7, 8})
+    assert selected == frozenset({0, 1})
