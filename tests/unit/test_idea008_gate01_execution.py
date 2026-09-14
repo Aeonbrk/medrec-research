@@ -287,6 +287,14 @@ def test_gate01_molerec_path_uses_all_keyword_forward_and_same_forward_capture(
         "tensor_ddi_adj": object(),
         "average_projection": object(),
     }
+    assert tuple(inspect.signature(model.forward).parameters) == (
+        "substruct_data",
+        "mol_data",
+        "patient_data",
+        "ddi_mask_H",
+        "tensor_ddi_adj",
+        "average_projection",
+    )
 
     # Reproduce the original controller defect against the pinned signature:
     # the positional value binds ``substruct_data`` and the keyword repeats it.
