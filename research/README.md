@@ -29,6 +29,7 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 - **Runner-produced terminal classification**: `KILL_TARGET_SEMANTICS`.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain untouched.
 - **Next owner**: `ccf-integrity-auditor`.
+- **Modern-backbone calibration**: [`memory/modern-backbone-calibration.md`](memory/modern-backbone-calibration.md), terminal state `MODERN_BACKBONE_CALIBRATION_COMPLETE`; this comparison-only phase created no Idea 009 and authorizes no further backbone hunting.
 
 Idea 008 remains admitted for the same bounded kill-first method cycle. All Train-only and Dev selections remain frozen. The corrected repository-owned controller path completed one fresh Audit under the unchanged protocol and produced the single runner classification `KILL_TARGET_SEMANTICS`. Public-safe aggregate evidence is recorded in `ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-result.json`; integrity review precedes any research decision.
 

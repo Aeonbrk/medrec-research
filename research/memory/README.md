@@ -120,6 +120,7 @@ protocol/feature rescue.
 
 ## Navigation
 
+- [`modern-backbone-calibration.md`](modern-backbone-calibration.md): authoritative comparison-only calibration summary and terminal state.
 - [`research-space-reorientation.md`](research-space-reorientation.md): current cross-Idea SSOT and live routing.
 - [`literature-opportunity-map.md`](literature-opportunity-map.md): current closest-work / opportunity map.
 - [`reusable-lessons.md`](reusable-lessons.md): durable methodological guardrails.

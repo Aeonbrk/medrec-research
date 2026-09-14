@@ -103,17 +103,24 @@ otherwise-unparsable, and 5 textual values.
 
 Stable complete admission units number 103,848 in Train and 21,615 in
 Gate01-Dev (10,480 and 2,129 supported cases; mean sizes 9.91 and 10.15).
-Complete temporal episodes would yield 565,311 and 125,551 units (10,485 and
-2,129 cases; mean sizes 53.92 and 58.97), but the canonical diagnosis and
-procedure inputs are admission-level and have no event timestamps. All 4,231
-Train and 1,004 Gate01-Dev patients with at least two prescription decision
-points therefore have zero episodes with proven strictly preceding clinical
-context under the causal contract.
+They represent 130 and 123 of the 131 medications. Complete temporal episodes
+would yield 565,311 and 125,551 units (10,485 and 2,129 cases; mean sizes
+53.92 and 58.97), representing 130 and 124 medications, respectively, but the
+canonical diagnosis and procedure inputs are admission-level and have no event
+timestamps. All 4,231 Train and 1,004 Gate01-Dev patients with at least two
+prescription decision points therefore have zero episodes with proven strictly
+preceding clinical context under the causal contract.
 
 Admission-unit concentration is top-10/top-25/bottom-half share
 31.9765%/61.3859%/6.2197% in Train and 32.7504%/63.1506%/6.5279% in
 Gate01-Dev. Episode-unit concentration is
 56.6851%/78.5672%/2.6209% and 56.5420%/79.9675%/2.5464%, respectively.
+Conditioned route-row concentration is
+56.2358%/80.0702%/2.4342% (Train) and 56.6767%/81.1168%/2.3090%
+(Gate01-Dev), with 109/87 medications having at least 50 rows and 97/77 at
+least 100. Conditioned numeric-dose-row concentration is
+57.5558%/79.2177%/2.5367% and 57.1552%/80.5940%/2.4344%, with 109/86
+medications having at least 50 rows and 96/77 at least 100.
 
 ### Decision
 

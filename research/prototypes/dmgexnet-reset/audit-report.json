@@ -1,0 +1,134 @@
+{
+  "auxiliary_resources": [
+    {
+      "available_at_inference": false,
+      "canonical_status": "inadmissible_full_cohort_future_union",
+      "construction": "matrix.py allocates one row per patient, loops over every admission, and sets each code column to one; the row is therefore a whole-patient union rather than a visit-time feature. Diagnosis channel; shape [6350, 1958].",
+      "resource": "diag_new.pkl",
+      "source_data": "records.pkl (all 6,350 patients)",
+      "train_only_required": true,
+      "uses_medication_labels": false
+    },
+    {
+      "available_at_inference": false,
+      "canonical_status": "inadmissible_full_cohort_future_union",
+      "construction": "matrix.py allocates one row per patient, loops over every admission, and sets each code column to one; the row is therefore a whole-patient union rather than a visit-time feature. Procedure channel; shape [6350, 1430].",
+      "resource": "pro_new.pkl",
+      "source_data": "records.pkl (all 6,350 patients)",
+      "train_only_required": true,
+      "uses_medication_labels": false
+    },
+    {
+      "available_at_inference": false,
+      "canonical_status": "inadmissible_target_and_future_union",
+      "construction": "matrix.py allocates one row per patient, loops over every admission, and sets each code column to one; the row is therefore a whole-patient union rather than a visit-time feature. Medication channel; shape [6350, 131].",
+      "resource": "med131_new.pkl",
+      "source_data": "records.pkl (all 6,350 patients)",
+      "train_only_required": true,
+      "uses_medication_labels": true
+    }
+  ],
+  "canonical_performance": null,
+  "drug_graph_contract": {
+    "canonical_index_assertion": "not executed because information budget gate failed",
+    "required_medication_count": 131,
+    "required_resources": [
+      "ehr_adj",
+      "ddi_adj",
+      "ddi_mask_H",
+      "idx2drug"
+    ]
+  },
+  "expected_source_revision": "66b32302947e248d9caeb15ee1bfdb13b50cbdce",
+  "fidelity_checks": {
+    "cross_stream_attention_directions": "source_inspected_bidirectional_not_executed",
+    "cuda_finite_forward_backward": "not_executed_after_information_budget_gate",
+    "deterministic_seed_plumbing": "source_seed_module_missing",
+    "dev_prescriptions_excluded_from_graphs": "not_executed_after_information_budget_gate",
+    "diagnosis_procedure_streams_separate": "source_inspected_not_executed",
+    "drug_graph_vocabulary_131_alignment": "not_executed_after_information_budget_gate",
+    "historical_medications_temporally_aligned": "source_mutates_target_and_not_executed",
+    "longitudinal_visit_order": "source_inspected_not_executed",
+    "train_only_ehr_graph": "not_executed_after_information_budget_gate"
+  },
+  "implementation_fidelity": "DMGEXNET_ADAPTATION_FIDELITY_UNRESOLVED",
+  "matrix_source": {
+    "full_patient_union": true,
+    "information_budget_violation": true,
+    "output_names": [
+      "diag_new.pkl",
+      "pro_new.pkl",
+      "med131_new.pkl"
+    ],
+    "uses_all_admissions": true,
+    "uses_medication_channel": true
+  },
+  "official_inference_policy": {
+    "activation": "sigmoid",
+    "molerec_k_diagnostic": "not run",
+    "same_k_diagnostic": "not run",
+    "threshold": 0.5
+  },
+  "official_objective": {
+    "base_loss": "0.95 * BCE + 0.05 * multilabel_margin",
+    "conditional_ddi_loss": "used when current predicted DDI rate exceeds target_ddi",
+    "similarity_explanation_loss": "mixed with the base/DDI branch using a=0.9",
+    "simplified_for_canonical_run": false
+  },
+  "official_source": "https://github.com/pc-star123/DMGExNet",
+  "official_training_defaults": {
+    "a": 0.9,
+    "attention_heads": 4,
+    "embedding_dimension": 128,
+    "epochs": 70,
+    "kp": 0.05,
+    "learning_rate": 0.0005,
+    "run_status": "not_started_after_information_budget_gate",
+    "target_ddi": 0.05
+  },
+  "paper": "https://doi.org/10.1002/eng2.70899",
+  "resource_files_present": {
+    "diag_new.pkl": false,
+    "med131_new.pkl": false,
+    "pro_new.pkl": false
+  },
+  "schema_version": 1,
+  "source_execution_sanity": {
+    "defects": [
+      {
+        "evidence": "DMGExNet_main.py imports seed.set_seed but src/seed.py is absent",
+        "impact": "the official entry point cannot import",
+        "name": "missing_seed_module"
+      },
+      {
+        "evidence": "--Test is store_true with default=True",
+        "impact": "a default invocation skips the 70-epoch training loop",
+        "name": "test_mode_default"
+      },
+      {
+        "evidence": "CrossBiAttention.forward requires query, key, value",
+        "impact": "the model call supplies only query and key",
+        "name": "cross_attention_arity"
+      },
+      {
+        "evidence": "stream embeddings are 64-wide while the default Transformer d_model is 128",
+        "impact": "the declared default forward has incompatible tensor widths",
+        "name": "stream_width_mismatch"
+      },
+      {
+        "evidence": "forward overwrites the admission medication list in place",
+        "impact": "current targets can be mutated during evaluation/training",
+        "name": "in_place_target_mutation"
+      },
+      {
+        "evidence": "forward consumes patient-indexed auxiliary rows",
+        "impact": "matrix.py rows are not point-in-time visit features",
+        "name": "global_aspect_rows"
+      }
+    ],
+    "status": "blocked_by_pinned_source_execution_defects"
+  },
+  "source_revision": "66b32302947e248d9caeb15ee1bfdb13b50cbdce",
+  "source_revision_verified": true,
+  "terminal_verdict": "DMGEXNET_INFORMATION_BUDGET_MISMATCH"
+}
