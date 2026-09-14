@@ -88,6 +88,8 @@ def test_patient_conditioned_interaction_is_permutation_equivariant() -> None:
     permutation = torch.randperm(MODULE.CANDIDATE_COUNT)
     with torch.no_grad():
         original = model(patient, logits, history, relation, relation)
+        medication_embeddings = model.medication_embeddings.detach().clone()
+        model.medication_embeddings.copy_(medication_embeddings[permutation])
         permuted = model(
             patient,
             logits[:, permutation],
@@ -95,5 +97,6 @@ def test_patient_conditioned_interaction_is_permutation_equivariant() -> None:
             relation[permutation][:, permutation],
             relation[permutation][:, permutation],
         )
+        model.medication_embeddings.copy_(medication_embeddings)
     assert original.shape == (2, MODULE.CANDIDATE_COUNT)
     assert torch.allclose(permuted, original[:, permutation], atol=1e-5, rtol=1e-5)
