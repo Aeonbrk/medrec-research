@@ -73,11 +73,35 @@ Filled from the one remote Train/Gate01-Dev run:
 
 | Surface | Jaccard | F1 | PRAUC | Precision | Recall | DDI rate | Mean medications |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| GlobalStrong | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| ProblemDrug | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| StaticTwoPass | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| NeedCover | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
+| GlobalStrong | 0.529174 | 0.683480 | 0.773576 | 0.661221 | 0.736513 | 0.072223 | 21.545070 |
+| ProblemDrug | 0.466960 | 0.625717 | 0.755558 | 0.751977 | 0.565428 | 0.082206 | 14.993897 |
+| StaticTwoPass | 0.481188 | 0.639966 | 0.761894 | 0.746491 | 0.587578 | 0.081395 | 15.541784 |
+| NeedCover | 0.477415 | 0.636425 | 0.761072 | 0.745629 | 0.583867 | 0.081619 | 15.490610 |
 
-NeedCover − StaticTwoPass Jaccard: `TBD`
+NeedCover − StaticTwoPass Jaccard: `-0.00377264645`
 
-Terminal recommendation: `TBD`
+The model-count standard deviations were `5.762196` (GlobalStrong),
+`6.540338` (ProblemDrug), `6.091508` (StaticTwoPass), and `6.211919`
+(NeedCover). The final NeedCover state therefore did not gain accuracy through
+prescription-size inflation.
+
+## Coverage and residual diagnostics
+
+The 2,130 Dev visits contributed 33,456 explicit diagnosis problem states.
+
+| Surface | Coverage mean ± std | Residual mean ± std | Coverage near-boundary | Residual near-boundary |
+| --- | ---: | ---: | ---: | ---: |
+| ProblemDrug | 0.259223 ± 0.212726 | 0.740777 ± 0.212726 | 0.058555 | 0.058555 |
+| StaticTwoPass | 0.194231 ± 0.178338 | 0.805769 ± 0.178338 | 0.158268 | 0.158268 |
+| NeedCover | 0.193676 ± 0.181950 | 0.806324 ± 0.181950 | 0.167892 | 0.167892 |
+
+Near-boundary means `c_k <= 0.05` or `c_k >= 0.95` (and analogously for
+`r_k`). NeedCover's residual signal was not a constant collapse, but it still
+failed the decisive matched-depth comparison.
+
+The run used code revision
+`28eb0270cf18c48507abd3d0e7642cd702415de2`, CUDA, and the fixed configuration
+above. The permitted small-delta diagnosis-count/multimorbidity diagnostic was
+not run because the matched Jaccard delta was negative.
+
+Terminal recommendation: `KILL_NEEDCOVER_MECHANISM`
