@@ -336,6 +336,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         frozenset(sorted(np.argsort(-row, kind="stable")[: len(base)]))
         for row, base in zip(teacher_logits, base_predictions)  # noqa: B905
     )
+    exact_cardinality_preserved = tuple(map(len, base_predictions)) == tuple(
+        map(len, student_predictions)
+    )
+    if not exact_cardinality_preserved:
+        raise RuntimeError("Student-SameK decoding changed a frozen MoleRec cardinality")
     graph_refine_metrics = _load_graph_refine_metrics(args.graph_refine_result)
     graph_supported_metrics = _load_optional_metrics(args.graph_refine_supported_result)
     supported_rows = np.flatnonzero(dev_supported)
@@ -441,6 +446,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "GraphRefine-SameK": graph_refine_metrics,
             "FutureGraphKD Student-SameK": student_metrics,
         },
+        "exact_molerec_cardinality_preserved": exact_cardinality_preserved,
         "supported_dev_metrics": {
             "GraphRefine-SameK": graph_supported_metrics,
             "FutureGraphKD Student-SameK": supported_student_metrics,
