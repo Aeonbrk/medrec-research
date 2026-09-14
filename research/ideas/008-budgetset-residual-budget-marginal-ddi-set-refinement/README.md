@@ -3,8 +3,8 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `TRAIN_DEV_COMPLETE / AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION`
-- **Stage**: `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION`
+- **Status**: `TRAIN_DEV_COMPLETE / AUDIT_REAUTHORIZED_PENDING_REEXECUTION`
+- **Stage**: `IDEA_008_GATE_01_AUDIT_REAUTHORIZED_PENDING_REEXECUTION`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), revision v1.2
@@ -13,13 +13,13 @@
 - **Implementation integrity before Audit attempt**: `IMPLEMENTATION_INTEGRITY_PASS`
 - **Runner integrity before Audit attempt**: `RUNNER_INTEGRITY_PASS`
 - **Train/Dev**: complete with all selections frozen
-- **Audit controller correction**: `COMPLETE`; [`experiments/gate-01-audit-controller-fix-authorization.md`](experiments/gate-01-audit-controller-fix-authorization.md)
-- **Signature-faithful regression**: `PASS`
-- **319 Train contract smoke**: `PASS`; no scientific metrics computed
+- **Controller correction**: complete at `25888b954d8f27b7c03a759790b25f93afcd6982`
+- **Controller re-verification**: [`experiments/gate-01-audit-controller-reverification.md`](experiments/gate-01-audit-controller-reverification.md), verdict `CONTROLLER_REVERIFICATION_PASS`
+- **Fresh Audit authorization**: [`experiments/gate-01-audit-reauthorization.md`](experiments/gate-01-audit-reauthorization.md), state `AUTHORIZED_NOT_RUN`
 - **Quarantine**: intact
-- **Next owner**: `ccf-integrity-auditor`
+- **Next owner**: local execution agent
 
-Idea 008 remains admitted for the same bounded kill-first method cycle. The first Audit attempt stopped at the first Audit visit before a successful frozen MoleRec forward. No Audit prediction, metric, operating point, bootstrap result, killer comparison, seed-robustness result, or scientific Gate verdict exists.
+Idea 008 remains admitted for the same bounded kill-first method cycle. The first Audit attempt stopped before a successful frozen MoleRec forward and generated no scientific evidence. The corrected controller path passed independent re-verification, and one fresh Audit attempt from the beginning is now authorized.
 
 ## Scientific question
 
@@ -34,8 +34,6 @@ requested residual constraint slack
 ```
 
 ## Frozen scientific identity
-
-The protocol, model, checkpoint, dataset, candidate vocabulary, budgets, controls, learned configurations, and retained checkpoints remain unchanged.
 
 ```text
 MoleRec revision = dd5afaf0a503fd3de3229f86ec7f26b345d10e3a
@@ -55,23 +53,25 @@ Independent: LR 0.001, eta 5.0, epochs {2002: 7, 2003: 6, 2004: 6}
 
 No Audit quantity may alter these values.
 
-## Confirmed controller blocker
+## Controller correction and integrity result
 
-The pinned upstream MoleRec forward contract is:
+The pinned MoleRec contract is:
 
 ```text
 forward(substruct_data, mol_data, patient_data, ddi_mask_H, tensor_ddi_adj, average_projection)
 ```
 
-The failed formal controller supplied `patient_data` positionally while also supplying `substruct_data` by keyword. The positional value therefore occupied `substruct_data`, producing the runtime error `forward() got multiple values for argument 'substruct_data'`.
+The repository-owned `extract_gate01_molerec_features(...)` path passes no positional forward arguments and supplies all six pinned inputs by keyword. The signature-faithful regression reproduces the original controller TypeError and verifies exactly one eval/no-grad same-forward score/embedding extraction with the full 131-candidate contract.
 
-The correction is implementation-local: the formal Idea 008 path now supplies all six pinned forward inputs by keyword, matching the already-qualified Comparison invocation semantics. No protocol or scientific change is authorized.
+Independent re-verification found the correction bounded to the actual invocation defect and its tests, with no scientific change.
 
-## Correction and re-verification boundary
+## Fresh Audit boundary
 
-The controller-fix authorization permitted only the actual invocation correction, direct regression tests, the existing targeted/full software checks, and one narrow real-model contract smoke on a previously authorized Gate01-Train visit. Those checks passed.
+The failed first attempt contributes zero scientific evidence and must not be resumed or pooled. The fresh attempt starts from the beginning of Gate01-Audit and must use `extract_gate01_molerec_features(...)` for every pinned MoleRec visit extraction.
 
-Gate01-Audit is not authorized for another execution attempt during this phase. Stop at `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION`. Independent re-verification must pass before the pipeline coordinator can authorize a fresh Audit attempt from the beginning.
+Only protocol-v1.2 terminal evaluation is authorized: frozen controls and learned checkpoints, operating-point metrics, budget/composition response, killer frontiers, 1000 patient-clustered bootstrap resamples with seed 80081, matched-seed robustness, and exactly one terminal classification under the frozen precedence.
+
+No retraining, reselection, protocol change, new control, solver expansion, or post-hoc rescue is authorized.
 
 ## Quarantine
 
@@ -82,9 +82,11 @@ G3/G4, R0 Holdout, the historical project test, and paper-level SOTA benchmarkin
 ```text
 Idea 008: ADMITTED
 Gate01-Train + Gate01-Dev: COMPLETE
-Gate01-Audit: OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT
+First Gate01-Audit attempt: BLOCKED_NO_RESULT
+Controller re-verification: CONTROLLER_REVERIFICATION_PASS
+Fresh Gate01-Audit attempt: AUTHORIZED_NOT_RUN
 Protocol revision: v1.2 unchanged
 Scientific Gate verdict: NONE
-Stage: IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION
-Next owner: ccf-integrity-auditor
+Stage: IDEA_008_GATE_01_AUDIT_REAUTHORIZED_PENDING_REEXECUTION
+Next owner: local execution agent
 ```
