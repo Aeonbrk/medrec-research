@@ -658,7 +658,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "device_name": torch.cuda.get_device_name(device),
         "config": {
             "hidden_dimension": OFFICIAL_DIM,
-            "number_of_experts_per_path": 4,
+            "gru_experts_per_path": 4,
+            "router_gate_count": 16,
             "router": "official learned Top2Gating",
             "top_k": 2,
             "second_policy_train": "random",
