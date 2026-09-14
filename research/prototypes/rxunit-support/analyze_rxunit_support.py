@@ -516,11 +516,15 @@ def temporal_summary(state: PairAccumulator) -> dict[str, Any]:
             if end is None or end > next_start:
                 ambiguous = True
     temporal_change = False
+    route_temporal_change = False
     for index, (_, end, config) in enumerate(events[:-1]):
         next_start, _, next_config = events[index + 1]
         if config != next_config and end is not None and end <= next_start:
             temporal_change = True
-            break
+            if config[1] != next_config[1]:
+                route_temporal_change = True
+            if route_temporal_change:
+                break
     duplicate_rows = sum(count - 1 for count in state.signatures.values() if count > 1)
     nonmissing_routes = {route for route in state.route_classes if route != ROUTE_MISSING}
     nonmissing_doses = {dose for dose in state.dose_tokens if dose != DOSE_MISSING}
@@ -537,7 +541,7 @@ def temporal_summary(state: PairAccumulator) -> dict[str, Any]:
         "multiple_routes": len(nonmissing_routes) > 1,
         "multiple_doses": len(nonmissing_doses) > 1,
         "temporal_change_supported": temporal_change,
-        "route_temporal_change_supported": len(nonmissing_routes) > 1 and temporal_change,
+        "route_temporal_change_supported": route_temporal_change,
         "temporal_ordering_ambiguous": ambiguous,
     }
 
