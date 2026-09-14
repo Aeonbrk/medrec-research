@@ -1,18 +1,21 @@
-# Handoff: Idea 008 Gate 01 Audit Blocked / Controller Fix Required
+# Handoff: Idea 008 Gate 01 Audit Controller Fixed / Re-verification Pending
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_AUDIT_BLOCKED_PENDING_CONTROLLER_FIX_AND_REVERIFICATION`
+- **Current Stage**: `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Gate 01 protocol**: `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-protocol.md`
 - **Protocol revision**: `v1.2`, unchanged
 - **Gate01-Train + Gate01-Dev**: `COMPLETE`
 - **Gate01-Audit**: `OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT`
 - **Scientific Gate verdict**: none
+- **Controller correction**: `COMPLETE`
+- **Signature-faithful regression**: `PASS`
+- **319 real-model Train contract smoke**: `PASS`
 - **G3/G4**: `UNTOUCHED`
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
-- **Next owner**: local implementation agent
+- **Next owner**: `ccf-integrity-auditor`
 
 ## Frozen scientific state
 
@@ -36,17 +39,17 @@ The pinned MoleRec forward signature begins with `substruct_data, mol_data, pati
 
 This is an execution-controller integration defect, not a scientific result.
 
-## Authorized correction
+## Completed correction
 
 The bounded correction is defined in:
 
 `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-controller-fix-authorization.md`
 
-Only the formal MoleRec visit-invocation path and its direct regression tests may change. The corrected path must pass all six pinned MoleRec forward inputs by keyword and no forward input positionally.
+Only the formal MoleRec visit-invocation path and its direct regression tests changed. The corrected path passes all six pinned MoleRec forward inputs by keyword and no forward input positionally.
 
-Gate01-Audit is not authorized for another attempt during the correction or re-verification phase. One narrow real-model contract smoke may use a previously authorized Gate01-Train visit; it may verify only successful frozen score/embedding extraction.
+Gate01-Audit is not authorized for another attempt during the correction or re-verification phase. One narrow real-model contract smoke used a previously authorized Gate01-Train visit and verified only successful frozen score/embedding extraction.
 
-After the correction passes its required tests, stop at `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION` for independent integrity re-verification. A fresh Audit attempt requires a new pipeline authorization after that pass.
+The correction, required software checks, and the one authorized Train contract smoke passed. Stop at `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION` for independent integrity re-verification. A fresh Audit attempt requires a new pipeline authorization after that pass.
 
 ## Routing
 
@@ -57,7 +60,7 @@ Gate01-Train + Gate01-Dev: COMPLETE
 Gate01-Audit: OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT
 Scientific Gate verdict: NONE
 Quarantine: intact
-Stage: IDEA_008_GATE_01_AUDIT_BLOCKED_PENDING_CONTROLLER_FIX_AND_REVERIFICATION
-Next owner: local implementation agent
-Next task: apply only the authorized controller invocation correction, verify it, and stop before Audit
+Stage: IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION
+Next owner: ccf-integrity-auditor
+Next task: independently re-verify the bounded controller correction before any fresh Audit authorization
 ```

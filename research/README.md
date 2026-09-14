@@ -19,15 +19,17 @@ The project targets its first formal method paper at at least a CCF-A Data/Minin
 
 ## Current scientific state
 
-- **Stage**: `IDEA_008_GATE_01_AUDIT_BLOCKED_PENDING_CONTROLLER_FIX_AND_REVERIFICATION`.
+- **Stage**: `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION`.
 - **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
 - **Gate 01 protocol v1.2**: `DESIGN_INTEGRITY_PASS`; Train/Dev complete.
 - **Gate01-Audit**: opened on the first visit and blocked before a successful MoleRec forward; no scientific result exists.
 - **Controller fix authorization**: [`ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-controller-fix-authorization.md`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-controller-fix-authorization.md).
+- **Controller correction**: `COMPLETE`; all six pinned MoleRec inputs are passed by keyword.
+- **319 Train contract smoke**: `PASS`; no scientific metrics were computed.
 - **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain untouched.
-- **Next owner**: local implementation agent.
+- **Next owner**: `ccf-integrity-auditor`.
 
-Idea 008 remains admitted for one bounded kill-first method cycle. All Train-only and Dev selections remain frozen. The current work is an implementation-local correction to the formal Audit controller; no training, tuning, reselection, new control, or protocol change is authorized.
+Idea 008 remains admitted for one bounded kill-first method cycle. All Train-only and Dev selections remain frozen. The implementation-local correction to the formal Audit controller is complete and awaits independent re-verification; no training, tuning, reselection, new control, or protocol change is authorized.
 
 ## Active Idea 008 boundary
 
@@ -49,7 +51,7 @@ The primary killers remain Fixed-K Budget-Aware Greedy + 1-Swap and the Budget-C
 
 ## Execution routing
 
-The failed Audit attempt produced no prediction or aggregate scientific evidence. The controller must first be corrected to invoke the pinned MoleRec forward contract entirely by keyword and then pass independent re-verification.
+The failed Audit attempt produced no prediction or aggregate scientific evidence. The controller now invokes the pinned MoleRec forward contract entirely by keyword and awaits independent re-verification.
 
 Gate01-Audit is not authorized for another attempt until that re-verification passes and the pipeline coordinator issues a fresh execution authorization.
 
@@ -75,6 +77,6 @@ Gate01-Audit: OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT
 Protocol revision: v1.2 unchanged
 Scientific Gate verdict: NONE
 Quarantine: intact
-Stage: IDEA_008_GATE_01_AUDIT_BLOCKED_PENDING_CONTROLLER_FIX_AND_REVERIFICATION
-Next owner: local implementation agent
+Stage: IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION
+Next owner: ccf-integrity-auditor
 ```

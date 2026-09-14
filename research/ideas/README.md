@@ -15,19 +15,20 @@ Each Idea is one admitted scientific line before it graduates to a paper project
 | [`005-safety-substitution-structure`](005-safety-substitution-structure/README.md) | Safety-Preserving Substitution Structure | **Terminated** | ATC structure failed therapeutic semantic admission |
 | [`006-exposure-conditional-medication-recommendation`](006-exposure-conditional-medication-recommendation/README.md) | Exposure-Conditional Medication Recommendation | **Terminated** | learned exposure-conditioned method failed equal-entitlement direct-reranker challenge |
 | [`007-privileged-physiological-response-supervision`](007-privileged-physiological-response-supervision/README.md) | Privileged Physiological Response Supervision | **Terminated at Gate 01 P1** | insufficient / materially concentrated response support under frozen floors; no rescue |
-| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Audit blocked / controller fix pending** | — |
+| [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md) | BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement | **Audit blocked / controller fixed pending re-verification** | — |
 
 ## Current project state
 
-- **Stage**: `IDEA_008_GATE_01_AUDIT_BLOCKED_PENDING_CONTROLLER_FIX_AND_REVERIFICATION`.
+- **Stage**: `IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION`.
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`.
 - **Gate 01 protocol v1.2**: unchanged; Train/Dev complete.
 - **Gate01-Audit**: `OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT`.
 - **Scientific Gate verdict**: none.
+- **Controller correction**: `COMPLETE`; signature-faithful regression and 319 Train contract smoke passed.
 - **Quarantine**: intact.
-- **Next owner**: local implementation agent.
+- **Next owner**: `ccf-integrity-auditor`.
 
-The first Audit attempt stopped before a successful frozen MoleRec forward and before any Audit prediction or aggregate evidence. The active task is only the bounded invocation-contract correction defined by the Idea-local controller-fix authorization, followed by independent re-verification.
+The first Audit attempt stopped before a successful frozen MoleRec forward and before any Audit prediction or aggregate evidence. The bounded invocation-contract correction defined by the Idea-local controller-fix authorization is complete and awaits independent re-verification.
 
 No scientific choice may change. G3/G4, R0 Holdout, and historical project test remain untouched.
 
@@ -39,6 +40,6 @@ Gate01-Train + Gate01-Dev: COMPLETE
 Gate01-Audit: OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT
 Scientific Gate verdict: NONE
 Quarantine: intact
-Stage: IDEA_008_GATE_01_AUDIT_BLOCKED_PENDING_CONTROLLER_FIX_AND_REVERIFICATION
-Next owner: local implementation agent
+Stage: IDEA_008_GATE_01_AUDIT_CONTROLLER_FIXED_PENDING_REVERIFICATION
+Next owner: ccf-integrity-auditor
 ```
