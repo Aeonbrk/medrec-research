@@ -85,7 +85,14 @@ with no ambiguous mapping keys. Routes are only trimmed, uppercased, and
 whitespace-normalized; clinically distinct values are retained. `PROD_STRENGTH`
 is present on all canonical rows but is not used to infer doses. Dose kinds in
 the selected rows are 735,804 single-numeric, 41,234 numeric-range, 9,775
-otherwise-unparsable, and 5 textual values.
+otherwise-unparsable, and 5 textual values. The ten most frequent normalized
+routes are IV (40.7392%), PO (35.1498%), IV DRIP (6.9875%), PO/NG (6.2666%),
+IH (2.8375%), SC (2.1836%), PR (1.3539%), NG (0.9780%), TP (0.8899%), and
+ORAL (0.5287%); the remaining route tail is 2.0852%. Across the 130
+represented medications, median route entropy is 1.0573 bits (maximum 2.8986),
+median dose entropy is 2.3273 bits (maximum 5.9734), and median unique numeric
+dose values per medication is 23.5 (maximum 417). Median route-ambiguity pair
+fraction is 4.9070% (maximum 70.2891%).
 
 ### Admission and episode semantics
 
