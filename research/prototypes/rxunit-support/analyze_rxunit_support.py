@@ -522,6 +522,8 @@ def temporal_summary(state: PairAccumulator) -> dict[str, Any]:
             temporal_change = True
             break
     duplicate_rows = sum(count - 1 for count in state.signatures.values() if count > 1)
+    nonmissing_routes = {route for route in state.route_classes if route != ROUTE_MISSING}
+    nonmissing_doses = {dose for dose in state.dose_tokens if dose != DOSE_MISSING}
     complete_episode_count = sum(
         1
         for (config, start, _), count in state.signatures.items()
@@ -531,7 +533,11 @@ def temporal_summary(state: PairAccumulator) -> dict[str, Any]:
         "episode_count": len(unique_signatures),
         "complete_episode_count": complete_episode_count,
         "duplicate_rows": duplicate_rows,
+        "has_duplicate_order_records": duplicate_rows > 0,
+        "multiple_routes": len(nonmissing_routes) > 1,
+        "multiple_doses": len(nonmissing_doses) > 1,
         "temporal_change_supported": temporal_change,
+        "route_temporal_change_supported": len(nonmissing_routes) > 1 and temporal_change,
         "temporal_ordering_ambiguous": ambiguous,
     }
 
@@ -659,6 +665,10 @@ def case_count_summary(
     pair_counter = collections.Counter(pair_categories)
     multi_config = admission_pairs - pair_counter["one_unique_dose_route"]
     temporal_change = sum(item["temporal_change_supported"] for item in temporal)
+    route_multi = sum(item["multiple_routes"] for item in temporal)
+    route_temporal_change = sum(item["route_temporal_change_supported"] for item in temporal)
+    duplicate_rows = sum(item["duplicate_rows"] for item in temporal)
+    duplicate_pairs = sum(item["has_duplicate_order_records"] for item in temporal)
     temporal_ambiguous = sum(
         item["temporal_ordering_ambiguous"] for item in temporal if item["episode_count"] > 1
     )
@@ -678,6 +688,14 @@ def case_count_summary(
         "temporally_supported_change_fraction_of_multi_config": (
             temporal_change / multi_config if multi_config else 0.0
         ),
+        "pairs_with_multiple_routes": route_multi,
+        "pairs_with_routes_temporally_distinct": route_temporal_change,
+        "route_temporal_distinct_fraction_of_multiple_route_pairs": (
+            route_temporal_change / route_multi if route_multi else 0.0
+        ),
+        "duplicate_order_rows": duplicate_rows,
+        "pairs_with_duplicate_order_records": duplicate_pairs,
+        "duplicate_row_fraction": duplicate_rows / max(1, sum(state.row_count for state in states)),
         "episode_ordering_ambiguity_rate": temporal_ambiguous
         / max(1, sum(item["episode_count"] > 1 for item in temporal)),
         "episode_count_distribution": dict(sorted(episode_hist.items(), key=lambda item: item[0])),
