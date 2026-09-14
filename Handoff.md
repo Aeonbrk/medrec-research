@@ -1,20 +1,21 @@
-# Handoff: Idea 008 Gate 01 Audit Re-authorized / Fresh Attempt Pending
+# Handoff: Idea 008 Gate 01 Audit Executed / Pending Integrity Audit
 
 ## Current state
 
-- **Current Stage**: `IDEA_008_GATE_01_AUDIT_REAUTHORIZED_PENDING_REEXECUTION`
+- **Current Stage**: `IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`
 - **Active Idea**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Gate 01 protocol**: v1.2, unchanged
 - **Gate01-Train + Gate01-Dev**: `COMPLETE`
 - **First Gate01-Audit attempt**: `OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT`
-- **Controller correction**: `COMPLETE`
+- **Controller corrections**: MoleRec invocation correction verified at `25888b954d8f27b7c03a759790b25f93afcd6982`; Bundle ownership correction committed at `134d293dcdadd767eba0a5d121039110c1c47f3e`
 - **Controller re-verification**: `CONTROLLER_REVERIFICATION_PASS`
-- **Fresh Gate01-Audit attempt**: `AUTHORIZED_NOT_RUN`
-- **Scientific Gate verdict**: none
+- **Fresh Gate01-Audit attempt**: `COMPLETE`
+- **Runner-produced terminal classification**: `KILL_TARGET_SEMANTICS`
+- **Scientific Gate verdict**: none; decision pending integrity audit
 - **G3/G4**: `UNTOUCHED`
 - **R0 Holdout**: `UNTOUCHED`
 - **Historical project test**: `UNTOUCHED`
-- **Next owner**: local execution agent
+- **Next owner**: `ccf-integrity-auditor`
 
 ## Frozen scientific state
 
@@ -38,13 +39,19 @@ Record:
 
 `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-controller-reverification.md`
 
-## Fresh Audit authorization
+## Fresh Audit execution
 
-The fresh Audit attempt is authorized by:
+The fresh Audit attempt was authorized by:
 
 `research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-reauthorization.md`
 
-The first failed attempt contributes zero scientific evidence and must not be resumed or pooled. The fresh attempt starts from the beginning and must use `extract_gate01_molerec_features(...)` for every pinned MoleRec visit extraction.
+The first failed attempt contributes zero scientific evidence and was not resumed or pooled. The fresh attempt started from the beginning, used `extract_gate01_molerec_features(...)` for every pinned MoleRec visit extraction, and completed the frozen Audit path.
+
+Public-safe aggregate evidence is recorded in:
+
+`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-result.json`
+
+The run covered 1,113 Audit patients and 2,413 Audit visits, used 1,000 patient-clustered bootstrap replicates with seed 80081, and produced exactly one protocol classification: `KILL_TARGET_SEMANTICS`. No research continuation or termination decision has been made.
 
 No training, reselection, protocol change, new control, or post-hoc rescue is authorized. If another implementation/runtime change is required, stop and return to the pipeline coordinator.
 
@@ -55,10 +62,11 @@ Idea 008: ADMITTED
 Gate01-Train + Gate01-Dev: COMPLETE
 First Gate01-Audit attempt: BLOCKED_NO_RESULT
 Controller re-verification: CONTROLLER_REVERIFICATION_PASS
-Fresh Gate01-Audit attempt: AUTHORIZED_NOT_RUN
+Fresh Gate01-Audit attempt: COMPLETE
+Runner-produced terminal classification: KILL_TARGET_SEMANTICS
 Scientific Gate verdict: NONE
 Quarantine: intact
-Stage: IDEA_008_GATE_01_AUDIT_REAUTHORIZED_PENDING_REEXECUTION
-Next owner: local execution agent
-Next task: execute the fresh frozen Gate01-Audit from the beginning, then stop for integrity audit
+Stage: IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT
+Next owner: ccf-integrity-auditor
+Next task: independently audit the public-safe Gate01 result against protocol v1.2 and frozen identities
 ```

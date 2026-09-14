@@ -3,8 +3,8 @@
 # Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
-- **Status**: `TRAIN_DEV_COMPLETE / AUDIT_REAUTHORIZED_PENDING_REEXECUTION`
-- **Stage**: `IDEA_008_GATE_01_AUDIT_REAUTHORIZED_PENDING_REEXECUTION`
+- **Status**: `TRAIN_DEV_COMPLETE / AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`
+- **Stage**: `IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`
 - **Formal admission**: `ACCEPT_TO_CREATE_IDEA_008`
 - **Reviewer confidence**: medium-high
 - **Gate 01 protocol**: [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md), revision v1.2
@@ -13,13 +13,13 @@
 - **Implementation integrity before Audit attempt**: `IMPLEMENTATION_INTEGRITY_PASS`
 - **Runner integrity before Audit attempt**: `RUNNER_INTEGRITY_PASS`
 - **Train/Dev**: complete with all selections frozen
-- **Controller correction**: complete at `25888b954d8f27b7c03a759790b25f93afcd6982`
+- **Controller corrections**: MoleRec invocation correction verified at `25888b954d8f27b7c03a759790b25f93afcd6982`; Bundle ownership correction committed at `134d293dcdadd767eba0a5d121039110c1c47f3e`
 - **Controller re-verification**: [`experiments/gate-01-audit-controller-reverification.md`](experiments/gate-01-audit-controller-reverification.md), verdict `CONTROLLER_REVERIFICATION_PASS`
-- **Fresh Audit authorization**: [`experiments/gate-01-audit-reauthorization.md`](experiments/gate-01-audit-reauthorization.md), state `AUTHORIZED_NOT_RUN`
+- **Fresh Audit execution**: [`experiments/gate-01-audit-result.json`](experiments/gate-01-audit-result.json), terminal classification `KILL_TARGET_SEMANTICS`
 - **Quarantine**: intact
-- **Next owner**: local execution agent
+- **Next owner**: `ccf-integrity-auditor`
 
-Idea 008 remains admitted for the same bounded kill-first method cycle. The first Audit attempt stopped before a successful frozen MoleRec forward and generated no scientific evidence. The corrected controller path passed independent re-verification, and one fresh Audit attempt from the beginning is now authorized.
+Idea 008 remains admitted for the same bounded kill-first method cycle. The first Audit attempt stopped before a successful frozen MoleRec forward and generated no scientific evidence. The corrected controller path was exercised end to end, and the fresh Audit completed under the unchanged protocol with terminal classification `KILL_TARGET_SEMANTICS`. The independent integrity audit must review the public-safe result before any research continuation or termination decision.
 
 ## Scientific question
 
@@ -73,6 +73,10 @@ Only protocol-v1.2 terminal evaluation is authorized: frozen controls and learne
 
 No retraining, reselection, protocol change, new control, solver expansion, or post-hoc rescue is authorized.
 
+## Fresh Audit result
+
+The completed fresh Audit covered 1,113 patients and 2,413 visits, evaluated the frozen controls and retained checkpoints at all three budgets, and ran 1,000 patient-clustered bootstrap replicates with seed 80081. Public-safe aggregate metrics, frontier comparisons, compliance/response quantities, matched-seed counts, and the single runner-produced classification are recorded in [`experiments/gate-01-audit-result.json`](experiments/gate-01-audit-result.json). The classification is `KILL_TARGET_SEMANTICS`; no continuation or termination decision is recorded here.
+
 ## Quarantine
 
 G3/G4, R0 Holdout, the historical project test, and paper-level SOTA benchmarking remain outside this work.
@@ -84,9 +88,10 @@ Idea 008: ADMITTED
 Gate01-Train + Gate01-Dev: COMPLETE
 First Gate01-Audit attempt: BLOCKED_NO_RESULT
 Controller re-verification: CONTROLLER_REVERIFICATION_PASS
-Fresh Gate01-Audit attempt: AUTHORIZED_NOT_RUN
+Fresh Gate01-Audit attempt: COMPLETE
 Protocol revision: v1.2 unchanged
+Runner-produced terminal classification: KILL_TARGET_SEMANTICS
 Scientific Gate verdict: NONE
-Stage: IDEA_008_GATE_01_AUDIT_REAUTHORIZED_PENDING_REEXECUTION
-Next owner: local execution agent
+Stage: IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT
+Next owner: ccf-integrity-auditor
 ```

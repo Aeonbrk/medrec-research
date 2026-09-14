@@ -1,0 +1,331 @@
+{
+  "schema_version": 1,
+  "kind": "IDEA_008_GATE_01_AUDIT_EXECUTION",
+  "protocol_revision": "v1.2",
+  "stage": "IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT",
+  "gate01_audit": "COMPLETE",
+  "harness_revision": "134d293dcdadd767eba0a5d121039110c1c47f3e",
+  "molerec_upstream_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+  "molerec_profile": "molerec-embedding",
+  "checkpoint_sha256": "5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca",
+  "dataset_id": "molerec-table1-comparison-v1-1",
+  "candidate_vocabulary": 131,
+  "environment": "medrec-molerec-table1",
+  "python": "3.8.16",
+  "pytorch": "1.9.0+cu111",
+  "cuda": true,
+  "execution_device": "cuda:0",
+  "audit_patient_count": 1113,
+  "audit_visit_count": 2413,
+  "r_train": 0.07728988868497694,
+  "budgets": {
+    "b_L": 0.04637393321098616,
+    "b_M": 0.06183191094798155,
+    "b_H": 0.07728988868497694
+  },
+  "fixed_lambdas": {
+    "b_L": 1.0,
+    "b_M": 0.5,
+    "b_H": 0.0
+  },
+  "frozen_base": {
+    "jaccard": 0.5297015109003526,
+    "f1": 0.6842196118862706,
+    "prauc": 0.773652832404384,
+    "hard_ddi": 0.07484782309671148,
+    "mean_medications": 21.49026108578533,
+    "exact_k": 1.0
+  },
+  "greedy_plus_1swap": {
+    "b_L": {
+      "jaccard": 0.5090868909624922,
+      "f1": 0.6659612857256337,
+      "prauc": 0.7709007259386104,
+      "hard_ddi": 0.04095194285395033,
+      "positive_violation": 0.0,
+      "absolute_deviation": 0.005421990357035986,
+      "mean_medications": 21.49026108578533,
+      "exact_k": 1.0
+    },
+    "b_M": {
+      "jaccard": 0.5179126958614194,
+      "f1": 0.6736758652391402,
+      "prauc": 0.7724733720610276,
+      "hard_ddi": 0.052900343262143934,
+      "positive_violation": 0.0,
+      "absolute_deviation": 0.008931567685838113,
+      "mean_medications": 21.49026108578533,
+      "exact_k": 1.0
+    },
+    "b_H": {
+      "jaccard": 0.524157818905905,
+      "f1": 0.6792172711716252,
+      "prauc": 0.7732097416860295,
+      "hard_ddi": 0.06274132629702422,
+      "positive_violation": 0.0,
+      "absolute_deviation": 0.014548562387953037,
+      "mean_medications": 21.49026108578533,
+      "exact_k": 1.0
+    }
+  },
+  "fixed_lambda_support": {
+    "b_L": {
+      "lambda": 1.0,
+      "jaccard": 0.518235858179528,
+      "f1": 0.6738584261058114,
+      "prauc": 0.7518690070530931,
+      "hard_ddi": 0.047731355031449256,
+      "positive_violation": 0.007495572066993849,
+      "absolute_deviation": 0.013633722313525044,
+      "mean_medications": 21.49026108578533,
+      "exact_k": 1.0
+    },
+    "b_M": {
+      "lambda": 0.5,
+      "jaccard": 0.5251056293225288,
+      "f1": 0.6800325307992945,
+      "prauc": 0.7642740532701334,
+      "hard_ddi": 0.059352398560813854,
+      "positive_violation": 0.006456725040360117,
+      "absolute_deviation": 0.015392962467888259,
+      "mean_medications": 21.49026108578533,
+      "exact_k": 1.0
+    },
+    "b_H": {
+      "lambda": 0.0,
+      "jaccard": 0.5297015109003526,
+      "f1": 0.6842196118862706,
+      "prauc": 0.773652832404384,
+      "hard_ddi": 0.07484782309671148,
+      "positive_violation": 0.008088529871421632,
+      "absolute_deviation": 0.01861912533110939,
+      "mean_medications": 21.49026108578533,
+      "exact_k": 1.0
+    }
+  },
+  "families": {
+    "BudgetSet": {
+      "selected_learning_rate": 0.001,
+      "selected_eta": 5.0,
+      "retained_checkpoint_epochs": {
+        "2002": 6,
+        "2003": 10,
+        "2004": 6
+      },
+      "operating_points": {
+        "b_L": {
+          "jaccard": 0.5210725813144319,
+          "f1": 0.6765510374109419,
+          "prauc": 0.7611645471586562,
+          "hard_ddi": 0.05365852471761334,
+          "positive_violation": 0.011666952549600665,
+          "absolute_deviation": 0.016049313592574627,
+          "mean_medications": 21.49026108578533,
+          "exact_k": 1.0
+        },
+        "b_M": {
+          "jaccard": 0.521020464799823,
+          "f1": 0.6764964227671064,
+          "prauc": 0.7611602963169762,
+          "hard_ddi": 0.05361398763767198,
+          "positive_violation": 0.004537248688207075,
+          "absolute_deviation": 0.017292420686724073,
+          "mean_medications": 21.49026108578533,
+          "exact_k": 1.0
+        },
+        "b_H": {
+          "jaccard": 0.52097980443317,
+          "f1": 0.6764573993572589,
+          "prauc": 0.7611506039242447,
+          "hard_ddi": 0.05358405881632513,
+          "positive_violation": 0.0014764913881171488,
+          "absolute_deviation": 0.026658812644886676,
+          "mean_medications": 21.49026108578533,
+          "exact_k": 1.0
+        }
+      },
+      "compliance": {
+        "b_L": false,
+        "b_M": true,
+        "b_H": true
+      },
+      "compliance_result": "FAIL",
+      "budget_response": "FAIL",
+      "composition_response": {
+        "b_L_to_b_M": {
+          "aggregate": 0.001933968780218262,
+          "per_seed": {
+            "2002": 0.0012432656444260257,
+            "2003": 0.0037297969332780773,
+            "2004": 0.0008288437629506838
+          },
+          "threshold": 0.1,
+          "pass": false
+        },
+        "b_M_to_b_H": {
+          "aggregate": 0.0011051250172675784,
+          "per_seed": {
+            "2002": 0.0004144218814753419,
+            "2003": 0.0024865312888520514,
+            "2004": 0.0004144218814753419
+          },
+          "threshold": 0.1,
+          "pass": false
+        }
+      }
+    },
+    "Independent": {
+      "selected_learning_rate": 0.001,
+      "selected_eta": 5.0,
+      "retained_checkpoint_epochs": {
+        "2002": 7,
+        "2003": 6,
+        "2004": 6
+      },
+      "operating_points": {
+        "b_L": {
+          "jaccard": 0.5215087457129698,
+          "f1": 0.6768948570363204,
+          "prauc": 0.7510745327259999,
+          "hard_ddi": 0.055605264636370215,
+          "positive_violation": 0.012881800382001799,
+          "absolute_deviation": 0.016532269338620023,
+          "mean_medications": 21.49026108578533,
+          "exact_k": 1.0
+        },
+        "b_M": {
+          "jaccard": 0.5215010901363416,
+          "f1": 0.6768887174528909,
+          "prauc": 0.7510639566229429,
+          "hard_ddi": 0.055595158063048856,
+          "positive_violation": 0.00525801171528376,
+          "absolute_deviation": 0.016752776315500595,
+          "mean_medications": 21.49026108578533,
+          "exact_k": 1.0
+        },
+        "b_H": {
+          "jaccard": 0.5214837327042496,
+          "f1": 0.6768762046710041,
+          "prauc": 0.7510505371890165,
+          "hard_ddi": 0.05558599151754303,
+          "positive_violation": 0.0017584796440687335,
+          "absolute_deviation": 0.025220856455571882,
+          "mean_medications": 21.49026108578533,
+          "exact_k": 1.0
+        }
+      },
+      "compliance": {
+        "b_L": false,
+        "b_M": false,
+        "b_H": true
+      }
+    }
+  },
+  "frontier_comparisons": {
+    "BudgetSet_vs_Greedy": {
+      "b_L": {
+        "aggregate": {
+          "branch": "ordinary",
+          "selected_order": 1,
+          "utility_gap": 0.00315988545301249,
+          "risk_gap": -0.0007581814554694088,
+          "material_outside": false
+        },
+        "bootstrap": {
+          "replicates": 1000,
+          "seed": 80081,
+          "ci_lower": 0.001466072681422592,
+          "ci_upper": 0.0047586420349929465
+        },
+        "matched_seed_favorable_count": 3,
+        "matched_seed_required_count": 2,
+        "matched_seed_satisfied": true
+      },
+      "b_M": {
+        "aggregate": {
+          "branch": "ordinary",
+          "selected_order": 1,
+          "utility_gap": 0.003107768938403588,
+          "risk_gap": -0.0007136443755280455,
+          "material_outside": false
+        },
+        "bootstrap": {
+          "replicates": 1000,
+          "seed": 80081,
+          "ci_lower": 0.001418171162428547,
+          "ci_upper": 0.004694145313973021
+        },
+        "matched_seed_favorable_count": 3,
+        "matched_seed_required_count": 2,
+        "matched_seed_satisfied": true
+      }
+    },
+    "BudgetSet_vs_Independent": {
+      "b_L": {
+        "aggregate": {
+          "branch": "ordinary",
+          "selected_order": 0,
+          "utility_gap": -0.000436164398537886,
+          "risk_gap": 0.001946739918756872,
+          "material_outside": false
+        },
+        "bootstrap": {
+          "replicates": 1000,
+          "seed": 80081,
+          "ci_lower": -0.0014401985517957794,
+          "ci_upper": 0.0005305803396887768
+        },
+        "matched_seed_favorable_count": 1,
+        "matched_seed_required_count": 2,
+        "matched_seed_satisfied": false
+      },
+      "b_M": {
+        "aggregate": {
+          "branch": "ordinary",
+          "selected_order": 0,
+          "utility_gap": -0.000488280913146788,
+          "risk_gap": 0.0019912769986982354,
+          "material_outside": false
+        },
+        "bootstrap": {
+          "replicates": 1000,
+          "seed": 80081,
+          "ci_lower": -0.0014939909411693486,
+          "ci_upper": 0.00047478402370544853
+        },
+        "matched_seed_favorable_count": 1,
+        "matched_seed_required_count": 2,
+        "matched_seed_satisfied": false
+      }
+    }
+  },
+  "target_semantics": "FAIL",
+  "budget_response": "FAIL",
+  "composition_response": "FAIL",
+  "bootstrap": {
+    "replicates": 1000,
+    "seed": 80081
+  },
+  "terminal_conditions": {
+    "STOP_INVALID_GATE_IMPLEMENTATION": false,
+    "STOP_NO_BASE_DDI_HEADROOM": false,
+    "KILL_TARGET_SEMANTICS": true,
+    "KILL_BUDGET_RESPONSE": true,
+    "KILL_COMPOSITION_RESPONSE": true,
+    "KILL_BUDGETSET": true,
+    "KILL_JOINT_SET_INTERACTION": true,
+    "KILL_SEED_FRAGILITY": true,
+    "INCONCLUSIVE_STOP": true,
+    "PASS_GATE_01_BUDGETSET_MECHANISM_SURVIVES": false
+  },
+  "runner_produced_terminal_verdict": "KILL_TARGET_SEMANTICS",
+  "training_performed": "NO",
+  "protocol_changed": "NO",
+  "runner_changed": "NO",
+  "post_hoc_selection_rescue": "NO",
+  "g3_g4": "UNTOUCHED",
+  "r0": "UNTOUCHED",
+  "historical_project_test": "UNTOUCHED",
+  "next_state": "IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT",
+  "next_owner": "ccf-integrity-auditor"
+}
