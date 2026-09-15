@@ -1,291 +1,118 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research-Space Reorientation
+# Research-Space Reorientation — Architecture-First Open Search
 
-## Current workflow state
+This document is a directional synthesis, not a novelty gate or authorization checklist. Current numerical/state authority lives in [`current-research-state.md`](current-research-state.md).
 
-**Stage**: `PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
+## Why the project is stepping back
 
-**Paper objective**: first formal **method paper**, targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed. Pure benchmark/measurement work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes.
+The project has accumulated enough bounded negative evidence that continuing to optimize local corrections around the current backbone is no longer the best use of research time.
 
-**Active Idea**: none.
+The important pattern is not `all prior ideas failed`. It is more specific:
 
-The strict drug-changing order-revision Pair/Context Incremental Value test is
-closed. Semantic admission and strict-trace supportability passed with
-`N_strict = 1,040`, but all five frozen control comparisons failed; no Idea 008
-has been created.
+- several score/routing/reranking signals were absorbed by strong direct controls;
+- fixed-cardinality GraphRefine exposed a small ranking signal but not a paper-scale gain;
+- learned medication-medication residual dependence exists statistically, but a frozen-unary Oracle adds only `+0.000257` Jaccard above MoleRec;
+- persistent medication states and residual clinical-need feedback did not add mechanism value;
+- two structured-set v0 formulations were weak;
+- immediate-next-visit privileged state supplied negligible teacher headroom;
+- faithful modern HypeMed and Rx-Expert did not reset the canonical accuracy frontier;
+- a very high reported DMGExNet score is not comparable under the project's point-in-time information budget.
 
-**Idea 007**: terminated at Gate 01 P1 with insufficient and materially
-concentrated response support.
+These results justify an **architecture reset**, not a universal claim that graphs, interactions, retrieval, structured prediction, MoE, or longitudinal modeling are exhausted.
 
-**Latest closed method family**: privileged physiological response supervision.
+## What is actually closed
 
-**Strict re-review verdict**: `ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
+The following are poor default bets **when repeated with the same scientific role**:
 
-**Admission/design/closure owners**: `ccf-pipeline-orchestrator` (admission complete) ->
-`ccf-experiment-designer` (teacher-objective domain closed; exact V7 Generic
-Pre-Order KD frozen) -> `ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
-`ccf-pipeline-orchestrator` (P0/P1 and Pair/Context routing/closure complete)
-(current owner for the next routing decision).
+1. `strong MoleRec unary + small residual correction/reranker` as the central contribution;
+2. medication-medication pairwise residual interaction as the claimed missing source of set accuracy, absent a new source of headroom;
+3. repeated cardinality/threshold/loss tuning to rescue a weak architecture;
+4. the exact NeedCover residual-coverage formulation;
+5. the exact persistent MedState formulation;
+6. the tested RxDiffSet and TheraCompose v0 formulations;
+7. the tested immediate-next-visit FutureGraphKD signal;
+8. the unsupported RxUnit `(drug,dose,route)` target under current timing semantics;
+9. default hunting for another public backbone solely because recent backbones look more sophisticated.
 
-No further scientific execution or formal training is authorized by the current
-state.
-MIMIC-IV G3/G4 future groups, R0 Holdout, and the historical project test split
-remain quarantined.
+`Closed` here means `do not repeat an equivalent formulation without a new mechanism`. It does not mean the vocabulary used by the formulation is prohibited.
 
-No Idea 008 has been created or pre-allocated, and no literature search was run
-for this Pair/Context closure.
+## What remains open
 
-## Cumulative failure landscape
+The search space remains broad. A next method may use entirely new or familiar primitives if their composition changes what the model can represent or decide.
 
-### F1 — post-hoc same-information routes are compressed
+Examples of high-leverage search axes:
 
-Ideas 001--004 and EGSF showed that low-dimensional transformations/selectors over frozen information do not establish incremental value after strong controls.
+- model the patient–medication decision at a different granularity;
+- let different candidate decisions acquire different clinical evidence;
+- represent uncertainty, alternatives, or regimen construction explicitly rather than as a post-hoc correction;
+- formulate medication recommendation as a structured sequential/list/set decision when the structure is supported by a real source of headroom;
+- use conditional computation when routing changes information flow rather than only parameter count;
+- introduce supportable supervision unavailable to the current unary model but still deployable at inference;
+- build a new architecture from scratch without inheriting MoleRec's representation or decoder;
+- combine known mechanisms coherently when their interaction produces a different capability.
 
-### F2 — statistical structure is not clinical action semantics
+This list is deliberately non-exhaustive.
 
-Idea 005 found reproducible ATC output structure but failed therapeutic-substitution admission.
+## Search discipline
 
-### F3 — equal information/rule entitlement is mandatory
+The next search should begin with:
 
-EG-TER and Idea 006 require the strongest direct control to receive the same external rule/state/risk information as a learned method.
+> If MoleRec and all current prototypes did not exist, what is the most natural formulation of this prediction problem under the available EHR information and point-in-time constraint?
 
-### F4 — certification is a separate burden
+Then search both Medication Recommendation and adjacent fields for mechanisms. Do not force the search to preserve a previous successful component.
 
-CRC-PS showed empirical feasibility does not imply finite-sample certifiability.
+For each serious candidate, write two sentences before implementation:
 
-### F5 — medication cardinality is not normalized interaction propensity
+1. what new object / interaction / information flow / decision process is modeled;
+2. why a strong simple patient-to-131-logit baseline cannot already express it.
 
-B0 changed medication count without producing the required normalized-DDI trade-off.
+If the answer is mainly `more capacity`, `another GNN`, `another loss`, or `another reranker`, keep searching.
 
-### F6 — latent acceptable-treatment supervision is not identified
+## Novelty posture
 
-The selective-prescription-supervision reset could not distinguish hidden clinically valid alternatives from ordinary retrospective label uncertainty.
+Novelty matters for publication but should not paralyze early architecture discovery.
 
-### F7 — new state semantics do not imply learned-method value
+Early stage:
 
-Idea 006 established a real exposure-state mismatch, but the learned method lost to an equal-entitlement direct reranker.
+- rule out an obvious duplicate;
+- identify the strongest nearby control;
+- prototype the scientific mechanism cheaply.
 
-### F8 — chronology does not imply harmful deployment shift
+After empirical survival:
 
-S0 found no forward degradation; the later target era had higher Recall@5 than the source audit era, and medication-prior bias improved it further.
+- verify closest work and novelty from primary sources;
+- refine contribution boundaries;
+- run strong baselines and decisive ablations;
+- invest in multi-seed/statistical claim support.
 
-### F9 — workflow action labels do not automatically define regimen edits
+A combination of known primitives is acceptable when the interaction creates a materially different capability. Do not require every component to be novel.
 
-M0 had abundant `New / Change / D/C` support, but the frozen pre-order state-consistency floors failed badly:
+## Failure-memory posture
 
-- `Change = 0.17228553254342177` active-before;
-- `D/C = 0.15933081187948597` active-before;
-- required floor: `0.70` for each.
+Use old failures as **priors**:
 
-No model was trained.
+- avoid rerunning equivalent methods;
+- reuse lessons about cardinality, baseline fidelity, information budget, target supportability, and strong controls;
+- do not convert prior failures into global architecture bans;
+- revisit a component only when it plays a materially different role.
 
-### F10 — privileged future access does not identify privileged semantics
+Historical literature maps and review packets remain valuable discovery aids, but their dated `CLOSED/CROWDED/PRIOR ART` labels are not current admission gates.
 
-A future-only clinical signal may be a legal predictive target while the gain still comes from generic future-state regularization, medication identity/static prototypes, monitoring policy, or positive-event sample weighting.
-
-This remains a reusable rule rather than an unresolved blocker. The current R1--R3 contract now supplies the prospective subtraction required to test it.
-
-Record:
-
-[`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md).
-
-### F11 — realized-event privileged supervision can fail before modeling
-
-Idea 007's frozen six-channel, administered-positive, 24-hour response
-supervision object failed the Gate 01 P1 support contract before any model was
-trained. Coverage was below the global and partition floors, supported events per
-counted medication were too sparse, and Dev/Audit patient concentration also
-failed. The medication concentration checks passed.
-
-Record:
-
-[`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
-
-### F12 — a valid workflow trace can still lack incremental context value
-
-The strict drug-changing order-revision trace re-materialized exactly (`1,040`
-events; zero frozen integrity violations), but PairContext failed every frozen
-comparison against destination marginal, source transition, flattened-base
-plus-source-prior, trace-context-only, and permuted-context controls. This
-closes the tested context-dependent incremental-value route, not every possible
-workflow or longitudinal information object.
-
-Record:
-
-[`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md).
-
-## Higher-order reusable constraints
-
-### C1 — cosmetic post-hoc resurrection is closed
-
-A new statistic/function over an already failed frozen information premise is not a new research direction.
-
-### C2 — semantic admission precedes clinical interpretation
-
-Therapeutic alternatives, hidden positives, treatment obligations, clinical appropriateness, or action semantics require independent evidence.
-
-### C3 — direct-use or semantic-ablation sufficiency must be challenged first
-
-A new signal/state semantic supports a learned method only if the proposed mechanism adds value beyond the strongest equal-entitlement direct use or semantic-ablation control available for that information-flow setting.
-
-### C4 — certification follows mechanism evidence
-
-Do not make guarantees the first novelty investment.
-
-### C5 — separate count effects from normalized interaction propensity
-
-Absolute pair burden can move mechanically with output size.
-
-### C6 — hospitalization DDI co-membership is not current execution overlap
-
-R0 remains reusable infrastructure/evidence, not the target paper.
-
-### C7 — deployment adaptation requires actual degradation
-
-Do not build adaptation because periods differ; first establish a material deployment loss.
-
-### C8 — a new model must encode a new scientific object
-
-Transformer/Mamba/GNN/point-process architectures are allowed only when they instantiate a new falsifiable decision object, supervision structure, state transition, or information flow.
-
-### C9 — workflow labels must survive state-semantic admission
-
-Action-like database fields cannot be promoted into state transitions merely because they are frequent and named `Change` or `D/C`.
-
-### C10 — privileged-response semantics require subtraction, not only leakage safety
-
-Strictly pre-order deployment is necessary but insufficient. A response-specific method claim must show that its benefit depends on:
-
-- focal-medication conditioning beyond generic future-state supervision;
-- patient-medication-response correspondence beyond shuffle/static prototypes;
-- physiological values beyond monitoring availability/frequency;
-- equal support/sample entitlement rather than positive-event reweighting;
-- privileged future-response information beyond ordinary pre-order KD mechanics.
-
-The current bounded optimizer revision now freezes these requirements strongly enough for Idea admission.
-
-### C11 — sparse realized-event supervision requires supportability first
-
-When a claimed mechanism depends on supervision available only on a realized-event
-subset, a cheap outcome-free supportability check should precede detailed model
-design if failure would terminate the method rather than invite threshold or
-window tuning. This is a constraint on that supervision pattern, not a universal
-diagnostic checklist.
-
-## Research-space boundary map
-
-| Route / premise | Status | Evidence boundary | Reopen / advance condition |
-| --- | --- | --- | --- |
-| Frozen-output feature/routing families | `CLOSED` | Ideas 001--004 + EGSF | genuinely new information/objective |
-| ATC sibling substitution | `CLOSED` | Idea 005 | new action resolution + admitted therapeutic semantics |
-| Count-mediated safety/coverage | `CLOSED` | B0 | different mechanism |
-| Selective prescription supervision | `NOT ADMITTED` | supervision reset | identifiable multi-valid target |
-| Exposure-conditioned DDI learning | `CLOSED under Idea 006` | direct-control sufficiency | different safety target/action problem |
-| Residual temporal-practice adaptation | `CLOSED under S0` | no material forward degradation | actual degradation in a different deployment setting |
-| Event-sourced `New/Change/D/C` regimen editing | `NOT ADMITTED under M0` | workflow/state inconsistency | independently valid action semantics / different decision object |
-| Generic longitudinal modeling | `CROWDED / LOW PRIOR` | MR-DTR, DrugDoctor, HeteroMed, ChainCare | specific non-generic mechanism |
-| Generic labs/vitals fusion | `CROWDED` | REFINE, ChainCare, HIFINet, MedGCN | different information-flow role |
-| Joint MedRec + lab prediction | `PRIOR ART` | MedGCN; Bhoi et al. 2023 | response-specific mechanism beyond generic auxiliary learning |
-| Knowledge distillation for MedRec | `PRIOR ART` | LEADER; IJCAI-ECAI 2026 dual-channel KD | different knowledge source + mechanism evidence |
-| Training-time privileged clinical modalities | `PRIOR ART outside MedRec` | OC-Distill and broader LUPI/KD | MedRec-specific scientific object |
-| Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting | future access itself cannot carry novelty |
-| Generic future-observation distillation | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 | future access itself cannot carry novelty |
-| Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 | response-supervision role + MedRec-specific evidence |
-| **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen P1 report and integrity audit in `research/ideas/007-privileged-physiological-response-supervision/` | do not relax the failed support contract; reopen only with a materially different object, source, setting, or independently motivated response definition |
-| **Strict drug-changing order-revision Pair/Context value** | **`FROZEN PRE-IDEA EXECUTION`** | `PASS_SEMANTIC_ADMISSION`; `PASS_STRICT_DRUG_CHANGING_SUPPORTABILITY` | complete only the frozen Pair/Context test; no semantic or threshold rescue |
-
-`CLOSED` is conditional on the recorded premise, not a universal ban on the noun.
-
-## Closed method family record: Idea 007
-
-Packet:
-
-[`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/).
-
-Canonical Idea-007 protocol and audit:
-
-[`../ideas/007-privileged-physiological-response-supervision/`](../ideas/007-privileged-physiological-response-supervision/),
-[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md),
-and
-[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md).
-
-Strict review:
-
-[`model-reset-20260908-privileged-physiological-response/idea-review.md`](model-reset-20260908-privileged-physiological-response/idea-review.md).
-
-Closest-work provenance:
-
-[`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md).
-
-### Problem
-
-Physiological evidence observed after medication administration can be informative about the joint patient/treatment context, but it is unavailable at medication decision time and is observationally confounded.
-
-### Admitted insight
-
-Use future post-administration physiology only as **privileged training supervision**. A teacher learns a response-associated patient-medication representation from realized treatment context and post-administration monitoring. A deployable student must anticipate that representation from strictly pre-order state and candidate medication.
-
-The scientific contribution survives closest-work subtraction only if paired physiological **values** create incremental medication-specific information beyond generic future supervision and monitoring policy.
-
-### R1--R3 admission contract
-
-1. **Medication specificity**: matched Generic Future-State Auxiliary / Medication-Ablated Future.
-2. **Monitoring separation**: Monitoring-Mask-Only plus physiology-value versus response-availability separation.
-3. **Equal entitlement**: positive-only observed response, same support/sample mask across privileged variants, unsupported examples retained in the recommendation objective, and strictly pre-order student features/normalization.
-
-### Gate 01 kill conditions
-
-Terminate the response-specific family if any of the following occurs:
-
-- GenericFutureAux or MedicationAblatedFuture performs comparably;
-- ResponseShuffle performs comparably;
-- MonitoringMaskOnly performs comparably;
-- StaticResponsePrototype performs comparably;
-- richer pre-order physiology performs comparably;
-- response support is insufficient or materially concentrated;
-- deployment leakage or unmatched support/reweighting is detected.
-
-No architecture, response-window, modality, subgroup, post-hoc feature, favorable
-seed, split, or response-definition rescue follows these outcomes under the same
-Idea.
-
-The audited protocol operationalizes `materially` / `comparable` / `≈` with fixed
-practical and statistical rules before training. An inconclusive interval is also
-a stop; it cannot be rescued by changing the threshold.
-
-The authorized P1 preflight reached the support stop before any model training:
-global coverage was `0.029461` against the `0.10` floor; Train, Dev, and Audit
-coverage was `0.029263`, `0.030365`, and `0.029491` against the `0.05` floor.
-Minimum supported events per counted medication failed in every scope, and Dev/Audit
-patient concentration also failed. The support record and integrity audit are the
-canonical closure evidence; no model comparison or physiology-wide conclusion
-follows from them.
-
-### Non-causal boundary
-
-Observed post-administration physiology is not an individual medication effect. It may reflect severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, treatment timing, monitoring policy, and selective measurement.
-
-Use `response-associated signature`, not treatment-effect, efficacy, therapeutic-benefit, counterfactual, clinical-optimality, or individualized-causal-benefit language.
-
-## Publication boundary
-
-This admission is not an empirical result and not publication evidence. The first paper remains method-first.
-
-Current project state:
+## Next execution
 
 ```text
-Idea 007: TERMINATED_AT_GATE_01_P1
-Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
-Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
-Active Idea: none
-Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
-New Idea: NOT CREATED
-Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
-Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
-Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+broad architecture / adjacent-method search
+→ one Rank-1 candidate
+→ one seed, one main config, Train/Dev
+→ strong baseline + decisive mechanism ablation
+→ material signal? continue
+→ clear hidden implementation/decoding issue? redesign once
+→ otherwise kill and reset family
 ```
 
-No Idea 008 creation, Gate 01, rescue, or work outside the closed Pair/Context
-packet is authorized by this map. This update did not run a literature search.
+Do not create Idea 009 until a prototype earns formalization.
+
+Do not use held-out evaluation resources for architecture selection.
+
+The goal of the next cycle is not to prove novelty first. It is to discover a mechanism with enough empirical and scientific signal to deserve the cost of a real paper workflow.

@@ -2,80 +2,48 @@
 
 # Research Organization
 
-This directory manages the scientific lifecycle:
+This directory contains the scientific evidence, exploratory prototypes, formal Ideas, and cross-project memory for `medrec-research`.
 
-`bounded pre-Idea admission when necessary -> idea optimization/review -> Idea -> Minimal Experiment -> Evidence -> Decision -> Paper`.
+## Current state
 
-## Core policy
+The current scientific state is maintained in [`memory/current-research-state.md`](memory/current-research-state.md).
 
-The project targets its first formal method paper at at least a CCF-A Data/Mining/AI venue family. Genuine new models and mechanisms are allowed; pure benchmark/measurement/survey work, indefinite diagnostics, and feature fishing are not acceptable terminal outcomes. The strongest simple or equal-entitlement control precedes method storytelling.
+As of 2026-09-15:
+
+- **Active formal Idea**: none.
+- **Ideas 001--008**: terminated.
+- **Idea 009**: not created.
+- **Formal Gate**: none active.
+- **Current phase**: architecture-first open search after modern-backbone calibration and interaction-first closure.
+- **Modern-backbone calibration**: `MODERN_BACKBONE_CALIBRATION_COMPLETE`.
+- **Residual interaction family**: closed as a primary research direction after frozen-unary isolation showed only `+0.000257` privileged Oracle Jaccard headroom over the original MoleRec unary surface.
+- **Quarantined evaluation resources**: G3/G4, R0 Holdout, and historical project test remain untouched according to the current recorded evidence.
+
+The next research step is not another backbone hunt, residual reranker, or diagnostic chain. It is broad architecture search followed by one small decisive Train/Dev prototype of the best mechanism-bearing candidate.
 
 ## Directory structure
 
-- `ideas/`: admitted method hypotheses and bounded hypothesis-selection experiments.
-- `memory/`: cross-Idea reusable lessons and historical research-space records.
-- `premise-audit/`: bounded premise tests; not a standing exploratory lane.
+- [`prototypes/`](prototypes/README.md): bounded pre-Idea architecture, mechanism, target-supportability, and baseline-calibration screens. A prototype does not require an Idea number or formal Gate.
+- [`ideas/`](ideas/README.md): formal Ideas that survived far enough to justify a frozen scientific protocol. Ideas 001--008 are historical and terminated.
+- [`memory/`](memory/README.md): current cross-project synthesis, reusable lessons, historical literature/search records, and failure memory.
+- `premise-audit/`: bounded premise checks retained for provenance; not a standing exploratory lane.
 - `baselines/`: reproduction/comparison infrastructure, separate from scientific Idea failures.
 
-## Current scientific state
+## Research policy
 
-- **Stage**: `IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT`.
-- **Active Idea**: [`008-budgetset-residual-budget-marginal-ddi-set-refinement`](ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/README.md).
-- **Gate 01 protocol v1.2**: unchanged; Train/Dev complete.
-- **First Gate01-Audit attempt**: blocked on the first visit before a successful MoleRec forward; no scientific result exists.
-- **Controller corrections**: MoleRec invocation correction verified at `25888b954d8f27b7c03a759790b25f93afcd6982`; Bundle ownership correction committed at `134d293dcdadd767eba0a5d121039110c1c47f3e`.
-- **Controller re-verification**: `CONTROLLER_REVERIFICATION_PASS`.
-- **Fresh Gate01-Audit attempt**: `COMPLETE`.
-- **Runner-produced terminal classification**: `KILL_TARGET_SEMANTICS`.
-- **Quarantine**: intact; G3/G4, R0 Holdout, and historical project test remain untouched.
-- **Next owner**: `ccf-integrity-auditor`.
-- **Modern-backbone calibration**: [`memory/modern-backbone-calibration.md`](memory/modern-backbone-calibration.md), terminal state `MODERN_BACKBONE_CALIBRATION_COMPLETE`; this comparison-only phase created no Idea 009 and authorizes no further backbone hunting.
-
-Idea 008 remains admitted for the same bounded kill-first method cycle. All Train-only and Dev selections remain frozen. The corrected repository-owned controller path completed one fresh Audit under the unchanged protocol and produced the single runner classification `KILL_TARGET_SEMANTICS`. Public-safe aggregate evidence is recorded in `ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-result.json`; integrity review precedes any research decision.
-
-## Active Idea 008 boundary
-
-Working name: **BudgetSet: Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement**.
-
-The admitted interaction remains:
+The project targets a real method paper. New architectures and models are explicitly welcome. Search broadly and test narrowly:
 
 ```text
-requested residual constraint slack
-× composition-dependent marginal DDI cost
-× iterative fixed-K set refinement
+step back
+→ broad literature / adjacent-method search
+→ choose one candidate with a real mechanism
+→ one-seed Train/Dev prototype
+→ decisive control / ablation
+→ continue / redesign once / kill
 ```
 
-The primary killers remain Fixed-K Budget-Aware Greedy + 1-Swap and the Budget-Conditioned Independent Scorer under the frozen protocol.
+Historical failures constrain equivalent formulations; they do not ban architectural primitives or adjacent families by name. A failed GNN does not ban GNNs, a failed interaction head does not ban every patient-conditioned interaction, and prior art on a component does not prevent a coherent new combination. Novelty and closest-work rigor become strict for survivors and paper claims, not as a barrier to cheap architecture discovery.
 
-## Execution routing
+The strongest simple/equal-information control remains mandatory for interpretation. Public baseline adaptation must be faithful, and literature scores are comparable only when the information budget and evaluation semantics match.
 
-The failed Audit attempt contributes zero scientific evidence and is not resumed. The fresh attempt must use the repository-owned `extract_gate01_molerec_features(...)` path for each frozen MoleRec visit extraction and may perform only the terminal evaluation defined by protocol v1.2.
-
-After the fresh Audit produced exactly one protocol terminal classification, execution stopped and returned to `ccf-integrity-auditor` before any research decision.
-
-## Historical closed state
-
-Ideas 001--007 remain terminated. Idea 007 remains `TERMINATED_AT_GATE_01_P1`. The strict drug-changing Pair/Context route remains `ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`. Idea 008 reopens neither route.
-
-## Quarantine
-
-Do not inspect or use:
-
-- MIMIC-IV G3/G4 future reserve;
-- R0 Holdout;
-- historical project test split.
-
-## Routing
-
-```text
-Idea 008: ADMITTED
-Gate01-Train + Gate01-Dev: COMPLETE
-First Gate01-Audit attempt: BLOCKED_NO_RESULT
-Controller re-verification: CONTROLLER_REVERIFICATION_PASS
-Fresh Gate01-Audit attempt: COMPLETE
-Runner-produced terminal classification: KILL_TARGET_SEMANTICS
-Scientific Gate verdict: NONE
-Quarantine: intact
-Stage: IDEA_008_GATE_01_AUDIT_EXECUTED_PENDING_INTEGRITY_AUDIT
-Next owner: ccf-integrity-auditor
-```
+See [`../docs/playbooks/RESEARCH_WORKFLOW.md`](../docs/playbooks/RESEARCH_WORKFLOW.md) for the prototype-first workflow and [`memory/current-research-state.md`](memory/current-research-state.md) for current routing.

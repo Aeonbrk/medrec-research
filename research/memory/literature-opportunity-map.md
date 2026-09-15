@@ -1,245 +1,82 @@
 <!-- markdownlint-disable MD013 -->
 
-# Literature Opportunity Map
+# Literature Opportunity Map — Historical Search Record
 
-## Current status
+This file preserves conclusions from the 2026-09-09 to 2026-09-11 literature/search phase. It is **not** the current routing authority and is **not** a novelty gate. See [`current-research-state.md`](current-research-state.md) and [`research-space-reorientation.md`](research-space-reorientation.md) for the current state.
 
-Refresh date: 2026-09-09.
+The labels below such as `CLOSED`, `CROWDED`, and `PRIOR ART` describe the search scope and formulation at that time. They should be read as evidence about nearby work and strong controls, not as permanent bans on primitives or architectures.
 
-Current update: 2026-09-11, using the existing strict semantic-admission,
-supportability, and Pair/Context execution records; no new literature search was
-run.
+## Historical project state at this snapshot
 
-Current project stage:
+At the time of this map:
 
-`PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
+- Ideas 001--007 had been terminated;
+- the strict Pair/Context packet had failed incremental-value controls;
+- Idea 008 and the later architecture/backbone/residual-dependence prototypes had not yet been incorporated into this map.
 
-**Active Idea**: none. Ideas 001--007 are terminated. Idea 007 was formally
-created/admitted and then closed at Gate 01 P1.
+Therefore any old routing or authorization language from this search phase is superseded by the current-state synthesis.
 
-Current packet:
+## Historical search observations
 
-[`model-reset-20260910-strict-drug-changing-order-revision/`](model-reset-20260910-strict-drug-changing-order-revision/).
-
-Strict admission review:
-
-[`model-reset-20260908-privileged-physiological-response/idea-review.md`](model-reset-20260908-privileged-physiological-response/idea-review.md).
-
-Closest-work provenance:
-
-[`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md).
-
-Reviewer verdict:
-
-`ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
-
-Gate-01 protocol and independent design audit:
-
-[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md),
-[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-design-integrity-audit.md).
-
-P1 closure evidence:
-
-[`../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json`](../ideas/007-privileged-physiological-response-supervision/experiments/gate-01-mechanical-preflight.json),
-[`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md).
-
-Current frozen packet:
-
-[`model-reset-20260910-strict-drug-changing-order-revision/`](model-reset-20260910-strict-drug-changing-order-revision/).
-
-## Closed or compressed spaces
-
-| Space | Current judgment | Main reason |
+| Space | Observation at snapshot | How to use it now |
 | --- | --- | --- |
-| Frozen-output feature/routing variants | `CLOSED` | Ideas 001--004 + EGSF; strong-control absorption |
-| ATC sibling therapeutic substitution | `CLOSED` | Idea 005 semantic admission failure |
-| Count-mediated safety/coverage | `CLOSED` | B0 normalized-DDI result |
-| Selective prescription supervision | `NOT ADMITTED` | latent acceptable-treatment target not identifiable |
-| Exposure-conditioned DDI learning | `CLOSED under Idea 006` | learned method failed equal-entitlement direct-reranker challenge |
-| Residual temporal-practice adaptation | `CLOSED under S0` | no material forward degradation |
-| Raw `New / Change / D/C` regimen-edit supervision | `NOT ADMITTED under M0` | action marks were inconsistent with frozen causal regimen state |
-| Generic longitudinal modeling | `CROWDED` | MR-DTR, DrugDoctor, HeteroMed, ChainCare, DMRNet |
-| Generic KG/RAG/agent safety | `CROWDED` | KATMed, RES-MR, SafeRx-Agent, ATLAS |
-| Generic finer action granularity | `CROWDED / HIGH COST` | FineMed, GRAIN, SafeRx-Agent, RxEval |
-| Generic labs/vitals fusion | `CROWDED` | REFINE, ChainCare, HIFINet, MedGCN |
-| Joint MedRec + lab prediction | `PRIOR ART` | MedGCN; Bhoi et al. 2023 |
-| Knowledge distillation for MedRec | `PRIOR ART` | LEADER; IJCAI-ECAI 2026 dual-channel MedRec KD |
-| Training-time privileged multimodal distillation | `PRIOR ART outside MedRec` | OC-Distill and broader LUPI/KD |
-| Clinical future-information teacher → history-only student | `PRIOR ART outside MedRec` | 2026 future-aware blood-glucose forecasting |
-| True-future-observation teacher → current-only student | `PRIOR ART outside MedRec` | Privileged Foresight Distillation 2026 |
-| Medication-aware physiological-response representation | `PRIOR ART outside general MedRec` | Wu et al. EMBC 2025 |
-| **Privileged physiological response supervision** | **`CLOSED UNDER IDEA 007 / GATE 01 P1 SUPPORT TERMINATION`** | frozen six-channel administered-positive formulation failed supportability before training; P1 report and integrity audit are canonical |
-| **Strict drug-changing order-revision Pair/Context value** | **`CLOSED UNDER PRE-IDEA INCREMENTAL-VALUE FAILURE`** | strict identity re-materialized, but all five frozen control comparisons failed; no rescue |
+| Frozen-output feature/routing variants | Ideas 001--004 and earlier EGSF-style work were repeatedly absorbed by strong controls | avoid equivalent scalar/reranking stories; does not ban new decision architectures |
+| ATC sibling therapeutic substitution | Idea 005 failed semantic admission | do not treat taxonomy proximity as therapeutic substitutability without evidence |
+| Count-mediated safety/coverage | simple count effects explained part of apparent safety movement | keep cardinality controls when they answer a concrete confound |
+| Selective prescription supervision | latent acceptable-treatment target was not identifiable in the tested formulation | a future selective target needs a new identifiable supervision source |
+| Exposure-conditioned DDI learning | Idea 006 lost to equal-entitlement direct control | compare learned safety mechanisms to simple direct controls |
+| Residual temporal-practice adaptation | no material forward degradation in the tested S0 setting | the exact adaptation premise was weak; other temporal problems remain open |
+| Raw workflow-action regimen editing | action marks did not satisfy the frozen regimen-state semantics | workflow labels need semantic validation before being treated as treatment edits |
+| Longitudinal modeling | many nearby MedRec papers already used temporal/visit history mechanisms | use as a component when useful; do not claim generic longitudinal modeling itself as novelty |
+| KG/RAG/agent safety | substantial nearby work existed | closest-work check required for a survivor; not a ban on knowledge/retrieval components |
+| Finer medication/action granularity | nearby fine-grained formulations existed and some were costly | new granularity is still open if the target is supportable and materially different |
+| Labs/vitals fusion and joint prediction | substantial prior clinical/MedRec use | generic fusion is not enough for a contribution; a new mechanism may still use these modalities |
+| Knowledge distillation | established in MedRec and adjacent clinical prediction | KD can be an implementation primitive but should not carry the paper claim by itself |
+| Privileged future information | established outside and inside adjacent clinical tasks | must show that the specific privileged signal is supportable and incrementally useful |
+| Medication-aware physiological response | nearby representation work existed | the tested Idea 007 response-supervision formulation later failed supportability; other signals require fresh evidence |
 
-## Strict Pair/Context closure
+## Historical closest-work notes
 
-The frozen strict trace contained `1,040` events with zero semantic or execution-
-integrity violations. PairContext did not meet the preregistered relative-gain,
-patient-cluster bootstrap, and per-seed NLL conditions against any of the five
-controls. This closes the tested context-dependent incremental-value route; it
-does not establish a universal claim about workflow or longitudinal information.
+The following papers/families were used during that search phase to subtract generic claims and identify controls. This list is a discovery aid, not a current SOTA table and not a complete 2026 literature review.
 
-Record:
+- **REFINE (NeurIPS 2023)**: dosage-titration trends and lab-test responses for fine-grained medication recommendation.
+- **ChainCare (Information Processing & Management 2026)**: medication/injection and lab-event chains for representation and downstream prediction.
+- **MedGCN / Bhoi et al. 2023**: medication recommendation coupled with lab-related prediction/imputation.
+- **DrugDoctor (Briefings in Bioinformatics 2024)**: historical prescription and downstream patient-condition modeling.
+- **MR-DTR (WWW 2025)**: time-aware/dynamic-treatment-regime medication recommendation.
+- **LEADER and later MedRec KD work**: knowledge distillation as an established implementation family.
+- **OC-Distill and broader LUPI/KD work**: training-time privileged modalities with reduced-modality students.
+- **Future-aware clinical forecasting / Privileged Foresight Distillation**: future information in a training teacher with deployment-time restrictions.
+- **Wu et al. (EMBC 2025)**: medication-aware physiological-response representation in a related setting.
 
-[`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md).
+These observations mean that generic claims such as `we use history`, `we use KD`, `we use labs`, or `we use future privileged information` are unlikely to be sufficient novelty statements. They do **not** mean such components cannot appear in a new architecture.
 
-## Closed Idea-007 opportunity record
+## Historical Idea-007 opportunity
 
-**Privileged physiological response supervision for medication recommendation** was
-the bounded Idea-007 opportunity; it is now closed before training.
+The search-scoped Idea-007 object was medication-in-context realized post-administration physiological values used only as privileged training supervision for a strictly pre-order student, with matched subtraction intended to distinguish medication-specific response value from generic future-state learning, monitoring policy, static priors, and KD mechanics.
 
-The generic future-privileged KD mechanism was not the opportunity. The tested
-MedRec-specific scientific object was:
+The later project record closed this exact formulation at Gate 01 P1 because support was insufficient/materially concentrated before training. That is the relevant current lesson; no broader claim that physiology is universally uninformative is warranted.
 
-> use medication-in-context realized post-administration physiological **values** only as positive-event training supervision for a strictly pre-order candidate-medication student, then require matched evidence that focal medication conditioning, individualized response pairing, and physiological values matter beyond generic future supervision, monitoring policy, static medication priors, response-independent regularization, positive-event weighting, and KD mechanics.
+## Historical Pair/Context closure
 
-The frozen formulation did not have sufficient, sufficiently distributed support
-for Gate-01 mechanism learning. This closes the formulation under Idea 007; it does
-not establish that physiology or response supervision is universally uninformative.
+The strict drug-changing order-revision trace was semantically re-materialized, but the frozen Pair/Context model did not beat its five controls under the preregistered incremental-value conditions. This closes that tested Pair/Context mechanism, not all workflow or longitudinal information.
 
-## Closest-work subtraction
+See the dedicated failure record for exact evidence.
 
-### REFINE — NeurIPS 2023
+## Current use of this map
 
-REFINE models dosage-titration trends and lab-test responses to characterize patient health for fine-grained medication recommendation.
+Use this file to:
 
-Therefore `use lab response in MedRec` is not novel.
+- rediscover nearby paper families;
+- remember which generic claims already had obvious prior work;
+- identify strong controls for a new survivor;
+- avoid repeating the exact historical formulations.
 
-### ChainCare — Information Processing & Management 2026
+Do **not** use this file to:
 
-ChainCare models bidirectional lab-test / medication-injection event chains, including injection-first sequences where medication physiological effects are associated with follow-up lab tests, and uses the resulting monitoring representations for medication recommendation and disease prediction.
+- reject a cheap new architecture solely because a component appears above;
+- infer that the current literature frontier is unchanged since this snapshot;
+- treat old `CLOSED/CROWDED/PRIOR ART` labels as current authorization;
+- demand complete novelty proof before a Train/Dev mechanism screen.
 
-Therefore medication-administration / follow-up-monitoring structure is prior art.
-
-### MedGCN and Bhoi et al. 2023
-
-MedGCN couples medication recommendation with lab-test imputation. Bhoi et al. explicitly integrate medication recommendation and lab-test response prediction.
-
-Therefore generic lab auxiliary, multitask, and future/lab-response prediction are prior art and primary killer-control families.
-
-### DrugDoctor — Briefings in Bioinformatics 2024
-
-DrugDoctor considers the impact of historical prescriptions on downstream patient condition at visit level.
-
-Therefore downstream response evidence after prior medication is already part of MedRec prior art.
-
-### MR-DTR — WWW 2025
-
-MR-DTR establishes time-aware/dynamic-treatment-regime medication recommendation. Generic treatment-dynamics framing is crowded.
-
-### LEADER and IJCAI-ECAI 2026 MedRec KD
-
-LEADER uses feature-level knowledge distillation for medication recommendation. An accepted IJCAI-ECAI 2026 paper, `Dual-Channel Semantic-Enhanced Combinatorial Medication Recommendation via Knowledge Distillation`, independently confirms that MedRec KD is a current CCF-A-level method family.
-
-Therefore KD mechanics cannot carry novelty.
-
-### OC-Distill — 2026
-
-OC-Distill transfers complementary training-time clinical modality information into a reduced-modality ICU student.
-
-Therefore generic clinical privileged-information distillation is established.
-
-### Future-aware blood-glucose forecasting — Scientific Reports 2026
-
-A teacher uses historical CGM plus future insulin/meal disturbances that are unavailable at deployment; a student learns from historical input only through knowledge distillation.
-
-Therefore `clinical future information during training -> deployable history-only student` is already explicit prior art.
-
-### Wu et al. — IEEE EMBC 2025
-
-This work learns medicine-aware patient representations from transient physiological responses to vasoactive infusions.
-
-Therefore medication-conditioned physiological-response representation itself is established outside general MedRec.
-
-### Privileged Foresight Distillation — 2026
-
-PFD uses true future observations in a training-time teacher and distills a future-conditioned correction into a current-only student while explicitly testing capacity/regularization explanations.
-
-Therefore future observation access and future-to-current distillation are not novelty claims.
-
-## Search-scoped residual delta
-
-Within the retained 2023--2026 search, no direct general-MedRec method was found whose central mechanism is exactly:
-
-> use paired realized post-administration physiological **values** only during training to supervise a strictly pre-order candidate-medication student, with response-specific mechanism subtraction.
-
-This is a narrow composition of established primitives. It becomes a meaningful MedRec method contribution only if Gate 01 establishes that the signal is specifically carried by medication-in-context physiological values and pairing.
-
-Novelty status at admission:
-
-`MODERATE / SEARCH-SCOPED / ADMITTED_FOR_ONE_KILL_FIRST_GATE`.
-
-Current status:
-
-`CLOSED_UNDER_IDEA_007_P1_SUPPORT_TERMINATION`.
-
-This is not a universal novelty proof.
-
-## Mandatory future alternatives
-
-The admitted R1--R3 contract freezes:
-
-- matched Generic Future-State Auxiliary / Medication-Ablated Future;
-- Monitoring-Mask-Only plus physiological-value versus response-availability separation;
-- equal-support positive-only response semantics and strictly pre-order deployment entitlement.
-
-Gate 01 must additionally cover:
-
-- Strict Pre-Order Base;
-- Base + Pre-Order Physiology;
-- Static Medication Response Prototype;
-- Response Shuffle;
-- Generic KD (included because the proposed implementation has a live
-  teacher/student-alignment alternative);
-- Proposed privileged physiological response supervision.
-
-A compatible monitoring-aware MedRec baseline may be included when task alignment supports a fair comparison.
-
-The audited protocol fixes the practical/statistical meaning of `materially`,
-`comparable`, and `≈` before any result. The response-specific story terminates if
-Generic Future-State Auxiliary, Medication-Ablated Future, Response Shuffle,
-Monitoring-Mask-Only, Static Response Prototype, or richer pre-order physiology
-performs comparably, or if response support is insufficient/materially
-concentrated, the interval is inconclusive, or deployment leakage/unequal
-entitlement is detected.
-
-## Claim boundary
-
-Post-administration physiology is observational and confounded by severity, co-medications, procedures, fluids, ventilation, dose/route, clinician actions, spontaneous progression, treatment timing, monitoring policy, and selective measurement.
-
-Allowed framing:
-
-- response-associated physiological signature;
-- medication-in-context physiological trajectory;
-- privileged physiological response supervision;
-- future physiological supervision.
-
-Disallowed without independent causal identification:
-
-- causal drug response;
-- individual treatment effect;
-- drug efficacy;
-- therapeutic benefit;
-- counterfactual outcome;
-- clinically optimal medication;
-- individualized causal benefit.
-
-## Current routing
-
-Current project state:
-
-```text
-Idea 007: TERMINATED_AT_GATE_01_P1
-Decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
-Active Idea: none
-Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
-New Idea: NOT CREATED
-Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
-Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
-Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
-```
-
-No Idea 008 creation, Gate 01, rescue, or work outside the closed Pair/Context
-packet is authorized by this map. No new literature search was run for this
-update.
+For any candidate that survives a fast prototype, perform a fresh primary-source closest-work review before formal paper claims.

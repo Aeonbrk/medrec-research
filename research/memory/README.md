@@ -1,132 +1,72 @@
 <!-- markdownlint-disable MD013 -->
 
-# Cross-Idea Research Memory
+# Cross-Project Research Memory
 
-This directory stores curated cross-Idea constraints, decisive failures, literature-space admission evidence, and bounded resets. It is not a dumping ground for idea-local scratch work.
+This directory stores the current research-state synthesis, reusable lessons, failure records, and historical search/literature snapshots.
+
+## Authority and precedence
+
+Use the following order when documents disagree:
+
+1. **Run-local evidence**: aggregate result JSON, audit records, formal Idea artifacts, and source-bound experiment README files describe what actually happened in that run.
+2. **Current synthesis**: [`current-research-state.md`](current-research-state.md) is the authoritative current scientific-state and routing summary.
+3. **Indexes / handoff**: `research/README.md`, `research/ideas/README.md`, `research/prototypes/README.md`, and `Handoff.md` summarize the current synthesis.
+4. **Historical memory**: older literature maps, reset packets, review notes, failure records, and reorientation documents preserve what was believed or decided at their recorded time. Old `CLOSED`, `CROWDED`, `PRIOR ART`, `NOT AUTHORIZED`, or routing labels do not override later evidence.
+
+Do not edit historical result records merely to make their old state labels look current. Resolve contradictions by fixing the current synthesis and clearly marking historical snapshots.
 
 ## Current state
 
-Authoritative project stage:
+See [`current-research-state.md`](current-research-state.md).
 
-`PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`
-
-**Active Idea**: none. Ideas 001--007 are terminated; Idea 007 was formally
-closed at Gate 01 P1. No Idea 008 has been created or pre-allocated.
-
-The paper objective remains a first formal **method paper** targeting at least a CCF-A Data/Mining/AI venue family. A genuinely new model is allowed when it encodes an admitted scientific mechanism; architecture replacement by itself is insufficient.
-
-The latest admitted family was **privileged physiological response supervision**;
-it is closed under Idea 007 after the Gate 01 P1 support failure. The strict
-drug-changing order-revision Pair/Context Incremental Value packet is also
-closed after its frozen five-control failure.
-
-Strict re-review verdict:
-
-`ACCEPT_TO_CREATE_IDEA_007` (`4.17 / 5.00`, medium-high confidence).
-
-Admission, design, and closure owners:
-
-`ccf-pipeline-orchestrator` (admission complete) -> `ccf-experiment-designer`
-(teacher-objective domain closed; exact V7 Generic Pre-Order KD frozen) ->
-`ccf-integrity-auditor` (`DESIGN_INTEGRITY_PASS`) ->
-`ccf-pipeline-orchestrator` (P0/P1 routing and Pair/Context closure complete)
-(current owner for the next routing decision).
-
-The frozen Pair/Context pre-Idea execution is complete and terminated with
-`ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE`. Gate 01, rescue, and unrelated model
-work are not authorized. MIMIC-IV G3/G4 future groups, R0 Holdout, and the
-historical project test split remain quarantined.
-
-## Historical privileged-response records
-
-- [`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/): current method-reset packet.
-- [`model-reset-20260908-privileged-physiological-response/idea-review.md`](model-reset-20260908-privileged-physiological-response/idea-review.md): current strict admission review, `ACCEPT_TO_CREATE_IDEA_007`.
-- [`model-reset-20260908-privileged-physiological-response/closest-work-review.md`](model-reset-20260908-privileged-physiological-response/closest-work-review.md): 2026-09-09 independent closest-work refresh and novelty subtraction.
-- [`../ideas/007-privileged-physiological-response-supervision/`](../ideas/007-privileged-physiological-response-supervision/): admitted Idea and audited Gate-01 design.
-- [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md): canonical Gate-01 P1 support failure and closure boundary.
-- [`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md): bounded Pair/Context incremental-value failure and no-rescue boundary.
-- [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md): reusable mechanism-identification constraint from the prior pre-Idea state; not an empirical failure.
-
-## Closed Idea-007 response-supervision boundary
-
-The generic primitive is prior art. The search-scoped surviving object is:
-
-> medication-in-context realized post-administration physiological **values** used only as positive-event, training-time privileged supervision for a strictly pre-order candidate-medication student, with matched subtraction proving incremental medication-specific value beyond generic future-state learning, monitoring policy, static medication priors, individualized-pairing artifacts, positive-event weighting, and KD mechanics.
-
-The frozen admission contract requires:
-
-1. medication-specificity subtraction through matched Generic Future-State Auxiliary / Medication-Ablated Future;
-2. Monitoring-Mask-Only plus explicit physiological-value versus response-availability separation;
-3. equal-support positive-only response semantics, full-`E_rec` student recommendation, supported-only teacher/alignment branches, and strictly pre-order student/deployment entitlement;
-4. future Gate killers including Response Shuffle, Static Medication Response Prototype, richer Pre-Order Physiology, and exact future-free Generic Pre-Order KD.
-
-If a simple matched control performs comparably, terminate the response-specific mechanism. The P1 support gate did fail before training. Do not rescue with architecture scaling, another future window, extra modalities, subgroup mining, or repeated response-definition search under Idea 007.
-
-## Cross-Idea failure memory
-
-The central reusable boundaries remain:
-
-- Oracle/headroom is not mechanism evidence.
-- A new state semantic is not learned-method evidence.
-- The strongest direct or equal-entitlement control can terminate a learned story.
-- Diagnostics do not substitute for method evidence.
-- Reproducible structure does not establish clinical semantics.
-- A failed mechanism is not rescued by architecture or feature fishing.
-- Privileged future information is scientifically meaningful only when semantic components survive matched subtraction.
-
-Failure records include:
-
-- [`failures/tension-gate-02--recommender-confidence-sufficiency.md`](failures/tension-gate-02--recommender-confidence-sufficiency.md)
-- [`failures/score-geometry-gate-01--no-incremental-score-geometry.md`](failures/score-geometry-gate-01--no-incremental-score-geometry.md)
-- [`failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md`](failures/prescription-relative-confidence-gate-01--no-incremental-relative-confidence.md)
-- [`failures/co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md`](failures/co-selection-compatibility-gate-01--no-incremental-co-selection-compatibility.md)
-- [`failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md`](failures/safety-substitution-structure-semantic-admission--atc-structure-not-therapeutically-admissible.md)
-- [`failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md`](failures/exposure-conditioned-learning-gate-01--direct-control-sufficiency.md)
-- [`failures/privileged-response-preidea--response-specificity-not-yet-identified.md`](failures/privileged-response-preidea--response-specificity-not-yet-identified.md)
-- [`failures/privileged-physiological-response-gate-01-p1--insufficient-support.md`](failures/privileged-physiological-response-gate-01-p1--insufficient-support.md)
-
-## Current cross-Idea rules for new-model work
-
-> A new signal/state must beat its strongest equal-entitlement direct or semantic-ablation control.
-> A new architecture must encode a genuinely different decision object, supervision structure, state transition, or information flow.
-> Workflow action labels must survive state-semantic admission before being interpreted as regimen edits.
-> Privileged future information is admissible only for training when deployment inputs remain strictly pre-order and the proposed semantics survive matched generic-future, shuffle, prototype, monitoring, and support-entitlement controls.
-> For a method whose claimed mechanism depends on a realized-event subset, run a
-> cheap outcome-free supportability check before detailed model design when failure
-> would terminate the method rather than trigger threshold or window tuning.
-> Observational post-administration physiology may support a response-associated predictive representation, but it does not identify treatment effect, efficacy, therapeutic benefit, counterfactual outcome, clinical optimality, or individualized causal benefit.
-
-## Routing
-
-Current project state:
+As of 2026-09-15:
 
 ```text
-Idea 007: TERMINATED_AT_GATE_01_P1
-Decision: STOP_INSUFFICIENT_OR_MATERIALLY_CONCENTRATED_RESPONSE_SUPPORT
-Pair/Context decision: ABANDON_NO_INCREMENTAL_PAIR_CONTEXT_VALUE
-Active Idea: none
-Stage: PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION
-New Idea: NOT CREATED
-Experiment: PAIR/CONTEXT PRE-IDEA TERMINATED
-Training: FORMAL TRAINING NOT AUTHORIZED; BOUNDED PRE-IDEA PROBES COMPLETE
-Quarantine: intact
-Next owner: ccf-pipeline-orchestrator
+Active formal Idea: none
+Ideas 001--008: terminated
+Idea 009: absent
+Active formal Gate: none
+Modern backbone calibration: MODERN_BACKBONE_CALIBRATION_COMPLETE
+Residual interaction-first family: CLOSE_INTERACTION_FIRST_FAMILY
+Current phase: architecture-first open search
 ```
 
-Idea 007's P1 support record is complete and its no-rescue boundary is terminal.
-The current packet's Pair/Context run is also terminal after all five frozen
-control comparisons failed. This state does not authorize Idea 008, Gate 01, or
-protocol/feature rescue.
+The project is deliberately **not** precommitted to a named architecture. New models, representations, prediction granularities, training paradigms, decoders, and coherent combinations are open for search.
 
-## Navigation
+## Durable evidence bundles
 
-- [`modern-backbone-calibration.md`](modern-backbone-calibration.md): authoritative comparison-only calibration summary and terminal state.
-- [`research-space-reorientation.md`](research-space-reorientation.md): current cross-Idea SSOT and live routing.
-- [`literature-opportunity-map.md`](literature-opportunity-map.md): current closest-work / opportunity map.
-- [`reusable-lessons.md`](reusable-lessons.md): durable methodological guardrails.
-- [`model-reset-20260908-privileged-physiological-response/`](model-reset-20260908-privileged-physiological-response/): admitted pre-Idea packet.
-- [`model-reset-20260908-event-sourced-regimen-editing/`](model-reset-20260908-event-sourced-regimen-editing/): completed M0 reset; raw workflow-action semantics were not admitted.
-- [`literature-search-20260905-prescription-supervision-reset/`](literature-search-20260905-prescription-supervision-reset/): rejected selective-supervision reset and identifiability boundary.
-- [`resource-reset-20260905-exposure-localized-safety/`](resource-reset-20260905-exposure-localized-safety/): completed exposure-state resource reset; reusable infrastructure only.
-- [`model-reset-20260910-strict-drug-changing-order-revision/`](model-reset-20260910-strict-drug-changing-order-revision/): frozen strict Pair/Context Incremental Value pre-Idea packet.
-- [`failures/strict-drug-changing-pair-context--no-incremental-value.md`](failures/strict-drug-changing-pair-context--no-incremental-value.md): terminal Pair/Context failure memory.
+- [`modern-backbone-calibration.md`](modern-backbone-calibration.md): faithful recent-baseline calibration and information-budget lessons.
+- [`../prototypes/README.md`](../prototypes/README.md): current inventory of pre-Idea prototypes, mechanism screens, and terminal decisions.
+- [`../ideas/README.md`](../ideas/README.md): formal Ideas 001--008 and their terminal scope.
+- [`failures/`](failures/): failure records. These are formulation-local evidence, not universal architectural prohibitions.
+- [`reusable-lessons.md`](reusable-lessons.md): methodological lessons from multiple routes.
+- [`accumulated-experience.md`](accumulated-experience.md): historical archive synthesis; not live routing authority.
+
+## Historical discovery material
+
+- [`literature-opportunity-map.md`](literature-opportunity-map.md): historical literature/opportunity snapshot. Use it for discovery and prior search provenance, not as a current novelty gate.
+- [`research-space-reorientation.md`](research-space-reorientation.md): current directional synthesis, with historical boundaries explicitly scoped.
+- `model-reset-*`, `literature-search-*`, and `resource-reset-*` directories: dated search/reset packets. Their authorization language belongs to those packets only.
+
+## How to use failure memory
+
+Failure memory should answer:
+
+```text
+What exact formulation was tested?
+What strong control absorbed it?
+What information budget and target semantics were used?
+What should we avoid repeating unchanged?
+What components remain reusable in a materially different mechanism?
+```
+
+Do not generalize `a tested formulation failed` into `the entire method family is impossible`. Conversely, do not rename an equivalent failed formulation and rerun it without a new scientific mechanism.
+
+## Research posture
+
+- Search broadly, execute narrowly, kill weak directions quickly.
+- Prefer architecture-level hypotheses over small residual corrections when the evidence supports a reset.
+- Use strong simple baselines and equal-information controls.
+- Treat novelty as a survivor/paper requirement, not a barrier to cheap discovery.
+- Preserve raw negative evidence, but keep the search space open to genuinely different objects and information flows.
+- Stop diagnostic chains once they answer the family-level question.

@@ -1,83 +1,105 @@
-# Handoff: Idea 008 Terminated / HyperEdit-MR Screen Stopped
+# Handoff: Architecture-First Open Search
 
-## Current state
+## Current scientific state
 
-- **Current Stage**: `TERMINATED_AT_GATE_01`
-- **Active Idea**: none; HyperEdit-MR remains a prototype
-- **Gate 01 protocol**: v1.2, unchanged
-- **Gate01-Train + Gate01-Dev**: `COMPLETE`
-- **First Gate01-Audit attempt**: `OPENED_BLOCKED_AT_FIRST_VISIT / NO_RESULT`
-- **Controller corrections**: MoleRec invocation correction verified at `25888b954d8f27b7c03a759790b25f93afcd6982`; Bundle ownership correction committed at `134d293dcdadd767eba0a5d121039110c1c47f3e`
-- **Controller re-verification**: `CONTROLLER_REVERIFICATION_PASS`
-- **Fresh Gate01-Audit attempt**: `COMPLETE`
-- **Runner-produced terminal classification**: `KILL_TARGET_SEMANTICS`
-- **Scientific Gate verdict**: `KILL_TARGET_SEMANTICS`
-- **G3/G4**: `UNTOUCHED`
-- **R0 Holdout**: `UNTOUCHED`
-- **Historical project test**: `UNTOUCHED`
-- **Next owner**: none
-- **Modern-backbone calibration**: [`research/memory/modern-backbone-calibration.md`](research/memory/modern-backbone-calibration.md), terminal state `MODERN_BACKBONE_CALIBRATION_COMPLETE`; comparison-only, with no Idea 009 or additional backbone hunting.
+- **Authoritative synthesis**: `research/memory/current-research-state.md`
+- **Active formal Idea**: none
+- **Ideas 001--008**: terminated
+- **Idea 009**: not created
+- **Active formal Gate**: none
+- **Modern-backbone calibration**: `MODERN_BACKBONE_CALIBRATION_COMPLETE`
+- **Interaction-first residual family**: `CLOSE_INTERACTION_FIRST_FAMILY`
+- **Current phase**: step back, search broadly, then prototype one new architecture/mechanism on Train/Dev
 
-Idea 008:
-TERMINATED_AT_GATE_01
+According to the current recorded evidence, G3/G4, R0 Holdout, and the historical project test remain quarantined from the recent exploratory prototype sequence.
 
-Terminal result:
-KILL_TARGET_SEMANTICS
+## Current empirical anchors
 
-Reusable observation:
-Budget-conditioned learned refinement collapsed to nearly identical medication sets across requested budgets, while explicit optimization produced a visible utility–DDI trade-off.
+| Surface | Jaccard | PRAUC | DDI | Role |
+| --- | ---: | ---: | ---: | --- |
+| MoleRec | 0.529174 | 0.773576 | 0.072223 | strong simple canonical anchor |
+| GraphRefine-SameK | 0.533650 | 0.784240 | 0.073328 | current executed admissible Train/Dev ceiling; not an active paper direction |
+| HypeMed-LeakageSafe | 0.512112 | 0.753822 | 0.059404 | faithful recent reference; canonically weak on accuracy |
+| Rx-Expert coarse | 0.510522 | 0.757858 | 0.077303 | faithful recent architecture-family reference; backbone reset stopped |
+| DMGExNet | — | — | — | literature/architecture reference only; information-budget mismatch prevents canonical numerical comparison |
 
-HyperEdit-MR screen: `STOP_HYPEREDIT` (weak effect; Train/Dev only).
+The earlier HypeMed-inspired `0.431689` result is non-faithful historical output and must not be used as canonical HypeMed performance.
 
-## Frozen scientific state
+## Most recent family-level result
+
+The frozen-unary residual-dependence isolation fixed the original MoleRec logits and learned only a symmetric zero-diagonal residual interaction matrix.
+
+Key deltas:
 
 ```text
-r_train = 0.07728988868497694
-b_L = 0.04637393321098616
-b_M = 0.06183191094798155
-b_H = 0.07728988868497694
-fixed lambda: b_L -> 1.0, b_M -> 0.5, b_H -> 0.0
-BudgetSet: LR 0.001, eta 5.0, epochs {2002: 6, 2003: 10, 2004: 6}
-Independent: LR 0.001, eta 5.0, epochs {2002: 7, 2003: 6, 2004: 6}
+FrozenOracle - MoleRec:
+  Jaccard +0.000257
+  NLL     -0.010482
+  PRAUC   -0.010974
+
+FrozenOracle - FrozenShuffled:
+  Jaccard +0.010644
+
+FrozenMeanField - MoleRec:
+  Jaccard -0.003437
 ```
 
-The model source, checkpoint, dataset, candidate vocabulary, protocol, controls, and learned artifacts remain unchanged.
+Interpretation:
 
-## Re-verification result
+- visit-specific co-label dependence exists;
+- it is not aligned with material set-accuracy headroom above the strong MoleRec unary;
+- deployable mean-field recovery is harmful;
+- do not continue to CRF/energy/beam-search/partial-set-completion rescue for this pairwise residual signal.
 
-The bounded controller correction at `25888b954d8f27b7c03a759790b25f93afcd6982` passed independent re-verification. The repository-owned `extract_gate01_molerec_features(...)` path supplies no positional MoleRec forward arguments and passes exactly the six pinned inputs by keyword. The signature-faithful regression reproduces the original controller failure and verifies one eval/no-grad same-forward score/embedding extraction over all 131 candidates.
+Family-level decision: `CLOSE_INTERACTION_FIRST_FAMILY`.
 
-Record:
+Mechanistic note: `DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY`.
 
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-controller-reverification.md`
+The older `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` result is retained as a historical intermediate probe and is superseded for routing by the frozen-unary identification result.
 
-## Fresh Audit execution
+## Other recent terminal prototypes
 
-The fresh Audit attempt was authorized by:
+- NeedCover: `KILL_NEEDCOVER_MECHANISM`.
+- MedState: `KILL_PERSISTENT_MED_STATE`.
+- RxUnitSet: `KILL_RXUNIT_UNSUPPORTABLE_TARGET`.
+- FutureGraphKD: `STOP_NO_FUTURE_STATE_SIGNAL`.
+- RxDiffSet-v0: `STOP_RXDIFFSET_V0`.
+- TheraCompose-v0: `STOP_THERACOMPOSE_V0`.
+- HyperEdit sequential: `STOP_HYPEREDIT`; GraphRefine-SameK remains a weak diagnostic/anchor only.
+- HypeMed faithful: `HYPEMED_CANONICAL_WEAK`; previous simplified adapter invalidated.
+- Rx-Expert: `STOP_RXEXPERT_BACKBONE_RESET`.
+- DMGExNet: `DMGEXNET_INFORMATION_BUDGET_MISMATCH`.
 
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-reauthorization.md`
+See `research/prototypes/README.md` for the reconciled inventory.
 
-The first failed attempt contributes zero scientific evidence and was not resumed or pooled. The fresh attempt started from the beginning, used `extract_gate01_molerec_features(...)` for every pinned MoleRec visit extraction, and completed the frozen Audit path.
+## Next research action
 
-Public-safe aggregate evidence is recorded in:
+Do **not** start another diagnostic on a closed family and do **not** hunt another public backbone by default.
 
-`research/ideas/008-budgetset-residual-budget-marginal-ddi-set-refinement/experiments/gate-01-audit-result.json`
+Use the next cycle for architecture-first discovery:
 
-The run covered 1,113 Audit patients and 2,413 Audit visits, used 1,000 patient-clustered bootstrap replicates with seed 80081, and produced exactly one protocol classification: `KILL_TARGET_SEMANTICS`. Idea 008 is terminated at Gate 01.
+```text
+step back
+→ broad MedRec + adjacent-method search
+→ formulate one Rank-1 mechanism-bearing candidate
+→ enough closest-work checking to avoid an obvious duplicate
+→ one seed / one main config / Train+Dev
+→ strongest relevant baseline + decisive mechanism ablation
+→ continue / redesign once / kill
+```
 
-No training, reselection, protocol change, new control, or post-hoc rescue is authorized. If another implementation/runtime change is required, stop and return to the pipeline coordinator.
+The candidate is not required to use MoleRec or any previously successful component. New architectures, prediction granularities, decoders, representations, supervision paradigms, and coherent combinations are open.
+
+Novelty is a survivor/paper requirement, not a reason to block a cheap architecture prototype. Historical failure and literature files are evidence and discovery aids; they do not impose global bans on architectural primitives.
 
 ## Routing
 
 ```text
-Idea 008: TERMINATED_AT_GATE_01
-Gate01-Train + Gate01-Dev: COMPLETE
-First Gate01-Audit attempt: BLOCKED_NO_RESULT
-Controller re-verification: CONTROLLER_REVERIFICATION_PASS
-Fresh Gate01-Audit attempt: COMPLETE
-Runner-produced terminal classification: KILL_TARGET_SEMANTICS
-Scientific Gate verdict: KILL_TARGET_SEMANTICS
-Quarantine: intact
-Stage: TERMINATED_AT_GATE_01
-Next owner: none
+Active Idea: none
+Idea 009: absent
+Formal Gate: none
+Backbone hunting: complete by default
+Interaction-first residual rescue: closed
+Held-out architecture selection: forbidden
+Next owner: architecture / method search, then one bounded Train/Dev prototype
 ```
