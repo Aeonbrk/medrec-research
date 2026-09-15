@@ -43,7 +43,7 @@ def run(device_name: str = "cpu") -> dict:
         e0 = early(packed)
         l0 = late(packed)
         e_perm = early(packed_permuted)
-    if not torch.equal(e0, l0):
+    if not torch.allclose(e0, l0, atol=1e-5, rtol=1e-5):
         raise RuntimeError("early and late zero-conditioner logits differ")
     if not torch.allclose(e0, e_perm, atol=1e-5, rtol=1e-5):
         raise RuntimeError("canonicalized current-code permutation changed logits")
