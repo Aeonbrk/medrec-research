@@ -5,6 +5,7 @@
 .claude/
 .codegraph/
 .venv/
+/slides/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
@@ -13,6 +14,8 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+node_modules/
+*.pdf
 
 # Local runtime and project skills
 .agents/skills/
