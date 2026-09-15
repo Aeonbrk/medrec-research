@@ -157,6 +157,19 @@ Routing guidance:
 
 The earlier `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` remains valid as historical probe output from the confounded formulation, but it is not the current routing basis.
 
+### MICA — Medication-Indexed Clinical Assembly
+
+Observed result from the complete source-bound Train/Dev screen at revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`:
+
+- MICA-Early (`X → F_m → T`) selected epoch 3: Jaccard `0.541580`, F1 `0.694409`, PRAUC `0.793045`, DDI `0.075212`.
+- MICA-Late (`X → T → F_m`) selected epoch 3: Jaccard `0.541656`, F1 `0.694569`, PRAUC `0.792254`, DDI `0.075664`.
+- Mechanism delta `Early − Late = -0.000076`, with both arms completing all 60 epochs under the same frozen configuration and `848900` parameters.
+- Epoch-60 Dev rows were materially worse than the selected checkpoints (Early Jaccard `0.480911`; Late `0.475597`), so they are recorded as final-epoch evidence and were not substituted for selected-checkpoint metrics.
+
+The frozen rule therefore yields `KILL_MICA_MECHANISM` (`ΔJ <= 0.002`). Neither project accuracy nor safety bar is satisfied, but that branch is secondary because the mechanism cutoff already kills the candidate. The one bounded cardinality diagnostic is not authorized because the delta is not in the weak interval `(0.002, 0.004]`. This is exploratory single-seed Train/Dev evidence, not held-out evaluation, a formal Gate, or a novelty conclusion.
+
+Routing guidance: close this MICA formulation without creating Idea 009 or starting a rescue cycle. The negative result is local to medication-conditioned clinical assembly before shared attention versus the matched late control; it does not ban medication-specific computation or upstream conditional interaction in a materially different future design.
+
 ## 6. Cross-project lessons
 
 ### Strong unary quality absorbs many local corrections

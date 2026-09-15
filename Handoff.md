@@ -1,14 +1,14 @@
-# Handoff: MICA Execution Finalization — Screen Pending
+# Handoff: MICA Screen Complete — Mechanism Killed
 
 Updated: 2026-09-15.
 
-The verified starting `origin/main` was `2496f39ffa3085e29e4ae9edeca217215b8aba0e`. This handoff records the execution-finalization state after that revision; no MICA training, CUDA model preflight, real-data architecture screen, source deployment, or detached remote job has been launched yet.
+The verified starting `origin/main` was `2496f39ffa3085e29e4ae9edeca217215b8aba0e`. Execution finalization and the complete MICA screen are now finished at source revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`. Both arms completed 60 epochs on the canonical Train/Dev split; aggregate evidence is recorded in [`research/prototypes/mica/result.json`](research/prototypes/mica/result.json). Raw checkpoints, predictions and logs remain private on 319.
 
 ## Workspace and deliverables
 
 - Current branch: `main`.
 - The starting `HEAD` and freshly fetched `origin/main` were both `2496f39ffa3085e29e4ae9edeca217215b8aba0e` before execution finalization.
-- `research/prototypes/mica/` is tracked in the execution-finalization commit; the run must use that exact clean immutable revision.
+- `research/prototypes/mica/` is tracked in the pushed execution revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`.
 - Design and scientific contract: [`research/prototypes/mica/README.md`](research/prototypes/mica/README.md). It contains ERAN verdict, primary-source provenance, full model equations/shapes/configuration, matched control, execution plan, decision rules, and renderable Mermaid figure.
 - Model draft: `research/prototypes/mica/mica.py`.
 - Runner draft: `research/prototypes/mica/run_mica.py`.
@@ -39,27 +39,23 @@ The raw EHR information budget is the canonical admission-level task. Current D/
 | Architecture and code review | Main-agent design/inspection performed; independent reviewer failed due to agent usage limits before returning findings. This is **not** a review pass. |
 | Implementation | Model, runner, synthetic preflight and aggregate decision script are execution-finalized. The runner binds the whole clean checkout, requires `--source-revision`, uses strict Jaccard improvement, writes one progress schema, records selected versus epoch-60 evidence, and freezes/records TF32 policy. |
 | Local verification before handoff | Scoped syntax/Ruff checks target only the final MICA files. These checks do not establish CUDA or real-data validity. |
-| Runtime verification | No model forward/backward was executed in the declared environment. No CUDA preflight or real-data split/vocabulary validation ran. |
-| Remote activity | Read-only SSH account, GPU/disk, checkout status and Python/package-version inspection only. No source transfer, environment change, job creation, training or GPU model inference. |
-| Results | No MICA metrics, checkpoint, survival verdict or runtime evidence exists. |
+| Runtime verification | Real-data contract preflight and the single synthetic CUDA preflight passed on the final clean checkout. Both official arms completed all 60 epochs in `medrec-molerec-table1`. |
+| Remote activity | Primary `319-lab` passed account/capacity checks; additive isolated checkout used revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`; Early ran on GPU 0 and Late on GPU 1. |
+| Results | Public-safe aggregate evidence is in `research/prototypes/mica/result.json`; raw checkpoints, predictions and logs remain on 319. |
 
-## Remaining execution work
+## Execution outcome
 
-The execution-finalization implementation is complete. Remaining work is only the authorized run:
+The final run passed the required preflights and completed both arms. The frozen aggregate decision is `KILL_MICA_MECHANISM`: Early Jaccard `0.5415802299`, Late Jaccard `0.5416562262`, ΔJ `-0.0000759963`. The selected checkpoints were both epoch 3; epoch-60 Dev rows are separately recorded and were not substituted.
 
-1. On a new additive 319 checkout, verify the exact final revision, clean status, `medrec-molerec-table1` environment, GPU capacity, disk and the two canonical data roots.
-2. Run both `--preflight-only` data-contract checks and exactly one `preflight_mica.py --device cuda` check.
-3. If and only if those pass, launch the complete Early/Late 60-epoch screen, retain private artifacts on 319, summarize the two completed result files, and apply the frozen decision.
-
-The scientific risk remains whether early conditioning earns any benefit over the matched late control. Its greater per-example compute is acknowledged; parameter count and optimization opportunities, not FLOPs, are matched.
+Execution-only failures preserved outside the scientific result were: two preflight retries while correcting exact data-root binding and bounded CUDA equality checking, and one detached-launch wrapper failure caused by pre-populating arm output directories. The successful retry used the same final revision, seed, configuration, split and two authorized arms; no rescue experiment or scientific parameter change occurred.
 
 ## Remote resumption context
 
-Read `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` again immediately before the next authorized remote operation. In this session the primary `319-lab` connection failed; `319-lab-via-server` authenticated. Observed environment: Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`, scikit-learn `1.2.0`, CUDA available. These observations are not a future preflight pass.
+The final remote operation used the primary `319-lab` target. Runtime was Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`, and CUDA was available; the recorded run evidence is bound to that environment.
 
-The existing remote research checkout was at `246e4f3620ac9b39973e9e5f6385d8f2a765058c` with unrelated untracked Idea 006/resource-reset directories. Preserve it; use an additive isolated checkout at the final execution revision. The old GPU observation is stale: recheck immediately before submission and never touch unrelated processes. Proposed allocation is Early on GPU 0, Late on GPU 1, subject to current capacity; no additional arms are planned.
+The existing remote research checkout at `246e4f3620ac9b39973e9e5f6385d8f2a765058c` with unrelated untracked Idea 006/resource-reset directories was preserved. The run used an additive isolated checkout at the final execution revision, with Early on GPU 0 and Late on GPU 1; no additional arms were launched.
 
-No remote MICA output directory or monitoring session has been created. Snapshot and Train/Dev identities are in the prototype README and existing prototype commands; private data and execution output roots remain outside Git.
+The private remote output root was `/root/zhb/medrec-mica-runs/9616c6b381a259e49b8e737ab26e2ebca73aa505-attempt2`; raw artifacts remain outside Git. The public-safe aggregate was summarized on 319 and recorded locally as `research/prototypes/mica/result.json`.
 
 ## Current scientific state
 
@@ -138,9 +134,9 @@ The older `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` result is retained as a his
 
 See `research/prototypes/README.md` for the reconciled inventory.
 
-## Next assigned execution task
+## Next assigned task
 
-Use the finalized source revision for the minimum Remote Preflight and synthetic/data-contract checks → full Early/Late Train/Dev screen → aggregate evidence intake → apply the predeclared decision. Do not start a new brainstorm, create Idea 009 or open a formal Gate as part of this handoff.
+No further MICA execution is authorized by this handoff. Preserve the kill result, do not create Idea 009 or open a formal Gate automatically, and require a materially different proposal before another architecture screen.
 
 The mechanism cutoff is Early minus Late Jaccard: `<=0.002` kills; `(0.002,0.004]` is weak and not a survivor; `>0.004` is a signal. Project survival additionally requires the precise accuracy or safety bar in README §8. A positive mechanism delta against a weak control alone is insufficient. No held-out selection, broad sweep, automatic rescue, or interpretation of incomplete runs as passes.
 
@@ -153,7 +149,7 @@ Formal Gate: none
 Backbone hunting: complete by default
 Strong-unary pairwise residual rescue: deprioritized
 Held-out architecture selection: forbidden
-MICA: execution finalized; not run
-Current session: execution finalization complete
-Next owner: run the assigned minimum preflight and full Train/Dev screen
+MICA: `KILL_MICA_MECHANISM`; complete and closed
+Current session: execution and evidence intake complete
+Next owner: future architecture search under the current-state routing boundary
 ```

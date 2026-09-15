@@ -2,7 +2,7 @@
 
 # MICA — Medication-Indexed Clinical Assembly
 
-Status as of 2026-09-15: **execution finalized; screen pending**. The implementation is bound to the verified `2496f39ffa3085e29e4ae9edeca217215b8aba0e` starting `origin/main` and the execution-finalization commit that follows it. This remains one exploratory Train/Dev architecture screen, not Idea 009 or a formal Gate. Source binding, strict checkpoint selection, result reporting, CUDA numeric-policy recording, and summarizer validation are part of the finalized runner. No CUDA preflight, remote job, or result exists yet; the specification below remains the scientific contract for the authorized run.
+Status as of 2026-09-15: **screen complete; mechanism killed**. The implementation was finalized from verified `origin/main` `2496f39ffa3085e29e4ae9edeca217215b8aba0e` and the complete run used immutable revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`. Both authorized arms completed the frozen 60-epoch Train/Dev screen; public-safe aggregate evidence is [`result.json`](result.json). This remains exploratory Train/Dev evidence, not Idea 009, a formal Gate, or a novelty claim. Source binding, strict checkpoint selection, result reporting, CUDA numeric-policy recording, and summarizer validation were executed.
 
 ## 1. ERAN verdict: REPLACE
 
@@ -220,6 +220,6 @@ flowchart TD
     FC --> PC["Identical medication-specific pooling and output"]
 ```
 
-## EXECUTION NEXT
+## EXECUTION OUTCOME
 
-Run the minimum remote/data-contract and single synthetic CUDA preflights, then execute the complete candidate and parameter-identical late control for one frozen 60-epoch Train/Dev screen. Keep raw artifacts on 319, return aggregate evidence only, and apply the frozen mechanism and project survival rules.
+The minimum remote/data-contract and single synthetic CUDA preflights passed, both arms completed all 60 epochs, and aggregate evidence was summarized from the completed result files. The frozen decision is `KILL_MICA_MECHANISM` with Early minus Late Jaccard `-0.0000759963`; no bounded diagnostic or rescue cycle is authorized.

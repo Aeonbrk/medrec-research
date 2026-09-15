@@ -1,0 +1,154 @@
+{
+  "decision": "KILL_MICA_MECHANISM",
+  "evidence_class": "exploratory_train_dev_single_seed",
+  "execution": {
+    "completed_epochs": {
+      "MICA-Early": 60,
+      "MICA-Late": 60
+    },
+    "environment": {
+      "numpy": "1.23.5",
+      "python": "3.8.16",
+      "torch": "1.9.0+cu111"
+    },
+    "gpu_assignment": {
+      "MICA-Early": 0,
+      "MICA-Late": 1
+    },
+    "peak_gpu_memory_mb": {
+      "MICA-Early": 714.90283203125,
+      "MICA-Late": 537.91064453125
+    },
+    "remote_checkout_revision": "9616c6b381a259e49b8e737ab26e2ebca73aa505",
+    "source_revision": "9616c6b381a259e49b8e737ab26e2ebca73aa505",
+    "wall_time_seconds": {
+      "MICA-Early": 4146.744139432907,
+      "MICA-Late": 1534.2756416797638
+    }
+  },
+  "frozen_configuration": {
+    "batch_size_visits": 16,
+    "clinical_attention_blocks": 2,
+    "decoder": "sigmoid probability >= 0.35",
+    "ddi_weight": 0.05,
+    "epochs": 60,
+    "ffn_dim": 256,
+    "heads": 4,
+    "hidden_dim": 128,
+    "learning_rate": 0.0003,
+    "medications": 131,
+    "numeric_policy": {
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": true,
+      "dtype": "float32"
+    },
+    "optimizer": "AdamW",
+    "seed": 20260914,
+    "weight_decay": 0.0001
+  },
+  "mechanism_jaccard_delta": -0.00007599629889143422,
+  "parameter_count": 848900,
+  "project_accuracy_bar": false,
+  "project_safety_bar": false,
+  "references": {
+    "GraphRefine-SameK": {
+      "ddi": 0.073328,
+      "jaccard": 0.53365,
+      "prauc": 0.78424,
+      "role": "historical diagnostic/reference only"
+    },
+    "MoleRec": {
+      "ddi": 0.072223,
+      "jaccard": 0.529174,
+      "prauc": 0.773576,
+      "role": "historical canonical reference"
+    }
+  },
+  "rows": {
+    "MICA-Early": {
+      "epoch_60_Dev": {
+        "ddi_rate": 0.08090558320624697,
+        "f1": 0.6397086915630537,
+        "jaccard": 0.4809106349705234,
+        "mean_medication_count": 20.146478873239438,
+        "nll": 0.5416021943092346,
+        "prauc": 0.7196593302447009,
+        "precision": 0.6450707718898799,
+        "recall": 0.6638176608997891,
+        "std_medication_count": 6.6351704597473145
+      },
+      "selected_checkpoint": {
+        "Dev": {
+          "ddi_rate": 0.07521238052211504,
+          "f1": 0.694408517006996,
+          "jaccard": 0.5415802299057342,
+          "mean_medication_count": 19.845070422535212,
+          "nll": 0.2022671103477478,
+          "prauc": 0.7930448110532787,
+          "precision": 0.7028655713483902,
+          "recall": 0.7104740763067368,
+          "std_medication_count": 7.071561813354492
+        },
+        "Train": {
+          "ddi_rate": 0.08338499297850537,
+          "f1": 0.7245691906651971,
+          "jaccard": 0.579120759589401,
+          "mean_medication_count": 19.05510534846029,
+          "nll": 0.1747087687253952,
+          "prauc": 0.8211596193748655,
+          "precision": 0.7306083002457817,
+          "recall": 0.7369353685546121,
+          "std_medication_count": 6.91517448425293
+        }
+      },
+      "selected_epoch": 3
+    },
+    "MICA-Late": {
+      "epoch_60_Dev": {
+        "ddi_rate": 0.08222788573855792,
+        "f1": 0.6355543948209389,
+        "jaccard": 0.4755974937705941,
+        "mean_medication_count": 20.32957746478873,
+        "nll": 0.5266745090484619,
+        "prauc": 0.7179619760030489,
+        "precision": 0.639222910015366,
+        "recall": 0.6603326222597529,
+        "std_medication_count": 7.010744094848633
+      },
+      "selected_checkpoint": {
+        "Dev": {
+          "ddi_rate": 0.07566426068309012,
+          "f1": 0.6945685675984937,
+          "jaccard": 0.5416562262046256,
+          "mean_medication_count": 19.95492957746479,
+          "nll": 0.20245981216430664,
+          "prauc": 0.7922542977011173,
+          "precision": 0.7017677115690796,
+          "recall": 0.7119793328599457,
+          "std_medication_count": 7.253028392791748
+        },
+        "Train": {
+          "ddi_rate": 0.08461623599233702,
+          "f1": 0.72513007853123,
+          "jaccard": 0.5797746169451309,
+          "mean_medication_count": 19.259033272952617,
+          "nll": 0.17444971203804016,
+          "prauc": 0.8214235625575013,
+          "precision": 0.7278952858724955,
+          "recall": 0.7409777983759454,
+          "std_medication_count": 7.053877830505371
+        }
+      },
+      "selected_epoch": 3
+    }
+  },
+  "split": {
+    "dev_patients": 1004,
+    "dev_visits": 2130,
+    "train_patients": 4233,
+    "train_visits": 10489
+  },
+  "status": "complete"
+}
