@@ -137,11 +137,24 @@ class MICADynamicQuery(BaseMICA):
         keys = self.key(normalized)
         values = self.value(normalized)
         contexts = []
+        # Keep the zero-initialized adapter path on the inherited four-dimensional
+        # contraction.  This makes the initial static/dynamic adapter function
+        # numerically identical to MICA-Core; once the dynamic adapter is trained,
+        # its genuinely per-patient queries use the batched contraction below.
+        exact_shared_query = self.variant == "static_query_adapter" or not bool(
+            torch.any(self.query_adapter[2].weight.detach() != 0).item()
+        )
         for start in range(0, MEDICATIONS, CHUNK):
             selected = queries[:, start : start + CHUNK]
-            scores = torch.einsum("bcd,btd->bct", self.query(selected), keys) / math.sqrt(DIM)
-            weights = scores.masked_fill(~mask[:, None, :], float("-inf")).softmax(dim=-1)
-            contexts.append(torch.einsum("bct,btd->bcd", weights, values))
+            if exact_shared_query:
+                expanded = assembled[:, None].expand(-1, selected.shape[1], -1, -1)
+                contexts.append(self.read(expanded, selected[0], mask))
+            else:
+                scores = torch.einsum(
+                    "bcd,btd->bct", self.query(selected), keys
+                ) / math.sqrt(DIM)
+                weights = scores.masked_fill(~mask[:, None, :], float("-inf")).softmax(dim=-1)
+                contexts.append(torch.einsum("bct,btd->bcd", weights, values))
         return torch.cat(contexts, dim=1)
 
     def _adapter_context(

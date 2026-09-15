@@ -74,7 +74,13 @@ _RUNNER._scientific_config = _scientific_config
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
-    return _RUNNER.run(args)
+    result = _RUNNER.run(args)
+    if not args.preflight_only:
+        generated = args.output_dir / "results.json"
+        expected = args.output_dir / "result.json"
+        if generated.exists():
+            generated.replace(expected)
+    return result
 
 
 def main() -> None:
