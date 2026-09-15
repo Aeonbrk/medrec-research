@@ -337,6 +337,20 @@ def summarize(
             if scoped_safe_rank_rerun_revision
             else None
         ),
+        "excluded_runtime_attempts": [
+            {
+                "revision": "c41c304ceb59b1537e3a0eb97a4fd64ec7025cb9",
+                "arm": "SafeRank",
+                "completed_epochs": 1,
+                "reason": "SafeSwap candidate-counting runtime defect; no complete result used",
+            },
+            {
+                "revision": "93c2bf72b0ed7e37913c0ea399ca535c680a7bfa",
+                "arm": "SafeRank",
+                "completed_epochs": 2,
+                "reason": "SafeRank candidate-scoring runtime defect; no complete result used",
+            },
+        ],
         "verification": {
             "preflight_status": "PASS",
             "cuda_preflight_revision": scoped_safe_rank_rerun_revision or run_revision,
