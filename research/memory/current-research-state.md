@@ -12,7 +12,7 @@ Ideas 001--008: terminated
 Idea 009: not created
 Active formal Gate: none
 Modern-backbone calibration: complete
-Interaction-first residual family: closed as a primary direction
+Strong-unary residual-correction route: deprioritized as a primary direction
 Current action: architecture-first open search
 ```
 
@@ -20,23 +20,29 @@ No named new architecture is pre-approved. The next candidate should emerge from
 
 According to the current recorded evidence, G3/G4, R0 Holdout, and the historical project test remain quarantined from the recent exploratory prototype sequence.
 
-## 2. Evidence hierarchy
+## 2. Evidence hierarchy and epistemic labels
 
 When summaries conflict:
 
 1. run-local result JSON / audit / source-bound README is authoritative for that run;
-2. this file is authoritative for current cross-project interpretation;
+2. this file is authoritative for current cross-project interpretation and routing;
 3. current indexes and `Handoff.md` summarize this file;
 4. older search, review, authorization, literature, and reorientation documents are historical snapshots.
 
-A historical `CLOSED`, `CROWDED`, `PRIOR ART`, or `NOT AUTHORIZED` label applies to its dated formulation and workflow state. It is not a permanent ban on an architectural primitive.
+Use three distinct labels in current-state synthesis:
+
+- **Observed result**: directly produced by an experiment, audit, or source review.
+- **Interpretation**: scientific reading of one or more observed results.
+- **Routing guidance**: what the project should prioritize or deprioritize next.
+
+Do not promote a routing inference into a runner-produced terminal verdict. A historical `CLOSED`, `CROWDED`, `PRIOR ART`, or `NOT AUTHORIZED` label applies to its dated formulation and workflow state; it is not a permanent ban on an architectural primitive.
 
 ## 3. Canonical comparison anchors
 
 | Surface | Jaccard | F1 | PRAUC | DDI | AvgMed | Current role |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | MoleRec | 0.529174 | 0.683480 | 0.773576 | 0.072223 | 21.5451 | strong simple canonical anchor |
-| GraphRefine-SameK | 0.533650 | 0.687394 | 0.784240 | 0.073328 | 21.5451 | current executed admissible Train/Dev ceiling; **not** an active paper direction |
+| GraphRefine-SameK | 0.533650 | 0.687394 | 0.784240 | 0.073328 | 21.5451 | best observed executed admissible Train/Dev reference so far; **not** an active paper direction |
 | HypeMed-LeakageSafe | 0.512112 | 0.668091 | 0.753822 | 0.059404 | 23.6549 | faithful recent baseline/reference; accuracy too weak for backbone reset |
 | HypeMed-OfficialSemantics | 0.514256 | 0.670078 | 0.755615 | 0.059559 | 23.5770 | faithful sensitivity/reference, not canonical comparison surface |
 | Rx-Expert coarse | 0.510522 | 0.666965 | 0.757858 | 0.077303 | 22.4268 | faithful recent architecture-family reference; not a new backbone |
@@ -44,7 +50,9 @@ A historical `CLOSED`, `CROWDED`, `PRIOR ART`, or `NOT AUTHORIZED` label applies
 
 The old HypeMed-inspired `0.431689` result is `SUPERSEDED_NON_FAITHFUL_HYPEMED_ADAPTER` and must never be presented as canonical HypeMed performance.
 
-`MODERN_BACKBONE_CALIBRATION_COMPLETE`: do not continue hunting public backbones without a specific scientific reason. A strong baseline is a comparator, not a mandatory substrate for the next model.
+Observed phase result: `MODERN_BACKBONE_CALIBRATION_COMPLETE`.
+
+Routing guidance: do not continue hunting public backbones by default without a specific scientific reason. A strong baseline is a comparator, not a mandatory substrate for the next model.
 
 ## 4. Formal Ideas 001--008
 
@@ -65,34 +73,45 @@ All eight Ideas remain terminated. Their components may be reused in materially 
 
 ### HyperEdit / GraphRefine
 
+Observed results:
+
 - Sequential HyperEdit: `STOP_HYPEREDIT`; Jaccard `0.497527`, DDI `0.064668`, severe under-prescription.
 - Retrieval-only fusion: small movement around MoleRec.
 - `GraphRefine-SameK`: Jaccard `0.533650` (`+0.004476` vs MoleRec) with slightly worse DDI `+0.001105`.
-- Interpretation: there is a weak patient-conditioned ranking signal, but the effect is too small to justify a paper direction and later interaction-first evidence does not support repeated residual-graph rescue.
+
+Interpretation: there is a weak patient-conditioned ranking signal. It is useful as evidence and as a comparison reference, but it is not a paper-scale result by itself.
+
+Routing guidance: do not repeatedly rescue the same residual-graph formulation; medication-specific computation or graph structure remains open inside a materially different architecture.
 
 ### TheraCompose-v0
 
-`STOP_THERACOMPOSE_V0`. Latent therapeutic intents + patient-conditioned medication interactions + structured energy/inference collapsed far below the strong baseline. This kills that v0 formulation, not all latent-intent or structured-set models.
+Observed result: `STOP_THERACOMPOSE_V0`. Latent therapeutic intents + patient-conditioned medication interactions + structured energy/inference collapsed far below the strong baseline.
+
+Interpretation: this kills that v0 formulation, not all latent-intent or structured-set models.
 
 ### RxDiffSet-v0
 
-`STOP_RXDIFFSET_V0`. Full denoising and SameK outputs remained materially below MoleRec/GraphRefine; one-step denoising approached but did not beat MoleRec. Do not tune this denoising formulation further without a materially new mechanism.
+Observed result: `STOP_RXDIFFSET_V0`. Full denoising and SameK outputs remained materially below MoleRec/GraphRefine; one-step denoising approached but did not beat MoleRec.
+
+Routing guidance: do not tune this denoising formulation further without a materially new mechanism.
 
 ### FutureGraphKD-v0
 
-`STOP_NO_FUTURE_STATE_SIGNAL`. Immediate-next-visit diagnosis/procedure information provided only `+0.000513` Teacher-over-Student Jaccard on the supported subset. The signal itself was weak; this is not merely a KD failure.
+Observed result: `STOP_NO_FUTURE_STATE_SIGNAL`. Immediate-next-visit diagnosis/procedure information provided only `+0.000513` Teacher-over-Student Jaccard on the supported subset.
+
+Interpretation: the tested privileged signal itself was weak; this is not merely a KD implementation failure.
 
 ### NeedCover
 
-`KILL_NEEDCOVER_MECHANISM`. Regimen-conditioned residual diagnosis-need reasoning was worse than the matched static two-pass control (`NeedCover - StaticTwoPass = -0.003773` Jaccard).
+Observed result: `KILL_NEEDCOVER_MECHANISM`. Regimen-conditioned residual diagnosis-need reasoning was worse than the matched static two-pass control (`NeedCover - StaticTwoPass = -0.003773` Jaccard).
 
 ### MedState
 
-`KILL_PERSISTENT_MED_STATE`. Persistent per-medication latent trajectories were worse than the matched stateless relational reader; persistence itself showed no positive mechanism value in this formulation.
+Observed result: `KILL_PERSISTENT_MED_STATE`. Persistent per-medication latent trajectories were worse than the matched stateless relational reader; persistence itself showed no positive mechanism value in this formulation.
 
 ### RxUnitSet
 
-`KILL_RXUNIT_UNSUPPORTABLE_TARGET`. `(drug, dose, route)` prescription-unit semantics had high raw route/dose observability but insufficient stable admission-level unit identity and no proven strictly preceding episode context under the available canonical inputs. No model was trained.
+Observed result: `KILL_RXUNIT_UNSUPPORTABLE_TARGET`. `(drug, dose, route)` prescription-unit semantics had high raw route/dose observability but insufficient stable admission-level unit identity and no proven strictly preceding episode context under the available canonical inputs. No model was trained.
 
 ### Modern public backbones
 
@@ -119,22 +138,28 @@ Key deltas:
 - `FrozenOracle - FrozenShuffled`: Jaccard `+0.010644`.
 - `FrozenMeanField - MoleRec`: Jaccard `-0.003437`.
 
-Current interpretation:
+Observed terminal recommendation from the actual frozen-unary run:
 
-- visit-specific residual co-label dependence **exists**;
+`DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY`
+
+Interpretation:
+
+- visit-specific residual co-label dependence exists;
 - true label context is meaningfully better than shuffled context;
-- but almost none of that dependence provides set-accuracy headroom beyond the original MoleRec unary surface;
+- under this W-only residual formulation, privileged true-label context provides only `+0.000257` Jaccard above the original MoleRec surface;
 - deployable mean-field recovery is harmful on Jaccard, NLL, and PRAUC.
 
-Family-level decision: `CLOSE_INTERACTION_FIRST_FAMILY`.
+Routing guidance:
 
-Mechanistic note: `DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY`.
+- deprioritize `strong unary + pairwise residual medication correction` as the primary paper mechanism;
+- do not proceed to CRF/energy/beam-search/partial-set-completion solely to recover this specific pairwise residual signal, because the measured privileged set-accuracy headroom is negligible;
+- this does **not** close medication-specific interaction, structured prediction, or patient-regimen reasoning when they play a materially different role upstream or inside a new architecture.
 
-The earlier `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` is retained as historical probe evidence but is superseded for routing by the frozen-unary identification result. Do **not** proceed to CRF/energy/beam-search/partial-set-completion rescue solely to recover this pairwise residual signal; the privileged Oracle ceiling itself is too small.
+The earlier `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` remains valid as historical probe output from the confounded formulation, but it is not the current routing basis.
 
 ## 6. Cross-project lessons
 
-### Strong unary quality dominates many local corrections
+### Strong unary quality absorbs many local corrections
 
 Several reranking, residual, interaction, and structured-decoding routes show real local signal but not enough incremental set accuracy above the strongest unary surface. Small local gains should not be inflated into a paper story.
 
@@ -156,7 +181,7 @@ Idea 007 and RxUnitSet show that some attractive supervision/target objects are 
 
 ### Statistical dependence is not necessarily decision headroom
 
-The frozen-unary residual probe is the clearest example: co-label dependence is measurable, but the original strong unary has already absorbed nearly all set-accuracy-relevant benefit.
+The frozen-unary residual probe is the clearest example: co-label dependence is measurable, but this W-only oracle context adds essentially no set-accuracy improvement above the frozen MoleRec surface.
 
 ### Failure scope must stay local
 
@@ -171,9 +196,9 @@ The project should now search broadly for a genuinely different formulation. Hig
 - new prediction granularity or hierarchy;
 - structured list/set generation where the structure is the primary model rather than a residual head;
 - patient-specific conditional computation when it changes information flow rather than only capacity;
-- new decoder/inference mechanisms tied to a demonstrated source of headroom;
+- new decoder/inference mechanisms tied to a demonstrated source of headroom or a new decision process;
 - new supervision/training paradigms with supportable targets;
-- coherent combinations of known primitives that create a different capability.
+- coherent combinations of known primitives that create a different capability or inductive bias.
 
 These are search directions, not requirements. Adjacent fields should be searched for mechanisms rather than fashion.
 
@@ -182,11 +207,12 @@ Do not assume the next model must use MoleRec, GraphRefine, hypergraphs, MoE, re
 ## 8. Next workflow
 
 1. Step back and perform broad method/closest-family search, including adjacent structured prediction and recommendation work.
-2. Converge to **one** Rank-1 candidate with a concrete scientific mechanism.
+2. Converge to **one** Rank-1 candidate with a concrete scientific mechanism or inductive-bias hypothesis.
 3. Check enough literature to avoid an obvious duplicate and identify the strongest control; do not demand a full novelty proof before a cheap prototype.
-4. Run one seed / one main config on Train/Dev with the strongest relevant baseline and a decisive mechanism ablation.
+4. By default, run one seed / one main config on Train/Dev with the strongest relevant baseline and a decisive matched control or ablation.
 5. Continue only for material signal; allow at most one bounded redesign when the result identifies a concrete hidden failure.
-6. For a survivor, perform rigorous primary-source novelty/closest-work verification, stronger baselines, multiple seeds, formal experiment design, and untouched evaluation.
+6. If target semantics, privileged information, or another scientific entitlement must be fixed before modeling, formalize that contract earlier rather than forcing the prototype-first sequence.
+7. For a survivor, perform rigorous primary-source novelty/closest-work verification, stronger baselines, multiple seeds, formal experiment design, and untouched evaluation.
 
 The governing principle is:
 

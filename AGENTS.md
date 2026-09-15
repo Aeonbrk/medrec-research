@@ -8,7 +8,7 @@ This repository is the active research home for medication-recommendation method
 scientific value × iteration speed × trustworthy evidence
 ```
 
-The immediate goal is a credible first method paper. CCF-B-level publishability is a practical floor; CCF-A is a stretch target. New architectures, new representations, new prediction granularities, new decoders/inference procedures, new supervision paradigms, and coherent combinations of known primitives are all allowed.
+The immediate publication goal is a credible first method paper with CCF-B as the practical floor. Research quality should remain CCF-A-oriented, with CCF-A as the stretch publication target. New architectures, representations, prediction granularities, decoders/inference procedures, supervision paradigms, and coherent combinations of known primitives are all allowed.
 
 Use `docs/guides/first-principles-research-practice-sources.md` as methodological background, but do not turn any checklist, novelty heuristic, prior failure, or workflow artifact into a substitute for scientific judgment.
 
@@ -25,13 +25,16 @@ step back
 → continue / redesign once / kill
 ```
 
-Early prototypes normally use one seed, one main configuration, Train/Dev only, and a strong baseline. Formal claim-support rigor is paid after a method earns it.
+Early prototypes normally use one seed, one main configuration, Train/Dev only, and a strong baseline. Formal claim-support rigor is paid after a method earns it. This is a default workflow, not a prohibition on earlier formalization when target semantics, information entitlement, or another scientific contract must be frozen before modeling.
 
-Architecture-first means changing what is modeled when the evidence calls for it. Prioritize candidates that introduce a materially different object, interaction, information flow, prediction granularity, decision process, decoder, or supervision structure. Before implementation, answer:
+Architecture-first means changing what is modeled when the evidence calls for it. Prioritize candidates that introduce a materially different capability, object, interaction, information flow, inductive bias, prediction granularity, decision process, decoder, or supervision structure. Before implementation, answer:
 
 ```text
-What new object, interaction, information flow, or decision process is modeled?
-Why can a strong simple baseline not already express it?
+What capability, object, interaction, information flow, inductive bias,
+or decision process is changed?
+
+What matched strong control can test whether that change—not merely
+extra capacity or optimization budget—causes any gain?
 ```
 
 If the current backbone did not exist, periodically ask how the task would be formulated from scratch.
@@ -50,6 +53,7 @@ Useful screening magnitudes include roughly Jaccard `+0.010`, or DDI `-0.010` wi
 
 - `research/memory/current-research-state.md` is the current scientific-state synthesis and routing authority.
 - Raw experiment result files, audit records, and idea-local artifacts remain the evidence authority for the runs they describe.
+- The current synthesis must distinguish observed run results, cross-project interpretation, and routing guidance. A routing recommendation must not be presented as if it were a runner-produced terminal verdict.
 - Historical memory documents are discovery aids and provenance records. Their old `CLOSED`, `CROWDED`, `PRIOR ART`, authorization, or routing labels apply to the recorded scope and date; they do not override the current-state synthesis.
 - Novelty, closest-work, SOTA, and benchmark-comparability claims must be verified from primary sources when they matter to a survivor decision or paper claim.
 - Public baseline adaptation is fidelity-first: prefer official source plus a thin data/evaluation wrapper. A semantically inspired rewrite cannot be used to reject a published method.

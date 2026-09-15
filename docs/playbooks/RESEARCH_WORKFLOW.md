@@ -4,8 +4,8 @@ This workflow separates **fast scientific search** from **formal claim support**
 
 ## Directory philosophy
 
-- `research/prototypes/`: bounded pre-Idea architecture, mechanism, target-supportability, and baseline-calibration screens. A prototype may fail, succeed, or only answer a diagnostic question. It does not need an Idea number or formal Gate.
-- `research/ideas/<idea-name>/`: formally admitted survivors whose scientific object and decisive experiment are mature enough to justify a frozen protocol.
+- `research/prototypes/`: default lane for bounded pre-Idea architecture, mechanism, target-supportability, and baseline-calibration screens. A prototype may fail, succeed, or only answer a diagnostic question. It normally does not need an Idea number or formal Gate.
+- `research/ideas/<idea-name>/`: formally admitted research lines whose scientific object and protocol are mature enough to justify a frozen contract. Formalization may occur before a prototype when target semantics, information entitlement, privileged supervision, or another scientific boundary must be fixed first.
 - `research/baselines/`: baseline reproduction/comparison infrastructure. Baseline execution failure is not automatically scientific-method failure.
 - `research/memory/`: current cross-project synthesis plus reusable lessons and historical search records.
 - `papers/<paper-name>/`: claim-support experiments and manuscript lifecycle after a method has earned promotion.
@@ -21,7 +21,7 @@ step back
 → broad literature / adjacent-method search
 → formulate one mechanism-bearing candidate
 → implement the smallest decisive Train/Dev prototype
-→ compare against a strong simple baseline and a mechanism control
+→ compare against a strong simple baseline and a matched mechanism control
 → continue / redesign once / kill
 ```
 
@@ -32,19 +32,21 @@ Typical early screen:
 - Train/Dev only;
 - no held-out test/Audit use;
 - no broad hyperparameter sweep;
-- one decisive matched ablation when the mechanism requires it.
+- one decisive matched ablation or control when the mechanism requires it.
 
 A cheap diagnostic is allowed when the result could distinguish implementation/decoding failure from scientific failure. Repeated diagnostics that do not change the decision are not a research program.
 
-Prototype code and aggregate public-safe results belong under `research/prototypes/`. Do not create Idea 009, a formal Gate, or a paper directory merely to test a new architecture.
+Prototype code and aggregate public-safe results belong under `research/prototypes/`. Do not create a formal Idea, Gate, or paper directory merely because a new architecture is being tested. Conversely, do not force a prototype-first sequence when the scientific contract itself must be frozen before modeling.
 
 ### Lane B — survivor formalization and claim support
 
-A prototype enters the formal lane only after it shows material signal or otherwise earns a paper-level investigation:
+A method typically enters the formal lane after it shows material signal or otherwise earns a paper-level investigation. It may enter earlier when formal target/information semantics are themselves necessary to make the experiment valid.
+
+Typical progression:
 
 ```text
-surviving prototype
-→ closest-work / novelty verification from primary sources
+surviving or contract-sensitive candidate
+→ closest-work / novelty verification from primary sources as appropriate
 → formal Idea or paper candidate
 → frozen experiment design
 → execute
@@ -59,15 +61,16 @@ Formalization should add rigor, not ceremony. A coding bug normally means `fix �
 Before implementing a candidate, state:
 
 ```text
-What new object, interaction, information flow, prediction granularity,
-training signal, or decision process is modeled?
+What capability, object, interaction, information flow, inductive bias,
+prediction granularity, training signal, or decision process is changed?
 
-Why can the strongest simple baseline not already express it?
+What matched strong control can test whether that change—not merely
+extra capacity or optimization budget—causes any gain?
 ```
 
-This is a mechanism test, not a novelty-maximization test. Known primitives may be combined when their interaction creates a materially different capability.
+This is a mechanism/attribution test, not a novelty-maximization test. A strong baseline may in principle be expressive enough to approximate the same mapping; a new method can still be scientifically valuable when its inductive bias, credit assignment, conditional computation, data efficiency, or inference process creates a reproducible capability. Known primitives may be combined when their interaction creates a materially different behavior.
 
-Early literature search should identify obvious duplicates and strong controls. Do not reject a cheap architecture prototype merely because some component is prior art, the family is crowded, or a historical memory file used a `CLOSED` label for a narrower formulation. Rigorous novelty subtraction is required after empirical survival and before paper claims.
+Early literature search should identify obvious duplicates and strong controls. Do not reject a cheap architecture prototype merely because some component is prior art, the family is crowded, or a historical memory file used a `CLOSED` label for a narrower formulation. Rigorous novelty subtraction is required for survivors before paper claims.
 
 Negative evidence is local to the tested formulation and entitlement. Preserve it, use it to avoid repeating equivalent experiments, and reset a weak family after bounded failures. Do not transform a failed route into a universal ban on an architectural primitive.
 
@@ -87,11 +90,11 @@ A strong baseline is evidence, not a mandatory backbone. New models may be desig
 ## Experiment execution
 
 1. **Define the question.** Write the mechanism and the cheapest result that would change the decision.
-2. **Fix the bounded screen.** Declare data entitlement, comparator, seed/configuration, metrics, and stopping interpretation. Formal Gate paperwork is unnecessary for a pre-Idea prototype.
+2. **Fix the bounded screen.** Declare data entitlement, comparator, seed/configuration, metrics, and stopping interpretation. Formal Gate paperwork is normally unnecessary for a pre-Idea prototype.
 3. **Execute on the proper plane.** Freeze a source revision, run real-data/GPU work on 319, and keep restricted artifacts outside Git.
 4. **Check only decision-relevant integrity.** Leakage, target timing, index alignment, baseline fidelity, or source identity should be checked when they could invalidate the conclusion.
 5. **Decide.** Continue, redesign once, or kill. Do not rescue weak effects with unbounded tuning.
-6. **Record compact evidence.** Preserve aggregate metrics, scope, provenance, and the scientific interpretation. Promote genuinely cross-project lessons to `research/memory/`.
+6. **Record compact evidence.** Preserve aggregate metrics, scope, provenance, and the scientific interpretation. Distinguish observed run verdicts from later project-level routing decisions. Promote genuinely cross-project lessons to `research/memory/`.
 
 ## Formal Idea / paper experiments
 

@@ -15,6 +15,14 @@ Use the following order when documents disagree:
 
 Do not edit historical result records merely to make their old state labels look current. Resolve contradictions by fixing the current synthesis and clearly marking historical snapshots.
 
+Within current synthesis, distinguish:
+
+- **observed result** — directly produced by a run or audit;
+- **interpretation** — scientific reading of the evidence;
+- **routing guidance** — current prioritization for future work.
+
+Do not present routing guidance as if it were a runner-produced terminal verdict.
+
 ## Current state
 
 See [`current-research-state.md`](current-research-state.md).
@@ -27,16 +35,18 @@ Ideas 001--008: terminated
 Idea 009: absent
 Active formal Gate: none
 Modern backbone calibration: MODERN_BACKBONE_CALIBRATION_COMPLETE
-Residual interaction-first family: CLOSE_INTERACTION_FIRST_FAMILY
+Strong-unary pairwise residual-correction route: deprioritized
 Current phase: architecture-first open search
 ```
+
+The frozen-unary residual run itself returned `DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY`; the project-level decision to deprioritize repeated strong-unary pairwise residual correction is a routing interpretation, not a replacement of that run-local verdict.
 
 The project is deliberately **not** precommitted to a named architecture. New models, representations, prediction granularities, training paradigms, decoders, and coherent combinations are open for search.
 
 ## Durable evidence bundles
 
 - [`modern-backbone-calibration.md`](modern-backbone-calibration.md): faithful recent-baseline calibration and information-budget lessons.
-- [`../prototypes/README.md`](../prototypes/README.md): current inventory of pre-Idea prototypes, mechanism screens, and terminal decisions.
+- [`../prototypes/README.md`](../prototypes/README.md): current inventory of pre-Idea prototypes, mechanism screens, and observed terminal decisions.
 - [`../ideas/README.md`](../ideas/README.md): formal Ideas 001--008 and their terminal scope.
 - [`failures/`](failures/): failure records. These are formulation-local evidence, not universal architectural prohibitions.
 - [`reusable-lessons.md`](reusable-lessons.md): methodological lessons from multiple routes.
@@ -60,7 +70,7 @@ What should we avoid repeating unchanged?
 What components remain reusable in a materially different mechanism?
 ```
 
-Do not generalize `a tested formulation failed` into `the entire method family is impossible`. Conversely, do not rename an equivalent failed formulation and rerun it without a new scientific mechanism.
+Do not generalize `a tested formulation failed` into `the entire method family is impossible`. Conversely, do not rename an equivalent failed formulation and rerun it without a new scientific reason.
 
 ## Research posture
 
@@ -68,5 +78,6 @@ Do not generalize `a tested formulation failed` into `the entire method family i
 - Prefer architecture-level hypotheses over small residual corrections when the evidence supports a reset.
 - Use strong simple baselines and equal-information controls.
 - Treat novelty as a survivor/paper requirement, not a barrier to cheap discovery.
-- Preserve raw negative evidence, but keep the search space open to genuinely different objects and information flows.
-- Stop diagnostic chains once they answer the family-level question.
+- Preserve raw negative evidence, but keep the search space open to genuinely different capabilities, objects, inductive biases, and information flows.
+- Stop diagnostic chains once they answer the scoped scientific question.
+- Treat prototype-first execution as the default, not an absolute rule; formalize earlier when the scientific contract itself requires it.
