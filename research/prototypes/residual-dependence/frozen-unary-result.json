@@ -1,0 +1,200 @@
+{
+  "config": {
+    "batch_size": 512,
+    "candidate_count": 131,
+    "epochs": 80,
+    "inference_threshold_logit": 0.0,
+    "learned_parameters": "W only",
+    "learning_rate": 0.005,
+    "mean_field_damping": 0.5,
+    "mean_field_steps": 5,
+    "optimizer": "AdamW",
+    "weight_decay": 0.0001
+  },
+  "decision": "DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY",
+  "decision_detail": {
+    "major_probabilistic_gain": true,
+    "mean_field_minus_molerec_jaccard": -0.003436662049358996,
+    "oracle_minus_molerec_jaccard": 0.00025667491316339053,
+    "oracle_minus_molerec_nll": -0.010482445359230042,
+    "oracle_minus_molerec_prauc": -0.010973526648485055,
+    "oracle_minus_shuffled_jaccard": 0.010644101955093799,
+    "thresholds": {
+      "major_nll_gain": -0.01,
+      "major_prauc_gain": 0.01,
+      "recoverable_mean_field_headroom": 0.004,
+      "small_set_headroom": 0.004,
+      "strong_set_headroom": 0.008
+    }
+  },
+  "device": "cuda",
+  "key_deltas": {
+    "FrozenMeanField_minus_MoleRec": {
+      "jaccard": -0.003436662049358996,
+      "mean_count": -0.12817001342773438,
+      "nll": 0.002272680401802063,
+      "prauc": -0.0063602950262279245
+    },
+    "FrozenOracle_minus_FrozenShuffled": {
+      "jaccard": 0.010644101955093799,
+      "mean_count": -0.6774654388427734,
+      "nll": -0.028404787182807922,
+      "prauc": 0.015233496083282394
+    },
+    "FrozenOracle_minus_MoleRec": {
+      "jaccard": 0.00025667491316339053,
+      "mean_count": -0.7300472259521484,
+      "nll": -0.010482445359230042,
+      "prauc": -0.010973526648485055
+    }
+  },
+  "mean_field": {
+    "context_labels_used": false,
+    "damping": 0.5,
+    "derangement_verified": true,
+    "dev_derangement_shift": 1382,
+    "steps": 5
+  },
+  "metrics": {
+    "FrozenMeanField": {
+      "bce": 0.24889115989208221,
+      "deployable": true,
+      "f1": 0.6805179906595488,
+      "jaccard": 0.5257370955453741,
+      "mean_medication_count": 21.416900634765625,
+      "nll": 0.24889115989208221,
+      "prauc": 0.7672154086989255,
+      "precision": 0.6615400839151798,
+      "privileged_oracle": false,
+      "recall": 0.7303209974896211,
+      "std_medication_count": 5.969790458679199,
+      "visit_count": 2130.0
+    },
+    "FrozenNeutral": {
+      "bce": 0.24661847949028015,
+      "deployable": true,
+      "f1": 0.6834804993422424,
+      "jaccard": 0.5291737575947331,
+      "mean_medication_count": 21.54507064819336,
+      "nll": 0.24661847949028015,
+      "prauc": 0.7735757037251534,
+      "precision": 0.6612209454064921,
+      "privileged_oracle": false,
+      "recall": 0.736513034767981,
+      "std_medication_count": 5.762195587158203,
+      "visit_count": 2130.0
+    },
+    "FrozenOracle": {
+      "bce": 0.2361360341310501,
+      "deployable": false,
+      "f1": 0.6835385542342169,
+      "jaccard": 0.5294304325078965,
+      "mean_medication_count": 20.81502342224121,
+      "nll": 0.2361360341310501,
+      "prauc": 0.7626021770766683,
+      "precision": 0.6711007310197673,
+      "privileged_oracle": true,
+      "recall": 0.7181774348382322,
+      "std_medication_count": 6.222068786621094,
+      "visit_count": 2130.0
+    },
+    "FrozenShuffled": {
+      "bce": 0.26454082131385803,
+      "deployable": false,
+      "f1": 0.674246558767279,
+      "jaccard": 0.5187863305528027,
+      "mean_medication_count": 21.492488861083984,
+      "nll": 0.26454082131385803,
+      "prauc": 0.7473686809933859,
+      "precision": 0.6551495497763665,
+      "privileged_oracle": true,
+      "recall": 0.725245966524611,
+      "std_medication_count": 5.987560272216797,
+      "visit_count": 2130.0
+    },
+    "MoleRec": {
+      "bce": 0.24661847949028015,
+      "deployable": true,
+      "f1": 0.6834804993422424,
+      "jaccard": 0.5291737575947331,
+      "mean_medication_count": 21.54507064819336,
+      "nll": 0.24661847949028015,
+      "prauc": 0.7735757037251534,
+      "precision": 0.6612209454064921,
+      "privileged_oracle": false,
+      "recall": 0.736513034767981,
+      "std_medication_count": 5.762195587158203,
+      "visit_count": 2130.0
+    }
+  },
+  "neutral_surface": {
+    "max_abs_neutral_minus_molerec_logit": 0.0,
+    "passed": true,
+    "tolerance": 1e-07
+  },
+  "optional_one_shot_decomposition": {
+    "ran": false,
+    "reason": "FrozenOracle-MoleRec Jaccard headroom below +0.008 threshold"
+  },
+  "parameter_diagnostics": {
+    "w_diagonal_max_abs": 0.0,
+    "w_frobenius_norm": 74.67424011230469,
+    "w_max_abs": 4.283397674560547,
+    "w_symmetry_max_abs": 0.0
+  },
+  "prevalence": {
+    "max": 0.8918867111206055,
+    "mean": 0.14472158253192902,
+    "min": 0.0
+  },
+  "prior_implementation_fact": {
+    "neutral_context_reproduced_raw_molerec": false,
+    "pairwise_unary": "separate learned A,b initialized identity/zero, jointly optimized with W",
+    "score_only_and_pairwise_shared_a_b": false,
+    "score_only_unary": "learned A,b initialized identity/zero",
+    "w_only_required": true
+  },
+  "prototype_status": "throwaway_pre_idea_identification_experiment",
+  "scope": {
+    "audit_resources_read": false,
+    "ddi_or_ehr_graphs_used": false,
+    "dev_threshold_tuning": false,
+    "dev_visits": 2130,
+    "formal_gate_created_or_modified": false,
+    "g3_resources_read": false,
+    "g4_resources_read": false,
+    "ground_truth_cardinality_used": false,
+    "heldout_resources_read": false,
+    "historical_test_resources_read": false,
+    "idea_009_created": false,
+    "molerec_retrained": false,
+    "push_performed": false,
+    "raw_ehr_inputs": false,
+    "test_resources_read": false,
+    "train_only_prevalence": true,
+    "train_visits": 10489
+  },
+  "seed": 20260914,
+  "source_revision": "b841b1f4583746f92c8ad9ea97012f34c6538f88",
+  "surfaces": {
+    "FrozenMeanField": "raw logits plus exactly five frozen damped mean-field updates; deployable diagnostic",
+    "FrozenNeutral": "same raw logits; numerically identical to MoleRec",
+    "FrozenOracle": "raw logits plus W with true Dev y_-i; privileged/non-deployable",
+    "FrozenShuffled": "raw logits plus W with one seeded Dev derangement; privileged/non-deployable",
+    "MoleRec": "frozen canonical raw logits, zero-logit decoding"
+  },
+  "train_loss": {
+    "bce": 0.19400752655097417
+  },
+  "validation": {
+    "current_target_leakage": {
+      "current_target_used_in_prediction": false,
+      "max_self_target_logit_change": 0.0,
+      "passed": true,
+      "rows_checked": 8,
+      "tolerance": 1e-06
+    },
+    "finite_forward_backward_smoke": true
+  },
+  "working_name": "Residual-Dependence Headroom Probe — Frozen Unary"
+}

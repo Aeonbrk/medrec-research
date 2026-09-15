@@ -106,3 +106,53 @@ than ScoreOnly). Under the pre-registered interpretation this is an inference
 gap, not evidence for a new recommendation architecture.
 
 Terminal recommendation: `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP`
+
+## Frozen-unary identification follow-up
+
+The prior implementation was inspected before this follow-up. `ScoreOnly` and
+the pairwise Oracle/MeanField model did **not** share `A,b`: each learned its
+own `A,b`, initialized as identity/zero, and the pairwise model optimized them
+jointly with `W`. Its neutral context therefore did not reproduce raw MoleRec,
+so a W-only fit with the unary term frozen to `s` was required.
+
+This follow-up uses the same Train/Gate01-Dev arrays, seed, optimizer budget,
+and zero-logit decoder. Only `W` is learned; no score calibration, graph,
+embedding, patient input, or MoleRec retraining is present. `FrozenOracle` and
+`FrozenShuffled` remain privileged, non-deployable diagnostics.
+
+### Result record
+
+- Run-code revision: `b841b1f4583746f92c8ad9ea97012f34c6538f88`
+- Starting local HEAD: `77e99a49d8da04335bfbcffe8d8a2fbaf4d7c7f5`
+- Starting and final verified origin/main: `3fa399c6238a1a30e1ec10066bdeb0ac697b76bd`
+- Result was run on CUDA GPU 1 with seed `20260914`; no push was performed.
+
+| Surface | NLL | PRAUC | Jaccard | F1 | Precision | Recall | Mean count | Status |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| MoleRec | 0.246618 | 0.773576 | 0.529174 | 0.683480 | 0.661221 | 0.736513 | 21.545071 | deployable frozen comparator |
+| FrozenNeutral | 0.246618 | 0.773576 | 0.529174 | 0.683480 | 0.661221 | 0.736513 | 21.545071 | deployable; identical to MoleRec |
+| FrozenShuffled | 0.264541 | 0.747369 | 0.518786 | 0.674247 | 0.655150 | 0.725246 | 21.492489 | privileged diagnostic; non-deployable |
+| FrozenOracle | 0.236136 | 0.762602 | 0.529430 | 0.683539 | 0.671101 | 0.718177 | 20.815023 | privileged oracle; non-deployable |
+| FrozenMeanField | 0.248891 | 0.767215 | 0.525737 | 0.680518 | 0.661540 | 0.730321 | 21.416901 | deployable diagnostic |
+
+Primary deltas:
+
+| Comparison | Jaccard delta | NLL delta | PRAUC delta | Mean-count delta |
+| --- | ---: | ---: | ---: | ---: |
+| FrozenOracle − MoleRec | +0.000257 | −0.010482 | −0.010974 | −0.730047 |
+| FrozenOracle − FrozenShuffled | +0.010644 | −0.028405 | +0.015233 | −0.677465 |
+| FrozenMeanField − MoleRec | −0.003437 | +0.002273 | −0.006360 | −0.128170 |
+
+The neutral-equivalence assertion passed exactly (`max_abs = 0.0`, tolerance
+`1e-7`). `W` was symmetric with zero diagonal (Frobenius norm `74.674240`,
+maximum absolute entry `4.283398`). The Dev derangement was a fixed-point-free
+cyclic shift of `1382` rows. The current-target leakage check passed with
+maximum own-logit change `0.0`; the finite CUDA forward/backward smoke passed.
+
+FrozenOracle is only `+0.000257` Jaccard over the original MoleRec surface,
+below the `+0.004` set-accuracy headroom threshold. It does improve NLL by
+`0.010482`, but PRAUC decreases by `0.010974`, and FrozenMeanField is below
+MoleRec on Jaccard, NLL, and PRAUC. The one-shot positive/negative context
+decomposition was correctly skipped because Oracle headroom was below `+0.008`.
+
+Terminal recommendation: `DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY`
