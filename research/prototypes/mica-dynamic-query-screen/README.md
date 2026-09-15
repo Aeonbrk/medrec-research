@@ -7,7 +7,8 @@ Starting authoritative state for this preparation: `abe01977e1d8838d0291ad195e50
 The screen ran from one clean revision after a scoped execution fix. The
 starting `origin/main` was `cf6e17b7325b43a197babcd8d0fbdb0aa19d1623`; the
 execution-fix and run revision was
-`5083cdba2e02067f949e8a6fe0c4dcf2f323748b`, which is also final `origin/main`.
+`5083cdba2e02067f949e8a6fe0c4dcf2f323748b`. Public evidence was recorded in a
+later documentation commit on `origin/main`.
 
 This prototype is additive. It does not modify the completed `mica/` attribution or `mica-v2-screen/` evidence.
 

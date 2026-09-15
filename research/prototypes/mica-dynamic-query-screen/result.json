@@ -79,7 +79,6 @@
   },
   "evidence_class": "exploratory_train_dev_single_seed",
   "execution_fix_commit": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
-  "final_origin_main": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
   "formal_gate_opened": false,
   "frozen_configuration": {
     "batch_size_visits": 16,

@@ -6,8 +6,8 @@ The verified starting `origin/main` for this preparation was
 `abe01977e1d8838d0291ad195e5027883c0e86a1`. The execution starting
 `origin/main` was `cf6e17b7325b43a197babcd8d0fbdb0aa19d1623`; a scoped
 execution fix was committed and pushed as
-`5083cdba2e02067f949e8a6fe0c4dcf2f323748b`, which is the run revision and final
-`origin/main`.
+`5083cdba2e02067f949e8a6fe0c4dcf2f323748b`, which is the run revision. Public
+evidence was recorded in a later documentation commit on `origin/main`.
 
 The previous six-lane MICA-v2 screen is complete and remains frozen. Its conclusion is `KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`.
 
