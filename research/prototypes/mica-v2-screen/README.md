@@ -2,8 +2,9 @@
 
 # MICA-v2 Screen — Accuracy and Safe-Decision Extensions
 
-Status: implementation and primary-source collision screen are complete; the
-six full Train/Dev lanes are launched only after the required remote preflight.
+Status: implementation, primary-source collision screen, preflight, and the
+six complete Train/Dev lanes are finished.  Public-safe aggregate evidence is
+in [`result.json`](result.json).
 This is an additive exploratory prototype.  It does not alter the frozen
 `research/prototypes/mica/` attribution experiment, create Idea 009, open a
 formal Gate, or make a novelty claim.
@@ -181,6 +182,62 @@ the order Core, FineHistory, DualEvidence, SafeRank, SelfOnly, SetContext and
 record the actual physical IDs.  Keep checkpoints, predictions, targets, split
 membership, and logs private on 319.  Only aggregate public-safe rows belong in
 `result.json`.
+
+## Completed execution and outcome
+
+The authoritative starting `origin/main` was
+`dc6a7f2f9084ff51902be6674650ce36947ea6e8`.  The baseline six-lane launch used
+`RUN_REVISION=9aba7ba1070bda24be5541723c4870e64ee3fa77`.  A scoped runtime fix
+(`6d8d3fd473569a9b6425954bc0fb263657b284c9`) was proven equivalent for SafeSwap
+and used only to rerun the invalid Core and SafeRank attempts; unaffected lanes
+remain bound to the baseline revision.  The mixed-revision provenance is
+explicit in `result.json` and is not relabeled as one source revision.
+
+The approved fallback host was `319-lab-via-server`, using the isolated remote
+checkouts `/root/zhb/medrec-research-mica-v2-3cb5f75` (baseline) and
+`/root/zhb/medrec-research-mica-v2-6d8d3fd` (scoped rerun).  The environment was
+Python `3.8.16`, PyTorch `1.9.0+cu111`, and NumPy `1.23.5`.  Actual GPU mapping
+was Core→0, FineHistory→1, DualEvidence→2, SafeRank→3, SelfOnly→4, and
+SetContext→6; GPU 5 was occupied by an unrelated process and was not touched.
+The required preflight was `PASS`, including target-free finite forward and
+backward, canonical split/vocabulary checks, parameter checks, five SafeSwap
+equivalence trials, and three vectorized ranking-loss equivalence trials.
+
+Selected-checkpoint and final-epoch public-safe rows are below.  `result.json`
+also records the complete Train/Dev precision, recall, count standard
+deviation, NLL, wall time, peak memory, source revision, and runtime metadata.
+
+| Arm | Params | Selected epoch | Dev J | Dev F1 | Dev PRAUC | Dev precision | Dev recall | Dev DDI | Dev AvgMed | Dev StdMed | Dev NLL | Epoch-60 Dev J | Wall s | Peak MB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Core | 848900 | 3 | 0.542244156 | 0.695005519 | 0.792730126 | 0.702829904 | 0.711926450 | 0.076299636 | 19.9535 | 7.3448 | 0.202483 | 0.474090260 | 1591.826 | 419.755 |
+| FineHistory | 848900 | 3 | 0.545571259 | 0.698012548 | 0.793580091 | 0.697115527 | 0.724617377 | 0.076861089 | 20.4568 | 7.2738 | 0.201844 | 0.474567144 | 2302.053 | 4170.571 |
+| DualEvidence | 849285 | 3 | 0.541726823 | 0.694895597 | 0.790286786 | 0.693028408 | 0.722212573 | 0.075270373 | 20.5211 | 7.3309 | 0.203168 | 0.471593672 | 2171.346 | 498.200 |
+| SafePTO | 848900 | 3 | 0.530585641 | 0.684883786 | 0.792730126 | 0.692547844 | 0.701637631 | 0.054273453 | 19.9535 | 7.3448 | 0.202483 | 0.465547732 | — | — |
+| SafeRank | 848900 | 3 | 0.529318395 | 0.683672466 | 0.792415427 | 0.693806893 | 0.698106292 | 0.054160684 | 19.8300 | 7.3674 | 0.202427 | 0.466505052 | 7152.467 | 418.742 |
+| SelfOnly | 981380 | 4 | 0.540036756 | 0.692749231 | 0.790218582 | 0.698974006 | 0.711374540 | 0.077534246 | 19.8662 | 6.5460 | 0.205359 | 0.472723310 | 1572.713 | 451.940 |
+| SetContext | 981380 | 4 | 0.539562262 | 0.692592812 | 0.789016459 | 0.704655031 | 0.705205222 | 0.078843891 | 19.4488 | 6.1504 | 0.205355 | 0.471958603 | 1562.282 | 451.940 |
+
+The frozen comparisons are:
+
+```text
+ΔJ_fine                 = +0.003327103  → WEAK_FINE_HISTORY
+ΔJ_dual                 = -0.000517333  → KILL_DUAL_EVIDENCE
+SafePTO − Core          = ΔJ -0.011658515, ΔDDI -0.022026183
+SafeRank − Core         = ΔJ -0.012925762, ΔDDI -0.022138952
+SafeRank − SafePTO      = ΔJ -0.001267247, ΔDDI -0.000112769
+SetContext − SelfOnly   = ΔJ -0.000474494, ΔDDI +0.001309645
+```
+
+SafePTO has no useful accuracy-preserving safe headroom (`NO_MICA_SAFE_DECISION_HEADROOM`),
+SafeRank fails project survival and adds no incremental value, and SetContext is
+`KILL_SET_CONTEXT`.  Because both history variants fail to survive, the history
+refinement family is reset.  The single cross-lane route is
+`KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`.
+
+The excluded runtime-only attempts (legacy Core postprocessing and two early
+SafeRank attempts) are retained in `result.json` and do not contribute metrics.
+No held-out evaluation, additional seed, formal Gate, Audit, G3/G4, R0 Holdout,
+historical project test, Idea 009, rescue, or extra ablation was performed.
 
 ## Frozen decisions
 

@@ -1,0 +1,597 @@
+{
+  "additional_seeds": false,
+  "arm_source_revisions": {
+    "Core": "6d8d3fd473569a9b6425954bc0fb263657b284c9",
+    "DualEvidence": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+    "FineHistory": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+    "SafeRank": "6d8d3fd473569a9b6425954bc0fb263657b284c9",
+    "SelfOnly": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+    "SetContext": "9aba7ba1070bda24be5541723c4870e64ee3fa77"
+  },
+  "audit_run": false,
+  "completed_epochs": {
+    "Core": 60,
+    "DualEvidence": 60,
+    "FineHistory": 60,
+    "SafeRank": 60,
+    "SelfOnly": 60,
+    "SetContext": 60
+  },
+  "conclusions": {
+    "dual_evidence": "kill_dual_evidence",
+    "fine_history": "weak_fine_history",
+    "history_family": "reset_history_refinement_family",
+    "safe_decision_headroom": "NO_MICA_SAFE_DECISION_HEADROOM",
+    "safe_rank": "kill_saferank_project_survival",
+    "safe_rank_incremental": "no_material_incremental_value",
+    "safe_rank_stretch": false,
+    "safe_rank_strong": false,
+    "set_context": "kill_set_context",
+    "set_context_preserve": false
+  },
+  "deltas": {
+    "classes": {
+      "delta_j_dual": "no_material_contribution",
+      "delta_j_fine": "weak_contribution",
+      "safe_pto_minus_core_delta_j": "strong_signal",
+      "safe_rank_minus_core_delta_j": "strong_signal",
+      "set_context_minus_self_only_delta_j": "no_material_contribution"
+    },
+    "delta_j_dual": -0.0005173327577371323,
+    "delta_j_fine": 0.0033271026259921177,
+    "safe_pto_minus_core_delta_ddi": -0.022026182845347388,
+    "safe_pto_minus_core_delta_j": -0.011658514857924573,
+    "safe_rank_minus_core_delta_ddi": -0.022138952106758425,
+    "safe_rank_minus_core_delta_j": -0.012925761521488499,
+    "safe_rank_minus_safe_pto_delta_ddi": -0.00011276926141103732,
+    "safe_rank_minus_safe_pto_delta_j": -0.0012672466635639257,
+    "set_context_minus_self_only_delta_ddi": 0.00130964526657594,
+    "set_context_minus_self_only_delta_j": -0.00047449377422581485
+  },
+  "environment": {
+    "numeric_policy": {
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": true,
+      "dtype": "float32"
+    },
+    "numpy": "1.23.5",
+    "python": "3.8.16",
+    "torch": "1.9.0+cu111"
+  },
+  "evidence_class": "exploratory_train_dev_single_seed",
+  "excluded_runtime_attempts": [
+    {
+      "arm": "Core",
+      "completed_epochs": 60,
+      "reason": "Legacy SafePTO postprocessing runtime defect; no complete result used",
+      "revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77"
+    },
+    {
+      "arm": "SafeRank",
+      "completed_epochs": 1,
+      "reason": "SafeSwap candidate-counting runtime defect; no complete result used",
+      "revision": "c41c304ceb59b1537e3a0eb97a4fd64ec7025cb9"
+    },
+    {
+      "arm": "SafeRank",
+      "completed_epochs": 2,
+      "reason": "SafeRank candidate-scoring runtime defect; no complete result used",
+      "revision": "93c2bf72b0ed7e37913c0ea399ca535c680a7bfa"
+    }
+  ],
+  "formal_gate_opened": false,
+  "frozen_configuration": {
+    "batch_size_visits": 16,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "clinical_attention_blocks": 2,
+    "ddi_weight": 0.05,
+    "decoder": "sigmoid probability >= 0.35",
+    "decoder_threshold": 0.35,
+    "epochs": 60,
+    "eps": 1e-08,
+    "ffn_dim": 256,
+    "gradient_clip": 5.0,
+    "heads": 4,
+    "hidden_dim": 128,
+    "learning_rate": 0.0003,
+    "loss": "BCE + 0.05 * normalized DDI penalty",
+    "mechanism": "MICA-Core DrugQuery anchor",
+    "medications": 131,
+    "numeric_policy": {
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": true,
+      "dtype": "float32"
+    },
+    "optimizer": "AdamW",
+    "rank_weight": null,
+    "safe_rate": null,
+    "seed": 20260914,
+    "variant": "core",
+    "weight_decay": 0.0001
+  },
+  "gpu_assignment": {
+    "Core": 0,
+    "DualEvidence": 2,
+    "FineHistory": 1,
+    "SafeRank": 3,
+    "SelfOnly": 4,
+    "SetContext": 6
+  },
+  "held_out_evaluated": false,
+  "idea_009_created": false,
+  "matched_parameter_counts": {
+    "Core": 848900,
+    "DualEvidence": 849285,
+    "FineHistory": 848900,
+    "SafeRank": 848900,
+    "SelfOnly": 981380,
+    "SetContext": 981380
+  },
+  "next_route": "KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH",
+  "references": {
+    "GraphRefine-SameK": {
+      "ddi_rate": 0.073328,
+      "diagnostic_only": true,
+      "f1": 0.687394,
+      "jaccard": 0.53365,
+      "mean_medication_count": 21.5451,
+      "prauc": 0.78424
+    },
+    "MoleRec": {
+      "ddi_rate": 0.0722229457474476,
+      "f1": 0.6834804993422424,
+      "jaccard": 0.5291737575947331,
+      "mean_medication_count": 21.54507042253521,
+      "prauc": 0.7735757037251534,
+      "precision": 0.6612209454064921,
+      "recall": 0.736513034767981,
+      "std_medication_count": 5.762195587158203,
+      "visit_count": 2130.0
+    }
+  },
+  "remote_checkout_revision": [
+    "6d8d3fd473569a9b6425954bc0fb263657b284c9",
+    "9aba7ba1070bda24be5541723c4870e64ee3fa77"
+  ],
+  "rows": {
+    "Core": {
+      "Dev": {
+        "ddi_rate": 0.07629963604758543,
+        "f1": 0.6950055191031947,
+        "jaccard": 0.5422441561252869,
+        "mean_medication_count": 19.953521126760563,
+        "nll": 0.20248271524906158,
+        "prauc": 0.7927301263294768,
+        "precision": 0.7028299038479917,
+        "recall": 0.7119264495618668,
+        "std_medication_count": 7.344839572906494,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.0848823133506627,
+        "f1": 0.7251575319048125,
+        "jaccard": 0.5797550056004186,
+        "mean_medication_count": 19.23672418724378,
+        "nll": 0.1743428111076355,
+        "prauc": 0.8214571570339204,
+        "precision": 0.728389243218351,
+        "recall": 0.7406004172261795,
+        "std_medication_count": 7.075537204742432,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 419.7548828125,
+      "decoder": "sigmoid probability >= 0.35",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.08032331668675737,
+        "f1": 0.6338637160545393,
+        "jaccard": 0.4740902602140073,
+        "mean_medication_count": 20.207042253521127,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "precision": 0.6391300081540162,
+        "recall": 0.6576620125314528,
+        "std_medication_count": 6.934627532958984,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 3,
+      "wall_time_seconds": 1591.8259048461914
+    },
+    "DualEvidence": {
+      "Dev": {
+        "ddi_rate": 0.07527037276618258,
+        "f1": 0.6948955967935981,
+        "jaccard": 0.5417268233675497,
+        "mean_medication_count": 20.52112676056338,
+        "nll": 0.20316752791404724,
+        "prauc": 0.7902867857915612,
+        "precision": 0.6930284080936869,
+        "recall": 0.7222125726046726,
+        "std_medication_count": 7.330863952636719,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.08270012758965697,
+        "f1": 0.723762540848549,
+        "jaccard": 0.5780333717497959,
+        "mean_medication_count": 19.56754695395176,
+        "nll": 0.17496554553508759,
+        "prauc": 0.8203385963366069,
+        "precision": 0.7219221977311668,
+        "recall": 0.744861127389962,
+        "std_medication_count": 7.2204461097717285,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 498.2001953125,
+      "decoder": "sigmoid probability >= 0.35",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.08308104013917417,
+        "f1": 0.6311899899675417,
+        "jaccard": 0.4715936717552923,
+        "mean_medication_count": 20.074647887323945,
+        "nll": 0.5482944846153259,
+        "prauc": 0.7132473272387633,
+        "precision": 0.6385871707475426,
+        "recall": 0.6517655626507539,
+        "std_medication_count": 6.874090194702148,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 849285,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 3,
+      "wall_time_seconds": 2171.3464806079865
+    },
+    "FineHistory": {
+      "Dev": {
+        "ddi_rate": 0.07686108907365646,
+        "f1": 0.6980125482651623,
+        "jaccard": 0.545571258751279,
+        "mean_medication_count": 20.45680751173709,
+        "nll": 0.20184366405010223,
+        "prauc": 0.79358009094393,
+        "precision": 0.6971155266329981,
+        "recall": 0.7246173771666369,
+        "std_medication_count": 7.273804187774658,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.08523277423517434,
+        "f1": 0.7271596749198082,
+        "jaccard": 0.5823103839314132,
+        "mean_medication_count": 19.507102678997043,
+        "nll": 0.17299309372901917,
+        "prauc": 0.8234451361192071,
+        "precision": 0.725840577559617,
+        "recall": 0.7470187237789614,
+        "std_medication_count": 7.17903470993042,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 4170.57080078125,
+      "decoder": "sigmoid probability >= 0.35",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.08040071812975161,
+        "f1": 0.6341979376268053,
+        "jaccard": 0.4745671439864075,
+        "mean_medication_count": 20.2018779342723,
+        "nll": 0.553080677986145,
+        "prauc": 0.7173664529658682,
+        "precision": 0.6396454989982446,
+        "recall": 0.6581592744940061,
+        "std_medication_count": 6.834090232849121,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 3,
+      "wall_time_seconds": 2302.053185224533
+    },
+    "SafePTO": {
+      "Dev": {
+        "ddi_rate": 0.05427345320223804,
+        "f1": 0.6848837856491942,
+        "jaccard": 0.5305856412673623,
+        "mean_medication_count": 19.953521126760563,
+        "nll": 0.20248271524906158,
+        "prauc": 0.7927301263294768,
+        "precision": 0.6925478436983585,
+        "recall": 0.7016376305792842,
+        "std_medication_count": 7.344839572906494,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.055448878784059207,
+        "f1": 0.7082713030083295,
+        "jaccard": 0.5593098643294734,
+        "mean_medication_count": 19.23672418724378,
+        "nll": 0.1743428111076355,
+        "prauc": 0.8214571570339204,
+        "precision": 0.71129270742905,
+        "recall": 0.7234953053693833,
+        "std_medication_count": 7.075537204742432,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": null,
+      "decoder": "SafeSwap",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.05553642156018598,
+        "f1": 0.6257337564944286,
+        "jaccard": 0.46554773247385967,
+        "mean_medication_count": 20.207042253521127,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "precision": 0.6311367615932549,
+        "recall": 0.6490010271195437,
+        "std_medication_count": 6.934627532958984,
+        "visit_count": 2130.0
+      },
+      "inference_only": true,
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 3,
+      "source": "Lane-0 Core selected checkpoint",
+      "wall_time_seconds": null
+    },
+    "SafeRank": {
+      "Dev": {
+        "ddi_rate": 0.054160683940827,
+        "f1": 0.683672466193153,
+        "jaccard": 0.5293183946037984,
+        "mean_medication_count": 19.830046948356806,
+        "nll": 0.20242741703987122,
+        "prauc": 0.7924154271022645,
+        "precision": 0.6938068931922982,
+        "recall": 0.698106292424721,
+        "std_medication_count": 7.36737060546875,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.05544181601690919,
+        "f1": 0.7078504136051199,
+        "jaccard": 0.5588513467103915,
+        "mean_medication_count": 19.111926780436647,
+        "nll": 0.17463456094264984,
+        "prauc": 0.8215240750633853,
+        "precision": 0.7135814049865757,
+        "recall": 0.720382411394532,
+        "std_medication_count": 7.106845855712891,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 418.7421875,
+      "decoder": "SafeSwap",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.05614486118942027,
+        "f1": 0.6270180774943871,
+        "jaccard": 0.46650505223842365,
+        "mean_medication_count": 20.471830985915492,
+        "nll": 0.5444437265396118,
+        "prauc": 0.7164777563830798,
+        "precision": 0.6283621584400682,
+        "recall": 0.6550345690634906,
+        "std_medication_count": 6.905764579772949,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 3,
+      "wall_time_seconds": 7152.4671931266785
+    },
+    "SelfOnly": {
+      "Dev": {
+        "ddi_rate": 0.0775342459593927,
+        "f1": 0.6927492308984332,
+        "jaccard": 0.5400367559249134,
+        "mean_medication_count": 19.866197183098592,
+        "nll": 0.20535887777805328,
+        "prauc": 0.7902185821253248,
+        "precision": 0.6989740064254553,
+        "recall": 0.7113745395759641,
+        "std_medication_count": 6.546004295349121,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.0844901546105589,
+        "f1": 0.7353477469588803,
+        "jaccard": 0.5921604445480195,
+        "mean_medication_count": 19.22738106587854,
+        "nll": 0.16870248317718506,
+        "prauc": 0.8319441136033489,
+        "precision": 0.7347319918955462,
+        "recall": 0.7540733039032451,
+        "std_medication_count": 6.382750511169434,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 451.93994140625,
+      "decoder": "sigmoid probability >= 0.35",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.07908478050208796,
+        "f1": 0.6322606956100072,
+        "jaccard": 0.47272331043511506,
+        "mean_medication_count": 19.37323943661972,
+        "nll": 0.4836757481098175,
+        "prauc": 0.7220404473621232,
+        "precision": 0.6523893456867011,
+        "recall": 0.6424938024617609,
+        "std_medication_count": 6.936136722564697,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 981380,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 4,
+      "wall_time_seconds": 1572.7127389907837
+    },
+    "SetContext": {
+      "Dev": {
+        "ddi_rate": 0.07884389122596865,
+        "f1": 0.6925928117875924,
+        "jaccard": 0.5395622621506876,
+        "mean_medication_count": 19.44882629107981,
+        "nll": 0.20535509288311005,
+        "prauc": 0.7890164593415623,
+        "precision": 0.7046550312302964,
+        "recall": 0.7052052221963232,
+        "std_medication_count": 6.15041971206665,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.08426198114584335,
+        "f1": 0.7349110007785192,
+        "jaccard": 0.5918682987995995,
+        "mean_medication_count": 18.880636857660406,
+        "nll": 0.1687980443239212,
+        "prauc": 0.8330073056012108,
+        "precision": 0.7403261267621236,
+        "recall": 0.7476992417476837,
+        "std_medication_count": 6.113885402679443,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 451.93994140625,
+      "decoder": "sigmoid probability >= 0.35",
+      "epoch_60_Dev": {
+        "ddi_rate": 0.0777579749091466,
+        "f1": 0.6316679913962343,
+        "jaccard": 0.47195860277450163,
+        "mean_medication_count": 19.484507042253522,
+        "nll": 0.49808841943740845,
+        "prauc": 0.7182570354736897,
+        "precision": 0.6482294476747947,
+        "recall": 0.643347995633551,
+        "std_medication_count": 6.667276382446289,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 981380,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 4,
+      "wall_time_seconds": 1562.2818977832794
+    }
+  },
+  "run_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+  "schema_version": 1,
+  "selected_epochs": {
+    "Core": 3,
+    "DualEvidence": 3,
+    "FineHistory": 3,
+    "SafeRank": 3,
+    "SelfOnly": 4,
+    "SetContext": 4
+  },
+  "source_bound_references": {
+    "medication_vocabulary": "voc_final.pkl: med_voc IDs 0..130",
+    "snapshot": "molerec-table1-c721-www23",
+    "train_dev": "gate01-train-dev-5752596a-20260913a"
+  },
+  "source_revision_exception": {
+    "affected_arms": [
+      "Core",
+      "SafeRank"
+    ],
+    "baseline_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+    "corrected_revision": "6d8d3fd473569a9b6425954bc0fb263657b284c9",
+    "description": "SafeSwap incremental candidate counting was proven equivalent to the naive implementation and used only to rerun the invalid SafeRank lane.",
+    "kind": "scoped_runtime_fix"
+  },
+  "split": {
+    "dev_patients": 1004,
+    "dev_visits": 2130,
+    "train_patients": 4233,
+    "train_visits": 10489
+  },
+  "starting_revision": "dc6a7f2f9084ff51902be6674650ce36947ea6e8",
+  "status": "complete",
+  "verification": {
+    "cuda_preflight_revision": "6d8d3fd473569a9b6425954bc0fb263657b284c9",
+    "preflight_status": "PASS",
+    "safe_rank_vectorized_equivalence": {
+      "random_trials": 3,
+      "status": "PASS"
+    },
+    "safe_swap_incremental_equivalence": {
+      "random_trials": 5,
+      "status": "PASS"
+    }
+  }
+}

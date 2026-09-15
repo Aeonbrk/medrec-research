@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Current Research State — 2026-09-15
+# Current Research State — 2026-09-16
 
 This file is the authoritative **current scientific synthesis and routing state** for `medrec-research`. It does not replace run-local evidence; it reconciles it.
 
@@ -171,6 +171,61 @@ Observed result from the complete source-bound three-arm attribution screen: sta
 The frozen attribution conclusion is `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY`: medication-specific evidence selection carries the strong surface in this matched decomposition, while applying the same FiLM conditioner before pooling adds no material Dev Jaccard. This is exploratory single-seed Train/Dev evidence, not held-out evaluation, a formal Gate, or a novelty conclusion; medication/label-specific attention remains prior art.
 
 Routing guidance: preserve DrugQuery as the MICA-Core substrate for this tested attribution and stop. Do not rerun Early, create Idea 009, open a formal Gate, or add a rescue/ablation cycle. The conclusion is local to this three-arm decomposition and does not make a novelty claim or ban other materially different medication-specific computation.
+
+### MICA-v2 accuracy and safe-decision extension screen
+
+Observed result: six complete single-seed Train/Dev lanes were executed after a
+passing targeted preflight on the canonical `molerec-table1-c721-www23`
+snapshot (`4233/10489` Train patients/visits and `1004/2130` Dev
+patients/visits; exact 131-ID vocabulary).  The requested starting
+`origin/main` was `dc6a7f2f9084ff51902be6674650ce36947ea6e8`.  The baseline
+launch used `9aba7ba1070bda24be5541723c4870e64ee3fa77`; a proven-equivalent
+runtime fix at `6d8d3fd473569a9b6425954bc0fb263657b284c9` was used only for the
+invalid Core and SafeRank reruns.  This scoped mixed-revision exception is
+explicit in the run result and is not collapsed into one source revision.
+
+Environment was Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`,
+float32 with TF32 disabled and deterministic cuDNN, on the approved fallback
+`319-lab-via-server`.  Actual GPU allocation was Core 0, FineHistory 1,
+DualEvidence 2, SafeRank 3, SelfOnly 4, and SetContext 6; GPU 5 was busy with
+an unrelated process and was not touched.  SafeSwap incremental and SafeRank
+vectorized ranking implementations passed their scoped equivalence checks.
+
+Selected complete-Dev rows (the run-local result also stores Train rows,
+precision/recall, count standard deviation, NLL, wall time, and peak memory)
+were:
+
+| Arm | Params | Epoch | Jaccard | F1 | PRAUC | DDI | AvgMed | Epoch-60 Jaccard |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Core | 848900 | 3 | 0.542244156 | 0.695005519 | 0.792730126 | 0.076299636 | 19.9535 | 0.474090260 |
+| FineHistory | 848900 | 3 | 0.545571259 | 0.698012548 | 0.793580091 | 0.076861089 | 20.4568 | 0.474567144 |
+| DualEvidence | 849285 | 3 | 0.541726823 | 0.694895597 | 0.790286786 | 0.075270373 | 20.5211 | 0.471593672 |
+| SafePTO | 848900 | 3 | 0.530585641 | 0.684883786 | 0.792730126 | 0.054273453 | 19.9535 | 0.465547732 |
+| SafeRank | 848900 | 3 | 0.529318395 | 0.683672466 | 0.792415427 | 0.054160684 | 19.8300 | 0.466505052 |
+| SelfOnly | 981380 | 4 | 0.540036756 | 0.692749231 | 0.790218582 | 0.077534246 | 19.8662 | 0.472723310 |
+| SetContext | 981380 | 4 | 0.539562262 | 0.692592812 | 0.789016459 | 0.078843891 | 19.4488 | 0.471958603 |
+
+Interpretation from the frozen rules:
+
+- `ΔJ_fine = +0.003327103`: `WEAK_FINE_HISTORY`, not a survivor.
+- `ΔJ_dual = −0.000517333`: `KILL_DUAL_EVIDENCE`; with FineHistory weak,
+  `RESET_HISTORY_REFINEMENT_FAMILY` applies.
+- SafePTO versus Core is `ΔJ −0.011658515`, `ΔDDI −0.022026183`: the DDI
+  reduction does not preserve enough Jaccard, so
+  `NO_MICA_SAFE_DECISION_HEADROOM`.
+- SafeRank versus Core is `ΔJ −0.012925762`, `ΔDDI −0.022138952`; it fails
+  project survival.  SafeRank versus SafePTO is `ΔJ −0.001267247`,
+  `ΔDDI −0.000112769`, so there is no material incremental value.
+- SetContext versus SelfOnly is `ΔJ −0.000474494`, `ΔDDI +0.001309645`:
+  `KILL_SET_CONTEXT`.
+
+Routing guidance: keep the validated MICA-Core DrugQuery substrate and return
+to a materially different architecture search.  The single frozen next route
+is `KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`.  This remains
+exploratory single-seed Train/Dev evidence: no held-out evaluation, additional
+seed, formal Gate, Audit, G3/G4, R0 Holdout, historical project test, rescue,
+or Idea 009 was performed.  Runtime-only failed attempts are excluded from the
+metrics but retained in `research/prototypes/mica-v2-screen/result.json`.
 
 ## 6. Cross-project lessons
 

@@ -1,10 +1,66 @@
-# Handoff: MICA Attribution Complete — DrugQuery Preserved
+# Handoff: MICA-v2 Screen Complete — Keep MICA-Core
 
-Updated: 2026-09-15.
+Updated: 2026-09-16.
 
-The verified starting `origin/main` was `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc`. The three-arm attribution implementation and complete runs are finished at source revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`. SharedPool, DrugQuery, and MICA-Late each completed 60 epochs on the canonical Train/Dev split; aggregate evidence is recorded in [`research/prototypes/mica/result.json`](research/prototypes/mica/result.json). Raw checkpoints, predictions and logs remain private on 319.
+The verified starting `origin/main` for this screen was
+`dc6a7f2f9084ff51902be6674650ce36947ea6e8`.  The six-lane MICA-v2 extension
+screen is complete on the canonical Train/Dev split.  Public-safe aggregate
+evidence is recorded in
+[`research/prototypes/mica-v2-screen/result.json`](research/prototypes/mica-v2-screen/result.json);
+raw checkpoints, predictions, targets, split membership, and logs remain
+private on 319.
 
-## Workspace and deliverables
+## Current MICA-v2 screen
+
+- Baseline `RUN_REVISION`: `9aba7ba1070bda24be5541723c4870e64ee3fa77`.
+- Scoped corrected rerun revision for Core and SafeRank:
+  `6d8d3fd473569a9b6425954bc0fb263657b284c9`.
+- Approved remote fallback: `319-lab-via-server`; isolated checkouts were
+  `/root/zhb/medrec-research-mica-v2-3cb5f75` (baseline) and
+  `/root/zhb/medrec-research-mica-v2-6d8d3fd` (corrected).
+- Environment: Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`,
+  float32, TF32 off, deterministic cuDNN.
+- GPU mapping: Core→0, FineHistory→1, DualEvidence→2, SafeRank→3,
+  SelfOnly→4, SetContext→6.  GPU 5 was occupied by an unrelated process and
+  was not touched.
+- Preflight: `PASS`, including canonical snapshot/split/vocabulary and target
+  alignment, target-free finite forward/backward, parameter checks, five
+  SafeSwap equivalence trials, and three vectorized ranking-loss equivalence
+  trials.
+
+Selected Dev checkpoints:
+
+| Arm | Jaccard | F1 | PRAUC | DDI | AvgMed | Epoch | Epoch-60 J |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Core | 0.542244156 | 0.695005519 | 0.792730126 | 0.076299636 | 19.9535 | 3 | 0.474090260 |
+| FineHistory | 0.545571259 | 0.698012548 | 0.793580091 | 0.076861089 | 20.4568 | 3 | 0.474567144 |
+| DualEvidence | 0.541726823 | 0.694895597 | 0.790286786 | 0.075270373 | 20.5211 | 3 | 0.471593672 |
+| SafePTO | 0.530585641 | 0.684883786 | 0.792730126 | 0.054273453 | 19.9535 | 3 | 0.465547732 |
+| SafeRank | 0.529318395 | 0.683672466 | 0.792415427 | 0.054160684 | 19.8300 | 3 | 0.466505052 |
+| SelfOnly | 0.540036756 | 0.692749231 | 0.790218582 | 0.077534246 | 19.8662 | 4 | 0.472723310 |
+| SetContext | 0.539562262 | 0.692592812 | 0.789016459 | 0.078843891 | 19.4488 | 4 | 0.471958603 |
+
+Frozen deltas and routing:
+
+```text
+ΔJ_fine               = +0.003327103  → WEAK_FINE_HISTORY
+ΔJ_dual               = -0.000517333  → KILL_DUAL_EVIDENCE
+SafePTO − Core        = ΔJ -0.011658515, ΔDDI -0.022026183
+SafeRank − Core       = ΔJ -0.012925762, ΔDDI -0.022138952
+SafeRank − SafePTO    = ΔJ -0.001267247, ΔDDI -0.000112769
+SetContext − SelfOnly = ΔJ -0.000474494, ΔDDI +0.001309645
+```
+
+The frozen conclusion is
+`KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`: FineHistory is
+weak, DualEvidence and SetContext are killed, SafePTO has no useful
+accuracy-preserving headroom, and SafeRank fails project survival with no
+incremental value over SafePTO.  Both history lanes therefore reset the history
+refinement family.  No further experiment is authorized from this handoff.
+Do not create Idea 009, open a formal Gate, run Audit/G3/G4/R0 Holdout or the
+historical project test, add seeds, or launch another ablation.
+
+## Prior MICA attribution artifacts
 
 - Current branch: `main`.
 - The starting `HEAD` and freshly fetched `origin/main` were both `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc` before implementation.
@@ -137,9 +193,16 @@ See `research/prototypes/README.md` for the reconciled inventory.
 
 ## Next assigned task
 
-No further MICA execution is authorized by this handoff. Preserve the attribution result, do not create Idea 009 or open a formal Gate automatically, and require a materially different proposal before another architecture screen.
+No further MICA-v2 execution is authorized by this handoff. Preserve the
+validated DrugQuery substrate and the six-lane negative/weak extension evidence.
+Do not create Idea 009 or open a formal Gate automatically; require a
+materially different proposal before another architecture screen.
 
-The frozen comparisons are DrugQuery minus SharedPool for medication-specific evidence selection and MICA-Late minus DrugQuery for pre-pooling conditioning. A positive result against a weak control alone is insufficient; this screen records the matched rows and stops without rescue or additional ablation.
+The frozen v2 comparisons are FineHistory/Core, DualEvidence/Core,
+SafePTO/Core, SafeRank/Core, SafeRank/SafePTO, and SetContext/SelfOnly.  The
+screen records the matched rows and stops without rescue or additional
+ablation.  The earlier DrugQuery/SharedPool/MICA-Late attribution remains
+frozen and is summarized above as historical context.
 
 ## Routing
 
@@ -151,6 +214,7 @@ Backbone hunting: complete by default
 Strong-unary pairwise residual rescue: deprioritized
 Held-out architecture selection: forbidden
 MICA: `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY`; attribution complete and closed
-Current session: execution and evidence intake complete
+MICA-v2: `KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`; six-lane screen complete
+Current session: execution, evidence intake, and documentation complete
 Next owner: future architecture search under the current-state routing boundary
 ```

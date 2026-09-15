@@ -22,6 +22,7 @@ Current cross-project interpretation is authoritative in [`../memory/current-res
 | [`dmgexnet-reset/`](dmgexnet-reset/README.md) | DMGExNet modern-backbone calibration | `DMGEXNET_INFORMATION_BUDGET_MISMATCH` | literature score is not a canonical numerical reference because official auxiliary rows use future/target-derived information |
 | [`rxexpert-reset/`](rxexpert-reset/README.md) | Rx-Expert coarse MoE/multimodal backbone calibration | `STOP_RXEXPERT_BACKBONE_RESET` | faithful conditional routing and drug features did not beat MoleRec; router did not collapse |
 | [`mica/`](mica/README.md) | shared versus medication-specific evidence selection and pre-pooling conditioning | `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY` | complete one-seed three-arm screen: DrugQuery−SharedPool ΔJ `+0.009814`; MICA-Late−DrugQuery ΔJ `−0.000588`; preserve medication-specific pooling, drop the extra pre-pooling FiLM step |
+| [`mica-v2-screen/`](mica-v2-screen/README.md) | MICA-Core accuracy and safe-decision extensions | `KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH` | complete six-lane screen: FineHistory weak (`ΔJ +0.003327`), DualEvidence killed, SafePTO/SafeRank safety trade-off loses too much Jaccard, and SetContext killed; full aggregate rows are in [`result.json`](mica-v2-screen/result.json) |
 
 ## Family-level interpretation
 
@@ -44,6 +45,25 @@ Idea 007 and FutureGraphKD show two different limitations: response-specific sup
 ### Modern backbone calibration
 
 The calibration phase is complete. HypeMed and Rx-Expert are useful recent references but do not improve the best observed canonical accuracy reference. DMGExNet is not numerically comparable under the point-in-time information budget. Do not continue backbone hunting by default.
+
+### MICA-v2 extension screen
+
+The six complete single-seed Train/Dev lanes were run from one canonical split
+after a passing preflight.  The corrected Core anchor reproduced DrugQuery at
+Dev Jaccard `0.5422441561`.  FineHistory was weak (`+0.003327` Jaccard) and
+DualEvidence was killed (`−0.000517`); both therefore reset the history
+refinement family.  SafePTO reduced DDI by `0.022026` but lost `0.011659`
+Jaccard, so there was no useful accuracy-preserving safe headroom.  SafeRank
+reduced DDI by `0.022139` relative to Core but lost `0.012926` Jaccard and did
+not add value over SafePTO.  SetContext did not beat its parameter-matched
+SelfOnly control (`ΔJ −0.000474`).
+
+Interpretation and routing are local to this exploratory screen: retain the
+validated MICA-Core DrugQuery substrate, do not rescue these lanes, and return
+to a materially different architecture search.  The source-revision exception
+for the corrected Core/SafeRank reruns and the excluded runtime-only attempts
+are recorded in `mica-v2-screen/result.json`; no Idea 009 or formal Gate was
+created.
 
 ## Prototype policy
 
