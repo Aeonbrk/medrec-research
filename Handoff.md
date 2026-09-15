@@ -1,14 +1,14 @@
-# Handoff: MICA Screen Complete — Mechanism Killed
+# Handoff: MICA Attribution Complete — DrugQuery Preserved
 
 Updated: 2026-09-15.
 
-The verified starting `origin/main` was `2496f39ffa3085e29e4ae9edeca217215b8aba0e`. Execution finalization and the complete MICA screen are now finished at source revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`. Both arms completed 60 epochs on the canonical Train/Dev split; aggregate evidence is recorded in [`research/prototypes/mica/result.json`](research/prototypes/mica/result.json). Raw checkpoints, predictions and logs remain private on 319.
+The verified starting `origin/main` was `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc`. The three-arm attribution implementation and complete runs are finished at source revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`. SharedPool, DrugQuery, and MICA-Late each completed 60 epochs on the canonical Train/Dev split; aggregate evidence is recorded in [`research/prototypes/mica/result.json`](research/prototypes/mica/result.json). Raw checkpoints, predictions and logs remain private on 319.
 
 ## Workspace and deliverables
 
 - Current branch: `main`.
-- The starting `HEAD` and freshly fetched `origin/main` were both `2496f39ffa3085e29e4ae9edeca217215b8aba0e` before execution finalization.
-- `research/prototypes/mica/` is tracked in the pushed execution revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`.
+- The starting `HEAD` and freshly fetched `origin/main` were both `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc` before implementation.
+- `research/prototypes/mica/` is tracked in implementation revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`.
 - Design and scientific contract: [`research/prototypes/mica/README.md`](research/prototypes/mica/README.md). It contains ERAN verdict, primary-source provenance, full model equations/shapes/configuration, matched control, execution plan, decision rules, and renderable Mermaid figure.
 - Model draft: `research/prototypes/mica/mica.py`.
 - Runner draft: `research/prototypes/mica/run_mica.py`.
@@ -17,14 +17,15 @@ The verified starting `origin/main` was `2496f39ffa3085e29e4ae9edeca217215b8aba0
 
 ## Selected architecture
 
-**ERAN verdict: REPLACE.** MICA means Medication-Indexed Clinical Assembly. Its hypothesis is that candidate medication identity should affect clinical code-to-code and current/history composition before evidence aggregation. The scientific object is a separate clinical evidence field for each medication, not a conserved evidence-allocation budget or a correction to MoleRec scores.
+**Attribution conclusion: PRESERVE DRUGQUERY.** MICA means Medication-Indexed Clinical Assembly. The screen tested whether the strong surface depends on medication-specific evidence selection and whether conditioning before pooling adds an independent contribution. The scientific object remains medication-specific clinical evidence, not a conserved evidence-allocation budget or a correction to MoleRec scores.
 
 ```text
-Candidate: exact EHR tokens X → medication conditioning F_m → clinical assembly T → medication-specific readout
-Control:   exact EHR tokens X → clinical assembly T → medication conditioning F_m → identical readout
+SharedPool: exact EHR tokens X → shared clinical assembly T → one shared pool → F_m → head
+DrugQuery:  exact EHR tokens X → shared clinical assembly T → medication-specific pool → F_m → head
+MICA-Late:  exact EHR tokens X → shared clinical assembly T → F_m → medication-specific pool → head
 ```
 
-Both arms use identical parameter shapes, inputs, optimizer, loss, decoder and update budget. Current D/P codes remain individual tokens; every strictly earlier visit supplies three mean tokens (D/P/M) with ordinal visit lag. There is no persistent medication state, latent intent target, medication-to-medication residual, retrieval, or inherited backbone.
+All three arms use identical parameter shapes, inputs, optimizer, loss, decoder and update budget. Current D/P codes remain individual tokens; every strictly earlier visit supplies three mean tokens (D/P/M) with ordinal visit lag. There is no persistent medication state, latent intent target, medication-to-medication residual, retrieval, or inherited backbone.
 
 Proposed fixed configuration: 131 medications, hidden width 128, two clinical attention blocks, four heads, FFN width 256, batch 16 visits, 60 complete epochs, AdamW `3e-4`, weight decay `1e-4`, seed `20260914`, BCE plus `0.05` normalized DDI penalty, fixed probability threshold `0.35`, best full-Dev Jaccard checkpoint with earliest tie. Read the prototype README for the exact formulas and initialization; do not infer missing implementation details from this summary.
 
@@ -36,26 +37,26 @@ The raw EHR information budget is the canonical admission-level task. Current D/
 | --- | --- |
 | Repository base and scientific state | Verified at the requested revision; existing Ideas and numerical anchors below remain unchanged. |
 | Literature | X-Ray summary found in the user's local `Documents/notes/xray-papers-innovation-summary.md`; relevant motifs and inventory inspected. Primary-source DrugDoctor, SSPNet, HypeMed, Rx-Expert, FLAME, Set Transformer and FiLM checked. FineMed's official repository/publisher material checked, but full equations remained inaccessible. No verified novelty claim. |
-| Architecture and code review | Main-agent design/inspection performed; independent reviewer failed due to agent usage limits before returning findings. This is **not** a review pass. |
+| Architecture and code review | Main-agent design/inspection performed for the bounded attribution implementation; no broad review or redesign was requested. |
 | Implementation | Model, runner, synthetic preflight and aggregate decision script are execution-finalized. The runner binds the whole clean checkout, requires `--source-revision`, uses strict Jaccard improvement, writes one progress schema, records selected versus epoch-60 evidence, and freezes/records TF32 policy. |
 | Local verification before handoff | Scoped syntax/Ruff checks target only the final MICA files. These checks do not establish CUDA or real-data validity. |
-| Runtime verification | Real-data contract preflight and the single synthetic CUDA preflight passed on the final clean checkout. Both official arms completed all 60 epochs in `medrec-molerec-table1`. |
-| Remote activity | Primary `319-lab` passed account/capacity checks; additive isolated checkout used revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`; Early ran on GPU 0 and Late on GPU 1. |
+| Runtime verification | Real-data contract, target-free/parameter, and single synthetic CUDA preflights passed on the final clean checkout. All three arms completed 60 epochs in `medrec-molerec-table1`. |
+| Remote activity | Primary `319-lab` failed connection and approved fallback `319-lab-via-server` passed account/capacity checks; additive isolated checkout used revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`; SharedPool/DrugQuery/Late ran on GPUs 0/1/2. |
 | Results | Public-safe aggregate evidence is in `research/prototypes/mica/result.json`; raw checkpoints, predictions and logs remain on 319. |
 
 ## Execution outcome
 
-The final run passed the required preflights and completed both arms. The frozen aggregate decision is `KILL_MICA_MECHANISM`: Early Jaccard `0.5415802299`, Late Jaccard `0.5416562262`, ΔJ `-0.0000759963`. The selected checkpoints were both epoch 3; epoch-60 Dev rows are separately recorded and were not substituted.
+The final run passed the required preflights and completed all three arms. Selected epoch 3 Dev Jaccards were SharedPool `0.5324303341`, DrugQuery `0.5422441561`, and MICA-Late `0.5416562262`; epoch-60 Dev rows are separately recorded and were not substituted. The primary `Δ_query` is `+0.0098138220` and secondary `Δ_film` is `−0.0005879299`. The frozen aggregate conclusion is `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY`.
 
-Execution-only failures preserved outside the scientific result were: two preflight retries while correcting exact data-root binding and bounded CUDA equality checking, and one detached-launch wrapper failure caused by pre-populating arm output directories. The successful retry used the same final revision, seed, configuration, split and two authorized arms; no rescue experiment or scientific parameter change occurred.
+The earlier Early hypothesis remains killed and was not rerun. No additional ablation, rescue, held-out evaluation, Idea 009, or formal Gate was created.
 
 ## Remote resumption context
 
-The final remote operation used the primary `319-lab` target. Runtime was Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`, and CUDA was available; the recorded run evidence is bound to that environment.
+The primary `319-lab` connection failed its preflight; the approved fallback `319-lab-via-server` was used. Runtime was Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`, and CUDA was available; the recorded run evidence is bound to that environment.
 
-The existing remote research checkout at `246e4f3620ac9b39973e9e5f6385d8f2a765058c` with unrelated untracked Idea 006/resource-reset directories was preserved. The run used an additive isolated checkout at the final execution revision, with Early on GPU 0 and Late on GPU 1; no additional arms were launched.
+The existing remote research checkout at `246e4f3620ac9b39973e9e5f6385d8f2a765058c` with unrelated untracked Idea 006/resource-reset directories was preserved. The run used an additive isolated checkout at the final execution revision, with SharedPool on GPU 0, DrugQuery on GPU 1, and MICA-Late on GPU 2; no additional arms were launched.
 
-The private remote output root was `/root/zhb/medrec-mica-runs/9616c6b381a259e49b8e737ab26e2ebca73aa505-attempt2`; raw artifacts remain outside Git. The public-safe aggregate was summarized on 319 and recorded locally as `research/prototypes/mica/result.json`.
+The private remote output root was `/root/zhb/medrec-mica-attribution-cd731bb`; raw artifacts remain outside Git. The public-safe aggregate was summarized on 319 and recorded locally as `research/prototypes/mica/result.json`.
 
 ## Current scientific state
 
@@ -136,9 +137,9 @@ See `research/prototypes/README.md` for the reconciled inventory.
 
 ## Next assigned task
 
-No further MICA execution is authorized by this handoff. Preserve the kill result, do not create Idea 009 or open a formal Gate automatically, and require a materially different proposal before another architecture screen.
+No further MICA execution is authorized by this handoff. Preserve the attribution result, do not create Idea 009 or open a formal Gate automatically, and require a materially different proposal before another architecture screen.
 
-The mechanism cutoff is Early minus Late Jaccard: `<=0.002` kills; `(0.002,0.004]` is weak and not a survivor; `>0.004` is a signal. Project survival additionally requires the precise accuracy or safety bar in README §8. A positive mechanism delta against a weak control alone is insufficient. No held-out selection, broad sweep, automatic rescue, or interpretation of incomplete runs as passes.
+The frozen comparisons are DrugQuery minus SharedPool for medication-specific evidence selection and MICA-Late minus DrugQuery for pre-pooling conditioning. A positive result against a weak control alone is insufficient; this screen records the matched rows and stops without rescue or additional ablation.
 
 ## Routing
 
@@ -149,7 +150,7 @@ Formal Gate: none
 Backbone hunting: complete by default
 Strong-unary pairwise residual rescue: deprioritized
 Held-out architecture selection: forbidden
-MICA: `KILL_MICA_MECHANISM`; complete and closed
+MICA: `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY`; attribution complete and closed
 Current session: execution and evidence intake complete
 Next owner: future architecture search under the current-state routing boundary
 ```

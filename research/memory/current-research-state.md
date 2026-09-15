@@ -159,16 +159,18 @@ The earlier `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` remains valid as historic
 
 ### MICA — Medication-Indexed Clinical Assembly
 
-Observed result from the complete source-bound Train/Dev screen at revision `9616c6b381a259e49b8e737ab26e2ebca73aa505`:
+Observed result from the complete source-bound three-arm attribution screen: starting `origin/main` revision `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc`, implementation/run revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`:
 
-- MICA-Early (`X → F_m → T`) selected epoch 3: Jaccard `0.541580`, F1 `0.694409`, PRAUC `0.793045`, DDI `0.075212`.
-- MICA-Late (`X → T → F_m`) selected epoch 3: Jaccard `0.541656`, F1 `0.694569`, PRAUC `0.792254`, DDI `0.075664`.
-- Mechanism delta `Early − Late = -0.000076`, with both arms completing all 60 epochs under the same frozen configuration and `848900` parameters.
-- Epoch-60 Dev rows were materially worse than the selected checkpoints (Early Jaccard `0.480911`; Late `0.475597`), so they are recorded as final-epoch evidence and were not substituted for selected-checkpoint metrics.
+- SharedPool (`X → T → shared pool → F_m`) selected epoch 3: Dev Jaccard `0.532430`, F1 `0.686189`, PRAUC `0.787419`, DDI `0.077247`.
+- DrugQuery (`X → T → medication-specific pool → F_m`) selected epoch 3: Dev Jaccard `0.542244`, F1 `0.695006`, PRAUC `0.792730`, DDI `0.076300`.
+- MICA-Late (`X → T → F_m → medication-specific pool`) selected epoch 3: Dev Jaccard `0.541656`, F1 `0.694569`, PRAUC `0.792254`, DDI `0.075664`.
+- All three arms completed 60 epochs under the same frozen configuration and `848900` parameters. Epoch-60 Dev Jaccards were SharedPool `0.458946`, DrugQuery `0.474090`, and MICA-Late `0.475597`; they are recorded as final-epoch evidence and were not substituted for selected-checkpoint metrics.
+- Primary `Δ_query = DrugQuery − SharedPool = +0.009814` (meaningful, below the `0.010` strong-signal threshold).
+- Secondary `Δ_film = MICA-Late − DrugQuery = −0.000588` (no material contribution).
 
-The frozen rule therefore yields `KILL_MICA_MECHANISM` (`ΔJ <= 0.002`). Neither project accuracy nor safety bar is satisfied, but that branch is secondary because the mechanism cutoff already kills the candidate. The one bounded cardinality diagnostic is not authorized because the delta is not in the weak interval `(0.002, 0.004]`. This is exploratory single-seed Train/Dev evidence, not held-out evaluation, a formal Gate, or a novelty conclusion.
+The frozen attribution conclusion is `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY`: medication-specific evidence selection carries the strong surface in this matched decomposition, while applying the same FiLM conditioner before pooling adds no material Dev Jaccard. This is exploratory single-seed Train/Dev evidence, not held-out evaluation, a formal Gate, or a novelty conclusion; medication/label-specific attention remains prior art.
 
-Routing guidance: close this MICA formulation without creating Idea 009 or starting a rescue cycle. The negative result is local to medication-conditioned clinical assembly before shared attention versus the matched late control; it does not ban medication-specific computation or upstream conditional interaction in a materially different future design.
+Routing guidance: preserve DrugQuery as the MICA-Core substrate for this tested attribution and stop. Do not rerun Early, create Idea 009, open a formal Gate, or add a rescue/ablation cycle. The conclusion is local to this three-arm decomposition and does not make a novelty claim or ban other materially different medication-specific computation.
 
 ## 6. Cross-project lessons
 

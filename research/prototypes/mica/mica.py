@@ -112,7 +112,9 @@ class MICA(nn.Module):
 
     VARIANTS = ("shared_pool", "drug_query", "late")
 
-    def __init__(self, diagnosis_count: int, procedure_count: int, variant: str = "shared_pool") -> None:
+    def __init__(
+        self, diagnosis_count: int, procedure_count: int, variant: str = "shared_pool"
+    ) -> None:
         super().__init__()
         if variant not in self.VARIANTS:
             raise ValueError("variant must be shared_pool, drug_query, or late")

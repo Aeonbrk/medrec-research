@@ -21,7 +21,7 @@ Current cross-project interpretation is authoritative in [`../memory/current-res
 | [`hypeinteract/`](hypeinteract/README.md) | HypeMed calibration + proposed interaction stage | HypeMed adapter superseded; faithful HypeMed `HYPEMED_CANONICAL_WEAK`; HypeInteract not run | official-source fidelity materially changes conclusions; faithful recent baseline remains below MoleRec accuracy |
 | [`dmgexnet-reset/`](dmgexnet-reset/README.md) | DMGExNet modern-backbone calibration | `DMGEXNET_INFORMATION_BUDGET_MISMATCH` | literature score is not a canonical numerical reference because official auxiliary rows use future/target-derived information |
 | [`rxexpert-reset/`](rxexpert-reset/README.md) | Rx-Expert coarse MoE/multimodal backbone calibration | `STOP_RXEXPERT_BACKBONE_RESET` | faithful conditional routing and drug features did not beat MoleRec; router did not collapse |
-| [`mica/`](mica/README.md) | medication identity before versus after shared clinical assembly | `KILL_MICA_MECHANISM` | complete one-seed Early/Late screen had ΔJ `-0.000076`; Early/Late selected checkpoints were both near `0.542` but the ordering intervention did not help |
+| [`mica/`](mica/README.md) | shared versus medication-specific evidence selection and pre-pooling conditioning | `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY` | complete one-seed three-arm screen: DrugQuery−SharedPool ΔJ `+0.009814`; MICA-Late−DrugQuery ΔJ `−0.000588`; preserve medication-specific pooling, drop the extra pre-pooling FiLM step |
 
 ## Family-level interpretation
 

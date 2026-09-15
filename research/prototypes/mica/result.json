@@ -1,41 +1,36 @@
 {
-  "decision": "KILL_MICA_MECHANISM",
-  "evidence_class": "exploratory_train_dev_single_seed",
-  "execution": {
-    "completed_epochs": {
-      "MICA-Early": 60,
-      "MICA-Late": 60
-    },
-    "environment": {
-      "numpy": "1.23.5",
-      "python": "3.8.16",
-      "torch": "1.9.0+cu111"
-    },
-    "gpu_assignment": {
-      "MICA-Early": 0,
-      "MICA-Late": 1
-    },
-    "peak_gpu_memory_mb": {
-      "MICA-Early": 714.90283203125,
-      "MICA-Late": 537.91064453125
-    },
-    "remote_checkout_revision": "9616c6b381a259e49b8e737ab26e2ebca73aa505",
-    "source_revision": "9616c6b381a259e49b8e737ab26e2ebca73aa505",
-    "wall_time_seconds": {
-      "MICA-Early": 4146.744139432907,
-      "MICA-Late": 1534.2756416797638
-    }
+  "decision": "PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY",
+  "deltas": {
+    "delta_film": -0.0005879299206612565,
+    "delta_film_class": "no_material_contribution",
+    "delta_late_shared": 0.009225892089020582,
+    "delta_late_shared_class": "meaningful_architecture_contribution",
+    "delta_query": 0.009813822009681838,
+    "delta_query_class": "meaningful_architecture_contribution"
   },
+  "evidence_class": "exploratory_train_dev_single_seed",
+  "starting_revision": "dfec9fb6ebda7893168e3f0263825dd8f1fb44fc",
+  "experiment_revision": "cd731bb0abe3dca3ebaa8a3e5346eeff74270f75",
+  "formal_gate_opened": false,
+  "frozen_attribution_conclusion": "PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY",
   "frozen_configuration": {
     "batch_size_visits": 16,
+    "betas": [
+      0.9,
+      0.999
+    ],
     "clinical_attention_blocks": 2,
-    "decoder": "sigmoid probability >= 0.35",
     "ddi_weight": 0.05,
+    "decoder": "sigmoid probability >= 0.35",
+    "decoder_threshold": 0.35,
     "epochs": 60,
+    "eps": 1e-08,
     "ffn_dim": 256,
+    "gradient_clip": 5.0,
     "heads": 4,
     "hidden_dim": 128,
     "learning_rate": 0.0003,
+    "loss": "BCE + 0.05 * normalized DDI penalty",
     "medications": 131,
     "numeric_policy": {
       "cuda_matmul_allow_tf32": false,
@@ -48,64 +43,141 @@
     "seed": 20260914,
     "weight_decay": 0.0001
   },
-  "mechanism_jaccard_delta": -0.00007599629889143422,
-  "parameter_count": 848900,
-  "project_accuracy_bar": false,
-  "project_safety_bar": false,
-  "references": {
-    "GraphRefine-SameK": {
-      "ddi": 0.073328,
-      "jaccard": 0.53365,
-      "prauc": 0.78424,
-      "role": "historical diagnostic/reference only"
+  "execution": {
+    "remote_checkout_revision": "cd731bb0abe3dca3ebaa8a3e5346eeff74270f75",
+    "environment": {
+      "python": "3.8.16",
+      "torch": "1.9.0+cu111",
+      "numpy": "1.23.5",
+      "conda_environment": "medrec-molerec-table1"
     },
-    "MoleRec": {
-      "ddi": 0.072223,
-      "jaccard": 0.529174,
-      "prauc": 0.773576,
-      "role": "historical canonical reference"
+    "gpu_assignment": {
+      "SharedPool": 0,
+      "DrugQuery": 1,
+      "MICA-Late": 2
+    },
+    "wall_time_seconds": {
+      "SharedPool": 952.0824599266052,
+      "DrugQuery": 1502.664253950119,
+      "MICA-Late": 1511.2192447185516
+    },
+    "peak_gpu_memory_mb": {
+      "SharedPool": 63.033203125,
+      "DrugQuery": 419.75439453125,
+      "MICA-Late": 537.91064453125
     }
   },
+  "held_out_evaluated": false,
+  "idea_009_created": false,
+  "matched_parameter_count": 848900,
+  "novelty_verified": false,
+  "references": {
+    "GraphRefine-SameK": {
+      "ddi_rate": 0.073328,
+      "diagnostic_only": true,
+      "f1": 0.687394,
+      "jaccard": 0.53365,
+      "mean_medication_count": 21.5451,
+      "prauc": 0.78424
+    },
+    "MoleRec": {
+      "ddi_rate": 0.0722229457474476,
+      "f1": 0.6834804993422424,
+      "jaccard": 0.5291737575947331,
+      "mean_medication_count": 21.54507042253521,
+      "prauc": 0.7735757037251534,
+      "precision": 0.6612209454064921,
+      "recall": 0.736513034767981,
+      "std_medication_count": 5.762195587158203,
+      "visit_count": 2130.0
+    }
+  },
+  "source_bound_references": {
+    "snapshot": "molerec-table1-c721-www23",
+    "train_dev": "gate01-train-dev-5752596a-20260913a",
+    "medication_vocabulary": "voc_final.pkl: med_voc IDs 0..130"
+  },
   "rows": {
-    "MICA-Early": {
+    "DrugQuery": {
+      "Dev": {
+        "ddi_rate": 0.07629963604758543,
+        "f1": 0.6950055191031947,
+        "jaccard": 0.5422441561252869,
+        "mean_medication_count": 19.953521126760563,
+        "nll": 0.20248271524906158,
+        "prauc": 0.7927301263294768,
+        "precision": 0.7028299038479917,
+        "recall": 0.7119264495618668,
+        "std_medication_count": 7.344839572906494,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.0848823133506627,
+        "f1": 0.7251575319048125,
+        "jaccard": 0.5797550056004186,
+        "mean_medication_count": 19.23672418724378,
+        "nll": 0.1743428111076355,
+        "prauc": 0.8214571570339204,
+        "precision": 0.728389243218351,
+        "recall": 0.7406004172261795,
+        "std_medication_count": 7.075537204742432,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 419.75439453125,
       "epoch_60_Dev": {
-        "ddi_rate": 0.08090558320624697,
-        "f1": 0.6397086915630537,
-        "jaccard": 0.4809106349705234,
-        "mean_medication_count": 20.146478873239438,
-        "nll": 0.5416021943092346,
-        "prauc": 0.7196593302447009,
-        "precision": 0.6450707718898799,
-        "recall": 0.6638176608997891,
-        "std_medication_count": 6.6351704597473145
+        "ddi_rate": 0.08032331668675737,
+        "f1": 0.6338637160545393,
+        "jaccard": 0.4740902602140073,
+        "mean_medication_count": 20.207042253521127,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "precision": 0.6391300081540162,
+        "recall": 0.6576620125314528,
+        "std_medication_count": 6.934627532958984,
+        "visit_count": 2130.0
       },
-      "selected_checkpoint": {
-        "Dev": {
-          "ddi_rate": 0.07521238052211504,
-          "f1": 0.694408517006996,
-          "jaccard": 0.5415802299057342,
-          "mean_medication_count": 19.845070422535212,
-          "nll": 0.2022671103477478,
-          "prauc": 0.7930448110532787,
-          "precision": 0.7028655713483902,
-          "recall": 0.7104740763067368,
-          "std_medication_count": 7.071561813354492
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
         },
-        "Train": {
-          "ddi_rate": 0.08338499297850537,
-          "f1": 0.7245691906651971,
-          "jaccard": 0.579120759589401,
-          "mean_medication_count": 19.05510534846029,
-          "nll": 0.1747087687253952,
-          "prauc": 0.8211596193748655,
-          "precision": 0.7306083002457817,
-          "recall": 0.7369353685546121,
-          "std_medication_count": 6.91517448425293
-        }
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
       },
-      "selected_epoch": 3
+      "selected_epoch": 3,
+      "wall_time_seconds": 1502.664253950119
     },
     "MICA-Late": {
+      "Dev": {
+        "ddi_rate": 0.07566426068309012,
+        "f1": 0.6945685675984937,
+        "jaccard": 0.5416562262046256,
+        "mean_medication_count": 19.95492957746479,
+        "nll": 0.20245981216430664,
+        "prauc": 0.7922542977011173,
+        "precision": 0.7017677115690796,
+        "recall": 0.7119793328599457,
+        "std_medication_count": 7.253028392791748,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.08461623599233702,
+        "f1": 0.72513007853123,
+        "jaccard": 0.5797746169451309,
+        "mean_medication_count": 19.259033272952617,
+        "nll": 0.17444971203804016,
+        "prauc": 0.8214235625575013,
+        "precision": 0.7278952858724955,
+        "recall": 0.7409777983759454,
+        "std_medication_count": 7.053877830505371,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 537.91064453125,
       "epoch_60_Dev": {
         "ddi_rate": 0.08222788573855792,
         "f1": 0.6355543948209389,
@@ -115,35 +187,93 @@
         "prauc": 0.7179619760030489,
         "precision": 0.639222910015366,
         "recall": 0.6603326222597529,
-        "std_medication_count": 7.010744094848633
+        "std_medication_count": 7.010744094848633,
+        "visit_count": 2130.0
       },
-      "selected_checkpoint": {
-        "Dev": {
-          "ddi_rate": 0.07566426068309012,
-          "f1": 0.6945685675984937,
-          "jaccard": 0.5416562262046256,
-          "mean_medication_count": 19.95492957746479,
-          "nll": 0.20245981216430664,
-          "prauc": 0.7922542977011173,
-          "precision": 0.7017677115690796,
-          "recall": 0.7119793328599457,
-          "std_medication_count": 7.253028392791748
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
         },
-        "Train": {
-          "ddi_rate": 0.08461623599233702,
-          "f1": 0.72513007853123,
-          "jaccard": 0.5797746169451309,
-          "mean_medication_count": 19.259033272952617,
-          "nll": 0.17444971203804016,
-          "prauc": 0.8214235625575013,
-          "precision": 0.7278952858724955,
-          "recall": 0.7409777983759454,
-          "std_medication_count": 7.053877830505371
-        }
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
       },
-      "selected_epoch": 3
+      "selected_epoch": 3,
+      "wall_time_seconds": 1511.2192447185516
+    },
+    "SharedPool": {
+      "Dev": {
+        "ddi_rate": 0.07724675427782544,
+        "f1": 0.6861891417440328,
+        "jaccard": 0.532430334115605,
+        "mean_medication_count": 19.853990610328637,
+        "nll": 0.20558872818946838,
+        "prauc": 0.7874185089475605,
+        "precision": 0.6957705722850862,
+        "recall": 0.7018890844539368,
+        "std_medication_count": 7.172246932983398,
+        "visit_count": 2130.0
+      },
+      "Train": {
+        "ddi_rate": 0.08562193226329928,
+        "f1": 0.7188164297292542,
+        "jaccard": 0.5721905351804076,
+        "mean_medication_count": 18.99923729621508,
+        "nll": 0.17767727375030518,
+        "prauc": 0.8160009093170002,
+        "precision": 0.7263088966622717,
+        "recall": 0.7296009442087527,
+        "std_medication_count": 6.96273946762085,
+        "visit_count": 10489.0
+      },
+      "cuda_peak_memory_mb": 63.033203125,
+      "epoch_60_Dev": {
+        "ddi_rate": 0.08161735382120978,
+        "f1": 0.6196864127844912,
+        "jaccard": 0.45894554415795175,
+        "mean_medication_count": 20.14976525821596,
+        "nll": 0.6186424493789673,
+        "prauc": 0.7024395525646883,
+        "precision": 0.624558201945525,
+        "recall": 0.6425811401085186,
+        "std_medication_count": 6.708456516265869,
+        "visit_count": 2130.0
+      },
+      "parameter_count": 848900,
+      "runtime": {
+        "numeric_policy": {
+          "cuda_matmul_allow_tf32": false,
+          "cudnn_allow_tf32": false,
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "dtype": "float32"
+        },
+        "numpy": "1.23.5",
+        "python": "3.8.16",
+        "torch": "1.9.0+cu111"
+      },
+      "selected_epoch": 3,
+      "wall_time_seconds": 952.0824599266052
     }
   },
+  "schema_version": 2,
+  "seed": 20260914,
+  "selected_epochs": {
+    "DrugQuery": 3,
+    "MICA-Late": 3,
+    "SharedPool": 3
+  },
+  "completed_epochs": {
+    "SharedPool": 60,
+    "DrugQuery": 60,
+    "MICA-Late": 60
+  },
+  "source_revision": "cd731bb0abe3dca3ebaa8a3e5346eeff74270f75",
   "split": {
     "dev_patients": 1004,
     "dev_visits": 2130,
