@@ -19,6 +19,22 @@ CHUNK = 16
 THRESHOLD = 0.35
 
 
+def configure_numeric_policy() -> dict[str, object]:
+    """Freeze the float32 CUDA policy shared by both MICA variants."""
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    return {
+        "dtype": "float32",
+        "cuda_matmul_allow_tf32": bool(torch.backends.cuda.matmul.allow_tf32),
+        "cudnn_allow_tf32": bool(torch.backends.cudnn.allow_tf32),
+        "cudnn_deterministic": bool(torch.backends.cudnn.deterministic),
+        "cudnn_benchmark": bool(torch.backends.cudnn.benchmark),
+    }
+
+
 def pack_inputs(
     rows: Sequence[dict[str, Any]], diagnosis_count: int, procedure_count: int
 ) -> dict[str, torch.Tensor]:

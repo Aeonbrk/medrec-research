@@ -2,7 +2,7 @@
 
 # MICA — Medication-Indexed Clinical Assembly
 
-Status as of 2026-09-15: **design and partial implementation; NOT RUN**. The user stopped execution preparation and requested handoff to another agent. See [`../../../Handoff.md`](../../../Handoff.md) for the exact workspace state, unfinished runner corrections and verification gaps. This is one proposed exploratory Train/Dev architecture screen, not Idea 009 or a formal Gate. Design base: `08046c67d586f510afdab79b872ac74b03ea0572`. The new prototype files are not yet committed, CUDA preflight has not run, and no remote job or result exists. The specification below is the intended scientific contract, not a claim that the draft implementation already satisfies it.
+Status as of 2026-09-15: **execution finalized; screen pending**. The implementation is bound to the verified `2496f39ffa3085e29e4ae9edeca217215b8aba0e` starting `origin/main` and the execution-finalization commit that follows it. This remains one exploratory Train/Dev architecture screen, not Idea 009 or a formal Gate. Source binding, strict checkpoint selection, result reporting, CUDA numeric-policy recording, and summarizer validation are part of the finalized runner. No CUDA preflight, remote job, or result exists yet; the specification below remains the scientific contract for the authorized run.
 
 ## 1. ERAN verdict: REPLACE
 
@@ -122,7 +122,7 @@ All other loss weights are zero: no margin, cardinality, auxiliary-stage, distil
 | Batch | 16 visits, last partial batch retained; identical seeded visit permutations in both arms |
 | Epochs | 60 complete Train epochs; no early stopping |
 | Gradient clipping | global norm 5.0 |
-| Precision | float32; no mixed precision; deterministic cuDNN settings |
+| Precision | float32; no mixed precision; CUDA matmul TF32 off; cuDNN TF32 off; deterministic cuDNN settings |
 | Checkpoint | highest full-Dev Jaccard at the fixed decoder; strict improvement only, earliest epoch wins exact ties |
 | Final evidence | selected checkpoint on complete Train and complete Dev; also record epoch-60 Dev row |
 
@@ -142,7 +142,7 @@ Expected headroom is a hypothesis. The strongest objections are substantial: the
 
 ## 7. Full Train/Dev execution and minimum preflight
 
-Use the existing `medrec-molerec-table1` Baseline Environment on the 319 Execution Plane. The Harness Terminal performs source checks and aggregate intake only. Its runtime was observed as Python 3.8.16 / PyTorch 1.9.0+cu111; reverify on submission. Do not change that environment to satisfy core Python 3.11 tooling.
+Use the existing `medrec-molerec-table1` Baseline Environment on the 319 Execution Plane. The Harness Terminal performs source checks and aggregate intake only. Its runtime was observed as Python 3.8.16 / PyTorch 1.9.0+cu111; reverify on submission. Do not change that environment to satisfy core Python 3.11 tooling. The finalized runner requires an exact clean checkout, an explicit full `--source-revision`, and an output directory outside that checkout.
 
 Allocate GPU 0 to MICA-Early and GPU 1 to MICA-Late, subject to immediate Remote Preflight (utilization at most 10%, at least 16 GiB free memory/device, at least 20 GiB free disk). GPUs 2–3 remain unused: there are only two authorized scientific arms. Do not add seeds, variants, or hyperparameter lanes merely to occupy GPUs.
 
@@ -220,6 +220,6 @@ flowchart TD
     FC --> PC["Identical medication-specific pooling and output"]
 ```
 
-## IMPLEMENT NEXT
+## EXECUTION NEXT
 
-Implement the complete candidate and parameter-identical late control → minimum causal/split/vocabulary/tensor preflight → full one-seed Train/Dev on two GPUs → collect only aggregate evidence locally → apply the frozen mechanism and project survival rules.
+Run the minimum remote/data-contract and single synthetic CUDA preflights, then execute the complete candidate and parameter-identical late control for one frozen 60-epoch Train/Dev screen. Keep raw artifacts on 319, return aggregate evidence only, and apply the frozen mechanism and project survival rules.
