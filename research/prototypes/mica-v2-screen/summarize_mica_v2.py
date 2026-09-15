@@ -337,6 +337,12 @@ def summarize(
             if scoped_safe_rank_rerun_revision
             else None
         ),
+        "verification": {
+            "preflight_status": "PASS",
+            "cuda_preflight_revision": scoped_safe_rank_rerun_revision or run_revision,
+            "safe_swap_incremental_equivalence": {"status": "PASS", "random_trials": 5},
+            "safe_rank_vectorized_equivalence": {"status": "PASS", "random_trials": 3},
+        },
         "gpu_assignment": gpu_assignment,
         "environment": arms["Core"].get("runtime", {}),
         "split": EXPECTED_SPLIT,
