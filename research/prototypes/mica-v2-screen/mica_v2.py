@@ -213,7 +213,7 @@ class MICAv2(BaseMICA):
     """MICA-Core plus the five explicitly bounded extension lanes."""
 
     def __init__(self, diagnosis_count: int, procedure_count: int, variant: str = "core") -> None:
-        if variant not in self.VARIANTS:
+        if variant not in VARIANTS:
             raise ValueError("unknown MICA-v2 variant: " + str(variant))
         # BaseMICA's drug-query modules are the exact Core modules.  The
         # variant field is changed only after construction, so Core/FineHistory/
