@@ -227,6 +227,34 @@ seed, formal Gate, Audit, G3/G4, R0 Holdout, historical project test, rescue,
 or Idea 009 was performed.  Runtime-only failed attempts are excluded from the
 metrics but retained in `research/prototypes/mica-v2-screen/result.json`.
 
+### MICA dynamic-query screen
+
+Observed result: six complete single-seed Train/Dev lanes tested whether a
+medication's query should itself change with current patient evidence. The run
+used one clean revision `5083cdba2e02067f949e8a6fe0c4dcf2f323748b` on
+`319-lab-via-server`, with Python `3.8.16`, PyTorch `1.9.0+cu111`, NumPy
+`1.23.5`, and actual GPUs `0,1,2,3,4,6`. The canonical data-contract and
+synthetic CUDA preflights passed after a scoped numerical identity fix.
+
+Selected Dev Jaccards were Core `0.542244156`, StaticMultiQuery `0.543054168`,
+GlobalDynamicMultiQuery `0.542375545`, EvidenceDynamicMultiQuery `0.542493823`,
+StaticQueryAdapter `0.542281479`, and DynamicQueryAdapter `0.541552428`.
+Matched deltas were GlobalDynamic−StaticMultiQuery `−0.000678623`,
+EvidenceDynamic−StaticMultiQuery `−0.000560345`, and
+DynamicAdapter−StaticAdapter `−0.000729051`; all are within the frozen
+`0.002` no-material-contribution threshold. The complete aggregate evidence is
+`research/prototypes/mica-dynamic-query-screen/result.json`.
+
+Interpretation: neither tested dynamic route-mixture signal nor continuous
+patient-conditioned query generation added material set-accuracy value above
+its matched static capacity control. This does not support latent-indication,
+therapeutic-mode, or causal-route claims.
+
+Frozen conclusion: `KILL_PATIENT_CONDITIONED_QUERY_FAMILY`. Routing guidance is
+`KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`; no rescue, extra
+seed, held-out evaluation, formal Gate, Audit, G3/G4, R0 Holdout, historical
+test, or Idea 009 follows.
+
 ## 6. Cross-project lessons
 
 ### Strong unary quality absorbs many local corrections

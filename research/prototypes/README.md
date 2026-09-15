@@ -23,6 +23,7 @@ Current cross-project interpretation is authoritative in [`../memory/current-res
 | [`rxexpert-reset/`](rxexpert-reset/README.md) | Rx-Expert coarse MoE/multimodal backbone calibration | `STOP_RXEXPERT_BACKBONE_RESET` | faithful conditional routing and drug features did not beat MoleRec; router did not collapse |
 | [`mica/`](mica/README.md) | shared versus medication-specific evidence selection and pre-pooling conditioning | `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY` | complete one-seed three-arm screen: DrugQuery−SharedPool ΔJ `+0.009814`; MICA-Late−DrugQuery ΔJ `−0.000588`; preserve medication-specific pooling, drop the extra pre-pooling FiLM step |
 | [`mica-v2-screen/`](mica-v2-screen/README.md) | MICA-Core accuracy and safe-decision extensions | `KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH` | complete six-lane screen: FineHistory weak (`ΔJ +0.003327`), DualEvidence killed, SafePTO/SafeRank safety trade-off loses too much Jaccard, and SetContext killed; full aggregate rows are in [`result.json`](mica-v2-screen/result.json) |
+| [`mica-dynamic-query-screen/`](mica-dynamic-query-screen/README.md) | patient-conditioned medication queries beyond MICA-Core's patient-dependent keys/values | `KILL_PATIENT_CONDITIONED_QUERY_FAMILY` | complete six-lane screen: GlobalDynamic−StaticMultiQuery `ΔJ −0.000679`, EvidenceDynamic−StaticMultiQuery `ΔJ −0.000560`, and DynamicAdapter−StaticAdapter `ΔJ −0.000729`; all dynamic deltas are non-material |
 
 ## Family-level interpretation
 
@@ -64,6 +65,19 @@ to a materially different architecture search.  The source-revision exception
 for the corrected Core/SafeRank reruns and the excluded runtime-only attempts
 are recorded in `mica-v2-screen/result.json`; no Idea 009 or formal Gate was
 created.
+
+### MICA dynamic-query screen
+
+The six authorized single-seed Train/Dev lanes tested whether the query used by
+each medication should itself change with current patient evidence. Static
+multi-query and static adapter controls isolated extra capacity from dynamic
+conditioning. All three matched dynamic deltas were within `0.002` Jaccard:
+GlobalDynamic−StaticMultiQuery `−0.000679`,
+EvidenceDynamic−StaticMultiQuery `−0.000560`, and
+DynamicAdapter−StaticAdapter `−0.000729`. The frozen conclusion is
+`KILL_PATIENT_CONDITIONED_QUERY_FAMILY`; no dynamic arm reached material
+headroom above the same-revision Core. This is exploratory Train/Dev evidence,
+not held-out evaluation, a formal Gate, or a latent-route interpretation.
 
 ## Prototype policy
 

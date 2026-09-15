@@ -1,8 +1,13 @@
 # MICA Dynamic-Query Screen
 
-Status: **prepared for one bounded six-GPU Train/Dev screen; not yet executed**.
+Status: **complete bounded six-GPU Train/Dev screen; dynamic-query family killed**.
 
 Starting authoritative state for this preparation: `abe01977e1d8838d0291ad195e5027883c0e86a1`.
+
+The screen ran from one clean revision after a scoped execution fix. The
+starting `origin/main` was `cf6e17b7325b43a197babcd8d0fbdb0aa19d1623`; the
+execution-fix and run revision was
+`5083cdba2e02067f949e8a6fe0c4dcf2f323748b`, which is also final `origin/main`.
 
 This prototype is additive. It does not modify the completed `mica/` attribution or `mica-v2-screen/` evidence.
 
@@ -183,4 +188,82 @@ Files:
 - `preflight_dynamic_query.py`
 - `summarize_dynamic_query.py`
 
-No experiment result exists until full remote execution completes.
+Before execution, no experiment result existed; the completed evidence is
+recorded below and in `result.json`.
+
+## 8. Completed execution and outcome
+
+All six authorized arms completed the frozen 60-epoch Train/Dev run on the
+canonical split. The remote route was `319-lab-via-server`, with Python
+`3.8.16`, PyTorch `1.9.0+cu111`, NumPy `1.23.5`, float32, TF32 disabled, and
+deterministic cuDNN. Actual GPU assignment was Core→0,
+StaticMultiQuery→1, GlobalDynamicMultiQuery→2,
+EvidenceDynamicMultiQuery→3, StaticQueryAdapter→4, and
+DynamicQueryAdapter→6. GPU 5 was occupied by an unrelated process and was not
+touched.
+
+The data-contract preflight passed the canonical snapshot, exact 131-item
+vocabulary, `4233/10489` Train patients/visits, `1004/2130` Dev
+patients/visits, and row-wise target alignment. The synthetic CUDA preflight
+passed Core equivalence, matched initialization/parameter checks, zero-init
+adapter identity, finite forward/backward, and nonzero route/adapter
+gradients.
+
+The first CUDA preflight exposed a numerical identity defect: the adapter's
+batched 3-D attention contraction differed from the inherited 4-D Core
+contraction by sub-micro-unit floating-point error. The fix reuses the
+inherited contraction while the adapter is zero initialized; the corrected
+preflight passed before launch. The runner also emits the required per-arm
+`result.json` artifact.
+
+Selected complete-Dev rows are:
+
+| Arm | Params | Jaccard | F1 | PRAUC | DDI | AvgMed | Selected epoch | Epoch-60 Jaccard | Wall s | Peak MB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Core | 848900 | 0.542244 | 0.695006 | 0.792730 | 0.076300 | 19.9535 | 3 | 0.474090 | 1722.3 | 419.8 |
+| StaticMultiQuery | 916496 | 0.543054 | 0.695737 | 0.792592 | 0.076041 | 20.3249 | 3 | 0.475445 | 1362.8 | 80.3 |
+| GlobalDynamicMultiQuery | 916496 | 0.542376 | 0.695048 | 0.792699 | 0.075794 | 20.2455 | 3 | 0.472518 | 1380.5 | 81.5 |
+| EvidenceDynamicMultiQuery | 916496 | 0.542494 | 0.694929 | 0.790688 | 0.076909 | 19.8427 | 4 | 0.471767 | 1337.0 | 80.3 |
+| StaticQueryAdapter | 857092 | 0.542281 | 0.694900 | 0.792782 | 0.076508 | 19.9540 | 3 | 0.473168 | 1390.2 | 426.0 |
+| DynamicQueryAdapter | 857092 | 0.541552 | 0.694291 | 0.792617 | 0.076725 | 19.9704 | 3 | 0.474511 | 1274.0 | 144.7 |
+
+The complete Train/Dev precision, recall, count standard deviation, NLL,
+epoch-60 metrics, provenance, and private-artifact policy are recorded in
+[`result.json`](result.json).
+
+Frozen selected-checkpoint comparisons:
+
+```text
+StaticMultiQuery - Core:
+  ΔJ = +0.000810012
+
+GlobalDynamic - StaticMulti:
+  ΔJ = -0.000678623
+  ΔF1 = -0.000688930
+  ΔPRAUC = +0.000106778
+  ΔDDI = -0.000247303
+
+EvidenceDynamic - StaticMulti:
+  ΔJ = -0.000560345
+  ΔF1 = -0.000808074
+  ΔPRAUC = -0.001904352
+  ΔDDI = +0.000867433
+
+StaticAdapter - Core:
+  ΔJ = +0.000037323
+
+DynamicAdapter - StaticAdapter:
+  ΔJ = -0.000729051
+  ΔF1 = -0.000608737
+  ΔPRAUC = -0.000165037
+  ΔDDI = +0.000217101
+```
+
+All three matched dynamic deltas are within `0.002`, so the frozen decision is
+`KILL_PATIENT_CONDITIONED_QUERY_FAMILY`. No dynamic arm survives the absolute
+Core and supporting-metric requirements. This remains exploratory single-seed
+Train/Dev evidence: no held-out evaluation, Idea 009, formal Gate, Audit,
+G3/G4, R0 Holdout, historical test, extra seed, sweep, or rescue was run.
+
+The single next-route recommendation is
+`KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`.
