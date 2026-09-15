@@ -1,4 +1,4 @@
-"""Medication-indexed clinical assembly and its parameter-identical late control."""
+"""Medication-indexed clinical assembly attribution variants."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ from typing import Any
 
 import torch
 from torch import nn
-from torch.utils.checkpoint import checkpoint
 
 MEDICATIONS = 131
 DIM = 128
@@ -102,17 +101,21 @@ class ClinicalBlock(nn.Module):
 
 
 class MICA(nn.Module):
-    """Same learned modules; candidate identity enters before or after assembly.
+    """Parameter-matched attribution variants for the MICA clinical path.
 
-    ``early`` evaluates T(F_m(X)); ``late`` evaluates F_m(T(X)). Both retain
-    medication-specific attention pooling and the identical prediction head.
-    The forward interface has no labels, scores, split, or patient identifiers.
+    ``shared_pool`` evaluates ``T(X) -> shared_pool -> F_m(c)``;
+    ``drug_query`` evaluates ``T(X) -> medication_pool(c_m) -> F_m(c_m)``;
+    ``late`` evaluates ``T(X) -> F_m(T(X)) -> medication_pool(c_m)``.
+    All variants retain the same medication embeddings, readout Q/K/V maps,
+    prediction head, and target-free forward interface.
     """
 
-    def __init__(self, diagnosis_count: int, procedure_count: int, variant: str = "early") -> None:
+    VARIANTS = ("shared_pool", "drug_query", "late")
+
+    def __init__(self, diagnosis_count: int, procedure_count: int, variant: str = "shared_pool") -> None:
         super().__init__()
-        if variant not in ("early", "late"):
-            raise ValueError("variant must be early or late")
+        if variant not in self.VARIANTS:
+            raise ValueError("variant must be shared_pool, drug_query, or late")
         self.variant = variant
         self.med_offset = diagnosis_count + procedure_count
         self.codes = nn.EmbeddingBag(
@@ -178,6 +181,7 @@ class MICA(nn.Module):
         return x[:, None] * (1.0 + scale[None, :, None]) + shift[None, :, None]
 
     def read(self, views: torch.Tensor, drugs: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        """Medication-specific attention pooling over ``[B,M,K,D]`` views."""
         normalized = self.read_norm(views)
         scores = torch.einsum("md,bmkd->bmk", self.query(drugs), self.key(normalized)) / math.sqrt(
             DIM
@@ -185,33 +189,54 @@ class MICA(nn.Module):
         weights = scores.masked_fill(~mask[:, None], float("-inf")).softmax(dim=-1)
         return torch.einsum("bmk,bmkd->bmd", weights, self.value(normalized))
 
-    def early_context(
-        self, x: torch.Tensor, drugs: torch.Tensor, mask: torch.Tensor
+    def read_shared(
+        self, views: torch.Tensor, query_drug: torch.Tensor, mask: torch.Tensor
     ) -> torch.Tensor:
-        views = self.condition(x, drugs)
-        batch, medications, tokens, _ = views.shape
-        expanded_mask = mask[:, None].expand(batch, medications, tokens).reshape(-1, tokens)
-        views = self.assemble(views.reshape(-1, tokens, DIM), expanded_mask)
-        return self.read(views.reshape(batch, medications, tokens, DIM), drugs, mask)
+        """Attention-pool one shared clinical context with an existing readout.
+
+        ``query_drug`` is a deterministic, normalized mean of the medication
+        embeddings. The returned context is ``[B,D]`` and therefore gives every
+        medication the same evidence weights.
+        """
+        normalized = self.read_norm(views)
+        query = self.query(query_drug)
+        scores = torch.einsum("d,bkd->bk", query, self.key(normalized)) / math.sqrt(DIM)
+        weights = scores.masked_fill(~mask, float("-inf")).softmax(dim=-1)
+        return torch.einsum("bk,bkd->bd", weights, self.value(normalized))
+
+    def condition_context(self, context: torch.Tensor, drugs: torch.Tensor) -> torch.Tensor:
+        """Apply the existing medication-specific conditioner to ``[B,M,D]``."""
+        scale, shift = (0.5 * self.conditioner(drugs).tanh()).chunk(2, dim=-1)
+        return context * (1.0 + scale[None]) + shift[None]
 
     def forward(self, batch: dict[str, torch.Tensor]) -> torch.Tensor:
         x = self.encode_tokens(batch)
         mask = batch["mask"]
         drugs = self.drug_norm(self.codes.weight[self.med_offset :])
-        if self.variant == "late":
-            x = self.assemble(x, mask)
-        contexts = []
-        for start in range(0, MEDICATIONS, CHUNK):
-            selected = drugs[start : start + CHUNK]
-            if self.variant == "early":
-                if self.training and torch.is_grad_enabled():
-                    context = checkpoint(self.early_context, x, selected, mask)
-                else:
-                    context = self.early_context(x, selected, mask)
-            else:
-                context = self.read(self.condition(x, selected), selected, mask)
-            contexts.append(context)
-        context = torch.cat(contexts, dim=1)
+        assembled = self.assemble(x, mask)
+        if self.variant == "shared_pool":
+            # Normalize the mean after normalizing each medication embedding;
+            # this creates one deterministic query without adding parameters.
+            shared_query = torch.nn.functional.normalize(drugs.mean(dim=0), dim=-1)
+            shared_context = self.read_shared(assembled, shared_query, mask)
+            context = self.condition_context(
+                shared_context[:, None, :].expand(-1, MEDICATIONS, -1), drugs
+            )
+        elif self.variant == "drug_query":
+            contexts = []
+            for start in range(0, MEDICATIONS, CHUNK):
+                selected = drugs[start : start + CHUNK]
+                expanded = assembled[:, None].expand(-1, selected.shape[0], -1, -1)
+                pooled = self.read(expanded, selected, mask)
+                contexts.append(self.condition_context(pooled, selected))
+            context = torch.cat(contexts, dim=1)
+        else:
+            contexts = []
+            for start in range(0, MEDICATIONS, CHUNK):
+                selected = drugs[start : start + CHUNK]
+                context = self.read(self.condition(assembled, selected), selected, mask)
+                contexts.append(context)
+            context = torch.cat(contexts, dim=1)
         broadcast_drugs = drugs.unsqueeze(0).expand(context.shape[0], -1, -1)
         features = torch.cat((context, broadcast_drugs, context * broadcast_drugs), dim=-1)
         return self.head(features).squeeze(-1) + self.drug_bias

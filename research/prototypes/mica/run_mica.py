@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the fixed MICA early/late Train/Dev prototype screen."""
+"""Run the fixed MICA attribution Train/Dev screen."""
 
 from __future__ import annotations
 
@@ -488,7 +488,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--variant", choices=("early", "late"), required=True)
+    parser.add_argument("--variant", choices=MICA.VARIANTS, required=True)
     parser.add_argument("--snapshot-root", type=Path, required=True)
     parser.add_argument("--train-dev-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
