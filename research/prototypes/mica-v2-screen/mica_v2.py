@@ -212,8 +212,6 @@ class MedicationContextBlock(nn.Module):
 class MICAv2(BaseMICA):
     """MICA-Core plus the five explicitly bounded extension lanes."""
 
-    VARIANTS = VARIANTS
-
     def __init__(self, diagnosis_count: int, procedure_count: int, variant: str = "core") -> None:
         if variant not in self.VARIANTS:
             raise ValueError("unknown MICA-v2 variant: " + str(variant))
