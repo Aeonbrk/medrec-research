@@ -407,7 +407,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     model = MICAv2(dx, proc, args.variant).to(device)
     model.initialize_prevalence(torch.from_numpy(train_targets.mean(0)).to(device))
     ddi_tensor = torch.from_numpy(ddi).to(device)
-    ddi_rows = ddi.tolist()
+    ddi_rows = tuple(tuple(int(bool(value)) for value in row) for row in ddi.tolist())
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=LR,

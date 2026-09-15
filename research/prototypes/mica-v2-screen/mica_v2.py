@@ -322,17 +322,33 @@ def safe_swap(
 
     while _ddi_pair_count(selected, ddi) > budget:
         current_count = _ddi_pair_count(selected, ddi)
+        selected_order = sorted(selected)
+        current_sum = sum(values[index] for index in selected_order)
+        outgoing_degree = {
+            outgoing: sum(int(bool(ddi[outgoing][other])) for other in selected_order)
+            for outgoing in selected_order
+        }
+        incoming_degree = {
+            incoming: sum(int(bool(ddi[incoming][other])) for other in selected_order)
+            for incoming in range(n)
+            if incoming not in selected
+        }
         candidates: list[tuple[float, tuple[int, ...], int, int, set[int]]] = []
-        for outgoing in sorted(selected):
+        for outgoing in selected_order:
             for incoming in range(n):
                 if incoming in selected:
                     continue
-                proposal = set(selected)
-                proposal.remove(outgoing)
-                proposal.add(incoming)
-                new_count = _ddi_pair_count(proposal, ddi)
+                new_count = (
+                    current_count
+                    - outgoing_degree[outgoing]
+                    + incoming_degree[incoming]
+                    - int(bool(ddi[incoming][outgoing]))
+                )
                 if new_count < current_count:
-                    new_sum = sum(values[index] for index in proposal)
+                    new_sum = current_sum - values[outgoing] + values[incoming]
+                    proposal = set(selected)
+                    proposal.remove(outgoing)
+                    proposal.add(incoming)
                     candidates.append(
                         (-new_sum, tuple(sorted(proposal)), outgoing, incoming, proposal)
                     )
@@ -344,18 +360,34 @@ def safe_swap(
         current_count = _ddi_pair_count(selected, ddi)
         if current_count > budget:
             break
-        current_sum = sum(values[index] for index in selected)
+        selected_order = sorted(selected)
+        current_sum = sum(values[index] for index in selected_order)
+        incoming_degree = {
+            incoming: sum(int(bool(ddi[incoming][other])) for other in selected_order)
+            for incoming in range(n)
+            if incoming not in selected
+        }
         candidates = []
-        for outgoing in sorted(selected):
+        outgoing_degree = {
+            outgoing: sum(int(bool(ddi[outgoing][other])) for other in selected_order)
+            for outgoing in selected_order
+        }
+        for outgoing in selected_order:
             for incoming in range(n):
                 if incoming in selected:
                     continue
-                proposal = set(selected)
-                proposal.remove(outgoing)
-                proposal.add(incoming)
-                if _ddi_pair_count(proposal, ddi) <= budget:
-                    gain = sum(values[index] for index in proposal) - current_sum
+                new_count = (
+                    current_count
+                    - outgoing_degree[outgoing]
+                    + incoming_degree[incoming]
+                    - int(bool(ddi[incoming][outgoing]))
+                )
+                if new_count <= budget:
+                    gain = values[incoming] - values[outgoing]
                     if gain > 0.0:
+                        proposal = set(selected)
+                        proposal.remove(outgoing)
+                        proposal.add(incoming)
                         candidates.append(
                             (-gain, tuple(sorted(proposal)), outgoing, incoming, proposal)
                         )
