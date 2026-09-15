@@ -167,6 +167,7 @@ def summarize(
     gpu_assignment: dict[str, int],
     run_revision: str | None = None,
     scoped_safe_rank_rerun_revision: str | None = None,
+    scoped_runtime_fix_arms: tuple[str, ...] = ("SafeRank",),
 ) -> dict[str, Any]:
     if len(arms) != len(VARIANT_FILES):
         raise ValueError("exactly six MICA-v2 arms are required")
@@ -180,10 +181,13 @@ def summarize(
             raise ValueError("scoped SafeRank rerun revisions are not bound to arm results")
         if revisions != {run_revision, scoped_safe_rank_rerun_revision}:
             raise ValueError("unexpected source revisions in scoped SafeRank rerun")
+        affected = set(scoped_runtime_fix_arms)
+        if not affected or not affected.issubset(arms):
+            raise ValueError("scoped runtime-fix arm list is invalid")
         for display, arm in arms.items():
-            expected = scoped_safe_rank_rerun_revision if display == "SafeRank" else run_revision
+            expected = scoped_safe_rank_rerun_revision if display in affected else run_revision
             if arm.get("source_revision") != expected:
-                raise ValueError("only SafeRank may use the scoped rerun revision")
+                raise ValueError("an unaffected arm uses the scoped rerun revision")
     else:
         only_revision = next(iter(revisions))
         if run_revision and run_revision != only_revision:
@@ -326,7 +330,7 @@ def summarize(
         "source_revision_exception": (
             {
                 "kind": "scoped_runtime_fix",
-                "affected_arm": "SafeRank",
+                "affected_arms": list(scoped_runtime_fix_arms),
                 "baseline_revision": run_revision,
                 "corrected_revision": scoped_safe_rank_rerun_revision,
                 "description": (
@@ -408,6 +412,7 @@ def main() -> None:
     parser.add_argument("--starting-revision", required=True)
     parser.add_argument("--run-revision")
     parser.add_argument("--scoped-safe-rank-rerun-revision")
+    parser.add_argument("--scoped-runtime-fix-arms", default="SafeRank")
     parser.add_argument("--gpu-assignment")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -421,6 +426,7 @@ def main() -> None:
         _parse_gpu_assignment(args.gpu_assignment),
         args.run_revision,
         args.scoped_safe_rank_rerun_revision,
+        tuple(item for item in args.scoped_runtime_fix_arms.split(",") if item),
     )
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n")
     print(json.dumps(result, sort_keys=True, allow_nan=False))
