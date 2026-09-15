@@ -297,6 +297,23 @@ def _ddi_pair_count(selected: Iterable[int], ddi: Sequence[Sequence[float]]) -> 
     )
 
 
+_SAFE_SWAP_ADJACENCY_CACHE: dict[int, tuple[object, tuple[frozenset[int], ...]]] = {}
+
+
+def _ddi_adjacency(ddi: Sequence[Sequence[float]]) -> tuple[frozenset[int], ...]:
+    """Cache immutable DDI neighbor sets for repeated SafeSwap calls."""
+
+    key = id(ddi)
+    cached = _SAFE_SWAP_ADJACENCY_CACHE.get(key)
+    if cached is not None and cached[0] is ddi:
+        return cached[1]
+    adjacency = tuple(
+        frozenset(index for index, value in enumerate(row) if bool(value)) for row in ddi
+    )
+    _SAFE_SWAP_ADJACENCY_CACHE[key] = (ddi, adjacency)
+    return adjacency
+
+
 def _logit_values(logits: Sequence[float] | torch.Tensor) -> list[float]:
     if isinstance(logits, torch.Tensor):
         return [float(value) for value in logits.detach().cpu().flatten().tolist()]
@@ -319,21 +336,26 @@ def safe_swap(
         return ()
     selected = set(sorted(range(n), key=lambda index: (-values[index], index))[:k])
     budget = math.floor(float(safety_rate) * k * (k - 1) / 2.0)
+    adjacency = _ddi_adjacency(ddi)
+    current_count = _ddi_pair_count(selected, ddi)
 
-    while _ddi_pair_count(selected, ddi) > budget:
-        current_count = _ddi_pair_count(selected, ddi)
+    while current_count > budget:
         selected_order = sorted(selected)
+        selected_snapshot = set(selected_order)
         current_sum = sum(values[index] for index in selected_order)
         outgoing_degree = {
-            outgoing: sum(int(bool(ddi[outgoing][other])) for other in selected_order)
-            for outgoing in selected_order
+            outgoing: len(adjacency[outgoing] & selected_snapshot) for outgoing in selected_order
         }
         incoming_degree = {
-            incoming: sum(int(bool(ddi[incoming][other])) for other in selected_order)
+            incoming: len(adjacency[incoming] & selected_snapshot)
             for incoming in range(n)
             if incoming not in selected
         }
-        candidates: list[tuple[float, tuple[int, ...], int, int, set[int]]] = []
+        best_sum: float | None = None
+        best_proposal: tuple[int, ...] | None = None
+        best_outgoing = None
+        best_incoming = None
+        best_count = None
         for outgoing in selected_order:
             for incoming in range(n):
                 if incoming in selected:
@@ -342,36 +364,59 @@ def safe_swap(
                     current_count
                     - outgoing_degree[outgoing]
                     + incoming_degree[incoming]
-                    - int(bool(ddi[incoming][outgoing]))
+                    - int(outgoing in adjacency[incoming])
                 )
                 if new_count < current_count:
                     new_sum = current_sum - values[outgoing] + values[incoming]
-                    proposal = set(selected)
-                    proposal.remove(outgoing)
-                    proposal.add(incoming)
-                    candidates.append(
-                        (-new_sum, tuple(sorted(proposal)), outgoing, incoming, proposal)
-                    )
-        if not candidates:
+                    if best_sum is None or new_sum > best_sum:
+                        best_sum = new_sum
+                        best_proposal = tuple(
+                            [
+                                *sorted(index for index in selected_order if index != outgoing),
+                                incoming,
+                            ]
+                        )
+                        best_outgoing, best_incoming, best_count = (
+                            outgoing,
+                            incoming,
+                            new_count,
+                        )
+                    elif new_sum == best_sum:
+                        proposal = tuple(
+                            [
+                                *sorted(index for index in selected_order if index != outgoing),
+                                incoming,
+                            ]
+                        )
+                        if best_proposal is None or proposal < best_proposal:
+                            best_proposal = proposal
+                            best_outgoing, best_incoming, best_count = (
+                                outgoing,
+                                incoming,
+                                new_count,
+                            )
+        if best_outgoing is None or best_incoming is None or best_count is None:
             break
-        selected = min(candidates)[-1]
+        selected.remove(best_outgoing)
+        selected.add(best_incoming)
+        current_count = best_count
 
-    while True:
-        current_count = _ddi_pair_count(selected, ddi)
-        if current_count > budget:
-            break
+    while current_count <= budget:
         selected_order = sorted(selected)
-        current_sum = sum(values[index] for index in selected_order)
+        selected_snapshot = set(selected_order)
+        outgoing_degree = {
+            outgoing: len(adjacency[outgoing] & selected_snapshot) for outgoing in selected_order
+        }
         incoming_degree = {
-            incoming: sum(int(bool(ddi[incoming][other])) for other in selected_order)
+            incoming: len(adjacency[incoming] & selected_snapshot)
             for incoming in range(n)
             if incoming not in selected
         }
-        candidates = []
-        outgoing_degree = {
-            outgoing: sum(int(bool(ddi[outgoing][other])) for other in selected_order)
-            for outgoing in selected_order
-        }
+        best_gain: float | None = None
+        best_proposal = None
+        best_outgoing = None
+        best_incoming = None
+        best_count = None
         for outgoing in selected_order:
             for incoming in range(n):
                 if incoming in selected:
@@ -380,20 +425,42 @@ def safe_swap(
                     current_count
                     - outgoing_degree[outgoing]
                     + incoming_degree[incoming]
-                    - int(bool(ddi[incoming][outgoing]))
+                    - int(outgoing in adjacency[incoming])
                 )
                 if new_count <= budget:
                     gain = values[incoming] - values[outgoing]
-                    if gain > 0.0:
-                        proposal = set(selected)
-                        proposal.remove(outgoing)
-                        proposal.add(incoming)
-                        candidates.append(
-                            (-gain, tuple(sorted(proposal)), outgoing, incoming, proposal)
+                    if gain > 0.0 and (best_gain is None or gain > best_gain):
+                        best_gain = gain
+                        best_proposal = tuple(
+                            [
+                                *sorted(index for index in selected_order if index != outgoing),
+                                incoming,
+                            ]
                         )
-        if not candidates:
+                        best_outgoing, best_incoming, best_count = (
+                            outgoing,
+                            incoming,
+                            new_count,
+                        )
+                    elif gain > 0.0 and gain == best_gain:
+                        proposal = tuple(
+                            [
+                                *sorted(index for index in selected_order if index != outgoing),
+                                incoming,
+                            ]
+                        )
+                        if best_proposal is None or proposal < best_proposal:
+                            best_proposal = proposal
+                            best_outgoing, best_incoming, best_count = (
+                                outgoing,
+                                incoming,
+                                new_count,
+                            )
+        if best_outgoing is None or best_incoming is None or best_count is None:
             break
-        selected = min(candidates)[-1]
+        selected.remove(best_outgoing)
+        selected.add(best_incoming)
+        current_count = best_count
     return tuple(sorted(selected))
 
 
