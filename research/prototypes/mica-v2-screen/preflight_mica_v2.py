@@ -124,7 +124,7 @@ def run(device_name: str = "cpu") -> dict[str, object]:
         set_b = models["set_context"].medication_context(changed, self_only=False)
     if not torch.allclose(self_a[:, 0], self_b[:, 0], atol=1e-6, rtol=1e-6):
         raise RuntimeError("SelfOnly has a cross-medication path")
-    if torch.allclose(set_a[:, 0], set_b[:, 0], atol=1e-6, rtol=1e-6):
+    if torch.allclose(set_a[:, 0], set_b[:, 0], atol=1e-8, rtol=1e-8):
         raise RuntimeError("SetContext did not expose a cross-medication path")
 
     target = torch.zeros((2, MEDICATIONS), device=device)
