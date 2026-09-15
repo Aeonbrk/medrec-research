@@ -165,6 +165,8 @@ def summarize(
     arms: dict[str, dict[str, Any]],
     starting_revision: str,
     gpu_assignment: dict[str, int],
+    run_revision: str | None = None,
+    scoped_safe_rank_rerun_revision: str | None = None,
 ) -> dict[str, Any]:
     if len(arms) != len(VARIANT_FILES):
         raise ValueError("exactly six MICA-v2 arms are required")
@@ -172,7 +174,21 @@ def summarize(
         _validate_arm(arm, VARIANT_FILES[display])
     revisions = {arm.get("source_revision") for arm in arms.values()}
     if len(revisions) != 1 or not isinstance(next(iter(revisions)), str):
-        raise ValueError("all arms must share one immutable source revision")
+        if not run_revision or not scoped_safe_rank_rerun_revision:
+            raise ValueError("all arms must share one immutable source revision")
+        if run_revision not in revisions or scoped_safe_rank_rerun_revision not in revisions:
+            raise ValueError("scoped SafeRank rerun revisions are not bound to arm results")
+        if revisions != {run_revision, scoped_safe_rank_rerun_revision}:
+            raise ValueError("unexpected source revisions in scoped SafeRank rerun")
+        for display, arm in arms.items():
+            expected = scoped_safe_rank_rerun_revision if display == "SafeRank" else run_revision
+            if arm.get("source_revision") != expected:
+                raise ValueError("only SafeRank may use the scoped rerun revision")
+    else:
+        only_revision = next(iter(revisions))
+        if run_revision and run_revision != only_revision:
+            raise ValueError("run revision does not match arm results")
+        run_revision = only_revision
     if arms["Core"]["parameter_count"] != arms["FineHistory"]["parameter_count"]:
         raise ValueError("FineHistory must match Core parameter count")
     if arms["Core"]["parameter_count"] != arms["SafeRank"]["parameter_count"]:
@@ -302,8 +318,25 @@ def summarize(
         "status": "complete",
         "evidence_class": "exploratory_train_dev_single_seed",
         "starting_revision": starting_revision,
-        "run_revision": next(iter(revisions)),
-        "remote_checkout_revision": next(iter(revisions)),
+        "run_revision": run_revision,
+        "remote_checkout_revision": sorted(revisions),
+        "arm_source_revisions": {
+            display: arms[display]["source_revision"] for display in VARIANT_FILES
+        },
+        "source_revision_exception": (
+            {
+                "kind": "scoped_runtime_fix",
+                "affected_arm": "SafeRank",
+                "baseline_revision": run_revision,
+                "corrected_revision": scoped_safe_rank_rerun_revision,
+                "description": (
+                    "SafeSwap incremental candidate counting was proven equivalent to the "
+                    "naive implementation and used only to rerun the invalid SafeRank lane."
+                ),
+            }
+            if scoped_safe_rank_rerun_revision
+            else None
+        ),
         "gpu_assignment": gpu_assignment,
         "environment": arms["Core"].get("runtime", {}),
         "split": EXPECTED_SPLIT,
@@ -353,6 +386,8 @@ def main() -> None:
     for _display, flag in VARIANT_FILES.items():
         parser.add_argument("--" + flag.replace("_", "-"), type=Path, required=True)
     parser.add_argument("--starting-revision", required=True)
+    parser.add_argument("--run-revision")
+    parser.add_argument("--scoped-safe-rank-rerun-revision")
     parser.add_argument("--gpu-assignment")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -360,7 +395,13 @@ def main() -> None:
         display: json.loads(getattr(args, flag.replace("-", "_")).read_text())
         for display, flag in VARIANT_FILES.items()
     }
-    result = summarize(arms, args.starting_revision, _parse_gpu_assignment(args.gpu_assignment))
+    result = summarize(
+        arms,
+        args.starting_revision,
+        _parse_gpu_assignment(args.gpu_assignment),
+        args.run_revision,
+        args.scoped_safe_rank_rerun_revision,
+    )
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n")
     print(json.dumps(result, sort_keys=True, allow_nan=False))
 
