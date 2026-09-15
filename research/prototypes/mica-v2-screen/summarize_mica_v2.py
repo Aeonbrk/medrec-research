@@ -343,6 +343,12 @@ def summarize(
         ),
         "excluded_runtime_attempts": [
             {
+                "revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+                "arm": "Core",
+                "completed_epochs": 60,
+                "reason": "Legacy SafePTO postprocessing runtime defect; no complete result used",
+            },
+            {
                 "revision": "c41c304ceb59b1537e3a0eb97a4fd64ec7025cb9",
                 "arm": "SafeRank",
                 "completed_epochs": 1,
