@@ -427,7 +427,9 @@ def safe_rank_loss(
 ) -> torch.Tensor:
     """Construct detached candidate sets and rank them with current logits."""
 
-    losses: list[torch.Tensor] = []
+    candidate_masks: list[list[bool]] = []
+    candidate_rows: list[int] = []
+    better_pairs: list[tuple[int, int]] = []
     detached = logits.detach().cpu()
     for row_index in range(logits.shape[0]):
         detached_row = detached[row_index]
@@ -447,16 +449,32 @@ def safe_rank_loss(
             if candidate not in candidates:
                 candidates.append(candidate)
         qualities = [_set_quality(candidate, target_set, ddi) for candidate in candidates]
+        candidate_offset = len(candidate_masks)
+        for candidate in candidates:
+            mask = [False] * MEDICATIONS
+            for index in candidate:
+                mask[index] = True
+            candidate_masks.append(mask)
+            candidate_rows.append(row_index)
         for left, left_quality in enumerate(qualities):
             for right, right_quality in enumerate(qualities):
                 if left_quality > right_quality:
-                    difference = _set_score(logits[row_index], candidates[left]) - _set_score(
-                        logits[row_index], candidates[right]
-                    )
-                    losses.append(nn.functional.softplus(-difference))
-    if not losses:
+                    better_pairs.append((candidate_offset + left, candidate_offset + right))
+    if not better_pairs:
         return logits.sum() * 0.0
-    return torch.stack(losses).mean()
+    mask = torch.tensor(candidate_masks, dtype=torch.bool, device=logits.device)
+    rows = torch.tensor(candidate_rows, dtype=torch.long, device=logits.device)
+    candidate_logits = logits.index_select(0, rows)
+    scores = torch.where(
+        mask,
+        nn.functional.logsigmoid(candidate_logits),
+        nn.functional.logsigmoid(-candidate_logits),
+    ).mean(dim=1)
+    left = torch.tensor([pair[0] for pair in better_pairs], dtype=torch.long, device=logits.device)
+    right = torch.tensor([pair[1] for pair in better_pairs], dtype=torch.long, device=logits.device)
+    return nn.functional.softplus(
+        -(scores.index_select(0, left) - scores.index_select(0, right))
+    ).mean()
 
 
 def safe_rank_objective(
