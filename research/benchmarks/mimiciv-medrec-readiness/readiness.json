@@ -108,7 +108,13 @@
     "candidate_rebuild_patients": 77615,
     "candidate_rebuild_visits": 209358,
     "candidate_rebuild_medication_axis": 131,
-    "candidate_rebuild_note": "aggregate resource evidence only; not the frozen MICA-IV cohort"
+    "candidate_rebuild_note": "aggregate resource evidence only; not the frozen MICA-IV cohort",
+    "mapping_inputs_present_on_execution_plane": [
+      "CafeMed ndc2rxnorm_mapping.txt",
+      "CafeMed ndc2atc_level4.csv",
+      "ARMR MIMIC-IV ddi_A_final.json"
+    ],
+    "mapping_freeze_note": "presence was checked; version, coverage, and final cohort projection still need an implementation manifest"
   },
   "primary_sources": [
     {

@@ -44,6 +44,11 @@ held-out evaluation has been completed.
 | Held-out test access in this stage | MISSING | The untouched test partition is deliberately not read or evaluated in Stage -1. |
 | MICA-IV training result | MISSING | Training is explicitly not run in this stage. |
 
+The checked execution-plane mapping inputs are the CafeMed
+`ndc2rxnorm_mapping.txt`, CafeMed `ndc2atc_level4.csv`, and the ARMR
+MIMIC-IV `ddi_A_final.json` asset. Their presence establishes capability, not
+that their versions or coverage have already been frozen for this benchmark.
+
 ## Why the protocol is feasible
 
 The 319-side MIMIC-IV 3.1 rebuild already demonstrates the required mechanical
