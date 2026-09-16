@@ -46,7 +46,7 @@ Medication-specific evidence selection remains the strongest surviving mechanism
 
 Current interpretation:
 
-> In the tested single-seed Train/Dev comparisons, medication-specific evidence selection moved accuracy in the same favorable direction on MIMIC-III and MIMIC-IV surfaces. Stability across training randomness is not yet established.
+> In the tested Train/Dev comparisons, medication-specific evidence selection moved accuracy in the same favorable direction on MIMIC-III and MIMIC-IV surfaces. Two new matched MIMIC-III seed pairs reproduce the favorable Jaccard/F1/PRAUC and lower-DDI direction; medication cardinality is mixed. This remains development evidence, not a final superiority or safety claim.
 
 These results are `DEVELOPMENT` evidence. They are not final-table superiority, SOTA, universal safety improvement, or a calibration claim. The fixed-131/generalized MICA implementation passed exact no-training equivalence on the 131-medication path.
 
@@ -112,14 +112,14 @@ Before the next MIII runs, freeze only what can change their interpretation: pat
 
 ### MICA stability
 
-Default next evidence is two new paired MIII seeds per arm under that frozen profile:
+The default two new paired MIII seeds per arm under the frozen profile are now complete:
 
 ```text
 SharedPool seed A / DrugQuery seed A
 SharedPool seed B / DrugQuery seed B
 ```
 
-Add the third paired seed when MICA remains a central component/control, the first two pairs disagree and change routing, or otherwise-ready GPU capacity makes completing the third pair the cheapest decision. If no higher-value ready task exists and the runs are short, six-way parallel completion is acceptable.
+Add a third paired seed only when MICA remains a central component/control, the two pairs disagree and change routing, or otherwise-ready GPU capacity makes completion cheaper than another decision boundary. The current two-pair direction is stable for accuracy/PRAUC/DDI but not medication cardinality, so it supports continued development without forcing a third pair now.
 
 Historical single-seed evidence remains separate unless it exactly satisfies the new run contract.
 
