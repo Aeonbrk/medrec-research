@@ -1,4 +1,77 @@
-# Handoff: MICA Dynamic-Query Screen Complete — Family Killed
+# Handoff: STAGE -1 — MICA Core consolidation + MIMIC-IV readiness
+
+Updated: 2026-09-16.
+
+## Current authoritative state
+
+```text
+Stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
+Status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
+AUTHORITATIVE_START_REVISION: fccd2484c10aa9cf7a48cb02504a8fa78b61dde6
+FINAL_REVISION: pending closeout commit
+Active formal Idea: none
+Idea 009: not created
+Active formal Gate: none
+```
+
+Stage -1 is complete for its bounded scope. No Test partition was opened, no
+new method family or seed was added, and no paper or novelty claim follows.
+
+## Stage -1A — training diagnosis
+
+[`research/diagnostics/mica-training-dynamics/diagnosis.json`](research/diagnostics/mica-training-dynamics/diagnosis.json)
+classifies the available progress as `OVERFIT_DOMINANT`. Fifteen complete
+MICA/MICA-v2/Dynamic Query arms were available: twelve peak at epoch 3 and
+three at epoch 4. With 10,489 Train visits and batch 16, this is about 1,968
+and 2,624 optimizer updates. Train total/BCE objectives continue to fall (DDI
+loss is retained in the curve file) while Dev NLL rises and Dev Jaccard/PRAUC
+fall. SafePTO had no epoch-level progress and was not classified. The common
+recipe/encoder dynamics are the supported explanation; the prior DrugQuery
+architecture verdict is unchanged.
+
+## Stage -1B — training recipe
+
+The three complete recipe arms are recorded in
+[`recipe-result.json`](research/prototypes/mica-core-consolidation/recipe-result.json).
+Constant AdamW `1e-4` (`t1_lower_constant`) was selected for Stage -1C: its
+peak Jaccard is `0.542280` versus anchor `0.542244`, peak PRAUC remains within
+the `0.002` floor, and all late Jaccard/PRAUC/NLL drift measures are lower than
+the anchor. Cosine decay was not selected because its NLL drift was larger.
+
+## Stage -1C — intrinsic Core controls
+
+All four controls completed 60 epochs with the selected recipe and are
+summarized in
+[`consolidation-result.json`](research/prototypes/mica-core-consolidation/consolidation-result.json).
+The predeclared decision is `KEEP_EXISTING_MICA_CORE`: OneClinicalBlock misses
+the PRAUC floor and has worse late J/PRAUC degradation; NoPostReadConditioner
+is slightly worse on late PRAUC drop despite fewer parameters; SimplifiedHead
+misses both peak floors. No intrinsic simplification is promoted.
+
+## Stage -1D — MIMIC-IV readiness
+
+The frozen protocol is a dataset-native visit-level task:
+`(current diagnoses, current procedures, strictly previous visit
+diagnosis/procedure/medication history) -> current medication set`. It uses
+patient-level `2/3, 1/6, 1/6` roles, target-only current medications,
+versioned deterministic NDC/formulary → RxNorm → ATC4 normalization, fixed
+MICA metrics/threshold/checkpoint semantics, and pre-training leakage/split/
+DDI checks. The status is `MIMIC_IV_PROTOCOL_READY_FOR_IMPLEMENTATION`.
+The repository adapter and final public-safe mapping manifest remain to be
+implemented; no MICA-IV training or Test materialization occurred.
+
+## One next action
+
+Implement and freeze the MIMIC-IV adapter from
+[`protocol-draft.md`](research/benchmarks/mimiciv-medrec-readiness/protocol-draft.md),
+then run its mechanical contract checks. Do not enter Stage 0 automatically.
+
+---
+
+# Historical handoff: MICA Dynamic-Query Screen Complete — Family Killed
+
+The remainder of this file is retained as historical execution context. Its
+older routing text is superseded by the current Stage -1 handoff above.
 
 Updated: 2026-09-16.
 

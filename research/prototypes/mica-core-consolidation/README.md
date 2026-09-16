@@ -50,6 +50,28 @@ decoder, and 60 complete epochs.
 The target-free CUDA/data preflight for all four controls passed on the exact
 source revision; its public-safe summary is [`preflight-result.json`](preflight-result.json).
 
+## Stage -1C result
+
+The four complete 60-epoch controls used the selected `t1_lower_constant`
+recipe on source revision `5864011a864851c7eba1ed2a0742221c9e7dcf5f`. The
+public-safe aggregate is [`consolidation-result.json`](consolidation-result.json).
+
+| Control | Params | Best epoch | Jaccard | F1 | PRAUC | DDI | NLL | Epoch-60 J | Epoch-60 PRAUC | Epoch-60 NLL |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Core | 848900 | 5 | 0.542280 | 0.695095 | 0.790848 | 0.076524 | 0.204557 | 0.474699 | 0.715865 | 0.513763 |
+| OneClinicalBlock | 716420 | 5 | 0.541037 | 0.693987 | 0.788838 | 0.076553 | 0.204490 | 0.466714 | 0.708844 | 0.503723 |
+| NoPostReadConditioner | 815876 | 5 | 0.541534 | 0.694440 | 0.790505 | 0.076623 | 0.204606 | 0.474836 | 0.714880 | 0.501174 |
+| SimplifiedHead | 799876 | 5 | 0.536593 | 0.690080 | 0.786329 | 0.076371 | 0.205739 | 0.467744 | 0.709090 | 0.423841 |
+
+The predeclared rule therefore gives `KEEP_EXISTING_MICA_CORE`. Both
+OneClinicalBlock and NoPostReadConditioner reduce parameters, but
+OneClinicalBlock misses the PRAUC floor and has worse late Jaccard/PRAUC
+degradation. NoPostReadConditioner stays within the peak Jaccard/PRAUC floors
+and has lower Jaccard drop and NLL drift, but its PRAUC drop is slightly worse
+than Core (`0.075625` versus `0.074983`), so it is not a stable replacement.
+SimplifiedHead fails both peak accuracy floors. No simplification had a
+meaningful Jaccard gain (`>0.004`).
+
 ## Execution and evidence boundary
 
 `run_consolidation.py` requires an exact clean source revision, the canonical

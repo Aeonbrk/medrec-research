@@ -11,12 +11,16 @@ Active formal Idea: none
 Ideas 001--008: terminated
 Idea 009: not created
 Active formal Gate: none
+Current stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
+Stage status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 Modern-backbone calibration: complete
 Strong-unary residual-correction route: deprioritized as a primary direction
-Current action: architecture-first open search
+Current action: MICA Core consolidation + training diagnosis + MIMIC-IV readiness
 ```
 
-No named new architecture is pre-approved. The next candidate should emerge from a step-back search, not from attachment to MoleRec, GraphRefine, HypeMed, Rx-Expert, RCER, or any other existing formulation.
+No new architecture family, Idea 009, formal Gate, held-out evaluation, or
+multi-seed run is authorized in Stage -1. The earlier architecture-search
+directions remain deferred until this substrate work is complete.
 
 According to the current recorded evidence, G3/G4, R0 Holdout, and the historical project test remain quarantined from the recent exploratory prototype sequence.
 
@@ -255,7 +259,79 @@ Frozen conclusion: `KILL_PATIENT_CONDITIONED_QUERY_FAMILY`. Routing guidance is
 seed, held-out evaluation, formal Gate, Audit, G3/G4, R0 Holdout, historical
 test, or Idea 009 follows.
 
-## 6. Cross-project lessons
+## 6. STAGE -1 consolidation (2026-09-16)
+
+This is the current bounded state. It is exploratory Train/Dev evidence and a
+protocol-readiness record, not a paper claim or a new method proposal. The
+authoritative start revision was `fccd2484c10aa9cf7a48cb02504a8fa78b61dde6`;
+the Stage -1 experiment source revision was
+`5864011a864851c7eba1ed2a0742221c9e7dcf5f`.
+
+### Training-dynamics diagnosis (Stage -1A)
+
+The complete progress artifacts covered 15 arms: MICA SharedPool, DrugQuery,
+and MICA-Late; MICA-v2 Core, FineHistory, DualEvidence, SelfOnly, SetContext,
+and SafeRank; and all six Dynamic Query arms. SafePTO has a public aggregate
+row but no epoch-level progress and was not classified. With 10,489 Train
+visits and batch 16, one epoch is 656 optimizer updates; epochs 3, 4, and 60
+are approximately 1,968, 2,624, and 39,360 updates. Twelve included arms peak
+at epoch 3 and three at epoch 4.
+
+Observed Train BCE and total loss continue to decrease (Train DDI loss is
+recorded in the curve file), while Dev NLL rises and Dev Jaccard/PRAUC fall
+after the early peak. The predeclared diagnosis is
+`OVERFIT_DOMINANT`: the common recipe/encoder dynamics and rapid late
+memorization explain the timing better than a DrugQuery-specific defect. This
+does not change the prior DrugQuery attribution or the closed-family verdicts.
+The aggregate diagnosis is
+[`diagnosis.json`](../diagnostics/mica-training-dynamics/diagnosis.json), with
+curves in
+[`learning_curves.csv`](../diagnostics/mica-training-dynamics/learning_curves.csv).
+
+### Training-recipe test (Stage -1B)
+
+The three declared MICA-Core arms were complete for 60 epochs. Relative to
+the constant `3e-4` anchor, constant `1e-4` selected epoch 5, raised peak
+Jaccard from `0.542244` to `0.542280`, kept peak PRAUC within `0.002`
+(`0.790848` versus `0.792730`), and reduced Jaccard/PRAUC drop and NLL drift
+to `0.067581/0.074983/0.309206` from
+`0.068154/0.078207/0.337782`. Cosine decay reduced the Jaccard/PRAUC drop
+but had larger NLL drift (`0.430405`). The bounded decision is
+`ADOPT_STABLE_RECIPE_FOR_STAGE_MINUS_1C` with constant AdamW `1e-4`, seed
+`20260914`, and all other settings unchanged. See
+[`recipe-result.json`](../prototypes/mica-core-consolidation/recipe-result.json).
+
+### Intrinsic consolidation (Stage -1C)
+
+Using that recipe, Core, OneClinicalBlock, NoPostReadConditioner, and
+SimplifiedHead all completed 60 epochs with selected epoch 5. The public-safe
+rows and rule evaluation are in
+[`consolidation-result.json`](../prototypes/mica-core-consolidation/consolidation-result.json).
+No control met all predeclared accuracy, parameter, and late-stability
+conditions, so the result is `KEEP_EXISTING_MICA_CORE`. In particular,
+NoPostReadConditioner reduced parameters and met the peak floors, but its
+PRAUC drop (`0.075625`) was slightly worse than Core (`0.074983`); the linear
+SimplifiedHead also missed both peak floors.
+
+### MIMIC-IV readiness (Stage -1D)
+
+The frozen draft defines `(D_t, P_t, H_<t) -> M_t`, where history contains
+only strictly earlier visits and the current prescription-derived medication
+set is target-only. It uses patient-level `2/3, 1/6, 1/6` roles, dataset-native
+vocabularies, deterministic versioned NDC/formulary → RxNorm → ATC4 mapping,
+the fixed MICA metric/threshold/checkpoint semantics, and a pre-training
+leakage/split/DDI coverage contract. MIMIC-IV v3.1 tables and mapping inputs
+are available or reusable, while the repository-owned adapter, final mapping
+coverage manifest, and any MICA-IV run remain missing. Therefore readiness is
+`MIMIC_IV_PROTOCOL_READY_FOR_IMPLEMENTATION`; no MICA-IV training or Test
+materialization was performed. See the
+[`readiness record`](../benchmarks/mimiciv-medrec-readiness/README.md) and
+[`protocol draft`](../benchmarks/mimiciv-medrec-readiness/protocol-draft.md).
+
+The one next action is to implement and freeze this MIMIC-IV adapter and run
+its mechanical contract checks. Do not enter Stage 0 automatically.
+
+## 7. Cross-project lessons
 
 ### Strong unary quality absorbs many local corrections
 
@@ -285,9 +361,11 @@ The frozen-unary residual probe is the clearest example: co-label dependence is 
 
 Negative evidence should prevent equivalent reruns, not prevent innovation. A component from a failed route may still be useful inside a new architecture with a different object or information flow. Do not turn memory into a novelty firewall.
 
-## 7. Open research space
+## 8. Deferred open research space
 
-The project should now search broadly for a genuinely different formulation. High-leverage possibilities include, but are not limited to:
+After the Stage -1 next action is complete, the project may search broadly for
+a genuinely different formulation. High-leverage possibilities include, but
+are not limited to:
 
 - new architecture built from scratch rather than a MoleRec correction;
 - medication-specific or decision-specific clinical evidence acquisition;
@@ -302,16 +380,11 @@ These are search directions, not requirements. Adjacent fields should be searche
 
 Do not assume the next model must use MoleRec, GraphRefine, hypergraphs, MoE, retrieval, medication graphs, or any previously successful component.
 
-## 8. Next workflow
+## 9. Next workflow
 
-1. Step back and perform broad method/closest-family search, including adjacent structured prediction and recommendation work.
-2. Converge to **one** Rank-1 candidate with a concrete scientific mechanism or inductive-bias hypothesis.
-3. Check enough literature to avoid an obvious duplicate and identify the strongest control; do not demand a full novelty proof before a cheap prototype.
-4. By default, run one seed / one main config on Train/Dev with the strongest relevant baseline and a decisive matched control or ablation.
-5. Continue only for material signal; allow at most one bounded redesign when the result identifies a concrete hidden failure.
-6. If target semantics, privileged information, or another scientific entitlement must be fixed before modeling, formalize that contract earlier rather than forcing the prototype-first sequence.
-7. For a survivor, perform rigorous primary-source novelty/closest-work verification, stronger baselines, multiple seeds, formal experiment design, and untouched evaluation.
+1. Implement and freeze the MIMIC-IV visit-level adapter from the Stage -1
+   protocol draft, then run the target-free mechanical leakage, split,
+   normalization, and DDI-coverage checks.
 
-The governing principle is:
-
-> Search broadly, execute narrowly, and kill weak directions quickly. Spend rigor on survivors, not ceremony on weak candidates.
+No Stage 0, Idea 009, formal Gate, Audit, held-out Test, or additional seed
+follows automatically from this handoff.
