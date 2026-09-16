@@ -1,0 +1,804 @@
+{
+  "arms": [
+    {
+      "arm": "shared_pool",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.532430334115605
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20558872818946838
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7874185089475605
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.07348478995765328,
+        "nll_drift": 0.4130537211894989,
+        "prauc": 0.08497895638287223
+      },
+      "epoch_60": {
+        "f1": 0.6196864127844912,
+        "jaccard": 0.45894554415795175,
+        "nll": 0.6186424493789673,
+        "prauc": 0.7024395525646883,
+        "train_bce": 0.0571450560667748,
+        "train_ddi": 0.12555447042937365,
+        "train_loss": 0.06342277960990834
+      },
+      "family": "mica",
+      "label": "SharedPool",
+      "source_revision": "cd731bb0abe3dca3ebaa8a3e5346eeff74270f75",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.22362630841945463,
+        "bce_epoch_10": 0.14409930071677093,
+        "bce_epoch_20": 0.10706265739665403,
+        "bce_epoch_3": 0.19108994371335947,
+        "bce_epoch_60": 0.0571450560667748,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0017390848929999226,
+        "max_total_loss_increase": -4.2746693609055364e-05,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "drug_query",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5422441561252869
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20248271524906158
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7927301263294768
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06815389591127957,
+        "nll_drift": 0.3377818912267685,
+        "prauc": 0.07820660209804153
+      },
+      "epoch_60": {
+        "f1": 0.6338637160545393,
+        "jaccard": 0.4740902602140073,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "train_bce": 0.06204900591897833,
+        "train_ddi": 0.12516657883223775,
+        "train_loss": 0.06830733488090546
+      },
+      "family": "mica",
+      "label": "DrugQuery",
+      "source_revision": "cd731bb0abe3dca3ebaa8a3e5346eeff74270f75",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 58,
+        "bce_epoch_1": 0.22057116875652819,
+        "bce_epoch_10": 0.1446337758648076,
+        "bce_epoch_20": 0.10871117111355484,
+        "bce_epoch_3": 0.18788799874939857,
+        "bce_epoch_60": 0.06204900591897833,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016516953989165856,
+        "max_total_loss_increase": 6.493859846151695e-05,
+        "total_loss_decreasing_steps": 58,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "mica_late",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5416562262046256
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20245981216430664
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7922542977011173
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06605873243403149,
+        "nll_drift": 0.3242146968841553,
+        "prauc": 0.07429232169806843
+      },
+      "epoch_60": {
+        "f1": 0.6355543948209389,
+        "jaccard": 0.4755974937705941,
+        "nll": 0.5266745090484619,
+        "prauc": 0.7179619760030489,
+        "train_bce": 0.06161759402405796,
+        "train_ddi": 0.12500402478389147,
+        "train_loss": 0.06786779526666209
+      },
+      "family": "mica",
+      "label": "MICA-Late",
+      "source_revision": "cd731bb0abe3dca3ebaa8a3e5346eeff74270f75",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.2205450830727017,
+        "bce_epoch_10": 0.14442758714491288,
+        "bce_epoch_20": 0.10817562997844064,
+        "bce_epoch_3": 0.18791194158828295,
+        "bce_epoch_60": 0.06161759402405796,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016561998624170984,
+        "max_total_loss_increase": -0.00014705309588047832,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "v2_core",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5422441561252869
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20248271524906158
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7927301263294768
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06815389591127957,
+        "nll_drift": 0.3377818912267685,
+        "prauc": 0.07820660209804153
+      },
+      "epoch_60": {
+        "f1": 0.6338637160545393,
+        "jaccard": 0.4740902602140073,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "train_bce": 0.06204900591897833,
+        "train_ddi": 0.12516657883223775,
+        "train_loss": 0.06830733488090546
+      },
+      "family": "mica-v2",
+      "label": "Core",
+      "source_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+      "status": "running",
+      "train_dynamics": {
+        "bce_decreasing_steps": 58,
+        "bce_epoch_1": 0.22057116875652819,
+        "bce_epoch_10": 0.1446337758648076,
+        "bce_epoch_20": 0.10871117111355484,
+        "bce_epoch_3": 0.18788799874939857,
+        "bce_epoch_60": 0.06204900591897833,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016516953989165856,
+        "max_total_loss_increase": 6.493859846151695e-05,
+        "total_loss_decreasing_steps": 58,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "fine_history",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.545571258751279
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20184366405010223
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.79358009094393
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.0710041147648715,
+        "nll_drift": 0.3512370139360428,
+        "prauc": 0.0762136379780618
+      },
+      "epoch_60": {
+        "f1": 0.6341979376268053,
+        "jaccard": 0.4745671439864075,
+        "nll": 0.553080677986145,
+        "prauc": 0.7173664529658682,
+        "train_bce": 0.060881566348271576,
+        "train_ddi": 0.12514851353611503,
+        "train_loss": 0.06713899206954356
+      },
+      "family": "mica-v2",
+      "label": "FineHistory",
+      "source_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.22209365180193588,
+        "bce_epoch_10": 0.14421921729507342,
+        "bce_epoch_20": 0.10770811154246501,
+        "bce_epoch_3": 0.18696768870826716,
+        "bce_epoch_60": 0.060881566348271576,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.001666753018936037,
+        "max_total_loss_increase": -0.00013430521356694314,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "dual_evidence",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5417268233675497
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20316752791404724
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7902867857915612
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.07013315161225742,
+        "nll_drift": 0.3451269567012787,
+        "prauc": 0.07703945855279792
+      },
+      "epoch_60": {
+        "f1": 0.6311899899675417,
+        "jaccard": 0.4715936717552923,
+        "nll": 0.5482944846153259,
+        "prauc": 0.7132473272387633,
+        "train_bce": 0.06340324839482783,
+        "train_ddi": 0.12482548427713623,
+        "train_loss": 0.06964452263929957
+      },
+      "family": "mica-v2",
+      "label": "DualEvidence",
+      "source_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 58,
+        "bce_epoch_1": 0.22099001693144826,
+        "bce_epoch_10": 0.14502513507111692,
+        "bce_epoch_20": 0.1095409977821345,
+        "bce_epoch_3": 0.18854658625148388,
+        "bce_epoch_60": 0.06340324839482783,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016324377335257816,
+        "max_total_loss_increase": 2.4541497901084397e-05,
+        "total_loss_decreasing_steps": 58,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "self_only",
+      "best_jaccard": {
+        "epoch": 4,
+        "optimizer_updates": 2624,
+        "value": 0.5400367559249134
+      },
+      "best_nll": {
+        "epoch": 4,
+        "value": 0.20535887777805328
+      },
+      "best_prauc": {
+        "epoch": 4,
+        "value": 0.7902185821253248
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06731344548979834,
+        "nll_drift": 0.2783168703317642,
+        "prauc": 0.06817813476320156
+      },
+      "epoch_60": {
+        "f1": 0.6322606956100072,
+        "jaccard": 0.47272331043511506,
+        "nll": 0.4836757481098175,
+        "prauc": 0.7220404473621232,
+        "train_bce": 0.06341830366917522,
+        "train_ddi": 0.12529537332888746,
+        "train_loss": 0.06968307247924696
+      },
+      "family": "mica-v2",
+      "label": "SelfOnly",
+      "source_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.2253411941799266,
+        "bce_epoch_10": 0.14787184529802755,
+        "bce_epoch_20": 0.1117608128816091,
+        "bce_epoch_3": 0.19000410479009974,
+        "bce_epoch_60": 0.06341830366917522,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016890708325770466,
+        "max_total_loss_increase": -0.0003773986995617984,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "set_context",
+      "best_jaccard": {
+        "epoch": 4,
+        "optimizer_updates": 2624,
+        "value": 0.5395622621506876
+      },
+      "best_nll": {
+        "epoch": 4,
+        "value": 0.20535509288311005
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7895709323643768
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06760365937618595,
+        "nll_drift": 0.2927333265542984,
+        "prauc": 0.07131389689068712
+      },
+      "epoch_60": {
+        "f1": 0.6316679913962343,
+        "jaccard": 0.47195860277450163,
+        "nll": 0.49808841943740845,
+        "prauc": 0.7182570354736897,
+        "train_bce": 0.060922235519685536,
+        "train_ddi": 0.12555065692189946,
+        "train_loss": 0.0671997684802491
+      },
+      "family": "mica-v2",
+      "label": "SetContext",
+      "source_revision": "9aba7ba1070bda24be5541723c4870e64ee3fa77",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.2245981758177161,
+        "bce_epoch_10": 0.14698962929342232,
+        "bce_epoch_20": 0.10983615722132543,
+        "bce_epoch_3": 0.19012826019257878,
+        "bce_epoch_60": 0.060922235519685536,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0017213478754747357,
+        "max_total_loss_increase": -0.0002544907159909432,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "safe_rank",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5293183946037984
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20242741703987122
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7924154271022645
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06281334236537472,
+        "nll_drift": 0.3420163094997406,
+        "prauc": 0.07593767071918478
+      },
+      "epoch_60": {
+        "f1": 0.6270180774943871,
+        "jaccard": 0.46650505223842365,
+        "nll": 0.5444437265396118,
+        "prauc": 0.7164777563830798,
+        "train_bce": 0.06247637318535135,
+        "train_ddi": 0.1261796469751606,
+        "train_loss": 0.13802310573934248
+      },
+      "family": "mica-v2",
+      "label": "SafeRank",
+      "source_revision": "6d8d3fd473569a9b6425954bc0fb263657b284c9",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 58,
+        "bce_epoch_1": 0.22062344880221807,
+        "bce_epoch_10": 0.14464933593889837,
+        "bce_epoch_20": 0.10855415415287654,
+        "bce_epoch_3": 0.18791730042885457,
+        "bce_epoch_60": 0.06247637318535135,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016434592550709404,
+        "max_total_loss_increase": 0.0006217321798110131,
+        "total_loss_decreasing_steps": 58,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "dynamic_core",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5422441561252869
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20248271524906158
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7927301263294768
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06815389591127957,
+        "nll_drift": 0.3377818912267685,
+        "prauc": 0.07820660209804153
+      },
+      "epoch_60": {
+        "f1": 0.6338637160545393,
+        "jaccard": 0.4740902602140073,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "train_bce": 0.06204900591897833,
+        "train_ddi": 0.12516657883223775,
+        "train_loss": 0.06830733488090546
+      },
+      "family": "dynamic-query",
+      "label": "Core",
+      "source_revision": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 58,
+        "bce_epoch_1": 0.22057116875652819,
+        "bce_epoch_10": 0.1446337758648076,
+        "bce_epoch_20": 0.10871117111355484,
+        "bce_epoch_3": 0.18788799874939857,
+        "bce_epoch_60": 0.06204900591897833,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016516953989165856,
+        "max_total_loss_increase": 6.493859846151695e-05,
+        "total_loss_decreasing_steps": 58,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "static_multiquery",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5430541680531868
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20177368819713593
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7925920339091012
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06760913635635374,
+        "nll_drift": 0.3521094471216202,
+        "prauc": 0.07593044149041217
+      },
+      "epoch_60": {
+        "f1": 0.6349975816635346,
+        "jaccard": 0.4754450316968331,
+        "nll": 0.5538831353187561,
+        "prauc": 0.716661592418689,
+        "train_bce": 0.059979659522502594,
+        "train_ddi": 0.1253526615385037,
+        "train_loss": 0.06624729260951437
+      },
+      "family": "dynamic-query",
+      "label": "StaticMultiQuery",
+      "source_revision": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.21947994907496257,
+        "bce_epoch_10": 0.14277308575105072,
+        "bce_epoch_20": 0.10552462538163898,
+        "bce_epoch_3": 0.18698526705080792,
+        "bce_epoch_60": 0.059979659522502594,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016558685245709626,
+        "max_total_loss_increase": -0.0002915343598762915,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "global_dynamic_multiquery",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5423755448061097
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.2023562639951706
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7926988116703296
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.0698575679332693,
+        "nll_drift": 0.3668444901704788,
+        "prauc": 0.07586543986634708
+      },
+      "epoch_60": {
+        "f1": 0.6321779229273803,
+        "jaccard": 0.4725179768728404,
+        "nll": 0.5692007541656494,
+        "prauc": 0.7168333718039825,
+        "train_bce": 0.058791485710879485,
+        "train_ddi": 0.12551067490938655,
+        "train_loss": 0.06506701946061075
+      },
+      "family": "dynamic-query",
+      "label": "GlobalDynamicMultiQuery",
+      "source_revision": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.21950090439795356,
+        "bce_epoch_10": 0.141927472020323,
+        "bce_epoch_20": 0.10503171062700195,
+        "bce_epoch_3": 0.186699706438454,
+        "bce_epoch_60": 0.058791485710879485,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.00166271972618887,
+        "max_total_loss_increase": -2.1094817691996726e-05,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "evidence_dynamic_multiquery",
+      "best_jaccard": {
+        "epoch": 4,
+        "optimizer_updates": 2624,
+        "value": 0.5424938234034716
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20243628323078156
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7927078536513986
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.07072659286394034,
+        "nll_drift": 0.3560094088315964,
+        "prauc": 0.07722810636028277
+      },
+      "epoch_60": {
+        "f1": 0.6313030899724479,
+        "jaccard": 0.4717672305395313,
+        "nll": 0.5584456920623779,
+        "prauc": 0.7154797472911159,
+        "train_bce": 0.06003306148931937,
+        "train_ddi": 0.12556042339354795,
+        "train_loss": 0.06631108267671933
+      },
+      "family": "dynamic-query",
+      "label": "EvidenceDynamicMultiQuery",
+      "source_revision": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.21967152162245565,
+        "bce_epoch_10": 0.1434012222621334,
+        "bce_epoch_20": 0.10710583091214042,
+        "bce_epoch_3": 0.18727591996061552,
+        "bce_epoch_60": 0.06003306148931937,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.0016673632154562807,
+        "max_total_loss_increase": -5.375638793109205e-05,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "static_query_adapter",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5422814788475844
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20237649977207184
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7927815996051335
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06911342636027573,
+        "nll_drift": 0.3447398394346237,
+        "prauc": 0.07742788606221074
+      },
+      "epoch_60": {
+        "f1": 0.6329820289316993,
+        "jaccard": 0.47316805248730864,
+        "nll": 0.5471163392066956,
+        "prauc": 0.7153537135429228,
+        "train_bce": 0.06168391765803397,
+        "train_ddi": 0.12534656317186987,
+        "train_loss": 0.06795124588353992
+      },
+      "family": "dynamic-query",
+      "label": "StaticQueryAdapter",
+      "source_revision": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.2205268616730997,
+        "bce_epoch_10": 0.14454273053848296,
+        "bce_epoch_20": 0.10872981734683941,
+        "bce_epoch_3": 0.1878634476450858,
+        "bce_epoch_60": 0.06168391765803397,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.00165717625760898,
+        "max_total_loss_increase": -0.0001489698008911855,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    },
+    {
+      "arm": "dynamic_query_adapter",
+      "best_jaccard": {
+        "epoch": 3,
+        "optimizer_updates": 1968,
+        "value": 0.5415524278247726
+      },
+      "best_nll": {
+        "epoch": 3,
+        "value": 0.20237907767295837
+      },
+      "best_prauc": {
+        "epoch": 3,
+        "value": 0.7926165623419816
+      },
+      "completed_epochs": 60,
+      "drops": {
+        "jaccard": 0.06704188266196814,
+        "nll_drift": 0.3513287603855133,
+        "prauc": 0.07669167173925384
+      },
+      "epoch_60": {
+        "f1": 0.6339144073979329,
+        "jaccard": 0.4745105451628045,
+        "nll": 0.5537078380584717,
+        "prauc": 0.7159248906027278,
+        "train_bce": 0.06156638924617401,
+        "train_ddi": 0.12515576022694616,
+        "train_loss": 0.06782417725254905
+      },
+      "family": "dynamic-query",
+      "label": "DynamicQueryAdapter",
+      "source_revision": "5083cdba2e02067f949e8a6fe0c4dcf2f323748b",
+      "status": "complete",
+      "train_dynamics": {
+        "bce_decreasing_steps": 59,
+        "bce_epoch_1": 0.22051501293713807,
+        "bce_epoch_10": 0.1445031185837853,
+        "bce_epoch_20": 0.10811688251482973,
+        "bce_epoch_3": 0.1878304992555515,
+        "bce_epoch_60": 0.06156638924617401,
+        "bce_steps": 59,
+        "late_bce_slope_per_epoch_10_to_60": -0.001658734586752226,
+        "max_total_loss_increase": -0.0002525280139980268,
+        "total_loss_decreasing_steps": 59,
+        "total_loss_steps": 59
+      },
+      "updates_per_epoch": 656
+    }
+  ],
+  "data_contract": {
+    "batch_size": 16,
+    "epoch_3_updates": 1968,
+    "epoch_4_updates": 2624,
+    "epoch_60_updates": 39360,
+    "metrics": [
+      "train_loss",
+      "train_bce",
+      "train_ddi",
+      "dev_jaccard",
+      "dev_prauc",
+      "dev_nll",
+      "dev_f1"
+    ],
+    "train_visits": 10489,
+    "updates_per_epoch": 656
+  },
+  "evidence_class": "aggregate_progress_only",
+  "missing_or_not_used": [
+    "Raw logs, patient IDs, logits, targets, checkpoints, and private paths were not read or copied.",
+    "Baseline progress is summarized separately because its source logs use different evaluation semantics."
+  ],
+  "missing_progress": {
+    "v2_safe_pto": {
+      "family": "mica-v2",
+      "label": "SafePTO",
+      "reason": "public aggregate result exists, but no epoch-level progress artifact was available",
+      "source": "research/prototypes/mica-v2-screen/result.json"
+    }
+  },
+  "schema_version": 1,
+  "stage": "STAGE -1A",
+  "status": "complete",
+  "training_diagnosis": {
+    "all_family_peak_in_3_or_4": true,
+    "arms_with_material_train_drift": [],
+    "arms_with_overfit_pattern": [
+      "shared_pool",
+      "drug_query",
+      "mica_late",
+      "v2_core",
+      "fine_history",
+      "dual_evidence",
+      "self_only",
+      "set_context",
+      "safe_rank",
+      "dynamic_core",
+      "static_multiquery",
+      "global_dynamic_multiquery",
+      "evidence_dynamic_multiquery",
+      "static_query_adapter",
+      "dynamic_query_adapter"
+    ],
+    "classification": "OVERFIT_DOMINANT",
+    "interpretation": "Train BCE and total loss continue to fall while Dev metrics degrade after epoch 3-4; the shared recipe/encoder dynamics dominate the late failure. The evidence does not isolate DrugQuery, v2, or dynamic-query as the cause.",
+    "peak_epoch_counts": {
+      "3": 12,
+      "4": 3
+    },
+    "rule": {
+      "optimization_drift": "late train total loss has a material increase (threshold 0.001 per epoch)",
+      "overfit_dominant": "train BCE keeps decreasing while Dev NLL rises and Dev Jaccard/PRAUC fall",
+      "rapid_fit_late_memorization": "all arms peak at epoch 3 or 4 after rapid early fit"
+    }
+  }
+}
