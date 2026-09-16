@@ -497,6 +497,67 @@ def fit_vocab(
     }
 
 
+def audit_vocab_fit(
+    vocabs: Mapping[str, Mapping[str, int]],
+    visits_by_subject: Mapping[str, Sequence[Mapping[str, Any]]],
+    roles: Mapping[str, str],
+    dx_by_hadm: Mapping[str, set[str]],
+    proc_by_hadm: Mapping[str, set[str]],
+    meds_by_hadm: Mapping[str, set[str]],
+) -> dict[str, Any]:
+    """Prove that every fitted vocabulary token came from Train patients only."""
+
+    train_dx: set[str] = set()
+    train_proc: set[str] = set()
+    train_med: set[str] = set()
+    dev_dx: set[str] = set()
+    dev_proc: set[str] = set()
+    dev_med: set[str] = set()
+    for subject, visits in visits_by_subject.items():
+        role = roles[subject]
+        dx_target = train_dx if role == "train" else dev_dx if role == "dev" else None
+        proc_target = train_proc if role == "train" else dev_proc if role == "dev" else None
+        med_target = train_med if role == "train" else dev_med if role == "dev" else None
+        if dx_target is None or proc_target is None or med_target is None:
+            continue
+        for visit in visits:
+            hadm = visit["hadm_id"]
+            dx_target.update(dx_by_hadm.get(hadm, set()))
+            proc_target.update(proc_by_hadm.get(hadm, set()))
+            med_target.update(meds_by_hadm.get(hadm, set()))
+
+    fitted_dx = set(vocabs["diagnosis"]) - {"<UNK>"}
+    fitted_proc = set(vocabs["procedure"]) - {"<UNK>"}
+    fitted_med = set(vocabs["medication"])
+    return {
+        "pass": (
+            "<UNK>" in vocabs["diagnosis"]
+            and "<UNK>" in vocabs["procedure"]
+            and fitted_dx <= train_dx
+            and fitted_proc <= train_proc
+            and fitted_med <= train_med
+            and not (fitted_dx & dev_dx - train_dx)
+            and not (fitted_proc & dev_proc - train_proc)
+            and not (fitted_med & dev_med - train_med)
+        ),
+        "train_diagnosis_tokens": len(train_dx),
+        "train_procedure_tokens": len(train_proc),
+        "train_medication_tokens": len(train_med),
+        "dev_diagnosis_tokens": len(dev_dx),
+        "dev_procedure_tokens": len(dev_proc),
+        "dev_medication_tokens": len(dev_med),
+        "fitted_diagnosis_tokens": len(fitted_dx),
+        "fitted_procedure_tokens": len(fitted_proc),
+        "fitted_medication_tokens": len(fitted_med),
+    }
+
+
+def _project_code_tokens(tokens: Iterable[str], vocab: Mapping[str, int]) -> list[str]:
+    """Map input-side codes outside a Train vocabulary to the explicit UNK token."""
+
+    return sorted({token if token in vocab else "<UNK>" for token in tokens})
+
+
 def _history_entry(
     visit: Mapping[str, Any],
     dx_by_hadm: Mapping[str, set[str]],
@@ -543,9 +604,20 @@ def write_examples(
                     stats["visits_without_mapped_target"] += 1
                     history.append(_history_entry(visit, dx_by_hadm, proc_by_hadm, meds_by_hadm))
                     continue
-                current_dx = sorted(dx_by_hadm.get(hadm, set()))
-                current_proc = sorted(proc_by_hadm.get(hadm, set()))
-                history_copy = [dict(entry) for entry in history]
+                raw_current_dx = sorted(dx_by_hadm.get(hadm, set()))
+                raw_current_proc = sorted(proc_by_hadm.get(hadm, set()))
+                current_dx = _project_code_tokens(raw_current_dx, dx_vocab)
+                current_proc = _project_code_tokens(raw_current_proc, proc_vocab)
+                history_copy = []
+                for entry in history:
+                    projected_entry = dict(entry)
+                    projected_entry["diagnoses"] = _project_code_tokens(
+                        entry["diagnoses"], dx_vocab
+                    )
+                    projected_entry["procedures"] = _project_code_tokens(
+                        entry["procedures"], proc_vocab
+                    )
+                    history_copy.append(projected_entry)
                 known_target = sorted(token for token in target if token in med_vocab)
                 oov_target = sorted(token for token in target if token not in med_vocab)
                 example = {
@@ -577,13 +649,13 @@ def write_examples(
                     stats["examples_with_target_oov"] += 1
                 if not known_target:
                     stats["examples_all_target_oov"] += 1
-                input_dx = current_dx + [
-                    token for entry in history_copy for token in entry["diagnoses"]
+                input_dx = raw_current_dx + [
+                    token for entry in history for token in entry["diagnoses"]
                 ]
-                input_proc = current_proc + [
-                    token for entry in history_copy for token in entry["procedures"]
+                input_proc = raw_current_proc + [
+                    token for entry in history for token in entry["procedures"]
                 ]
-                input_hist_med = [token for entry in history_copy for token in entry["medications"]]
+                input_hist_med = [token for entry in history for token in entry["medications"]]
                 stats["dx_input_tokens"] += len(input_dx)
                 stats["dx_input_oov_tokens"] += sum(token not in dx_vocab for token in input_dx)
                 stats["proc_input_tokens"] += len(input_proc)
@@ -651,8 +723,32 @@ def audit_examples(path: Path) -> dict[str, Any]:
         "current_target_input_hits": current_target_input_hits,
         "current_hadm_history_hits": current_hadm_history_hits,
         "invalid_input_keys": invalid_input_keys,
+        "input_schema_pass": invalid_input_keys == 0,
         "strict_history_pass": current_hadm_history_hits == 0,
         "current_target_not_in_input_pass": current_target_input_hits == 0,
+    }
+
+
+def audit_visit_chronology(
+    visits_by_subject: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> dict[str, Any]:
+    """Recheck the frozen admission ordering without using medication data."""
+
+    subjects_checked = 0
+    visits_checked = 0
+    failures = 0
+    for _subject, visits in visits_by_subject.items():
+        subjects_checked += 1
+        visits_checked += len(visits)
+        keys = [_hadm_sort_key(str(v["admittime"]), str(v["hadm_id"])) for v in visits]
+        orders = [v["visit_order"] for v in visits]
+        if keys != sorted(keys) or orders != list(range(len(visits))):
+            failures += 1
+    return {
+        "subjects_checked": subjects_checked,
+        "visits_checked": visits_checked,
+        "failures": failures,
+        "pass": failures == 0,
     }
 
 
@@ -698,9 +794,12 @@ def load_ddi_projection(
         for right in range(left + 1, len(source_codes))
         if matrix[left, right] == 1
     }
+    source_supported_codes = {code for pair in source_pairs for code in pair}
     vocab_codes = set(medication_vocab)
     represented = sorted(set(source_codes) & vocab_codes)
+    represented_supported = sorted(source_supported_codes & vocab_codes)
     unmapped_endpoints = sorted(set(source_codes) - vocab_codes)
+    unmapped_supported_endpoints = sorted(source_supported_codes - vocab_codes)
     projected_pairs = sorted(
         pair for pair in source_pairs if pair[0] in vocab_codes and pair[1] in vocab_codes
     )
@@ -735,11 +834,18 @@ def load_ddi_projection(
             "source_ddi_pair_count": len(source_pairs),
             "source_supported_concept_count": len({x for pair in source_pairs for x in pair}),
             "projected_medication_vocab_size": len(medication_vocab),
-            "projected_supported_concept_count": len(represented),
+            "represented_source_concept_count": len(represented),
+            "projected_supported_concept_count": len(represented_supported),
             "projected_concept_coverage": (len(represented) / len(set(source_codes)))
             if source_codes
             else 0.0,
+            "projected_supported_concept_coverage": (
+                len(represented_supported) / len(source_supported_codes)
+                if source_supported_codes
+                else 0.0
+            ),
             "unmapped_source_endpoint_count": len(unmapped_endpoints),
+            "unmapped_supported_endpoint_count": len(unmapped_supported_endpoints),
             "projected_ddi_pair_count": len(projected_pairs),
             "unmapped_ddi_pair_count": len(source_pairs) - len(projected_pairs),
             "source_checks": {
@@ -787,6 +893,7 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
         source_meta[table_name] = inspect_table(mimic_hosp / f"{table_name}.csv.gz", required)
 
     visits, hadm_to_subject, roles = load_admissions(mimic_hosp / "admissions.csv.gz")
+    chronology_audit = audit_visit_chronology(visits)
     role_subjects = {
         role: sorted(subject for subject, value in roles.items() if value == role)
         for role in {"train", "dev", "test"}
@@ -870,6 +977,7 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
         )
 
     vocabs = fit_vocab(visits, roles, dx_by_hadm, proc_by_hadm, meds_by_hadm)
+    vocab_audit = audit_vocab_fit(vocabs, visits, roles, dx_by_hadm, proc_by_hadm, meds_by_hadm)
     (output_dir / "vocabularies.private.json").write_text(
         json.dumps(vocabs, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -1049,10 +1157,12 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
                 "medication_target": "Dev/Test target concepts absent from Train are reported OOV and never extend Train vocab",
                 "medication_history": "history concepts absent from Train target vocab map to an input-side unknown at model consumption",
             },
+            "fit_audit": vocab_audit,
         },
         "train": train_summary,
         "dev": dev_summary,
         "ddi": ddi,
+        "chronology_audit": chronology_audit,
         "private_artifacts": [
             artifact_meta(train_examples),
             artifact_meta(dev_examples),
@@ -1074,15 +1184,18 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
         "SOURCE_IDENTITY_PASS": True,
         "PATIENT_SPLIT_DISJOINT_PASS": len(set(roles.values())) == 3
         and sum(len(role_subjects[role]) for role in ("train", "dev", "test")) == len(roles),
-        "VISIT_CHRONOLOGY_PASS": True,
+        "VISIT_CHRONOLOGY_PASS": bool(chronology_audit["pass"]),
         "STRICT_HISTORY_PASS": bool(
             train_audit["strict_history_pass"] and dev_audit["strict_history_pass"]
+        ),
+        "INPUT_SCHEMA_PASS": bool(
+            train_audit["input_schema_pass"] and dev_audit["input_schema_pass"]
         ),
         "CURRENT_TARGET_NOT_IN_INPUT_PASS": bool(
             train_audit["current_target_not_in_input_pass"]
             and dev_audit["current_target_not_in_input_pass"]
         ),
-        "TRAIN_ONLY_VOCAB_FIT_PASS": True,
+        "TRAIN_ONLY_VOCAB_FIT_PASS": bool(vocab_audit["pass"]),
         "NORMALIZATION_DETERMINISM_PASS": bool(samples) and bool(determinism_digest.hexdigest()),
         "DDI_MATRIX_VALID_PASS": all(ddi["projection_checks"].values())
         and all(ddi["source_checks"].values()),
@@ -1107,9 +1220,13 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
         "DDI_PROJECTION_COVERAGE_REPORTED": {
             "status": "REPORTED",
             "concept_coverage": ddi["projected_concept_coverage"],
+            "supported_concept_coverage": ddi["projected_supported_concept_coverage"],
+            "source_supported_concepts": ddi["source_supported_concept_count"],
+            "projected_supported_concepts": ddi["projected_supported_concept_count"],
             "source_pairs": ddi["source_ddi_pair_count"],
             "projected_pairs": ddi["projected_ddi_pair_count"],
             "unmapped_endpoints": ddi["unmapped_source_endpoint_count"],
+            "unmapped_supported_endpoints": ddi["unmapped_supported_endpoint_count"],
         },
         "source_stats": {"diagnoses": dx_stats, "procedures": proc_stats},
         "test_targets_loaded": False,

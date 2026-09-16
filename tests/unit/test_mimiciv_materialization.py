@@ -30,6 +30,14 @@ def test_split_role_is_deterministic_and_complete() -> None:
     assert MODULE.split_role("10000032") == MODULE.split_role("10000032")
 
 
+def test_input_codes_use_explicit_train_vocab_unknown() -> None:
+    vocab = {"<UNK>": 0, "ICD9:4019": 1}
+    assert MODULE._project_code_tokens(["ICD9:4019", "ICD10:A001"], vocab) == [
+        "<UNK>",
+        "ICD9:4019",
+    ]
+
+
 def test_serialized_history_audit_rejects_current_visit_history(tmp_path: Path) -> None:
     path = tmp_path / "examples.jsonl"
     valid = {
