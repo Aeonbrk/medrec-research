@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "profile_id": "mimic-iii-canonical-131-paper-dev-v1",
+  "evidence_role": "DEVELOPMENT",
+  "profile_base_revision": "b51179113541677af8a31ef320027903d2a175f1",
+  "benchmark": {
+    "surface": "MIMIC-III canonical-131",
+    "source_snapshot_id": "molerec-table1-c721-www23",
+    "source_assets": {
+      "records_final.pkl": {
+        "bytes": 1483986,
+        "sha256": "87f9a778cf2d24f25cb981ea0a1f165147d367d556e78fa37a0ca3b3a9a9dff5"
+      },
+      "voc_final.pkl": {
+        "bytes": 63496,
+        "sha256": "7c69fa6faa2f5a354d76dd84e08b1895a4b90f624afb533f5e7c0db7da3fd535"
+      },
+      "ddi_A_final.pkl": {
+        "bytes": 137483,
+        "sha256": "100ce58bbceca4ab51b06d93ce3423cbee2f1093c6284d97b9c663a771849c8e"
+      }
+    },
+    "medication_identity": {
+      "level": "ATC4",
+      "count": 131,
+      "ordering": "source med_voc insertion order",
+      "canonical_sorted_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+      "vocabulary_source": "research/benchmarks/mimiciv-medrec-common131/vocabulary.json"
+    },
+    "ddi": {
+      "matrix_shape": [131, 131],
+      "undirected_pair_count": 448,
+      "supported_medication_count": 91,
+      "semantics": "finite binary symmetric zero-diagonal SafeDrug/MoleRec authority",
+      "alignment": "canonical medication row order"
+    }
+  },
+  "split": {
+    "unit": "patient",
+    "patient_count_total": 6350,
+    "algorithm": "Train is range(0, floor(2N/3)); Dev is i in range(floor(2N/3), N) with SHA256(idea008-gate01-v1:<i>) first 8 bytes / 2^64 < 0.5",
+    "train": {
+      "patients": 4233,
+      "visits": 10489,
+      "membership_digest": "43124aa2cf02e1f7780ee6dcc97e936dd412a836bad742d1423c57f7ad282f3c",
+      "target_tokens": 198856,
+      "target_cardinality_mean": 18.958527982,
+      "target_cardinality_median": 19.0,
+      "empty_target_visits": 0,
+      "target_array_sha256": "2322fbf97161448ce1cab22e23b21d0cdf16504d2c8c3ac4a8072af8b49269cd"
+    },
+    "dev": {
+      "patients": 1004,
+      "visits": 2130,
+      "membership_digest": "6377c372218ab566162d9d347f515e1590af0843f243f10c2f03b11d18d73215",
+      "target_tokens": 41951,
+      "target_cardinality_mean": 19.695305164,
+      "target_cardinality_median": 19.0,
+      "empty_target_visits": 0,
+      "target_array_sha256": "99441a3bf3e44119b747871e4aa9345f34e2ebeab27c9b6ea1ff2e4e93ee10bf"
+    },
+    "membership_digest_algorithm": "SHA256(concatenated decimal snapshot patient indices with one trailing newline)",
+    "test": {
+      "status": "SEALED",
+      "membership_loaded": false,
+      "targets_loaded": false,
+      "evaluation_run": false
+    }
+  },
+  "task": {
+    "granularity": "visit-level medication-set prediction",
+    "input": "current diagnosis and procedure sets plus strictly previous visits' diagnosis, procedure, and medication sets",
+    "history_cutoff": "j < t in chronological snapshot order",
+    "chronology_tie_break": "source admission order",
+    "first_visit": "eligible when mapped target is non-empty; history is empty",
+    "target": "deduplicated medication identity set from the current visit",
+    "current_target_in_input": false,
+    "future_information_in_input": false,
+    "empty_target_policy": "exclude recommendation example, retain chronology and history, report count",
+    "patient_without_eligible_visit": "exclude from patient-macro denominator and report count",
+    "diagnosis_and_procedure_vocabulary": "source Train-fitted IDs; no refit during Dev",
+    "medication_oov": "reject after the frozen source mapping; no UNK medication"
+  },
+  "evaluator": {
+    "implementation": "research/prototypes/paper_contract/evaluator.py",
+    "primary_metric": "patient_macro_jaccard",
+    "patient_macro": "average visit metrics within patient, then average patient means equally",
+    "set_edge_cases": {
+      "both_empty": 1.0,
+      "exactly_one_empty": 0.0
+    },
+    "prauc": {
+      "label": "average_precision",
+      "score": "one finite sigmoid medication score per declared coordinate",
+      "coordinate_space": "all 131 coordinates, including zero-support coordinates",
+      "tie_break": "canonical vocabulary order",
+      "empty_target": 0.0
+    },
+    "ddi": {
+      "aggregation": "pooled predicted unordered pairs",
+      "self_pairs": "excluded",
+      "duplicate_pairs": "count once",
+      "zero_denominator_rate": 0.0,
+      "zero_denominator_pair_count": 0
+    },
+    "reported_metrics": [
+      "jaccard",
+      "f1",
+      "prauc",
+      "ddi_rate",
+      "average_medication_count",
+      "target_average_medication_count",
+      "precision",
+      "recall",
+      "visit_macro",
+      "zero_support_coordinates"
+    ]
+  },
+  "selection": {
+    "maximum_training_budget": "60 complete Train epochs",
+    "validation_schedule": "evaluate complete Dev after every epoch",
+    "operating_points": [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95],
+    "native_default": 0.35,
+    "metric": "Dev patient-macro Jaccard",
+    "rule": "evaluate every operating point at every checkpoint, then select one checkpoint/operating-point pair jointly",
+    "tie_break": [
+      "operating point closest to native default",
+      "declared operating-point order",
+      "earlier checkpoint"
+    ],
+    "thresholds_frozen_before_repeated_runs": true
+  },
+  "mica_stability": {
+    "arms": ["SharedPool", "DrugQuery"],
+    "matched_seed_ids": [20260917, 20260918],
+    "historical_seed_not_relabelled": 20260914,
+    "recipe": {
+      "optimizer": "AdamW",
+      "learning_rate": 0.0001,
+      "weight_decay": 0.0001,
+      "batch_size_visits": 16,
+      "epochs": 60,
+      "gradient_clip": 5.0,
+      "loss": "BCE + 0.05 * normalized DDI penalty",
+      "numeric_policy": "float32; TF32 disabled; deterministic cuDNN"
+    }
+  },
+  "observed_train_dev_support": {
+    "train_zero_support_codes": ["P02C"],
+    "dev_zero_support_codes": ["A16A", "A11H", "J06B", "R02A", "V04C", "S01K", "P02C"],
+    "support_coordinates_remain_in_output_space": true
+  }
+}

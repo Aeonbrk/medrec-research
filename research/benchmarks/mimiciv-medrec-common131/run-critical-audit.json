@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "audit_id": "mimiciv-common131-run-critical-v1",
+  "authoritative_revision": "53765aa3c4ca5197bad38f768aea48c36ef48fa6",
+  "surface": "MIMIC-IV harmonized/common-131",
+  "run_critical_verdict": "READY_WITH_EXPLICIT_LIMITATION",
+  "paper_lineage_status": "UNKNOWN_PENDING_ASYNC_AUDIT",
+  "test_loaded": false,
+  "output_semantics": {
+    "coordinate_identity": "the 131 exact uppercase ATC4 codes in vocabulary.json, in frozen canonical order",
+    "code_semantics": "ATC4 identity after uppercase normalization; source native ATC4 field follows the documented [:4] projection where applicable",
+    "target_projection": "retain native target tokens whose normalized identity is in the canonical 131 list; deduplicate and order by canonical vocabulary",
+    "zero_support_coordinates": ["A11G", "G02C"],
+    "zero_support_policy": "retain coordinates in the 131 output space and AP/PRAUC; predicting one is a false positive",
+    "target_oov": "native target OOV is rejected before projection; dropped native-only coordinates are counted as projection loss",
+    "empty_projected_target": "exclude from recommendation examples, retain the underlying visit in chronology and history, report every exclusion",
+    "ddi_alignment": "canonical 131 medication row order with 448 undirected source pairs; no inferred pairs"
+  },
+  "input_semantics": {
+    "historical_medication_projection": "yes; native-only medication identities are removed from prior-visit medication history",
+    "native173_only_history_medications": "cannot appear in common131 history after projection",
+    "diagnosis_inputs": "unchanged from the native Train-fitted diagnosis vocabulary, including explicit unknown handling on Dev",
+    "procedure_inputs": "unchanged from the native Train-fitted procedure vocabulary, including explicit unknown handling on Dev",
+    "medication_graph_universe": "canonical 131 for the common surface; DDI rows follow canonical order",
+    "molecular_graph_universe": "canonical 131 medication rows; MoleRec/SafeDrug method-local BRICS columns remain distinct",
+    "train_only_statistics": "diagnosis/procedure serializers are Train-fitted; the canonical medication list and molecular/DDI assets are frozen source assets, not target-frequency fits"
+  },
+  "population_effects": {
+    "projection_changes_eligible_visits": true,
+    "projected_empty_visits_remain_in_history": true,
+    "train": {
+      "native_examples": 308824,
+      "common_examples": 308474,
+      "projected_empty_examples": 350,
+      "native_evaluated_patients": 149001,
+      "common_evaluated_patients": 130886,
+      "native_target_cardinality_mean": 14.595960816,
+      "common_target_cardinality_mean": 11.104253583
+    },
+    "dev": {
+      "native_examples": 76529,
+      "common_examples": 76443,
+      "projected_empty_examples": 86,
+      "native_evaluated_patients": 37076,
+      "common_evaluated_patients": 32656,
+      "native_target_cardinality_mean": 14.603575146,
+      "common_target_cardinality_mean": 11.111578643
+    },
+    "interpretation": "the common surface changes evaluated visit/patient membership and target cardinality, so differences are not attributable to output width alone"
+  },
+  "native_vs_common": {
+    "patients": "full split membership is inherited, but evaluated patients decrease when all projected targets for a patient are empty",
+    "visits": "recommendation examples decrease from 308824 to 308474 in Train and from 76529 to 76443 in Dev; chronology retains source visits",
+    "targets": "native 173-token targets are projected to canonical 131 and native-only tokens are dropped",
+    "history_inputs": "diagnoses/procedures are unchanged; historical medication sets are projected to canonical 131",
+    "target_cardinality": "mean falls from 14.595960816 to 11.104253583 in Train and from 14.603575146 to 11.111578643 in Dev",
+    "ddi_universe": "native surface uses a 173x173 projection with 443 pairs; common surface uses canonical 131x131 with 448 pairs and two explicit zero-support coordinates"
+  },
+  "evidence_paths": [
+    "manifest.json",
+    "semantic-audit.json",
+    "protocol.md",
+    "vocabulary.json",
+    "../mimiciv-medrec/manifest.json",
+    "../mimiciv-medrec/README.md"
+  ],
+  "limitations": [
+    "exact cohort/preprocessing identity with every named literature benchmark remains unresolved",
+    "common-131 and native-173 are target-space views of the same MIMIC-IV population, not independent datasets",
+    "this audit does not authorize Test loading or paper-candidate language"
+  ]
+}

@@ -14,6 +14,9 @@ sorted code set is
 is the public ordered medication list. `materialize_common131.py` is the
 restricted-plane materializer; it reads the frozen native MIMIC-IV JSONL and
 writes private projected rows, offsets, and an aggregate manifest outside Git.
+[`run-critical-audit.json`](run-critical-audit.json) records the explicit
+input, output, population, and native-versus-common differences required
+before a run uses this surface.
 
 Projection is exact uppercase ATC4 identity. Native-only codes are dropped
 from target and history; the two canonical codes without native support remain
@@ -30,3 +33,15 @@ mapping is introduced.
 The variant is Train/Dev-only for Stage -1G. It reuses the native patient split,
 visit chronology, current-target exclusion, and strict previous-visit history
 contract. It must never be populated with Test rows or targets.
+
+## Run-critical verdict
+
+The surface is `READY_WITH_EXPLICIT_LIMITATION`. The projection is exact and
+the DDI, molecular rows, zero-support coordinates, and empty-target policy are
+aligned, but projection changes the evaluated patient/visit set and target
+cardinality. Historical medication inputs are projected to 131 as well;
+native-173-only medications cannot remain in common-131 history. Diagnosis and
+procedure inputs stay on the native Train-fitted vocabularies. A comparison
+between common-131 and native-173 therefore cannot be described as an output
+width-only ablation or as two independent datasets. Exact identity with any
+named published MIMIC-IV cohort remains an asynchronous paper-lineage audit.
