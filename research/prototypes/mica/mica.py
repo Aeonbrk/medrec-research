@@ -113,15 +113,22 @@ class MICA(nn.Module):
     VARIANTS = ("shared_pool", "drug_query", "late")
 
     def __init__(
-        self, diagnosis_count: int, procedure_count: int, variant: str = "shared_pool"
+        self,
+        diagnosis_count: int,
+        procedure_count: int,
+        variant: str = "shared_pool",
+        medication_count: int = MEDICATIONS,
     ) -> None:
         super().__init__()
         if variant not in self.VARIANTS:
             raise ValueError("variant must be shared_pool, drug_query, or late")
+        if medication_count <= 0:
+            raise ValueError("medication_count must be positive")
         self.variant = variant
+        self.medication_count = int(medication_count)
         self.med_offset = diagnosis_count + procedure_count
         self.codes = nn.EmbeddingBag(
-            self.med_offset + MEDICATIONS, DIM, mode="mean", include_last_offset=True
+            self.med_offset + self.medication_count, DIM, mode="mean", include_last_offset=True
         )
         self.types = nn.Embedding(6, DIM)
         self.token_norm = nn.LayerNorm(DIM, eps=1e-5)
@@ -137,7 +144,7 @@ class MICA(nn.Module):
         self.head = nn.Sequential(
             nn.Linear(3 * DIM, DIM), nn.GELU(), nn.Dropout(0.1), nn.Linear(DIM, 1)
         )
-        self.drug_bias = nn.Parameter(torch.zeros(MEDICATIONS))
+        self.drug_bias = nn.Parameter(torch.zeros(self.medication_count))
         self.register_buffer(
             "lag_frequency", torch.exp(torch.arange(0, DIM, 2) * (-math.log(10000.0) / DIM))
         )
@@ -222,11 +229,11 @@ class MICA(nn.Module):
             shared_query = torch.nn.functional.normalize(drugs.mean(dim=0), dim=-1)
             shared_context = self.read_shared(assembled, shared_query, mask)
             context = self.condition_context(
-                shared_context[:, None, :].expand(-1, MEDICATIONS, -1), drugs
+                shared_context[:, None, :].expand(-1, self.medication_count, -1), drugs
             )
         elif self.variant == "drug_query":
             contexts = []
-            for start in range(0, MEDICATIONS, CHUNK):
+            for start in range(0, self.medication_count, CHUNK):
                 selected = drugs[start : start + CHUNK]
                 expanded = assembled[:, None].expand(-1, selected.shape[0], -1, -1)
                 pooled = self.read(expanded, selected, mask)
@@ -234,7 +241,7 @@ class MICA(nn.Module):
             context = torch.cat(contexts, dim=1)
         else:
             contexts = []
-            for start in range(0, MEDICATIONS, CHUNK):
+            for start in range(0, self.medication_count, CHUNK):
                 selected = drugs[start : start + CHUNK]
                 context = self.read(self.condition(assembled, selected), selected, mask)
                 contexts.append(context)
@@ -245,14 +252,19 @@ class MICA(nn.Module):
 
 
 def objective(
-    logits: torch.Tensor, targets: torch.Tensor, ddi: torch.Tensor
+    logits: torch.Tensor,
+    targets: torch.Tensor,
+    ddi: torch.Tensor,
+    medication_count: int = MEDICATIONS,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    if medication_count <= 0 or logits.shape[-1] != medication_count:
+        raise ValueError("medication_count must match the logits medication dimension")
     bce = nn.functional.binary_cross_entropy_with_logits(logits, targets)
     probabilities = logits.sigmoid()
     ddi_loss = (
         torch.einsum(
             "bi,ij,bj->b", probabilities, torch.triu(ddi, diagonal=1), probabilities
         ).mean()
-        / MEDICATIONS
+        / medication_count
     )
     return bce + 0.05 * ddi_loss, bce, ddi_loss
