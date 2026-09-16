@@ -20,10 +20,13 @@ contract.
 
 ## SCIENTIFIC_CORE
 
-MoleRec embeds the current diagnosis and procedure sets, summarizes each
-modality per visit, and uses two GRUs to form a longitudinal patient
-representation. In parallel, a global molecular GNN and a substructure
-representation (embedding-table or GNN version) are combined with a learned
+MoleRec embeds the diagnosis and procedure sets supplied in each visit and
+uses two GRUs to form a longitudinal patient representation. The pinned
+`MoleRecModel.forward` reads only those two channels; the medication list in a
+source-shaped admission is used by the training loop as the current target and
+is not consumed as a patient feature. In parallel, a global molecular GNN and a
+substructure
+  GNN substructure representation is combined with a learned
 patient-conditioned substructure relation. An adjacency-aware attention
 aggregator produces one representation per medication, followed by a scalar
 medication score. The official forward path is implemented in
@@ -53,11 +56,12 @@ medication score. The official forward path is implemented in
   [`research/benchmarks/mimiciii-medrec/profile.json`](../../research/benchmarks/mimiciii-medrec/profile.json).
 - Vocabulary: the source `med_voc` order, 131 ATC4 coordinates; DDI is the
   aligned `131 × 131` binary symmetric matrix with 448 unordered pairs.
-- Input budget: current diagnosis/procedure sets and strictly previous
-  diagnosis/procedure/medication visits. Current medications are targets only;
-  they are not passed to the forward path.
-- History: source admission order is chronological; a previous visit's
-  observed medications may enter the next visit's prefix.
+- Input budget: current diagnosis/procedure sets plus the source-shaped
+  chronological prefix. The released forward path consumes diagnosis and
+  procedure channels only; medication history is retained for source
+  compatibility but is not consumed by this pinned model.
+- History: source admission order is chronological; current medications are
+  labels only and are never passed as forward features.
 - Output: a medication set over all 131 coordinates, with continuous scores
   retained for the paper evaluator.
 - Evidence role: `DEVELOPMENT`; no Test rows, targets, or Test-derived choice.
@@ -67,6 +71,9 @@ medication score. The official forward path is implemented in
 - Mechanical: isolate the pinned source, bind the canonical snapshot assets,
   preserve the molecular/substructure assets, and translate outputs to the
   paper evaluator's full-vocabulary score schema.
+- The current-profile entrypoint is
+  [`baselines/molerec_profile.py`](../molerec_profile.py); it imports the pinned
+  source model and keeps the released per-visit optimizer update path intact.
 - Benchmark-specific: use the frozen canonical-131 Train/Dev patient split,
   complete-Dev patient-macro selection, and the declared global operating-point
   set. These choices do not claim to reproduce the paper's source split.
@@ -98,9 +105,10 @@ medication score. The official forward path is implemented in
 
 ## DEVELOPMENT_ENTITLEMENT
 
-- Candidate configurations are declared before screening: source-faithful
-  MoleRec embedding-table path at the frozen paper-profile training budget;
-  no broad learning-rate, molecular-asset, or decoder sweep.
+- Candidate configuration is declared before screening: the released default
+  MoleRec GNN path at its source training budget; no embedding-table variant,
+  broad learning-rate, molecular-asset, or decoder sweep is authorized in this
+  lane.
 - Screening seeds: the current paper profile may use its declared development
   seeds only; historical seeds are not relabeled.
 - Selection: choose checkpoint and global operating point jointly by Dev
