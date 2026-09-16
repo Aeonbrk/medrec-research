@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "stage": "STAGE -1G",
+  "cleanup_base_revision": "d33909b178356613e9eb75a57c9dba8efafc0940",
+  "remote_scope": "Stage -1G execution roots and explicitly identified scratch objects only",
+  "relevant_execution_roots": {
+    "before_bytes": 1196513918,
+    "after_bytes": 899916607,
+    "reclaimed_bytes": 296597311,
+    "common131_benchmark_preserved": true
+  },
+  "additional_exact_scratch": {
+    "bytes_removed": 288868,
+    "logs_compressed": 2,
+    "compressed_log_bytes_saved": 6512
+  },
+  "jobs": {
+    "current_common131_lanes_confirmed_stopped": 4,
+    "previous_native173_lanes_confirmed_stopped": 3,
+    "bootstrap_watchers_confirmed_stopped": 1,
+    "natural_completions_among_stopped_lanes": 0,
+    "residual_stage1g_processes_after_cleanup": 0
+  },
+  "compaction": {
+    "invalidated_run_records": 7,
+    "terminal_result_json_preserved": 8,
+    "selected_checkpoints_removed": 11,
+    "prediction_array_sets_removed": 11,
+    "run_directories_removed": 12,
+    "temporary_source_checkouts_removed": 1,
+    "temporary_script_directory_removed": 1,
+    "bootstrap_scratch_removed": 1
+  },
+  "privacy": {
+    "patient_ids_committed": false,
+    "predictions_committed": false,
+    "model_weights_committed": false,
+    "private_runtime_paths_committed": false,
+    "test_loaded": false
+  }
+}

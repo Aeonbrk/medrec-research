@@ -1,6 +1,17 @@
 # Stage -1G — Competitive substrate calibration
 
-Status: `COMMON131_FROZEN_PRIMARY; NATIVE173_LANES_PRESERVED_SECONDARY; EXECUTION_IN_PROGRESS`
+Status: `COMMON131_PRESERVED; EXTERNAL_MIV_LANES_INVALIDATED; EXECUTION_STOPPED_FOR_INDEPENDENT_REVIEW`
+
+## Current cleanup boundary — 2026-09-16
+
+The common-131 benchmark materialization, qualification record, G0 evidence,
+and completed MICA/MIMIC-III aggregate evidence remain preserved. The
+incomplete MIMIC-IV external lanes and the prior native-173 diagnostic lanes
+were stopped before terminal comparison and are not primary comparison rows.
+Their public-safe stop and invalidation records are in
+[`cleanup-invalidation.json`](cleanup-invalidation.json). Stage -1G has no
+substrate verdict. An independent fidelity review is required before any new
+experiment or continuation.
 
 ## 2026-09-16 protocol amendment — comparability-driven common131 primary
 

@@ -158,7 +158,7 @@
   "supplementary_families": ["RETAIN", "SafeDrug"],
   "coverage_verdict": "THREE_PAIRED_FAMILIES; TWO_RECENT_OR_MOLECULAR_LINEAGES_PLUS_ESTABLISHED_GRAPH_CONTROL",
   "native_173_jobs": {
-    "status": "preserved_secondary_diagnostic",
+    "status": "stopped_preserved_secondary_diagnostic",
     "new_lanes_after_correction": false,
     "existing_families": ["ARMR", "GAMENet", "RETAIN"]
   }

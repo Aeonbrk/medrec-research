@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "stage": "STAGE -1G",
+  "authoritative_revision": "53765aa3c4ca5197bad38f768aea48c36ef48fa6",
+  "status": "EXECUTION_STOPPED_FOR_INDEPENDENT_FIDELITY_REVIEW",
+  "evidence_scope": {
+    "roles": ["Train", "Dev"],
+    "test_loaded": false,
+    "primary_comparison_rows_admitted": false
+  },
+  "current_common131_runs": [
+    {
+      "baseline": "ARMR",
+      "dataset": "MIMIC-IV",
+      "surface": "common131",
+      "status": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "source_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
+      "runner_revision": "3f44ec9dfbb66730db74f32b9d69e3bab1b596cae037b401941dbbda091e4785",
+      "completed_epoch_or_update": "10/14",
+      "best_or_last_dev_metrics": {
+        "jaccard": 0.43168325256724294,
+        "f1": 0.5814691841794205,
+        "prauc": 0.7407960619153993,
+        "ddi_rate": 0.07963769800754122,
+        "mean_medication_count": 21.510511099773687,
+        "nll": 0.19741716980934143
+      },
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as execution diagnostics, not a primary comparison row.",
+      "test_loaded": false
+    },
+    {
+      "baseline": "MoleRec",
+      "dataset": "MIMIC-IV",
+      "surface": "common131",
+      "status": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+      "runner_revision": "d5d10f75f9025cb8ee07644082e4a05c4fc81d258ef0cc8950f12b07aa381242",
+      "completed_epoch_or_update": "21/50",
+      "best_or_last_dev_metrics": {
+        "jaccard": 0.4863675352325621,
+        "f1": 0.6373412857489228,
+        "prauc": 0.7339668597160278,
+        "ddi_rate": 0.10283256555068318,
+        "mean_medication_count": 12.928691966563322,
+        "nll": 0.1764860302209854
+      },
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as execution diagnostics, not a primary comparison row.",
+      "test_loaded": false
+    },
+    {
+      "baseline": "GAMENet",
+      "dataset": "MIMIC-IV",
+      "surface": "common131",
+      "status": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "source_revision": "da695b4fc9390882f3a681c82115e81291ae6380",
+      "runner_revision": "3f44ec9dfbb66730db74f32b9d69e3bab1b596cae037b401941dbbda091e4785",
+      "completed_epoch_or_update": "21/40",
+      "best_or_last_dev_metrics": {
+        "jaccard": 0.48713073913986665,
+        "f1": 0.6367441461979985,
+        "prauc": 0.7341032870350264,
+        "ddi_rate": 0.12432324796909436,
+        "mean_medication_count": 10.446711929149824,
+        "nll": 0.14430008828639984
+      },
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as execution diagnostics, not a primary comparison row.",
+      "test_loaded": false
+    },
+    {
+      "baseline": "RETAIN",
+      "dataset": "MIMIC-IV",
+      "surface": "common131",
+      "status": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "runner_revision": "3f44ec9dfbb66730db74f32b9d69e3bab1b596cae037b401941dbbda091e4785",
+      "completed_epoch_or_update": "8/40",
+      "best_or_last_dev_metrics": {
+        "jaccard": 0.45356488446309495,
+        "f1": 0.6060300222529125,
+        "prauc": 0.6971251810846262,
+        "ddi_rate": 0.13391243447255072,
+        "mean_medication_count": 11.625210941485813,
+        "nll": 0.15211009979248047
+      },
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as supplementary execution diagnostics.",
+      "test_loaded": false
+    }
+  ],
+  "previous_native173_diagnostics": [
+    {
+      "baseline": "ARMR",
+      "dataset": "MIMIC-IV",
+      "surface": "native173",
+      "status": "INVALIDATED_NATIVE173_DIAGNOSTIC",
+      "source_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "test_loaded": false
+    },
+    {
+      "baseline": "GAMENet",
+      "dataset": "MIMIC-IV",
+      "surface": "native173",
+      "status": "INVALIDATED_NATIVE173_DIAGNOSTIC",
+      "source_revision": "da695b4fc9390882f3a681c82115e81291ae6380",
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "test_loaded": false
+    },
+    {
+      "baseline": "RETAIN",
+      "dataset": "MIMIC-IV",
+      "surface": "native173",
+      "status": "INVALIDATED_NATIVE173_DIAGNOSTIC",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "natural_complete": false,
+      "termination": "SIGTERM",
+      "test_loaded": false
+    }
+  ]
+}

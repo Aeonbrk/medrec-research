@@ -10,13 +10,16 @@ Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
 Current phase: STAGE -1G — COMPETITIVE SUBSTRATE CALIBRATION
-Stage -1G status: DESIGNED_NOT_EXECUTED
+Stage -1G status: EXECUTION_PAUSED_AFTER_INVALIDATED_EXTERNAL_LANES
 Paper claim: none
 Held-out evaluation: untouched for current architecture search
 Knowledge-home migration review: PASS
 ```
 
-Stage -1F established a reusable cross-dataset MICA mechanism. Stage -1G is now authorized to resolve the remaining external-comparison weakness before any Stage 0 RSM implementation.
+Stage -1F established a reusable cross-dataset MICA mechanism. Stage -1G
+common-131 materialization and qualification evidence are preserved, but the
+incomplete MIMIC-IV external lanes were stopped before terminal comparison.
+There is no Stage -1G substrate verdict.
 
 ## Validated substrate
 
@@ -131,6 +134,20 @@ Direct Partial Regimen Assignment / RSM remains the leading bounded architecture
 
 The candidate remains scientifically interesting because it changes the final decision from independent medication membership to direct medication-or-NULL partial set assignment over medication-specific evidence proposals. Its value should not be tested until the substrate is shown to be externally competitive.
 
+## Stage -1G cleanup disposition
+
+- `research/benchmarks/mimiciv-medrec-common131/` remains a preserved
+  harmonized Train/Dev development surface; it is not an official universal
+  MIMIC-IV benchmark.
+- Valid Stage -1F MICA evidence, G0 equivalence evidence, common-131
+  materialization, qualification, and completed MIMIC-III aggregates remain
+  authoritative for what they actually record.
+- Incomplete MIMIC-IV ARMR, MoleRec, GAMENet, and RETAIN lanes, plus prior
+  native-173 diagnostic lanes, are recorded as invalidated diagnostics in
+  `research/prototypes/mica-competitive-substrate-calibration/cleanup-invalidation.json`.
+- No external baseline is admitted as a primary paper comparison row and no
+  substrate verdict has been issued.
+
 ## Evaluation boundaries
 
 - Stage -1G is Train/Dev and one seed per baseline arm unless a run explicitly states otherwise.
@@ -146,6 +163,6 @@ The migration at `3c420eb0d810c10f629f575495a767aef5698436` passed independent a
 
 ## Next scientific action
 
-Execute Stage -1G exactly as frozen in `research/prototypes/mica-competitive-substrate-calibration/protocol.md`.
-
-Start with the no-training equivalence audit and baseline qualification. If both pass, freeze the three paired baseline families and launch the six Train/Dev lanes across the available GPUs. Do not read Test, implement RSM, create Idea 009, open a Gate, or broaden into a final-paper benchmark automatically.
+Independent cleanup/fidelity review is required before any new experiment.
+Do not resume Stage -1G lanes, read Test, implement RSM, create Idea 009,
+open a Gate, or broaden into a final-paper benchmark without that review.
