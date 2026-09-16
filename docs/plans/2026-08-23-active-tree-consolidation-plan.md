@@ -6,7 +6,7 @@ status: completed
 execution: local
 ---
 
-# Active Tree Consolidation
+# Active tree consolidation
 
 ## Goal
 

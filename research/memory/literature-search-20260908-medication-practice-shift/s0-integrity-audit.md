@@ -1,4 +1,4 @@
-# S0 Integrity Audit
+# S0 integrity audit
 
 ## Verdict: `INTEGRITY_AUDIT_PASS`
 

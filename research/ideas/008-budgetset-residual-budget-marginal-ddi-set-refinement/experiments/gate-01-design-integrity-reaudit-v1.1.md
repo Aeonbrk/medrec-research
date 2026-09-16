@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Re-audit — Idea 008 Protocol v1.1
+# Gate 01 design integrity re-audit: Idea 008 protocol v1.1
 
 ## Audit status
 
@@ -23,7 +23,7 @@ This re-audit asks only whether protocol v1.1 is scientifically identity-preserv
 
 The correction commit `30c8ae539f04b1c3ab4b772149e87a76b3833c8a -> d248da5e410cfd739ac398f7ddfb1d4db1163aa5` changes only five protocol/state documentation files. It does not change code, data, backbone assets, baseline registry, training outputs, or quarantined material. The scientific backbone, candidate pool, cardinality rule, initialization, `T=2`, budgets, objective, LR/eta grid, gamma, seeds, killer roles, fixed-lambda support, primary utility, practical margins, bootstrap count/seed, PASS standard, and quarantine remain unchanged.
 
-## B1 — Residual scientific identity
+## B1: Residual scientific identity
 
 `PASS`.
 
@@ -41,13 +41,13 @@ $$
 
 The learned utility heads refine rather than replace the frozen backbone scorer. BudgetSet-vs-Independent therefore continues to isolate composition-dependent current-set feedback rather than entitlement to learn a replacement recommendation utility model.
 
-## B2 — MoleRec representation
+## B2: MoleRec representation
 
 `PASS`.
 
 Protocol v1.1 uniquely freezes `e_i(x)` to the candidate row of `molecule_embeddings` immediately before `self.score_extractor` in pinned `yangnianzu0515/MoleRec@dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`. The pinned forward constructs `molecule_embeddings` through patient-derived `substruct_weight`, so the representation is patient/visit-conditioned. The same frozen no-gradient forward supplies both `s_i(x)` and `e_i(x)`, and no alternate internal tensor is allowed. Repository Comparison inference uses the same pinned model in evaluation mode with `torch.no_grad()`.
 
-## B3 — Gate01-Dev / Gate01-Audit split
+## B3: Gate01-Dev / Gate01-Audit split
 
 `PASS`.
 
@@ -69,7 +69,7 @@ Audit iff u >= 0.5
 
 All visits from one patient inherit one assignment. No label, outcome, DDI value, prediction, or model result enters the split. Audit data remain unopened.
 
-## B4 — Low-cardinality execution
+## B4: Low-cardinality execution
 
 `PASS`.
 
@@ -82,7 +82,7 @@ K_x = 1 -> highest frozen s_i, canonical medication-order tie-break
 
 Both have zero hard DDI and zero budget violation and bypass pair-budget Greedy logic. Other score-producing methods retain exact `TopK_{K_x}` semantics; protocol-wide `R_DDI`, relaxed pair risk, and marginal DDI are zero for `K_x < 2`, so no low-cardinality mathematical branch remains undefined.
 
-## B5 — Checkpoint, patience, and configuration selection
+## B5: Checkpoint, patience, and configuration selection
 
 `PASS`.
 
@@ -90,7 +90,7 @@ Each `family × configuration × seed` trains independently and receives one Dev
 
 Configuration selection then aggregates only the three retained seed checkpoints, applies the frozen aggregate Dev criterion, and uniquely breaks remaining ties by smaller learning rate then smaller `eta`. Audit cannot select epoch, seed, configuration, or hyperparameter.
 
-## B6 — Aggregation, frontier, bootstrap, and seed semantics
+## B6: Aggregation, frontier, bootstrap, and seed semantics
 
 `FAIL` due to one remaining execution-blocking empty-frontier ambiguity.
 
@@ -106,7 +106,7 @@ The following v1.1 corrections are otherwise sufficient and pass re-audit:
 - bootstrap resamples patients with multiplicity, includes all visits, recomputes operating points and the control frontier inside every replicate, and never bootstraps a precomputed scalar gap;
 - favorable seed uses a sign-only rule rather than a second `0.005` materiality threshold when its frontier comparator exists.
 
-### Remaining blocker — favorable seed is undefined when the eligible control frontier is empty
+### Remaining blocker: favorable seed is undefined when the eligible control frontier is empty
 
 Section 11 explicitly supports the reachable case in which no control operating point satisfies
 
@@ -130,7 +130,7 @@ This is not an exotic corner case: the protocol itself explicitly authorizes and
 
 **Minimum correction**: extend Section 12.2 with one explicit sign-only seed-level comparator for the empty-eligible-frontier case, for both deterministic controls and matched Independent seeds. The correction must specify the comparator and any tie-break needed to choose it, then define favorable deterministically without changing the aggregate material-frontier rule or introducing a new `0.005` seed threshold. No other B6 statistic or scientific choice needs to change.
 
-## B7 — Terminal precedence
+## B7: Terminal precedence
 
 `PASS`.
 
@@ -159,7 +159,7 @@ B2 representation: PASS
 B3 split: PASS
 B4 low-cardinality execution: PASS
 B5 learned selection: PASS
-B6 aggregation/statistics/seeds: FAIL — one empty-frontier favorable-seed blocker
+B6 aggregation/statistics/seeds: FAIL: one empty-frontier favorable-seed blocker
 B7 terminal precedence: PASS
 
 Scientific identity preserved: YES

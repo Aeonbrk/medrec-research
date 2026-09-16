@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Memory — Strict Drug-Changing Pair/Context Incremental Value
+# Failure memory: strict drug-changing pair/context incremental value
 
 ## Failure class
 

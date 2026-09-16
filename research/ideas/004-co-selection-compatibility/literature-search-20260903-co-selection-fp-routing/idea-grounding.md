@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Grounding — Frequency-Corrected Co-Selection Compatibility
+# Idea Grounding: Frequency-Corrected Co-Selection compatibility
 
 ## Source-supported observations
 

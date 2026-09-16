@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: Co-Selection Compatibility (Gate 01 no incremental co-selection compatibility)
+# Failure record: co-selection compatibility (Gate 01 no incremental co-selection compatibility)
 
 Source boundary: `medrec-research` Idea `004-co-selection-compatibility`, Gate 01 formal run `gate-01-co-selection-compatibility-20260903-154343` on `319-lab` at frozen harness commit `8640ce521a942bd34daa2a5547c2e2db1febca6a`. The independent integrity audit concluded `INTEGRITY_PASS`; the authoritative research decision is `STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY` / `TERMINATE_IDEA_004`.
 

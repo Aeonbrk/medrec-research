@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: EGSF selector
+# Failure record: EGSF selector
 
 Source boundary: `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. Every archive path in this record refers to that revision.
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 — Prescription-Relative Confidence
+# Gate 01: Prescription-Relative confidence
 
 ## Mode
 
@@ -18,7 +18,7 @@ This is a validation-only falsification gate. It is not a publication experiment
 
 ---
 
-## 1. Scientific state entering Gate 01
+## 1. Scientific state entering gate 01
 
 Idea 001 is closed at authoritative commit `194daf4580ca7dfe80497ccfdce89ffcee95f46f` with `TERMINATE_CURRENT_TENSION_ROUTE`.
 Idea 002 is closed at authoritative commit `2afeb34452f79ceba1e883914f5792402f3ff145` (memory: `4f1618c48e35d030038981083068b4af7f933e47`, closure correction: `e368bf2221538e0c0a0fc07b6133dfb84a4998ee`) with `STOP_NO_INCREMENTAL_SCORE_GEOMETRY`.
@@ -104,7 +104,7 @@ This is inference only; MoleRec is never retrained.
 
 ---
 
-## 5. Exact new observable: Prescription-Relative Confidence
+## 5. Exact new observable: Prescription-Relative confidence
 
 Let $n_t = |\hat{M}_t|$ be the number of medications in the predicted prescription at visit $t$.
 Because candidate $m \in \mathcal{Q}_t$ requires $d_t(m) > 0$, there is at least one active DDI pair in $\hat{M}_t$, guaranteeing $n_t \ge 2$.

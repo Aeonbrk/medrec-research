@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Grounding — Safety by Substitution, Not Suppression
+# Idea Grounding: Safety by Substitution, not suppression
 
 ## Problem
 
@@ -22,7 +22,7 @@ $$
 
 The method is not yet authorized because the current data may not expose enough alternative-choice structure at ATC-3.
 
-## Why Gate 01 comes first
+## Why gate 01 comes first
 
 The proposed mechanism predicts an output phenotype before any method is built: score mass can be split across sibling choices, or multiple sibling choices can be emitted where the observed prescription contains one.
 

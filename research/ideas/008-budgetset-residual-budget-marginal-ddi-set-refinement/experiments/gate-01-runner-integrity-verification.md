@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Runner Integrity Verification — Idea 008
+# Gate 01 runner integrity verification: Idea 008
 
 ## Verification status
 
@@ -47,7 +47,7 @@ The runner preserves:
 
 No protocol-identity regression was found.
 
-## R1 — Device execution path
+## R1: Device execution path
 
 `FAIL`.
 
@@ -57,7 +57,7 @@ This is reachable through the supported execution surface because the frozen Mol
 
 Required bounded correction: make one component own device placement consistently for scores, embeddings, budgets, DDI, targets, `K_x`, and Independent static summaries before model execution. Do not change model semantics.
 
-## R2 — Learned selection closure
+## R2: Learned selection closure
 
 `FAIL`.
 

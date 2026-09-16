@@ -1,4 +1,4 @@
-# MedRec Research Agent Instructions
+# MedRec research agent instructions
 
 ## Research objective
 
@@ -33,8 +33,8 @@ Architecture-first means changing what is modeled when the evidence calls for it
 What capability, object, interaction, information flow, inductive bias,
 or decision process is changed?
 
-What matched strong control can test whether that change—not merely
-extra capacity or optimization budget—causes any gain?
+What matched strong control can test whether that change, not merely
+extra capacity or optimization budget, causes any gain?
 ```
 
 If the current backbone did not exist, periodically ask how the task would be formulated from scratch.

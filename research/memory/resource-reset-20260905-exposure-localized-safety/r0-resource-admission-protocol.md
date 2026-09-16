@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# R0 — Exposure Resource & Premise Admission Protocol
+# R0: Exposure resource & premise admission protocol
 
 ## Status
 

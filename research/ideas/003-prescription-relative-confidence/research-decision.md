@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Decision: Idea 003 (Prescription-Relative Confidence)
+# Research decision: Idea 003 (prescription-relative confidence)
 
 - **Idea**: `003-prescription-relative-confidence`
 - **Gate**: `gate-01-prescription-relative-confidence`
@@ -13,7 +13,7 @@
 
 ---
 
-## 1. Executive Summary
+## 1. Executive summary
 
 Idea 003 hypothesized that within-prescription relative confidence rank $r_t(m)$ contains reproducible incremental false-positive routing signal for DDI-active medications beyond a strong simple control model built from absolute medication score $s_t(m)$, predicted prescription size $n_t$, and train-only medication prevalence $p_{train}(m)$.
 
@@ -31,11 +31,11 @@ The research decision is to terminate Idea 003 at Gate 01.
 
 ---
 
-## 2. Quantitative Evidence Summary
+## 2. Quantitative evidence summary
 
 All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`) from restricted candidate records on 319:
 
-### Policy Yields on Audit Cohort ($N_{Audit} = 7,740$)
+### Policy yields on audit cohort ($N_{Audit} = 7,740$)
 
 | Policy / Selector | 10% Budget ($k=774$) | 20% Budget ($k=1,548$) | 30% Budget ($k=2,322$) |
 | :--- | :---: | :---: | :---: |
@@ -45,7 +45,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 | `RankAugmented` ($u, c, f, u \cdot c, u \cdot f, r$) | 57.24% | 56.91% | 55.00% |
 | Retrospective `Oracle` | 100.0% | 100.0% | 100.0% |
 
-### Paired Differences and Patient-Clustered Bootstrap 95% CIs (1,000 replicates)
+### Paired differences and Patient-Clustered bootstrap 95% CIs (1,000 replicates)
 
 | Comparison | 10% Budget Point Est | 10% Budget 95% CI | 20% Budget Point Est | 20% Budget 95% CI |
 | :--- | :---: | :---: | :---: | :---: |
@@ -55,7 +55,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ---
 
-## 3. Failure Diagnosis
+## 3. Failure diagnosis
 
 1. **The preregistered relative-rank feature did not generalize incrementally**: Although within-prescription relative rank $r_t(m)$ received a positive coefficient on Dev ($\beta_r = +0.2223$), its addition produced negative point gaps on held-out Audit ($-0.26\%$ at both primary budgets) with confidence intervals crossing zero.
 2. **The Gate does not identify a universal explanation for that failure**: The evidence supports the narrower conclusion that the frozen `RankAugmented` construction did not improve routing beyond the frozen `StrongControl`. It does not establish that the control absorbs all possible single-visit predictive information, nor does it distinguish definitively among redundancy, estimator mismatch, weak signal, or absence of signal as causal explanations.
@@ -63,7 +63,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ---
 
-## 4. Closure & Scope Boundaries
+## 4. Closure & scope boundaries
 
 - Idea 003 is formally **CLOSED** at Gate 01.
 - No Gate 02 will be designed or executed for Idea 003.
@@ -73,7 +73,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ---
 
-## 5. Post-Idea-003 Research Selection
+## 5. Post-Idea-003 research selection
 
 Synthesizing the scoped findings across Ideas 001, 002, and 003:
 

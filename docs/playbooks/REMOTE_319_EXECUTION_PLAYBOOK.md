@@ -1,16 +1,16 @@
-# Remote 319 Execution Playbook
+# Remote 319 execution playbook
 
 The MacBook Air is the harness terminal. The 319 remote host is the execution plane for real EHR data, training, GPU inference, and external baseline Conda environments. A local synthetic run verifies software and protocol wiring; it is not experimental evidence.
 
 ## Current snapshot (2026-08-31)
 
-**SSH Connection**: ⚠️ Primary `319-lab` failed its preflight; approved fallback `319-lab-via-server` authenticated and was used for read-only checks and additive recovery work  
-**GPU Status**: ✅ 8× NVIDIA GeForce RTX 3090 (24 GiB each); resident external GPU processes are permitted when current utilization is at most 10% and the run's free-memory threshold passes
-**Disk**: ✅ `/root/zhb` filesystem had >2.5 TiB free capacity during the recovery preflight  
-**Repository**: ✅ `/root/zhb/medrec-research` remains a clean checkout at `a09fcab8c3760a5caa14ec3ab475ddf4152a3665`; the additive recovery worktree did not alter it  
-**Data Root**: ✅ `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured outside the checkout  
-**Conda Environment**: ✅ `medrec-molerec-table1` exists with the declared Python 3.8.16 runtime and was used for program-native recovery validation  
-**Reproduction Program**: ✅ SafeDrug archived and MoleRec program façades validated the seven recovery lanes without training or testing hooks
+**SSH Connection**: Primary `319-lab` failed its preflight; approved fallback `319-lab-via-server` authenticated and was used for read-only checks and additive recovery work  
+**GPU Status**: 8× NVIDIA GeForce RTX 3090 (24 GiB each); resident external GPU processes are permitted when current utilization is at most 10% and the run's free-memory threshold passes
+**Disk**: `/root/zhb` filesystem had >2.5 TiB free capacity during the recovery preflight  
+**Repository**: `/root/zhb/medrec-research` remains a clean checkout at `a09fcab8c3760a5caa14ec3ab475ddf4152a3665`; the additive recovery worktree did not alter it  
+**Data Root**: `MEDREC_DATA_ROOT=/root/zhb/medrec-data` configured outside the checkout  
+**Conda Environment**: `medrec-molerec-table1` exists with the declared Python 3.8.16 runtime and was used for program-native recovery validation  
+**Reproduction Program**: SafeDrug archived and MoleRec program façades validated the seven recovery lanes without training or testing hooks
 
 **Status Summary**: SafeDrug `main` runs are historical only. Attempt `formal-20260828-a09fcab-u8-b` completed through the authorized continuation with Reproduction verdict `completed_mismatch`; the five target baselines are Comparison-qualified under one Unified Research Protocol v1.1 scope.
 
@@ -133,7 +133,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research reproduce gamenet \
   --dry-run
 ```
 
-Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. Successor formal lanes additionally require an attempt-owned frozen schedule supplied with `--schedule`; the requested GPU order and CPU sets must match that artifact exactly, with GPU 7 reserved. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, GPU utilization at most 10%, the declared free-memory threshold, and free disk before creating one tmux session. A failed preflight or schedule gate creates no tmux state.
+Dry-run validates registry identity, local Git revision, paths, and thresholds, then prints the complete command without opening SSH. Successor formal lanes also require an attempt-owned frozen schedule supplied with `--schedule`; the requested GPU order and CPU sets must match that artifact exactly, with GPU 7 reserved. A non-dry invocation requires a clean local worktree and 319-verified environment identity, then tries `319-lab` followed only by `319-lab-via-server`. It requires strict host-key acceptance and `root`, verifies exact clean harness and upstream revisions, external data root, archived inputs, program presence, Conda environment checksum, GPU utilization at most 10%, the declared free-memory threshold, and free disk before creating one tmux session. A failed preflight or schedule gate creates no tmux state.
 
 The checked-in registry marks RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec `comparison_ready` only for their recorded v1.1 scope; the built-in reference remains `registered`. Readiness does not waive a new run's source, environment, data, GPU-capacity, or disk preflight.
 
@@ -202,7 +202,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec-research evidence-intake \
   --output /path/to/public-decision-packet.json
 ```
 
-## Reproduction Execution Playbooks
+## Reproduction execution playbooks
 
 Detailed, step-by-step reproduction preparation and execution playbooks govern remote reproduction runs on `319-wild`:
 

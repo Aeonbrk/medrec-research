@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Audit — Output-Structure Signature
+# Gate 01 design integrity audit: output-structure signature
 
 ## Verdict
 

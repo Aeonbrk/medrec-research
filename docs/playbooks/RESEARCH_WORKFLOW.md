@@ -1,4 +1,4 @@
-# Research Workflow
+# Research workflow
 
 This workflow separates **fast scientific search** from **formal claim support**. The default objective is to test important hypotheses quickly without lowering the evidence standard for methods that survive.
 
@@ -12,7 +12,7 @@ This workflow separates **fast scientific search** from **formal claim support**
 
 ## Two-lane workflow
 
-### Lane A — exploratory method search
+### Lane A: exploratory method search
 
 Use this lane by default when no method has survived yet:
 
@@ -38,7 +38,7 @@ A cheap diagnostic is allowed when the result could distinguish implementation/d
 
 Prototype code and aggregate public-safe results belong under `research/prototypes/`. Do not create a formal Idea, Gate, or paper directory merely because a new architecture is being tested. Conversely, do not force a prototype-first sequence when the scientific contract itself must be frozen before modeling.
 
-### Lane B — survivor formalization and claim support
+### Lane B: survivor formalization and claim support
 
 A method typically enters the formal lane after it shows material signal or otherwise earns a paper-level investigation. It may enter earlier when formal target/information semantics are themselves necessary to make the experiment valid.
 
@@ -64,8 +64,8 @@ Before implementing a candidate, state:
 What capability, object, interaction, information flow, inductive bias,
 prediction granularity, training signal, or decision process is changed?
 
-What matched strong control can test whether that change—not merely
-extra capacity or optimization budget—causes any gain?
+What matched strong control can test whether that change, not merely
+extra capacity or optimization budget, causes any gain?
 ```
 
 This is a mechanism/attribution test, not a novelty-maximization test. A strong baseline may in principle be expressive enough to approximate the same mapping; a new method can still be scientifically valuable when its inductive bias, credit assignment, conditional computation, data efficiency, or inference process creates a reproducible capability. Known primitives may be combined when their interaction creates a materially different behavior.
@@ -96,7 +96,7 @@ A strong baseline is evidence, not a mandatory backbone. New models may be desig
 5. **Decide.** Continue, redesign once, or kill. Do not rescue weak effects with unbounded tuning.
 6. **Record compact evidence.** Preserve aggregate metrics, scope, provenance, and the scientific interpretation. Distinguish observed run verdicts from later project-level routing decisions. Promote genuinely cross-project lessons to `research/memory/`.
 
-## Formal Idea / paper experiments
+## Formal idea / paper experiments
 
 For a survivor, freeze the comparison contract before claim-support evaluation. Strong baselines, equal-information controls, multiple seeds where appropriate, decisive ablations, untouched evaluation data, and statistical evidence belong here.
 

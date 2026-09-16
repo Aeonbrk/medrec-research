@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Model Reset: Privileged Physiological Response Supervision
+# Model Reset: Privileged physiological response supervision
 
 ## Status
 
@@ -20,7 +20,7 @@
 
 The Event-Sourced Regimen Editing M0 gate remains closed. Raw `New / Change / D/C` workflow marks are not reused as regimen-edit supervision.
 
-## Admitted scientific family and Idea 007
+## Admitted scientific family and idea 007
 
 **Privileged physiological response supervision for medication recommendation.**
 
@@ -54,15 +54,15 @@ This is predictive privileged supervision, not causal treatment-effect estimatio
 
 The route cannot claim novelty from any of the following individually:
 
-- lab-response/titration modeling in MedRec — REFINE;
-- lab/injection monitoring event chains — ChainCare;
-- joint MedRec/lab-response or lab-prediction tasks — MedGCN and Bhoi et al. 2023;
-- downstream historical health-state evidence after prior medications — DrugDoctor;
-- MedRec knowledge distillation — LEADER and an accepted IJCAI-ECAI 2026 dual-channel MedRec KD method;
-- generic clinical training-time privileged-modality distillation — OC-Distill;
-- clinical future-aware teacher/student transfer — 2026 future-aware blood-glucose forecasting;
-- medication-aware physiological-response representation — Wu et al. EMBC 2025;
-- generic true-future-observation teacher to current-only student distillation — Privileged Foresight Distillation 2026.
+- lab-response/titration modeling in MedRec: REFINE;
+- lab/injection monitoring event chains: ChainCare;
+- joint MedRec/lab-response or lab-prediction tasks: MedGCN and Bhoi et al. 2023;
+- downstream historical health-state evidence after prior medications: DrugDoctor;
+- MedRec knowledge distillation: LEADER and an accepted IJCAI-ECAI 2026 dual-channel MedRec KD method;
+- generic clinical training-time privileged-modality distillation: OC-Distill;
+- clinical future-aware teacher/student transfer: 2026 future-aware blood-glucose forecasting;
+- medication-aware physiological-response representation: Wu et al. EMBC 2025;
+- generic true-future-observation teacher to current-only student distillation: Privileged Foresight Distillation 2026.
 
 The search-scoped residual delta is narrower:
 
@@ -88,7 +88,7 @@ This is scientifically admissible for Idea creation.
 
 ## Frozen R1--R3 admission contract
 
-### R1 — Medication-specificity subtraction
+### R1: Medication-specificity subtraction
 
 Generic Future-State Auxiliary / Medication-Ablated Future must use the same recommendation examples, support, administration anchor, future window, future-value availability, student, latent dimensionality, comparable teacher capacity, auxiliary weight, and update entitlement while removing focal-medication identity and medication-specific construction from the privileged target branch.
 
@@ -96,7 +96,7 @@ If medication ablation is comparable to Proposed:
 
 `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE`.
 
-### R2 — Monitoring-policy separation
+### R2: Monitoring-policy separation
 
 Monitoring-Mask-Only must receive the same response-support mask, future window, measurement availability/frequency structure, student, capacity, and update entitlement but no physiological values or value-derived summary.
 
@@ -104,7 +104,7 @@ If Monitoring-Mask-Only is comparable to Proposed:
 
 `STOP_MONITORING_POLICY_SUFFICIENCY`.
 
-### R3 — Equal-support positive-only supervision and deployment entitlement
+### R3: Equal-support positive-only supervision and deployment entitlement
 
 - response supervision exists only on actually administered positive medication events with valid linked future monitoring;
 - unchosen medications receive no invented counterfactual response;
@@ -120,7 +120,7 @@ If Monitoring-Mask-Only is comparable to Proposed:
 
 Deployment leakage or unmatched support/reweighting invalidates the future Gate.
 
-## Future Gate 01 killer family
+## Future gate 01 killer family
 
 The audited Gate 01 protocol covers:
 

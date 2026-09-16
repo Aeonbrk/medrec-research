@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: SafeDrug Four-Model Reproduction B0 Data Gate Termination
+# Failure Record: SafeDrug Four-Model reproduction B0 data gate termination
 
 - **Attempt ID**: `formal-20260825-231500`
 - **Status**: Historical (Terminal attempt; succeeded by `formal-20260826-025500`)
@@ -23,7 +23,7 @@ The four-model full reproduction attempt (`formal-20260825-231500`) is **termina
 
 ---
 
-## What Was Verified
+## What was verified
 
 1. **Remote Preflight & Environment Identity**:
    - 319-lab-via-server host preflight passed (`root`, 8× RTX 3090 GPUs idle, >2.5 TiB free disk).
@@ -52,7 +52,7 @@ The four-model full reproduction attempt (`formal-20260825-231500`) is **termina
 
 ---
 
-## The B0 Gate Discrepancy
+## The B0 gate discrepancy
 
 When evaluated against the IJCAI 2021 Table 1 Paper Baseline (`B0`), the regenerated dataset yielded:
 
@@ -68,7 +68,7 @@ The observation of **15,032 visits** instead of **14,995 visits** is a property 
 
 ---
 
-## Non-Revival Boundary
+## Non-Revival boundary
 
 Under the Unified Research Protocol and the fail-closed reproduction policy:
 

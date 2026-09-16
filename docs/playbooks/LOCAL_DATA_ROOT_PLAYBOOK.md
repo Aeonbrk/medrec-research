@@ -1,4 +1,4 @@
-# Local Data Root Playbook
+# Local data root playbook
 
 The Local Data Root on 319 is the only home for restricted EHR inputs, derived snapshots, patient split membership, real Prediction Records, checkpoints, and private run artifacts. It must be outside both the 319 repository checkout and the archived `New-Search` checkout. Do not mirror it to the MacBook harness.
 

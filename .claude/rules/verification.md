@@ -1,12 +1,12 @@
-# Verification & Quality Gates
+# Verification & quality gates
 
 > Mechanical verification before task completion
 
-## Pre-Completion Checklist
+## Pre-Completion checklist
 
 Before reporting "done", run these checks:
 
-### 1. Python Code Quality
+### 1. Python code quality
 
 ```bash
 # Linting
@@ -26,7 +26,7 @@ rtk proxy /opt/homebrew/bin/uv run pytest tests/unit/test_modified_module.py -v
 rtk proxy /opt/homebrew/bin/uv run pytest -q --tb=short
 ```
 
-### 3. Markdown Integrity
+### 3. Markdown integrity
 
 For any modified `.md` files:
 
@@ -36,9 +36,9 @@ rtk markdownlint '**/*.md' --ignore '.agents/**'
 
 **Rule**: Do NOT hard-wrap prose. Let editors handle line wrapping.
 
-## Git Verification
+## Git verification
 
-### Before Commit
+### Before commit
 
 ```bash
 # Check what's staged
@@ -48,7 +48,7 @@ rtk git diff --staged
 rtk git status
 ```
 
-### Commit Message Format
+### Commit message format
 
 MUST follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/):
 
@@ -71,9 +71,9 @@ docs(playbook): update MKL conflict workaround
 refactor: strip ARIS workflow layer
 ```
 
-## Security Verification
+## Security verification
 
-### Never Commit
+### Never commit
 
 - API keys, tokens, credentials
 - `.env` files with real values
@@ -81,14 +81,14 @@ refactor: strip ARIS workflow layer
 - AWS/GCP credentials
 - Database passwords
 
-### Check Before Commit
+### Check before commit
 
 ```bash
 # Scan for potential secrets
 rtk git diff --staged | grep -iE '(api[_-]?key|secret|password|token|credential)'
 ```
 
-## Verification Failure Response
+## Verification failure response
 
 If verification fails:
 
@@ -97,7 +97,7 @@ If verification fails:
 3. **Fix before claiming done** - Loop until green
 4. **Explain if can't fix** - State why and what's blocking
 
-## Continuous Verification
+## Continuous verification
 
 For long-running tasks, verify incrementally:
 
@@ -109,21 +109,21 @@ For long-running tasks, verify incrementally:
 
 Don't wait until the end to discover issues.
 
-## Project-Specific Gates
+## Project-Specific gates
 
-### GAMENet Experiments
+### GAMENet experiments
 
 - Model checkpoints saved correctly
 - Metrics logged to expected location
 - Results reproducible with seed
 
-### Dataset Processing
+### Dataset processing
 
 - Output shape matches expected
 - No data leakage between splits
 - Preprocessing deterministic
 
-## Verification Tools Quick Reference
+## Verification tools quick reference
 
 | Check | Command |
 | ------- | --------- |

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# R0 Decision Record — Exposure Resource & Premise Admission
+# R0 decision record: exposure resource and premise admission
 
 ## Verdict
 
@@ -14,7 +14,7 @@
 
 ---
 
-## 1. Decision Question Answered
+## 1. Decision question answered
 
 > Can raw MIMIC-IV support a method paper in which medication-order recommendation conditions DDI pressure on a pre-order, execution-confirmed active medication state, and is that safety semantic materially different from visit-union DDI co-membership?
 
@@ -22,7 +22,7 @@
 
 1. **Resource Feasibility**: All 8 required hospital-wide tables exist with linkable chronological order and administration events. Deterministic medication normalization achieves **81.92%** coverage on eligible medication orders and **81.89%** coverage on eligible eMAR administrations.
 2. **Premise Scale & Support**: Across **137,764** Discovery patients with medication orders and **323,216** hospitalizations, we observe **1,050,523** eMAR-observed visit-union DDI patient-pair episodes across **68,695** distinct patients and **391** unique DDI relations from the frozen repository DDI asset.
-3. **Material Semantic Mismatch**: Exactly **221,157** episodes (**21.0521%**) are `static-only`—meaning both interacting medications were actually administered to the patient in the same hospitalization, yet their completed order intervals and administration records show no execution-confirmed concurrent-active overlap.
+3. **Material Semantic Mismatch**: Exactly **221,157** episodes (**21.0521%**) are `static-only`, meaning both interacting medications were actually administered to the patient in the same hospitalization, yet their completed order intervals and administration records show no execution-confirmed concurrent-active overlap.
 4. **Broad Distribution**: The static-only mismatch is widely distributed across **280** distinct DDI relations that each contribute at least 20 static-only episodes (HHI = **0.0131**, Gini = **0.7651**, top-5 share = **15.52%**), proving that the phenomenon is not an artifact of a single drug pair.
 5. **Deployable State Feasibility**: A strictly pre-order execution-confirmed active medication state can be constructed using only past information (provider order time from `poe.ordertime` and prior eMAR administrations from `emar.charttime`), without post-order events, future administrations, or discharge-coded current-visit diagnoses/procedures.
 
@@ -30,7 +30,7 @@ All 7 frozen admission floors pass at full precision.
 
 ---
 
-## 2. Frozen R0 Decision Criteria Matrix
+## 2. Frozen R0 decision criteria matrix
 
 | Condition | Domain | Frozen Threshold | Observed Value (Full Precision) | Verdict |
 | :--- | :--- | :--- | :--- | :--- |
@@ -44,23 +44,23 @@ All 7 frozen admission floors pass at full precision.
 
 ---
 
-## 3. Real Schema Verification & Linkage Mechanics
+## 3. Real schema verification & linkage mechanics
 
 Mechanical schema verification of raw MIMIC-IV 3.1:
 
-### 3.1 Medication Request / Order Event Time
+### 3.1 medication request / order event time
 
 - Documented provider order event time is defined by `poe.ordertime` (present in 100% of POE medication records).
 - Scheduled prescription course start time is defined by `prescriptions.starttime` (present in 99.89% of prescription records).
 - Hospitalization key is `hadm_id` (present in 100% of hospital-admitted prescription and administration events).
 
-### 3.2 Linkage Identifiers
+### 3.2 linkage identifiers
 
 - `poe_id`: Present in **99.09%** of Discovery prescriptions (**14,009,505 / 14,138,795**) and **100.00%** of Discovery eMAR administrations (**20,701,305 / 20,701,305**).
 - `pharmacy_id`: Present in **100.00%** of Discovery prescriptions (**14,138,795 / 14,138,795**) and **93.46%** of Discovery eMAR administrations (**19,346,908 / 20,701,305**).
 - `emar_detail`: Confirms that `product_code` directly corresponds to the hospital formulary code (`formulary_drug_cd`), providing an exact identity match for barcode-scanned medications.
 
-### 3.3 Status & Timing Fields at Order Time
+### 3.3 status & timing fields at order time
 
 - `prescriptions.stoptime` and `pharmacy.status` (e.g., `'Discontinued via patient discharge'`) are determined retrospectively upon encounter completion or order discontinuation; they are **not** available at inference time and must not be used as online model features.
 - Safe past-only information available at decision time $t$:
@@ -71,16 +71,16 @@ Mechanical schema verification of raw MIMIC-IV 3.1:
 
 ---
 
-## 4. Medication Normalization & DDI Knowledge Asset
+## 4. Medication normalization & DDI knowledge asset
 
-### 4.1 Frozen DDI Asset
+### 4.1 frozen DDI asset
 
 - **Identity**: SafeDrug / MoleRec Table 1 canonical DDI matrix (`ddi_A_final.pkl` and `voc_final.pkl`).
 - **Medication Representation**: WHO ATC Level 4 (4-character alphanumeric codes).
 - **Asset SHA256**: `dcb2078931968533835a5ff090dbf8a3afcf3fef415415a013274bea3a4182a7` (exact match to project frozen digest).
 - **Content**: 448 canonical pairwise DDI relations across 91 DDI-represented concepts within the 131-concept action vocabulary.
 
-### 4.2 Evaluated Normalization Paths
+### 4.2 evaluated normalization paths
 
 | Path | Strategy | Order Coverage (`MAIN`) | Admin Coverage | Unique Concepts | DDI Overlap |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -93,9 +93,9 @@ Path 4 is deterministic, auditable, and requires no patient-specific hand mappin
 
 ---
 
-## 5. Distinction Between Retrospective Diagnostic and Online State
+## 5. Distinction between retrospective diagnostic and online state
 
-### 5.1 Retrospective Premise Overlap Diagnostic
+### 5.1 retrospective premise overlap diagnostic
 
 In the R0 scientific premise diagnostic:
 
@@ -104,7 +104,7 @@ In the R0 scientific premise diagnostic:
 - Otherwise, the episode is categorized as `static_only` (21.0521% of episodes).
 - This retrospective interval construction serves exclusively as a cohort diagnostic to prove that visit-union co-membership collapses temporally disjoint treatments.
 
-### 5.2 Strict Pre-Order Online Active State
+### 5.2 strict Pre-Order online active state
 
 For an online recommender evaluated at order decision time $t$:
 
@@ -117,7 +117,7 @@ For an online recommender evaluated at order decision time $t$:
 
 ---
 
-## 6. Distribution of Static-Only Mismatch
+## 6. Distribution of Static-Only mismatch
 
 Top 10 DDI relations contributing to static-only episodes:
 
@@ -141,7 +141,7 @@ Top 10 DDI relations contributing to static-only episodes:
 
 ---
 
-## 7. Public & Data Safety Boundary
+## 7. Public & data safety boundary
 
 1. **Quarantine Adherence**:
    - Total MIMIC-IV 3.1 patients: **364,627**.
@@ -156,7 +156,7 @@ Top 10 DDI relations contributing to static-only episodes:
 
 ---
 
-## 8. Publication Boundary & Non-Claims
+## 8. Publication boundary & Non-Claims
 
 R0 PASS establishes only resource feasibility and the validity of the minimum semantic premise. The eventual method paper must respect the following boundaries:
 
@@ -167,7 +167,7 @@ R0 PASS establishes only resource feasibility and the validity of the minimum se
 
 ---
 
-## 9. Next Stage Handoff
+## 9. Next stage handoff
 
 In accordance with Section 17:
 

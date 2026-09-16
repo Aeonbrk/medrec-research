@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD013 -->
 
-# Baseline Research Infrastructure
+# Baseline research infrastructure
 
 This directory manages the external baseline models, reproduction audits, readiness preflights, and candidate pools.
 
-## Purpose & Scope
+## Purpose & scope
 
 Baseline reproduction and qualification belong to **research infrastructure**, not scientific idea exploration. Mismatches in published point estimates, environment setup interruptions, or upstream codebase quirks are operational/reproduction issues and are strictly decoupled from scientific idea failures.
 
-## Directory Structure
+## Directory structure
 
 - **`preflight/`**: Public-safe readiness reports, qualification records, and reference point targets:
   - [`five-model-baseline-readiness-report.md`](preflight/five-model-baseline-readiness-report.md): Two-axis readiness assessment for all 5 classical baselines.
@@ -23,6 +23,6 @@ Baseline reproduction and qualification belong to **research infrastructure**, n
   - [`safedrug-reproduction-b0-failure-2026-08-25.md`](failures/safedrug-reproduction-b0-failure-2026-08-25.md): Pilot execution failure history.
 - **[`candidate-expansion-pool.md`](candidate-expansion-pool.md)**: Roadmap of candidate baselines for future Comparison Mode qualification (e.g. VITA, ARMR, FLAME, KEHGCN, HypeMed).
 
-## Authoritative Baseline Identity
+## Authoritative baseline identity
 
 The single authoritative source of truth for baseline definitions, code entrypoints, Conda environments, and readiness states is [`../../baselines/registry.toml`](../../baselines/registry.toml).

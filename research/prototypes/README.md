@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Prototype Inventory
+# Prototype inventory
 
 `research/prototypes/` is the default pre-Idea execution lane for bounded Train/Dev architecture, mechanism, target-supportability, and baseline-calibration screens. A prototype may fail, succeed, or only answer a diagnostic question. These artifacts are evidence, not a queue of routes that must be rescued.
 
@@ -60,7 +60,7 @@ not add value over SafePTO.  SetContext did not beat its parameter-matched
 SelfOnly control (`ΔJ −0.000474`).
 
 Interpretation and routing are local to this exploratory screen: retain the
-validated MICA-Core DrugQuery substrate, do not rescue these lanes, and return
+validated MICA-Core DrugQuery base, do not rescue these lanes, and return
 to a materially different architecture search.  The source-revision exception
 for the corrected Core/SafeRank reruns and the excluded runtime-only attempts
 are recorded in `mica-v2-screen/result.json`; no Idea 009 or formal Gate was

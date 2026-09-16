@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Accumulated Experience
+# Accumulated experience
 
 This ledger carries the canonical scientific record from `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. It is complete for the archive's 6 idea cards, 11 experiment cards, and 12 claim cards. It is a curated memory, not a replacement for source records or raw artifacts.
 
@@ -15,7 +15,7 @@ This ledger carries the canonical scientific record from `New-Search` commit `99
 >
 > This ledger preserves past evidence and historical non-revival boundaries without creating a duplicate authoritative state.
 
-## Reading the Ledger
+## Reading the ledger
 
 The source's `status` or `stage` is a record-local field. The lifecycle column states the durable interpretation for new work in this repository.
 
@@ -74,33 +74,33 @@ No archived result establishes clinical safety, therapeutic equivalence, patient
 | `claim:kdd2025_not_equivalent_to_risk_budgeted_deployment` | `supported` | Supported / scoped | The current full-method reading preserves a narrow non-equivalence finding while requiring KDD 2025 as a kill-check baseline. | `research-wiki/claims/kdd2025_not_equivalent_to_risk_budgeted_deployment.md` |
 | `claim:safety_claim_audit_protocol` | `proposed` | Proposed | E3b is a seed negative case; the audit classification has not been validated beyond its planned case study. | `research-wiki/claims/safety_claim_audit_protocol.md` |
 
-## Decisive Route Histories
+## Decisive route histories
 
-### EGSF Selector
+### EGSF selector
 
 E0.1 supports proxy-risk strata and E2 supports diagnostic frontier existence. E2b found fixed-lambda competition. E3-Minimal's earlier result was overturned by E3b: global lambda `30.0` beat both selector variants under calibrated utility and strict-count controls. The selector idea and fixed-lambda-resistant claims are failed; only the bucket and oracle-frontier diagnostics survive.
 
 Sources: `research-wiki/ideas/egsf.md`, `research-wiki/experiments/egsf_e0_1_dynamic_budget_audit.md`, `research-wiki/experiments/egsf_e2_oracle_frontier_initial.md`, `research-wiki/experiments/egsf_e2b_controls_initial.md`, `research-wiki/experiments/egsf_e3b_strong_followup.md`, `research-wiki/claims/egsf_dynamic_budget_motivated.md`, `research-wiki/claims/egsf_frontier_exists.md`, `research-wiki/claims/egsf_minimal_selector.md`, and `research-wiki/claims/egsf_not_fixed_lambda.md`.
 
-### EG-TER Repair
+### EG-TER repair
 
 Blind metric validation supports `D_therapeutic`. E4 passed against unlevelled baselines, then E5 levelled hard filters and eliminated all binary repair differences. The solver is invalidated; the Hard-Safety Baseline Trap and the metric's scoped evaluation role survive.
 
 Sources: `research-wiki/ideas/eg_ter.md`, `research-wiki/experiments/eg_ter_metric_validity_week1.md`, `research-wiki/experiments/eg_ter_e4_minimal_pilot.md`, `research-wiki/experiments/eg_ter_e5_robustness.md`, `research-wiki/claims/eg_ter_metric_validity.md`, `research-wiki/claims/eg_ter_repair_pilot_asymmetric_info.md`, and `research-wiki/claims/hard_safety_baseline_trap.md`.
 
-### CRC-PS Action Family
+### CRC-PS action family
 
 The KDD audit supports only a narrow distinction between calibration or set confidence and a fixed-base deployment contract. R006 then failed its preregistered finite-grid certificate with zero accepted lambdas, invalidating the deployable-action claim while reinforcing the bounded-loss-only guardrail. R007 is blocked for the archived route.
 
 Sources: `research-wiki/ideas/crc_ps.md`, `research-wiki/experiments/crc_ps_kdd2025_method_audit.md`, `research-wiki/experiments/crc_ps_r006_failure_analysis.md`, `research-wiki/claims/crc_ps_bounded_loss_only.md`, `research-wiki/claims/crc_ps_current_route_deployable_action_rule.md`, `research-wiki/claims/crc_ps_not_absorbed_by_hf_strongutility_k.md`, and `research-wiki/claims/kdd2025_not_equivalent_to_risk_budgeted_deployment.md`.
 
-### Historical Backup Routes
+### Historical backup routes
 
 The Safety Claim Audit Card is an unvalidated backup protocol seeded by E3b. The Boundary Evidence-Eligibility Certificate is demoted because of strong overlap with existing literature. Differential Prescription Action Modeling is only a secondary alternative, contingent on a tightly controlled failure-decomposition contribution.
 
 Sources: `research-wiki/ideas/safety_claim_audit_card.md`, `research-wiki/experiments/safety_claim_audit_minimal_case_study.md`, `research-wiki/claims/safety_claim_audit_protocol.md`, `research-wiki/ideas/boundary_evidence_eligibility_certificate.md`, and `research-wiki/ideas/differential_prescription_action_modeling.md`.
 
-## Gaps and Practical Memory
+## Gaps and practical memory
 
 The following gaps remain useful research constraints, not authority to revive their failed parent routes. Their canonical definitions and route-specific limits are in `research-wiki/gap_map.md`.
 

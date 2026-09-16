@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Literature Search Notes — Residual False-Positive Routing
+# Literature search Notes: Residual False-Positive routing
 
 - **Date**: 2026-09-02
 - **CCFA owners**: `ccf-literature-monitor` + `ccf-literature-searcher`

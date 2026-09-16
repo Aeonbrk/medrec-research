@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Audit Controller Re-verification — Idea 008
+# Gate 01 audit controller reverification: Idea 008
 
 ## Verdict
 
@@ -14,11 +14,11 @@
 
 ## Findings
 
-1. **Change surface — PASS.** Relative to the correction base, the implementation change is limited to the Idea-local MoleRec call assembly, its direct regression proof, and public-safe routing documents. No scientific choice changed.
-2. **Pinned invocation contract — PASS.** `extract_gate01_molerec_features` supplies `forward_args=()` and exactly the six pinned inputs through `forward_kwargs`: `substruct_data`, `mol_data`, `patient_data`, `ddi_mask_H`, `tensor_ddi_adj`, and `average_projection`.
-3. **Regression proof — PASS.** The signature-faithful regression reproduces the original duplicate-`substruct_data` TypeError and then verifies one eval/no-grad forward, one `score_extractor` execution, same-forward score/embedding capture, and 131 candidate-aligned outputs. The final correction revision explicitly asserts the pinned forward parameter order.
-4. **Real-model contract evidence — PASS.** The bounded correction record reports the authorized 319 Train-side real-model contract smoke as passing under the frozen MoleRec source/checkpoint/environment, with no scientific metric computed.
-5. **Scientific freeze and quarantine — PASS.** Train/Dev selections remain frozen; no second Audit access, Audit metric, retraining, post-hoc selection, or scientific Gate verdict was produced. G3/G4, R0 Holdout, and the historical project test remain untouched.
+1. **Change surface, PASS.** Relative to the correction base, the implementation change is limited to the Idea-local MoleRec call assembly, its direct regression proof, and public-safe routing documents. No scientific choice changed.
+2. **Pinned invocation contract, PASS.** `extract_gate01_molerec_features` supplies `forward_args=()` and exactly the six pinned inputs through `forward_kwargs`: `substruct_data`, `mol_data`, `patient_data`, `ddi_mask_H`, `tensor_ddi_adj`, and `average_projection`.
+3. **Regression proof, PASS.** The signature-faithful regression reproduces the original duplicate-`substruct_data` TypeError and then verifies one eval/no-grad forward, one `score_extractor` execution, same-forward score/embedding capture, and 131 candidate-aligned outputs. The final correction revision explicitly asserts the pinned forward parameter order.
+4. **Real-model contract evidence, PASS.** The bounded correction record reports the authorized 319 Train-side real-model contract smoke as passing under the frozen MoleRec source/checkpoint/environment, with no scientific metric computed.
+5. **Scientific freeze and quarantine, PASS.** Train/Dev selections remain frozen; no second Audit access, Audit metric, retraining, post-hoc selection, or scientific Gate verdict was produced. G3/G4, R0 Holdout, and the historical project test remain untouched.
 
 ## Frozen scientific state
 

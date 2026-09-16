@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 — Output-Structure Signature
+# Gate 01: Output-Structure signature
 
 ## Mode
 
@@ -18,7 +18,7 @@ This is a validation-only falsification gate. It is not a publication experiment
 
 ---
 
-## 1. Scientific state entering Gate 01
+## 1. Scientific state entering gate 01
 
 Ideas 001--004 are formally closed. Their scoped negative evidence supports a research-prioritization change: another low-dimensional candidate-level reranking observable is low expected value relative to a mechanism that changes prediction formation or output structure.
 
@@ -262,7 +262,7 @@ If this control removes materiality, the structural route terminates.
 
 ---
 
-## 11. Gate A — dataset support
+## 11. Gate A: dataset support
 
 Audit must contain at least three distinct ATC-2 sibling candidate groups, each represented by at least 50 distinct Audit patients with one or more eligible singleton-target units.
 
@@ -276,7 +276,7 @@ The `50`-patient support floor reuses the project's established Gate support con
 
 ---
 
-## 12. Gate B — raw signature materiality
+## 12. Gate B: raw signature materiality
 
 Under the frozen raw threshold `0.5`, require both:
 
@@ -291,7 +291,7 @@ The 50-patient criterion reuses the existing project support convention. The thr
 
 ---
 
-## 13. Gate C — calibration killer control
+## 13. Gate C: calibration killer control
 
 Apply the Dev-frozen per-medication thresholds to Audit and recompute the exact same materiality conditions.
 

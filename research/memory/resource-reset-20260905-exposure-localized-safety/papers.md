@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Decision-Relevant Papers — Exposure-Localized Safety Reset
+# Decision-relevant papers, exposure-localized safety reset
 
 | Work | Year / venue | Role in reset | What is already covered | Remaining implication |
 | --- | --- | --- | --- | --- |

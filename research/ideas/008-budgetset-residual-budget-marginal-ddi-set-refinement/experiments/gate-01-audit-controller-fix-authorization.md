@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Audit Controller Fix Authorization — Idea 008
+# Gate 01 audit controller fix authorization: Idea 008
 
 ## Authorization status
 

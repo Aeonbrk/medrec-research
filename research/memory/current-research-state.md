@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Current Research State — 2026-09-16
+# Current research state: 2026-09-16
 
 This file is the authoritative **current scientific synthesis and routing state** for `medrec-research`. It does not replace run-local evidence; it reconciles it.
 
@@ -11,7 +11,7 @@ Active formal Idea: none
 Ideas 001--008: terminated
 Idea 009: not created
 Active formal Gate: none
-Current stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
+Current stage: STAGE -1, MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
 Stage status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 Modern-backbone calibration: complete
 Strong-unary residual-correction route: deprioritized as a primary direction
@@ -20,7 +20,7 @@ Current action: review the frozen Stage -1F cross-dataset Train/Dev result; rema
 
 No new architecture family, Idea 009, formal Gate, held-out evaluation, or
 multi-seed run is authorized in Stage -1. The earlier architecture-search
-directions remain deferred until this substrate work is complete.
+directions remain deferred until this base work is complete.
 
 According to the current recorded evidence, G3/G4, R0 Holdout, and the historical project test remain quarantined from the recent exploratory prototype sequence.
 
@@ -50,15 +50,15 @@ Do not promote a routing inference into a runner-produced terminal verdict. A hi
 | HypeMed-LeakageSafe | 0.512112 | 0.668091 | 0.753822 | 0.059404 | 23.6549 | faithful recent baseline/reference; accuracy too weak for backbone reset |
 | HypeMed-OfficialSemantics | 0.514256 | 0.670078 | 0.755615 | 0.059559 | 23.5770 | faithful sensitivity/reference, not canonical comparison surface |
 | Rx-Expert coarse | 0.510522 | 0.666965 | 0.757858 | 0.077303 | 22.4268 | faithful recent architecture-family reference; not a new backbone |
-| DMGExNet | — | — | — | — | — | literature/architecture reference only; canonical numerical comparison blocked by information-budget mismatch |
+| DMGExNet | - | - | - | - | - | literature/architecture reference only; canonical numerical comparison blocked by information-budget mismatch |
 
 The old HypeMed-inspired `0.431689` result is `SUPERSEDED_NON_FAITHFUL_HYPEMED_ADAPTER` and must never be presented as canonical HypeMed performance.
 
 Observed phase result: `MODERN_BACKBONE_CALIBRATION_COMPLETE`.
 
-Routing guidance: do not continue hunting public backbones by default without a specific scientific reason. A strong baseline is a comparator, not a mandatory substrate for the next model.
+Routing guidance: do not continue hunting public backbones by default without a specific scientific reason. A strong baseline is a comparator, not a mandatory base for the next model.
 
-## 4. Formal Ideas 001--008
+## 4. Formal ideas 001--008
 
 | Idea | Terminal scope |
 | --- | --- |
@@ -161,7 +161,7 @@ Routing guidance:
 
 The earlier `RESIDUAL_DEPENDENCE_EXISTS_INFERENCE_GAP` remains valid as historical probe output from the confounded formulation, but it is not the current routing basis.
 
-### MICA — Medication-Indexed Clinical Assembly
+### MICA: medication-indexed clinical assembly
 
 Observed result from the complete source-bound three-arm attribution screen: starting `origin/main` revision `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc`, implementation/run revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`:
 
@@ -174,7 +174,7 @@ Observed result from the complete source-bound three-arm attribution screen: sta
 
 The frozen attribution conclusion is `PRESERVE_DRUGQUERY_AS_MICA_CORE_LATE_FILM_UNNECESSARY`: medication-specific evidence selection carries the strong surface in this matched decomposition, while applying the same FiLM conditioner before pooling adds no material Dev Jaccard. This is exploratory single-seed Train/Dev evidence, not held-out evaluation, a formal Gate, or a novelty conclusion; medication/label-specific attention remains prior art.
 
-Routing guidance: preserve DrugQuery as the MICA-Core substrate for this tested attribution and stop. Do not rerun Early, create Idea 009, open a formal Gate, or add a rescue/ablation cycle. The conclusion is local to this three-arm decomposition and does not make a novelty claim or ban other materially different medication-specific computation.
+Routing guidance: preserve DrugQuery as the MICA-Core base for this tested attribution and stop. Do not rerun Early, create Idea 009, open a formal Gate, or add a rescue/ablation cycle. The conclusion is local to this three-arm decomposition and does not make a novelty claim or ban other materially different medication-specific computation.
 
 ### MICA-v2 accuracy and safe-decision extension screen
 
@@ -223,7 +223,7 @@ Interpretation from the frozen rules:
 - SetContext versus SelfOnly is `ΔJ −0.000474494`, `ΔDDI +0.001309645`:
   `KILL_SET_CONTEXT`.
 
-Routing guidance: keep the validated MICA-Core DrugQuery substrate and return
+Routing guidance: keep the validated MICA-Core DrugQuery base and return
 to a materially different architecture search.  The single frozen next route
 is `KEEP_MICA_CORE_AND_RETURN_TO_MATERIAL_ARCHITECTURE_SEARCH`.  This remains
 exploratory single-seed Train/Dev evidence: no held-out evaluation, additional
@@ -414,7 +414,7 @@ Negative evidence should prevent equivalent reruns, not prevent innovation. A co
 ## 8. Deferred open research space
 
 After the Stage -1 next action is complete, the project may search broadly for
-a genuinely different formulation. High-leverage possibilities include, but
+a genuinely different formulation. High-impact possibilities include, but
 are not limited to:
 
 - new architecture built from scratch rather than a MoleRec correction;

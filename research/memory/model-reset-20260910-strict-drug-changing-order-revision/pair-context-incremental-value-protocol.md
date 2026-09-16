@@ -1,4 +1,4 @@
-# Pair/Context Incremental Value Protocol
+# Pair/Context incremental value protocol
 
 ## Scientific status
 

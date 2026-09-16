@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Decision — Idea 006: Exposure-Conditional Medication Recommendation
+# Research decision. Idea 006: exposure-conditional medication recommendation
 
 ## Verdict
 
 `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
 
 - **Idea**: `006-exposure-conditional-medication-recommendation`
-- **Gate**: Gate 01 — Exposure-Conditioned Learning vs Direct Exposure Controls
+- **Gate**: 01: Exposure-Conditioned Learning vs Direct Exposure Controls
 - **Execution commit**: `3e51887a570bf8c4ef9503f7ffb852881c931130`
 - **Integrity audit**: `INTEGRITY_AUDIT_PASS`
 - **Lifecycle transition**: `ACTIVE -> TERMINATED_AT_GATE_01`

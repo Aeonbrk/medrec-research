@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Final Closest-Work Delta Check — Exposure-Localized Medication Safety
+# Final closest-work delta check: exposure-localized medication safety
 
 ## Search status
 
@@ -69,11 +69,11 @@ The surviving delta is narrow but method-capable. It is sufficiently separated f
 
 ## Stable source links
 
-- Rough et al. 2020: https://doi.org/10.1002/cpt.1826
-- Contextualized DDI management 2022: https://doi.org/10.1002/cpt.2624
-- Contextualized DDI algorithms 2021: https://doi.org/10.1093/jamiaopen/ooab023
-- PIMNet: https://doi.org/10.1016/j.ymeth.2023.06.005
-- KATMed: https://doi.org/10.1016/j.jbi.2026.104991
-- RES-MR: https://doi.org/10.1145/3805712.3809604
-- GRAIN: https://arxiv.org/abs/2608.00098
-- SafeRx-Agent: https://arxiv.org/abs/2605.29146
+- Rough et al. 2020: <https://doi.org/10.1002/cpt.1826>
+- Contextualized DDI management 2022: <https://doi.org/10.1002/cpt.2624>
+- Contextualized DDI algorithms 2021: <https://doi.org/10.1093/jamiaopen/ooab023>
+- PIMNet: <https://doi.org/10.1016/j.ymeth.2023.06.005>
+- KATMed: <https://doi.org/10.1016/j.jbi.2026.104991>
+- RES-MR: <https://doi.org/10.1145/3805712.3809604>
+- GRAIN: <https://arxiv.org/abs/2608.00098>
+- SafeRx-Agent: <https://arxiv.org/abs/2605.29146>

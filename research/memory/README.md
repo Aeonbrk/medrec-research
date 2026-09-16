@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Cross-Project Research Memory
+# Cross-project research memory
 
 This directory stores the current research-state synthesis, reusable lessons, failure records, and historical search/literature snapshots.
 
@@ -17,9 +17,9 @@ Do not edit historical result records merely to make their old state labels look
 
 Within current synthesis, distinguish:
 
-- **observed result** — directly produced by a run or audit;
-- **interpretation** — scientific reading of the evidence;
-- **routing guidance** — current prioritization for future work.
+- **observed result**: directly produced by a run or audit;
+- **interpretation**: scientific reading of the evidence;
+- **routing guidance**: current prioritization for future work.
 
 Do not present routing guidance as if it were a runner-produced terminal verdict.
 

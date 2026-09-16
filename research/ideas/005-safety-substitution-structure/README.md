@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 005: Safety-Preserving Substitution Structure
+# Idea 005: Safety-Preserving substitution structure
 
 - **Idea ID**: `005-safety-substitution-structure`
 - **Status**: `TERMINATED / STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`

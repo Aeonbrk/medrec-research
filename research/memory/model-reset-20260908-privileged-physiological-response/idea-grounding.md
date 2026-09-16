@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Grounding — Privileged Physiological Response Supervision
+# Idea grounding: privileged physiological response supervision
 
 ## Decision context
 
@@ -10,15 +10,15 @@ M0 closed raw workflow-action supervision. This reset therefore moves to a diffe
 
 ## Source-backed observations
 
-### REFINE — NeurIPS 2023
+### REFINE: NeurIPS 2023
 
-Stable source: https://papers.nips.cc/paper_files/paper/2023/hash/4b7439a4ab0b8e4bcb4e2412c6a10a58-Abstract-Conference.html
+Stable source: <https://papers.nips.cc/paper_files/paper/2023/hash/4b7439a4ab0b8e4bcb4e2412c6a10a58-Abstract-Conference.html>
 
 REFINE explicitly models medication dosage-titration trends and lab-test responses to characterize patient health, then uses those representations for fine-grained medication recommendation and personalized interaction modeling.
 
 Implication: `labs + response trend + medication recommendation` is prior art. A new route cannot claim novelty from merely feeding response-related measurements into a patient encoder.
 
-### ChainCare — Information Processing & Management 2026
+### ChainCare: Information processing & management 2026
 
 DOI: `10.1016/j.ipm.2026.104739`
 
@@ -26,15 +26,15 @@ ChainCare jointly models monitoring-level lab tests and medication injections th
 
 Implication: monitoring-event execution logic and lab/injection temporal chains are current MedRec prior art. A new route must use a different information-flow role for future monitoring.
 
-### MedGCN — medication recommendation + lab imputation
+### MedGCN: medication recommendation + lab imputation
 
-Stable source: https://arxiv.org/abs/1904.00326
+Stable source: <https://arxiv.org/abs/1904.00326>
 
 MedGCN performs medication recommendation and lab-test imputation jointly with multi-task graph learning.
 
 Implication: a generic auxiliary lab-prediction loss is not a sufficient method delta.
 
-### Bhoi et al. — AAAI Symposium 2023
+### Bhoi et al.: AAAI symposium 2023
 
 DOI: `10.1609/aaaiss.v1i1.27489`
 
@@ -42,7 +42,7 @@ This work explicitly integrates medication recommendation and lab-test response 
 
 Implication: `joint medication recommendation + lab response prediction` itself is prior art.
 
-### DrugDoctor — Briefings in Bioinformatics 2024
+### DrugDoctor: Briefings in bioinformatics 2024
 
 DOI: `10.1093/bib/bbae464`
 
@@ -50,23 +50,23 @@ DrugDoctor uses historical prescriptions together with the nearest subsequent he
 
 Implication: using downstream condition after previous medication as historical evidence is already covered at visit granularity.
 
-### LEADER — medication recommendation knowledge distillation
+### LEADER: medication recommendation knowledge distillation
 
-Stable source: https://arxiv.org/abs/2402.02803
+Stable source: <https://arxiv.org/abs/2402.02803>
 
 LEADER transfers LLM-derived semantic representations into a smaller medication recommender through feature-level knowledge distillation.
 
 Implication: knowledge distillation in MedRec is prior art. Distillation can only be a mechanism primitive, not the novelty claim.
 
-### OC-Distill — 2026
+### OC-Distill: 2026
 
-Stable source: https://arxiv.org/abs/2604.16878
+Stable source: <https://arxiv.org/abs/2604.16878>
 
 OC-Distill uses multimodal information at training time and deploys a student that requires only vital signs at inference for ICU risk prediction.
 
 Implication: training-time privileged multimodal supervision is an established general ML/clinical prediction primitive. The MedRec contribution must be medication-response-specific rather than generic privileged learning.
 
-### Wu et al. — EMBC 2025
+### Wu et al.: EMBC 2025
 
 DOI: `10.1109/EMBC58623.2025.11254154`
 

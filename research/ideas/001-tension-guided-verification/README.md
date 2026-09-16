@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD001 MD013 -->
 
-# Idea 001: Tension-Guided Verification
+# Idea 001: Tension-Guided verification
 
 - **Idea ID**: `001-tension-guided-verification`
 - **Status**: Terminated (`TERMINATE_CURRENT_TENSION_ROUTE`)
@@ -8,11 +8,11 @@
 - **Key Uncertainty**: Whether apparent tension gains survive control for medication count, drug frequency, and global scalar reranking (competing simple explanations).
 - **Final Decision (P6)**: Current Tension route terminated at Gate 02 (`STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL`); Gate 03 is `NOT_AUTHORIZED`.
 - **Audited Lifecycle State**:
-  - Gate 01: `pass` / `P0 Status: AUDIT_PASS` ([gate-01-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-01-integrity-audit.md))
-  - Gate 02: `STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL` / `P5 Status: INTEGRITY_PASS` ([gate-02-integrity-audit.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/experiments/gate-02-integrity-audit.md))
+  - Gate 01: `pass` / `P0 Status: AUDIT_PASS` ([gate-01-integrity-audit.md](experiments/gate-01-integrity-audit.md))
+  - Gate 02: `STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL` / `P5 Status: INTEGRITY_PASS` ([gate-02-integrity-audit.md](experiments/gate-02-integrity-audit.md))
 - **Residual Opportunity**: Retained as `UNRESOLVED_RESEARCH_OPPORTUNITY` (residual Oracle headroom over ScoreOnly).
-- **Formal Decision Record**: [research-decision.md](file:///Users/oian/Codes/master/medrec-research/research/ideas/001-tension-guided-verification/research-decision.md)
-- **Failure Memory Record**: [tension-gate-02--recommender-confidence-sufficiency.md](file:///Users/oian/Codes/master/medrec-research/research/memory/failures/tension-gate-02--recommender-confidence-sufficiency.md)
+- **Formal Decision Record**: [research-decision.md](research-decision.md)
+- **Failure Memory Record**: [tension-gate-02--recommender-confidence-sufficiency.md](../../memory/failures/tension-gate-02--recommender-confidence-sufficiency.md)
 - **Next CCFA Owner**: `ccf-idea-optimizer` / Research Operator (Ideation Stage; not paper-writing or implementation)
 
 > **Scientific Lifecycle Summary (P6 Decision)**:
@@ -28,7 +28,7 @@
 >
 > *(The sections below preserve the historical hypothesis, task ontology, and roadmap as originally formulated prior to empirical falsification).*
 
-# MedRec Research Roadmap v2
+# MedRec research roadmap v2
 
 ## 0. 整条路线到底研究什么
 
@@ -52,7 +52,7 @@ $$
 \text{外部安全规则是否反对该预测}
 $$
 
-本路线不再声称“medication action 是临床决策的真实原子单位”，而提出一个更弱但可以被直接证伪的母假设：
+本路线不再声称"medication action 是临床决策的真实原子单位"，而提出一个更弱但可以被直接证伪的母假设：
 
 $$
 \boxed{
@@ -155,7 +155,7 @@ $M_{t-1}\rightarrow M_t$ 只是构造 observable transition 的手段。
 
 ---
 
-## 1.2 Action 定义
+## 1.2 action 定义
 
 对于药物 $m$：
 
@@ -183,7 +183,7 @@ m\in M_{t-1},
 m\notin M_t
 $$
 
-这里只能说“下一次处方未观察到”，不能解释成 clinician actively stopped the medication。
+这里只能说"下一次处方未观察到"，不能解释成 clinician actively stopped the medication。
 
 ### Not-Added
 
@@ -225,7 +225,7 @@ $$
 
 ---
 
-# 2. 最终优化问题：不是“最大准确率 + 最小 DDI”
+# 2. 最终优化问题：不是"最大准确率 + 最小 DDI"
 
 首先定义经验处方模仿目标：
 
@@ -289,13 +289,13 @@ C\leq B
 \right}
 $$
 
-其中 $\pi$ 是决定“哪些 candidate 值得再次审核”的 trigger policy。
+其中 $\pi$ 是决定"哪些 candidate 值得再次审核"的 trigger policy。
 
 这就是最终主线。
 
 ---
 
-# 3. S-1：Decision-Time / Leakage Audit
+# 3. S-1：Decision-Time / leakage audit
 
 这是所有 Setting 之前必须完成的零号条件。
 
@@ -388,7 +388,7 @@ $$
 
 ---
 
-## 3.3 Gate
+## 3.3 gate
 
 如果发现当前 baseline pipeline 存在明显未来信息：
 
@@ -400,7 +400,7 @@ $$
 
 ---
 
-# 4. S0：Observable Action Surface
+# 4. S0：Observable action surface
 
 通过 S-1 后，第一步仍然不设计模型。
 
@@ -495,7 +495,7 @@ $$
 
 > 某 action 是共同 failure mode。
 
-而是得到 empirical action landscape。
+而是得到实际候选动作空间。
 
 可能发现：
 
@@ -508,7 +508,7 @@ $$
 
 ---
 
-# 5. S0.5：Observability + Coverage Audit
+# 5. S0.5：Observability + coverage audit
 
 原来的 Observability Audit 必须与 Coverage 合并。
 
@@ -516,7 +516,7 @@ $$
 
 ---
 
-## 5.1 Observability
+## 5.1 observability
 
 分别统计：
 
@@ -550,7 +550,7 @@ Observed-Remove 降级为 exploratory analysis。
 
 ---
 
-## 5.2 Coverage
+## 5.2 coverage
 
 后面会出现：
 
@@ -606,7 +606,7 @@ $$
 
 ---
 
-# 6. S1：Action-Conditioned Model Evidence Sufficiency
+# 6. S1：Action-Conditioned model evidence sufficiency
 
 这是原 S1 的修正版。
 
@@ -658,7 +658,7 @@ $$
 
 ---
 
-## 6.2 Evidence atom 不能混粒度
+## 6.2 evidence atom 不能混粒度
 
 原框架把 diagnosis、procedure、medication、visit 放进同一预算，这不公平。
 
@@ -733,7 +733,7 @@ $$
 
 越低越好。
 
-### Comprehensiveness / Necessity
+### Comprehensiveness / necessity
 
 $$
 L_{\text{comp}}
@@ -746,7 +746,7 @@ $$
 
 对于正向 action，越大说明被选 evidence 越重要。
 
-### Semantic Replacement
+### Semantic replacement
 
 构造频率、时间位置相似但语义不同的 $\tilde E$：
 
@@ -758,7 +758,7 @@ s_f(a,m\mid E)
 s_f(a,m\mid\tilde E).
 $$
 
-这样才能排除 selector 只是偏爱“最近”“高频”等 shortcut。
+这样才能排除 selector 只是偏爱"最近""高频"等 shortcut。
 
 ---
 
@@ -813,7 +813,7 @@ $$
 
 ---
 
-## 7.1 Strong controls
+## 7.1 strong controls
 
 S1 至少击败：
 
@@ -839,7 +839,7 @@ $$
 
 ---
 
-# 8. S1.5：Evidence Lifecycle
+# 8. S1.5：Evidence lifecycle
 
 只有 S1 发现稳定 action-conditioned structure 后才进入。
 
@@ -875,11 +875,11 @@ P(E_{\text{clinical}}\mid Add,\Delta t)
 P(E_{\text{clinical}}\mid Retain,\Delta t).
 $$
 
-而不是简单发现“最近的信息更重要”。
+而不是简单发现"最近的信息更重要"。
 
 ---
 
-# 9. S2：Transition-Level Constraint Audit
+# 9. S2：Transition-Level constraint audit
 
 这是整条路线另一个非常扎实的基础 Setting。
 
@@ -897,7 +897,7 @@ $$
 
 ---
 
-## 9.1 External constraint
+## 9.1 external constraint
 
 设：
 
@@ -927,7 +927,7 @@ $$
 
 ---
 
-## 9.2 Introduced constraint
+## 9.2 introduced constraint
 
 若当前 Add $m_i$：
 
@@ -957,7 +957,7 @@ $$
 
 ---
 
-## 9.3 Persistent constraint
+## 9.3 persistent constraint
 
 若 interaction pair 在前后处方中都存在：
 
@@ -1055,7 +1055,7 @@ $$
 
 ---
 
-# 11. S2.5：Contextual Constraint Relevance
+# 11. S2.5：Contextual constraint relevance
 
 这一 Setting 降级成 exploratory。
 
@@ -1101,7 +1101,7 @@ Simple decay 只是 baseline。
 
 ---
 
-# 12. S3：Dual-Evidence Tension Audit
+# 12. S3：Dual-Evidence tension audit
 
 这是整个修订最重要的变化。
 
@@ -1115,7 +1115,7 @@ $$
 
 因为 ground-truth prescription 与 external safety constraint 本身可能发生冲突。
 
-一个模型偏离真实 prescription，可能降低了 external violation；此时不能简单叫“错误”。
+一个模型偏离真实 prescription，可能降低了 external violation；此时不能简单叫"错误"。
 
 S3 真正研究：
 
@@ -1173,7 +1173,7 @@ $$
 
 ---
 
-# 13. S3 第一版不要急着定义一个 Conflict Score
+# 13. S3 第一版不要急着定义一个 conflict score
 
 不要先写：
 
@@ -1273,7 +1273,7 @@ $$
 
 ---
 
-# 14. S3 的真正输出不是模型，而是一张 Tension Map
+# 14. S3 的真正输出不是模型，而是一张 tension map
 
 最理想的核心图不是：
 
@@ -1315,17 +1315,17 @@ $$
 
 S4 主线直接死亡。
 
-如果 HH 完全等于“多药患者”：
+如果 HH 完全等于"多药患者"：
 
 Tension hypothesis 也死亡。
 
 ---
 
-# 15. S4：Budgeted Tension-Aware Verification & Revision
+# 15. S4：Budgeted Tension-Aware verification & revision
 
 这是整条路线真正的方法学核心。
 
-X-Ray 文献已经明确形成 Candidate → Verify → Revise 的趋势，SafeRx-Agent、PharmGraph-Auditor 等都在把生成和验证分开，因此“增加一个 verifier”本身不是 novelty。
+X-Ray 文献已经明确形成 Candidate → Verify → Revise 的趋势，SafeRx-Agent、PharmGraph-Auditor 等都在把生成和验证分开，因此"增加一个 verifier"本身不是 novelty。
 
 GiantMed 等也已经说明 boundary medication refinement 是邻近 occupied space。
 
@@ -1396,7 +1396,7 @@ $$
 
 ---
 
-# 16. Tension Trigger 第一版不要复杂
+# 16. Tension trigger 第一版不要复杂
 
 最开始可以使用：
 
@@ -1435,7 +1435,7 @@ $$
 
 ---
 
-# 17. S4 必须比较的 Trigger
+# 17. S4 必须比较的 trigger
 
 原研究框架的 same-budget design 必须保留，而且要加强。
 
@@ -1501,7 +1501,7 @@ $$
 
 ---
 
-# 18. Revision Budget 必须完全匹配
+# 18. Revision budget 必须完全匹配
 
 对于所有 trigger：
 
@@ -1652,7 +1652,7 @@ $$
 
 ---
 
-# 21. S4 的 Kill Criteria
+# 21. S4 的 kill criteria
 
 以下任意一种出现，都应该主动杀掉复杂方法。
 
@@ -1700,7 +1700,7 @@ $$
 
 ---
 
-# 22. S5：Counterfactual / Perturbation Stress Tests
+# 22. S5：Counterfactual / perturbation stress tests
 
 S5 不负责证明现实中存在某种临床机制。
 
@@ -1716,7 +1716,7 @@ $$
 
 ---
 
-## 22.1 Evidence deletion
+## 22.1 evidence deletion
 
 对于 S1 找到的 $E^+$：
 
@@ -1730,7 +1730,7 @@ $$
 
 ---
 
-## 22.2 Matched irrelevant deletion
+## 22.2 matched irrelevant deletion
 
 删除相同数量、相似频率，但无关的 $\tilde E$：
 
@@ -1744,7 +1744,7 @@ $$
 
 ---
 
-## 22.3 Semantic replacement
+## 22.3 semantic replacement
 
 $$
 E^+
@@ -1758,7 +1758,7 @@ $\tilde E^+$ 控制 frequency / position，只改变语义。
 
 ---
 
-## 22.4 Temporal corruption
+## 22.4 temporal corruption
 
 $$
 t_e
@@ -1770,7 +1770,7 @@ $$
 
 ---
 
-## 22.5 Constraint injection/removal
+## 22.5 constraint injection/removal
 
 加入一条相关 external constraint：
 
@@ -1802,7 +1802,7 @@ $$
 
 ---
 
-## 22.6 Synthetic data 的严格边界
+## 22.6 synthetic data 的严格边界
 
 LLM 可以用作：
 
@@ -1816,11 +1816,11 @@ X-Ray 中 GenRxR 已经暴露出反事实合成数据真实性和跨环境迁移
 
 ---
 
-# 23. 六个统一 Research Gates
+# 23. 六个统一 research gates
 
 这部分直接继承原来的科研框架，因为它本身是正确的。
 
-## Gate A：Problem / Phenomenon Exists
+## Gate A：Problem / phenomenon exists
 
 先冻结模型。
 
@@ -1841,7 +1841,7 @@ $$
 
 ---
 
-## Gate B：Minimal Intervention
+## Gate B：Minimal intervention
 
 任何新 idea 先做最小版本。
 
@@ -1875,7 +1875,7 @@ $$
 
 ---
 
-## Gate C：Strongest Simple Control
+## Gate C：Strongest simple control
 
 这是整个项目最重要的 Gate。
 
@@ -1924,7 +1924,7 @@ $$
 
 ---
 
-## Gate D：Mechanism Test
+## Gate D：Mechanism test
 
 如果 claim 是 Tension-based allocation：
 
@@ -1946,11 +1946,11 @@ $$
 
 或者更重要：
 
-在相同 $B$ 下，Tension policy 的 frontier 改善来自它更准确地选中了“值得 revision 的 action”。
+在相同 $B$ 下，Tension policy 的 frontier 改善来自它更准确地选中了"值得 revision 的 action"。
 
 ---
 
-## Gate E：Backbone Independence
+## Gate E：Backbone independence
 
 至少选三个结构差异明显的 backbone。
 
@@ -1992,7 +1992,7 @@ FLAME、KEHGCN 可以作为完整系统 comparison，而不一定强行插件化
 
 ---
 
-## Gate F：Scale Up
+## Gate F：Scale up
 
 只有 A–E 通过以后才扩规模：
 
@@ -2056,7 +2056,7 @@ $$
 
 ---
 
-# 25. 整条路线哪些是“基础设施”，哪些是真正论文贡献
+# 25. 整条路线哪些是"基础设施"，哪些是真正论文贡献
 
 这一点必须分清。
 
@@ -2128,7 +2128,7 @@ $$
 
 # 27. 不同实验结果，对应不同论文路线
 
-这部分也继承最初框架“结果决定论文，而不是先决定论文再解释结果”的原则。
+这部分也继承最初框架"结果决定论文，而不是先决定论文再解释结果"的原则。
 
 ### 路线 A：S1 很强，S2/S3 弱
 
@@ -2166,7 +2166,7 @@ $$
 
 > tension phenomenon 是真的，但 tension 不是更好的 allocation signal。
 
-此时不能硬做“Conflict-Aware Revision”。
+此时不能硬做"Conflict-Aware Revision"。
 
 可能形成 diagnostic / benchmark 型工作，但主模型故事结束。
 
@@ -2224,7 +2224,7 @@ $$
 }
 $$
 
-这时论文真正的贡献就不是“双塔”“KG”“LLM agent”或者“又一个 safety loss”。
+这时论文真正的贡献就不是"双塔""KG""LLM agent"或者"又一个 safety loss"。
 
 而是：
 
@@ -2234,7 +2234,7 @@ $$
 
 # 28. 代码库应该围绕科研假设，而不是围绕模型名字组织
 
-最初研究框架里“失败的方法死掉，但 instrumentation 留下”的思想非常重要。
+最初研究框架里"失败的方法死掉，但 instrumentation 留下"的思想非常重要。
 
 建议最终结构：
 

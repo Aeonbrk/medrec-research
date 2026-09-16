@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Memory — Exposure-Conditioned Learning Gate 01: Direct-Control Sufficiency
+# Failure memory. Exposure-conditioned learning Gate 01: direct-control sufficiency
 
 ## Failure class
 
@@ -9,7 +9,7 @@
 ## Source
 
 - Idea: `006-exposure-conditional-medication-recommendation`
-- Gate: Gate 01 — Exposure-Conditioned Learning vs Direct Exposure Controls
+- Gate: Gate 01, exposure-conditioned learning vs direct exposure controls
 - Gate verdict: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
 - Execution commit: `3e51887a570bf8c4ef9503f7ffb852881c931130`
 - Integrity audit: `INTEGRITY_AUDIT_PASS`

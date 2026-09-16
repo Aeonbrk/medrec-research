@@ -1,4 +1,4 @@
-# Residual-Dependence Headroom Probe
+# Residual-dependence headroom probe
 
 This is one bounded, throwaway pre-Idea diagnostic. It asks whether the true
 medication vector contains visit-specific conditional dependence after the

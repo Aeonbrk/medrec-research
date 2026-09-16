@@ -70,7 +70,7 @@ The durable finding is therefore limited to the tested representation and estima
 
 ## What did not fail
 
-- **The strong-control requirement remains valid**: Future candidate selectors must face frozen recommender confidence and candidate-specific trivial confounds. Idea 003 additionally shows a positive `StrongControl - ScoreOnly` interval at the 20% primary budget, while the 10% interval crosses zero.
+- **The strong-control requirement remains valid**: Future candidate selectors must face frozen recommender confidence and candidate-specific trivial confounds. Idea 003 also shows a positive `StrongControl - ScoreOnly` interval at the 20% primary budget, while the 10% interval crosses zero.
 - **Residual false-positive heterogeneity remains unresolved**:
 
 $$

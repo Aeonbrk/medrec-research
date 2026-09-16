@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Integrity Audit Report
+# Gate 01 integrity audit report
 
 - **Idea**: `002-score-geometry-sufficiency`
 - **Gate**: `gate-01-score-geometry-sufficiency`
@@ -12,7 +12,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full
@@ -42,7 +42,7 @@ P6 research decision unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-Evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -51,7 +51,7 @@ P6 research decision unlocked: yes
 | `gate-01-summary.json` & §15 | Residual Oracle headroom survives on fresh Idea-002 Audit split: Oracle achieves 100.0% yield, beating ScoreOnly by $+38.79\%$ (10% budget) and $+40.68\%$ (20% budget). | Empirically verified: $Oracle - Score = +38.79\%$ (10%, 95% CI: [34.36%, 42.29%]), $+40.68\%$ (20%, 95% CI: [37.65%, 44.06%]). Both lower CIs $> 0$. | **Supported** | None. |
 | `gate-01-summary.json` & §15 | `ScoreGeometry` achieves identical yield to `ScoreOnly` ($Geometry - Score = 0.0\%$, 95% CI: [0.0%, 0.0%] across all budgets). Preregistered score map supplies zero incremental routing signal. | Empirically verified: Dev quintile map has strictly monotonic empirical risks ($\hat p_1 > \hat p_2 > \hat p_3 > \hat p_4 > \hat p_5$). With raw score ascending tie-break, candidate ordering collapses identically to `ScoreOnly`. | **Supported** | None. |
 
-### Explicitly Disallowed Claims Check
+### Explicitly disallowed claims check
 
 The audit confirmed that none of the forbidden claims are asserted in active repository documentation:
 
@@ -63,7 +63,7 @@ The audit confirmed that none of the forbidden claims are asserted in active rep
 
 ---
 
-## 2. Frozen Identity Audit
+## 2. Frozen identity audit
 
 The formal public summary records exactly the 10 frozen identities, verified against registry authority and execution environment:
 
@@ -82,7 +82,7 @@ The formal public summary records exactly the 10 frozen identities, verified aga
 
 ---
 
-## 3. Candidate Corpus & Row-Level Invariant Audit
+## 3. Candidate corpus & Row-Level invariant audit
 
 Evaluated on all 15,549 rows of `gate-01-candidates.jsonl`:
 
@@ -99,7 +99,7 @@ Evaluated on all 15,549 rows of `gate-01-candidates.jsonl`:
 
 ---
 
-## 4. Fresh Split Integrity Audit
+## 4. Fresh split integrity audit
 
 The complete validation cohort was independently partitioned using standard library `random.Random(2002)` over $0 \dots 1058$ ($N=1059$):
 
@@ -118,7 +118,7 @@ The complete validation cohort was independently partitioned using standard libr
 
 ---
 
-## 5. Dev-Only Score Geometry Map Audit
+## 5. Dev-Only score geometry map audit
 
 Computed strictly from the 7,422 Dev partition candidates without any access to Audit labels:
 
@@ -131,7 +131,7 @@ Computed strictly from the 7,422 Dev partition candidates without any access to 
 | 0.6 | 4454 (score sorted index 4453) | 0.9492053389549255 | 0.9492053389549255 | Exact match |
 | 0.8 | 5938 (score sorted index 5937) | 0.9794603586196899 | 0.9794603586196899 | Exact match |
 
-### Empirical Bin Risk and Ordering
+### Empirical bin risk and ordering
 
 | Bin | Score Interval | Dev Candidates | Distinct Patients | Dev $P(Y^{PB}=1)$ | Priority Rank | Status |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -141,7 +141,7 @@ Computed strictly from the 7,422 Dev partition candidates without any access to 
 | B4 | $0.949205 < s \le 0.979460$ | 1,484 | 408 | 0.179919 (267 / 1484) | 4 | Exact match |
 | B5 | $s > 0.979460$ | 1,484 | 362 | 0.053908 (80 / 1484) | 5 | Exact match |
 
-### Order Equivalence Finding
+### Order equivalence finding
 
 Because $\hat p_1 > \hat p_2 > \hat p_3 > \hat p_4 > \hat p_5$ is strictly monotonic non-increasing with model score, and within each bin candidate tie-breaking sorts by $s$ ascending, the induced `ScoreGeometry` candidate ranking on Dev is **100% order-equivalent to raw ScoreOnly**:
 
@@ -150,7 +150,7 @@ Because $\hat p_1 > \hat p_2 > \hat p_3 > \hat p_4 > \hat p_5$ is strictly monot
 
 ---
 
-## 6. Audit Policy Yields, Gaps & Headroom Audit
+## 6. Audit policy yields, gaps, and headroom audit
 
 Evaluated on all 8,127 Audit candidates across 422 patients using the frozen Dev quintile map:
 
@@ -184,7 +184,7 @@ Evaluated on all 8,127 Audit candidates across 422 patients using the frozen Dev
 
 ---
 
-## 7. Patient-Clustered Bootstrap Uncertainty Audit
+## 7. Patient-Clustered bootstrap uncertainty audit
 
 Resampling unit: Audit patient ($N=422$ unique clusters). Replicates: 1,000, seed: 1203.
 
@@ -214,7 +214,7 @@ Resampling unit: Audit patient ($N=422$ unique clusters). Replicates: 1,000, see
 
 ---
 
-## 8. Decision Tree Verification
+## 8. Decision tree verification
 
 1. **Gate 01-A Support Check**:
    - Audit beneficial patients ($Y^{PB}=1$): $419 \ge 50$ (Pass)
@@ -235,7 +235,7 @@ Resampling unit: Audit patient ($N=422$ unique clusters). Replicates: 1,000, see
 
 ---
 
-## 9. Final Auditor Verdict
+## 9. Final auditor verdict
 
 ```text
 P5 Status: INTEGRITY_PASS

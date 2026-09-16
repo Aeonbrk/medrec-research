@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Grounding: Event-Sourced Regimen Editing
+# Idea grounding: event-sourced regimen editing
 
 ## Decision context
 
@@ -28,9 +28,9 @@ M0 tests whether this discarded action-state structure is predictive enough to j
 
 ## Closest work and exact delta
 
-### Rough et al. — Predicting Inpatient Medication Orders From EHR Data
+### Rough et al.: Predicting inpatient medication orders from EHR data
 
-Stable source: https://doi.org/10.1002/cpt.1826
+Stable source: <https://doi.org/10.1002/cpt.1826>
 
 Rough et al. predict specific inpatient medication orders whenever a medication order is placed, with a 10-minute multilabel horizon and only pre-order EHR information. This is the closest task-level precedent for order-time prediction.
 
@@ -48,9 +48,9 @@ Not covered by that work:
 - state-valid action decoding;
 - learned action-medication structure beyond medication identity.
 
-### MICRON — Change Matters
+### MICRON: Change matters
 
-Stable source: https://doi.org/10.24963/ijcai.2021/513
+Stable source: <https://doi.org/10.24963/ijcai.2021/513>
 
 MICRON explicitly predicts medication addition and removal sets by modeling differences between consecutive visits.
 
@@ -69,9 +69,9 @@ Remaining distinction:
 
 Therefore "predict medication changes" alone is not novel enough.
 
-### ARMR — Adaptively Responsive Network for Medication Recommendation
+### ARMR: Adaptively responsive network for medication recommendation
 
-Stable source: https://doi.org/10.24963/ijcai.2025/871
+Stable source: <https://doi.org/10.24963/ijcai.2025/871>
 
 ARMR explicitly balances reuse of historical medications and introduction of new drugs according to changing patient state.
 
@@ -89,7 +89,7 @@ Remaining distinction:
 
 ### HeteroMed
 
-Stable source: https://doi.org/10.1007/s13755-026-00430-5
+Stable source: <https://doi.org/10.1007/s13755-026-00430-5>
 
 HeteroMed uses collaborative drug expansion and inheritance to model medication increases and decreases while integrating heterogeneous EHR knowledge.
 
@@ -159,7 +159,7 @@ The reset succeeds only if the new decision structure itself carries incremental
 
 ## Current confidence
 
-- Problem importance: `moderate-high` — medication management is intrinsically an edit process, and order-time support is more deployment-aligned than discharge-coded visit snapshots.
-- Project-resource fit: `high` — raw POE transaction types and causal order-time infrastructure already exist.
-- Novelty confidence: `moderate / needs-final-search` — closest work covers either visit-level changes or order-time medication identity, but a final strict overlap review is still required.
-- Expected research-time efficiency: `high if M0 passes` — the premise can be falsified with one bounded run before building a final architecture.
+- Problem importance: `moderate-high`: medication management is intrinsically an edit process, and order-time support is more deployment-aligned than discharge-coded visit snapshots.
+- Project-resource fit: `high`: raw POE transaction types and causal order-time infrastructure already exist.
+- Novelty confidence: `moderate / needs-final-search`: closest work covers either visit-level changes or order-time medication identity, but a final strict overlap review is still required.
+- Expected research-time efficiency: `high if M0 passes`: the premise can be falsified with one bounded run before building a final architecture.

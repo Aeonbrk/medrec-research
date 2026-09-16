@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 005 Output-Structure Signature Gate Plan
+# Idea 005 output-structure signature gate plan
 
 ## Goal
 
@@ -35,21 +35,21 @@ Excluded:
 
 ## Work units
 
-### P0 — Protocol and state verification
+### P0: Protocol and state verification
 
 - Confirm local `origin/main` equals the accepted Gate implementation revision.
 - Confirm clean harness checkout.
 - Confirm Idea 004 remains terminated and Idea 005 protocol is the active Gate.
 - Confirm test split has not been staged or predicted.
 
-### P1 — Local software verification
+### P1: Local software verification
 
 - Run Idea 005 self-test.
 - Run focused unit tests.
 - Run repository completion checks required by `AGENTS.md`.
 - Fix only implementation defects that violate the frozen Gate; any scientific-protocol change returns to design review.
 
-### P2 — 319 preflight
+### P2: 319 preflight
 
 Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`.
 
@@ -57,7 +57,7 @@ Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`.
 - Verify authenticated expected account, clean exact remote checkout, external data root, frozen baseline source/checkpoint/environment, current disk capacity, and admissible GPU state.
 - Do not mutate data, baseline source, checkpoint, or environment to force admission.
 
-### P3 — One formal validation-only run
+### P3: One formal validation-only run
 
 - Use a fresh restricted run directory.
 - Stage only validation contexts/targets plus required frozen identity metadata.
@@ -66,7 +66,7 @@ Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`.
 - Evaluate the mechanical Gate on Audit once.
 - Do not rerun with changed seeds, thresholds, groups, signatures, or support conditions.
 
-### P4 — Integrity audit
+### P4: Integrity audit
 
 Independently verify:
 
@@ -79,7 +79,7 @@ Independently verify:
 - Gate A/B/C counts mechanically imply the reported verdict;
 - public summary contains no restricted patient-level material.
 
-### P5 — Research decision
+### P5: Research decision
 
 Record exactly one of:
 

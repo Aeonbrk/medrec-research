@@ -1,4 +1,4 @@
-# Gate 01 P1 Mechanical-Preflight Integrity Audit — Idea 007
+# Gate 01 P1 mechanical-preflight integrity audit: Idea 007
 
 ## Audit status
 
@@ -28,7 +28,7 @@ inspect a patient row, or evaluate a model.
 | Global and partition counts are arithmetically consistent. | `E_rec`: `3,907,607 + 826,301 + 819,547 = 5,553,455`; `N_A`: `114,350 + 25,091 + 24,169 = 163,610`. | **PASS** |
 | Coverage ratios are computed from the reported counts. | Global `163,610 / 5,553,455 = 0.0294609392`; Train `0.0292634341`; Dev `0.0303654479`; Audit `0.0294906820`. | **PASS** |
 | Concentration booleans follow the frozen thresholds. | Medication shares pass all scopes. Patient maximum/top-20 shares fail in Dev and Audit and pass in Train exactly as reported against `0.01` / `0.10`. | **PASS** |
-| The STOP verdict follows the frozen decision rule. | Global and every partition fail the coverage floor; every scope also fails the minimum supported-events-per-counted-medication floor. Dev and Audit additionally fail patient concentration. | **PASS** |
+| The STOP verdict follows the frozen decision rule. | Global and every partition fail the coverage floor; every scope also fails the minimum supported-events-per-counted-medication floor. Dev and Audit also fail patient concentration. | **PASS** |
 | No private material entered the committed report. | JSON validation and a forbidden-field scan found no patient/admission/event identifiers, raw times, trajectories, predictions, checkpoints, or weights. | **PASS** |
 | No downstream scientific execution occurred. | Report flags `training: NOT_RUN`, `recommendation_outcomes_accessed: false`, quarantines intact, and the remote run exited immediately after writing aggregate evidence. | **PASS** |
 

@@ -1,4 +1,4 @@
-# Gate 01 Decision Record — Exposure-Conditioned Learning vs Direct Exposure Controls
+# Gate 01 decision record: exposure-conditioned learning vs direct exposure controls
 
 ## Verdict: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
 
@@ -12,13 +12,13 @@
 
 ---
 
-## 1. Decision Question Answered
+## 1. Decision question answered
 
 > Under the frozen leakage-safe provider-order-time task, does end-to-end exposure-conditioned DDI learning create incremental safety/fidelity value beyond a direct exposure-aware reranker that receives exactly the same active-regimen state and DDI matrix?
 
 **Result**: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
 
-### Conditions Evaluation Matrix
+### Conditions evaluation matrix
 
 | Condition | Description | Threshold | Observed Value | Verdict |
 | :--- | :--- | :--- | :--- | :--- |
@@ -30,7 +30,7 @@
 
 ---
 
-## 2. Dev Evaluation Metrics (K=5 Primary)
+## 2. Dev evaluation metrics (K=5 Primary)
 
 | Method | Selected Param | Recall@5 | IncrementalExposureDDI@5 | ActiveDDI@5 | NewDDI@5 | NDCG@5 | Hit@5 | MRR | micro-PRAUC |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -43,7 +43,7 @@
 
 ---
 
-## 3. Secondary Evaluation Metrics (K=10)
+## 3. Secondary evaluation metrics (K=10)
 
 | Method | Recall@10 | IncrementalExposureDDI@10 | ActiveDDI@10 | NewDDI@10 | NDCG@10 | Hit@10 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -56,7 +56,7 @@
 
 ---
 
-## 4. Quarantine and Scientific Integrity Verification
+## 4. Quarantine and scientific integrity verification
 
 1. **Quarantine Adherence**:
    - `R0 Holdout` was strictly uninspected (0 clinical events, 0 predictions, 0 targets accessed).
@@ -71,6 +71,6 @@
 
 ---
 
-## 5. Next Routing
+## 5. Next routing
 
 - **Next Owner Skill**: `ccf-pipeline-orchestrator`

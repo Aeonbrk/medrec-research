@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD013 -->
 
-# Search Notes
+# Search notes
 
-## Search Mode
+## Search mode
 
 `ccf-literature-searcher / exploratory`
 
 This was the single bounded reset authorized after B0 failure. It was not a broad 'latest medication recommendation' search.
 
-## Safe Queries Used
+## Safe queries used
 
 Representative public queries:
 
@@ -23,7 +23,7 @@ Representative public queries:
 - `Counterfactual Implicit Feedback Modeling NeurIPS 2025`
 - `Correct and Weight implicit feedback false negatives 2026`
 
-## Sources Checked
+## Sources checked
 
 Primary/high-confidence sources included:
 
@@ -34,7 +34,7 @@ Primary/high-confidence sources included:
 - stable arXiv pages;
 - the user-maintained 64-paper `xray-papers-innovation-summary.md` as the project's primary literature prior.
 
-## Screened Clusters
+## Screened clusters
 
 1. MedRec noisy-label robustness: KRAM.
 2. MedRec hierarchical/multi-label objective design: CEHMR.
@@ -45,7 +45,7 @@ Primary/high-confidence sources included:
 
 Broader longitudinal, KG/RAG/agent, rule-safety, and action-change families were not re-expanded because the repository reorientation already marks them crowded or conditionally closed and B0 supplied no evidence that reopens them.
 
-## Excluded Sources
+## Excluded sources
 
 - Policy-excluded venue/domain sources, including MDPI, were omitted from the final report.
 - Search-engine mirrors, scraped copies, and ResearchGate were not used as primary provenance when a publisher/proceedings/arXiv source was available.
@@ -57,7 +57,7 @@ Broader longitudinal, KG/RAG/agent, rule-safety, and action-change families were
 - Current MIMIC labels do not identify the complete clinically acceptable medication set. That is precisely the supervision problem; it also limits direct clinical validation of any method using only retrospective set overlap.
 - It remains unknown whether a MedRec-specific observation mechanism can be identified from the existing structured pipeline strongly enough to beat generic PU/MNAR losses without importing expensive new annotations.
 
-## Handoff Notes
+## Handoff notes
 
 ### For idea optimization
 

@@ -1,10 +1,10 @@
 <!-- markdownlint-disable MD013 -->
 
-# B0 — Cardinality Attribution Decision Record
+# B0 cardinality attribution decision record
 
-## 1. Scientific Protocol Identity
+## 1. Scientific protocol identity
 
-- **Audit Gate**: `B0 — Cardinality Attribution`
+- **Audit Gate**: `B0 (cardinality attribution)`
 - **Single Source of Truth**: `research/premise-audit/README.md`
 - **Backbone Identity**: MoleRec Table 1 Comparison Mode (`dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`)
 - **Checkpoint SHA256**: `5de4665570d8730f2c49ca7de963a43847037c00480c52e580d651cd79fd0dca`
@@ -14,9 +14,9 @@
 
 ---
 
-## 2. Quantitative Evidence
+## 2. Quantitative evidence
 
-### 2.1 Sample Size and Count Distribution
+### 2.1 sample size and count distribution
 
 - **Validation Cohort Patients**: 1059 (859 patients with $\ge 1$ eligible visit)
 - **Validation Visits**: 1220
@@ -24,14 +24,14 @@
 - **Equal-count Prevalence ($|\hat M_t| = |M_t|$)**: 0.0779 (7.79%)
 - **Over-count Prevalence ($|\hat M_t| > |M_t|$)**: 0.5844 (58.44%)
 
-### 2.2 Primary Paired Outcomes
+### 2.2 primary paired outcomes
 
 | Metric | Original Frozen ($\hat M_t^{orig}$) | Oracle-Count Diagnostic ($\hat M_t^{oc}$) | Paired Delta | 95% Patient Bootstrap CI |
 | :--- | :--- | :--- | :--- | :--- |
 | **F1** | 0.6881 | 0.6981 | +0.0100 | [+0.0067, +0.0134] |
 | **Pair-Normalized DDI Rate** | 0.0445 | 0.0445 | -0.0000 | [-0.0007, +0.0007] |
 
-### 2.3 Secondary and Corroborating Outcomes
+### 2.3 secondary and corroborating outcomes
 
 | Metric | Original Frozen ($\hat M_t^{orig}$) | Oracle-Count Diagnostic ($\hat M_t^{oc}$) | Paired Delta | 95% Patient Bootstrap CI |
 | :--- | :--- | :--- | :--- | :--- |
@@ -43,7 +43,7 @@
 
 ---
 
-## 3. Frozen Decision Gate Evaluation
+## 3. Frozen decision gate evaluation
 
 | Condition | Threshold Requirement | Observed Empirical Value | Gate Status |
 | :--- | :--- | :--- | :--- |
@@ -53,7 +53,7 @@
 
 ---
 
-## 4. Final Verdict and Next State
+## 4. Final verdict and next state
 
 - **Verdict**: `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
 - **Diagnostic Role**: Diagnostic attribution only; oracle-count is strictly non-deployable and not a baseline.

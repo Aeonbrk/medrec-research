@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Semantic Admission Ledger — Safety-Preserving Substitution Structure
+# Semantic admission ledger: safety-preserving substitution structure
 
 - **Idea**: `005-safety-substitution-structure`
 - **Formal Run ID**: `gate-01-output-structure-signature-20260904-155810`
@@ -14,7 +14,7 @@
 
 ---
 
-## 1. Adjudication Ledger
+## 1. Adjudication ledger
 
 | # | Directed Relation ($y_t \to a_t$) | Parent ATC-2 | Authoritative Source (Tier A) | Issuing Org & Year | Stable Link / DOI | Relevant Clinical Context | Naive Shared Indication | Strict Semantic Label | Concise Clinical Rationale |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: | :--- |
@@ -44,7 +44,7 @@
 
 ---
 
-## 2. Adjudication Summary
+## 2. Adjudication summary
 
 - **Total supported candidate relations**: 23
 - **Strict Admitted relations (`ADMIT_ALTERNATIVE_CLASS_RELATION`)**: 1

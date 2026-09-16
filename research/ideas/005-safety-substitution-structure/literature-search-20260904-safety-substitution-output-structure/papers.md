@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Literature Set — Safety Substitution and Output Structure
+# Literature Set: Safety substitution and output structure
 
 Search cutoff: 2026-09-04.
 

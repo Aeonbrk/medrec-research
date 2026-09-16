@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Formal Execution Authorization — Idea 008
+# Gate 01 formal execution authorization: Idea 008
 
 ## Authorization status
 
@@ -272,7 +272,7 @@ After configuration selection, freeze the selected configuration and its three r
 
 ## 9. Frozen controls
 
-### Fixed-K Budget-Aware Greedy + 1-Swap
+### Fixed-K Budget-Aware greedy + 1-Swap
 
 Use the exact deterministic protocol-v1.2 algorithm with identical `s`, DDI matrix, complete candidate pool, requested budget, and `K_x`. Do not add restarts, MILP/MIQP, beam search, evolutionary search, or another solver family.
 

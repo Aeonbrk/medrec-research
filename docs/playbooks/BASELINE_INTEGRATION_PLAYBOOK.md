@@ -1,4 +1,4 @@
-# Baseline Integration Playbook
+# Baseline integration playbook
 
 This playbook adds external medication-recommendation baselines without copying a model zoo into the Active Research Home.
 
@@ -20,13 +20,13 @@ When a pinned source needs harness-owned invocation, implement one Reproduction 
 
 Create the declared Conda environment and run the pinned source outside this repository. Record preprocessing, split, feature timing, checkpoint selection, thresholding, metric aggregation, random seeds, and working-directory assumptions. This characterizes Reproduction Mode only and cannot create a Comparison Mode Run Record. Preserve restricted outputs outside Git.
 
-## 4. Implement the Prediction Adapter
+## 4. Implement the prediction adapter
 
 The Baseline Environment emits target-free Adapter Prediction Payloads containing visit identity, predicted medications, and optional scores. It never emits split or target fields. The core Prediction Adapter joins those payloads to core-owned targets and creates Prediction Records. The baseline-side code may translate identifiers, storage formats, tensors, and output serialization. It may not modify the Baseline Core, add information, select a new threshold, or repair recommendations unless that operation is declared for every compared method.
 
 The core process adapter keeps expected evaluation records outside the subprocess request. It rejects target-bearing requests before launch, nonzero exits, malformed JSON, schema violations, missing or extra visits, duplicate visits, unknown medication codes, and core-owned fields in output. Do not accept best-effort output or let baseline code define evaluation labels.
 
-## 5. Spend the Adaptation Budget
+## 5. Spend the adaptation budget
 
 Declare the same allowed tuning and integration allowance for all compared methods before validation runs. Record trial count, search space, selection metric, seeds, stopping rule, and compute allowance. Test data cannot be used.
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# MICA-v2 Screen — Accuracy and Safe-Decision Extensions
+# MICA-v2 screen: accuracy and safe-decision extensions
 
 Status: implementation, primary-source collision screen, preflight, and the
 six complete Train/Dev lanes are finished.  Public-safe aggregate evidence is
@@ -52,7 +52,7 @@ families:
 Medication-specific attention, fine-grained history, current/history paths,
 generic set prediction, DDI losses, and decision-focused ranking are therefore
 treated as prior art or adjacent primitives.  The purpose here is to test a
-coherent synthesis around the already validated DrugQuery substrate.
+coherent synthesis around the already validated DrugQuery base.
 
 ## Canonical data and entitlement
 
@@ -212,7 +212,7 @@ deviation, NLL, wall time, peak memory, source revision, and runtime metadata.
 | Core | 848900 | 3 | 0.542244156 | 0.695005519 | 0.792730126 | 0.702829904 | 0.711926450 | 0.076299636 | 19.9535 | 7.3448 | 0.202483 | 0.474090260 | 1591.826 | 419.755 |
 | FineHistory | 848900 | 3 | 0.545571259 | 0.698012548 | 0.793580091 | 0.697115527 | 0.724617377 | 0.076861089 | 20.4568 | 7.2738 | 0.201844 | 0.474567144 | 2302.053 | 4170.571 |
 | DualEvidence | 849285 | 3 | 0.541726823 | 0.694895597 | 0.790286786 | 0.693028408 | 0.722212573 | 0.075270373 | 20.5211 | 7.3309 | 0.203168 | 0.471593672 | 2171.346 | 498.200 |
-| SafePTO | 848900 | 3 | 0.530585641 | 0.684883786 | 0.792730126 | 0.692547844 | 0.701637631 | 0.054273453 | 19.9535 | 7.3448 | 0.202483 | 0.465547732 | — | — |
+| SafePTO | 848900 | 3 | 0.530585641 | 0.684883786 | 0.792730126 | 0.692547844 | 0.701637631 | 0.054273453 | 19.9535 | 7.3448 | 0.202483 | 0.465547732 | - | - |
 | SafeRank | 848900 | 3 | 0.529318395 | 0.683672466 | 0.792415427 | 0.693806893 | 0.698106292 | 0.054160684 | 19.8300 | 7.3674 | 0.202427 | 0.466505052 | 7152.467 | 418.742 |
 | SelfOnly | 981380 | 4 | 0.540036756 | 0.692749231 | 0.790218582 | 0.698974006 | 0.711374540 | 0.077534246 | 19.8662 | 6.5460 | 0.205359 | 0.472723310 | 1572.713 | 451.940 |
 | SetContext | 981380 | 4 | 0.539562262 | 0.692592812 | 0.789016459 | 0.704655031 | 0.705205222 | 0.078843891 | 19.4488 | 6.1504 | 0.205355 | 0.471958603 | 1562.282 | 451.940 |

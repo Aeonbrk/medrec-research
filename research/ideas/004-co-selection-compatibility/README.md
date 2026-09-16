@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 004: Frequency-Corrected Co-Selection Compatibility
+# Idea 004: Frequency-Corrected Co-Selection compatibility
 
 - **Idea ID**: `004-co-selection-compatibility`
 - **Status**: `REJECTED / TERMINATED_AT_GATE_01`
@@ -105,7 +105,7 @@ The mechanism is an error-routing hypothesis. Co-selection association is not in
 
 ## Closest prior work
 
-The retained closest-work set includes HI-DR (AAAI 2025; DOI `10.1609/aaai.v39i11.33301`), DMRNet (Neural Networks 2026; DOI `10.1016/j.neunet.2026.109168`), MSAM (arXiv `2601.19259`), GenRxR (RecSys 2026; DOI `10.1145/3773078.3831753`), GRAIN (arXiv `2608.00098`), and CRHP (IEEE JBHI; DOI `10.1109/JBHI.2025.3582393`). These works make generic “use medication relations/co-prescription” claims non-novel.
+The retained closest-work set includes HI-DR (AAAI 2025; DOI `10.1609/aaai.v39i11.33301`), DMRNet (Neural Networks 2026; DOI `10.1016/j.neunet.2026.109168`), MSAM (arXiv `2601.19259`), GenRxR (RecSys 2026; DOI `10.1145/3773078.3831753`), GRAIN (arXiv `2608.00098`), and CRHP (IEEE JBHI; DOI `10.1109/JBHI.2025.3582393`). These works make generic "use medication relations/co-prescription" claims non-novel.
 
 ## Novelty delta
 

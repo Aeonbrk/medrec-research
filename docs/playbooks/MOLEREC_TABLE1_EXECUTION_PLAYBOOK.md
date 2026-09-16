@@ -1,8 +1,8 @@
-# MoleRec Table 1 Five-Model Reproduction Playbook
+# MoleRec table 1 five-model reproduction playbook
 
 This playbook is the operator gate for the reproduction defined by `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`. It is not evidence of execution. Attempt `formal-20260828-a09fcab-u8-b` completed through authorized continuation `continuation-20260830-pathfix-1` with verdict `completed_mismatch`. The original failed queue and all continuation evidence are terminal; do not replay, relabel, or tune them.
 
-## Scope and Invariants
+## Scope and invariants
 
 1. **Reproduction Mode only**: Comparison Mode, Prediction Adapters, and comparison qualifications are out of scope.
 2. **Frozen authorities**:
@@ -37,7 +37,7 @@ This playbook is the operator gate for the reproduction defined by `docs/plans/2
 6. **Validation-only SafeDrug selection**: all three SafeDrug training candidates must be terminal before selection. Rank by validation Jaccard descending, validation DDI ascending, learning rate ascending, and lane ID ascending. No test metric may enter `selection.json`; only the selected candidate may receive a test command.
 7. **Four-axis verdict**: report execution integrity, paper point fidelity, directional relationships, and artifact completeness separately. `completed_match` requires all four axes; a complete scientific miss is `completed_mismatch`.
 
-## Current Gate State
+## Current gate state
 
 The following local contracts are implemented and synthetic-tested: registry lanes and program-declared probes, v2 status/result identity, atomic finalization, immutable source-aware recovery, validation-only SafeDrug selection, the eight-file snapshot builder, the four-axis audit, the frozen-schedule admission contract, the persisted GPU 7 queue, and bounded running-status heartbeats.
 
@@ -45,7 +45,7 @@ The original failed RETAIN pair, queue, ledger, selection, preregistration, sche
 
 The terminal audit verdict is `completed_mismatch`: execution integrity and artifact completeness passed, paper point fidelity passed 16 of 25 checks, and directional relationships passed 3 of 4 checks. This is the final Reproduction Mode result; do not replay or tune it. The old `formal-20260826-025500` attempt remains immutable historical evidence and is not reusable successor evidence.
 
-## Operator Sequence
+## Operator sequence
 
 ### 1. Run local gates and inspect the freeze boundary
 
@@ -98,7 +98,7 @@ conda run -n medrec-molerec-table1 python baselines/molerec.py molerec-embedding
   --mode probe --probe-scope environment
 ```
 
-The full probe must additionally prove the new snapshot, imports, CUDA allocation, RDKit BRICS, PyG extensions, and every declared architecture/profile before U6 admission.
+The full probe must also prove the new snapshot, imports, CUDA allocation, RDKit BRICS, PyG extensions, and every declared architecture/profile before U6 admission.
 
 ### 4. Build and publish the additive eight-file snapshot
 
@@ -200,7 +200,7 @@ rtk proxy /opt/homebrew/bin/uv run medrec audit-prepared-molerec-table1 \
 
 The audit reopens finalized sibling artifacts, checks all 25 inclusive mean ± 2 standard-deviation intervals, checks the four MoleRec/SafeDrug directions, and reports all four axes. It must reject the current attempt because its RETAIN entry failed and four pairs are absent. Do not promote any packet to Git until Codex reviews its public-safe contents.
 
-## Stop Conditions
+## Stop conditions
 
 Stop before formal training or testing when any of these occurs: source/environment/snapshot identity mismatch, dirty or changed code after freeze, failed program probe, missing or mismatched input, failed bridge check, incomplete smoke pair, missing SafeDrug candidate, invalid selection, queue collision, invalid recovery premise, or any attempt to use the old attempt's checkpoints/logs/metrics.
 

@@ -6,7 +6,7 @@ status: accepted
 execution: remote
 ---
 
-# SafeDrug Archived Single-Baseline Program
+# SafeDrug archived Single-Baseline program
 
 ## Follow-on execution plan
 

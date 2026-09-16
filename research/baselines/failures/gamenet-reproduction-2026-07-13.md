@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: GAMENet controlled reproduction
+# Failure record: GAMENet controlled reproduction
 
 Source boundary: historical GAMENet commit `da695b4fc9390882f3a681c82115e81291ae6380`. Restricted source checkout, data copy, checksum manifest, and diagnostics remain outside Git. This record is historical failure provenance and does not define the active SafeDrug archived baseline.
 

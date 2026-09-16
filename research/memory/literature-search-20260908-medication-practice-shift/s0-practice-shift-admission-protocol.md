@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# S0 — Medication Practice-Shift Admission
+# S0: medication practice-shift admission
 
 ## 0. Protocol identity
 
@@ -70,7 +70,7 @@ Because `anchor_year_group` is patient-level, patients cannot cross these enviro
 
 ## 4. Patient partitions inside eras
 
-### 4.1 Source era `G0 + G1`
+### 4.1 source era `G0 + G1`
 
 Hash source `subject_id` with:
 
@@ -92,7 +92,7 @@ SourceAudit: 0.90 <= u <= 1.00
 - SourceTune: checkpoint selection only.
 - SourceAudit: source-era reference performance only.
 
-### 4.2 Target era `G2`
+### 4.2 target era `G2`
 
 Hash target `subject_id` with:
 
@@ -177,7 +177,7 @@ Tie-break by ascending medication concept code.
 
 The only adaptation allowed in S0 is `TargetPriorBias`.
 
-### 8.1 Marginal estimation
+### 8.1 marginal estimation
 
 For each medication `m`, compute burst-level occurrence rates on:
 
@@ -300,11 +300,11 @@ Return:
 
 only if **all** conditions hold.
 
-### Condition 1 — scale
+### Condition 1: scale
 
 All support floors in Section 12 pass.
 
-### Condition 2 — material forward degradation
+### Condition 2: material forward degradation
 
 $$
 G_{base} \ge 0.020
@@ -312,7 +312,7 @@ $$
 
 and the 95% bootstrap CI lower bound for `G_base` is strictly greater than `0.010`.
 
-### Condition 3 — marginal-prior control is insufficient
+### Condition 3: marginal-prior control is insufficient
 
 Both must hold:
 

@@ -1,4 +1,4 @@
-# MedRec Research
+# MedRec research
 
 MedRec Research is the active repository for general computer-science research on medication recommendation. It provides shared cohort, prediction, evaluation, provenance, and baseline-comparison semantics without binding the library to one research idea.
 

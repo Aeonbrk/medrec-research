@@ -1,4 +1,4 @@
-# M0 Integrity Audit
+# M0 integrity audit
 
 ## Verdict: `INTEGRITY_AUDIT_PASS`
 

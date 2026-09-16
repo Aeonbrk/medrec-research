@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea-Grounding Packet
+# Idea-grounding packet
 
-## Scope And Evidence Boundary
+## Scope and evidence boundary
 
 - **Topic / seed**: retrospective medication prescriptions as selective/partial supervision rather than exhaustive positive/negative clinical labels.
 - **Search date**: 2026-09-05.
@@ -16,7 +16,7 @@
 - **Searcher inference**: a MedRec-specific opportunity may remain in modeling the prescription-generation/observation process, but only if it produces a domain-specific method beyond generic PU or false-negative weighting.
 - **Unknowns**: whether the existing structured MIMIC pipeline contains enough information to identify that observation mechanism without new clinician labels, notes, labs, or external treatment ontologies.
 
-## Evidence Cards
+## Evidence cards
 
 | Source | Supported observation | Reported limitation / boundary | Mechanism primitive | Protocol anchor | Transfer condition | Confidence |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@
 | Counterfactual Implicit Feedback Modeling (NeurIPS 2025) | Joint PU/MNAR can be formulated through counterfactual estimation | General recommendation, not clinical prescribing | counterfactual observation model | implicit-feedback benchmarks | Strong generic prior-art/control risk | direct |
 | Correct-and-Weight (2026 preprint) | Uncertain negatives can be down-weighted using PU-style correction and confidence weighting | Generic implicit-feedback loss; current preprint | negative decontamination / weighting | sparse recommendation benchmarks | Simple killer control for loss-only ideas | direct |
 
-## Cross-Source Relations
+## Cross-Source relations
 
 | Source pair / cluster | Relation | Open gap or conflict | Why it matters | Evidence needed next |
 | --- | --- | --- | --- | --- |
@@ -39,7 +39,7 @@
 | Generic PU/MNAR vs proposed supervision family | conflicts-with | Generic false-negative correction is already mature prior art | A plug-in PU loss would not carry CCF-A novelty | Domain-specific prescribing observation mechanism and objective |
 | FineMed vs proposed supervision family | leaves-open | Finer supervision is crowded, but its target is diagnosis-to-drug correspondence rather than choice observation | Prevents a generic 'fine-grained labels' story | Keep existing 131-label action space unless mechanism requires otherwise |
 
-## Idea Constraints
+## Idea constraints
 
 ### Already covered central claims
 
@@ -72,6 +72,6 @@
 
 ### Minimum viable research question
 
-> Can the retrospective prescription-generation process be modeled as **selective medication supervision**—where observed prescriptions are positive actions but unprescribed candidates have heterogeneous negative reliability—and can a MedRec-specific training objective exploit that structure beyond generic PU/MNAR and noisy-label controls using the current structured EHR pipeline?
+> Can the retrospective prescription-generation process be modeled as **selective medication supervision**, where observed prescriptions are positive actions but unprescribed candidates have heterogeneous negative reliability, and can a MedRec-specific training objective exploit that structure beyond generic PU/MNAR and noisy-label controls using the current structured EHR pipeline?
 
 This question is ready for `ccf-idea-optimizer`, not for experiment execution. The optimizer must reject it if the only implementable mechanism is a generic loss substitution or if evaluation becomes circular without new ground truth.

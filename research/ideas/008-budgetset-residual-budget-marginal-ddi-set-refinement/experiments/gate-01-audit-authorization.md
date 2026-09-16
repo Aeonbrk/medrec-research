@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Audit Execution Authorization — Idea 008
+# Gate 01 audit execution authorization: Idea 008
 
 ## Authorization status
 
@@ -84,7 +84,7 @@ seed 2004 retained epoch = 6
 
 Only these retained checkpoints are eligible for Gate01-Audit. Audit results cannot replace a checkpoint, configuration, seed, fixed-lambda value, or budget.
 
-## 4. Authorized Audit operations
+## 4. Authorized audit operations
 
 Gate01-Audit may now be opened exactly once for the frozen terminal evaluation. The execution may:
 

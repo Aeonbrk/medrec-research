@@ -10,11 +10,11 @@ target_branch: main
 baseline_revision: 87e4a393dfc955d26b1a048c9320980bec6e5146
 ---
 
-# refactor: Harden MedRec Architecture Surfaces
+# refactor: Harden MedRec architecture surfaces
 
-## Goal Capsule
+## Goal capsule
 
-完成现有架构重构的最后一层“surface hardening”，使代码的**真实依赖面**与已经确定的架构意图一致，而不重新设计科学执行架构。
+完成现有架构重构的最后一层"surface hardening"，使代码的**真实依赖面**与已经确定的架构意图一致，而不重新设计科学执行架构。
 
 最终状态必须满足：
 
@@ -24,11 +24,11 @@ baseline_revision: 87e4a393dfc955d26b1a048c9320980bec6e5146
 4. 现有 Registry、RemoteExecutor、attempt policy、evaluation queue、evidence、snapshot、selection、audit、comparison protocol 等已经合理的知识边界不被重新拆解。
 5. 所有公共 CLI、科学语义、artifact schema、historical evidence 和五模型 Comparison 行为保持不变。
 
-这不是一次“大重构”。这是一次**边界闭合与删除型重构**。
+这不是一次"大重构"。这是一次**边界闭合与删除型重构**。
 
 ---
 
-# 1. Settled Decisions
+# 1. Settled decisions
 
 以下决策已经确定，实施过程中不得重新打开，除非出现能够证明其错误的新代码证据。
 
@@ -40,7 +40,7 @@ baseline_revision: 87e4a393dfc955d26b1a048c9320980bec6e5146
 
 原因是后一步依赖前一步已经稳定的 seam。
 
-## A2. 不按文件大小拆 Program
+## A2. 不按文件大小拆 program
 
 以下大文件保持 deep module：
 
@@ -56,7 +56,7 @@ baseline_revision: 87e4a393dfc955d26b1a048c9320980bec6e5146
 
 只在发现新的独立 knowledge domain 时拆分，禁止按 train/test/recovery、LOC、函数数量机械拆分。
 
-## A3. 两个 Reproduction Program 平行但不抽象成共同基类
+## A3. 两个 reproduction program 平行但不抽象成共同基类
 
 SafeDrug 与 MoleRec 可以拥有相同的高层行为形状：
 
@@ -94,7 +94,7 @@ SafeDrug 与 MoleRec 可以拥有相同的高层行为形状：
 
 不新增 reproduction executable。
 
-## A6. Candidate 3 是 deletion refactor，不是 Comparison redesign
+## A6. Candidate 3 是 deletion refactor，不是 comparison redesign
 
 删除的是：
 
@@ -115,7 +115,7 @@ SafeDrug 与 MoleRec 可以拥有相同的高层行为形状：
 
 ---
 
-# 2. Repository Facts
+# 2. Repository facts
 
 ## F1. Program implementation 已经足够 deep
 
@@ -128,7 +128,7 @@ SafeDrug/MoleRec 已经分别把内部知识分布到：
 
 因此当前问题不是缺少拆分，而是 façade 仍然过宽。
 
-## F2. 两个 Program 当前 `__all__` 仍暴露大量内部实现
+## F2. 两个 program 当前 `__all__` 仍暴露大量内部实现
 
 包括但不限于：
 
@@ -173,7 +173,7 @@ SafeDrug/MoleRec 已经分别把内部知识分布到：
 
 v1 的 repo-internal调用只存在于 adapter 单元测试。
 
-## F5. file-based Comparison v1 仍然活跃
+## F5. file-based comparison v1 仍然活跃
 
 `accept-comparison`、`PredictionRecord`、`evaluate_predictions`、`RunRecord` 有独立 integration/unit coverage。
 
@@ -208,7 +208,7 @@ v1 的 repo-internal调用只存在于 adapter 单元测试。
 
 ### R5
 
-Program 内部 helper 可以继续存在；不要求为了“看起来 private”而机械批量改名。
+Program 内部 helper 可以继续存在；不要求为了"看起来 private"而机械批量改名。
 
 Publicness 由：
 
@@ -294,7 +294,7 @@ Root CLI 不得直接 import：
 
 ### R17
 
-不得修改 file-based Comparison v1 protocol，仅因为它与 process schema-v1 都使用“v1”编号。
+不得修改 file-based Comparison v1 protocol，仅因为它与 process schema-v1 都使用"v1"编号。
 
 两者不是同一个 seam。
 
@@ -325,7 +325,7 @@ Root CLI 不得直接 import：
 
 ### R19
 
-不得新建 compatibility shim、deprecated alias 或“双接口过渡层”。
+不得新建 compatibility shim、deprecated alias 或"双接口过渡层"。
 
 这是内部研究代码的 architecture closure，不保留新的技术债。
 
@@ -335,9 +335,9 @@ Root CLI 不得直接 import：
 
 ---
 
-# 4. Acceptance Evidence
+# 4. Acceptance evidence
 
-## AE1 — Program façade
+## AE1: Program façade
 
 两个 Program 的正式 in-process export surface 只包含：
 
@@ -348,7 +348,7 @@ execute
 
 Direct-script CLI `main()` 作为跨进程/跨 runtime transport entrypoint 保持完全兼容，并在内部直接委托给 `probe`/`execute`。
 
-## AE2 — Program behavior
+## AE2: Program behavior
 
 以下行为保持：
 
@@ -360,7 +360,7 @@ Direct-script CLI `main()` 作为跨进程/跨 runtime transport entrypoint 保�
 - SafeDrug selection admission
 - MoleRec native history/checkpoint semantics
 
-## AE3 — Program tests
+## AE3: Program tests
 
 不存在测试把：
 
@@ -377,19 +377,19 @@ check_*
 
 Scientific helper 的 focused tests 仍可以直接测试真正 owning module。
 
-## AE4 — Root CLI
+## AE4: Root CLI
 
 `src/medrec_research/cli.py` 不包含 MoleRec Table-1 scientific attempt/evaluation implementation knowledge。
 
-## AE5 — CLI compatibility
+## AE5: CLI compatibility
 
 所有现有 public command integration tests保持相同行为。
 
-## AE6 — Root CLI test locality
+## AE6: Root CLI test locality
 
 `tests/integration/test_run_cli.py` 不再依赖 root CLI reproduction private handlers。
 
-## AE7 — Adapter surface
+## AE7: Adapter surface
 
 以下符号不存在：
 
@@ -404,35 +404,35 @@ ProcessPredictionAdapter.predict
 ProcessPredictionAdapter.predict_comparison
 ```
 
-## AE8 — Comparison preservation
+## AE8: Comparison preservation
 
 `accept-comparison` integration test保持通过。
 
 `PredictionRecord` / `RunRecord` / `evaluate_predictions` 测试保持通过。
 
-## AE9 — Runtime preservation
+## AE9: Runtime preservation
 
 MoleRec Program closure 继续通过 Python 3.8 syntax compatibility 检查。
 
 SafeDrug Program 不引入逆向 core dependency。
 
-## AE10 — No collateral architecture change
+## AE10: No collateral architecture change
 
 git diff 中不存在无关 Registry/evidence/attempt/queue/protocol redesign。
 
-## AE11 — Repository quality
+## AE11: Repository quality
 
 完整测试、lint、format 和 repository markdown/documentation gates 全绿。
 
 ---
 
-# 5. Implementation Units
+# 5. Implementation units
 
 ## U0. Characterize the three boundaries before editing
 
 ### Goal
 
-把“不能改变的 observable contract”变成 implementation guardrail。
+把"不能改变的 observable contract"变成 implementation guardrail。
 
 ### Scope
 
@@ -470,7 +470,7 @@ R1–R20, AE1–AE11.
 
 ---
 
-## U1. Close the Reproduction Program façades
+## U1. Close the reproduction program façades
 
 ### Goal
 
@@ -807,7 +807,7 @@ Reject the implementation if the final diff introduces:
 
 ---
 
-# 6. Expected Architecture After Completion
+# 6. Expected architecture after completion
 
 ```text
                          ┌──────────────────────┐
@@ -860,7 +860,7 @@ root cli (src/medrec_research/cli.py)
 
 ---
 
-# 7. Non-Goals
+# 7. Non-goals
 
 明确不做：
 
@@ -878,14 +878,14 @@ root cli (src/medrec_research/cli.py)
 - 不拆 evidence。
 - 不拆 queue。
 - 不迁移 historical artifact schema。
-- 不做“顺便 cleanup”。
+- 不做"顺便 cleanup"。
 - 不以 LOC reduction 作为成功指标。
 
 ---
 
-# 8. Risk Register
+# 8. Risk register
 
-## Risk 1 — Public façade narrowing accidentally deletes testability
+## Risk 1: Public façade narrowing accidentally deletes testability
 
 Mitigation：
 
@@ -893,7 +893,7 @@ Internal scientific helpers继续可被 owning-module focused tests验证。
 
 收窄的是 supported façade，不是删除所有内部函数。
 
-## Risk 2 — CLI move changes argparse behavior
+## Risk 2: CLI move changes argparse behavior
 
 Mitigation：
 
@@ -901,7 +901,7 @@ Characterization first；existing subprocess integration tests remain authoritat
 
 Parser composition必须复用原 argument declarations或保持严格等价。
 
-## Risk 3 — CLI module重新成为新的 god module
+## Risk 3: CLI module重新成为新的 god module
 
 Mitigation：
 
@@ -911,7 +911,7 @@ Mitigation：
 
 只有当实施中发现两个真正独立 knowledge domains 时才允许再拆 CLI command module。
 
-## Risk 4 — Candidate 3 accidentally destroys file-based Comparison
+## Risk 4: Candidate 3 accidentally destroys file-based comparison
 
 Mitigation：
 
@@ -919,27 +919,27 @@ Mitigation：
 
 `accept-comparison` 是独立 hard gate。
 
-## Risk 5 — Python 3.8 regression
+## Risk 5: Python 3.8 regression
 
 Mitigation：
 
 U1 后立即做 AST compatibility，而不是拖到最终 gate。
 
-## Risk 6 — Scope creep into recently stabilized reproduction architecture
+## Risk 6: Scope creep into recently stabilized reproduction architecture
 
 Mitigation：
 
 R18 为硬边界。
 
-发现邻近代码“看起来也能优化”时默认不修改，除非它阻塞本计划 Acceptance Evidence。
+发现邻近代码"看起来也能优化"时默认不修改，除非它阻塞本计划 Acceptance Evidence。
 
-## Risk 7 — Target-free Comparison wire format and privacy boundary regression
+## Risk 7: Target-free Comparison wire format and privacy boundary regression
 
 Mitigation & Acceptance Gate：
 
 在 U3 中执行 1:1 安全验证测试迁移清单，将 `test_process_adapter.py` 中所有的负向防护测试（target field rejection、split membership rejection、unknown request fields rejection、core-owned output fields rejection、timeout 处理、stderr privacy 与 error masking）全部完整绑定在 `predict_comparison` 上，必须全绿方可通过 U3 gate。
 
-## Risk 8 — Information leakage in reproduction CLI dirty-worktree and subprocess execution
+## Risk 8: Information leakage in reproduction CLI dirty-worktree and subprocess execution
 
 Mitigation & Acceptance Gate：
 
@@ -947,7 +947,7 @@ Mitigation & Acceptance Gate：
 
 ---
 
-# 9. Definition of Done
+# 9. Definition of done
 
 本计划只有在以下条件全部成立时才能标记 completed：
 
@@ -985,7 +985,7 @@ Mitigation & Acceptance Gate：
 
 ---
 
-# 10. Compound Engineering Execution Handoff
+# 10. Compound engineering execution handoff
 
 交给执行代理时使用：
 
@@ -1010,7 +1010,7 @@ After implementation:
 No real-data, remote 319, retraining, or test-set scientific execution is permitted.
 ```
 
-## Post-Review Compound Step
+## Post-review compound step
 
 只有在本次实现产生新的、可复用且此前文档未表达的工程经验时，才进入 compound：
 

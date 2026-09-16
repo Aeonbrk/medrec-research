@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Decision: Idea 004 (Co-Selection Compatibility)
+# Research decision: Idea 004 (co-selection compatibility)
 
 - **Idea**: `004-co-selection-compatibility`
 - **Gate**: `gate-01-co-selection-compatibility`
@@ -13,7 +13,7 @@
 
 ---
 
-## 1. Executive Summary
+## 1. Executive summary
 
 Idea 004 hypothesized that train-only frequency-corrected pairwise co-selection compatibility (empirical Normalized Pointwise Mutual Information, NPMI) averaged over peer predicted medications, $A_t(m) = \frac{1}{|\hat M_t|-1} \sum_{j \in \hat M_t \setminus \{m\}} \text{NPMI}_{train}(m, j)$, contains reproducible incremental false-positive routing signal for DDI-active medications beyond a strong simple control model incorporating absolute score $s_t(m)$, predicted prescription size $n_t$, candidate train prevalence $p_{train}(m)$, peer prevalence mean $q_t(m)$, and their predeclared score interactions.
 
@@ -31,11 +31,11 @@ The research decision is to terminate Idea 004 at Gate 01.
 
 ---
 
-## 2. Quantitative Evidence Summary
+## 2. Quantitative evidence summary
 
 All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`) from restricted candidate records on 319:
 
-### Policy Yields on Audit Cohort ($N_{Audit} = 7,787$)
+### Policy yields on audit cohort ($N_{Audit} = 7,787$)
 
 | Policy / Selector | 10% Budget ($k=778$) | 20% Budget ($k=1,557$) | 30% Budget ($k=2,336$) |
 | :--- | :---: | :---: | :---: |
@@ -45,7 +45,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 | `CoSelectionAugmented` ($x_{ctrl}, A_t(m)$) | 62.34% | 59.60% | 55.99% |
 | Retrospective `Oracle` | 100.0% | 100.0% | 100.0% |
 
-### Paired Differences and Patient-Clustered Bootstrap 95% CIs (1,000 replicates)
+### Paired differences and Patient-Clustered bootstrap 95% CIs (1,000 replicates)
 
 | Comparison | 10% Budget Point Est | 10% Budget 95% CI | 20% Budget Point Est | 20% Budget 95% CI |
 | :--- | :---: | :---: | :---: | :---: |
@@ -55,7 +55,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ---
 
-## 3. Failure Diagnosis
+## 3. Failure diagnosis
 
 1. **The preregistered co-selection compatibility observable did not generalize incrementally**: Although co-selection compatibility $A_t(m)$ entered the Dev linear probability model with negative coefficient ($\beta_A = -0.9439$), its addition produced statistically indistinguishable point differences ($+0.77\%$ at 10%, $+0.06\%$ at 20%) with bootstrap 95% confidence intervals crossing zero.
 2. **The Gate does not identify a single universal explanation for that failure**: The evidence supports the narrower conclusion that the frozen `CoSelectionAugmented` construction did not improve routing beyond the frozen `StrongControl`. It does not establish that the control absorbs all relational information, nor does it distinguish definitively between co-selection sparsity, linear representation limits, or absence of incremental signal.
@@ -63,7 +63,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ---
 
-## 4. Closure & Scope Boundaries
+## 4. Closure & scope boundaries
 
 - Idea 004 is formally **CLOSED** at Gate 01.
 - No Gate 02 will be designed or executed for Idea 004.
@@ -73,7 +73,7 @@ All figures independently verified by `ccf-integrity-auditor` (`INTEGRITY_PASS`)
 
 ---
 
-## 5. Post-Idea-004 Research Selection
+## 5. Post-Idea-004 research selection
 
 Synthesizing the scoped findings across Ideas 001, 002, 003, and 004:
 

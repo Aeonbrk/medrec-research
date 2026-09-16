@@ -1,12 +1,12 @@
 <!-- markdownlint-disable MD013 -->
 
-# Pre-Idea Premise Audit
+# Pre-idea premise audit
 
 ## Status
 
 The only authorized pre-Idea premise audit has been completed.
 
-- **Gate**: `B0 — Cardinality Attribution`
+- **Gate**: `B0 (cardinality attribution)`
 - **Verdict**: `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`
 - **Decision**: [`b0-decision.md`](b0-decision.md)
 - **Aggregate summary**: [`b0-summary.json`](b0-summary.json)
@@ -94,10 +94,10 @@ Any failure returned `FAIL_B0_NO_MATERIAL_COUNT_SAFETY_TRADEOFF`.
 
 B0 evaluated 1,220 eligible validation visits.
 
-- Under-count prevalence: 33.77% — Condition 1 passed.
+- Under-count prevalence: 33.77% (Condition 1 passed).
 - Over-count prevalence: 58.44%; oracle-count reduced mean predicted count from 21.55 to 19.95.
-- F1: 0.6881 -> 0.6981, `delta = +0.009977`, 95% CI `[+0.0067, +0.0134]` — Condition 2 failed the frozen point-estimate floor.
-- Pair-normalized DDI rate: 0.044519 -> 0.044516, `delta = -0.000002`, 95% CI `[-0.0007, +0.0007]` — Condition 3 decisively failed.
+- F1: 0.6881 -> 0.6981, `delta = +0.009977`, 95% CI `[+0.0067, +0.0134]`. Condition 2 failed the frozen point-estimate floor.
+- Pair-normalized DDI rate: 0.044519 -> 0.044516, `delta = -0.000002`, 95% CI `[-0.0007, +0.0007]`. Condition 3 decisively failed.
 
 The scientific result is therefore not a near-pass. The cardinality intervention did not expose the required normalized-DDI trade-off.
 

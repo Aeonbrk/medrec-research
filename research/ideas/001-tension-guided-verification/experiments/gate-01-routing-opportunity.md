@@ -1,4 +1,4 @@
-# Gate 01 — Routing Opportunity Under a Fixed Revision Operator
+# Gate 01: Routing opportunity under a fixed revision operator
 
 * **Idea**: `001-tension-guided-verification`
 * **Stage**: Idea / Hypothesis Selection
@@ -281,7 +281,7 @@ Do not compensate by enlarging the test set or changing the candidate definition
 
 Use patient-level clustered bootstrap with 1,000 resamples.
 
-The bootstrap exists to detect whether apparent routing headroom is driven by a small number of repeatedly represented patients. Patient clusters must be enumerated in deterministic original validation traversal order before drawing resamples with the declared PRNG seed, ensuring invariance to pseudonymization keys.
+The bootstrap exists to detect whether apparent routing headroom is driven by a small number of repeatedly represented patients. Patient clusters must be enumerated in deterministic original validation traversal order before drawing resamples with the declared PRNG seed, to maintain invariance to pseudonymization keys.
 
 Report 95% intervals for:
 
@@ -293,7 +293,7 @@ The patient is the resampling unit.
 
 ## Gate decision
 
-### PASS — routing opportunity exists
+### PASS: routing opportunity exists
 
 Pass the routing-opportunity gate when:
 
@@ -312,7 +312,7 @@ Interpretation:
 
 This permits research on predictors of revision value.
 
-### DOWNGRADE — routing exists but RiskOnly is sufficient
+### DOWNGRADE: routing exists but RiskOnly is sufficient
 
 If Oracle clearly exceeds Random but RiskOnly is statistically indistinguishable from Oracle over the primary budgets:
 
@@ -328,7 +328,7 @@ Interpretation:
 
 The next research question becomes whether predictive support contributes any incremental information beyond RiskOnly.
 
-### FAIL — no useful routing opportunity under $R_0$
+### FAIL: no useful routing opportunity under $R_0$
 
 Fail when Oracle does not reliably exceed Random at the primary budgets, or when Pareto-beneficial revisions have effectively no usable support.
 

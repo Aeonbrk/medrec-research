@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 002: Score-Geometry Sufficiency
+# Idea 002: Score-Geometry sufficiency
 
 - **Idea ID**: `002-score-geometry-sufficiency`
 - **Status**: `TERMINATED_AT_GATE_01`

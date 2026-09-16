@@ -6,7 +6,7 @@ status: completed
 execution: local
 ---
 
-# Baseline Program Architecture
+# Baseline program architecture
 
 ## Goal
 

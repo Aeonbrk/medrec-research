@@ -1,4 +1,4 @@
-# Strict Drug-Changing Supportability Decision
+# Strict drug-changing supportability decision
 
 ## Scientific question
 

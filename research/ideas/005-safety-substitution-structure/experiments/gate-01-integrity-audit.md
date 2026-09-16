@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Integrity Audit Report — Output-Structure Signature
+# Gate 01 integrity audit Report: Output-Structure signature
 
 - **Idea**: `005-safety-substitution-structure`
 - **Gate**: `gate-01-output-structure-signature`
@@ -13,7 +13,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full (numeric-audit, claim-audit, citation-audit)
@@ -43,7 +43,7 @@ Research decision unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-Evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -53,7 +53,7 @@ Research decision unlocked: yes
 | `gate-01-summary.json` §Gate C | Under Dev-only per-medication F1 thresholds, the exact same materiality conditions hold on Audit. | Observed: 394 distinct Audit patients with `AnySignature` ($\ge 50$), and 14 distinct ATC-2 parents each with $\ge 10$ signature patients ($\ge 3$). | **Supported** | Gate C PASSED. Calibrated SplitMassFN: 46 patients (50 units); calibrated DuplicateSiblingFP: 391 patients (1,122 units). |
 | `gate-01-summary.json` §Verdict | Mechanical verdict is `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`. | Direct mechanical consequence of Gate A = True, Gate B = True, Gate C = True. | **Supported** | Verdict matches frozen decision tree exactly. |
 
-### Explicitly Disallowed Claims Check
+### Explicitly disallowed claims check
 
 The audit confirmed that none of the forbidden claims are made:
 
@@ -65,7 +65,7 @@ The audit confirmed that none of the forbidden claims are made:
 
 ---
 
-## 2. Frozen Identity Audit
+## 2. Frozen identity audit
 
 The formal public summary records exactly the frozen identities, verified against registry authority and execution environment:
 
@@ -89,7 +89,7 @@ The formal public summary records exactly the frozen identities, verified agains
 
 ---
 
-## 3. Test Isolation Audit
+## 3. Test isolation audit
 
 1. **Staging Isolation**: `stage_gate01_inputs.py` partitioned records by `_split_ranges(6350)`: `train` range(0, 4233), `test` range(4233, 5291), `validation` range(5291, 6350). The staging loop strictly iterates `validation_patient_indices` only.
 2. **Context Count**: Exactly 1,220 validation visits from 1,059 validation patients were staged to `features.pkl`.
@@ -99,7 +99,7 @@ The formal public summary records exactly the frozen identities, verified agains
 
 ---
 
-## 4. Cohort Partition & Split Audit
+## 4. Cohort partition & split audit
 
 - Split unit: patient
 - Seed: `2005` (deterministic shuffle over validation indices $0 \dots 1058$)
@@ -111,7 +111,7 @@ The formal public summary records exactly the frozen identities, verified agains
 
 ---
 
-## 5. Calibration Leakage Audit
+## 5. Calibration leakage audit
 
 - **Threshold Fitting Split**: Thresholds $\tau_m$ were fitted on Dev visits only ($N_{Dev} = 529$ patients).
 - **Objective**: Maximize per-medication binary F1 on Dev with candidate set $\{0.0, 0.5, 1.0 + 10^{-12}\} \cup \{p_t(m) : t \in Dev\}$ and tie-break: highest F1, closest to 0.5, larger threshold.
@@ -121,7 +121,7 @@ The formal public summary records exactly the frozen identities, verified agains
 
 ---
 
-## 6. Raw-Set Invariant Audit
+## 6. Raw-Set invariant audit
 
 The comparison adapter predicted set was verified on every visit against the raw decision threshold:
 
@@ -133,7 +133,7 @@ Every prediction record in `batch.predictions` satisfied `set(prediction.predict
 
 ---
 
-## 7. Numerical Verification & Decision Tree Recomputation
+## 7. Numerical verification & decision tree recomputation
 
 | Evaluation Metric | Preregistered Requirement | Observed Value | Evaluation Status |
 | :--- | :--- | :--- | :--- |
@@ -143,14 +143,14 @@ Every prediction record in `batch.predictions` satisfied `set(prediction.predict
 | **Gate C: Calibrated AnySignature Patients** | $\ge 50$ distinct Audit patients | 394 patients | **PASS** |
 | **Gate C: Calibrated Signature Parents** | $\ge 3$ parents with $\ge 10$ patients each | 14 parents | **PASS** |
 
-### Breakdown of Preregistered Signatures
+### Breakdown of preregistered signatures
 
 | Signature Policy | SplitMassFN Units | SplitMassFN Patients | DuplicateSiblingFP Units | DuplicateSiblingFP Patients | AnySignature Units | AnySignature Patients | Parents with $\ge 10$ Patients |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Raw ($0.5$)** | 71 | 65 | 680 | 326 | 751 | 338 | 8 |
 | **Calibrated (Dev-F1)** | 50 | 46 | 1,122 | 391 | 1,172 | 394 | 14 |
 
-### Decision Tree Path
+### Decision tree path
 
 ```text
 [Gate A: ATC-3 sibling-group support]

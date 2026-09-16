@@ -1,12 +1,12 @@
 <!-- markdownlint-disable MD013 -->
 
-# MICA — Medication-Indexed Clinical Assembly
+# MICA: medication-indexed clinical assembly
 
 Status as of 2026-09-15: **three-arm attribution screen complete**. The authoritative starting `origin/main` was `dfec9fb6ebda7893168e3f0263825dd8f1fb44fc`; the implementation and all three runs are bound to immutable revision `cd731bb0abe3dca3ebaa8a3e5346eeff74270f75`. SharedPool, DrugQuery, and MICA-Late each completed the frozen 60-epoch Train/Dev screen; public-safe aggregate evidence is [`result.json`](result.json). The earlier killed Early hypothesis was not rerun. This remains exploratory Train/Dev evidence, not Idea 009, a formal Gate, or a novelty claim. Source binding, strict checkpoint selection, parameter matching, target-free/CUDA preflight, result reporting, and summarizer validation were executed.
 
 ## 1. ERAN verdict: REPLACE
 
-An evidence-to-medication attention matrix is insufficient as the central mechanism. DrugDoctor and SSPNet already implement drug-aware clinical reads; local ProblemDrug and MedState also tested medication-specific clinical attention. If allocation means a softmax across drugs, it additionally assumes that clinical evidence is a scarce resource: one diagnosis would compete to support several medications. The available admission-level targets do not justify that assumption.
+An evidence-to-medication attention matrix is insufficient as the central mechanism. DrugDoctor and SSPNet already implement drug-aware clinical reads; local ProblemDrug and MedState also tested medication-specific clinical attention. If allocation means a softmax across drugs, it also assumes that clinical evidence is a scarce resource: one diagnosis would compete to support several medications. The available admission-level targets do not justify that assumption.
 
 From first principles, the supported task is to predict one medication set from the current diagnosis/procedure sets and strictly earlier observed visits. A useful model must preserve that the significance of a clinical code depends on other current evidence and prior clinical context. Different medication decisions can require different interpretations of those relationships. Whether this inductive bias improves prediction remains an empirical question.
 
@@ -33,7 +33,7 @@ The external X-Ray summary at `xray-papers-innovation-summary.md` was used as a 
 | Diagnosis decomposition collision | [FineMed official repository](https://github.com/liyifo/FineMed) and [publisher record](https://doi.org/10.1016/j.ins.2026.123930) describe diagnosis-level sub-recommendations, diagnosis enhancement, and offline LLM-assisted medication mapping. | MICA has no diagnosis-level medication targets, correspondence labels, severity/lab augmentation, or per-diagnosis prescriptions. FineMed's complete equations were not accessible; exact normalization/history details remain unverified. |
 | List-generation collision | [FLAME](https://arxiv.org/abs/2505.20218) uses drug-level filtering and list-wise add/remove alignment. | MICA makes simultaneous decisions from clinical evidence; no LLM policy, provisional prescription, edit sequence, or reward shaping. |
 
-The closest five Medication Recommendation architectures examined were DrugDoctor, SSPNet, FineMed, HypeMed, and Rx-Expert; FLAME and adjacent set/conditioning literature were checked additionally. The accessed sources did not reveal the exact medication-indexed clinical self-attention computation below. That is enough to justify screening, not a verified novelty finding. A survivor still needs full FineMed text and broader closest-work verification.
+The closest five Medication Recommendation architectures examined were DrugDoctor, SSPNet, FineMed, HypeMed, and Rx-Expert; FLAME and adjacent set/conditioning literature were also checked. The accessed sources did not reveal the exact medication-indexed clinical self-attention computation below. That is enough to justify screening, not a verified novelty finding. A survivor still needs full FineMed text and broader closest-work verification.
 
 **X-Ray-summary priors only:** KERL/HeteroMed suggest expansion versus continuation; ChainCare and DCGM suggest temporal evidence organization. These motivated search but do not establish MICA's mechanism or headroom. Expansion/continuation was not selected because that decomposition is already explicit in those summaries. An intent-slot set generator was not selected because the local TheraCompose formulation failed badly and this screen has no new intent supervision.
 
@@ -193,8 +193,8 @@ Use the selected full-Dev rows after all three arms complete all 60 epochs. Clas
 | Observed relation | Frozen conclusion |
 | --- | --- |
 | `DrugQuery − SharedPool > 0.004` and `MICA-Late − DrugQuery <= 0.002` | preserve DrugQuery as MICA-Core; late FiLM-before-pooling is unnecessary |
-| SharedPool is within `0.002` of both DrugQuery and MICA-Late | candidate-specific evidence selection is not carrying the strong surface; retain the shared clinical encoder/history substrate only |
-| `MICA-Late − DrugQuery > 0.004` | pre-pooling medication conditioning has independent value; preserve Late as the strong substrate |
+| SharedPool is within `0.002` of both DrugQuery and MICA-Late | candidate-specific evidence selection is not carrying the strong surface; retain the shared clinical encoder/history base only |
+| `MICA-Late − DrugQuery > 0.004` | pre-pooling medication conditioning has independent value; preserve Late as the strong base |
 | any other valid result | record the signed deltas and stop; no automatic rescue or additional ablation |
 
 Report precision/recall, DDI, mean medication count, count standard deviation, NLL, wall time, and peak GPU memory with every arm. This is one seed of exploratory Train/Dev evidence; no held-out selection, formal Gate, novelty claim, or additional diagnostic is authorized.

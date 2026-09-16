@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 MD036 -->
 
-# Idea Grounding — Residual False-Positive Routing Beyond Frozen Score
+# Idea Grounding: Residual False-Positive routing beyond frozen score
 
 ## Residual research question
 
@@ -31,12 +31,12 @@ $$
 **Source-supported observations**
 
 - KDD 2025 explicitly studies medication-level confidence calibration and introduces a binning-based confidence method. Confidence itself is therefore not an untouched research object.
-- GiantMed (KDD 2026) uses a deep model's absolute probability boundary to choose medications for local LLM refinement. “Boundary medications deserve verification” is already prior art.
+- GiantMed (KDD 2026) uses a deep model's absolute probability boundary to choose medications for local LLM refinement. "Boundary medications deserve verification" is already prior art.
 - A 2026 antibiotic-optimization study explicitly reports Top1-Top2 probability margin as a relative-confidence measure, although in a single-choice treatment setting rather than multi-label medication-candidate routing.
 
 **Optimizer inference**
 
-The remaining narrow opening is not “confidence matters” or “relative confidence is new.” It is whether a medication's within-prescription relative position contains incremental error information after conditioning on the medication's own frozen confidence and trivial prescription-level confounds.
+The remaining narrow opening is not "confidence matters" or "relative confidence is new." It is whether a medication's within-prescription relative position contains incremental error information after conditioning on the medication's own frozen confidence and trivial prescription-level confounds.
 
 ### Longitudinal medication actions
 
@@ -46,7 +46,7 @@ COGNet, KERL, HeteroMed, and DMRNet all make historical medications operational:
 
 **Optimizer inference**
 
-A binary previous-prescription-membership signal remains cheap to test, but the scientific novelty of “continuation vs new” is weak. It can still be useful as a control or diagnostic; it is not the strongest new Idea by itself.
+A binary previous-prescription-membership signal remains cheap to test, but the scientific novelty of "continuation vs new" is weak. It can still be useful as a control or diagnostic; it is not the strongest new Idea by itself.
 
 ### Medication-set / co-selection relations
 
@@ -66,7 +66,7 @@ HypeMed, KERL, HeteroMed, DMRNet, and related 2026 work already exploit longitud
 
 **Optimizer inference**
 
-“Add patient history” is not a sufficiently sharp hypothesis. Any future history route should begin with one observable such as previous-prescription membership before an encoder is justified.
+"Add patient history" is not a sufficiently sharp hypothesis. Any future history route should begin with one observable such as previous-prescription membership before an encoder is justified.
 
 ### Cross-model corroboration
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Decision Record: MoleRec Table 1 Five-Model Full Reproduction Authority and Architecture
+# Decision Record: MoleRec table 1 Five-Model full reproduction authority and architecture
 
 - **Date**: 2026-08-26
 - **Status**: Accepted
@@ -9,7 +9,7 @@
 
 ---
 
-## 1. Context and Problem Statement
+## 1. Context and problem statement
 
 The previous pilot reproduction (`formal-20260826-025500`) confirmed the execution pipeline for four SafeDrug-family models but revealed that:
 
@@ -20,19 +20,19 @@ The previous pilot reproduction (`formal-20260826-025500`) confirmed the executi
 
 ---
 
-## 2. Settled Decisions
+## 2. Settled decisions
 
-### D1: Two-Source Model Authority
+### D1: Two-Source model authority
 
 - **SafeDrug Family** (RETAIN, LEAP, GAMENet, SafeDrug): Frozen at `ycq091044/SafeDrug@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`.
 - **MoleRec**: Frozen at `yangnianzu0515/MoleRec@dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, using the embedding-table variant (`--embedding`).
 
-### D2: Common Data Authority and Executable Counts
+### D2: Common data authority and executable counts
 
 - Common EHR and DDI data processed under `ycq091044/SafeDrug@c7218d0976e5ee5588aeaf5bdbc86b338126bba5`.
 - Exact executable visit count is **15,032**; 14,995 is retained as paper-reported metadata. No post hoc visit trimming is permitted.
 
-### D3: Five Scientific Models, Seven Execution Lanes
+### D3: Five scientific Models, seven execution lanes
 
 - Five scientific models map to seven formal 50-epoch training lanes:
   - `molerec-retain` (RETAIN)
@@ -44,7 +44,7 @@ The previous pilot reproduction (`formal-20260826-025500`) confirmed the executi
   - `molerec-embedding` (MoleRec `--embedding`)
 - SafeDrug model selection is strictly **validation-only**: max validation Jaccard, min validation DDI, smaller LR tie-break. `selection.json` is generated before SafeDrug test evaluation. Non-selected candidates remain `not_tested_by_design`.
 
-### D4: Unified Compatibility Environment with Documented CUDA Deviation
+### D4: Unified compatibility environment with documented CUDA deviation
 
 - Environment `medrec-molerec-table1` declares:
   - Python 3.8.16
@@ -53,7 +53,7 @@ The previous pilot reproduction (`formal-20260826-025500`) confirmed the executi
   - NumPy 1.23.5, pandas 1.5.3, SciPy 1.10.0, scikit-learn 1.2.0, RDKit 2022.09.1, dill 0.3.7, dnc 1.1.0
 - **Hardware Deviation**: CUDA 11.1 is the minimal necessary deviation from recorded CUDA 10.2 to support NVIDIA Ampere RTX 3090 (SM86) hardware.
 
-### D5: Additive Eight-File Snapshot
+### D5: Additive Eight-File snapshot
 
 - Snapshot `snapshots/molerec-table1-c721-www23` exposes exactly 8 consumer files:
   - `records_final.pkl`, `voc_final.pkl`, `ddi_A_final.pkl`, `ehr_adj_final.pkl` (from accepted c721 dataset)
@@ -61,12 +61,12 @@ The previous pilot reproduction (`formal-20260826-025500`) confirmed the executi
   - `idx2drug.pkl` (byte-identical alias to `idx2SMILES.pkl`)
 - Proves ordered medication vocabulary equality and 491-column substructure alignment.
 
-### D6: GPU and NUMA Topology-Aware Scheduling
+### D6: GPU and NUMA Topology-Aware scheduling
 
 - P1 isolated profiling (5 architectures) and P2 concurrent profiling (7 lanes across GPUs 0–6).
 - Two NUMA nodes balanced; GPU 7 reserved for serial 10-round test evaluations and recorded recovery.
 
-### D7: Multi-Axis Verdicts
+### D7: Multi-Axis verdicts
 
 - Audit separately reports:
   1. `execution_integrity`
@@ -75,11 +75,11 @@ The previous pilot reproduction (`formal-20260826-025500`) confirmed the executi
   4. `artifact_completeness`
 - Overall verdict is `completed_match` if all pass; `completed_mismatch` if execution is complete but any point/direction check fails; or specific incomplete/blocked states.
 
-### D8: Narrow Reversible Terminal Cleanup
+### D8: Narrow reversible terminal cleanup
 
 - Superseded environment `medrec-safedrug-archived` may be removed only after successor environment and full reproduction attempt are terminal. Lock `environments/safedrug-archived-linux-64.lock` remains versioned for recovery.
 
-### D9: Package Resolution and Security Policy
+### D9: Package resolution and security policy
 
 - China mirrors prioritized via command/repo-scoped config.
 - Official HTTPS fallbacks with TLS verification strictly enforced. No global config mutation.

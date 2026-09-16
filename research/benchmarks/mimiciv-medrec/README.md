@@ -4,7 +4,7 @@
 
 ## Stage boundary
 
-`STAGE -1E — MIMIC-IV VISIT-LEVEL MEDREC BENCHMARK MATERIALIZATION`
+`STAGE -1E, MIMIC-IV VISIT-LEVEL MEDREC BENCHMARK MATERIALIZATION`
 
 This directory records a public-safe Train/Dev materialization of MIMIC-IV
 v3.1. It remains `PRE-IDEA`, `PRE-GATE`, `NO PAPER CLAIM`, `NO HOLDOUT TEST`,
@@ -64,8 +64,8 @@ than injected.
 | role | patients | visits | recommendation examples | dx vocab | procedure vocab | medication vocab |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Train | 149,001 | 364,492 | 308,824 | 26,070 | 13,118 | 173 |
-| Dev | 37,076 | 90,033 | 76,529 | — | — | — |
-| Test seal | 37,375 | membership only | not materialized | — | — | — |
+| Dev | 37,076 | 90,033 | 76,529 | - | - | - |
+| Test seal | 37,375 | membership only | not materialized | - | - | - |
 
 Train normalization covers `10,602,979 / 13,490,898` eligible prescription
 rows (`0.785936`); Dev covers `2,630,601 / 3,349,376` (`0.785400`). Dev target

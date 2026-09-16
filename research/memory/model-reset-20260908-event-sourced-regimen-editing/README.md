@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Model Reset: Event-Sourced Regimen Editing
+# Model reset: event-sourced regimen editing
 
 ## Status
 

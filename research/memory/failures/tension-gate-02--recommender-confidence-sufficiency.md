@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: Tension-guided verification (Gate 02 confidence sufficiency)
+# Failure record: tension-guided verification (Gate 02 confidence sufficiency)
 
 Source boundary: `medrec-research` Idea `001-tension-guided-verification`, Gate 02 formal run `gate-02-confidence-sufficiency-20260902-155433` on `319-wild` at harness commit `ef40f288fbf64f499d3f9967a7b2783ee3fe090b`. Public summary SHA256: `9f0e54ff484de7e935f62300e5a0016ed2042eb052ae8dcb86b2f7c3bd844e28`.
 

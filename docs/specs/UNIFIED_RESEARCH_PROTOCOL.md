@@ -1,4 +1,4 @@
-# Unified Research Protocol
+# Unified research protocol
 
 Protocol version: `1.0`
 Status: `Current Base Protocol (Active Comparison Mode requires v1.1 amendment)`

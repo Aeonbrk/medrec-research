@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Audit Report
+# Gate 01 design integrity audit report
 
 - **Idea**: `003-prescription-relative-confidence`
 - **Gate**: `gate-01-prescription-relative-confidence`
@@ -11,7 +11,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full
@@ -38,7 +38,7 @@ P0 verification and P1 implementation unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix (Design Protocol)
+## 1. Claim-Evidence matrix (Design Protocol)
 
 | Protocol Section | Preregistered Specification | Verification Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -57,7 +57,7 @@ P0 verification and P1 implementation unlocked: yes
 
 ---
 
-## 2. Frozen Identity Audit
+## 2. Frozen identity audit
 
 The preregistered protocol binds to the exact authoritative upstream identities established in `research/baselines/preflight/five-model-comparison-qualification.json` and `baselines/registry.toml`:
 
@@ -79,7 +79,7 @@ The preregistered protocol binds to the exact authoritative upstream identities 
 
 ---
 
-## 3. Data Leakage and Boundary Firewall Audit
+## 3. Data leakage and boundary firewall audit
 
 1. **Test Split Isolation**: Protocol explicitly forbids indexing, staging, predicting, or evaluating test data. Zero test references permitted in runner code.
 2. **Train-Only Prevalence Firewall**: Prevalence is computed solely over eligible visits of training patients. No validation or test data enters prevalence counts.
@@ -90,7 +90,7 @@ The preregistered protocol binds to the exact authoritative upstream identities 
 
 ---
 
-## 4. Decision Tree and Authorized Wording Audit
+## 4. Decision tree and authorized wording audit
 
 1. **Support Gate (Gate A)**: Requires $\ge 50$ Audit patients with $Y^{PB}=1$ and $\ge 50$ with $Y^{PB}=0$.
 2. **Oracle Headroom Gate (Gate B)**: Requires $LowerCI_{95\%}(\text{Oracle} - \text{StrongControl}) > 0$ at both 10% and 20% budgets. Failing this yields `STOP_NO_RESIDUAL_HEADROOM_AFTER_STRONG_CONTROL`.
@@ -99,7 +99,7 @@ The preregistered protocol binds to the exact authoritative upstream identities 
 
 ---
 
-## 5. Auditor Conclusion
+## 5. Auditor conclusion
 
 The design artifacts for Gate 01 of Idea 003 are complete, mathematically consistent, and fully verified against repository standards.
 

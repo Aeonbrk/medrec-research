@@ -3,3 +3,6 @@ build/**
 dist/**
 web/dist/**
 web/node_modules/**
+slides/node_modules/**
+node_modules/**
+

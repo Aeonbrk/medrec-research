@@ -1,4 +1,4 @@
-# Five-Model Baseline Readiness Report
+# Five-model baseline readiness report
 
 ## Overall conclusion
 
@@ -18,7 +18,7 @@ All five unchanged Baseline Cores have a legal terminal Reproduction Mode result
 | SafeDrug | SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`, validation-selected `5e-4` lane | `completed_mismatch`; legal ten-round result; other LR candidates not tested | `comparison_ready`; qualification `5280019b…` | Yes | None |
 | MoleRec | MoleRec `dd5afaf0a503fd3de3229f86ec7f26b345d10e3a`, profile `molerec-embedding` | `completed_mismatch`; legal ten-round result | `comparison_ready`; qualification `f3a00ae8…` | Yes | None |
 
-## Shared Comparison Scope
+## Shared comparison scope
 
 - Protocol: Unified Research Protocol v1.1, amendment `c5b8ac4a…`.
 - Dataset Manifest: `82d4efc2…`; 1,058 patient-disjoint test patients and 1,206 eligible test visits.
@@ -29,7 +29,7 @@ All five unchanged Baseline Cores have a legal terminal Reproduction Mode result
 - Execution path: `Baseline Core -> target-free predictions -> core-owned target join -> core evaluator`.
 - All five qualification attempts passed `environment_lock`, `adapter_smoke`, `cohort_identity`, `adaptation_budget`, `core_integrity`, `deterministic_adapter`, and `independent_evaluation`.
 
-## Core-recomputed Comparison outcomes
+## Core-recomputed comparison outcomes
 
 | Model | DDI | Jaccard | F1 | PRAUC | Avg medications |
 | --- | ---: | ---: | ---: | ---: | ---: |

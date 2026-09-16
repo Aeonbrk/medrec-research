@@ -1,4 +1,4 @@
-# Unified Research Protocol v1.1 Amendment
+# Unified research protocol v1.1 amendment
 
 Status: `Current Active Amendment (Additive to Protocol v1.0)`
 
@@ -53,7 +53,7 @@ A Prediction Adapter may translate invocation, identifiers, storage, and output
 representation. It may not modify the Baseline Core, feature information,
 training objective, ranking, threshold, structural decoder, or prediction set.
 
-## Adaptation Budget
+## Adaptation budget
 
 The amendment binds one equal Adaptation Budget to every method. It fixes the
 selection metric, maximum trials, compute allowance, stopping rule, seed policy,

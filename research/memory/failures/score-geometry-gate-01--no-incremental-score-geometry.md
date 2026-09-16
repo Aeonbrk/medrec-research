@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: Score-geometry sufficiency (Gate 01 no incremental score geometry)
+# Failure record: score-geometry sufficiency (Gate 01 no incremental score geometry)
 
 Source boundary: `medrec-research` Idea `002-score-geometry-sufficiency`, Gate 01 formal run `gate-01-score-geometry-sufficiency-20260902-174013` on `319-lab` at frozen harness commit `28fc24c64998c81563446f3f8e5bc10340e2b17b`. The independent integrity audit concluded `INTEGRITY_PASS`; the authoritative research decision is `STOP_NO_INCREMENTAL_SCORE_GEOMETRY` / `TERMINATE_IDEA_002`.
 

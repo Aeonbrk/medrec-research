@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Closest-Work Verification — Privileged Physiological Response Supervision
+# Closest-work verification: privileged physiological response supervision
 
 ## Search boundary
 

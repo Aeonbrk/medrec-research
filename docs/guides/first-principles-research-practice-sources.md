@@ -25,11 +25,11 @@
 | <a id="s06"></a>S06 | [Learning Research 仓库说明](https://github.com/pengsida/learning_research/blob/6fdbcdfe24167feb7164d5625a477c75bd118040/README.md) | 已阅读 | 明确长期目标和五种研究能力，并把想 idea、做实验、写作、报告和评审回应组织成连通的训练体系。该版本固定到上述提交，避免把浮动仓库状态混入资料。 |
 | <a id="s07"></a>S07 | [研究项目索引](https://pengsida.notion.site/research-project-b43507ef26d044bd888ac29f4736e116) | 已阅读 | 公开索引把长期目标、科研品质和项目实践连到 S08 至 S10。作为子页面关系的证据使用。 |
 | <a id="s08"></a>S08 | [博士生的楷模：Sebastian Starke](https://pengsida.notion.site/p/1713fe292ff1808eb33be93ea2d79ad9?pvs=25) | 已阅读 | 反思长期目标、优先选择尚未解决的重要问题、解决困难缺口、拓宽技术深度和尝试新技术。用于长期能力、独立判断和讨论部分。 |
-| <a id="s09"></a>S09 | [从面试问题反思科研品质](https://pengsida.notion.site/p/1d13fe292ff180de91afcb7f2eb57b69?pvs=25) | 已阅读 | 从基础能力走向影响力：选重要问题、承担值得的风险、适应变化、解决原因而非修补症状、协作和独立思考。用于“能力变成长期习惯”的具体品质说明。 |
+| <a id="s09"></a>S09 | [从面试问题反思科研品质](https://pengsida.notion.site/p/1d13fe292ff180de91afcb7f2eb57b69?pvs=25) | 已阅读 | 从基础能力走向影响力：选重要问题、承担值得的风险、适应变化、解决原因而非修补症状、协作和独立思考。用于"能力变成长期习惯"的具体品质说明。 |
 | <a id="s10"></a>S10 | [科研上忌讳的事情有哪些](https://pengsida.notion.site/p/1fa3fe292ff1807e98c5e3513045cbab?pvs=25) | 部分可读 | 公开页面只指向 S31，没有可据以综合的方法正文。 |
 | <a id="s11"></a>S11 | [如何有效地读论文](https://pengsida.notion.site/d192db870bc64436ae4a4a590b36772a) | 已阅读 | 提出从细节、问题与机制，进一步读到论文在文献树中的位置、里程碑、限制和失败案例。指南将其落为问题树、技术树和论文卡片。 |
 | <a id="s12"></a>S12 | [如何高效地讨论](https://pengsida.notion.site/d697ef578d784c869d4f8314f0d617da) | 已阅读 | 讨论要围绕已命名的问题，而不是活动汇报；会前准备问题、证据、自己的贡献、下一步与独立观点。用于讨论的会前、会中、会后结构。 |
-| <a id="s13"></a>S13 | [怎么练习写论文](https://pengsida.notion.site/c13c7e52aab64c1a8e3576b97fcb9851) | 已阅读 | 通过用自己的话概括创新和工作流程，练习清楚说明想法、进展、贡献和问题。用于“写作也是推理检查”的部分。 |
+| <a id="s13"></a>S13 | [怎么练习写论文](https://pengsida.notion.site/c13c7e52aab64c1a8e3576b97fcb9851) | 已阅读 | 通过用自己的话概括创新和工作流程，练习清楚说明想法、进展、贡献和问题。用于"写作也是推理检查"的部分。 |
 | <a id="s14"></a>S14 | [论文写作模板](https://pengsida.notion.site/c1a22465a0fa4b15a12985223916048e) | 已阅读 | 主张尽早写作；先规划图、故事、比较和消融；每段只传达一个信息；逐项检查主张是否有直接证据。指南据此给出主张证据表和图表职责。 |
 | <a id="s15"></a>S15 | [如何做学术报告 slides](https://pengsida.notion.site/slides-810f02670691444f8c94cc3d5b76dcbc) | 已阅读 | 用共同目标、相关工作的挑战、技术贡献、证据和未来工作组织一条完整故事。用于学术报告的论证顺序。 |
 | <a id="s16"></a>S16 | [高水平科研工作者的写作经验](https://pengsida.notion.site/74aef88b9187439fa4e301704f6eb49a) | 部分可读 | 公开索引提到 Bill Freeman、SIGGRAPH 论文主席以及段落和句子流畅性，但没有公开可读的附件正文；不据此添加未验证细节。 |
@@ -41,7 +41,7 @@
 | --- | --- | --- |
 | <a id="s18"></a>S18 | [Bill Freeman：《如何做研究》](http://people.csail.mit.edu/billf/www/papers/doresearch.pdf) | 已阅读 | 提醒研究者放慢速度以理解假设；每次只改一个因素，才能归因；定位实际失败阶段；用玩具模型缩小系统；读文献；把精确解释失败原因当作进展。用于实验诊断和最小实验。 |
 | <a id="s19"></a>S19 | [John Schulman：《一份有立场的机器学习研究指南》](https://pengsida.net/files/John_Schulman_How_to_do_research.pdf) | 已阅读 | 通过批判性阅读和讨论培养问题品味；用目标驱动、可泛化的方式做研究；目标高但步子递进；维护笔记并定期复盘。用于长期节奏、选题和独立判断。 |
-| <a id="s20"></a>S20 | [Michael Nielsen：《高效研究的原则》](https://pengsida.net/files/Michael_Nielsen_How_to_do_research.pdf) | 已阅读 | 强动机、个人愿景、主动性、责任感、纪律化习惯和反思共同支撑长期研究效能。用于“能力变成长期习惯”，不把个人建议误作实验规则。 |
+| <a id="s20"></a>S20 | [Michael Nielsen：《高效研究的原则》](https://pengsida.net/files/Michael_Nielsen_How_to_do_research.pdf) | 已阅读 | 强动机、个人愿景、主动性、责任感、纪律化习惯和反思共同支撑长期研究效能。用于"能力变成长期习惯"，不把个人建议误作实验规则。 |
 | <a id="s21"></a>S21 | [周志华：科研经验](https://pengsida.net/files/Zhihua_Zhou_How_to_do_research.pdf) | 已阅读 | TPIC 框架：题目（Topic）、问题（Problem）、想法（Idea）、具体工作（Concrete work）。其中定义清楚的问题是核心，连接文献、想法、分析和实验。用于第一原则和因果链。 |
 | <a id="s22"></a>S22 | [杨植麟：科研经验](https://pengsida.net/files/Zhilin_Yang_How_to_do_research.pdf) | 已阅读 | 强调个人愿景、主动性、责任感、纪律化工作，以及愿意面对重要问题。Notion 附件同名，但未对两个文件作字节级同一性声明。 |
 | <a id="s23"></a>S23 | [李武军：浅谈本科生科研能力培养](https://pengsida.net/files/Wujun_Li_Undergraduate_learning_research.pdf) | 已阅读 | 研究训练需要主动学习、持续阅读与分析、实验、验证和修订；兴趣与坚持会影响训练质量。作为长期训练的补充背景。 |
@@ -69,4 +69,4 @@
 
 先以只读方式尝试 `markdown.new`；Notion 页面只返回通用元数据时，改用公开浏览器读取可见文本。PDF 和 PNG 只下载到仓库外的临时目录，并用 LiteParse 读取一次。临时原件、解析文本、浏览器状态和网络轨迹均不纳入版本控制。
 
-本台账不承诺对互联网做无限递归抓取。“外链”只在下列情况进入实质阅读范围：它由种子材料直接指向，且提供研究方法、讲义、附件或理解种子材料所必需的内容。目录、个人资料、课程聚合和无法可靠取得的页面仍被记录，从而让后续维护者知道哪些内容已核对、哪些没有。
+本台账不承诺对互联网做无限递归抓取。"外链"只在下列情况进入实质阅读范围：它由种子材料直接指向，且提供研究方法、讲义、附件或理解种子材料所必需的内容。目录、个人资料、课程聚合和无法可靠取得的页面仍被记录，从而让后续维护者知道哪些内容已核对、哪些没有。

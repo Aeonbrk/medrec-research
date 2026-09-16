@@ -1,4 +1,4 @@
-# MedState Dynamics — Persistent Medication Identity States
+# MedState dynamics: persistent medication identity states
 
 MedState is one throwaway pre-Idea architecture screen. It is not Idea 009,
 does not create or modify a formal CCFA Gate, and makes no novelty or
@@ -69,7 +69,7 @@ deltas, and the bounded state-dynamics diagnostics.
 The primary comparison is `best(PersistentIndependent, PersistentRelational)`
 against `StatelessRelational`. A mechanism gain at or below `0.002` Jaccard is
 an immediate `KILL_PERSISTENT_MED_STATE`; a weak gain below `0.004` also does
-not survive. A surviving mechanism must additionally clear the requested
+not survive. A surviving mechanism must also clear the requested
 GlobalStrong accuracy/safety bar. No tuning or rescue is permitted.
 
 ### Result record

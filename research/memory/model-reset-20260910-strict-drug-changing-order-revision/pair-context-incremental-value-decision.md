@@ -1,4 +1,4 @@
-# Pair/Context Incremental Value Decision
+# Pair/Context incremental value decision
 
 ## Scientific question
 

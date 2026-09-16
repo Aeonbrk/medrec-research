@@ -1,11 +1,11 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 006: Exposure-Conditional Medication Recommendation
+# Idea 006: exposure-conditional medication recommendation
 
 - **Idea ID**: `006-exposure-conditional-medication-recommendation`
 - **Status**: `TERMINATED_AT_GATE_01`
 - **Formal verdict**: `STOP_NO_INCREMENTAL_EXPOSURE_CONDITIONED_LEARNING`
-- **Scientific stage**: Idea / hypothesis selection — completed and falsified
+- **Scientific stage**: Idea / hypothesis selection: completed and falsified
 - **Target venue assumption**: first formal method paper, CCF-A Data/Mining/AI venue family
 - **R0 resource gate**: `PASS_R0_EXPOSURE_RESOURCE_AND_PREMISE`
 - **R0 execution commit**: `ea134b7e75583186242bc72bc71eb2975b812edc`

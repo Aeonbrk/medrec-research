@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 — Co-Selection Compatibility
+# Gate 01: Co-Selection compatibility
 
 ## Mode
 
@@ -18,7 +18,7 @@ This is a validation-only falsification gate. It is not a publication experiment
 
 ---
 
-## 1. Scientific state entering Gate 01
+## 1. Scientific state entering gate 01
 
 Ideas 001--003 are closed. Their scoped negative evidence is preserved without extrapolation:
 
@@ -493,7 +493,7 @@ Public-safe after formal execution and audit:
 
 ## 20. Formal P0--P6 execution workflow
 
-### P0 — State and protocol verification
+### P0: State and protocol verification
 
 - verify `origin/main` equals the frozen protocol commit;
 - verify clean worktree;
@@ -502,27 +502,27 @@ Public-safe after formal execution and audit:
 - verify no test data/predictions are staged or accessed;
 - verify 319 preflight and required environment without executing the scientific Gate.
 
-### P1 — Implement exactly
+### P1: Implement exactly
 
 Implement the Idea-local runner and only necessary staging helper. No redesign, formula substitution, extra feature, or architecture.
 
-### P2 — Minimal synthetic verification
+### P2: Minimal synthetic verification
 
 Run only focused tests that can detect a scientific-semantics implementation error listed in Section 18. Do not substitute smoke output for real evidence.
 
-### P3 — Freeze implementation revision
+### P3: Freeze implementation revision
 
 Commit the exact implementation and tests. Record the implementation commit SHA. No scientific execution may precede this freeze.
 
-### P4 — One formal validation-only 319 execution
+### P4: One formal validation-only 319 execution
 
 Run exactly one formal Gate 01 on validation-only data using the frozen protocol and implementation revision. Do not run test. Do not rerun for a more favorable result.
 
-### P5 — Independent `ccf-integrity-auditor`
+### P5: Independent `ccf-integrity-auditor`
 
 Audit restricted evidence independently for source identity, train/Dev/Audit firewall, no test access, candidate-universe identity, exact observable/control implementation, deterministic split/ranking, bootstrap semantics, aggregate recomputation, and decision-tree application.
 
-### P6 — Research decision
+### P6: Research decision
 
 Apply the preregistered decision tree mechanically, write the scoped decision using Section 16 wording, update public-safe state artifacts, and stop.
 

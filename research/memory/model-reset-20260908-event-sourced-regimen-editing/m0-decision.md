@@ -1,4 +1,4 @@
-# M0 — Event-Sourced Regimen-Edit Admission
+# M0: event-sourced regimen-edit admission
 
 ## Verdict: `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE`
 

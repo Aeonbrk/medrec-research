@@ -1,9 +1,9 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Decision — Idea 002: Score-Geometry Sufficiency
+# Research decision. Idea 002: score-geometry sufficiency
 
 - **Idea**: `research/ideas/002-score-geometry-sufficiency/`
-- **Gate**: `Gate 01 — Score-Geometry Sufficiency`
+- **Gate**: `Gate 01: Score-Geometry Sufficiency`
 - **Formal Run ID**: `gate-01-score-geometry-sufficiency-20260902-174013`
 - **Harness Revision**: `28fc24c64998c81563446f3f8e5bc10340e2b17b`
 - **Decision Date**: 2026-09-02
@@ -62,7 +62,7 @@ Not established:
 
 ## Route boundary
 
-This particular score-geometry route is terminated. Changing only the function class on the same scientific premise — for example, five bins to ten bins, a spline, or an MLP — is not an authorized rescue. A future hypothesis must materially change the observable information, problem formalization, mechanistic claim, baseline, representation, or evidence source and must be preregistered before outcome inspection.
+This particular score-geometry route is terminated. Changing only the function class on the same scientific premise, for example, five bins to ten bins, a spline, or an MLP, is not an authorized rescue. A future hypothesis must materially change the observable information, problem formalization, mechanistic claim, baseline, representation, or evidence source and must be preregistered before outcome inspection.
 
 Historical validation evidence from Ideas 001 and 002 has already informed route selection. Future validation-only Audit evidence may continue to support research-route selection, but it is not untouched final generalization evidence. The test split remains untouched.
 

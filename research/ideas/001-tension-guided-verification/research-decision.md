@@ -1,10 +1,10 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Decision: Idea 001 Tension-Guided Verification
+# Research decision: Idea 001 tension-guided verification
 
 - **Idea**: `001-tension-guided-verification`
 - **Decision date**: 2026-09-02
-- **Decision Stage**: P6 — Final Research Decision
+- **Decision Stage**: P6: Final Research Decision
 - **Lifecycle Transition**: `TERMINATE_CURRENT_TENSION_ROUTE`
 - **Gate 03 Authorization**: `NOT_AUTHORIZED`
 - **Residual Headroom Status**: `UNRESOLVED_RESEARCH_OPPORTUNITY`
@@ -12,7 +12,7 @@
 
 ---
 
-## 1. Evidence Inputs
+## 1. Evidence inputs
 
 This decision is governed exclusively by the frozen, independently audited experimental evidence lifecycle:
 
@@ -42,14 +42,14 @@ This decision is governed exclusively by the frozen, independently audited exper
 
 ---
 
-## 2. Gate 01 Audited State
+## 2. Gate 01 audited state
 
 ```text
 Gate 01 verdict: pass
 P0 Status: AUDIT_PASS
 ```
 
-### Empirical Meaning
+### Empirical meaning
 
 Under the frozen MoleRec validation setting, candidate review universe $\mathcal Q$ ($d_t(m) > 0$), and singleton deletion operator $R_0(\hat M_t, m) = \hat M_t \setminus \{m\}$:
 
@@ -66,14 +66,14 @@ Gate 01 established that selective routing opportunity / Oracle headroom exists 
 
 ---
 
-## 3. Gate 02 Audited State
+## 3. Gate 02 audited state
 
 ```text
 Formal Gate 02 verdict: STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL
 P5 Status: INTEGRITY_PASS
 ```
 
-### Empirical Findings
+### Empirical findings
 
 Evaluated on the 7,959 Audit-partition candidates across 428 eligible patients (disjoint from the 430-patient Dev partition):
 
@@ -97,28 +97,28 @@ Evaluated on the 7,959 Audit-partition candidates across 428 eligible patients (
 
 ---
 
-## 4. Final Route Decision
+## 4. Final route decision
 
 ```text
 Decision: TERMINATE_CURRENT_TENSION_ROUTE
 Gate 03 Authorization: NOT_AUTHORIZED
 ```
 
-### Scientific Meaning
+### Scientific meaning
 
 > Under the frozen MoleRec validation setting, fixed candidate universe, fixed singleton revision operator $R_0$, frozen recommender confidence signal, preregistered global DDI-degree scalar control, and preregistered support-pressure interaction diagnostic, the current Tension hypothesis route did not establish incremental constraint-pressure signal beyond MoleRec confidence.
 
-### Enforcement of the Stop Rule
+### Enforcement of the stop rule
 
 Per the preregistered decision rule (§8 of `gate-02-confidence-sufficiency.md`), the leaf `STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL` mandates an immediate and unconditional stop of the Tension route:
 
 - No Gate 03 is authorized under Idea 001.
 - No model training or architecture scaling is permitted.
-- Post-hoc rescue attempts—including changing lambda grids, revising score thresholds, re-binning interaction groups, transforming DDI degree, or seeking alternative constraint features after seeing negative results—are strictly prohibited.
+- Post-hoc rescue attempts, including changing lambda grids, revising score thresholds, re-binning interaction groups, transforming DDI degree, or seeking alternative constraint features after seeing negative results, are strictly prohibited.
 
 ---
 
-## 5. Supported Conclusions
+## 5. Supported conclusions
 
 The following conclusions are grounded in the audited empirical records:
 
@@ -129,7 +129,7 @@ The following conclusions are grounded in the audited empirical records:
 
 ---
 
-## 6. Unsupported Conclusions (Strictly Forbidden Claims)
+## 6. Unsupported conclusions (Strictly forbidden Claims)
 
 To maintain scientific integrity, the following claims are explicitly barred from repository records, manuscripts, or presentations:
 
@@ -144,7 +144,7 @@ To maintain scientific integrity, the following claims are explicitly barred fro
 
 ---
 
-## 7. Residual Open Question
+## 7. Residual open question
 
 ```text
 Status: UNRESOLVED_RESEARCH_OPPORTUNITY
@@ -158,14 +158,14 @@ $$
 }
 $$
 
-### Explicit Boundary
+### Explicit boundary
 
 - Frozen MoleRec medication confidence explains a substantial portion of candidate false-positive ranking structure, but does not exhaust the Oracle allocation headroom under $R_0$.
 - **No speculative mechanism may be attributed to this residual headroom**. It must not be presumed to originate from richer DDI graphs, clinical diagnoses, procedures, patient longitudinal history, latent embeddings, epistemic uncertainty, probability calibration, causal structure, LLM reasoning, or alternative selector architectures without independent, preregistered empirical proof.
 
 ---
 
-## 8. Boundary Between Route Closure and a Future Idea
+## 8. Boundary between route closure and a future idea
 
 - This decision formally **closes** the current Tension route under Idea 001.
 - Future investigation into the residual open question must be initiated as a **new research Idea** with a distinct problem formulation, independent hypothesis, and fresh preregistration.
@@ -174,7 +174,7 @@ $$
 
 ---
 
-## 9. Revisit Conditions
+## 9. Revisit conditions
 
 The current route may only be reopened if there is a **materially different scientific basis**, such as:
 
@@ -184,7 +184,7 @@ The current route may only be reopened if there is a **materially different scie
 - Different candidate universe or revision action semantics.
 - A different model family or baseline regime.
 
-### Prohibited Post-Hoc Adjustments
+### Prohibited Post-Hoc adjustments
 
 The following do **not** constitute sufficient justification to reopen or revise the current route:
 
@@ -197,7 +197,7 @@ The following do **not** constitute sufficient justification to reopen or revise
 
 ---
 
-## 10. Next Owner & Stage Handoff
+## 10. Next owner & stage handoff
 
 ```text
 Next CCFA Owner: ccf-idea-optimizer / Research Operator

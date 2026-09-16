@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# SafeDrug IJCAI 2021 Four-Model Full Reproduction Report
+# SafeDrug IJCAI 2021 four-model full reproduction report
 
 - **Attempt ID**: `formal-20260826-025500`
 - **Execution Date**: 2026-08-26
@@ -14,7 +14,7 @@
 
 ---
 
-## 1. Executive Summary
+## 1. Executive summary
 
 We executed the complete end-to-end Reproduction Mode pipeline for all four models evaluated in the IJCAI 2021 SafeDrug paper: **GAMENet**, **SafeDrug**, **RETAIN**, and **LEAP**.
 
@@ -28,7 +28,7 @@ Every step of the pipeline was executed under strict fail-closed reproduction in
 
 ---
 
-## 2. Table 2 Reproduction Comparison
+## 2. Table 2 reproduction comparison
 
 | Model | Metric | Target (IJCAI 2021 Table 2) | Target 2$\sigma$ Interval | Observed Reproduction (10 Rounds) | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -55,7 +55,7 @@ Every step of the pipeline was executed under strict fail-closed reproduction in
 
 ---
 
-## 3. Core Scientific Claims and Relationship Checks
+## 3. Core scientific claims and relationship checks
 
 The core claims of the IJCAI 2021 SafeDrug paper were evaluated deterministically:
 
@@ -75,9 +75,9 @@ The core claims of the IJCAI 2021 SafeDrug paper were evaluated deterministicall
 
 ---
 
-## 4. Fail-Closed Reproduction Protocol Verdict
+## 4. Fail-closed reproduction protocol verdict
 
 - **Interval Checks**: **12 / 20** passed within strict $2\sigma$ statistical bounds.
 - **Relationship Checks**: **3 / 3** passed.
 - **Audit Verdict**: `completed_mismatch`
-- **Rationale**: Under the repository’s fail-closed verification contract, any point metric deviation beyond the published $2\sigma$ interval results in a `completed_mismatch` audit verdict. No tuning, seed sweeping, or threshold manipulation is performed. All artifacts and exact traces are permanently preserved.
+- **Rationale**: Under the repository's fail-closed verification contract, any point metric deviation beyond the published $2\sigma$ interval results in a `completed_mismatch` audit verdict. No tuning, seed sweeping, or threshold manipulation is performed. All artifacts and exact traces are permanently preserved.

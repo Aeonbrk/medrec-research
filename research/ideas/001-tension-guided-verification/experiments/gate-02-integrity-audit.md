@@ -1,4 +1,4 @@
-# Gate 02 Integrity Audit Report
+# Gate 02 integrity audit report
 
 - **Idea**: `001-tension-guided-verification`
 - **Gate**: `gate-02-confidence-sufficiency`
@@ -11,7 +11,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full
@@ -42,7 +42,7 @@ P6 research decision unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-Evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -51,7 +51,7 @@ P6 research decision unlocked: yes
 | `gate-02-summary.json` & `Handoff.md` line 107 | Scalar control selects $\lambda^* = 0.0$ on Dev, yielding identical performance to `ScoreOnly` on Audit ($Scalar - Score = 0.0\%$; 95% CI: [0.0%, 0.0%]). Adding active DDI degree provides zero incremental signal over model score. | Empirically verified: Dev grid search over 13 values selects $\lambda^* = 0.0$ with selection score 0.592556; Audit difference is 0.000000 across all budget tiers. | **Supported** | None. |
 | `gate-02-summary.json` & `Handoff.md` line 108 | Support-pressure interaction $I_{\text{Tension}} = -0.0052$ (95% CI: [-0.0457, +0.0364]) is statistically indistinguishable from zero across 4 cells with $>400$ patients each, rejecting the super-additive pressure hypothesis. | Empirically verified: $p_{HH}=0.1263, p_{HL}=0.1527, p_{LH}=0.4760, p_{LL}=0.4972$; $(0.1263 - 0.1527) - (0.4760 - 0.4972) = -0.005237$. Bootstrap 95% CI crosses zero. | **Supported** | None. |
 
-### Explicitly Disallowed Claims Check
+### Explicitly disallowed claims check
 
 The audit confirmed that none of the following forbidden claims are asserted in active repository documentation:
 
@@ -65,7 +65,7 @@ The audit confirmed that none of the following forbidden claims are asserted in 
 
 ---
 
-## 2. Frozen Identity Audit
+## 2. Frozen identity audit
 
 The formal public summary records exactly the 12 frozen identities, verified against registry authority and execution environment:
 
@@ -91,7 +91,7 @@ The formal public summary records exactly the 12 frozen identities, verified aga
 
 ---
 
-## 3. Candidate-Row Invariant Audit
+## 3. Candidate-Row invariant audit
 
 All 15,549 rows of `/root/zhb/medrec-data/runs/ideas/001-tension-guided-verification/gate-02-confidence-sufficiency-20260902-155433/gate-02-candidates.jsonl` were checked:
 
@@ -107,7 +107,7 @@ All 15,549 rows of `/root/zhb/medrec-data/runs/ideas/001-tension-guided-verifica
 
 ---
 
-## 4. Split Integrity Audit
+## 4. Split integrity audit
 
 The complete validation cohort was independently partitioned using standard library `random.Random(1203)` over $0 \dots 1058$ ($N=1059$):
 
@@ -127,7 +127,7 @@ The complete validation cohort was independently partitioned using standard libr
 
 ---
 
-## 5. Dev-Only Lambda Selection Audit
+## 5. Dev-Only lambda selection audit
 
 Computed strictly from the 7,590 Dev partition candidates without any access to Audit outcomes:
 
@@ -157,7 +157,7 @@ Computed strictly from the 7,590 Dev partition candidates without any access to 
 
 ---
 
-## 6. Audit Policy Yields, Gaps & Headroom Capture Audit
+## 6. Audit policy yields, gaps, and headroom capture audit
 
 Independent evaluation on 7,959 Audit candidates using frozen $\lambda^* = 0.0$ and $D_{\max}^{\text{Dev}} = 12.0$:
 
@@ -200,7 +200,7 @@ Independent evaluation on 7,959 Audit candidates using frozen $\lambda^* = 0.0$ 
 
 ---
 
-## 7. Interaction Diagnostic Audit
+## 7. Interaction diagnostic audit
 
 Evaluated on Audit candidates using frozen Dev median score $\tau_s = 0.9249944388866425$:
 
@@ -220,7 +220,7 @@ Evaluated on Audit candidates using frozen Dev median score $\tau_s = 0.92499443
 
 ---
 
-## 8. Independent Patient-Cluster Bootstrap Audit
+## 8. Independent Patient-Cluster bootstrap audit
 
 Recomputed using 1,000 patient-clustered replicates (seed 1203, cluster unit `patient_order`, unique patient orders sorted ascending prior to sampling):
 
@@ -253,7 +253,7 @@ Recomputed using 1,000 patient-clustered replicates (seed 1203, cluster unit `pa
 
 ---
 
-## 9. Independent Decision Tree Recomputation
+## 9. Independent decision tree recomputation
 
 All criteria derived prior to verdict inspection:
 
@@ -265,7 +265,7 @@ All criteria derived prior to verdict inspection:
 6. `interaction_support_met`: `true` (all four cell counts $\ge 50$)
 7. `interaction_ci_above_zero`: `false` ($I_{\text{Tension}}$ lower CI $-0.045749 \ngtr 0$)
 
-### Verdict Derivation Logic
+### Verdict derivation logic
 
 1. Support requirement met? Yes.
 2. Residual headroom survives ScoreOnly? Yes (`residual_headroom_survives_score_10` and `_20` both true).
@@ -284,7 +284,7 @@ STOP_NO_INCREMENTAL_CONSTRAINT_SIGNAL
 
 ---
 
-## 10. Audit Conclusion & Handoff
+## 10. Audit conclusion & handoff
 
 ```text
 P5 Status: INTEGRITY_PASS
@@ -296,7 +296,7 @@ All empirical metrics, identities, and decision criteria of Gate 02 are 100% ver
 
 > Under the frozen MoleRec validation setting, substantial false-positive ranking signal is present in the recommender's own medication probabilities, while residual Oracle headroom remains. Under the preregistered global additive DDI-degree scalar and the preregistered support-pressure interaction diagnostic, Gate 02 does not establish incremental constraint signal beyond MoleRec confidence.
 
-### Next Step
+### Next step
 
 Per the pre-registered research lifecycle, hand off to:
 

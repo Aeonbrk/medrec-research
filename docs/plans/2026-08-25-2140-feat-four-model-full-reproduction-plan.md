@@ -9,9 +9,9 @@ product_contract_source: ce-plan-bootstrap
 execution: code
 ---
 
-# SafeDrug Archived Four-Model Full Reproduction - Plan
+# SafeDrug archived four-model full reproduction plan
 
-## Goal Capsule
+## Goal capsule
 
 - **Objective:** Produce an auditable SafeDrug archived four-model reproduction outcome for GAMENet, SafeDrug, RETAIN, and LEAP, including an honest match or mismatch verdict against IJCAI 2021 Table 2.
 - **Means:** Correct the dataset-authority gate, regenerate the cohort with the SafeDrug `c7218d0` preprocessing lineage, execute the archived four-model program, and apply a deterministic Table 2 audit (KTD1, KTD5, KTD7, KTD9).
@@ -22,7 +22,7 @@ execution: code
 
 ---
 
-## Gemini Execution Directive
+## Gemini execution directive
 
 This document is the user's authorization for one new end-to-end four-model attempt. Gemini is to revise U1, U8, and U9, freeze and deploy that verified revision in U2, and then execute U3 through U7 in order. It must create a new attempt ID and a new staging candidate; `formal-20260825-231500`, its ledger, and its rejected candidate remain untouched historical provenance and are never admission inputs. Gemini must not stop after data preparation or the four smokes merely to request another GO: four valid fresh smokes are the automatic admission condition for the four formal 50-epoch submissions and original ten-round tests. If a declared gate fails, the authorized completion is the corresponding blocked or incomplete terminal packet, not a repair, retry, or scope expansion.
 
@@ -30,13 +30,13 @@ Execution order: `U8 -> U1 -> U9 -> U2 -> U3 -> U4 -> U5 -> U6 -> U7`.
 
 ---
 
-## Product Contract
+## Product contract
 
 ### Summary
 
 Execute one complete four-model SafeDrug Reproduction Mode attempt on the 15,032-visit cohort produced by the published `c7218d0` preprocessing lineage. Preserve 14,995 as the paper-reported visit metadata and disclose the 37-visit inconsistency without using it as an admission gate. Regenerate a new six-file candidate, run fresh non-evidence smokes, continue automatically to four formal 50-epoch runs and their original ten-round tests, and finish with a public-safe terminal packet plus the Table 2 audit when four valid results exist.
 
-### Problem Frame
+### Problem frame
 
 The completed preparation and the terminated attempt both observed 15,032 visits. The terminated attempt then failed because this plan's former contract elevated the isolated paper value 14,995 into a hard executable gate. That execution remains a truthful terminal result under its frozen contract, but its scientific interpretation is superseded by the evidence below. Its preparation smokes remain non-authorizing because they used another harness attempt and were not fresh admission artifacts for this plan.
 
@@ -44,7 +44,7 @@ SafeDrug `c7218d0` explicitly targets MIMIC-III 1.4. Running its unmodified scie
 
 The scientific authority remains split by stage. MoleRec states that it follows SafeDrug preprocessing after commit `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`, while the SafeDrug repository directs paper-result reproduction to the archived model lineage. Treating either revision as the sole authority would conflate dataset construction with model behavior and would make later MoleRec onboarding inconsistent.
 
-### Dataset Authority Evidence
+### Dataset authority evidence
 
 The following public-safe aggregates were computed from the exact `formal-20260825-231500` staging output using the published upstream aggregation semantics. They make 15,032 the executable denominator and 14,995 a reported inconsistency.
 
@@ -64,14 +64,14 @@ The first three rows and the maxima of 128 diagnoses, 50 procedures, and 65 medi
 - A3. The 319 host performs real-data preprocessing, GPU training, checkpoint testing, and restricted artifact storage.
 - A4. Codex reviews the terminal packet and repository diff after execution finishes.
 
-### Key Decisions
+### Key decisions
 
-- **Use 15,032 visits as the executable cohort and disclose 14,995 as paper metadata.** (session-settled: user-approved — chosen over retaining 14,995 as a hard gate: the published code and the companion statistics jointly support 15,032.) Governs R1, R2, R7, R12, R17, and R18.
-- **Regenerate under a new attempt.** (session-settled: user-approved — chosen over promoting or copying the rejected candidate: a fresh run binds the data to the corrected frozen harness without adding cross-attempt inheritance rules.) Governs R4, R19, and R20.
-- **Authorize one continuous smoke-to-formal execution.** (session-settled: user-directed — chosen over another preparation-only handoff: the requested deliverable is the complete four-model reproduction.) Governs R8 and R9.
-- **Separate data and model authorities.** (session-settled: user-directed — chosen over treating the archived model commit as the data authority: future MoleRec must share its declared `c7218d0` preprocessing lineage.) Governs R2, R5, and R16.
-- **Keep the current run to four models.** (session-settled: user-directed — chosen over adding MoleRec now: this execution reproduces the four SafeDrug Table 2 baselines while preserving a reusable data boundary for the fifth baseline.) Governs R15 and R16.
-- **Preserve the former attempt and supersede only its interpretation.** (session-settled: user-approved — chosen over rewriting the old ledger or erasing the failure: the former gate fired truthfully even though later evidence invalidated its authority premise.) Governs R19 and R20.
+- **Use 15,032 visits as the executable cohort and disclose 14,995 as paper metadata.** (session-settled: user-approved, chosen over retaining 14,995 as a hard gate: the published code and the companion statistics jointly support 15,032.) Governs R1, R2, R7, R12, R17, and R18.
+- **Regenerate under a new attempt.** (session-settled: user-approved, chosen over promoting or copying the rejected candidate: a fresh run binds the data to the corrected frozen harness without adding cross-attempt inheritance rules.) Governs R4, R19, and R20.
+- **Authorize one continuous smoke-to-formal execution.** (session-settled: user-directed, chosen over another preparation-only handoff: the requested deliverable is the complete four-model reproduction.) Governs R8 and R9.
+- **Separate data and model authorities.** (session-settled: user-directed, chosen over treating the archived model commit as the data authority: future MoleRec must share its declared `c7218d0` preprocessing lineage.) Governs R2, R5, and R16.
+- **Keep the current run to four models.** (session-settled: user-directed, chosen over adding MoleRec now: this execution reproduces the four SafeDrug Table 2 baselines while preserving a reusable data boundary for the fifth baseline.) Governs R15 and R16.
+- **Preserve the former attempt and supersede only its interpretation.** (session-settled: user-approved, chosen over rewriting the old ledger or erasing the failure: the former gate fired truthfully even though later evidence invalidated its authority premise.) Governs R19 and R20.
 
 ### Requirements
 
@@ -108,14 +108,14 @@ The first three rows and the maxima of 128 diagnoses, 50 procedures, and 65 medi
 - R20. The historical attempt, ledger, and rejected candidate remain unmodified; durable documentation may add a superseding interpretation but must not relabel that attempt as successful or claim that its blocked lanes ran.
 - R21. The Table 2 auditor accepts results only when all four ledger lanes are completed and each explicit result path is the same terminal artifact recorded for that lane in the current attempt.
 
-### Key Flows
+### Key flows
 
 - F1. **Build and publish the executable `c7218d0` dataset.** Gemini verifies the source and environment, runs the frozen `c7218d0` preprocessing boundary into new staging, completes the manifest, statistics, and six-file gates, publishes the new snapshot at the registry target already declared by the immutable harness revision, then runs final preflight. Covers R1-R6 and R16-R20.
 - F2. **Admit formal execution.** Gemini submits four fresh smokes, waits for all terminal artifacts, validates the shared identities and non-evidence boundary, then either stops the whole formal stage or immediately submits all four formal lanes. Covers R7-R9 and R11.
 - F3. **Complete independent formal lanes.** Gemini monitors all submitted lanes until each has a validated terminal outcome and never converts a disappeared session into success. Covers R9-R11 and R13.
 - F4. **Produce the terminal verdict.** Every terminal state emits a public-safe handoff with R17; when four current-attempt formal results exist, the auditor first binds them to the runtime ledger and then evaluates R12. Covers R12-R17 and R21.
 
-### Acceptance Examples
+### Acceptance examples
 
 - AE1. **Covers R1-R4, R17, and R18.** Given exact `c7218d0` staging with 6,350 patients and 15,032 visits plus passing statistics and six-file evidence, when the full probe runs, then publication is admitted and 14,995 is reported only as paper metadata.
 - AE2. **Covers R3.** Given 15,032 visits but a missing or vocabulary-misaligned molecular artifact, when the six-file probe runs, then the snapshot remains staging and the failure names the structural gate.
@@ -126,7 +126,7 @@ The first three rows and the maxima of 128 diagnoses, 50 procedures, and 65 medi
 - AE7. **Covers R1, R2, and R18.** Given a 14,995-visit candidate without a pinned executable lineage or matching companion statistics, when the data gate runs, then the candidate is rejected even though its visit count matches the paper scalar.
 - AE8. **Covers R19-R21.** Given the old attempt and its candidate still exist, when a new attempt starts or an audit resolves artifacts, then only the new attempt's uniquely bound staging and lane artifacts are eligible.
 
-### Success Criteria
+### Success criteria
 
 - A scientifically complete attempt has four validated formal result artifacts, each with 50 training epochs and ten test rounds.
 - The terminal audit reports each of the 20 interval checks and all three relationship checks, including the observed value, paper target, interval, and boolean verdict.
@@ -134,7 +134,7 @@ The first three rows and the maxima of 128 diagnoses, 50 procedures, and 65 medi
 - The final aggregate state distinguishes paper match, paper mismatch, and incomplete formal execution without tuning or rerunning any lane.
 - The repository and handoff contain no restricted artifact and retain an explicit data boundary suitable for later MoleRec onboarding.
 
-### Scope Boundaries
+### Scope boundaries
 
 #### In scope
 
@@ -151,7 +151,7 @@ The first three rows and the maxima of 128 diagnoses, 50 procedures, and 65 medi
 - Historical reconstruction or manual trimming of a 14,995-visit cohort without a pinned executable source.
 - Destructive removal or replacement of existing datasets, historical runs, environments, or another operator's processes.
 
-### Deferred to Follow-Up Work
+### Deferred to follow-up work
 
 - Add MoleRec as the fifth baseline against the accepted `safedrug-paper-c721-ijcai21` data interface.
 - Diagnose a mismatch only after this attempt has closed with an immutable failure or mismatch record.
@@ -163,7 +163,7 @@ The first three rows and the maxima of 128 diagnoses, 50 procedures, and 65 medi
 - The environment lock and registry identity remain valid only if the full program probe reproduces their current observed behavior.
 - The precise historical mechanism behind the paper's 14,995 value is unknown; this plan requires disclosure of the inconsistency and does not claim a specific typo or MIMIC release cause.
 
-### 319 Input Contract
+### 319 input contract
 
 The following operational values were resolved read-only on 319 on 2026-08-25. They remove path selection from Gemini's execution-time discretion:
 
@@ -184,7 +184,7 @@ U2 writes these resolved values and checks to the restricted 319 artifact `runs/
 
 The selected DDI file was observed on 2026-08-25 to contain 4,649,442 lines including its header and to be byte-equal by direct comparison to the other two copies found on 319. Those copies are corroboration, not fallback inputs: this attempt uses only the path declared above.
 
-### Restricted Input Manifest Contract
+### Restricted input manifest contract
 
 `runs/safedrug-archived/<formal-id>/input-manifest.json` is ignored, schema-versioned runtime state. It contains exactly these top-level fields: `schema_version = 1`, `kind = "safedrug_c721_input_manifest"`, `artifact_id` as its `MEDREC_DATA_ROOT`-relative path, `formal_id` equal to the current attempt, and `sources` as an array of exactly four objects. Each source object contains only `role`, `path`, `release`, `data_rows`, and `columns`.
 
@@ -213,22 +213,22 @@ U2 reads each header and counts data rows once while creating the manifest. U9 r
 
 ---
 
-## Planning Contract
+## Planning contract
 
-### Key Technical Decisions
+### Key technical decisions
 
-- KTD1. **Use dual pinned authorities.** (session-settled: user-directed — chosen over one archived revision owning both stages: future MoleRec requires the `c7218d0` data lineage.) R2 owns preprocessing behavior and R5 owns model behavior; the two checkouts never substitute for each other.
+- KTD1. **Use dual pinned authorities.** (session-settled: user-directed, chosen over one archived revision owning both stages: future MoleRec requires the `c7218d0` data lineage.) R2 owns preprocessing behavior and R5 owns model behavior; the two checkouts never substitute for each other.
 - KTD2. **Keep orchestration agent-owned and run-scoped.** Gemini acts as an external coordinator around the existing submission-only CLI, persists each lane response before the next submission, and monitors terminal artifacts through read-only remote inspection. Do not add lifecycle, polling, resume, or retry behavior to `RemoteExecutor`, the reproduction CLI, a daemon, or a job database.
 - KTD3. **Predeclare the additive registry target before revision freeze.** Set `dataset_subdirectory` to `snapshots/safedrug-paper-c721-ijcai21` in the same tracked revision as the runner, probe, and auditor. Before publication, use explicit staging paths for data validation; after one atomic publish, the already-frozen registry resolves the final target. If publication is interrupted after the rename but before ledger persistence, reconcile the unique final target against the staging proof before advancing; an ambiguous or unrelated existing target blocks without overwrite. No executable or registry commit occurs between U2 revision freeze and the last formal submission.
 - KTD4. **Bridge only the data interface.** Use `c7218d0` `data/processing.py` for `records_final.pkl`, `voc_final.pkl`, `ddi_A_final.pkl`, and `ehr_adj_final.pkl`. Require the regenerated ordered medication vocabulary to equal the pinned commit's own `data/voc_final.pkl`, then publish that commit's `data/ddi_mask_H.pkl` and `data/idx2SMILES.pkl` bytes as `ddi_mask_H.pkl` and the archived consumer filename `idx2drug.pkl`. Record `data/ddi_mask_H.py` as the public generator provenance, but do not rerun its unordered `list(set(...))` column construction when the pinned committed output already exists. Extend the harness probe to validate the vocabulary bijection, record medication indices, exact molecule-map key contract, symmetric zero-diagonal binary adjacency matrices, and the `ddi_mask_H` row/column domain. Block when source identity, path-only substitution, byte equality, or exact ordered-vocabulary equality cannot be proved; never trim, reserialize, reorder, or patch scientific values to satisfy R1-R3.
-- KTD5. **Make the smoke gate the sole formal admission.** (session-settled: user-directed — chosen over a second human GO: this plan itself authorizes formal continuation after R7 and R8 pass.) Gemini records the admission decision once and submits the four existing single-lane `reproduce <baseline>` calls on the pass branch, persisting each response before the next call so a partial submission outcome is unambiguous.
+- KTD5. **Make the smoke gate the sole formal admission.** (session-settled: user-directed, chosen over a second human GO: this plan itself authorizes formal continuation after R7 and R8 pass.) Gemini records the admission decision once and submits the four existing single-lane `reproduce <baseline>` calls on the pass branch, persisting each response before the next call so a partial submission outcome is unambiguous.
 - KTD6. **Use at-most-once lane submission.** A lane receives one smoke submission and, after aggregate admission, one formal submission. Failed formal lanes become terminal failures while unaffected lanes continue. After a lane publishes terminal artifacts, Gemini uses only read-only inspection for that lane; no later orchestration step writes its run root.
 - KTD7. **Use one deterministic Reproduction Mode auditor.** Version the 20 paper means and standard deviations separately from code. The auditor validates the existing schema-version-1 result fields, requires each explicit result path to match the completed current-attempt lane in the ledger, obtains harness/snapshot/preprocessing identities from that ledger, calculates R12, emits the R17 disclosure, and publishes one canonical allowlisted JSON packet through `write_json_atomic` without calling Comparison Mode.
 - KTD8. **Keep restricted and review artifacts separate.** Runtime state may name registry-relative remote artifacts but never embeds raw logs or absolute remote paths. Only the final public-safe aggregate packet is handed to Codex.
-- KTD9. **Name executable and reported dataset facts separately.** (session-settled: user-approved — chosen over replacing one unexplained scalar with another: the gate must encode the executable `c7218d0` counts and companion statistics while preserving the paper value as non-gating metadata.) The archived program owns executable validation; remote preflight validates the program's structured proof instead of maintaining a contradictory count policy; the auditor and handoff carry both meanings per R1, R17, and R18.
-- KTD10. **Start from fresh attempt-owned artifacts.** (session-settled: user-approved — chosen over adopting the old candidate: the old attempt remains terminal and cannot supply data, smoke, formal, or audit admission.) Gemini assigns a new attempt ID before U2 and binds every later candidate, session, and result to it per R19-R21.
+- KTD9. **Name executable and reported dataset facts separately.** (session-settled: user-approved, chosen over replacing one unexplained scalar with another: the gate must encode the executable `c7218d0` counts and companion statistics while preserving the paper value as non-gating metadata.) The archived program owns executable validation; remote preflight validates the program's structured proof instead of maintaining a contradictory count policy; the auditor and handoff carry both meanings per R1, R17, and R18.
+- KTD10. **Start from fresh attempt-owned artifacts.** (session-settled: user-approved, chosen over adopting the old candidate: the old attempt remains terminal and cannot supply data, smoke, formal, or audit admission.) Gemini assigns a new attempt ID before U2 and binds every later candidate, session, and result to it per R19-R21.
 
-### High-Level Technical Design
+### High-level technical design
 
 The first diagram separates the two scientific authorities and the artifact flow.
 
@@ -281,7 +281,7 @@ stateDiagram-v2
   completed_mismatch --> [*]
 ```
 
-### Runtime Ledger Contract
+### Runtime ledger contract
 
 The ignored ledger has schema version `1` and kind `safedrug_archived_formal_reproduction_state`. It contains only these public-safe groups:
 
@@ -307,7 +307,7 @@ Gemini resolves runtime IDs only on the verified 319 host and preserves only rel
 
 Gemini assigns failure codes from a small public-safe monitoring vocabulary such as `submission_blocked`, `session_missing_terminal`, `training_failed`, `testing_failed`, and `invalid_terminal_artifact`. It never copies a raw exception or log excerpt into the ledger.
 
-### Assumptions and Implementation-Time Notes
+### Assumptions and implementation-time notes
 
 - The authorized 319 raw inputs and mapping assets can reproduce the characterized `c7218d0` cohort. If they cannot, the resulting executable-count or statistics mismatch is a blocker, not a reason to infer or delete visits.
 - The frozen NumPy 1.23.5 environment remains acceptable if the environment probe, preprocessing startup, six-file load, and formal program all pass. Change a pin only after an observed compatibility failure, then regenerate the explicit lock and registered identity before any smoke.
@@ -318,7 +318,7 @@ Gemini assigns failure codes from a small public-safe monitoring vocabulary such
 
 U8 lands first because U1 also touches the archived program after its data-contract correction. U1 then completes result/status provenance and the audit CLI; U9 follows U1 because both edit the shared CLI and integration test. All three must land before any remote execution so the corrected authority, final verdict, semantic data gates, concrete preprocessing boundary, and final registry target are frozen in one harness revision. U2 creates and deploys a new attempt at that revision. U3 proves fresh data at an explicit staging path; U4 performs data-only publication and final preflight without changing tracked code. U5 is the only route into U6. U7 consumes the first terminal outcome from U2-U6 and never changes a scientific input; it runs the Table 2 comparison only after U6 reaches `audit_ready`.
 
-### System-Wide Impact
+### System-wide impact
 
 - **Archived program:** The full probe validates 15,032 executable visits, pinned `statistics(data)` outputs, and six-file semantics while reporting 14,995 only as paper metadata. Training, loss, checkpoint selection, and ten-round testing remain unchanged.
 - **CLI:** The existing narrow `c7218d0` staging and Table 2 audit commands are corrected in place. Existing formal and smoke commands remain submission-only and keep their independent-lane error behavior.
@@ -328,7 +328,7 @@ U8 lands first because U1 also touches the archived program after its data-contr
 
 ---
 
-## Implementation Units
+## Implementation units
 
 ### U1. Correct deterministic dataset authority and Table 2 auditing
 
@@ -386,7 +386,7 @@ U8 lands first because U1 also touches the archived program after its data-contr
 
 ### U9. Complete the concrete `c7218d0` staging boundary and final registry target
 
-- **Goal:** Make data regeneration directly executable while ensuring every later remote submission uses the same immutable tracked revision.
+- **Goal:** Make data regeneration directly executable so every later remote submission uses the same immutable tracked revision.
 - **Requirements:** R2-R4, R6, R14, and R16-R20; KTD1, KTD3, KTD4, and KTD10.
 - **Dependencies:** U1.
 - **Files:** `src/medrec_research/safedrug_c721.py`, `src/medrec_research/cli.py`, `baselines/registry.toml`, `tests/unit/test_safedrug_c721.py`, `tests/unit/test_registry.py`, and `tests/integration/test_run_cli.py`.
@@ -535,7 +535,7 @@ U8 lands first because U1 also touches the archived program after its data-contr
 
 ---
 
-## Verification Contract
+## Verification contract
 
 | Gate | Applies after | Proof | Pass outcome |
 | --- | --- | --- | --- |
@@ -553,7 +553,7 @@ No local synthetic test, dry run, smoke result, process exit, historical attempt
 
 ---
 
-## Definition of Done
+## Definition of done
 
 The plan is complete when one of these terminal outcomes is true and documented:
 
@@ -576,7 +576,7 @@ In every terminal outcome:
 
 ## Appendix
 
-### Appendix A: SafeDrug Table 2 Targets
+### Appendix A: SafeDrug table 2 targets
 
 The auditor versions these published means and standard deviations. R12 defines the acceptance rule; the intervals are calculated, not copied into a second authority.
 

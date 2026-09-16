@@ -1,4 +1,4 @@
-# Gate 01 Integrity Audit Report — Idea 006
+# Gate 01 integrity audit Report: Idea 006
 
 - **Audited Stage**: `IDEA_006_GATE_01`
 - **Audited Artifacts**:
@@ -13,7 +13,7 @@
 
 ---
 
-## 1. Quarantine & Non-Leakage Audit
+## 1. Quarantine and non-leakage audit
 
 1. **R0 Holdout Split Quarantine**:
    - `R0 Holdout` was strictly preserved in quarantine.
@@ -26,7 +26,7 @@
 
 ---
 
-## 2. Numeric & Statistical Consistency Audit
+## 2. Numeric & statistical consistency audit
 
 1. **Safety Budget Calculation**:
    - $R_{Base}^{Tune} = 0.09847289747342353$.
@@ -45,7 +45,7 @@
 
 ---
 
-## 3. PASS Rule & Condition Verification
+## 3. PASS rule & condition verification
 
 - **Condition 1 (Tune Budget Feasibility)**: `PASS` (`ec_budget_miss = False`).
 - **Condition 2 (Safety Over Base)**: `PASS` (Dev risk ratio $0.7607 \le 0.90$, CI upper $< 0$).
@@ -58,7 +58,7 @@
 
 ---
 
-## 4. Scientific Objectivity & Non-Rescue Audit
+## 4. Scientific objectivity and non-rescue audit
 
 - **No Model Rescue**: Zero post-hoc modifications, alternative learning rates, additional epochs, or architectural additions were attempted.
 - **No Threshold Relaxation**: The $+0.005$ Recall increment over direct reranker was strictly enforced as defined in the preregistered frozen protocol.
@@ -66,7 +66,7 @@
 
 ---
 
-## 5. Audit Conclusion
+## 5. Audit conclusion
 
 The execution of Gate 01 satisfies all scientific integrity, split quarantine, cryptographic freeze, and objective reporting requirements.
 **Verdict: `INTEGRITY_AUDIT_PASS`.**

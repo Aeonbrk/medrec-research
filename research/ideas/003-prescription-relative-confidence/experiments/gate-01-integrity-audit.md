@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Integrity Audit Report
+# Gate 01 integrity audit report
 
 - **Idea**: `003-prescription-relative-confidence`
 - **Gate**: `gate-01-prescription-relative-confidence`
@@ -12,7 +12,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full
@@ -41,7 +41,7 @@ P6 research decision unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-Evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -50,7 +50,7 @@ P6 research decision unlocked: yes
 | `gate-01-summary.json` | Residual Oracle headroom survives: Oracle achieves 100.0% yield, beating `StrongControl` by $+42.51\%$ (10% budget, 95% CI: [+39.04%, +46.15%]) and $+42.83\%$ (20% budget, 95% CI: [+40.34%, +45.78%]). | Empirically verified: Gate B passes unconditionally with substantial headroom. | **Supported** | None. |
 | `gate-01-summary.json` | `RankAugmented` achieves 57.24% (10% budget) and 56.91% (20% budget), resulting in negative point gaps vs `StrongControl` (-0.26% at 10%, -0.26% at 20%) and bootstrap 95% CIs crossing zero ([-1.37%, +1.19%] at 10%, [-0.65%, +0.80%] at 20%). Within-prescription relative confidence adds zero incremental signal. | Empirically verified: Gate C fails at both budgets. Lower 95% CI bounds are strictly $\le 0$. | **Supported** | None. |
 
-### Explicitly Disallowed Claims Check
+### Explicitly disallowed claims check
 
 The audit confirmed that none of the forbidden claims are asserted in active repository documentation:
 
@@ -62,7 +62,7 @@ The audit confirmed that none of the forbidden claims are asserted in active rep
 
 ---
 
-## 2. Frozen Identity Audit
+## 2. Frozen identity audit
 
 The formal public summary records exactly the 10 frozen identities, verified against registry authority and execution environment:
 
@@ -85,7 +85,7 @@ The formal public summary records exactly the 10 frozen identities, verified aga
 
 ---
 
-## 3. Candidate Corpus & Row-Level Invariant Audit
+## 3. Candidate corpus & Row-Level invariant audit
 
 Evaluated on all 15,549 rows of `gate-01-candidates.jsonl`:
 
@@ -104,7 +104,7 @@ Evaluated on all 15,549 rows of `gate-01-candidates.jsonl`:
 
 ---
 
-## 4. Cohort Partition & Split Audit
+## 4. Cohort partition & split audit
 
 The complete validation cohort was independently partitioned using standard library `random.Random(2003)` over $0 \dots 1058$ ($N=1059$):
 
@@ -123,7 +123,7 @@ The complete validation cohort was independently partitioned using standard libr
 
 ---
 
-## 5. Dev Model Fitting Audit
+## 5. Dev model fitting audit
 
 Dev ridge linear probability models ($\lambda = 10^{-6}$, unpenalized intercept) independently recomputed from Dev candidate rows:
 
@@ -145,7 +145,7 @@ Dev ridge linear probability models ($\lambda = 10^{-6}$, unpenalized intercept)
 
 ---
 
-## 6. Audit Policy Yields and Gaps Audit
+## 6. Audit policy yields and gaps audit
 
 Evaluated on 7,740 Audit candidates across review budgets $B \in \{10\%, 20\%, 30\%\}$:
 
@@ -174,7 +174,7 @@ Evaluated on 7,740 Audit candidates across review budgets $B \in \{10\%, 20\%, 3
 
 ---
 
-## 7. Bootstrap Uncertainty and Decision Criteria Audit
+## 7. Bootstrap uncertainty and decision criteria audit
 
 Patient-clustered bootstrap (1,000 replicates, seed 1203) independently reproduced from Audit candidate rows:
 
@@ -185,7 +185,7 @@ Patient-clustered bootstrap (1,000 replicates, seed 1203) independently reproduc
 | `Oracle - StrongControl` | 10% | [+0.390390, +0.461470] | [+0.390390, +0.461470] | Exact match |
 | `Oracle - StrongControl` | 20% | [+0.403418, +0.457819] | [+0.403418, +0.457819] | Exact match |
 
-### Mechanical Decision Tree Evaluation
+### Mechanical decision tree evaluation
 
 1. **Gate A (Audit Support)**:
    - $N_{PB=1} = 417 \ge 50$ (Pass)
@@ -207,7 +207,7 @@ Patient-clustered bootstrap (1,000 replicates, seed 1203) independently reproduc
 
 ---
 
-## 8. Audit Conclusion
+## 8. Audit conclusion
 
 The integrity audit confirms with 100% precision:
 

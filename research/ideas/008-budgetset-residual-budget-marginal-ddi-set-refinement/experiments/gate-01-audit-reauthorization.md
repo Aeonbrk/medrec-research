@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Audit Re-authorization — Idea 008
+# Gate 01 audit Re-authorization: Idea 008
 
 ## Authorization status
 
@@ -44,7 +44,7 @@ Independent: LR 0.001, eta 5.0, epochs {2002: 7, 2003: 6, 2004: 6}
 
 No Audit result may change any of these values.
 
-## Authorized Audit operations
+## Authorized audit operations
 
 Execute the terminal Gate01-Audit exactly under protocol v1.2 using only the frozen selections. Evaluate Frozen Base, Fixed-K Budget-Aware Greedy + 1-Swap, the Train-selected fixed-lambda supporting control, the three retained BudgetSet seeds, and the three retained Independent seeds at `b_L`, `b_M`, and `b_H`.
 

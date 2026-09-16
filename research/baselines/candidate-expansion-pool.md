@@ -1,10 +1,10 @@
-# Baseline Candidate Expansion Pool
+# Baseline candidate expansion pool
 
 - **Status**: Planning / Draft
 - **Role**: Target list of baseline architectures for future Comparison Mode qualification and multi-backbone evidence.
 - **Context**: Complements the five currently qualified classical baselines in `baselines/registry.toml` (RETAIN, LEAP, GAMENet, SafeDrug, MoleRec).
 
-## Classical Baselines (Currently Qualified)
+## Classical baselines (Currently Qualified)
 
 - RETAIN
 - LEAP
@@ -12,7 +12,7 @@
 - SafeDrug
 - MoleRec
 
-## Recent Strong Baselines (Expansion Targets)
+## Recent strong baselines (Expansion Targets)
 
 - VITA (AAAI'24, CCF-A)
 - ARMR (IJCAI'25, CCF-A)
@@ -20,6 +20,6 @@
 - KEHGCN (AAAI'26, CCF-A)
 - HypeMed (TOIS'26, CCF-A)
 
-## First-Party Method
+## First-Party method
 
 - Ours (Tension-Guided Verification / Active Hypothesis)

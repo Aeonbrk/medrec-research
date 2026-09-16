@@ -1,4 +1,4 @@
-# Gate 01 Integrity Audit Report
+# Gate 01 integrity audit report
 
 - **Idea**: `001-tension-guided-verification`
 - **Gate**: `gate-01-routing-opportunity`
@@ -9,7 +9,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full
@@ -37,7 +37,7 @@ Formal Gate 02 unlocked: no
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-Evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -46,7 +46,7 @@ Formal Gate 02 unlocked: no
 | `Handoff.md` line 79 | "only 31.67% of singleton deletions are Pareto-beneficial ($Y^{PB}=1$), while 68.33% are harmful to efficacy ($\Delta J < 0$)." | $\Delta J < 0$ measures retrospective reduction in Jaccard similarity against observed validation prescriptions under $R_0$. Equating observed prescription match with "efficacy" and Jaccard reduction with "harmful to efficacy" exceeds experimental scope. | **Overstated** | Replace "harmful to efficacy ($\Delta J < 0$)" with metric-specific wording: "reduce visit-level Jaccard under singleton deletion ($\Delta J < 0$, non-beneficial revisions under $R_0$)". |
 | `Handoff.md` line 81 | "Simple DDI-degree sorting fails to isolate safe deletions and causes substantial efficacy loss (>62% non-beneficial revisions)." | "Safe deletions" and "causes substantial efficacy loss" use causal and clinical safety vocabulary. Gate 01 protocol explicitly states: "This gate does not establish prospective prescribing semantics or clinical safety." | **Overstated** | Replace with: "Simple DDI-degree sorting fails to isolate Pareto-beneficial revisions under $R_0$ and results in >62% non-beneficial revisions (revisions that reduce visit-level Jaccard)." |
 
-### Explicitly Disallowed Claims Check
+### Explicitly disallowed claims check
 
 The audit confirmed that none of the following forbidden claims are asserted in `gate-summary.json` or `gate-01-routing-opportunity.md`:
 
@@ -62,11 +62,11 @@ The audit confirmed that none of the following forbidden claims are asserted in 
 
 ---
 
-## 2. Numeric Consistency Findings
+## 2. Numeric consistency findings
 
 An independent audit script was executed directly on `319-lab-via-server` using Python standard library only (without importing runner functions `evaluate_policies_at_budgets`, `run_patient_clustered_bootstrap`, or `evaluate_gate_verdict`).
 
-### 2.1 Row-Level Invariant Audit
+### 2.1 Row-Level invariant audit
 
 All 15,549 rows of `/root/zhb/medrec-data/runs/ideas/001-tension-guided-verification/gate-01-routing-opportunity-20260902-010537/candidate-revision-values.jsonl` were checked:
 
@@ -79,7 +79,7 @@ All 15,549 rows of `/root/zhb/medrec-data/runs/ideas/001-tension-guided-verifica
 
 **Invariant Failures Count**: 0.
 
-### 2.2 Recomputed Support Statistics
+### 2.2 recomputed support statistics
 
 | Metric | Recorded Public Summary | Independently Derived | Diff | Status |
 | :--- | :--- | :--- | :--- | :--- |
@@ -90,7 +90,7 @@ All 15,549 rows of `/root/zhb/medrec-data/runs/ideas/001-tension-guided-verifica
 | `non_beneficial_patients` | 857 | 857 | 0 | Exact match |
 | `support_sufficient` | `true` ($\ge 50$ threshold) | `true` | - | Exact match |
 
-### 2.3 Recomputed Policy Yields and Gaps
+### 2.3 recomputed policy yields and gaps
 
 | Policy / Metric | Budget | Recorded Public Summary | Independently Derived | Diff | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -109,7 +109,7 @@ All 15,549 rows of `/root/zhb/medrec-data/runs/ideas/001-tension-guided-verifica
 | `oracle_minus_risk_only` | 20% | 0.6436153103891926 | 0.6436153103891926 | 0.0 | Exact match |
 | `oracle_minus_risk_only` | 30% | 0.6713121783876501 | 0.6713121783876501 | 0.0 | Exact match |
 
-### 2.4 Recomputed Bootstrap Confidence Intervals
+### 2.4 recomputed bootstrap confidence intervals
 
 Reproduced via Python `random.Random(1203)`, 1,000 patient clusters, linear quantile interpolation $(n-1)q$:
 
@@ -125,7 +125,7 @@ Reproduced via Python `random.Random(1203)`, 1,000 patient clusters, linear quan
 | `oracle_minus_risk_only` | 20% | 0.6217650372562394 | 0.6217650372562394 | 0.6674048292375732 | 0.6674048292375732 | Exact match |
 | `oracle_minus_risk_only` | 30% | 0.6525612987007754 | 0.6525612987007754 | 0.6905851353636919 | 0.6905851353636919 | Exact match |
 
-### 2.5 Decision Criteria and Verdict
+### 2.5 decision criteria and verdict
 
 - `support_requirement_met`: `true` (Recorded: `true`)
 - `gap_oracle_random_10_ci_above_zero`: `true` (Recorded: `true`)
@@ -135,7 +135,7 @@ Reproduced via Python `random.Random(1203)`, 1,000 patient clusters, linear quan
 
 ---
 
-## 3. Cryptographic and Identity Consistency Findings
+## 3. Cryptographic and identity consistency findings
 
 The recorded execution identities in `gate-summary.json` match the frozen prerequisites of Gate 01 exactly:
 
@@ -155,7 +155,7 @@ The recorded execution identities in `gate-summary.json` match the frozen prereq
 
 ---
 
-## 4. Remediation Ledger for `Handoff.md`
+## 4. Remediation ledger for `Handoff.md`
 
 Because numeric verification passed with zero differences and verdict `pass` is mathematically confirmed, the only blocker to formal `AUDIT_PASS` is active claim overstatement in `Handoff.md`.
 
@@ -191,7 +191,7 @@ The exact required corrections are:
 
 ---
 
-## 5. Audit Determination & Next Action
+## 5. Audit determination & next action
 
 - **P0 Status**: `CLAIM_CORRECTION_REQUIRED`
 - **Formal Gate 02 Unlocked**: `no`
@@ -199,19 +199,19 @@ The exact required corrections are:
 
 ---
 
-## 6. Follow-up Claim Closure (P0 Resolution)
+## 6. Follow-up claim closure (P0 Resolution)
 
 - **Audit Date**: 2026-09-02
 - **Auditor**: `ccf-integrity-auditor`
 - **Audit Mode**: `claim-audit`
-- **Target Document**: [`Handoff.md`](file:///Users/oian/Codes/master/medrec-research/Handoff.md)
+- **Target Document**: [`Handoff.md`](../../../../Handoff.md)
 
-### 6.1 Verification of Corrections
+### 6.1 verification of corrections
 
-1. **[`Handoff.md:L79`](file:///Users/oian/Codes/master/medrec-research/Handoff.md#L79)**:
+1. **[`Handoff.md:L79`](../../../../Handoff.md#L79)**:
    - Verified replaced text: `"while 68.33% reduce visit-level Jaccard under singleton deletion ($\Delta J < 0$, non-beneficial revisions under $R_0$)"`.
    - The phrase `"harmful to efficacy"` has been completely removed. The statement is now strictly scoped to retrospective visit-level Jaccard change.
-2. **[`Handoff.md:L81`](file:///Users/oian/Codes/master/medrec-research/Handoff.md#L81)**:
+2. **[`Handoff.md:L81`](../../../../Handoff.md#L81)**:
    - Verified replaced text: `"Simple DDI-degree sorting fails to isolate Pareto-beneficial revisions under $R_0$ and results in >62% non-beneficial revisions (revisions that reduce visit-level Jaccard)"`.
    - The phrases `"safe deletions"` and `"causes substantial efficacy loss"` have been completely removed. The statement now reports retrospective sorting outcomes under operator $R_0$ without causal or clinical safety assertions.
 3. **Repository-Wide Active Documentation Scan**:
@@ -219,7 +219,7 @@ The exact required corrections are:
    - Zero overclaims asserting that the "Tension hypothesis is confirmed", "Tension predicts revision value", or "Tension is necessary" exist in active Gate 01 records.
    - The narrow supported scientific claim remains fully supported by the frozen numerical evidence.
 
-### 6.2 Follow-up Audit Summary
+### 6.2 Follow-up audit summary
 
 ```text
 Follow-up mode: claim-audit
@@ -230,7 +230,7 @@ Final P0 Status: AUDIT_PASS
 Formal Gate 02 unlocked: yes
 ```
 
-### 6.3 Scientific Scope Invariants
+### 6.3 scientific scope invariants
 
 `AUDIT_PASS` denotes solely that Gate 01 retrospective integrity closure is complete, all row-level numerical invariants and bootstrap uncertainties are reproduced, and active documentation is aligned with the empirical evidence boundary. It authorizes proceeding to the formal remote execution of Gate 02.
 

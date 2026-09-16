@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Optimization — Response-Privileged Medication Recommendation
+# Idea optimization: response-privileged medication recommendation
 
 ## Target venue and assumptions
 
@@ -89,7 +89,7 @@ Observed future physiology may be too confounded, too sparse, or too generic to 
 
 ## Candidate concretizations
 
-### Route A — Response-Privileged Feature Distillation — primary
+### Route A: Response-Privileged feature Distillation, primary
 
 For a supported positive medication event `(x_t, m)`:
 
@@ -135,7 +135,7 @@ Training-time response-associated supervision induces a pre-order candidate repr
 
 It cleanly preserves deployability, uses a genuinely different supervision source, and supports decisive response-shuffle/generic-future controls.
 
-### Route B — Medication-Conditioned Response Pretraining — fallback only
+### Route B: Medication-Conditioned response Pretraining, fallback only
 
 Pretrain the patient–medication interaction encoder to predict/contrast post-administration monitoring representations, then fine-tune for medication recommendation without teacher-student distillation.
 
@@ -204,7 +204,7 @@ variant. `A(e) = 0` disables only the auxiliary response term; it never drops,
 reweights, or changes the normalization of that example in the recommendation
 objective. No response target is constructed for an unchosen medication.
 
-### R1 — Medication-specificity subtraction (mandatory)
+### R1: Medication-specificity subtraction (mandatory)
 
 Freeze **Generic Future-State Auxiliary / Medication-Ablated Future** as a
 matched killer control. For every `e` with `A(e) = 1`, the proposed branch may
@@ -231,7 +231,7 @@ Future Gate stop rule:
 > proposed gain, stop with `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE` and
 > terminate the response-specific mechanism.
 
-### R2 — Monitoring-policy separation (mandatory)
+### R2: Monitoring-policy separation (mandatory)
 
 Freeze **Monitoring-Mask-Only** as a mandatory killer control and separate
 physiological values from response availability. Let `r_e` denote future
@@ -259,7 +259,7 @@ This failure cannot be rescued by a larger teacher, a different future window,
 or an additional modality. Those changes would alter the frozen comparison
 rather than identify physiological value.
 
-### R3 — Equal-support, positive-only, and deployment entitlement (mandatory)
+### R3: Equal-support, positive-only, and deployment entitlement (mandatory)
 
 Response supervision exists only on actually administered positive medication
 events with a valid linked future monitoring window (`A(e) = 1`). Unchosen
@@ -290,14 +290,14 @@ Future Gate validity rule:
 
 After the R1--R3 freeze, any later Gate 01 must include, at minimum:
 
-1. **Strict Pre-Order Base** — same deployable pre-order inputs, ordinary recommendation objective.
-2. **Base + Pre-order Physiology** — proves gains are not just from adding labs/vitals to inference.
-3. **Generic Future-State Auxiliary / Medication-Ablated Future** — the R1 control above.
-4. **Static Medication Response Prototype** — train-only per-medication average/prototype response signal, testing whether patient-specific privileged response is unnecessary.
-5. **Response Shuffle Control** — preserve recommendation labels, `A`, and monitoring amount while disrupting patient--medication--response correspondence.
-6. **Monitoring-Mask-Only** — the R2 control above.
-7. **Closest reproducible monitoring-aware MedRec baseline** — REFINE/ChainCare-style comparison where compatible with the frozen task, without misrepresenting task mismatch.
-8. **Knowledge-distillation control** — if needed, a same-capacity KD variant whose teacher lacks future physiological response, to isolate the knowledge source from KD mechanics.
+1. **Strict Pre-Order Base**: same deployable pre-order inputs, ordinary recommendation objective.
+2. **Base + Pre-order Physiology**: proves gains are not just from adding labs/vitals to inference.
+3. **Generic Future-State Auxiliary / Medication-Ablated Future**: the R1 control above.
+4. **Static Medication Response Prototype**: train-only per-medication average/prototype response signal, testing whether patient-specific privileged response is unnecessary.
+5. **Response Shuffle Control**: preserve recommendation labels, `A`, and monitoring amount while disrupting patient--medication--response correspondence.
+6. **Monitoring-Mask-Only**: the R2 control above.
+7. **Closest reproducible monitoring-aware MedRec baseline**: REFINE/ChainCare-style comparison where compatible with the frozen task, without misrepresenting task mismatch.
+8. **Knowledge-distillation control**: if needed, a same-capacity KD variant whose teacher lacks future physiological response, to isolate the knowledge source from KD mechanics.
 
 ## Killer decision logic for a future Gate 01
 
@@ -322,31 +322,31 @@ of these outcomes under the same Idea.
 
 ## Evidence challenge
 
-### Challenge 1 — observational confounding
+### Challenge 1: observational confounding
 
 A post-administration trajectory is not an individual drug effect.
 
 **Revision:** make the teacher target explicitly medication-in-context and response-associated; condition on observable concurrent treatment context; prohibit causal/efficacy language.
 
-### Challenge 2 — selective monitoring
+### Challenge 2: selective monitoring
 
 Labs/vitals are measured non-uniformly and can encode clinician concern.
 
 **Required evidence:** carry missingness/measurement-process information consistently and report support/concentration. Do not interpret monitoring frequency as physiology itself.
 
-### Challenge 3 — positive-only privileged response
+### Challenge 3: positive-only privileged response
 
 Realized post-administration response exists for observed positive medications, not unchosen alternatives.
 
 **Revision:** the method is representation supervision on observed positives, not counterfactual response prediction. Any contrastive negative construction must avoid pretending unobserved responses are known.
 
-### Challenge 4 — generic regularization
+### Challenge 4: generic regularization
 
 The teacher may simply make optimization easier.
 
 **Required control:** generic future-state auxiliary and response-shuffle are primary killer controls, not optional ablations.
 
-## Innovation claims — strongest honest version
+## Innovation claims: strongest honest version
 
 Potential Claim 1:
 

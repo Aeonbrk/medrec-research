@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Train/Dev Execution Authorization — Idea 008
+# Gate 01 Train/Dev execution authorization: Idea 008
 
 ## Authorization status
 
@@ -53,11 +53,11 @@ Gate01-Train is authorized for exactly these operations:
 2. Frozen Base `K_x` derivation using probability threshold `0.5`;
 3. computation of `r_train` from Frozen Base Train predictions and freezing:
 
-```text
-b_L = 0.60 * r_train
-b_M = 0.80 * r_train
-b_H = 1.00 * r_train
-```
+   ```text
+   b_L = 0.60 * r_train
+   b_M = 0.80 * r_train
+   b_H = 1.00 * r_train
+   ```
 
 4. Train-only Independent static summaries `d_i` and `p_i`;
 5. Train-only fixed-lambda selection from exactly `{0,0.25,0.5,1,2,4}` for each requested target;

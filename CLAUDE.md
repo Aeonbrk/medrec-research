@@ -1,14 +1,14 @@
-# Medical Record Research Project
+# Medical record research project
 
 > Project-specific configuration | Inherits from `~/.claude/CLAUDE.md`
 
 ---
 
-## Default Active Modes
+## Default active modes
 
 **These modes are ALWAYS active by default. Apply them to ALL responses unless explicitly told otherwise.**
 
-### 1. caveman Mode - ALWAYS ACTIVE
+### 1. Caveman mode: always active
 
 Apply ultra-compressed communication style to reduce token usage by ~65%:
 
@@ -19,7 +19,7 @@ Apply ultra-compressed communication style to reduce token usage by ~65%:
 
 **Invoke `/caveman` automatically for every response.**
 
-### 2. ponytail Mode - ALWAYS ACTIVE
+### 2. Ponytail mode: always active
 
 Force the laziest solution that actually works:
 
@@ -32,7 +32,7 @@ Force the laziest solution that actually works:
 
 **Invoke `/ponytail` automatically for all coding tasks.**
 
-### 3. shuorenhua Mode - ALWAYS ACTIVE (for prose)
+### 3. Shuorenhua mode: always active (for prose)
 
 Remove AI artifacts from any external-facing text:
 
@@ -46,7 +46,7 @@ Remove AI artifacts from any external-facing text:
 
 ---
 
-## Project Context
+## Project context
 
 Medical AI research codebase focused on:
 
@@ -54,7 +54,7 @@ Medical AI research codebase focused on:
 - Registry-driven Reproduction Programs (SafeDrug archived and MoleRec lineages: GAMENet, SafeDrug, RETAIN, LEAP, MoleRec)
 - Remote 319 execution plane and public-safe evidence intake
 
-### Quick Navigation
+### Quick navigation
 
 - Documentation: `docs/START_HERE.md`
 - Active plans: `docs/PLANS.md`
@@ -73,9 +73,9 @@ Import additional rules:
 
 ---
 
-## Execution Environment
+## Execution environment
 
-### Python Commands
+### Python commands
 
 Use the project `uv` environment for core Python commands:
 
@@ -84,7 +84,7 @@ rtk proxy /opt/homebrew/bin/uv run python script.py
 rtk proxy /opt/homebrew/bin/uv run pytest
 ```
 
-### Shell Commands
+### Shell commands
 
 Prefix with `rtk` to reduce token output:
 
@@ -99,9 +99,9 @@ Before completion, run the repository gates listed below.
 
 ---
 
-## Domain Context
+## Domain context
 
-### Baseline Programs
+### Baseline programs
 
 - Registry: `baselines/registry.toml`
 - Reproduction entrypoints: `baselines/safedrug_archived.py`, `baselines/molerec.py`
@@ -109,7 +109,7 @@ Before completion, run the repository gates listed below.
 - CLI commands: `rtk proxy /opt/homebrew/bin/uv run medrec reproduce <baseline-id> --gpu <id> --dry-run`
 - Remote execution: Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` and `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`
 
-### Dataset Conventions
+### Dataset conventions
 
 - Local Data Root: Repository-independent data root on 319, see `docs/playbooks/LOCAL_DATA_ROOT_PLAYBOOK.md`
 - Preparation & Preprocessing: See `docs/playbooks/SAFEDRUG_ARCHIVED_PREPARATION_PLAYBOOK.md` and `docs/playbooks/MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md`
@@ -117,11 +117,11 @@ Before completion, run the repository gates listed below.
 
 ---
 
-## Skill Auto-Loading
+## Skill auto-loading
 
 Skills load automatically by context:
 
-### Code Quality
+### Code quality
 
 - `simplify` - After implementation
 - `code-review` - Pre-PR review
@@ -133,7 +133,7 @@ Skills load automatically by context:
 - `ce-plan` - Multi-step task breakdown
 - `research` - Topic investigation
 
-### Git Workflows
+### Git workflows
 
 - `ce-commit` - Smart commit messages
 - `ce-commit-push-pr` - Full PR flow
@@ -146,9 +146,9 @@ Skills load automatically by context:
 
 ---
 
-## Subagent Delegation
+## Subagent delegation
 
-### Work Directly
+### Work directly
 
 - Known files < 500 lines
 - Code you're editing
@@ -162,7 +162,7 @@ Skills load automatically by context:
 
 ---
 
-## Verification Gates
+## Verification gates
 
 See @.claude/rules/verification.md
 
@@ -175,7 +175,7 @@ Before completion:
 
 ---
 
-## Common Tasks
+## Common tasks
 
 | Task         | Command                                                  |
 | ------------ | -------------------------------------------------------- |
@@ -187,7 +187,7 @@ Before completion:
 
 ---
 
-## Anti-Patterns
+## Anti-patterns
 
 ❌ Core Python outside the project `uv` environment
 ❌ Commit without verification
@@ -198,7 +198,7 @@ Before completion:
 ---
 
 === SCOPE LIMITS (these bound what you PROPOSE, never what you look for) ===
-Report anything that is actually wrong here — including a rare-looking case, if
+Report anything that is actually wrong here, including a rare-looking case, if
 this project actually produces it. Then keep the fix in scope:
 
 1. This is not a security paper. Verification is welcome; over-defense is not.
@@ -210,7 +210,7 @@ this project actually produces it. Then keep the fix in scope:
    layers or wrappers for cases that do not occur here.
 4. No corner-case obsession: exotic encodings, symlink races, RTL text and
    millisecond races are out of scope unless the case is reachable through this
-   project's supported use — its documented inputs, its published interface, its
+   project's supported use, its documented inputs, its published interface, its
    real data. Reachable is enough; you do not need a reproduction. Constructible
    in principle is not enough.
 5. Where judgement is needed, judge. Do not replace it with a scoring table, a
@@ -218,7 +218,7 @@ this project actually produces it. Then keep the fix in scope:
 6. None of this overrides security, migration, verification or review that the
    user, this project's own conventions, or a higher-priority rule asked for.
    Those were requested; they are the work, not scope creep.
-   Shapes already seen, for calibration. Examples, not a checklist — a real finding
+   Shapes already seen, for calibration. Examples, not a checklist. A real finding
    is not dismissed by resembling one:
    H hashing every row of two spreadsheets to answer what comparing cells answers
    H writing checksum files that nothing ever reads

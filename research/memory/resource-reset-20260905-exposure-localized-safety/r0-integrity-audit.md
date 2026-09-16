@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 
-# R0 Integrity Audit — Exposure Resource & Premise Admission
+# R0 integrity audit: exposure resource and premise admission
 
-## Audit Metadata
+## Audit metadata
 
 - **Audit Tool**: `ccf-integrity-auditor`
 - **Audit Modes**: `claim-audit`, `numeric-audit`, `quarantine-and-privacy-audit`
@@ -17,7 +17,7 @@
 
 ---
 
-## 1. Claim Audit (Claim-Support & Semantic Alignment)
+## 1. Claim audit (Claim-Support & semantic Alignment)
 
 | Candidate Claim / Statement | Target Text Location | Audited Semantic Boundary | Evidence Anchor | Finding |
 | :--- | :--- | :--- | :--- | :--- |
@@ -32,7 +32,7 @@
 
 ---
 
-## 2. Numeric Audit (Value Consistency & Protocol Floors)
+## 2. Numeric audit (Value consistency & protocol Floors)
 
 | Metric / Quantity | `r0-summary.json` | `r0-decision.md` | Protocol Floor | Consistency Check | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -72,7 +72,7 @@
 
 ---
 
-## 3. Quarantine & Privacy Audit
+## 3. Quarantine & privacy audit
 
 1. **Quarantine Partition Isolation**:
    - Dev subset (54,647 patients) was completely unused during R0 scientific analysis.
@@ -85,7 +85,7 @@
 
 ---
 
-## 4. Final Audit Verdict
+## 4. Final audit verdict
 
 `PASS_ALL_AUDITS`
 

@@ -1,4 +1,4 @@
-# S0 — Medication Practice-Shift Admission
+# S0: medication practice-shift admission
 
 ## Verdict: `FAIL_S0_NO_MATERIAL_RESIDUAL_PRACTICE_SHIFT`
 
@@ -51,9 +51,9 @@ Selected alpha: `1` (tie-break: smaller alpha).
 
 | Condition | PASS |
 | :--- | :--- |
-| Condition 1 — support floors | True |
-| Condition 2 — material base gap | False |
-| Condition 3 — residual after prior bias | False |
+| Condition 1 - support floors | True |
+| Condition 2 - material base gap | False |
+| Condition 3 - residual after prior bias | False |
 
 S0 does not support a material forward temporal-deployment degradation or residual practice-shift premise under this frozen setting. It does not establish causal practice drift, clinical benefit, or method superiority.
 

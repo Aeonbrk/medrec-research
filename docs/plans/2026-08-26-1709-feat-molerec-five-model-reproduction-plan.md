@@ -12,15 +12,15 @@ execution_target: 319-wild
 product_contract_source: ce-plan-bootstrap
 ---
 
-# MoleRec Table 1 Five-Model Full Reproduction
+# MoleRec table 1 five-model full reproduction
 
-## Goal Capsule
+## Goal capsule
 
 Produce a clean, auditable, full Reproduction Mode attempt for the five-model subset in MoleRec Table 1: RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec. The attempt must preserve the recorded upstream scientific behavior, use the accepted `c7218d0` data lineage, run seven training lanes and five test evaluations without test-set selection, maximize measured aggregate throughput on the real eight-GPU server, and end with an honest multi-axis `completed_match`, `completed_mismatch`, or incomplete verdict.
 
 This plan supersedes the execution scope of `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`; it does not rewrite or invalidate that completed historical attempt.
 
-## Product Contract
+## Product contract
 
 ### Summary
 
@@ -33,9 +33,9 @@ The current repository can reproduce four SafeDrug-family models through one arc
 
 The successor must fix those execution-system defects without changing the four archived Baseline Cores or MoleRec's scientific behavior.
 
-### Problem Frame
+### Problem frame
 
-The hidden critical question is not “can five programs run on five GPUs?” It is: **can one attempt prove that all five reported systems used compatible authorities, one semantically aligned data product, validation-only model selection, complete upstream evaluation, and non-overwritten evidence?**
+The hidden critical question is not "can five programs run on five GPUs?" It is: **can one attempt prove that all five reported systems used compatible authorities, one semantically aligned data product, validation-only model selection, complete upstream evaluation, and non-overwritten evidence?**
 
 The causal risks are:
 
@@ -47,7 +47,7 @@ The causal risks are:
 - testing all SafeDrug learning rates would leak test information into model selection;
 - deleting old environments before proving the replacement creates an avoidable recovery failure.
 
-### Claim Map
+### Claim map
 
 | Claim | Evidence required | Claim limit |
 | --- | --- | --- |
@@ -55,9 +55,9 @@ The causal risks are:
 | MoleRec's Table 1 point estimates were reproduced | 25 inclusive checks against reported mean ± two reported standard deviations | A miss remains a mismatch even if the direction is correct |
 | MoleRec preserves its reported advantage over SafeDrug | MoleRec > SafeDrug for Jaccard, F1, and PRAUC; MoleRec < SafeDrug for DDI | Aggregate proxy metrics do not establish clinical safety |
 | The compatibility environment is scientifically usable | frozen environment lock, CUDA/PyG/import/forward probes, fresh lane smokes | It is a disclosed compatibility environment, not exact historical hardware fidelity |
-| GPU use was optimized | isolated and concurrent non-evidence profiles plus a frozen measured schedule | “Optimized” means lower measured makespan under constraints, not 100% instantaneous utilization |
+| GPU use was optimized | isolated and concurrent non-evidence profiles plus a frozen measured schedule | "Optimized" means lower measured makespan under constraints, not 100% instantaneous utilization |
 
-### Key Decisions
+### Key decisions
 
 1. **Five scientific models, seven training lanes.** RETAIN, LEAP, GAMENet, and MoleRec each train once; SafeDrug trains at learning rates `1e-5`, `1e-4`, and `5e-4`. `session-settled: 1A, 7B, 9B`
 2. **One frozen compatibility environment.** All seven lanes use a new MoleRec-family Python 3.8 / PyTorch 1.9 / CUDA 11.1 environment. CUDA 11.1 is the minimum necessary RTX 3090 compatibility deviation from the recorded CUDA 10.2 stack. `session-settled: 6A, 8C, 12B`
@@ -140,7 +140,7 @@ The causal risks are:
 - **R39** Do not commit restricted data, split membership, weights, patient-level predictions, or private traces. Public-safe aggregate packets require Codex review before promotion from ignored runtime storage.
 - **R40** Delete `/root/anaconda3/envs/medrec-safedrug-archived` only after the successor environment, seven training lanes, five tests, and final audit are terminal; verify no process uses it and preserve its lock as recovery. Never delete `/home/zhangcr/anaconda3/envs/molorec`, `/root/anaconda3/envs/xytf/medrec-gamenet`, or any unowned environment.
 
-### Key Flows
+### Key flows
 
 #### Flow A: Freeze and admission
 
@@ -175,11 +175,11 @@ The causal risks are:
 4. State impact: old commands using `medrec-safedrug-archived` will stop; about 5.6 GiB is reclaimed. Recovery remains possible from `environments/safedrug-archived-linux-64.lock`.
 5. Remove only that named environment. If any check fails, preserve it and record cleanup as pending without altering scientific results.
 
-### Acceptance Examples
+### Acceptance examples
 
 #### Complete scientific mismatch
 
-All seven training lanes and five tests are valid; all artifacts are complete; 23 of 25 point intervals and all four relationships pass. The aggregate state is `completed_mismatch`, not `completed_match` and not “fully reproduced.”
+All seven training lanes and five tests are valid; all artifacts are complete; 23 of 25 point intervals and all four relationships pass. The aggregate state is `completed_mismatch`, not `completed_match` and not "fully reproduced."
 
 #### Relationship-only success
 
@@ -201,7 +201,7 @@ The full attempt is terminal, but a process still imports from `medrec-safedrug-
 
 A China mirror lacks an exact PyG wheel. The installer records mirror miss and uses `https://data.pyg.org` with TLS verification. It does not disable SSL verification or mutate global Conda/pip configuration.
 
-### Success Criteria
+### Success criteria
 
 - The repository has two explicit Reproduction Programs and seven non-colliding successor lanes.
 - The SafeDrug façade split passes all characterization and regression tests with no scientific behavior change.
@@ -213,7 +213,7 @@ A China mirror lacks an exact PyG wheel. The installer records mirror miss and u
 - No restricted artifact enters Git and no unrelated environment is removed.
 - The old experiment environment is either safely removed under the terminal gate or explicitly retained with a truthful pending reason.
 
-### Scope Boundaries
+### Scope boundaries
 
 In scope:
 
@@ -234,7 +234,7 @@ Out of scope:
 - clinical conclusions;
 - deletion of historical attempts, snapshots, locks, other users' environments, or unknown Conda prefixes.
 
-### Dependencies and Sources
+### Dependencies and sources
 
 - [Official MoleRec repository at frozen revision](https://github.com/yangnianzu0515/MoleRec/tree/dd5afaf0a503fd3de3229f86ec7f26b345d10e3a): model source, invocation, environment declaration, and paired assets.
 - [MoleRec paper](https://yangnianzu0515.github.io/files/paper5-molerec.pdf): Table 1 targets and experimental claims.
@@ -247,9 +247,9 @@ Out of scope:
 - `research/baselines/preflight/safedrug-four-model-reproduction-report.md`: completed pilot outcome and mismatch evidence.
 - `research/memory/reusable-lessons.md`: durable claim and execution controls.
 
-## Planning Contract
+## Planning contract
 
-### Key Technical Decisions
+### Key technical decisions
 
 #### KTD1: Two program authorities behind one static controller
 
@@ -319,7 +319,7 @@ Every terminal artifact explicitly carries its identities. The auditor requires 
 
 The old environment is removed only after the replacement and scientific attempt are terminal. Its explicit lock remains versioned, so removal does not erase the ability to reconstruct it. Cleanup failure never changes a scientific metric verdict. `session-settled: 8C, 13B`
 
-### High-Level Technical Design
+### High-level technical design
 
 #### Authority and artifact flow
 
@@ -406,7 +406,7 @@ flowchart TB
 
 The CPU sets are initial disjoint candidates, not scientific constants. P2 may select a different disjoint binding only when its evidence is recorded and the lane-isolation requirements remain true.
 
-### Runtime Ledger Contract
+### Runtime ledger contract
 
 The ignored attempt ledger must contain:
 
@@ -437,7 +437,7 @@ The Reproduction Program owns mode-specific execution and atomic status/result f
 
 GPU 7 uses an explicit FIFO evaluation queue. A non-SafeDrug lane may enter when its training artifact is terminal and identity-valid. SafeDrug has an additional hard barrier: all three candidates are terminal and `selection.json` is valid. Queue state is persisted so a restart cannot submit the same test twice.
 
-### Sequencing and System Impact
+### Sequencing and system impact
 
 - U1–U4 are local code/document work and create the contracts that later evidence depends on.
 - U5 creates the replacement environment but deliberately retains the old one.
@@ -449,7 +449,7 @@ GPU 7 uses an explicit FIFO evaluation queue. A non-SafeDrug lane may enter when
 
 The only destructive action is U10's removal of the exact experiment-owned Conda environment. It does not remove snapshots, historical runs, locks, other users' environments, or any Git artifact.
 
-### Risks and Mitigations
+### Risks and mitigations
 
 | Risk | Mechanism | Mitigation |
 | --- | --- | --- |
@@ -464,9 +464,9 @@ The only destructive action is U10's removal of the exact experiment-owned Conda
 | Mirror lacks exact binary | old package versions are sparsely mirrored | official version-specific HTTPS fallback with TLS enabled |
 | Over-refactoring | monolith cleanup expands into framework redesign | characterization tests, flat modules, thin façade, only one proven-dead deletion |
 
-## Implementation Units
+## Implementation units
 
-### Unit Index
+### Unit index
 
 <!-- markdownlint-disable MD036 -->
 
@@ -563,7 +563,7 @@ The only destructive action is U10's removal of the exact experiment-owned Conda
 - Legacy four-model Table 2 packets still validate under their original schema, and old CLI integration behavior remains covered.
 - An old submission that writes after a recovery is marked `stale_rejected` and cannot overwrite the active lane.
 
-### U4: Add MoleRec program, SafeDrug selector, and Table 1 audit
+### U4: Add MoleRec program, SafeDrug selector, and table 1 audit
 
 **Files**
 
@@ -732,7 +732,7 @@ The only destructive action is U10's removal of the exact experiment-owned Conda
 
 <!-- markdownlint-enable MD036 -->
 
-## Verification Contract
+## Verification contract
 
 ### Local implementation gates
 
@@ -793,7 +793,7 @@ Stop without scientific improvisation when:
 
 An incomplete attempt remains preserved. Do not fill missing metrics, reuse pilot results, or relabel it as a scientific mismatch.
 
-## Definition of Done
+## Definition of done
 
 This plan is complete only when all of the following hold:
 
@@ -807,7 +807,7 @@ This plan is complete only when all of the following hold:
 - All required local, remote, artifact, documentation, and policy gates pass.
 - Gemini returns the ignored evidence packet to Codex for review; Gemini does not self-promote it into durable research truth.
 
-## Appendix: MoleRec Table 1 Reference
+## Appendix: MoleRec table 1 reference
 
 The auditor stores and evaluates these published means and standard deviations without rounding observed values before comparison.
 

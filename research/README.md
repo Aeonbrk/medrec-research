@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Organization
+# Research organization
 
 This directory contains the scientific evidence, exploratory prototypes, formal Ideas, and cross-project memory for `medrec-research`.
 

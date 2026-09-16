@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Implementation / Mechanical Preflight Verification — Idea 008
+# Gate 01 implementation / mechanical preflight Verification: Idea 008
 
 ## Verification status
 

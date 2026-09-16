@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Review — Post-Idea-003 Residual False-Positive Routing
+# Idea review: post-idea-003 residual false-positive routing
 
 - **CCFA flow**: `ccf-idea-optimizer / exploratory` -> `ccf-idea-reviewer / standard`
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
@@ -13,7 +13,7 @@
 
 The exploratory pass deliberately produced competing information families without scoring or ranking. Scores appear only in the strict-review section.
 
-### Candidate 1 — Frequency-Corrected Co-Selection Compatibility
+### Candidate 1: Frequency-Corrected Co-Selection compatibility
 
 - **Problem**: a medication can be individually confident yet atypical relative to the identities of the other medications simultaneously predicted.
 - **Falsifiable claim**: conditional on frozen medication score, predicted set size, candidate prevalence, and peer-set popularity, one train-only frequency-corrected co-selection statistic adds reproducible medication-level false-positive routing information.
@@ -35,7 +35,7 @@ The exploratory pass deliberately produced competing information families withou
 - **Main confound**: marginal medication popularity and peer-set popularity.
 - **Architecture explicitly not justified**: GNN, hypergraph encoder, Transformer/Mamba relation module, LLM verifier.
 
-### Candidate 2 — Immediate Previous-Prescription Membership
+### Candidate 2: Immediate Previous-Prescription membership
 
 - **Problem**: continuation and newly proposed medications can have different error profiles at the same frozen score.
 - **Falsifiable claim**: $\mathbf1[m\in M_{t-1}]$ adds medication-level FP-routing information beyond score, popularity, set size, and medication-specific train-only persistence propensity.
@@ -57,7 +57,7 @@ The exploratory pass deliberately produced competing information families withou
 - **Main confound**: population chronicity/persistence of each medication.
 - **Architecture explicitly not justified**: history encoder, retrieval model, RNN/Transformer/Mamba.
 
-### Candidate 3 — Current Clinical-Code Association Support
+### Candidate 3: Current Clinical-Code association support
 
 - **Problem**: the backbone score may compress current diagnosis/procedure evidence in a way that hides whether a candidate has explicit empirical support from the current clinical codes.
 - **Falsifiable claim**: one train-only diagnosis/procedure-to-medication association scalar adds FP-routing information beyond score, set size, medication prevalence, and current code count.
@@ -79,7 +79,7 @@ The exploratory pass deliberately produced competing information families withou
 - **Main confound**: code-count and medication-prevalence effects.
 - **Architecture explicitly not justified**: heterogeneous GNN, retrieval encoder, LLM evidence model.
 
-### Candidate 4 — Active-DDI Local Clustering Residual
+### Candidate 4: Active-DDI local clustering residual
 
 - **Problem**: Idea 001 tested active DDI degree but not whether equal-degree candidates occupy different local topology inside the predicted prescription's induced DDI graph.
 - **Falsifiable claim**: candidate-local DDI clustering adds FP-routing information beyond frozen score and active DDI degree.
@@ -101,7 +101,7 @@ The exploratory pass deliberately produced competing information families withou
 - **Main confound**: active DDI degree.
 - **Architecture explicitly not justified**: DDI GNN or learned topology encoder.
 
-### Candidate 5 — Cross-Model Corroboration / Disagreement
+### Candidate 5: Cross-Model corroboration / disagreement
 
 - **Problem**: a MoleRec prediction may be fragile when independently frozen recommenders do not corroborate it.
 - **Falsifiable claim**: disagreement-specific information adds FP-routing value beyond MoleRec score and the best simple ensemble.
@@ -181,4 +181,4 @@ Weights and fatal-gate semantics follow the standard `ccf-idea-reviewer` rubric.
 
 `Frequency-Corrected Co-Selection Compatibility` is selected for `ccf-idea-optimizer / standard` concretization as Idea `004-co-selection-compatibility`.
 
-It is not selected because a positive result is expected. It wins because it introduces materially different information relative to Ideas 001--003, has a sharper mechanism than generic “use relations,” can face its strongest trivial explanation in a low-capacity control, and can be killed with one validation-only Gate before any relational architecture is justified.
+It is not selected because a positive result is expected. It wins because it introduces materially different information relative to Ideas 001--003, has a sharper mechanism than generic "use relations," can face its strongest trivial explanation in a low-capacity control, and can be killed with one validation-only Gate before any relational architecture is justified.

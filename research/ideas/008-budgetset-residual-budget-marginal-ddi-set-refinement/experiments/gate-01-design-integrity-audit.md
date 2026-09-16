@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Audit — Idea 008
+# Gate 01 design integrity audit: Idea 008
 
 ## Audit status
 
@@ -23,7 +23,7 @@ The protocol is not execution-ready. The blockers below are bounded protocol-def
 
 ## Blocking findings
 
-### B1 — The frozen BudgetSet update dropped the admitted explicit base-score residual anchor
+### B1: The frozen BudgetSet update dropped the admitted explicit base-score residual anchor
 
 **Protocol location**: Section 5.2, `BudgetSet definition -> Learned heads`.
 
@@ -55,17 +55,17 @@ $$
 
 Apply the same deterministic `+s_i` anchor to the Independent learned control so the learned-family comparison retains equal score anchoring. No other architecture change is required.
 
-### B2 — `e_i` is not the backbone quantity described by the protocol
+### B2: `e_i` is not the backbone quantity described by the protocol
 
 **Protocol location**: Sections 2.1, 5.2, and 8.
 
 The protocol states that `e_i` is a frozen per-medication embedding tensor already consumed by the `molerec-embedding` predictor and read from the qualified checkpoint. The pinned MoleRec implementation does not contain such a medication-embedding parameter. Its `self.embeddings` are diagnosis/procedure embeddings; the medication representation consumed by `score_extractor` is `molecule_embeddings`, generated during each forward pass. That tensor depends on the patient query through `substruct_weight`. The repository Comparison adapter exports final vocabulary probabilities, not that internal representation.
 
-**Failure caused**: an implementation could choose materially different tensors as `e_i`—for example global molecular embeddings, substructure embeddings, or the patient-conditioned final molecule representation—while all still appear superficially compatible with the prose. Learned capacity and patient information would differ, so the killer comparison would not have one frozen information entitlement.
+**Failure caused**: an implementation could choose materially different tensors as `e_i`, for example global molecular embeddings, substructure embeddings, or the patient-conditioned final molecule representation, while all still appear superficially compatible with the prose. Learned capacity and patient information would differ, so the killer comparison would not have one frozen information entitlement.
 
 **Minimum correction**: freeze one exact backbone quantity and extraction point. The smallest correction is to define `e_i(x)` as the frozen pinned MoleRec `molecule_embeddings[i]` tensor immediately before `score_extractor` for visit `x`, captured from the same no-gradient forward pass that produces `s_i`, and supplied identically to BudgetSet and Independent. No other MoleRec internal representation may be substituted after results are observed.
 
-### B3 — The Gate01-Dev / Gate01-Audit partition is not mechanically reproducible
+### B3: The Gate01-Dev / Gate01-Audit partition is not mechanically reproducible
 
 **Protocol location**: Section 2.2.
 
@@ -75,7 +75,7 @@ The protocol freezes salt `idea008-gate01-v1` and a lower-half / upper-half hash
 
 **Minimum correction**: freeze one exact patient-only formula, analogous to existing project split contracts, including the precise identifier, hash algorithm, string construction, numeric conversion, and `u < 0.5` versus `u >= 0.5` boundary. Preserve patient-disjointness and do not inspect target/model outcomes while constructing the split.
 
-### B4 — Greedy+1Swap is undefined for reachable `K_x < 2` cases
+### B4: Greedy+1Swap is undefined for reachable `K_x < 2` cases
 
 **Protocol location**: Sections 3 and 7.
 
@@ -85,7 +85,7 @@ Section 3 correctly defines pairwise risk and marginal DDI as zero when `K_x < 2
 
 **Minimum correction**: freeze `K_x=0 -> empty set`; freeze `K_x=1 -> highest frozen s_i candidate`, with medication-code ascending as final tie-break. Budget feasibility is automatic because pairwise DDI is zero.
 
-### B5 — Learned checkpoint selection and patience semantics are not uniquely executable
+### B5: Learned checkpoint selection and patience semantics are not uniquely executable
 
 **Protocol location**: Section 6.
 
@@ -95,7 +95,7 @@ The protocol freezes a 30-epoch ceiling, patience 5, four configurations, three 
 
 **Minimum correction**: freeze one checkpoint-selection procedure with evaluation cadence, seed aggregation, patience counter, checkpoint tie-breaking, and the ordering between checkpoint and configuration selection. BudgetSet and Independent must use exactly the same procedure.
 
-### B6 — Gate-level aggregation, frontier bootstrap, and seed semantics are not fully frozen
+### B6: Gate-level aggregation, frontier bootstrap, and seed semantics are not fully frozen
 
 **Protocol location**: Sections 10.2, 10.3, 11, and 12.
 
@@ -113,7 +113,7 @@ The following quantities can materially change PASS/KILL but do not yet have one
 
 **Minimum correction**: freeze one common aggregation contract before execution. It must name the mean unit, learned-seed aggregation, composition denominator, exact set-change predicate, full bootstrap statistic including within-replicate frontier recomputation or a predeclared fixed comparator, matched-seed semantics for Independent, and the exact numeric definition of a favorable seed.
 
-### B7 — Primary terminal-verdict precedence is not explicit
+### B7: Primary terminal-verdict precedence is not explicit
 
 **Protocol location**: Sections 4 and 13.
 

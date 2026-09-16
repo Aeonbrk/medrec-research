@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research Decision: Idea 005 Semantic Admission
+# Research decision: Idea 005 semantic admission
 
 - **Idea ID**: `005-safety-substitution-structure`
 - **Idea Name**: Safety-Preserving Substitution Structure
@@ -18,7 +18,7 @@
 
 ---
 
-## 1. Executive Summary
+## 1. Executive summary
 
 Idea 005 investigated whether model safety should be achieved through therapeutic substitution rather than blanket suppression.
 
@@ -47,7 +47,7 @@ Idea 005 is authoritatively **terminated**.
 
 ---
 
-## 2. Scientific Interpretation
+## 2. Scientific interpretation
 
 The central scientific question of Semantic Admission was:
 
@@ -71,7 +71,7 @@ Under this frozen supported-relation set, current ATC-3 action space, and prereg
 
 ---
 
-## 3. Strict Scope & Termination Bounds
+## 3. Strict scope & termination bounds
 
 1. **Route Termination**:
    The substitution-structure route is terminated before model implementation. No group-aware decoder, loss function, or substitution architecture is authorized.

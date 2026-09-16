@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 006 Strict Review — Exposure-Conditional Medication Recommendation
+# Idea 006 strict review: exposure-conditional medication recommendation
 
 ## Verdict
 

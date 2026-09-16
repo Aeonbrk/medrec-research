@@ -1,4 +1,4 @@
-# NeedCover — Regimen-Conditioned Residual Clinical-Need Reasoning
+# NeedCover: regimen-conditioned residual clinical-need reasoning
 
 NeedCover is a throwaway pre-Idea architecture screen. It is not Idea 009,
 not a CCFA Gate, and not a formal research-state transition. The screen tests
@@ -65,7 +65,7 @@ logs remain outside the repository.
 The primary mechanism comparison is `NeedCover Jaccard - StaticTwoPass
 Jaccard`. A delta at or below `0.002` is `KILL_NEEDCOVER_MECHANISM`. A delta in
 `(+0.002, +0.004]` permits exactly one diagnosis-count/multimorbidity and
-coverage-collapse diagnostic; it does not permit tuning. Survival additionally
+coverage-collapse diagnostic; it does not permit tuning. Survival also
 requires an unambiguous accuracy/safety improvement over `GlobalStrong`, with
 precision/F1/PRAUC guarding against prescription-size inflation.
 

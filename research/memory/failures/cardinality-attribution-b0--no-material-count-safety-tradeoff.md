@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# B0 Cardinality Attribution — No Material Count-Safety Trade-off
+# B0 cardinality attribution: no material count-safety tradeoff
 
 ## Status
 

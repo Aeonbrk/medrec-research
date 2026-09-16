@@ -1,10 +1,10 @@
 <!-- markdownlint-disable MD013 -->
 
-# Literature Memory
+# Literature memory
 
 This is the curated literature input carried from `New-Search` commit `9971464253c556345262b22ed6d44b2cc14c9da8`. It inventories all 21 canonical paper cards.
 
-## Interpretation Layers & Use Boundary
+## Interpretation layers & use boundary
 
 When reading the entries below, distinguish three conceptual layers:
 
@@ -16,7 +16,7 @@ When reading the entries below, distinguish three conceptual layers:
 > **Novelty Implications are Hypothesis-Dependent**:
 > A note that a paper "threatens generic safe-MedRec novelty" represents an internal research judgment at the archive cutoff, **not** an immutable scientific fact about the paper itself. Novelty implications shift as new literature is published and as active research questions are reformulated in `research/ideas/`. All new work requires prospective, up-to-date literature review.
 
-## Conformal, Calibration, and Recommendation Reliability
+## Conformal, Calibration, and recommendation reliability
 
 At New-Search commit `9971464253c556345262b22ed6d44b2cc14c9da8`, each `paper:<slug>` node maps to `research-wiki/papers/<slug>.md`.
 
@@ -29,7 +29,7 @@ At New-Search commit `9971464253c556345262b22ed6d44b2cc14c9da8`, each `paper:<sl
 | `paper:toni2025_you_dont_bring` | You Don't Bring Me Flowers: Mitigating Unwanted Recommendations Through Conformal Risk Control | 2025 | Card relevance is `TODO`; the graph records CRC-based filtering and replacement as an existing decision-time recommender safety layer. |
 | `paper:xu2025_selective_conformal_risk` | Selective Conformal Risk Control | 2025 | Card relevance is `TODO`; the graph records accepted-risk and coverage control as a threat to a selective-deployment claim. |
 
-## Boundary Evidence, Constraints, and Evaluation
+## Boundary Evidence, Constraints, and evaluation
 
 | Node | Paper | Year / identifier | Archived relevance |
 | --- | --- | ---: | --- |
@@ -43,7 +43,7 @@ At New-Search commit `9971464253c556345262b22ed6d44b2cc14c9da8`, each `paper:<sl
 | `paper:z2026_katmed_knowledgeaugmented_transformer` | KATMed: A Knowledge-Augmented Transformer for Contraindication-Aware Medication Recommendation in Comorbidities | 2026; DOI `10.1016/j.jbi.2026.104991` | Card relevance is `TODO`; contraindication-aware transformer work occupies part of the safety-constraint space. |
 | `paper:saxena2026_graphdiffmed_knowledgeconstrained_differential` | GraphDiffMed: Knowledge-Constrained Differential Attention with Pharmacological Graph Priors for Medication Recommendation | 2026; arXiv `2605.20188` | Card relevance is `TODO`; the graph identifies it as a pharmacological-constraint MedRec prior that threatens DDI-only safety narratives. |
 
-## Action-Level, Adaptation, and Safe-MedRec Alternatives
+## Action-Level, Adaptation, and Safe-MedRec alternatives
 
 | Node | Paper | Year / identifier | Archived relevance |
 | --- | --- | ---: | --- |
@@ -54,7 +54,7 @@ At New-Search commit `9971464253c556345262b22ed6d44b2cc14c9da8`, each `paper:<sl
 | `paper:moghaddam2026_useradaptive_metalearning_coldstart` | User-Adaptive Meta-Learning for Cold-Start Medication Recommendation with Uncertainty Filtering | 2026; arXiv `2601.22820` | Card relevance is `TODO`; adjacent adaptation and uncertainty-filtering work informed action-route ranking for sparse patient history. |
 | `paper:zhao2025_finegrained_alignment_large` | Fine-grained Alignment of Large Language Models for General Medication Recommendation without Overprescription | 2025; arXiv `2503.03687` | Card relevance is `TODO`; LAMO crowds generic LLM medication-alignment and overprescription-control narratives. |
 
-## Use Boundary
+## Use boundary
 
 These cards are literature context, not evidence that any archived route is
 novel, clinically safe, comparison-ready, or active. New-route work needs its

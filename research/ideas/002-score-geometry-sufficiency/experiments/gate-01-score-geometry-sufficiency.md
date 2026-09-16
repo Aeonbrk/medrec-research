@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 — Score-Geometry Sufficiency
+# Gate 01: Score-Geometry sufficiency
 
 ## Mode
 
@@ -18,7 +18,7 @@ This is a validation-only falsification gate. It is not a publication experiment
 
 ---
 
-## 1. Scientific state entering Gate 01
+## 1. Scientific state entering gate 01
 
 Idea 001 is closed at authoritative commit:
 
@@ -225,7 +225,7 @@ This is a retrospective false-positive label under the fixed benchmark semantics
 
 ---
 
-## 8. Fresh Idea-002 Dev / Audit split
+## 8. Fresh Idea-002 dev / audit split
 
 Use the complete validation patient universe, including patients with no eligible candidate rows, so seeded shuffling does not depend on eligibility.
 
@@ -263,7 +263,7 @@ and stop without changing the split.
 
 This gate permits exactly one learned score-only representation.
 
-### 9.1 Dev quintile cutpoints
+### 9.1 dev quintile cutpoints
 
 Let the eligible Idea002-Dev candidate scores sorted ascending be
 
@@ -297,7 +297,7 @@ Do not tune the number of bins.
 
 Do not compare equal-width, decile, spline, polynomial, isotonic, kernel, logistic, neural, or alternative histogram variants inside this gate.
 
-### 9.2 Dev bin risk
+### 9.2 dev bin risk
 
 For each bin $B_j$, compute only on Idea002-Dev:
 
@@ -326,7 +326,7 @@ $$
 
 Higher $g(s)$ means higher review priority.
 
-### 9.3 Deterministic ordering
+### 9.3 deterministic ordering
 
 `ScoreGeometry` sorts Audit candidates by:
 
@@ -364,7 +364,7 @@ $$
 
 No Monte Carlo simulation is needed for the point estimate.
 
-### ScoreOnly — strongest simple control
+### ScoreOnly: strongest simple control
 
 Rank:
 
@@ -378,13 +378,13 @@ Tie-break:
 2. patient traversal order;
 3. visit traversal order.
 
-### ScoreGeometry — only proposed selector
+### ScoreGeometry: only proposed selector
 
 Use the frozen five-bin $g(s)$ defined above.
 
 No other feature is permitted.
 
-### Oracle — analysis-only upper bound
+### Oracle: analysis-only upper bound
 
 Use the same retrospective ordering semantics as Idea 001:
 
@@ -397,7 +397,7 @@ Use the same retrospective ordering semantics as Idea 001:
 
 Oracle is not a predictor and must never be presented as deployable.
 
-### Explicitly excluded from Gate 01
+### Explicitly excluded from gate 01
 
 Do not include:
 
@@ -536,7 +536,7 @@ Report 95% percentile intervals for:
 
 ## 14. Formal decision tree
 
-### Gate 01-A — support
+### Gate 01-A: support
 
 If Audit support fails the 50-patient-per-outcome rule:
 
@@ -544,7 +544,7 @@ If Audit support fails the 50-patient-per-outcome rule:
 
 Stop.
 
-### Gate 01-B — does residual headroom still exist on the fresh Audit partition?
+### Gate 01-B: does residual headroom still exist on the fresh Audit partition?
 
 At both primary budgets require:
 
@@ -560,7 +560,7 @@ Interpretation:
 
 > The fresh Idea-002 Audit split does not independently retain reliable Oracle headroom beyond ScoreOnly, so no new residual explanation should be pursued from this gate.
 
-### Gate 01-C — does the fixed low-complexity score map beat ScoreOnly?
+### Gate 01-C: does the fixed low-complexity score map beat ScoreOnly?
 
 If at both primary budgets:
 

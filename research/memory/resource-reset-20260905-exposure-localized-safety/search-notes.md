@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Search Notes — Resource Reset: Exposure-Localized Medication Safety
+# Search notes. Resource reset: exposure-localized medication safety
 
 ## Search mode
 
@@ -83,4 +83,4 @@ Therefore the proposed route must use eMAR only to define an **operational execu
 
 ## Next decision
 
-The route is strong enough for strict idea review but depends on a new raw-data resource. No Idea 006 should be created until a single bounded `R0 — Exposure Resource & Premise Admission` confirms that MIMIC-IV order/administration events can be linked and normalized at useful scale and that visit-union DDI materially differs from executed-active DDI applicability.
+The route is strong enough for strict idea review but depends on a new raw-data resource. No Idea 006 should be created until a single bounded `R0, Exposure Resource & Premise Admission` confirms that MIMIC-IV order/administration events can be linked and normalized at useful scale and that visit-union DDI materially differs from executed-active DDI applicability.

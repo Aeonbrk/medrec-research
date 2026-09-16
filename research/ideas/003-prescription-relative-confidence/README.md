@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 003: Prescription-Relative Confidence Residual
+# Idea 003: Prescription-Relative confidence residual
 
 - **Idea ID**: `003-prescription-relative-confidence`
 - **Status**: `CLOSED (Gate 01 Falsified)`
@@ -191,7 +191,7 @@ The observable is backbone-agnostic for multi-label recommenders that expose a p
 - The Gate remains retrospective and validation-only.
 - Validation has already participated in prior research-route selection.
 - Relative position can be useful for statistical reasons without constituting a clinical decision rationale.
-- Closest-work search found adjacent relative-confidence and boundary methods, so novelty depends on the conditional decision-unit formulation rather than the phrase “relative confidence.”
+- Closest-work search found adjacent relative-confidence and boundary methods, so novelty depends on the conditional decision-unit formulation rather than the phrase "relative confidence."
 
 ## Stop boundary
 

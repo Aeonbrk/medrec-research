@@ -9,9 +9,9 @@ depth: deep
 product_contract_source: ce-plan-bootstrap
 ---
 
-# Refactor Reproduction Architecture
+# Refactor reproduction architecture
 
-## Goal Capsule
+## Goal capsule
 
 - **Objective:** A maintainer can change generic 319 remote execution, one reproduction attempt, or one Reproduction Program without loading or modifying unrelated attempt-specific or baseline-specific knowledge, while all accepted Reproduction Mode scientific semantics and evidence remain unchanged.
 - **Means:** Isolate MoleRec Table-1 attempt policy from `RemoteExecutor`, make the Baseline Registry the sole declaration authority with an immutable per-attempt snapshot, deepen SafeDrug and MoleRec Reproduction Programs behind `probe`/`execute`, and delete the shallow hook/re-export surfaces that currently leak internals. (KTD1–KTD8)
@@ -22,7 +22,7 @@ product_contract_source: ce-plan-bootstrap
 
 ---
 
-## Product Contract
+## Product contract
 
 ### Summary
 
@@ -30,7 +30,7 @@ The current reproduction code has the correct scientific boundaries at the repos
 
 The target is not a new research framework. It is a locality refactor: scientific decisions should live behind the module that owns them, declaration facts should have one authority, and generic infrastructure should contain only facts that remain true when the current MoleRec Table-1 attempt or either current baseline lineage is deleted.
 
-### Problem Frame
+### Problem frame
 
 The repository already defines Reproduction Mode, Reproduction Program, Reproduction Lane, Baseline Registry, Remote Preflight, and the 319 Execution Plane clearly. The implementation has drifted from those definitions as the five-model reproduction effort added frozen scheduling, recovery continuation, validation-only SafeDrug selection, and shared v2 training/test finalization.
 
@@ -49,7 +49,7 @@ This plan restores the existing architecture rather than replacing it.
 - R5. Historical attempt validation must use its frozen declaration for scientific identity. A later edit to `baselines/registry.toml` must not silently change the meaning of an already-created attempt.
 - R6. `evaluation_queue.py` must not carry a second hardcoded lane catalog or lane-to-program/profile mapping.
 
-#### Reproduction Program depth
+#### Reproduction program depth
 
 - R7. `baselines/safedrug_archived.py` and `baselines/molerec.py` must each become the deep Reproduction Program module for their pinned source lineage.
 - R8. The external program surface must be small: conceptually one probe operation and one execution operation. Smoke, formal training, test, and recovery are execution cases behind that surface rather than separate public hook APIs.
@@ -67,12 +67,12 @@ This plan restores the existing architecture rather than replacing it.
 - R17. Permanent retention of both old hook contracts and new Program contracts "for safety" is strictly prohibited. Legacy hook-bag fixtures and pass-through compatibility tests must be deleted once parity is proven under R16.
 - R18. The refactor must complete without real-data execution, new scientific evidence, retraining, test-set reruns, or modification of accepted historical evidence.
 
-### Key Decisions
+### Key decisions
 
-- **Keep this as architecture cleanup after baseline readiness, not an amendment to the completed five-model research plan.** (session-settled: user-directed — chosen over extending the completed readiness plan: the previous plan intentionally excluded broad reproduction refactoring while scientific execution was active.) Governs R14, R15, R18.
-- **Treat candidates 1–4 as one causal refactor package.** (session-settled: user-directed — chosen over four independent cleanups: attempt leakage, duplicated authority, shallow program interfaces, and temporal file decomposition are causally coupled.) Governs R1–R13.
+- **Keep this as architecture cleanup after baseline readiness, not an amendment to the completed five-model research plan.** (session-settled: user-directed, chosen over extending the completed readiness plan: the previous plan intentionally excluded broad reproduction refactoring while scientific execution was active.) Governs R14, R15, R18.
+- **Treat candidates 1–4 as one causal refactor package.** (session-settled: user-directed, chosen over four independent cleanups: attempt leakage, duplicated authority, shallow program interfaces, and temporal file decomposition are causally coupled.) Governs R1–R13.
 
-### Success Criteria
+### Success criteria
 
 - `RemoteExecutor` can be understood and tested without any MoleRec Table-1 schedule, recovery, SafeDrug-selection, or seven-lane knowledge.
 - Deleting the MoleRec Table-1 attempt module removes all seven-lane/GPU-7/c721/continuation policy while leaving generic remote execution intact.
@@ -82,7 +82,7 @@ This plan restores the existing architecture rather than replacing it.
 - The current public CLI entrypoints and artifact semantics remain accepted by the full local test suite without requiring real-data or 319 execution.
 - `ARCHITECTURE.md` describes the implemented dependency direction rather than the pre-refactor mixed ownership.
 
-### Acceptance Examples
+### Acceptance examples
 
 - AE1. **Registry changes after freeze:** An attempt declaration is created from the seven current Registry lanes. A test then constructs a different Registry declaration. Loading and validating the original attempt state still uses the frozen seven-lane identity and does not silently adopt the later values.
 - AE2. **Generic remote run:** A registered Reproduction Program is dry-run through `RemoteExecutor` with a GPU and optional CPU affinity. No frozen MoleRec schedule object is required or imported.
@@ -92,7 +92,7 @@ This plan restores the existing architecture rather than replacing it.
 - AE6. **Internal parser test:** A malformed upstream log remains directly testable through the internal log module, while external program callers do not import the parser from the program façade.
 - AE7. **No scientific execution:** The entire refactor passes unit/integration/format/lint verification using synthetic fixtures and dry-run behavior only.
 
-### Scope Boundaries
+### Scope boundaries
 
 In scope:
 
@@ -113,35 +113,35 @@ Outside this product's identity:
 - a plugin system, abstract base-class hierarchy, dependency-injection framework, or dynamic Program discovery;
 - cleanup of unrelated comparison, prediction, evaluation, registry-readiness, or research-route code.
 
-### Sources / Research
+### Sources / research
 
-- `CONTEXT.md` — canonical definitions for Reproduction Program, Reproduction Lane, Baseline Registry, Remote Preflight, and research modes.
-- `ARCHITECTURE.md` — current intended module/seam map and dependency direction.
-- `baselines/registry.toml` and `src/medrec_research/registry.py` — authoritative program/lane declaration model.
-- `src/medrec_research/remote_executor.py` — current mixed generic/attempt execution surface.
-- `src/medrec_research/reproduction/evaluation_queue.py` — current duplicated lane authority.
-- `src/medrec_research/reproduction/molerec_evaluation.py` — existing attempt-owned Table-1 evaluation orchestration.
-- `baselines/reproduction_runner.py` — current shared lifecycle plus dynamic program hook discovery.
+- `CONTEXT.md`: canonical definitions for Reproduction Program, Reproduction Lane, Baseline Registry, Remote Preflight, and research modes.
+- `ARCHITECTURE.md`: current intended module/seam map and dependency direction.
+- `baselines/registry.toml` and `src/medrec_research/registry.py`: authoritative program/lane declaration model.
+- `src/medrec_research/remote_executor.py`: current mixed generic/attempt execution surface.
+- `src/medrec_research/reproduction/evaluation_queue.py`: current duplicated lane authority.
+- `src/medrec_research/reproduction/molerec_evaluation.py`: existing attempt-owned Table-1 evaluation orchestration.
+- `baselines/reproduction_runner.py`: current shared lifecycle plus dynamic program hook discovery.
 - `baselines/safedrug_archived.py`, `baselines/molerec.py` and their `*_contract.py`, `*_data.py`, `*_logs.py`, `*_probe.py`, `*_runner.py` collaborators.
-- `tests/unit/test_remote_executor.py`, `tests/unit/test_evaluation_queue.py`, `tests/unit/test_reproduction_runner.py`, `tests/unit/test_safedrug_archived_program.py`, and `tests/unit/test_molerec_program.py` — current test surfaces and coupling.
-- `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md` — completed research-readiness plan; retained as historical authority, not edited by this refactor.
+- `tests/unit/test_remote_executor.py`, `tests/unit/test_evaluation_queue.py`, `tests/unit/test_reproduction_runner.py`, `tests/unit/test_safedrug_archived_program.py`, and `tests/unit/test_molerec_program.py`: current test surfaces and coupling.
+- `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`: completed research-readiness plan; retained as historical authority, not edited by this refactor.
 
 ---
 
-## Planning Contract
+## Planning contract
 
-### Key Technical Decisions
+### Key technical decisions
 
-- KTD1. **Make Remote Execution generic again.** `RemoteExecutor` keeps SSH policy, preflight, generic resource checks, command construction, dry-run, and tmux submission; MoleRec Table-1 schedule/continuation policy moves out. (session-settled: user-directed — chosen over keeping a mixed executor or moving all remote execution into `reproduction`: 319 execution is reusable capability, while the frozen schedule is attempt policy.) Governs R1, R2, R14.
-- KTD2. **Freeze Registry declarations at attempt creation.** The Registry is the authority that creates the attempt declaration; queue, schedule, continuation, and evidence then validate the immutable declaration rather than re-reading current Registry semantics. (session-settled: user-directed — chosen over live Registry reinterpretation or queue-owned metadata: reproducibility requires one declaration authority without making historical attempts mutable.) Governs R3–R6.
-- KTD3. **Use a high-leverage Program interface.** Each concrete Reproduction Program exposes conceptually `probe(request)` and `execute(request)`; execution cases stay behind that interface. (session-settled: user-directed — chosen over five phase-specific public methods or a typed bag of low-level hooks: the module should hide source-native lifecycle complexity rather than enumerate it.) Governs R7–R9, R16.
-- KTD4. **Program drives lifecycle; shared code provides mechanics.** Call direction is Program → shared mechanical primitives, never shared runner → Program callbacks. (session-settled: user-directed — chosen over preserving a generic callback engine: ownership of source-native ordering and checkpoint/log semantics belongs to the Program.) Governs R9, R10.
-- KTD5. **Treat the frozen schedule as MoleRec Table-1 attempt policy.** The seven lanes, GPU-7 reservation, c721 preprocessing, continuation reacceptance, and recovery admission live behind the Table-1 attempt seam. (session-settled: user-directed — chosen over promoting the current schedule into a generic reproduction framework: those facts describe one historical execution strategy, not Reproduction Mode itself.) Governs R2, R4, R5.
-- KTD6. **Keep deep internal modules; delete temporal façade layers.** Preserve `*_data.py`, `*_logs.py`, and `*_probe.py` where deletion would spread substantial rules; absorb `*_contract.py` and lineage `*_runner.py` into the owning Program and remove broad re-exports. (session-settled: user-directed — chosen over keeping six-file temporal decomposition or collapsing each lineage into a monolith: module count follows information hiding, not file-count preference.) Governs R7, R11, R12.
-- KTD7. **Do not unify scientific internals prematurely.** Share only semantics-free mechanical primitives; leave similar SafeDrug/MoleRec source rules separate until a future third real Program proves a stable internal abstraction. (session-settled: user-directed — chosen over a base class, strategy hierarchy, or plugin framework: two public adapters prove the Program seam but do not prove every internal rule is common.) Governs R10, R13.
-- KTD8. **Make the interface the primary test surface.** Program behavior is verified through `probe`/`execute`; internal parsers/invariants keep focused tests; fake-module hook tests and façade-internal tests are removed or narrowed. (session-settled: user-directed — chosen over layering new contract tests on top of the old implementation-coupled suite: keeping both would preserve the shallow architecture in tests.) Governs R16, R17.
+- KTD1. **Make Remote Execution generic again.** `RemoteExecutor` keeps SSH policy, preflight, generic resource checks, command construction, dry-run, and tmux submission; MoleRec Table-1 schedule/continuation policy moves out. (session-settled: user-directed, chosen over keeping a mixed executor or moving all remote execution into `reproduction`: 319 execution is reusable capability, while the frozen schedule is attempt policy.) Governs R1, R2, R14.
+- KTD2. **Freeze Registry declarations at attempt creation.** The Registry is the authority that creates the attempt declaration; queue, schedule, continuation, and evidence then validate the immutable declaration rather than re-reading current Registry semantics. (session-settled: user-directed, chosen over live Registry reinterpretation or queue-owned metadata: reproducibility requires one declaration authority without making historical attempts mutable.) Governs R3–R6.
+- KTD3. **Use a compact Program interface.** Each concrete Reproduction Program exposes conceptually `probe(request)` and `execute(request)`; execution cases stay behind that interface. (session-settled: user-directed, chosen over five phase-specific public methods or a typed bag of low-level hooks: the module should hide source-native lifecycle complexity rather than enumerate it.) Governs R7–R9, R16.
+- KTD4. **Program drives lifecycle; shared code provides mechanics.** Call direction is Program → shared mechanical primitives, never shared runner → Program callbacks. (session-settled: user-directed, chosen over preserving a generic callback engine: ownership of source-native ordering and checkpoint/log semantics belongs to the Program.) Governs R9, R10.
+- KTD5. **Treat the frozen schedule as MoleRec Table-1 attempt policy.** The seven lanes, GPU-7 reservation, c721 preprocessing, continuation reacceptance, and recovery admission live behind the Table-1 attempt seam. (session-settled: user-directed, chosen over promoting the current schedule into a generic reproduction framework: those facts describe one historical execution strategy, not Reproduction Mode itself.) Governs R2, R4, R5.
+- KTD6. **Keep deep internal modules; delete temporal façade layers.** Preserve `*_data.py`, `*_logs.py`, and `*_probe.py` where deletion would spread substantial rules; absorb `*_contract.py` and lineage `*_runner.py` into the owning Program and remove broad re-exports. (session-settled: user-directed, chosen over keeping six-file temporal decomposition or collapsing each lineage into a monolith: module count follows information hiding, not file-count preference.) Governs R7, R11, R12.
+- KTD7. **Do not unify scientific internals prematurely.** Share only semantics-free mechanical primitives; leave similar SafeDrug/MoleRec source rules separate until a future third real Program proves a stable internal abstraction. (session-settled: user-directed, chosen over a base class, strategy hierarchy, or plugin framework: two public adapters prove the Program seam but do not prove every internal rule is common.) Governs R10, R13.
+- KTD8. **Make the interface the primary test surface.** Program behavior is verified through `probe`/`execute`; internal parsers/invariants keep focused tests; fake-module hook tests and façade-internal tests are removed or narrowed. (session-settled: user-directed, chosen over layering new contract tests on top of the old implementation-coupled suite: keeping both would preserve the shallow architecture in tests.) Governs R16, R17.
 
-### High-Level Technical Design
+### High-level technical design
 
 The target dependency direction is one-way from attempt policy and concrete Programs toward generic mechanics. Generic infrastructure does not call back into scientific modules.
 
@@ -214,7 +214,7 @@ flowchart TB
 
 These diagrams define ownership and direction, not exact class or function signatures.
 
-### Information-Hiding / Deletion Test
+### Information-hiding / deletion test
 
 | Existing surface | Decision | Reason |
 | --- | --- | --- |
@@ -234,12 +234,12 @@ These diagrams define ownership and direction, not exact class or function signa
 Phase A establishes authority and dependency direction first, so later Program work cannot accidentally preserve attempt leakage.
 
 - U1 → U2 → U3 establish attempt ownership, RemoteExecutor isolation, and queue authority.
-- U4 creates the mechanical substrate that the concrete Programs can call without dynamic hooks and strips scientific semantics from shared artifact helpers.
+- U4 creates the mechanical base that the concrete Programs can call without dynamic hooks and strips scientific semantics from shared artifact helpers.
 - U5 and U6 deepen SafeDrug and MoleRec independently after U4; they may proceed in parallel once U4 is stable.
 - Characterization gate across U4–U6: new Program interface tests must prove observable parity before legacy hook-bag tests, lineage runner files, and façade re-exports are deleted.
 - U7 removes obsolete surfaces, updates architecture/domain documentation, and proves the complete repository.
 
-### System-Wide Impact
+### System-wide impact
 
 | Area | Impact |
 | --- | --- |
@@ -249,7 +249,7 @@ Phase A establishes authority and dependency direction first, so later Program w
 | Tests | Coverage moves upward to deep module interfaces while retaining targeted parser/data/probe tests. Tests coupled only to hook bags or re-export façades are retired after characterization parity is proven. |
 | Future research routes | Root/core stays idea-agnostic; a future research route does not inherit MoleRec Table-1 schedule assumptions merely by using RemoteExecutor or the Baseline Registry. |
 
-### Risks & Dependencies
+### Risks & dependencies
 
 - **Risk: scientific-semantic drift during file moves.** Mitigation: enforce the characterization gate at the owning Program interface before deleting legacy orchestration; verify observable artifact payloads, identity fields, adaptation reversibility, checkpoint semantics, failure classification, and dry-run intent.
 - **Risk: historical artifact incompatibility.** Mitigation: `attempt_declaration.json` sidecar ensures zero schema changes to accepted historical artifacts by default; historical reader/audit logic is preserved without requiring migration or reconstruction frameworks.
@@ -262,7 +262,7 @@ Phase A establishes authority and dependency direction first, so later Program w
 - **Dependency: current accepted Registry declarations and evidence schemas.** This plan assumes their meaning is correct and intentionally does not reopen them.
 - **Dependency: current baseline entrypoint paths.** `baselines/safedrug_archived.py` and `baselines/molerec.py` remain the registry-declared executable modules.
 
-### Deferred Implementation Notes
+### Deferred implementation notes
 
 - Exact placement of shared mechanics between `baselines/reproduction_runner.py` and `baselines/reproduction_artifacts.py` will be settled by the deletion test during implementation without creating new runtime packages.
 - Exact Python class/dataclass names, field names, and request/result signatures for `probe`/`execute` will be chosen during implementation, provided the public surface remains conceptually `probe` plus `execute` without low-level hook bags.
@@ -270,7 +270,7 @@ Phase A establishes authority and dependency direction first, so later Program w
 
 ---
 
-## Implementation Units
+## Implementation units
 
 ### U1. Establish the MoleRec Table-1 attempt module and frozen declaration
 
@@ -293,7 +293,7 @@ Phase A establishes authority and dependency direction first, so later Program w
   4. Move Table-1 test launch command construction into `molerec_table1_attempt.py` so `molerec_evaluation.py` constructs test commands without relying on Table-1 schedule policy in `RemoteExecutor`.
   5. Update `molerec_reproduction_audit.py` to validate lane coverage against the frozen attempt declaration rather than hardcoded module-level constants (`REQUIRED_LANE_IDS`).
   6. Keep recovery-evidence reopening and Table-1-specific invariants behind this attempt seam.
-  7. Update `molerec_evaluation.py` and Table-1 CLI entrypoints in `cli.py` to consume the new attempt module and declaration, ensuring `tests/integration/test_run_cli.py` remains runnable across unit boundaries.
+  7. Update `molerec_evaluation.py` and Table-1 CLI entrypoints in `cli.py` to consume the new attempt module and declaration, so `tests/integration/test_run_cli.py` remains runnable across unit boundaries.
 - **Execution note:** Add characterization tests for the current valid schedule and continuation behavior before moving the implementation; the evidence meaning must remain byte/field compatible where no schema addition is required.
 - **Patterns to follow:** Frozen validation objects in `src/medrec_research/registry.py`; public-safe fail-closed validation style in current reproduction evidence modules.
 - **Test scenarios:**
@@ -350,7 +350,7 @@ Phase A establishes authority and dependency direction first, so later Program w
   - Modify `tests/unit/test_molerec_reproduction_audit.py`
 - **Approach:**
   1. Delete `QUEUE_LANE_IDS`, `_LANE_METADATA`, or equivalent lane-to-program/profile/scientific-baseline duplicate truth in `evaluation_queue.py` and `molerec_reproduction_audit.py`.
-  2. Make queue creation/admission and audit functions load or receive the frozen attempt declaration (`attempt_declaration.json`), ensuring independent CLI worker processes validate queue entries without live Registry queries.
+  2. Make queue creation/admission and audit functions load or receive the frozen attempt declaration (`attempt_declaration.json`), so independent CLI worker processes validate queue entries without live Registry queries.
   3. Persist queue operational state separately from declaration identity; queue records may reference lane IDs/declaration identity but do not become an editable declaration source.
   4. Validate claimed/finalized evaluation entries against the declaration and the attempt's selection result, preserving current exact-five-test ordering and `not_tested_by_design` behavior.
   5. Keep queue claim/finalize/transition mechanics in `evaluation_queue.py`; only scientific identity authority moves out.
@@ -396,7 +396,7 @@ Phase A establishes authority and dependency direction first, so later Program w
   - No test constructs a fake object with `adapt_training_source`, `parse_training_log`, `select_checkpoint`, or other scientific hooks.
 - **Verification:** `baselines/reproduction_runner.py` and `baselines/reproduction_artifacts.py` contain no dynamic capability lookup and zero SafeDrug/MoleRec identifier, selection rule, or profile branching.
 
-### U5. Deepen the SafeDrug archived Reproduction Program
+### U5. Deepen the SafeDrug archived reproduction program
 
 - **Goal:** Make `baselines/safedrug_archived.py` the single deep owner of SafeDrug-family source semantics and lifecycle while retaining focused internal modules.
 - **Requirements:** R7–R13, R16–R18; KTD3, KTD4, KTD6–KTD8.
@@ -432,7 +432,7 @@ Phase A establishes authority and dependency direction first, so later Program w
   - Focused adaptation tests still prove exact/reversible source edits without requiring those helpers to be imported from the Program façade.
 - **Verification:** Registry entrypoint path is unchanged; `test_safedrug_archived_program.py` primarily tests Program behavior and no longer depends on broad re-exports.
 
-### U6. Deepen the MoleRec Reproduction Program
+### U6. Deepen the MoleRec reproduction program
 
 - **Goal:** Make `baselines/molerec.py` the single deep owner of MoleRec source semantics and lifecycle, parallel in public shape but not forced into shared scientific internals with SafeDrug.
 - **Requirements:** R7–R13, R16–R18; KTD3, KTD4, KTD6–KTD8.
@@ -504,7 +504,7 @@ Phase A establishes authority and dependency direction first, so later Program w
 
 ---
 
-## Verification Contract
+## Verification contract
 
 | Gate | Scope | Command / check | Expected outcome |
 | --- | --- | --- | --- |
@@ -523,7 +523,7 @@ If the repository's standard local wrapper requires `rtk proxy /opt/homebrew/bin
 
 ---
 
-## Definition of Done
+## Definition of done
 
 Global completion requires all of the following:
 
@@ -546,6 +546,6 @@ Global completion requires all of the following:
 - No abandoned compatibility shim, duplicate metadata table, dead hook adapter, obsolete export, or experimental refactor code remains in the diff.
 - No real-data run, retraining, new test evaluation, or historical evidence mutation was needed to claim completion.
 
-### Implementation and Verification Outcome
+### Implementation and verification outcome
 
 Implementation verification: Python 3.8 syntax compatibility was verified across baseline execution files via AST parsing; no Python 3.8.16 runtime or scientific execution was performed for this architecture refactor.

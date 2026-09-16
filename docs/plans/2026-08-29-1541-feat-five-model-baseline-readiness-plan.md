@@ -10,9 +10,9 @@ deepened: 2026-08-29
 product_contract_source: ce-plan-bootstrap
 ---
 
-# Five-Model Baseline Readiness - Plan
+# Five-model baseline readiness plan
 
-## Goal Capsule
+## Goal capsule
 
 - **Objective:** RETAIN, LEAP, GAMENet, SafeDrug, and MoleRec have truthful terminal Reproduction Mode verdicts and individually auditable Comparison Mode qualifications in one Unified Research Protocol v1.1 Comparison Scope, or each unresolved model names its single blocking gate.
 - **Means:** Finish the existing immutable five-model reproduction attempt first, then run one additive Comparison qualification path from unchanged Baseline Cores through target-free predictions and core-owned evaluation. (KTD1, KTD4)
@@ -32,27 +32,27 @@ product_contract_source: ce-plan-bootstrap
 
 ---
 
-## Product Contract
+## Product contract
 
 ### Summary
 
 Complete attempt `formal-20260828-a09fcab-u8-b` without repeating any of its seven 50-epoch training lanes, then qualify the same five Baseline Cores under one Comparison Scope. Reproduction paper fidelity and Comparison qualification remain independent axes. A valid `completed_mismatch` may still support `comparison = qualified` when the unified protocol gates pass.
 
-### Problem Frame
+### Problem frame
 
 The repository has recovered training evidence for seven lanes but no successor test result or final audit. It also has protocol objects, a target-free process seam, registry qualification schemas, and a basic evaluator, but no five-model Comparison qualification path. Treating the recovered checkpoints as test results would falsify Phase A. Treating upstream aggregate metrics as Comparison evidence would falsify Phase B.
 
-### Key Decisions
+### Key decisions
 
-- **Finish the admitted reproduction before Comparison qualification.** (session-settled: user-directed — chosen over interleaving new Comparison evidence with the unfinished attempt: the two modes answer different questions and require separate evidence.) Governs R1–R10.
-- **Reuse the seven immutable recovered training lanes.** (session-settled: user-directed — chosen over retraining, retrying, or allocating new recovery identities: the preserved 50-epoch execution is already the admitted scientific training evidence.) Governs R2–R6.
-- **Keep paper fidelity and Comparison qualification independent.** (session-settled: user-directed — chosen over making `completed_match` a prerequisite for qualification: a complete mismatch is a valid reproduction result and does not by itself invalidate an unchanged baseline.) Governs R9, R11, R22.
-- **Require one exact Comparison Scope for all five methods.** (session-settled: user-directed — chosen over method-specific cohorts, budgets, or evaluation semantics: only the shared scope supports later mechanism comparisons.) Governs R12–R21.
-- **Keep Baseline Cores unchanged and targets core-owned.** (session-settled: user-directed — chosen over adapting model behavior or allowing baseline-native evaluation to define Comparison evidence: representation translation must not change the method or leak test targets.) Governs R14–R20.
+- **Finish the admitted reproduction before Comparison qualification.** (session-settled: user-directed, chosen over interleaving new Comparison evidence with the unfinished attempt: the two modes answer different questions and require separate evidence.) Governs R1–R10.
+- **Reuse the seven immutable recovered training lanes.** (session-settled: user-directed, chosen over retraining, retrying, or allocating new recovery identities: the preserved 50-epoch execution is already the admitted scientific training evidence.) Governs R2–R6.
+- **Keep paper fidelity and Comparison qualification independent.** (session-settled: user-directed, chosen over making `completed_match` a prerequisite for qualification: a complete mismatch is a valid reproduction result and does not by itself invalidate an unchanged baseline.) Governs R9, R11, R22.
+- **Require one exact Comparison Scope for all five methods.** (session-settled: user-directed, chosen over method-specific cohorts, budgets, or evaluation semantics: only the shared scope supports later mechanism comparisons.) Governs R12–R21.
+- **Keep Baseline Cores unchanged and targets core-owned.** (session-settled: user-directed, chosen over adapting model behavior or allowing baseline-native evaluation to define Comparison evidence: representation translation must not change the method or leak test targets.) Governs R14–R20.
 
 ### Requirements
 
-#### Phase A: terminal Reproduction Mode
+#### Phase A: terminal reproduction mode
 
 - R1. Remote work must pass the approved 319 preflight immediately before any data or GPU action.
 - R2. Attempt continuation must reopen the attempt-owned ledger, all seven source/recovery evidence pairs, and the accepted schedule without mutating the original artifacts.
@@ -65,7 +65,7 @@ The repository has recovered training evidence for seven lanes but no successor 
 - R9. The final audit must reopen all five finalized test pairs and report `execution_integrity`, `paper_point_fidelity`, `directional_relationships`, and `artifact_completeness` separately.
 - R10. The aggregate Phase A verdict must be `completed_match` only when all four axes pass, `completed_mismatch` for complete valid execution with a point or direction miss, and otherwise the existing specific `selection_incomplete` or `formal_incomplete` state.
 
-#### Phase B: one Unified Research Protocol v1.1 Comparison Scope
+#### Phase B: one unified research protocol v1.1 comparison scope
 
 - R11. Phase B starts only after Phase A has a legal terminal audit packet; its outcome must not be selected or relabeled from the Phase A metric values.
 - R12. One public-safe scope identity must bind protocol v1.1, the v1.1 amendment, Dataset Manifest, archived SafeDrug comparison lineage, patient-disjoint split, eligible visits, medication vocabulary, feature availability, DDI evaluation asset, and one equal Adaptation Budget.
@@ -86,14 +86,14 @@ The repository has recovered training evidence for seven lanes but no successor 
 - R24. No restricted data, split membership, patient-level prediction, checkpoint, model weight, private path, hostname, or raw log may enter Git.
 - R25. The implementation ends in local commits only. It must not push, create a PR, add a sixth baseline, introduce a model architecture, or refactor the working reproduction framework beyond the narrow continuation and qualification seams.
 
-### Success Criteria
+### Success criteria
 
 - Attempt `formal-20260828-a09fcab-u8-b` has one legal five-model audit packet and no repeated training lane.
 - Every model has a qualification packet whose shared scope fields match exactly and whose method profile remains model-specific.
 - Reproduction paper misses remain visible and do not alter Comparison selection, evaluation, or readiness.
 - The final report can truthfully set each of `engineering_ready`, `reproduction_complete`, and `research_baseline_ready` without inferring one from another.
 
-### Acceptance Examples
+### Acceptance examples
 
 - AE1. **Complete reproduction mismatch:** Five valid test pairs exist and all four relationships pass, but one paper interval misses. The Phase A verdict is `completed_mismatch`; Phase B remains eligible to proceed.
 - AE2. **SafeDrug selection barrier:** The three recovered candidates validate and select `molerec-safedrug-lr-1e-4` by validation evidence. Only that lane enters the queue; the other two remain `not_tested_by_design` even if a manual admission names one of them.
@@ -102,7 +102,7 @@ The repository has recovered training evidence for seven lanes but no successor 
 - AE5. **Adapter behavior drift:** An adapter changes a threshold or filters the decoded set. Core-integrity validation fails, the method remains unqualified, and no replacement tuning run is authorized.
 - AE6. **Mixed scope:** Four packets use one manifest and the fifth uses a different eligible-visit digest. The fifth baseline and the suite are not `research_baseline_ready` even when all aggregate metrics exist.
 
-### Scope Boundaries
+### Scope boundaries
 
 In scope:
 
@@ -123,20 +123,20 @@ Outside this product's identity:
 
 ---
 
-## Planning Contract
+## Planning contract
 
-### Key Technical Decisions
+### Key technical decisions
 
-- KTD1. **Use an additive attempt-continuation artifact.** Re-accept the exact measured schedule against the current clean revision and bind it to the existing ledger and seven recovered pairs; never edit the original schedule or resubmit training. (session-settled: user-directed — chosen over restarting the attempt or rewriting frozen evidence: the admitted recovery siblings already preserve the only allowed training execution.) Governs R1–R4.
+- KTD1. **Use an additive attempt-continuation artifact.** Re-accept the exact measured schedule against the current clean revision and bind it to the existing ledger and seven recovered pairs; never edit the original schedule or resubmit training. (session-settled: user-directed, chosen over restarting the attempt or rewriting frozen evidence: the admitted recovery siblings already preserve the only allowed training execution.) Governs R1–R4.
 - KTD2. **Add one thin operator boundary over existing Phase A primitives.** Reuse `select_safedrug_candidate`, the source-aware GPU 7 queue, immutable evidence-pair finalization, and each program's `run_test_lane_v2` path. The boundary owns order, current-attempt claim/transition provenance, one-time operator-verified interruption recovery, and the five-pair final-audit barrier; it does not own scientific behavior or replace existing evidence writers. Governs R5–R10.
 - KTD3. **Keep the existing core-owned `ProcessPredictionAdapter` seam.** The subprocess request and response are target-free; the core's use of expected records for coverage validation and target join is the intended ownership boundary, not a reason to create a second adapter interface. Governs R15–R18.
 - KTD4. **Create two static Comparison adapter entrypoints.** One entrypoint serves the four SafeDrug archived profiles and one serves MoleRec. Each wraps only source-native training/inference invocation and representation translation. This follows the repository's two pinned source authorities without introducing dynamic discovery. Governs R14–R17.
 - KTD5. **Add an additive v1.1 score/evaluation/qualification path.** Preserve the v1.0 `PredictionRecord.scores`, `EvaluationResult`, Run Record, and schema-1 adapter contracts. In the same `ProcessPredictionAdapter` seam, a schema-2 response adds `vocabulary_scores`: one ordered `MedicationScore` entry for every declared medication. A new `VocabularyScoreSurface` validates and carries that target-free sidecar, and a `ComparisonPredictionBatch` links the joined `PredictionRecord` rows to their surfaces by patient/visit identity. Existing `predict()` remains schema 1; an explicit v1.1 invocation returns the batch without introducing a second adapter class or dynamic framework. The v1.1 qualification packet owns the five outcomes, DDI identity, bootstrap rounds, linked evidence payloads, mandatory amendment/profile identities, five readiness gates, and method-profile scope. Governs R12, R17–R21.
 - KTD6. **Advance readiness through the existing transition API.** Move each baseline to `smoke_ready` with smoke evidence, then call `advance_readiness(..., qualifications=(qualification,))` for `comparison_ready`. `add_comparison_qualification` remains the later-scope extension path and is not required for the first qualification. Governs R20–R21.
 - KTD7. **Materialize configuration before interpreting Phase A results.** Use one source-native configuration and pinned seed per method. Between validation-only SafeDrug selection and the first five-model test submission, publish a public-safe preregistration that carries the selected SafeDrug LR and every discretionary Comparison choice. U4 may later resolve manifest- and runtime-derived identities only through the preregistered deterministic procedure; it cannot add or alter a choice after Phase A outcomes exist. Any later change creates a different prospective scope and cannot repair this run. Governs R11–R14.
-- KTD8. **Deploy clean local commits without publishing a branch.** Use Git-native additive transfer to synchronize the approved commit to the dedicated 319 checkout. Do not push or create a PR. (session-settled: user-directed — chosen over the normal LFG push/PR tail: the requested delivery is a reviewed local commit while remote execution still requires an immutable Git revision.) Governs R1, R24–R25.
+- KTD8. **Deploy clean local commits without publishing a branch.** Use Git-native additive transfer to synchronize the approved commit to the dedicated 319 checkout. Do not push or create a PR. (session-settled: user-directed, chosen over the normal LFG push/PR tail: the requested delivery is a reviewed local commit while remote execution still requires an immutable Git revision.) Governs R1, R24–R25.
 
-### High-Level Technical Design
+### High-level technical design
 
 #### Overall lifecycle
 
@@ -204,13 +204,13 @@ flowchart TB
 - The DDI adjacency and full medication vocabulary are core-owned evaluation inputs bound to the same data lineage and manifest. They are never sent as test targets.
 - A Phase A `completed_mismatch` is sufficient to enter Phase B when execution integrity and artifact completeness pass; a Phase A incomplete state is not.
 
-### Sequencing and System-Wide Impact
+### Sequencing and system-wide impact
 
 U1 and U2 establish the clean continuation code revision. U2 materializes the Comparison preregistration after SafeDrug selection and before the first test submission; this records prospective choices but performs no Comparison training, inference, target join, or evaluation. U3 is the only Phase A real-data execution unit. After U3 is terminal, U4 resolves the exact runtime scope against that preregistration. U4–U6 may use synthetic fixtures before remote work, but U7 must not start until U3 is terminal and the final Comparison revision is clean. U8 promotes only public-safe evidence after U7.
 
 The change affects the registry, remote operator CLI, restricted evaluation flow, core evaluator, and Research Memory. It does not change either Reproduction Program's training or test semantics. The registry remains the identity authority; runtime artifacts remain outside Git.
 
-### Risks and Dependencies
+### Risks and dependencies
 
 - The existing schedule validator rejects an old harness revision. U1 must create a new bound artifact without weakening identity or allocation checks.
 - The source-native score surface may differ by decoder class. U5 must characterize all five frozen profiles and reject a profile that cannot expose source-faithful scores; it must not invent ranking or threshold behavior.
@@ -220,7 +220,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
 
 ---
 
-## Implementation Units
+## Implementation units
 
 ### U1. Bind the current attempt to a clean continuation revision
 
@@ -268,7 +268,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
   - Audit admission fails on four valid pairs, a merely terminal queue, a failed/blocked lane, a missing marker, or an identity mismatch; it succeeds only when all five finalized identities validate.
 - **Verification:** The integration fixture proves selection timing, queue order, serial execution, restart behavior, and final-audit barrier through public commands.
 
-### U3. Complete and audit Phase A on 319
+### U3. Complete and audit phase A on 319
 
 - **Goal:** Produce the attempt's five finalized ten-round test pairs and truthful four-axis terminal audit without another training execution.
 - **Requirements:** R1–R10, R22, R24.
@@ -359,7 +359,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
   - Existing v1.0 Evaluation Results and Run Records remain readable and keep their original semantics.
 - **Verification:** Unit and CLI integration tests prove the complete target-free-to-qualification chain and preserve v1.0 behavior.
 
-### U7. Run five Comparison qualifications on 319
+### U7. Run five comparison qualifications on 319
 
 - **Goal:** Produce one legal v1.1 qualification packet per model under the same scope, or preserve the first exact blocking gate for that model.
 - **Requirements:** R11–R24.
@@ -397,7 +397,7 @@ The change affects the registry, remote operator CLI, restricted evaluation flow
 
 ---
 
-## Verification Contract
+## Verification contract
 
 | Scope | Failure detected | Decision if it fails | Done signal |
 | --- | --- | --- | --- |
@@ -416,7 +416,7 @@ Local synthetic checks prove contracts only. They are not Phase A or Phase B sci
 
 ---
 
-## Definition of Done
+## Definition of done
 
 - U1–U2 are complete when the current attempt can be continued from its seven recovered lanes through a validated, exact, non-training operator path.
 - U3 is complete when five source-native ten-round test pairs and one four-axis audit establish `completed_match`, `completed_mismatch`, or a specific incomplete state without a scientific retry.

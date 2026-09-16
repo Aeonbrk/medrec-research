@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Protocol — Privileged Physiological Response Supervision
+# Gate 01 Protocol: Privileged physiological response supervision
 
 ## Protocol status
 
@@ -85,7 +85,7 @@ The administration anchor, 24-hour window, channel set, validity rule, and suppo
 indicator are immutable after the mechanical preflight begins. A different window,
 anchor, or response definition is a new Idea, not a Gate-01 repair.
 
-### 2.1 Exact physiology tensorization
+### 2.1 exact physiology tensorization
 
 For every event with its fixed anchor, define `W(e) = (a(e), a(e)+24 hours]`.
 The grid is 24 consecutive one-hour bins `(a(e)+(j-1)h, a(e)+jh]`, for
@@ -125,7 +125,7 @@ The preflight is run only on the authorized Gate-01 development pool after the
 patient-disjoint split is frozen. `G3`, `G4`, `R0 Holdout`, and the historical
 project test split are outside the pool and remain untouched.
 
-### 3.1 Global support floors
+### 3.1 global support floors
 
 The method is supportable only if all of the following hold on the complete
 Gate-01 development pool and separately on each Train, Dev, and Audit partition:
@@ -139,7 +139,7 @@ Gate-01 development pool and separately on each Train, Dev, and Audit partition:
 | supported focal medications | at least `20` globally and at least `10` per partition |
 | supported events per counted medication | at least `25` globally and at least `10` per partition |
 
-### 3.2 Concentration floors
+### 3.2 concentration floors
 
 Support must not be carried by a few medications or patients. With
 `p_m = N_m / N_A` and `p_i = N_i / N_A`, where `N_m` and `N_i` are supported
@@ -197,7 +197,7 @@ All variants that contain a privileged branch use the same deployable student
 backbone and recommendation head, with only the explicitly listed pre-order
 physiology input difference.
 
-### 5.1 Common student architecture
+### 5.1 common student architecture
 
 - one-layer GRU over the frozen causal pre-order event/state sequence, hidden size
   `128`;
@@ -241,7 +241,7 @@ and schema are the empty vector. For an `A(e)=1` example, at each of 24 steps th
 response-teacher input is
 `[z_r(j,:) (6), M_e(j,:) (6)]`; the seven monitoring-policy summaries from
 Section 5.4 are concatenated once to the sequence projection. `z_r` is normalized
-physiology. V8 additionally concatenates the focal-medication embedding (64
+physiology. V8 also concatenates the focal-medication embedding (64
 dimensions) after that projection; V3 uses an all-zero vector in that slot. No
 other teacher feature, context table, treatment code, or outcome is allowed.
 
@@ -265,7 +265,7 @@ future-derived features. For `A(e)=0`, no response-teacher tensor or latent is
 constructed and neither the response-teacher recommendation loss nor alignment
 loss is evaluated.
 
-### 5.2.2 V7 Generic Pre-Order KD teacher
+### 5.2.2 V7 generic Pre-Order KD teacher
 
 `V7`, **Generic Pre-Order KD**, uses a parameter-independent, non-deployed teacher
 `T_pre` that is exactly isomorphic to the deployable `S_pre`:
@@ -366,7 +366,7 @@ change these quantities.
 
 The student, latent dimension, auxiliary weight, optimizer/update entitlement,
 `E_rec`, and `A` are therefore equal across all privileged variants. The response
-family `V3`, `V4`, `V5`, `V6`, and `V8` additionally shares the identical
+family `V3`, `V4`, `V5`, `V6`, and `V8` also shares the identical
 administration anchor, future window, value/mask availability, and response-teacher
 shell. V7 is strictly pre-order and future-free by construction.
 
@@ -452,33 +452,33 @@ support, sample entitlement, recommendation weighting, or update budget is:
 
 `STOP_UNMATCHED_SUPPORT_OR_SAMPLE_ENTITLEMENT`.
 
-## 8. Training, Dev selection, and Audit evaluation
+## 8. Training, dev selection, and audit evaluation
 
 No step in this section is executed in the current workflow. It defines the only
 future execution order if a separate authorization is granted after this design
 audit.
 
-1. **P0 — Freeze record.** Serialize this protocol revision, split salt, variant
+1. **P0: Freeze record.** Serialize this protocol revision, split salt, variant
    matrix, seeds, hyperparameters, normalization source, response permutation seed,
    metric code revision, and decision thresholds. Do not open Audit outcomes.
-2. **P1 — Linkage preflight.** Run only the Section-3 mechanical checks. If any
+2. **P1: Linkage preflight.** Run only the Section-3 mechanical checks. If any
    floor fails, stop before training.
-3. **P2 — Train.** Fit every applicable variant on `Gate01-Train` with all three
+3. **P2: Train.** Fit every applicable variant on `Gate01-Train` with all three
    fixed seeds. No variant may receive a different number of examples, updates, or
    optimizer steps.
-4. **P3 — Dev checkpoint rule.** For each method/seed, choose the earliest epoch
+4. **P3: Dev checkpoint rule.** For each method/seed, choose the earliest epoch
    among the fixed set `{10, 20, 30, 40, 50}` with the lowest student
    recommendation loss over the full `E_rec` on `Gate01-Dev`; break ties by the
    smaller epoch. No Dev metric, subgroup, response definition, or control result
    may alter the rule.
-5. **P4 — Evaluation freeze.** Freeze the selected checkpoint, normalization
+5. **P4: Evaluation freeze.** Freeze the selected checkpoint, normalization
    parameters, candidate universe, `K=5`, metric implementation, bootstrap seed,
    and all stop rules. Record the exact configuration before reading any Audit
    recommendation outcome.
-6. **P5 — Audit.** Read `Gate01-Audit` once and evaluate all frozen variants with
+6. **P5: Audit.** Read `Gate01-Audit` once and evaluate all frozen variants with
    identical target joins and patient-clustered aggregation. No checkpoint,
    threshold, architecture, or split can be changed after Audit access.
-7. **P6 — Decision.** Apply Section 9 mechanically. A stop or inconclusive result
+7. **P6: Decision.** Apply Section 9 mechanically. A stop or inconclusive result
    closes the response-specific route; it does not authorize rescue or another
    response definition.
 
@@ -520,7 +520,7 @@ This is the sole operational meaning of `materially`, `comparable`, and `≈`:
   `STOP_GATE01_INCONCLUSIVE_NO_MECHANISM_ADMISSION` and does not continue to
   rescue, retune, or open a new response definition.
 
-The Proposed variant must additionally be non-inferior to `V1` on the primary
+The Proposed variant must also be non-inferior to `V1` on the primary
 metric: the 95% interval for `Recall@5(Proposed) - Recall@5(V1)` must have
 `CI_low > -0.005`. Failure is `STOP_PROPOSED_NOT_NONINFERIOR_TO_BASE`.
 

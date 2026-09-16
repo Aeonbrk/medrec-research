@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Search Notes — Medication-Transition Practice Shift
+# Search notes: medication-transition practice shift
 
 ## Workflow context
 

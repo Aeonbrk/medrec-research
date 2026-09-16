@@ -1,4 +1,4 @@
-# RxUnitSet — Structured Prescription-Unit Supportability
+# RxUnitSet: structured prescription-unit supportability
 
 This is a bounded pre-Idea supportability check for the proposed unordered
 `(drug, dose, route)` prescription-unit target. It is not Idea 009, not a

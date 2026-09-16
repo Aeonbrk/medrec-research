@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD001 MD013 MD036 -->
 
-# Gate 02 — Confidence Sufficiency and Residual Constraint Signal
+# Gate 02: Confidence sufficiency and residual constraint signal
 
 ## Mode
 
@@ -16,7 +16,7 @@ The purpose is to run the cheapest experiment that can falsify the need for a Te
 
 ---
 
-# 1. Scientific state entering Gate 02
+# 1. Scientific state entering gate 02
 
 Gate 01 has established one narrow result:
 
@@ -82,7 +82,7 @@ $$
 }
 $$
 
-This formulation supersedes any vague interpretation of “revision value” for this fixed $R_0$ experiment.
+This formulation supersedes any vague interpretation of "revision value" for this fixed $R_0$ experiment.
 
 ---
 
@@ -160,7 +160,7 @@ Such a change would constitute a new preregistered route.
 
 ---
 
-# 3. Integrity Gate 01 — mandatory upstream closure
+# 3. Integrity gate 01: mandatory upstream closure
 
 Before formal 319 execution of Gate 02 or interpretation of any Gate 02 results, hand Gate 01 to:
 
@@ -180,7 +180,7 @@ Do not copy:
 
 into Git or another unauthorized environment.
 
-## Required Gate 01 audit inputs
+## Required gate 01 audit inputs
 
 1. `gate-01-routing-opportunity.md`
 2. frozen Gate 01 runner revision
@@ -227,15 +227,15 @@ $$
 
 The auditor must also classify the following claim:
 
-> “Gate 01 confirms the Tension hypothesis.”
+> "Gate 01 confirms the Tension hypothesis."
 
 as `overstated / unsupported`.
 
 The supported statement is:
 
-> “Gate 01 confirms routing headroom under the frozen $R_0$ setting.”
+> "Gate 01 confirms routing headroom under the frozen $R_0$ setting."
 
-## Integrity Gate 01 outcome
+## Integrity gate 01 outcome
 
 Only:
 
@@ -359,7 +359,7 @@ Take validation patients only and perform one deterministic patient-level split:
 
 Procedure:
 
-1. start from the complete validation patient universe $\text{patient\_order} \in \{0, \dots, N_{\text{val\_patients}} - 1\}$ as defined by `validation_patient_count` in the staged metadata (ensuring patients without eligible follow-up visits are included in the permutation so that seeded shuffling does not shift subsequent patient assignments);
+1. start from the complete validation patient universe $\text{patient\_order} \in \{0, \dots, N_{\text{val\_patients}} - 1\}$ as defined by `validation_patient_count` in the staged metadata (including patients without eligible follow-up visits in the permutation so that seeded shuffling does not shift subsequent patient assignments);
 2. shuffle patient indices with PRNG seed `1203`;
 3. assign the first half to Dev and the remainder to Audit;
 4. all visits/candidates from one patient remain in exactly one partition.
@@ -384,7 +384,7 @@ Do not move patients between partitions to repair support.
 
 # 8. Baseline matrix
 
-## 8.1 Random
+## 8.1 random
 
 Uniform review among eligible Audit candidates.
 
@@ -420,7 +420,7 @@ preserve Gate 01's constraint-pressure-only baseline.
 
 ---
 
-## 8.3 ScoreOnly — primary strongest simple control
+## 8.3 ScoreOnly: primary strongest simple control
 
 For each eligible predicted medication, use its frozen MoleRec probability:
 
@@ -712,7 +712,7 @@ Report for:
 
 This is a diagnostic fraction of available Oracle headroom captured.
 
-Do **not** invent a post-hoc “good enough” threshold from the observed values.
+Do **not** invent a post-hoc "good enough" threshold from the observed values.
 
 The formal gate uses confidence intervals below.
 
@@ -823,7 +823,7 @@ Report 95% intervals for:
 
 # 16. Formal decision tree
 
-## Gate 02-A — Is model confidence already sufficient?
+## Gate 02-A: Is model confidence already sufficient?
 
 Require support first.
 
@@ -875,11 +875,11 @@ Proceed to Gate 02-B.
 
 ---
 
-# 17. Gate 02-B — Does DDI pressure add information beyond confidence?
+# 17. Gate 02-B: Does DDI pressure add information beyond confidence?
 
 Evaluate frozen $\lambda^*$.
 
-### Case B1 — positive-direction simple scalar succeeds
+### Case B1: positive-direction simple scalar succeeds
 
 If:
 
@@ -909,7 +909,7 @@ It does **not** yet justify a learned Tension model.
 
 ---
 
-### Case B2 — opposite-direction signal succeeds
+### Case B2: opposite-direction signal succeeds
 
 If:
 
@@ -933,7 +933,7 @@ The result demands problem reformulation.
 
 ---
 
-### Case B3 — scalar does not improve ScoreOnly
+### Case B3: scalar does not improve ScoreOnly
 
 If Scalar does not significantly beat ScoreOnly at both primary budgets, inspect only the preregistered interaction diagnostic.
 
@@ -970,7 +970,7 @@ Do not build Tension from this route.
 
 ---
 
-# 18. What Gate 02 must never claim
+# 18. What gate 02 must never claim
 
 Even after a positive result, do not claim:
 
@@ -1105,7 +1105,7 @@ It must not contain:
 
 ---
 
-# 22. Integrity Gate 02 — mandatory post-execution gate
+# 22. Integrity gate 02: mandatory post-execution gate
 
 After formal Gate 02 execution, stop immediately.
 
@@ -1194,7 +1194,7 @@ A Gate 02 positive result only authorizes a **new Tension-specific hypothesis te
 
 ---
 
-# 23. Integrity Gate 02 decision
+# 23. Integrity gate 02 decision
 
 Only:
 
@@ -1236,17 +1236,17 @@ They are not scientific evidence.
 
 # 25. Execution priority
 
-### P0 — Gate 01 Integrity Closure
+### P0: Gate 01 integrity closure
 
 Run `ccf-integrity-auditor`.
 
 If blocked, stop. Must achieve `AUDIT_PASS` before P4.
 
-### P1 — Gate 02 preregistration
+### P1: Gate 02 preregistration
 
 Create the protocol and freeze all definitions above.
 
-### P2 — Minimal implementation
+### P2: Minimal implementation
 
 Reuse the current process adapter and schema-v2 `vocabulary_scores`. Implementation and synthetic tests may be prepared in advance of P0 without constituting experimental execution.
 
@@ -1254,11 +1254,11 @@ Do not add a second adapter architecture.
 
 Do not train Tension.
 
-### P3 — Static / synthetic verification
+### P3: Static / synthetic verification
 
 Only the changed-path checks above.
 
-### P4 — Formal 319 Gate 02 execution
+### P4: Formal 319 gate 02 execution
 
 Requires P0 `AUDIT_PASS`.
 
@@ -1268,11 +1268,11 @@ Generate restricted + public artifacts.
 
 Stop immediately afterward.
 
-### P5 — Gate 02 Integrity Audit
+### P5: Gate 02 integrity audit
 
 Run `ccf-integrity-auditor`.
 
-### P6 — Research decision
+### P6: Research decision
 
 Hand the audited verdict to:
 

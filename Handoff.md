@@ -1,11 +1,11 @@
-# Handoff: STAGE -1F — Cross-dataset MICA mechanism replication
+# Handoff. Stage -1F: cross-dataset MICA mechanism replication
 
 Updated: 2026-09-16.
 
 ## Current authoritative state
 
 ```text
-Stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
+Stage: STAGE -1, MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
 Status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 AUTHORITATIVE_START_REVISION: 05acf0d6eccfefb6aeda526937136bbf6a24cbd5
 EXPERIMENT_SOURCE_REVISION: ffdaec8a6c0cdc20d071ad00eca8bb025f336ef0
@@ -33,7 +33,7 @@ are in
 the no-training cardinality/normalization diagnostics are in
 [`diagnostics.json`](research/prototypes/mica-cross-dataset-replication/diagnostics.json).
 
-## Stage -1A — training diagnosis
+## Stage -1A: training diagnosis
 
 [`research/diagnostics/mica-training-dynamics/diagnosis.json`](research/diagnostics/mica-training-dynamics/diagnosis.json)
 classifies the available progress as `OVERFIT_DOMINANT`. Fifteen complete
@@ -45,7 +45,7 @@ fall. SafePTO had no epoch-level progress and was not classified. The common
 recipe/encoder dynamics are the supported explanation; the prior DrugQuery
 architecture verdict is unchanged.
 
-## Stage -1B — training recipe
+## Stage -1B: training recipe
 
 The three complete recipe arms are recorded in
 [`recipe-result.json`](research/prototypes/mica-core-consolidation/recipe-result.json).
@@ -54,7 +54,7 @@ peak Jaccard is `0.542280` versus anchor `0.542244`, peak PRAUC remains within
 the `0.002` floor, and all late Jaccard/PRAUC/NLL drift measures are lower than
 the anchor. Cosine decay was not selected because its NLL drift was larger.
 
-## Stage -1C — intrinsic Core controls
+## Stage -1C: intrinsic core controls
 
 All four controls completed 60 epochs with the selected recipe and are
 summarized in
@@ -64,7 +64,7 @@ the PRAUC floor and has worse late J/PRAUC degradation; NoPostReadConditioner
 is slightly worse on late PRAUC drop despite fewer parameters; SimplifiedHead
 misses both peak floors. No intrinsic simplification is promoted.
 
-## Stage -1D/-1E — MIMIC-IV readiness and materialization
+## Stage -1D/-1E: MIMIC-IV readiness and materialization
 
 The frozen protocol is a dataset-native visit-level task:
 `(current diagnoses, current procedures, strictly previous visit
@@ -97,7 +97,7 @@ screen automatically.
 
 ---
 
-# Historical handoff: MICA Dynamic-Query Screen Complete — Family Killed
+# Historical handoff. MICA dynamic-query screen complete: family killed
 
 The remainder of this file is retained as historical execution context. Its
 older routing text is superseded by the current Stage -1 handoff above.
@@ -142,7 +142,7 @@ EvidenceDynamicMultiQuery - StaticMultiQuery
 DynamicQueryAdapter - StaticQueryAdapter
 ```
 
-The two static controls separate dynamic conditioning from extra capacity. The adapter pair additionally tests patient-conditioned query generation without any latent-route assumption.
+The two static controls separate dynamic conditioning from extra capacity. The adapter pair also tests patient-conditioned query generation without any latent-route assumption.
 
 Frozen common configuration remains the successful MICA configuration: seed `20260914`, hidden dim `128`, two clinical blocks, four heads, FFN `256`, batch `16`, full `60` epochs, AdamW `3e-4`, weight decay `1e-4`, BCE + `0.05` normalized DDI penalty, fixed sigmoid threshold `0.35`, highest complete-Dev Jaccard with strict improvement and earliest exact tie, float32 with TF32 disabled and deterministic cuDNN.
 
@@ -188,7 +188,7 @@ Current routing:
 Active formal Idea: none
 Formal Gate: none
 Held-out architecture selection: forbidden
-MICA-Core DrugQuery: preserved strong substrate
+MICA-Core DrugQuery: preserved strong base
 MICA-v2 extensions: closed
 MICA dynamic-query screen: complete; patient-conditioned query family killed
 Next owner: material architecture search after scientific review

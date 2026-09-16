@@ -2,7 +2,7 @@
 
 ## Stage boundary
 
-`STAGE -1A — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS`
+`STAGE -1A, MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS`
 
 This is a pre-idea, pre-gate, Train/Dev-only diagnostic. It is not a paper
 claim, a holdout evaluation, or permission to reopen the Dynamic Query,
@@ -74,7 +74,7 @@ invented.
 The archived MoleRec/SafeDrug/GAMENet/RETAIN logs are not semantically
 identical to MICA's row-level progress (their native evaluators and split
 roles differ), so they are not pooled into the classifier. Their available
-training records still show why “best epoch” must be reported with the native
+training records still show why "best epoch" must be reported with the native
 selection rule. The per-epoch validation rows extracted from those logs are in
 [`baseline_learning_curves.csv`](baseline_learning_curves.csv); they contain
 only aggregate metrics, not patient-level data.
@@ -96,7 +96,7 @@ classifier.
 These rows are historical context only. They do not justify changing MICA's
 recipe or architecture, and no test-side result was read for this diagnostic.
 
-## Consequence for Stage -1B
+## Consequence for stage -1B
 
 The next bounded question is exactly the frozen recipe test: whether constant
 `3e-4` causes late drift relative to constant `1e-4` or a 60-epoch cosine

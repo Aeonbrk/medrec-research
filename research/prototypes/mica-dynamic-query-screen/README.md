@@ -1,4 +1,4 @@
-# MICA Dynamic-Query Screen
+# MICA dynamic-query screen
 
 Status: **complete bounded six-GPU Train/Dev screen; dynamic-query family killed**.
 

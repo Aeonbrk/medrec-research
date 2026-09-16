@@ -11,24 +11,24 @@ origin: docs/plans/2026-08-23-archived-single-baseline-plan.md
 deepened: 2026-08-25
 ---
 
-# Prepare the SafeDrug Archived Four-Model Reproduction
+# Prepare the SafeDrug archived four-model reproduction
 
-## Goal Capsule
+## Goal capsule
 
 Make the archived SafeDrug four-model program ready for a later formal IJCAI 2021 Table 2 reproduction. The implementation and remote execution covered here end only after a modern 319 environment, a paper-matching archived dataset snapshot, and one non-evidence training epoch for each of GAMENet, SafeDrug, RETAIN, and LEAP have passed their gates.
 
 Gemini is the intended executor. It must stop with a public-safe preparation packet in `runtime/reproduction-prep/<prep-id>/go-no-go.json` whose `aggregate_state` is `awaiting_human_go_no_go` and whose `formal_training_authorized` value is `false`. It must not launch a 50-epoch training job or an upstream ten-round test.
 
-## Product Contract
+## Product contract
 
 All `A`, `R`, `AE`, `KTD`, and `U` identifiers are plan-local. The origin plan remains the scientific decision history through its named B0-B3 blocks; it is not the source of these identifiers and no implicit ID mapping exists.
 
 ### Actors
 
-- **A1 — Research owner:** authorizes the scientific target, source authority, remote code replacement boundary, and later formal-training decision.
-- **A2 — Execution agent:** implements the preparation path, performs the approved 319 operations, monitors every smoke lane, and leaves durable state for review.
-- **A3 — Review agent:** inspects the local diff and public-safe preparation evidence after Gemini stops at the preparation boundary and before recommending a later go or no-go decision.
-- **A4 — 319 host:** holds the authorized source data, isolated baseline environment, archived source checkout, generated dataset snapshot, and restricted runtime artifacts.
+- **A1 (Research owner).** Authorizes the scientific target, source authority, remote code replacement boundary, and later formal-training decision.
+- **A2 (Execution agent).** Implements the preparation path, performs the approved 319 operations, monitors every smoke lane, and leaves durable state for review.
+- **A3 (Review agent).** Inspects the local diff and public-safe preparation evidence after Gemini stops at the preparation boundary and before recommending a later go or no-go decision.
+- **A4 (319 host).** Holds the authorized source data, isolated baseline environment, archived source checkout, generated dataset snapshot, and restricted runtime artifacts.
 
 ### Requirements
 
@@ -46,27 +46,27 @@ All `A`, `R`, `AE`, `KTD`, and `U` identifiers are plan-local. The origin plan r
 - **R12:** The later Table 2 numeric gate is all 20 reproduced means within the paper mean plus or minus two reported standard deviations, with SafeDrug-over-GAMENet Jaccard/F1 and SafeDrug-under-LEAP DDI checked separately. No post-test retuning, seed changes, or checkpoint cherry-picking are allowed.
 - **R13:** The current execution ends before formal training and exposes an explicit human go/no-go boundary.
 
-### Key Decisions
+### Key decisions
 
-1. **Archived is the sole scientific source.** (session-settled: user-directed — chosen over SafeDrug master as scientific authority: upstream identifies archived as the paper-reproduction branch, while master changes cohort, medication vocabulary, preprocessing, and model behavior.) Governs R2-R4.
-2. **Recorded archived code semantics win over conflicting paper prose.** (session-settled: user-approved — chosen over normalizing implementation details to prose: Reproduction Mode preserves the authoritative upstream execution behavior.) Governs R3-R4.
-3. **Preparation stops before the first formal job.** (session-settled: user-directed — chosen over starting complete training immediately: the owner wants all prerequisites and four short smokes reviewed first.) Governs R7-R8 and R13.
-4. **Local code may overwrite the two remote code checkouts.** (session-settled: user-directed — chosen over preserving the remote checkouts: local progress is authoritative and restricted data and run artifacts are explicitly outside the replacement boundary.) Governs R9.
-5. **The eventual study uses one training run per model.** (session-settled: user-directed — chosen over multi-seed training: the reproduction target is archived source behavior and its ten test bootstraps, with their uncertainty interpreted correctly.) Governs R11-R12.
+1. **Archived is the sole scientific source.** (session-settled: user-directed, chosen over SafeDrug master as scientific authority: upstream identifies archived as the paper-reproduction branch, while master changes cohort, medication vocabulary, preprocessing, and model behavior.) Governs R2-R4.
+2. **Recorded archived code semantics win over conflicting paper prose.** (session-settled: user-approved, chosen over normalizing implementation details to prose: Reproduction Mode preserves the authoritative upstream execution behavior.) Governs R3-R4.
+3. **Preparation stops before the first formal job.** (session-settled: user-directed, chosen over starting complete training immediately: the owner wants all prerequisites and four short smokes reviewed first.) Governs R7-R8 and R13.
+4. **Local code may overwrite the two remote code checkouts.** (session-settled: user-directed, chosen over preserving the remote checkouts: local progress is authoritative and restricted data and run artifacts are explicitly outside the replacement boundary.) Governs R9.
+5. **The eventual study uses one training run per model.** (session-settled: user-directed, chosen over multi-seed training: the reproduction target is archived source behavior and its ten test bootstraps, with their uncertainty interpreted correctly.) Governs R11-R12.
 
-### Acceptance Examples
+### Acceptance examples
 
-- **AE1 — Ready:** all local gates pass; the remote harness and upstream source match their intended revisions; the recreated environment matches its explicit lock; B0 counts match; four smoke records report one observed epoch and a checkpoint; no smoke run contains `result.json`; the final state is `awaiting_human_go_no_go` with formal training disabled.
-- **AE2 — Environment blocker:** Conda resolves the candidate environment, but dnc cannot construct and execute a minimal forward pass under PyTorch 2.2.2. Preparation stops at `blocked_environment`; package pins may be revised, but archived model source is not patched.
-- **AE3 — Data blocker:** archived preprocessing completes but produces 15,032 visits or 112 medications. All smoke submission is blocked; the mismatch is investigated in preprocessing and mapping lineage rather than compensated in model code.
-- **AE4 — Partial smoke failure:** SafeDrug smoke fails while the other three complete. The surviving lanes remain completed, SafeDrug is recorded as failed with its public-safe reason, and the aggregate state is not advanced to `awaiting_human_go_no_go`.
-- **AE5 — Boundary violation prevention:** an executor attempts to invoke the formal `reproduce` command during this plan. The attempt is rejected by the plan's stop condition; only `reproduce-smoke` is authorized.
+- **AE1 (Ready).** All local gates pass; the remote harness and upstream source match their intended revisions; the recreated environment matches its explicit lock; B0 counts match; four smoke records report one observed epoch and a checkpoint; no smoke run contains `result.json`; the final state is `awaiting_human_go_no_go` with formal training disabled.
+- **AE2 (Environment blocker).** Conda resolves the candidate environment, but dnc cannot construct and execute a minimal forward pass under PyTorch 2.2.2. Preparation stops at `blocked_environment`; package pins may be revised, but archived model source is not patched.
+- **AE3 (Data blocker).** Archived preprocessing completes but produces 15,032 visits or 112 medications. All smoke submission is blocked; the mismatch is investigated in preprocessing and mapping lineage rather than compensated in model code.
+- **AE4 (Partial smoke failure).** SafeDrug smoke fails while the other three complete. The surviving lanes remain completed, SafeDrug is recorded as failed with its public-safe reason, and the aggregate state is not advanced to `awaiting_human_go_no_go`.
+- **AE5 (Boundary violation prevention).** An executor attempts to invoke the formal `reproduce` command during this plan. The attempt is rejected by the plan's stop condition; only `reproduce-smoke` is authorized.
 
-## Planning Contract
+## Planning contract
 
-### Scope Boundaries
+### Scope boundaries
 
-#### In Scope
+#### In scope
 
 - Extend the existing archived Reproduction Program with environment/data probe and non-evidence smoke behavior.
 - Add a distinct local smoke-submission interface that reuses remote preflight and preserves four-lane independence.
@@ -75,7 +75,7 @@ All `A`, `R`, `AE`, `KTD`, and `U` identifiers are plan-local. The origin plan r
 - Converge the two approved remote code checkouts to local/pinned authority without changing restricted data or prior run artifacts.
 - Regenerate the archived external snapshot, pass B0, run and monitor four one-epoch smokes, and assemble the review packet.
 
-#### Out of Scope
+#### Out of scope
 
 - Any formal 50-epoch training, ten-round test execution, Table 2 result analysis, or paper claim conclusion.
 - Multi-seed training, hyperparameter search, post-test tuning, or checkpoint selection across runs.
@@ -84,7 +84,7 @@ All `A`, `R`, `AE`, `KTD`, and `U` identifiers are plan-local. The origin plan r
 - Copying source data, patient membership, predictions, checkpoints, weights, pickle files, or raw logs into Git.
 - Backup frameworks, migration layers, feature flags, compatibility wrappers, checksums without a behavioral use, or generalized remote-state machinery.
 
-#### Deferred to Follow-Up Work
+#### Deferred to follow-up work
 
 - A separately authorized formal four-lane reproduction run.
 - Ten-round bootstrap validation, Table 2 comparison, headline relationship checks, integrity audit, and result-to-claim work.
@@ -99,16 +99,16 @@ All `A`, `R`, `AE`, `KTD`, and `U` identifiers are plan-local. The origin plan r
 - A clean immutable local harness revision can be produced through the repository's normal workflow before a real remote launch.
 - If the authorized raw inputs needed by archived preprocessing cannot be located on 319, that is a genuine blocker rather than a reason to synthesize or substitute data.
 
-### Key Technical Decisions
+### Key technical decisions
 
-1. **KTD1 — Keep one Reproduction Program with three parser-enforced behaviors.** The program accepts `--mode probe|smoke|formal`, with `formal` as the compatibility-preserving default. Probe creates no run root and performs no training; its `--probe-scope environment|full` selector separates data-independent candidate checks from the full six-input/B0 gate. Smoke runs exactly one epoch and has no testing tail; only formal may select the full-run checkpoint, invoke upstream testing, or publish `result.json`. The program defines one canonical six-file input manifest, a four-file B0 subset, and each profile's model-specific subset instead of treating the current four-file `GATE_INPUTS` as the complete contract.
-2. **KTD2 — Expose smoke as a separate top-level submission command and make the program probe a protocol.** `medrec reproduce-smoke` reuses lane mapping and remote resource gates but emits smoke sessions prefixed `medrec-smoke-` and program commands containing `--mode smoke`. After source/data/environment identity and GPU-idle checks, `RemoteExecutor` invokes `--mode probe --probe-scope full`, parses one versioned public-safe JSON object, and rejects any nonzero exit, extra output, missing field, failed check, or identity mismatch before tmux launch. The JSON names its scope, baseline/source, B0 counts when full, environment versions/identity, visible GPU identity, and pass/fail results for imports, CUDA tensor execution, RDKit BRICS, dnc forward, and, when full, six pickle loads; executor code must consume this program-owned result rather than duplicate the checks.
-3. **KTD3 — Make both source transformations exact, ordered, mode-limited, and jointly reversible.** (session-settled: user-approved — chosen over general source patching: the owner accepted the existing training-mode adaptation and a smoke-only 50-to-1 epoch adaptation, but no compatibility edits to archived scientific source.) Smoke transforms original archived bytes through exactly one training-default substitution and then exactly one epoch substitution; reversing them in the opposite order must reproduce the original bytes. Formal applies only the training-default substitution and can never receive the epoch substitution.
-4. **KTD4 — Freeze the modern environment only after it proves the integrated data path.** (session-settled: user-approved — chosen over recreating the paper's PyTorch 1.4 stack: PyTorch 1.4 CUDA builds do not support the RTX 3090's compute capability, while a modern environment is acceptable when the deviation is declared.) First use a named candidate environment for dependency/runtime probes and archived preprocessing into staging. After all six staged inputs load and B0 passes, export the Linux explicit lock, land those exact lock bytes in the local source of truth, recreate the declared environment from that lock, repeat the complete program probe, and only then register the hash of the recreated environment's exact `conda list --explicit` bytes.
-5. **KTD5 — Regenerate data additively and publish once.** Preprocessing writes to a staging directory under the same external snapshot parent as the final registry target. After the frozen environment loads all six files and B0 passes, one same-filesystem atomic directory rename publishes the target; file-by-file copying, target merging, and target overwrite are forbidden. An unexpected existing target is a blocker, not permission to delete it.
-6. **KTD6 — Make the execution agent the narrow preparation-state owner.** Gemini writes `runtime/reproduction-prep/<prep-id>/state.json` after each material gate from structured program/RemoteExecutor facts and emits `go-no-go.json` only after validating all four remote terminal records. The CLI remains argument parsing, lane orchestration, and public-safe presentation; `RemoteExecutor` owns remote facts; the baseline program owns probe/smoke records. This avoids inventing a generic job database while leaving agent-legible state outside shell history.
+1. **KTD1: Keep one Reproduction Program with three parser-enforced behaviors.** The program accepts `--mode probe|smoke|formal`, with `formal` as the compatibility-preserving default. Probe creates no run root and performs no training; its `--probe-scope environment|full` selector separates data-independent candidate checks from the full six-input/B0 gate. Smoke runs exactly one epoch and has no testing tail; only formal may select the full-run checkpoint, invoke upstream testing, or publish `result.json`. The program defines one canonical six-file input manifest, a four-file B0 subset, and each profile's model-specific subset instead of treating the current four-file `GATE_INPUTS` as the complete contract.
+2. **KTD2: Expose smoke as a separate top-level submission command and make the program probe a protocol.** `medrec reproduce-smoke` reuses lane mapping and remote resource gates but emits smoke sessions prefixed `medrec-smoke-` and program commands containing `--mode smoke`. After source/data/environment identity and GPU-idle checks, `RemoteExecutor` invokes `--mode probe --probe-scope full`, parses one versioned public-safe JSON object, and rejects any nonzero exit, extra output, missing field, failed check, or identity mismatch before tmux launch. The JSON names its scope, baseline/source, B0 counts when full, environment versions/identity, visible GPU identity, and pass/fail results for imports, CUDA tensor execution, RDKit BRICS, dnc forward, and, when full, six pickle loads; executor code must consume this program-owned result rather than duplicate the checks.
+3. **KTD3: Make both source transformations exact, ordered, mode-limited, and jointly reversible.** (session-settled: user-approved, chosen over general source patching: the owner accepted the existing training-mode adaptation and a smoke-only 50-to-1 epoch adaptation, but no compatibility edits to archived scientific source.) Smoke transforms original archived bytes through exactly one training-default substitution and then exactly one epoch substitution; reversing them in the opposite order must reproduce the original bytes. Formal applies only the training-default substitution and can never receive the epoch substitution.
+4. **KTD4: Freeze the modern environment only after it proves the integrated data path.** (session-settled: user-approved, chosen over recreating the paper's PyTorch 1.4 stack: PyTorch 1.4 CUDA builds do not support the RTX 3090's compute capability, while a modern environment is acceptable when the deviation is declared.) First use a named candidate environment for dependency/runtime probes and archived preprocessing into staging. After all six staged inputs load and B0 passes, export the Linux explicit lock, land those exact lock bytes in the local source of truth, recreate the declared environment from that lock, repeat the complete program probe, and only then register the hash of the recreated environment's exact `conda list --explicit` bytes.
+5. **KTD5: Regenerate data additively and publish once.** Preprocessing writes to a staging directory under the same external snapshot parent as the final registry target. After the frozen environment loads all six files and B0 passes, one same-filesystem atomic directory rename publishes the target; file-by-file copying, target merging, and target overwrite are forbidden. An unexpected existing target is a blocker, not permission to delete it.
+6. **KTD6: Make the execution agent the narrow preparation-state owner.** Gemini writes `runtime/reproduction-prep/<prep-id>/state.json` after each material gate from structured program/RemoteExecutor facts and emits `go-no-go.json` only after validating all four remote terminal records. The CLI remains argument parsing, lane orchestration, and public-safe presentation; `RemoteExecutor` owns remote facts; the baseline program owns probe/smoke records. This avoids inventing a generic job database while leaving agent-legible state outside shell history.
 
-#### Exact Smoke Source Contract
+#### Exact smoke source contract
 
 The epoch transformation matches the complete line token below once in the selected entrypoint after the training-default transformation. The source must contain exactly one original token and no smoke token before adaptation. The adapted source must contain exactly one smoke token and no original token at that location. Replacing the smoke token with the original token, then reversing the training-default transformation, must reproduce the original entrypoint bytes.
 
@@ -121,11 +121,11 @@ The epoch transformation matches the complete line token below once in the selec
 
 The unrelated `'    EPOCH = 100\n'` inside `Leap.py`'s dormant `fine_tune()` function is not part of `main()` and must remain unchanged. The audit source for all five declarations is archived revision `8deee38cfdb2a38882377ff95cce5922d6d9e8d6`.
 
-### High-Level Technical Design
+### High-level technical design
 
 These sketches constrain responsibilities and state transitions, not exact implementation syntax.
 
-#### Component Relationships
+#### Component relationships
 
 ```text
 local CLI
@@ -144,7 +144,7 @@ structured gate/submission facts
       -> Codex review packet
 ```
 
-#### Preparation Protocol
+#### Preparation protocol
 
 ```text
 implement contracts
@@ -159,7 +159,7 @@ implement contracts
   -> stop for human review
 ```
 
-#### Preparation State Machine
+#### Preparation state machine
 
 ```text
 planned
@@ -179,7 +179,7 @@ smoke_running    -> partial_smoke_failure
 
 `awaiting_human_go_no_go` is terminal for this plan. There is no transition from it to formal training in this artifact.
 
-#### Data Provenance Flow
+#### Data provenance flow
 
 ```text
 authorized 319 raw inputs
@@ -195,7 +195,7 @@ public-safe branch: B0 counts + revisions + environment identity + terminal stat
 restricted branch: rows + split membership + pickle values + logs + checkpoints
 ```
 
-#### Program Mode Matrix
+#### Program mode matrix
 
 | Behavior | Program selector | Training-mode adaptation | Epoch adaptation | Training | Upstream test | Terminal artifact |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -204,7 +204,7 @@ restricted branch: rows + split membership + pickle values + logs + checkpoints
 | Smoke | `--mode smoke` | Yes | Exact 50 to 1 | One epoch | No | `status.json` and `smoke.json` |
 | Formal default | omitted or `--mode formal` | Yes | No | 50 epochs | Ten rounds | Existing `status.json` and `result.json` |
 
-#### Public-Safe Protocol Shapes
+#### Public-safe protocol shapes
 
 The probe writes exactly one compact JSON object and one trailing newline to stdout on success. The top-level object has the following exact fields; unknown or missing fields are invalid.
 
@@ -254,7 +254,7 @@ Gemini owns two ignored aggregate artifacts with schema version `1`: mutable `st
 
 Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `failed`. GPU, session, terminal-artifact, and failure fields are `null` until known; artifact identifiers are registry-relative and never absolute remote paths. Aggregate state is one of `planned`, `implementing`, `local_verified`, `blocked_remote_code`, `remote_code_ready`, `blocked_environment`, `candidate_environment_ready`, `data_staged`, `environment_ready`, `blocked_data`, `data_ready`, `smoke_running`, `partial_smoke_failure`, or `awaiting_human_go_no_go`. A blocked state permits only `report_blocker`; the last two states permit only `request_codex_review`. `go-no-go.json` is emitted only after all four lanes have terminal status, so its aggregate state is exactly `partial_smoke_failure` or `awaiting_human_go_no_go` and all lane fields are resolved. Both files are written atomically from allowlisted structured facts; neither contains a raw log excerpt or absolute remote path.
 
-#### Gate Decisions
+#### Gate decisions
 
 | Gate | Pass action | Failure action |
 | --- | --- | --- |
@@ -266,7 +266,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 | Per-lane smoke | Preserve terminal record and continue other lanes | Record lane failure; do not cancel surviving lanes |
 | Four-lane aggregate | Emit ready review packet | Emit partial-smoke review packet without formal authorization |
 
-### Research Grounding
+### Research grounding
 
 - The repository already has one registry-driven program, exact training-mode adaptation, exact B0 count logic, formal checkpoint/test parsing, fail-closed remote preflight, and independent four-lane CLI mapping. The plan extends those seams instead of adding a second architecture.
 - The current formal `run_lane` always expects 50 epochs, selects a checkpoint, and starts the upstream ten-round test. It cannot serve as the smoke entry without conflating evidence classes.
@@ -274,9 +274,9 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 - The paper-reproduction dataset snapshot and declared Conda environment were absent during the planning preflight. The remote harness and upstream checkouts also did not match their intended clean revisions. These are observations to recheck, not assumptions to bypass.
 - PyTorch 2.2.2 publishes a Python 3.11 Linux CUDA 12.1 wheel, and the observed 319 NVIDIA driver is new enough for CUDA 12.1. The unresolved load-bearing risk is the complete archived stack, especially dnc and archived preprocessing APIs, under this package combination.
 
-## Implementation Units
+## Implementation units
 
-### U1 — Add probe and non-evidence smoke behavior to the archived program
+### U1: add probe and non-evidence smoke behavior to the archived program
 
 **Requirements:** R2-R8 and R13; Key Decisions 1-3; KTD1 and KTD3.
 
@@ -284,7 +284,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Depends on:** None.
 
-**Approach:** Preserve the current default formal behavior and dispatch the three parser-validated modes before entering any mode-specific tail. Define the canonical manifest as the registry's six inputs, preserve the current four B0 inputs for count calculation, and preserve each profile's required subset. Both probe scopes return the versioned KTD2 JSON after visible-CUDA tensor, RDKit BRICS, minimal dnc forward, imports, and environment identity checks; full scope additionally requires the dataset root, deserializes and validates the model-consumed structure of all six files, and calculates B0. Smoke must create one run-scoped entrypoint by applying the two KTD3 transformations, parse the log with `expected_epochs=1`, require `best_epoch: 0` and exactly one profile-matching epoch-0 checkpoint, then publish a non-evidence terminal record without entering the formal checkpoint/test/result tail.
+**Approach:** Preserve the current default formal behavior and dispatch the three parser-validated modes before entering any mode-specific tail. Define the canonical manifest as the registry's six inputs, preserve the current four B0 inputs for count calculation, and preserve each profile's required subset. Both probe scopes return the versioned KTD2 JSON after visible-CUDA tensor, RDKit BRICS, minimal dnc forward, imports, and environment identity checks; full scope also requires the dataset root, deserializes and validates the model-consumed structure of all six files, and calculates B0. Smoke must create one run-scoped entrypoint by applying the two KTD3 transformations, parse the log with `expected_epochs=1`, require `best_epoch: 0` and exactly one profile-matching epoch-0 checkpoint, then publish a non-evidence terminal record without entering the formal checkpoint/test/result tail.
 
 **Test scenarios:**
 
@@ -298,7 +298,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** Local tests prove mode separation and source reversibility without importing the remote baseline stack; the formal behavior's existing tests remain green.
 
-### U2 — Add an independent smoke-submission surface
+### U2: add an independent smoke-submission surface
 
 **Requirements:** R1, R7-R10, and R13; Key Decision 3; KTD2 and KTD6.
 
@@ -318,7 +318,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** CLI and executor tests distinguish planned/submitted smoke work from formal reproduction and prove that no smoke request can silently become a formal request.
 
-### U3 — Declare the candidate and frozen 319 environment contract
+### U3: declare the candidate and frozen 319 environment contract
 
 **Requirements:** R6 and R9; KTD4.
 
@@ -337,7 +337,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** The registry identity refers to a host-proved explicit environment, not a provisional YAML solve.
 
-### U4 — Document the bounded operator workflow and handoff state
+### U4: document the bounded operator workflow and handoff state
 
 **Requirements:** R1, R5, R8-R10, and R13; Key Decisions 3-4; KTD5-KTD6.
 
@@ -347,11 +347,11 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Approach:** Add one focused preparation playbook, linked from the existing navigation. It must state the source authority, authorized-data assumption, exact remote code replacement boundary, candidate-data-lock-recreation sequence, atomic snapshot publication, the versioned program probe contract, probe/smoke/formal distinctions, and the hard stop before formal training. Formal reproduction procedures remain deferred. Define the Gemini-owned runtime-state schema and update points, including public-safe field allowlists, lane states, next permitted action, and resume from the last passed gate; make clear that CLI/program/executor produce facts but do not own the aggregate state. Update existing playbooks only where their current wording would conflict with this approved preparation path.
 
-**Test expectation:** None — documentation-only unit. Verify links, command names, mode boundaries, and Markdown syntax.
+**Test expectation:** None, documentation-only unit. Verify links, command names, mode boundaries, and Markdown syntax.
 
 **Verification outcome:** A fresh executor can start at `docs/START_HERE.md`, reach one canonical procedure, and identify the next permitted action from `runtime/reproduction-prep/<prep-id>/state.json` without reading shell history.
 
-### U5 — Pass local gates and converge the approved remote code checkouts
+### U5: pass local gates and converge the approved remote code checkouts
 
 **Requirements:** R2, R4, R9, and R13; Key Decisions 1 and 4.
 
@@ -371,7 +371,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** Code identity is unambiguous and the preparation state contains only public-safe revisions and gate outcomes.
 
-### U6 — Build and prove the candidate modern environment
+### U6: build and prove the candidate modern environment
 
 **Requirements:** R2-R6 and R9; KTD3-KTD4.
 
@@ -390,7 +390,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** The candidate's exact direct pins and observed Python/PyTorch/CUDA/driver/GPU identities are recorded for U7, but no candidate hash enters the registry.
 
-### U7 — Regenerate data, freeze the environment, and publish the integrated pair
+### U7: regenerate data, freeze the environment, and publish the integrated pair
 
 **Requirements:** R2-R5, R8-R10; Key Decisions 1-2 and 4; KTD5.
 
@@ -412,7 +412,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** The state advances through `environment_ready` to `data_ready` only when the locked recreated environment, registered hash, final atomic snapshot, six-file structural loads, and public-safe B0 counts agree; every restricted value remains on 319 outside Git.
 
-### U8 — Run four one-epoch smokes and assemble the Codex review packet
+### U8: run four one-epoch smokes and assemble the Codex review packet
 
 **Requirements:** R1, R7-R13; Key Decisions 3 and 5; KTD2-KTD3 and KTD6.
 
@@ -432,7 +432,7 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 
 **Verification outcome:** Codex receives the local diff plus one public-safe packet containing harness/upstream revisions, environment identity and deviations, B0 counts, all four lane IDs/GPU IDs/terminal states/registry-relative artifact identifiers, `formal_training_authorized: false`, and no absolute remote path or restricted content.
 
-## System-Wide Impact
+## System-wide impact
 
 - **Reproduction Program:** gains probe and smoke behavior while its formal default and scientific profiles remain unchanged.
 - **CLI:** gains one explicit top-level command; existing `reproduce` callers and JSON shape remain stable.
@@ -444,9 +444,9 @@ Each lane state is one of `pending`, `submitted`, `running`, `completed`, or `fa
 - **Documentation:** adds the canonical archived procedure and reconciles existing baseline/319 guidance with the approved code-overwrite boundary.
 - **Failure propagation:** local failure blocks sync; environment failure blocks data/smoke; B0 failure blocks every smoke; lane smoke failure is isolated but blocks the aggregate go/no-go-ready state.
 
-## Verification Contract
+## Verification contract
 
-### Local Gates
+### Local gates
 
 Run targeted proof while implementing:
 
@@ -465,7 +465,7 @@ markdownlint '**/*.md' --ignore '.agents/**'
 
 The specific failures detected are program-mode regression, formal/smoke command confusion, preflight bypass, registry parse/identity drift, Python quality failure, or broken documentation. Any failure is fixed before remote progression.
 
-### Remote Preparation Gates
+### Remote preparation gates
 
 1. Before remote code mutation, both canonical targets are proved to be the approved Git roots and outside the external data root. After convergence, the harness checkout is clean at the exact local immutable revision and SafeDrug is clean at the archived revision.
 2. The candidate environment passes data-independent runtime checks, then generates a staged canonical six-file dataset whose four B0 inputs produce exact counts.
@@ -475,7 +475,7 @@ The specific failures detected are program-mode regression, formal/smoke command
 6. The final local packet uses an allowlist of revisions, environment versions/hash, B0 counts, prep/lane/GPU IDs, terminal states, and registry-relative artifact identifiers. It contains no absolute remote/data/user path, raw row, patient/split identifier, pickle value, prediction, weight, checkpoint content/location, raw log, or credential.
 7. No formal `medrec reproduce` submission occurs. This is a direct audit condition, not an inference from absent results.
 
-### Review Handoff
+### Review handoff
 
 Gemini returns:
 
@@ -487,7 +487,7 @@ Gemini returns:
 
 Codex then reviews the diff, replays the local verification contract, checks the registered environment identity against the packet, inspects the B0 and four smoke terminal contracts, and reports go/no-go findings. Codex does not launch formal training without a new owner instruction.
 
-## Risks and Dependencies
+## Risks and dependencies
 
 - **dnc compatibility is unresolved.** The mitigation is the explicit construct-and-forward probe plus four real smoke lanes. Environment pins may move; archived source may not.
 - **Archived preprocessing may depend on removed library APIs.** Resolve this first through compatible package pins inside the modern environment. If source modification beyond R4 is required, stop and report the exact incompatibility.
@@ -496,9 +496,9 @@ Codex then reviews the diff, replays the local verification contract, checks the
 - **A 1-epoch smoke can pass while 50 epochs later fail.** This plan proves integration and one optimization/checkpoint cycle only. It makes no convergence or Table 2 claim.
 - **Smoke logs contain diagnostic metrics.** Non-evidence classification, the absence of upstream testing/formal `result.json`, and isolation under smoke run roots prevent their accidental scientific use.
 
-## Open Questions
+## Open questions
 
-### Resolved During Planning
+### Resolved during planning
 
 - The reproduction target is IJCAI 2021 Table 2 in Reproduction Mode.
 - Archived, not master/main, is scientific authority; master/main is engineering reference only.
@@ -510,7 +510,7 @@ Codex then reviews the diff, replays the local verification contract, checks the
 - Server data authorization is settled and will not be re-asked.
 - Formal training requires a later human go/no-go instruction.
 
-### Deferred to Implementation
+### Deferred to implementation
 
 - The exact four GPU indices, chosen from the execution-time idle devices.
 - Whether direct dependency pins in R6 need adjustment after observed dnc, RDKit, preprocessing, or pickle compatibility failures.
@@ -518,25 +518,25 @@ Codex then reviews the diff, replays the local verification contract, checks the
 
 No product-level blocker remains. Any need for archived scientific-source modification beyond R4 is an execution blocker, not an implementation choice.
 
-## Sources and References
+## Sources and references
 
-### Repository Sources
+### Repository sources
 
-- `docs/plans/2026-08-23-archived-single-baseline-plan.md` — accepted lineage, B0, adaptation, four-model, and paper-comparison decisions.
-- `baselines/safedrug_archived.py` — current profiles, source adaptation, B0, formal runner, checkpoint/test parsing, and environment identity behavior.
-- `baselines/registry.toml` — one shared program, pinned archived revision, six inputs, external roots, and four IDs.
-- `src/medrec_research/remote_executor.py` — remote identity, environment, GPU, disk, and tmux gates.
-- `src/medrec_research/cli.py` — current one/all lane mapping and formal submission surface.
-- `tests/unit/test_safedrug_archived_program.py`, `tests/unit/test_remote_executor.py`, and `tests/integration/test_run_cli.py` — established contract-test seams.
-- `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` and `docs/playbooks/BASELINE_INTEGRATION_PLAYBOOK.md` — remote and baseline operational policy.
+- `docs/plans/2026-08-23-archived-single-baseline-plan.md`: accepted lineage, B0, adaptation, four-model, and paper-comparison decisions.
+- `baselines/safedrug_archived.py`: current profiles, source adaptation, B0, formal runner, checkpoint/test parsing, and environment identity behavior.
+- `baselines/registry.toml`: one shared program, pinned archived revision, six inputs, external roots, and four IDs.
+- `src/medrec_research/remote_executor.py`: remote identity, environment, GPU, disk, and tmux gates.
+- `src/medrec_research/cli.py`: current one/all lane mapping and formal submission surface.
+- `tests/unit/test_safedrug_archived_program.py`, `tests/unit/test_remote_executor.py`, and `tests/integration/test_run_cli.py`: established contract-test seams.
+- `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` and `docs/playbooks/BASELINE_INTEGRATION_PLAYBOOK.md`: remote and baseline operational policy.
 
-### External Primary Sources
+### External primary sources
 
 - PyTorch previous-version installation matrix: <https://pytorch.org/get-started/previous-versions/>
 - NVIDIA CUDA minor-version compatibility: <https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html>
 - Conda explicit environment export behavior: <https://docs.conda.io/projects/conda/en/latest/commands/list.html>
 
-## Definition of Done
+## Definition of done
 
 - U1-U4 are implemented with their test scenarios and documentation complete.
 - The repository-wide local verification contract passes at the final immutable local revision.

@@ -36,9 +36,9 @@ an exact paper-number reproduction.
 | Query split | Exact-self top-1 | Exact-self in top-10 | Same-patient in top-10 |
 | --- | ---: | ---: | ---: |
 | Train, official semantics (10,489) | 0.366098 | 0.809229 | 0.809324 |
-| Gate01-Dev, official semantics (2,130) | — | — | 0.000000 |
+| Gate01-Dev, official semantics (2,130) | - | - | 0.000000 |
 | Train, exact-self excluded (10,489) | 0.000000 | 0.000000 | 0.021832 |
-| Gate01-Dev, exact-self excluded (2,130) | — | — | 0.000000 |
+| Gate01-Dev, exact-self excluded (2,130) | - | - | 0.000000 |
 
 The Dev same-patient rate is zero as required by the patient-disjoint split.
 Dev exact-self columns are not interpreted: the evaluation dataset enumerates
@@ -58,7 +58,7 @@ sensitivity/reference run.
 | Surface | Jaccard | F1 | PRAUC | DDI | AvgMed |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | MoleRec (reference) | 0.529174 | 0.683480 | 0.773576 | 0.072223 | 21.5451 |
-| GraphRefine-SameK (reference) | 0.533650 | 0.687394 | 0.784240 | 0.073328 | — |
+| GraphRefine-SameK (reference) | 0.533650 | 0.687394 | 0.784240 | 0.073328 | - |
 | HypeMed-OfficialSemantics, epoch 75 | 0.514256 | 0.670078 | 0.755615 | 0.059559 | 23.5770 |
 | HypeMed-LeakageSafe, epoch 75 | 0.512112 | 0.668091 | 0.753822 | 0.059404 | 23.6549 |
 
@@ -90,6 +90,6 @@ only; upstream held-out eval/test intentionally omitted).
 
 **Final debug verdict:** `HYPEMED_CANONICAL_WEAK`.
 
-The prior adapter should additionally be recorded as
+The prior adapter should also be recorded as
 `HYPEMED_PREVIOUS_ADAPTER_INVALIDATED`; this debug does not create Idea 009 or
 alter shared project state.

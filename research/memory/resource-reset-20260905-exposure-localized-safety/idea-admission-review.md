@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Strict Pre-Idea Review — Exposure-Conditional Medication Recommendation
+# Strict pre-idea review: exposure-conditional medication recommendation
 
 ## Verdict
 
@@ -87,7 +87,7 @@ Repair condition: final paper must show a nontrivial interaction between exposur
 
 ### Skeptical prior-art expert
 
-Best argument: current search finds the two ingredients in separate literatures—order-time medication prediction and contextual DDI CDS—but not their central combination in recent MedRec.
+Best argument: current search finds the two ingredients in separate literatures, order-time medication prediction and contextual DDI CDS, but not their central combination in recent MedRec.
 
 Rejection-grade concern: reviewers can still summarize it as "Rough 2020 + dynamic SafeDrug loss".
 
@@ -126,7 +126,7 @@ The score is a development decision aid, not an acceptance probability.
 
 ## Fatal gate before Idea creation
 
-Run exactly one `R0 — Exposure Resource & Premise Admission`.
+Run exactly one `R0, Exposure Resource & Premise Admission`.
 
 R0 failure terminates this route without method implementation.
 

@@ -1,4 +1,4 @@
-# Medication Recommendation Research
+# Medication recommendation research
 
 This context covers reusable computational research for medication recommendation, independent of any single research route or hypothesis.
 

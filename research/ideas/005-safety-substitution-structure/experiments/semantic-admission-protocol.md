@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Semantic Admission Protocol — Safety-Preserving Substitution Structure
+# Semantic admission protocol: safety-preserving substitution structure
 
 ## Mode
 
@@ -128,7 +128,7 @@ This is an efficiency and reproducibility gate: a route dominated by one-off cla
 
 Semantic review is source-based. Relation support counts are hidden from the semantic adjudicator until the evidence label is frozen.
 
-### Tier A — qualifying admission evidence
+### Tier A: qualifying admission evidence
 
 At least one authoritative clinical source must explicitly position the two ATC-3 pharmacological/therapeutic subgroups, or their represented treatment classes at the same prediction resolution, as alternative treatment options for the same indication and overlapping clinical context.
 
@@ -141,13 +141,13 @@ Qualifying sources include:
 
 A Tier-A source must establish alternative positioning, not merely mention both therapies in the same disease chapter.
 
-### Tier B — corroborating indication evidence
+### Tier B: corroborating indication evidence
 
 FDA labeling / DailyMed Structured Product Labels may establish that therapies share an approved indication and may document contraindications, warnings, route, and population restrictions.
 
 Tier B evidence alone is not sufficient for admission.
 
-### Tier C — identity and taxonomy only
+### Tier C: identity and taxonomy only
 
 WHO ATC and NLM RxNorm/RxClass may resolve:
 

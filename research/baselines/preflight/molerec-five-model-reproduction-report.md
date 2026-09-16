@@ -1,4 +1,4 @@
-# MoleRec Five-Model Reproduction Report
+# MoleRec five-model reproduction report
 
 ## Verdict
 

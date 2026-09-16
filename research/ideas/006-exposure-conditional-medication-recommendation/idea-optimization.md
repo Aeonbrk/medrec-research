@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 006 Optimization — Exposure-Conditional Medication Recommendation
+# Idea 006 optimization: exposure-conditional medication recommendation
 
 ## Optimizer status
 
@@ -24,7 +24,7 @@ R0 directly supports the premise in MIMIC-IV 3.1 Discovery: among DDI pairs wher
 
 ### Root challenge
 
-DDI knowledge is pairwise and static, but **DDI applicability is state-dependent**. The relevant safety question when recommending a new medication is not only whether two medication codes can interact, but whether the interacting medication is part of the currently executed regimen when the new order is being considered.
+DDI knowledge is pairwise and static, but **DDI applicability is state-dependent**. The relevant safety question when recommending a new medication is whether the interacting medication is part of the currently executed regimen when the new order is considered, rather than whether the two codes can interact in isolation.
 
 ### Core insight
 
@@ -87,7 +87,7 @@ Not claimed as novelty:
 - active-ingredient granularity;
 - contextual DDI alerting.
 
-## Why this route survives the project failure landscape
+## Why this route survives prior project failures
 
 ### It is not another frozen-output feature
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Re-audit — Idea 008 Protocol v1.2
+# Gate 01 design integrity re-audit: Idea 008 protocol v1.2
 
 ## Audit status
 
@@ -27,7 +27,7 @@ The correction revision `2c340f5006505c6641d2f0d14a655c66efb2b055 -> 90bba30b645
 
 The only scientific protocol-semantic change is the B6 seed-robustness closure for an empty seed-specific eligible control frontier, plus the directly required invalid-implementation rule for a required killer family with zero sampled operating points. Accompanying edits propagate protocol revision/state and remove non-authoritative duplicate prose. They do not change the backbone, candidate pool, `K_x`, `q^(0)`, `T=2`, budgets, objective, LR grid, `eta` grid, `gamma`, learned seeds, Greedy algorithm, Independent architecture, fixed-lambda family, bootstrap, `delta_U`, `delta_R`, aggregate PASS criteria, kill criteria, or quarantine.
 
-## B1 — Residual scientific identity
+## B1: Residual scientific identity
 
 `PASS`.
 
@@ -39,31 +39,31 @@ $$
 
 Independent retains the same explicit `+s_i` anchor. The admitted scientific object remains residual-budget marginal-DDI fixed-cardinality set refinement rather than replacement utility learning.
 
-## B2 — MoleRec representation
+## B2: MoleRec representation
 
 `PASS`.
 
 The exact patient/visit-conditioned MoleRec `molecule_embeddings[i]` extraction point immediately before `score_extractor` is unchanged. BudgetSet and Independent still receive the same frozen `s_i(x)` and `e_i(x)` from the same no-gradient pinned MoleRec forward pass.
 
-## B3 — Gate01-Dev / Gate01-Audit split
+## B3: Gate01-Dev / Gate01-Audit split
 
 `PASS`.
 
 The deterministic patient-only SHA-256 membership formula, namespace, serialization, byte interpretation, and `u < 0.5` / `u >= 0.5` boundary are unchanged. No selection or outcome quantity enters membership.
 
-## B4 — Low-cardinality execution
+## B4: Low-cardinality execution
 
 `PASS`.
 
 The `K_x=0` and `K_x=1` Greedy branches and protocol-wide zero pair-risk semantics for `K_x<2` are unchanged.
 
-## B5 — Checkpoint, patience, and configuration selection
+## B5: Checkpoint, patience, and configuration selection
 
 `PASS`.
 
 The per-seed checkpoint key, local patience semantics, retained-checkpoint rule, three-seed configuration aggregation, and deterministic LR/`eta` tie-break remain unchanged. Gate01-Audit still cannot select epoch, seed, checkpoint, configuration, or hyperparameter.
 
-## B6 — Aggregation, frontier, bootstrap, and seed semantics
+## B6: Aggregation, frontier, bootstrap, and seed semantics
 
 `PASS`.
 
@@ -202,7 +202,7 @@ BudgetSet vs Independent at b_M
 
 Otherwise `KILL_SEED_FRAGILITY` triggers under the already-frozen precedence.
 
-## B7 — Terminal precedence
+## B7: Terminal precedence
 
 `PASS`.
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Research-Space Reorientation — Architecture-First Open Search
+# Research-space reorientation: architecture-first open search
 
 This document is a directional synthesis, not a novelty gate or authorization checklist. Current numerical/state authority lives in [`current-research-state.md`](current-research-state.md).
 
@@ -41,7 +41,7 @@ The following are poor default bets **when repeated with the same scientific rol
 
 The search space remains broad. A next method may use entirely new or familiar primitives if their composition changes capability, information flow, inductive bias, credit assignment, or decision process.
 
-Examples of high-leverage search axes:
+Examples of high-impact search axes:
 
 - model the patient–medication decision at a different granularity;
 - let different candidate decisions acquire different clinical evidence;

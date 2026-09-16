@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: Safety-Preserving Substitution Structure (Semantic Admission: ATC structure not therapeutically admissible)
+# Failure record: safety-preserving substitution structure (semantic admission, ATC structure not therapeutically admissible)
 
 Source boundary: `medrec-research` Idea `005-safety-substitution-structure`, Gate `semantic-admission` based on frozen Gate 01 run `gate-01-output-structure-signature-20260904-155810`. The independent integrity audit concluded `INTEGRITY_PASS`; the authoritative research decision is `STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE` / `TERMINATE_IDEA_005`.
 

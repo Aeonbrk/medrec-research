@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Semantic Admission Design Integrity Audit
+# Semantic admission design integrity audit
 
 - **Idea**: `005-safety-substitution-structure`
 - **Artifact**: `experiments/semantic-admission-protocol.md`
@@ -56,7 +56,7 @@ No semantic source can change candidate selection.
 
 The supported-relation threshold of at least 10 distinct Audit patients prevents the semantic workload from being dominated by one-off relations.
 
-The first decision condition additionally requires supported relations to cover at least 50% of calibrated-signature patients across at least 3 ATC-2 parents. If the empirical structure is too diffuse for reproducible semantic characterization, the route stops before expensive curation.
+The first decision condition also requires supported relations to cover at least 50% of calibrated-signature patients across at least 3 ATC-2 parents. If the empirical structure is too diffuse for reproducible semantic characterization, the route stops before expensive curation.
 
 ## 7. Semantic materiality
 

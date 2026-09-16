@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Memory: Medication Practice-Shift S0 — No Material Forward Degradation
+# Failure memory. Medication practice-shift S0: no material forward degradation
 
 ## Verdict
 

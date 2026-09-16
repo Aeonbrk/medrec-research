@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Grounding — Medication-Transition Practice Shift
+# Idea grounding: medication-transition practice shift
 
 ## Current verdict
 
@@ -20,7 +20,7 @@ That phenomenon is already plausible and narrow temporal/external validation evi
 
 The question that could support a method is:
 
-> **Does a medication recommender face residual forward conditional shift after the strongest trivial explanation — changed medication marginal frequencies — is given a fair opportunity to adapt?**
+> **Does a medication recommender face residual forward conditional shift after the strongest trivial explanation, changed medication marginal frequencies, is given a fair opportunity to adapt?**
 
 ## Why this is independent of Idea 006
 
@@ -82,7 +82,7 @@ The temporal gate must not use DDI/eMAR active-exposure information as a scienti
 
 ## Required local evidence before Idea creation
 
-One bounded gate, `S0 — Medication Practice-Shift Admission`, must establish all of the following:
+One bounded gate, `S0, Medication Practice-Shift Admission`, must establish all of the following:
 
 1. source-era and target-era cohorts are large enough under a conservative MIMIC-IV temporal assignment;
 2. a source-trained model suffers a material forward Recall@5 degradation;

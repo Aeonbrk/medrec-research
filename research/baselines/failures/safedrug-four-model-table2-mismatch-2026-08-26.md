@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: SafeDrug Four-Model Reproduction Table 2 Mismatch
+# Failure Record: SafeDrug Four-Model reproduction table 2 mismatch
 
 - **Attempt ID**: `formal-20260826-025500`
 - **Date**: 2026-08-26
@@ -13,7 +13,7 @@
 
 ---
 
-## 1. Terminal Outcome
+## 1. Terminal outcome
 
 The full four-model reproduction attempt `formal-20260826-025500` executed end-to-end (all 4 models completed 50 epochs of training on dedicated GPUs, followed by 10-round upstream test evaluation).
 
@@ -26,7 +26,7 @@ Under the fail-closed reproduction protocol, validating directional relationship
 
 ---
 
-## 2. Table 2 Discrepancies Breakdown
+## 2. Table 2 discrepancies breakdown
 
 | Model | Metric | Published Target | Published $2\sigma$ Interval | Observed Reproduction | Discrepancy | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -43,7 +43,7 @@ The remaining 12 cells passed within target intervals (GAMENet DDI, Jaccard, F1,
 
 ---
 
-## 3. Metric Reporting Correction: Percentage Points vs. Relative
+## 3. Metric reporting Correction: Percentage points vs. Relative
 
 In comparative summaries, changes in Jaccard and F1 are percentage-point shifts, not relative percentage changes:
 
@@ -53,7 +53,7 @@ In comparative summaries, changes in Jaccard and F1 are percentage-point shifts,
 
 ---
 
-## 4. Non-Revival & Admissibility Boundaries
+## 4. Non-Revival & admissibility boundaries
 
 1. **Immutable Historical Pilot**: Attempt `formal-20260826-025500` is closed and immutable. No parameter tuning, seed sweeping, or checkpoint substitution is permitted.
 2. **Inadmissibility as Successor Evidence**: The checkpoints, logs, and metrics from this pilot cannot serve as evidence for the five-model MoleRec Table 1 reproduction plan (`docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md`).

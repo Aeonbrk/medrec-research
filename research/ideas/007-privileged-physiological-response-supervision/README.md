@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 007: Privileged Physiological Response Supervision
+# Idea 007: Privileged physiological response supervision
 
 - **Idea ID**: `007-privileged-physiological-response-supervision`
 - **Status**: `TERMINATED_AT_GATE_01_P1`
@@ -61,7 +61,7 @@ The complete protocol is in
 [`experiments/gate-01-protocol.md`](experiments/gate-01-protocol.md). Its frozen
 contracts are summarized here:
 
-1. **R1 — Medication-specificity subtraction.** Generic Future-State Auxiliary /
+1. **R1: Medication-specificity subtraction.** Generic Future-State Auxiliary /
    Medication-Ablated Future uses the same recommendation examples, administered
    positive support, administration anchor, future window, future-value/mask
    availability, deployable student, latent dimension, identical teacher shell and
@@ -69,12 +69,12 @@ contracts are summarized here:
    Proposed. It removes focal medication identity and medication-specific response
    construction only from the privileged target branch. A comparable result stops
    with `STOP_NO_MEDICATION_SPECIFIC_RESPONSE_VALUE`.
-2. **R2 — Monitoring-policy separation.** Monitoring-Mask-Only receives the same
+2. **R2: Monitoring-policy separation.** Monitoring-Mask-Only receives the same
    response support, future window, measurement availability/frequency pattern,
    student, capacity, loss, optimizer, and updates, but no physiological values or
    value-derived summary. A comparable result stops with
    `STOP_MONITORING_POLICY_SUFFICIENCY`.
-3. **R3 — Equal support and deployment entitlement.**
+3. **R3: Equal support and deployment entitlement.**
    `A(e)=1` only for an actually administered positive focal-medication event with
    a valid linked future window. All privileged variants share the same `E_rec` and
    `A`; student recommendation loss covers full `E_rec`, while teacher
@@ -113,7 +113,7 @@ advantage is at least `0.005` and the paired 95% bootstrap lower bound is strict
 positive. `C ≈ Proposed` is defined mechanically when the paired 95% upper bound
 for Proposed's advantage is at most `0.005`; that result terminates the
 response-specific mechanism. A statistically inconclusive interval also stops
-admission and cannot trigger rescue. Proposed must additionally be non-inferior to
+admission and cannot trigger rescue. Proposed must also be non-inferior to
 Strict Pre-Order Base with lower bound above `-0.005`.
 
 No rescue is allowed with a larger teacher, Transformer-to-Mamba/GNN replacement,

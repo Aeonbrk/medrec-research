@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Audit — Co-Selection Compatibility
+# Gate 01 design integrity audit: co-selection compatibility
 
 - **Mode**: `ccf-integrity-auditor / claim-audit`
 - **Artifact audited**: `gate-01-co-selection-compatibility.md`

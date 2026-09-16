@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# M0 — Event-Sourced Regimen-Edit Admission Protocol
+# M0: event-sourced regimen-edit admission protocol
 
 ## 1. Gate identity
 
@@ -36,7 +36,7 @@ If the fixed structured decoder fails, no deeper Transformer, Mamba, GNN, point-
 
 ## 4. Data boundary
 
-### 4.1 Source
+### 4.1 source
 
 Use raw MIMIC-IV `3.1` provider-order data and the existing leakage-safe medication normalization/linkage infrastructure.
 
@@ -49,7 +49,7 @@ Required source fields include at least:
 - `transaction_type`;
 - medication linkage fields needed to map orders to the frozen 131-concept vocabulary.
 
-### 4.2 Temporal admissibility
+### 4.2 temporal admissibility
 
 Retain only decision events satisfying:
 
@@ -63,14 +63,14 @@ M0 may use only the already admitted chronological environments:
 
 M0 must not inspect G3/G4 (`2017 - 2022`) in any form, including aggregate counts, label frequencies, event distributions, features, predictions, or metrics.
 
-### 4.3 Additional quarantines
+### 4.3 additional quarantines
 
 M0 must not inspect:
 
 - R0 Holdout;
 - the historical project test split.
 
-### 4.4 Patient split
+### 4.4 patient split
 
 Within the admitted G0/G1/G2 patient universe, assign patients deterministically using the frozen subject-only salt:
 
@@ -100,7 +100,7 @@ The mark vocabulary therefore contains exactly `3 x 131 = 393` marks.
 
 Do not reinterpret the raw transaction labels as therapeutic intent. They are provider-order workflow actions.
 
-## 6. Phase A — semantic/support admission
+## 6. Phase A: semantic/support admission
 
 Phase A runs before any model training. If any required condition fails, stop immediately and return `FAIL_M0_NO_INCREMENTAL_EVENT_EDIT_STRUCTURE` without training Phase B.
 
@@ -169,7 +169,7 @@ No architecture grid is allowed.
 
 This tests whether simply preserving the action label is already sufficient.
 
-### 8.2 SeparateHeads + DirectStateMask — strongest simple control
+### 8.2 SeparateHeads + DirectStateMask: strongest simple control
 
 This is the mandatory killer control.
 
@@ -186,7 +186,7 @@ The mask is:
 
 Do not use DDI, drug interactions, diagnosis rules, external knowledge, or post-order events in the mask.
 
-### 8.3 StateEditProbe — fixed structured mechanism probe
+### 8.3 StateEditProbe: fixed structured mechanism probe
 
 `StateEditProbe` uses the same common encoder and the same deterministic state mask as the strongest control.
 
@@ -245,7 +245,7 @@ After this freeze, `EditAudit` may be accessed exactly once for the final M0 eva
 
 ## 11. Metrics
 
-### 11.1 Primary metric
+### 11.1 primary metric
 
 For each action `a`, compute `ActionRecall@5_a` on audit bursts containing at least one true mark of action `a`. Rank only marks belonging to that action after applying the variant's frozen decoding rule.
 
@@ -255,7 +255,7 @@ Define:
 
 This is the primary metric.
 
-### 11.2 Secondary metrics
+### 11.2 secondary metrics
 
 Report:
 

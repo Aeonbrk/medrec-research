@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Pre-M0 Closest-Work Check: Event-Sourced Regimen Editing
+# Pre-M0 closest-work check: event-sourced regimen editing
 
 ## Search date
 
@@ -16,9 +16,9 @@ Question searched:
 
 ## Closest retained work
 
-### Rough et al. 2020 — order-time medication identity
+### Rough et al. 2020: order-time medication identity
 
-Source: https://doi.org/10.1002/cpt.1826
+Source: <https://doi.org/10.1002/cpt.1826>
 
 Already covers:
 
@@ -29,9 +29,9 @@ Already covers:
 
 Does not appear to make explicit CPOE action type (`New / Change / D/C`) and state-valid regimen editing the supervised decision object.
 
-### MICRON 2021 — visit-level medication change
+### MICRON 2021: visit-level medication change
 
-Source: https://doi.org/10.24963/ijcai.2021/513
+Source: <https://doi.org/10.24963/ijcai.2021/513>
 
 Already covers medication addition/removal prediction from changes between consecutive visits.
 
@@ -39,17 +39,17 @@ Therefore addition/removal or "change matters" is not a novelty claim.
 
 The distinction retained for M0 is raw within-admission provider-order transaction marks and strictly causal event-sourced regimen state rather than visit-snapshot differencing.
 
-### ARMR 2025 — new versus historical medication at visit level
+### ARMR 2025: new versus historical medication at visit level
 
-Source: https://doi.org/10.24963/ijcai.2025/871
+Source: <https://doi.org/10.24963/ijcai.2025/871>
 
 Already covers adaptive weighting between new medication needs and historical medication reuse.
 
 Therefore new-versus-existing medication handling is not itself a novelty claim.
 
-### HeteroMed 2026 — expansion/inheritance
+### HeteroMed 2026: expansion/inheritance
 
-Source: https://doi.org/10.1007/s13755-026-00430-5
+Source: <https://doi.org/10.1007/s13755-026-00430-5>
 
 Already covers visit-level collaborative drug expansion/inheritance and medication increases/decreases.
 
@@ -61,8 +61,8 @@ Continuous-time decision models and marked temporal point-process methods alread
 
 Examples:
 
-- Continuous-Time Decision Transformer for Healthcare Applications: https://pmc.ncbi.nlm.nih.gov/articles/PMC10907982/
-- HoTPP benchmark, Neurocomputing 2026: https://doi.org/10.1016/j.neucom.2026.132771
+- Continuous-Time Decision Transformer for Healthcare Applications: <https://pmc.ncbi.nlm.nih.gov/articles/PMC10907982/>
+- HoTPP benchmark, Neurocomputing 2026: <https://doi.org/10.1016/j.neucom.2026.132771>
 
 Therefore "use a marked temporal point process" or "model continuous time" cannot be the novelty claim of a future Idea.
 

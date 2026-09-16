@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Grounding — Exposure-Conditional Medication Recommendation
+# Idea grounding: exposure-conditional medication recommendation
 
 ## Status
 
@@ -43,19 +43,19 @@ At first access, create a deterministic patient-level Discovery/Dev/Holdout part
 
 ## Optimizer candidate family
 
-### Candidate A — Static visit-set DDI reweighting
+### Candidate A: Static visit-set DDI reweighting
 
 Operation: `refine`.
 
 Rejected. It remains inside the already crowded SafeDrug/KATMed/HeteroMed family and does not use the new resource.
 
-### Candidate B — Predict medication plus administration time
+### Candidate B: Predict medication plus administration time
 
 Operation: `combine`.
 
 Rejected. Actual administration time is heavily influenced by workflow and is not a defensible normative safety target.
 
-### Candidate C — Exposure-conditioned next-order recommendation
+### Candidate C: Exposure-conditioned next-order recommendation
 
 Operation: `combine`.
 
@@ -71,7 +71,7 @@ At each provider medication-order decision point $t$:
 
 The future administration record is never an inference input. eMAR only contributes past execution evidence when defining the current active regimen.
 
-### Candidate D — Learned DDI applicability classifier
+### Candidate D: Learned DDI applicability classifier
 
 Operation: `transfer`.
 

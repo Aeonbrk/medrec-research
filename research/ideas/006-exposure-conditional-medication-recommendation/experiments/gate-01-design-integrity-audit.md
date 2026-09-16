@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Design Integrity Audit — Idea 006
+# Gate 01 design integrity audit: Idea 006
 
 ## Audit status
 

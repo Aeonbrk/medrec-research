@@ -14,11 +14,11 @@ This is the compact authoritative record for the completed 2026-09-14--2026-09-1
 | Surface | Role / state | Jaccard | F1 | PRAUC | DDI | AvgMed |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | MoleRec | Canonical anchor | 0.529174 | 0.683480 | 0.773576 | 0.072223 | 21.5451 |
-| GraphRefine-SameK | Canonical anchor; empirical Train/Dev ceiling among executed admissible surfaces | 0.533650 | 0.687394 | 0.784240 | 0.073328 | — |
+| GraphRefine-SameK | Canonical anchor; empirical Train/Dev ceiling among executed admissible surfaces | 0.533650 | 0.687394 | 0.784240 | 0.073328 | - |
 | HypeMed-LeakageSafe, epoch 75 | Canonical HypeMed comparison surface; `HYPEMED_CANONICAL_WEAK` | 0.512112 | 0.668091 | 0.753822 | 0.059404 | 23.6549 |
 | HypeMed-OfficialSemantics, epoch 75 | Faithful sensitivity/reference run; not the canonical comparison surface | 0.514256 | 0.670078 | 0.755615 | 0.059559 | 23.5770 |
 | Rx-Expert coarse | Trustworthy recent architecture-family reference; `RXEXPERT_MINOR_EXECUTION_PATCHES_ONLY`; `STOP_RXEXPERT_BACKBONE_RESET` | 0.510522 | 0.666965 | 0.757858 | 0.077303 | 22.4268 |
-| DMGExNet | No canonical metric; `DMGEXNET_INFORMATION_BUDGET_MISMATCH` | — | — | — | — | — |
+| DMGExNet | No canonical metric; `DMGEXNET_INFORMATION_BUDGET_MISMATCH` | - | - | - | - | - |
 
 The earlier HypeMed-inspired adapter's `Jaccard 0.431689` is `SUPERSEDED_NON_FAITHFUL_HYPEMED_ADAPTER`. It is historical diagnostic output only and is not canonical HypeMed performance. The faithful HypeMed terminal interpretation is `HYPEMED_PREVIOUS_ADAPTER_INVALIDATED` plus `HYPEMED_CANONICAL_WEAK`; leakage-safe HypeMed is the comparison row above.
 

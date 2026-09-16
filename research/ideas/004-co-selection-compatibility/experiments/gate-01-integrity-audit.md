@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Integrity Audit Report — Co-Selection Compatibility
+# Gate 01 integrity audit Report: Co-Selection compatibility
 
 - **Idea**: `004-co-selection-compatibility`
 - **Gate**: `gate-01-co-selection-compatibility`
@@ -12,7 +12,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full
@@ -41,7 +41,7 @@ P6 research decision unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-Evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -50,7 +50,7 @@ P6 research decision unlocked: yes
 | `gate-01-summary.json` | Residual Oracle headroom survives: Oracle achieves 100.0% yield, beating `StrongControl` by $+38.43\%$ (10% budget, 95% CI: [+33.87%, +42.93%]) and $+40.46\%$ (20% budget, 95% CI: [+37.18%, +43.61%]). | Empirically verified: Gate B passes unconditionally with substantial headroom. | **Supported** | None. |
 | `gate-01-summary.json` | `CoSelectionAugmented` achieves 62.34% (10% budget) and 59.60% (20% budget), resulting in negligible point gaps vs `StrongControl` (+0.77% at 10%, +0.06% at 20%) and bootstrap 95% CIs crossing zero ([-1.16%, +2.50%] at 10%, [-0.68%, +0.78%] at 20%). Train-only co-selection compatibility adds zero reproducible incremental signal. | Empirically verified: Gate C fails at both primary budgets. Lower 95% CI bounds are strictly $\le 0$. | **Supported** | None. |
 
-### Explicitly Disallowed Claims Check
+### Explicitly disallowed claims check
 
 The audit confirmed that none of the forbidden claims are asserted in active repository documentation:
 
@@ -62,7 +62,7 @@ The audit confirmed that none of the forbidden claims are asserted in active rep
 
 ---
 
-## 2. Frozen Identity Audit
+## 2. Frozen identity audit
 
 The formal public summary records exactly the frozen identities, verified against registry authority and execution environment:
 
@@ -85,7 +85,7 @@ The formal public summary records exactly the frozen identities, verified agains
 
 ---
 
-## 3. Candidate Corpus & Row-Level Invariant Audit
+## 3. Candidate corpus & Row-Level invariant audit
 
 Evaluated on all 15,549 rows of `gate-01-candidates.jsonl`:
 
@@ -104,7 +104,7 @@ Evaluated on all 15,549 rows of `gate-01-candidates.jsonl`:
 
 ---
 
-## 4. Cohort Partition & Split Audit
+## 4. Cohort partition & split audit
 
 The complete validation cohort was independently partitioned using standard library `random.Random(2004)` over $0 \dots 1058$ ($N=1059$):
 
@@ -121,11 +121,11 @@ The complete validation cohort was independently partitioned using standard libr
 
 ---
 
-## 5. Selector Fitting & Numerical Verification
+## 5. Selector fitting & numerical verification
 
 Dev linear probability models fit strictly on Dev candidates ($N=7,762$) with ridge penalty $10^{-6}$:
 
-### StrongControl Coefficients
+### StrongControl coefficients
 
 | Variable | Recorded (`gate-01-summary.json`) | Independently Recomputed | Diff | Status |
 | :--- | :---: | :---: | :---: | :---: |
@@ -138,7 +138,7 @@ Dev linear probability models fit strictly on Dev candidates ($N=7,762$) with ri
 | $u \cdot f$ | 0.138797882131 | 0.138797882131 | 0.0 | Exact match |
 | $u \cdot g$ | -0.881076421822 | -0.881076421822 | 0.0 | Exact match |
 
-### CoSelectionAugmented Coefficients
+### CoSelectionAugmented coefficients
 
 | Variable | Recorded (`gate-01-summary.json`) | Independently Recomputed | Diff | Status |
 | :--- | :---: | :---: | :---: | :---: |
@@ -154,7 +154,7 @@ Dev linear probability models fit strictly on Dev candidates ($N=7,762$) with ri
 
 ---
 
-## 6. Policy Yields & Gaps Verification
+## 6. Policy yields & gaps verification
 
 Evaluated on 7,787 Audit candidates:
 
@@ -171,7 +171,7 @@ Evaluated on 7,787 Audit candidates:
 
 ---
 
-## 7. Bootstrap Resampling & CI Verification
+## 7. Bootstrap resampling & CI verification
 
 1,000 patient-clustered bootstrap replicates with seed `1204`:
 
@@ -189,7 +189,7 @@ Evaluated on 7,787 Audit candidates:
 
 ---
 
-## 8. Preregistered Decision Tree Execution
+## 8. Preregistered decision tree execution
 
 ```text
 [Gate A: Audit Support]
@@ -214,7 +214,7 @@ Evaluated on 7,787 Audit candidates:
 
 ---
 
-## 9. Conclusion & Handoff
+## 9. Conclusion & handoff
 
 The audit confirms:
 

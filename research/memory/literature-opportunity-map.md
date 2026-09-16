@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Literature Opportunity Map — Historical Search Record
+# Literature opportunity map: historical search record
 
 This file preserves conclusions from the 2026-09-09 to 2026-09-11 literature/search phase. It is **not** the current routing authority and is **not** a novelty gate. See [`current-research-state.md`](current-research-state.md) and [`research-space-reorientation.md`](research-space-reorientation.md) for the current state.
 

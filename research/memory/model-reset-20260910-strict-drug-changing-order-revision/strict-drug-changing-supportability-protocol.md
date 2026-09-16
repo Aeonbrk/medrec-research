@@ -1,4 +1,4 @@
-# Strict Drug-Changing Supportability Protocol
+# Strict drug-changing supportability protocol
 
 This packet executes the already admitted strict drug-changing order-revision
 object. It is a bounded pre-Idea supportability check, not a model experiment.

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 008: BudgetSet — Residual-Budget Marginal-DDI Fixed-Cardinality Set Refinement
+# Idea 008. BudgetSet: residual-budget marginal-DDI fixed-cardinality set refinement
 
 - **Idea ID**: `008-budgetset-residual-budget-marginal-ddi-set-refinement`
 - **Status**: `TERMINATED_AT_GATE_01`
@@ -72,7 +72,7 @@ The repository-owned `extract_gate01_molerec_features(...)` path passes no posit
 
 Independent re-verification found the correction bounded to the actual invocation defect and its tests, with no scientific change.
 
-## Fresh Audit boundary
+## Fresh audit boundary
 
 The failed first attempt contributes zero scientific evidence and must not be resumed or pooled. The fresh attempt starts from the beginning of Gate01-Audit and must use `extract_gate01_molerec_features(...)` for every pinned MoleRec visit extraction.
 
@@ -80,7 +80,7 @@ Only protocol-v1.2 terminal evaluation is authorized: frozen controls and learne
 
 No retraining, reselection, protocol change, new control, solver expansion, or post-hoc rescue is authorized.
 
-## Fresh Audit result
+## Fresh audit result
 
 The completed fresh Audit covered 1,113 patients and 2,413 visits, evaluated the frozen controls and retained checkpoints at all three budgets, and ran 1,000 patient-clustered bootstrap replicates with seed 80081. Public-safe aggregate metrics, frontier comparisons, compliance/response quantities, matched-seed counts, and the single runner-produced classification are recorded in [`experiments/gate-01-audit-result.json`](experiments/gate-01-audit-result.json). The classification is `KILL_TARGET_SEMANTICS` and is the terminal Gate 01 result.
 

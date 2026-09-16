@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Pre-Idea Constraint — Privileged Response Specificity Requires Matched Subtraction
+# Pre-idea constraint: privileged response specificity requires matched subtraction
 
 ## Status
 

@@ -4,7 +4,7 @@
 
 ## Stage boundary
 
-`STAGE -1E — MIMIC-IV VISIT-LEVEL MEDREC BENCHMARK MATERIALIZATION`
+`STAGE -1E, MIMIC-IV VISIT-LEVEL MEDREC BENCHMARK MATERIALIZATION`
 
 This is a protocol-freezing and Train/Dev materialization record. It is **PRE-IDEA**,
 **PRE-GATE**, **NO PAPER CLAIM**, **NO HOLDOUT TEST**, and **NO NEW METHOD

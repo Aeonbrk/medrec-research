@@ -1,12 +1,12 @@
 <!-- markdownlint-disable MD013 -->
 
-# Search Notes — Safety Substitution and Output Structure
+# Search Notes: Safety substitution and output structure
 
 ## Search objective
 
 Resolve whether the proposed direction is merely a restatement of medication-label dependency, hierarchy-aware recommendation, diagnosis-specific recommendation, or generic safety regularization.
 
-## Search conclusions used for Gate 01
+## Search conclusions used for gate 01
 
 1. Dependency-aware medication generation is old enough that no novelty can rest on replacing independent labels with a structured decoder. LEAP is a direct anchor.
 2. Medication grouping / collective abstraction is also occupied; MSAM is a current close work.

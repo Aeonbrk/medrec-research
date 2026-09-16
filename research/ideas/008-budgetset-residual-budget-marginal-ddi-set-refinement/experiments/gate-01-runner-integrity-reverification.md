@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Runner Integrity Re-verification — Idea 008
+# Gate 01 runner integrity reverification: Idea 008
 
 ## Verification status
 
@@ -30,7 +30,7 @@ The corrected runner preserves the previously verified BudgetSet/Independent equ
 
 No scientific-identity regression was found.
 
-## R1 — Device execution path
+## R1: Device execution path
 
 `PASS`.
 
@@ -50,7 +50,7 @@ The targeted suite includes CPU/list placement, frozen-feature detach behavior, 
 
 The prior CPU/CUDA mismatch path is closed.
 
-## R2 — Learned selection closure
+## R2: Learned selection closure
 
 `PASS`.
 

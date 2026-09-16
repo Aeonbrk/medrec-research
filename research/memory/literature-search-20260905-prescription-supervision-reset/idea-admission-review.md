@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Pre-Idea Admission Review — Selective Prescription Supervision
+# Pre-idea admission review: selective prescription supervision
 
 ## Verdict
 
@@ -105,7 +105,7 @@ $$
 \frac{354}{100}=3.54/5.
 $$
 
-## Why no Idea 006 is created
+## Why no idea 006 is created
 
 The project's current policy is to create a new Idea only when a research hypothesis deserves a bounded unit of research time toward a method paper. Here, the next decisive missing input is not another model experiment on the same labels; it is an admissible supervision/evaluation source or an observation model that makes the latent target identifiable.
 

@@ -1,10 +1,10 @@
-# Historical: SafeDrug Archived Four-Model Reproduction Preparation
+# Historical: SafeDrug archived four-model reproduction preparation
 
 > **Do not execute this playbook.** It is retained as the historical preparation record for the terminated four-model attempt. The current authoritative procedure is [MoleRec Table 1 Five-Model Reproduction Playbook](MOLEREC_TABLE1_EXECUTION_PLAYBOOK.md).
 
 The preparation described below terminated at the B0 data gate because the frozen preprocessing produced 15,032 executable visits while the paper metadata reported 14,995. Its environment, snapshot, smoke, and formal instructions are not admission criteria for the current seven-lane MoleRec Table 1 attempt.
 
-## Scope and Invariants
+## Scope and invariants
 
 1. **Reproduction Mode Only**: Comparison Mode, Prediction Adapters, and comparison qualifications remain out of scope for this phase.
 2. **Scientific Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` is the sole scientific authority for code, cohort, vocabularies, loss weights, learning rates, checkpoint selection rules, and test evaluation. Upstream `master`/`main` is an engineering reference only.
@@ -16,9 +16,9 @@ The preparation described below terminated at the B0 data gate because the froze
 6. **Hard Preparation Stop**: Execution terminates at `aggregate_state=awaiting_human_go_no_go` with `formal_training_authorized: false` in `runtime/reproduction-prep/<prep-id>/go-no-go.json`. Formal 50-epoch training and ten-round testing are strictly prohibited without human authorization.
 7. **Historical Execution Record**: Attempt `formal-20260826-025500` completed full 50-epoch training and 10-round evaluation for all four models, achieving 12/20 point intervals and 3/3 directional relationships (terminal verdict `completed_mismatch`). In comparative reporting, metric differences are percentage-point changes (+1.312 points for Jaccard, +1.328 points for F1), not relative percentages. This historical attempt remains immutable and is succeeded by the MoleRec five-model reproduction plan.
 
-## Operator Sequence
+## Operator sequence
 
-### Step 1: Local Verification and Revision Pinning
+### Step 1: Local verification and revision pinning
 
 Run local test suite and quality gates:
 
@@ -31,7 +31,7 @@ markdownlint '**/*.md' --ignore '.agents/**'
 
 Commit changes to establish an immutable local Git revision `HEAD`.
 
-### Step 2: Converge Remote Code Checkouts
+### Step 2: Converge remote code checkouts
 
 1. Verify SSH connectivity and target paths on 319:
    - Remote harness root: `/root/zhb/medrec-research`
@@ -42,7 +42,7 @@ Commit changes to establish an immutable local Git revision `HEAD`.
 
 3. Ensure `/root/zhb/SafeDrug` is clean and checked out at `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6`.
 
-### Step 3: Build and Prove Candidate Modern Environment
+### Step 3: Build and prove candidate modern environment
 
 1. Create candidate Conda environment `medrec-safedrug-archived` on 319 from `environments/safedrug-archived.yml`:
 
@@ -60,7 +60,7 @@ Commit changes to establish an immutable local Git revision `HEAD`.
 
    Verify module imports, CUDA tensor execution on 1 visible RTX 3090, RDKit BRICS decomposition, and DNC forward pass.
 
-### Step 4: Regenerate Staged Dataset and Validate B0 Counts
+### Step 4: Regenerate staged dataset and validate B0 counts
 
 1. Run archived preprocessing into a staging directory: `/root/zhb/medrec-data/snapshots/staging-safedrug-archived-ijcai21`.
 
@@ -79,7 +79,7 @@ Commit changes to establish an immutable local Git revision `HEAD`.
    - DDI pairs: `448`
    - Molecular substructures: `491`
 
-### Step 5: Freeze Environment Lock and Publish Integrated Pair
+### Step 5: Freeze environment lock and publish integrated pair
 
 1. Export explicit Linux Conda lock on 319:
 
@@ -107,7 +107,7 @@ Commit changes to establish an immutable local Git revision `HEAD`.
 5. Atomically rename staging directory to final target:
    `/root/zhb/medrec-data/snapshots/safedrug-archived-ijcai21`.
 
-### Step 6: Execute Four Independent One-Epoch Smokes
+### Step 6: execute four independent one-epoch smokes
 
 1. Identify four idle GPUs (e.g. `0,1,2,3`) via `nvidia-smi`.
 
@@ -124,7 +124,7 @@ Commit changes to establish an immutable local Git revision `HEAD`.
    - `smoke.json`: `non_evidence: true`, `epochs_requested: 1`, `epochs_observed: 1`, `best_epoch: 0`, valid epoch-0 checkpoint
    - Confirm absence of `test.log` and `result.json`.
 
-### Step 7: Assemble Review Packet and Terminate
+### Step 7: Assemble review packet and terminate
 
 Write public-safe `runtime/reproduction-prep/<prep-id>/go-no-go.json` containing:
 

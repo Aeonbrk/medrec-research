@@ -1,6 +1,6 @@
 # Plans
 
-## Completed: Pre-Idea — Pair/Context Incremental Value (Terminated)
+## Completed. Pre-idea: pair/context incremental value (Terminated)
 
 - **Stage**: `PRE_IDEA_AFTER_PAIR_CONTEXT_INCREMENTAL_VALUE_TERMINATION`.
 - **Scientific object**: the already admitted directional strict drug-changing order-revision trace; no clinical-correctness or superiority semantics.
@@ -17,7 +17,7 @@
 - **Current owner**: `ccf-pipeline-orchestrator` after bounded execution termination.
 - **Public-safe results**: `research/memory/model-reset-20260910-strict-drug-changing-order-revision/pair-context-incremental-value-summary.json` and `pair-context-incremental-value-decision.md`.
 
-## Completed: Idea 007 — Gate 01 P1 Support Termination and Closure
+## Completed. Idea 007: Gate 01 P1 support termination and closure
 
 - **Admission**: `ACCEPT_TO_CREATE_IDEA_007`; Idea 007 was created/admitted and is now formally closed.
 - **Protocol**: `research/ideas/007-privileged-physiological-response-supervision/experiments/gate-01-protocol.md`.
@@ -29,7 +29,7 @@
 - **Project state**: active Idea none; Idea 008 not created or pre-allocated; quarantine intact.
 - **Next owner**: `ccf-idea-optimizer / exploratory` for materially different method-paper direction scouting.
 
-## Completed: Semantic Admission — Safety-Preserving Substitution Structure (Idea 005)
+## Completed. Semantic admission: safety-preserving substitution structure (Idea 005)
 
 - **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-protocol.md`.
 - **Status**: Completed and Terminated; formal verdict `STOP_ATC_STRUCTURE_NOT_THERAPEUTICALLY_ADMISSIBLE`.
@@ -45,7 +45,7 @@
 - **Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/semantic-admission-summary.json`.
 - **Next Stage**: next CCFA sequence for exploratory direction scouting.
 
-## Completed: Gate 01 — Output-Structure Signature (Idea 005)
+## Completed. Gate 01: output-structure signature (Idea 005)
 
 - **Protocol**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-output-structure-signature.md`.
 - **Status**: Completed; formal verdict `PASS_OUTPUT_STRUCTURE_SIGNATURE_BEYOND_PER_DRUG_CALIBRATION`.
@@ -60,7 +60,7 @@
 - **Public Summary**: `research/ideas/005-safety-substitution-structure/experiments/gate-01-summary.json`.
 - **Next Stage**: Semantic admission protocol design only (not executed in this session).
 
-## Completed: Gate 01 — Co-Selection Compatibility (Idea 004)
+## Completed. Gate 01: co-selection compatibility (Idea 004)
 
 - **Protocol**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-co-selection-compatibility.md`.
 - **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_CO_SELECTION_COMPATIBILITY`.
@@ -76,7 +76,7 @@
 - **Public Summary**: `research/ideas/004-co-selection-compatibility/experiments/gate-01-summary.json`.
 - **Next Stage**: next CCFA sequence for exploratory direction scouting.
 
-## Completed: Gate 01 — Prescription-Relative Confidence (Idea 003)
+## Completed. Gate 01: prescription-relative confidence (Idea 003)
 
 - **Protocol**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-prescription-relative-confidence.md`.
 - **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_PRESCRIPTION_RELATIVE_CONFIDENCE`.
@@ -92,7 +92,7 @@
 - **Public Summary**: `research/ideas/003-prescription-relative-confidence/experiments/gate-01-summary.json`.
 - **Next Stage**: superseded by selected Idea 004 co-selection compatibility and its frozen validation-only Gate 01 design.
 
-## Completed: Gate 01 — Score-Geometry Sufficiency (Idea 002)
+## Completed. Gate 01: score-geometry sufficiency (Idea 002)
 
 - **Protocol**: `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-score-geometry-sufficiency.md`.
 - **Status**: Completed and Terminated; formal verdict `STOP_NO_INCREMENTAL_SCORE_GEOMETRY` (Dev condition `STOP_DEV_ORDER_EQUIVALENT`).
@@ -106,7 +106,7 @@
 - **Decision Document**: `research/ideas/002-score-geometry-sufficiency/research-decision.md`.
 - **Public Summary**: `research/ideas/002-score-geometry-sufficiency/experiments/gate-01-summary.json`.
 
-## Completed: Architecture Surface Hardening and Boundary Consolidation
+## Completed: Architecture surface hardening and boundary consolidation
 
 - **Plan**: `docs/plans/2026-09-01-refactor-architecture-surface-hardening-plan.md`.
 - **Status**: Completed; units U0 through U5 implemented and verified across all 333 tests.
@@ -117,7 +117,7 @@
   - Rewrote process adapter tests and CLI integration tests without architectural drift or compatibility wrappers.
 - **Verification**: Local verification passed: 333 pytest tests passing, ruff lint and format check clean, Python 3.8 AST syntax check clean across all baseline files.
 
-## Completed: Reproduction Architecture Refactoring
+## Completed: Reproduction architecture refactoring
 
 - **Plan**: `docs/plans/2026-08-31-1849-refactor-reproduction-architecture-plan.md`.
 - **Status**: Completed; units U1 through U7 implemented and verified across all 318 tests.
@@ -130,7 +130,7 @@
   - Python 3.8 syntax compatibility verified across baseline execution files using AST parsing; this architecture refactor did not require scientific runtime execution.
 - **Verification**: Local verification passed: 318 pytest tests passing, ruff lint and format check clean, markdownlint clean, Python 3.8 AST syntax check clean on all baseline execution files.
 
-## Completed: Five-Model Baseline Readiness
+## Completed: five-model baseline readiness
 
 - **Plan**: `docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`.
 - **Phase A state**: attempt `formal-20260828-a09fcab-u8-b` completed through continuation `continuation-20260830-pathfix-1`. All five frozen upstream ten-round tests finalized legally; no training lane, recovery ID, checkpoint, threshold, or test selection changed.
@@ -142,14 +142,14 @@
 - **Reports**: `research/baselines/preflight/molerec-five-model-reproduction-report.md` and `research/baselines/preflight/five-model-baseline-readiness-report.md`.
 - **Qualification artifact**: `research/baselines/preflight/five-model-comparison-qualification.json`.
 
-## Completed: MoleRec Finalization Recovery and Conformance
+## Completed: MoleRec finalization recovery and conformance
 
 - **Status**: U1–U5 recovery and the later continuation-admission conformance are complete for formal attempt `formal-20260828-a09fcab-u8-b`: all seven source lanes retain one validated immutable recovery sibling. No lane was terminated, duplicated, retrained, or tested during recovery.
 - **Plan amendment**: `docs/plans/2026-08-28-1718-fix-molerec-finalization-recovery-plan.md` permits immutable same-attempt finalization from preserved histories and checkpoints. It does not permit retraining, test-based selection, Baseline Core changes, or source-artifact overwrite.
 - **Local conformance**: validation-only SafeDrug selection, declaration-owned probes, additive frozen-schedule continuation admission, recovered-test invocation, exact five-entry queue admission, failed-entry terminalization, and the five-pair audit barrier are synthetic-tested. These checks are not scientific evidence.
 - **Remote boundary**: The original source artifacts and seven recovery siblings remain immutable. The accepted schedule was additively rebound to clean revision `c4fc4d8408ce3119a02813525e17435a9ba102ec`; the source schedule was not overwritten. The first formal RETAIN test then failed as recorded above, closing the current attempt without a five-model result.
 
-## Completed: MoleRec Table 1 Five-Model Full Reproduction
+## Completed: MoleRec table 1 five-model full reproduction
 
 - **Status**: The original failed queue remains preserved, and the authorized continuation completed all five canonical test pairs plus the terminal audit without retraining.
 - **Plan**: `docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md` is authoritative for this work.
@@ -158,7 +158,7 @@
 - **Evidence boundary**: attempt `formal-20260826-025500` remains immutable historical SafeDrug-family evidence and is not successor evidence. The original failed RETAIN pair still contains no test metrics. Only the five finalized continuation test pairs feed the terminal audit.
 - **Outcome**: `completed_mismatch`; execution integrity and artifact completeness passed, while paper point fidelity and one directional relationship missed.
 
-## Completed: Baseline Program Architecture
+## Completed: Baseline program architecture
 
 - **Status**: completed locally on `2026-08-23`; the repository now exposes one registry-driven SafeDrug archived Reproduction Program and no empty baseline directory skeleton.
 
@@ -166,14 +166,14 @@
 - **Interface**: `medrec reproduce gamenet --gpu 0 --dry-run` plans one lane; `medrec reproduce all --gpus 0,1,2,3 --dry-run` plans four independent lanes.
 - **Boundary**: dry-run is executable now. Real submission remains blocked until the 319 dataset and environment identity pass their declared gates; the clean exact harness revision binds the program.
 
-## Completed: Active Tree Consolidation
+## Completed: Active tree consolidation
 
 - **Status**: completed on `2026-08-23`; the checked-out tree now retains only current protocol, archived-lineage identity, generic remote execution, and durable research evidence.
 - **Plan**: `docs/plans/2026-08-23-active-tree-consolidation-plan.md`.
 - **Scope**: removed SafeDrug-main runners and environments, MoleRec-only APIs, and retired HITL, Project Status, UI, review, and authority-control documentation. Git history remains the recovery layer.
 - **Boundary**: historical SafeDrug-main run summaries and scientific failure records remain; no remote environment, data, checkpoint, or run artifact was deleted.
 
-## Completed: SafeDrug Family Reproduction (SafeDrug, RETAIN, LEAP-SafeDrug) on 319
+## Completed: SafeDrug family reproduction (SafeDrug, RETAIN, LEAP-SafeDrug) on 319
 
 - **Status**: completed on `2026-08-23` as historical SafeDrug `main@88ce5c377dcdc2aa01aaa88f5478dfa4373ba49a` Reproduction Mode evidence; concurrent 3-GPU execution completed for `safedrug` (GPU 2), `retain` (GPU 3), and `leap-safedrug` (GPU 4).
 - **Historical implementation**: preserved in Git history. It repaired the shared `medrec-gamenet` environment on 319 (`971ad2bf...`), executed 50 training epochs, selected best checkpoints, ran 10 test rounds, and validated aggregate result artifacts for all three lanes.
@@ -183,7 +183,7 @@
   - `leap-safedrug`: Run `medrec-baseline-leap-safedrug-20260822-132647-545ede8a` (best epoch: 44), DDI $0.0705 \pm 0.0005$, Jaccard $0.4442 \pm 0.0030$, F1 $0.6068 \pm 0.0031$, PRAUC $0.6506 \pm 0.0035$, Avg Meds $18.9097 \pm 0.0782$.
 - **Boundary**: these runs used 15,032 visits and a 112-medication vocabulary, not the paper's 14,995 visits and 131 medications. They remain truthful historical provenance but do not participate in future baseline selection, paper reproduction, or Comparison Mode.
 
-## Blocked: Archived Four-Model Reproduction Preparation
+## Blocked: archived four-model reproduction preparation
 
 - **Status**: Codex review blocked the `2026-08-25` preparation at B0. The frozen snapshot contains 6,350 patients, 15,032 visits, and 131 medications, but the accepted SafeDrug/MoleRec paper-lineage contract requires exactly 14,995 visits. No upstream evidence supports the preparation packet's claim that the 37-visit difference is a paper typo.
 - **Plan**: `docs/plans/2026-08-25-1748-feat-archived-reproduction-preparation-plan.md`.
@@ -192,7 +192,7 @@
 - **Execution boundary**: current state is `blocked_data` with `formal_training_authorized: false`. Regenerate a 14,995-visit, 6,350-patient, 131-medication snapshot and rerun all four smokes before any 50-epoch job or upstream ten-round test.
 - **Authority**: SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` owns model behavior. The SafeDrug and MoleRec paper statistics plus MoleRec's declared SafeDrug-after-`c7218d0976e5ee5588aeaf5bdbc86b338126bba5` preprocessing lineage own the 14,995-visit B0 boundary. Data, runs, checkpoints, and weights remain untouched.
 
-## Terminated: SafeDrug Archived Four-Model Full Reproduction
+## Terminated: SafeDrug archived four-model full reproduction
 
 - **Status**: terminated on `2026-08-25` at the B0 Data Gate during attempt `formal-20260825-231500`.
 - **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
@@ -204,7 +204,7 @@
   - Under the fail-closed protocol, snapshot `snapshots/safedrug-paper-c721-ijcai21` was **not published**, the staging candidate was rejected, no formal/smoke lanes were admitted, and no retry or parameter tuning was conducted.
 - **State**: `runtime/reproduction-formal/formal-20260825-231500/state.json` is marked `terminated_b0_failure`.
 
-## Completed: SafeDrug Archived Four-Model Full Reproduction (Attempt formal-20260826-025500)
+## Completed: SafeDrug archived four-model full reproduction (Attempt formal-20260826-025500)
 
 - **Status**: completed on `2026-08-26`; executed full end-to-end Reproduction Mode for GAMENet, SafeDrug, RETAIN, and LEAP on 319 under attempt `formal-20260826-025500`.
 - **Plan**: `docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`.
@@ -218,7 +218,7 @@
   - Validated all 3/3 core publication scientific claims/relationships (SafeDrug Jaccard > GAMENet Jaccard, SafeDrug F1 > GAMENet F1, SafeDrug DDI < LEAP DDI).
   - Generated deterministic Table 2 audit packet (`completed_mismatch`, 12/20 point intervals within $2\sigma$, 3/3 relationships passed).
 
-## Completed (Superseded): SafeDrug Archived Single-Baseline Program
+## Completed (Superseded): SafeDrug archived single-baseline program
 
 - **Status**: completed and superseded; SafeDrug `archived@8deee38cfdb2a38882377ff95cce5922d6d9e8d6` was consolidated under the four-model reproduction plan (`docs/plans/2026-08-25-2140-feat-four-model-full-reproduction-plan.md`) and five-model baseline readiness plan (`docs/plans/2026-08-29-1541-feat-five-model-baseline-readiness-plan.md`).
 - **Plan**: `docs/plans/2026-08-23-archived-single-baseline-plan.md`.

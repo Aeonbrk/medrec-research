@@ -10,9 +10,9 @@ product_contract_source: ce-plan-bootstrap
 amends: docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md
 ---
 
-# MoleRec Finalization Recovery - Plan
+# MoleRec finalization recovery plan
 
-## Goal Capsule
+## Goal capsule
 
 - **Objective:** Complete the formal MoleRec five-model attempt from scientifically valid preserved training outputs when the harness finalizer cannot parse the frozen upstream log format.
 - **Means:** Add a narrow program-native history authority and immutable same-attempt administrative recovery path, then finish the remaining conformance work as bounded follow-up units (KTD1–KTD3).
@@ -23,20 +23,20 @@ amends: docs/plans/2026-08-26-1709-feat-molerec-five-model-reproduction-plan.md
 
 ---
 
-## Product Contract
+## Product contract
 
 ### Summary
 
 The frozen SafeDrug-family and MoleRec training programs print unlabeled validation metrics. The current harness requires labeled validation lines after training, so a scientifically complete lane can fail during administrative finalization. This plan permits recovery from the frozen program-native history and checkpoint artifacts without rerunning training, changing model selection, or overwriting the failed record.
 
-### Problem Frame
+### Problem frame
 
 The current failure is at the evidence adapter boundary, not in model training. If the harness treats a formatting mismatch as scientific failure, it discards valid outputs. If recovery is too permissive, it can become an unrecorded second interpretation of frozen evidence. The fix must separate scientific execution from administrative finalization and make the new interpretation explicit, narrow, immutable, and auditable.
 
-### Key Decisions
+### Key decisions
 
-- **Finalize preserved outputs without retraining.** (session-settled: user-directed — chosen over rerunning a clean attempt or abandoning the attempt: completed native histories and checkpoints preserve the one-run scientific execution.) Governs R1–R8.
-- **Recover under the same attempt with immutable sibling artifacts.** (session-settled: user-directed — chosen over a new attempt or overwriting the failed result: the scientific execution identity stays stable while finalizer provenance remains visible.) Governs R9–R13.
+- **Finalize preserved outputs without retraining.** (session-settled: user-directed, chosen over rerunning a clean attempt or abandoning the attempt: completed native histories and checkpoints preserve the one-run scientific execution.) Governs R1–R8.
+- **Recover under the same attempt with immutable sibling artifacts.** (session-settled: user-directed, chosen over a new attempt or overwriting the failed result: the scientific execution identity stays stable while finalizer provenance remains visible.) Governs R9–R13.
 
 ### Requirements
 
@@ -68,14 +68,14 @@ The current failure is at the evidence adapter boundary, not in model training. 
 - R18. Running status must expose an epoch or heartbeat update without changing scientific output or creating high-volume traces.
 - R19. Plan tracking, handoff text, and reproduction playbooks must describe the current attempt and the recovery boundary without claiming unfinished work is complete.
 
-### Acceptance Examples
+### Acceptance examples
 
 - **Recoverable finalization failure:** A 50-entry finite history selects epoch 49, its rounded metrics agree with the preserved epoch-49 checkpoint name, and the original status reports the diagnosed parser failure. Recovery writes a sibling result and provenance record; the failed original stays unchanged.
 - **Incomplete training:** A lane has 43 history entries for a 50-epoch formal run. Recovery rejects it even when a checkpoint exists.
 - **Checkpoint disagreement:** History selects epoch 31 but the only preserved checkpoint encodes epoch 28. Recovery rejects the lane instead of selecting either artifact opportunistically.
 - **No selection leakage:** Three valid recovered SafeDrug training results are compared using full-precision validation values. No test command is planned before `selection.json` validates.
 
-### Scope Boundaries
+### Scope boundaries
 
 In scope:
 
@@ -95,18 +95,18 @@ Out of scope:
 
 ---
 
-## Planning Contract
+## Planning contract
 
-### Key Technical Decisions
+### Key technical decisions
 
-- KTD1. **Use one validator for the common native history shape.** (session-settled: user-directed — chosen over retraining or abandoning preserved outputs: the native histories contain the full-precision validation sequence produced by the frozen run.) Both programs write the same seven-list mapping. SafeDrug-family history lives at `checkpoint_dir/history_<model_name>.pkl`; MoleRec history lives at `checkpoint_dir/history.pkl`. The two existing contract modules declare only that filename rule. Governs R1–R8.
-- KTD2. **Make recovery additive and same-attempt.** (session-settled: user-directed — chosen over a new attempt or in-place rewrite: additive siblings preserve both the original failure and the recovery interpretation.) Recovery writes `run_root/recoveries/<recovery_id>/` through `finalize_v2_pair`. The recovered status and result keep the original v2 identity and carry an identical additive `recovery` object; recovery provenance does not become a second scientific identity. Governs R9–R13.
+- KTD1. **Use one validator for the common native history shape.** (session-settled: user-directed, chosen over retraining or abandoning preserved outputs: the native histories contain the full-precision validation sequence produced by the frozen run.) Both programs write the same seven-list mapping. SafeDrug-family history lives at `checkpoint_dir/history_<model_name>.pkl`; MoleRec history lives at `checkpoint_dir/history.pkl`. The two existing contract modules declare only that filename rule. Governs R1–R8.
+- KTD2. **Make recovery additive and same-attempt.** (session-settled: user-directed, chosen over a new attempt or in-place rewrite: additive siblings preserve both the original failure and the recovery interpretation.) Recovery writes `run_root/recoveries/<recovery_id>/` through `finalize_v2_pair`. The recovered status and result keep the original v2 identity and carry an identical additive `recovery` object; recovery provenance does not become a second scientific identity. Governs R9–R13.
 - KTD3. **Keep normal finalization and recovery separate at the command boundary.** Normal training remains fail-closed. The explicit recovery operation accepts only the exact R9 predicate, does not expose training or test command hooks, and classifies the existing parser exception without broadening normal parsing. Governs R2, R7–R10.
 - KTD4. **Validate at the consumer boundary.** SafeDrug selection and evaluation admission reopen recovered artifacts and their provenance instead of trusting paths or in-memory values. Governs R12–R14, R17.
 - KTD5. **Prefer static declarations over executor branching.** Probe requirements, native-history authority, and schedule identity belong to existing registry/program records. This follows the repository's static-adapter design and avoids a plugin framework. Governs R7, R15–R16.
 - KTD6. **Add low-volume progress evidence only.** A bounded epoch or heartbeat update is sufficient for operators. Training logs remain the detailed trace. Governs R18.
 
-### High-Level Technical Design
+### High-level technical design
 
 ```mermaid
 stateDiagram-v2
@@ -143,11 +143,11 @@ U1–U4 are the hard local slice and run in order. U5 waits for all seven remote
 
 ---
 
-## Implementation Units
+## Implementation units
 
 | Unit | Title | Primary files | Depends on |
 | --- | --- | --- | --- |
-| U1 | Characterize native histories | `tests/unit/test_reproduction_runner.py` | — |
+| U1 | Characterize native histories | `tests/unit/test_reproduction_runner.py` | - |
 | U2 | Add history metric authority | `baselines/reproduction_history.py` | U1 |
 | U3 | Add immutable recovery finalizer | `baselines/reproduction_runner.py` | U2 |
 | U4 | Prove local recovery flow | `tests/unit/test_reproduction_artifacts.py` | U3 |
@@ -309,7 +309,7 @@ U1–U4 are the hard local slice and run in order. U5 waits for all seven remote
 
 ---
 
-## Verification Contract
+## Verification contract
 
 | Scope | Gate | Done signal |
 | --- | --- | --- |
@@ -323,7 +323,7 @@ No local synthetic result is scientific evidence. No remote command may run befo
 
 ---
 
-## Definition of Done
+## Definition of done
 
 - U1–U4 are complete when the explicit recovery path is locally verified, the original normal path still passes, the complete local gates pass, and the remote attempt remains untouched.
 - U5 is complete when every eligible source lane has one validated immutable recovery sibling and no lane was retrained.
@@ -335,7 +335,7 @@ No local synthetic result is scientific evidence. No remote command may run befo
 
 ---
 
-## Risks and Dependencies
+## Risks and dependencies
 
 - Native history is Python pickle and remains a trusted artifact produced by the cooperating frozen program on the experiment server. This plan does not add unrelated serialization hardening.
 - The original histories may expose a shape not covered by local synthetic fixtures. U5 must reject and report the exact mismatch; it must not patch the remote artifact.
@@ -344,6 +344,6 @@ No local synthetic result is scientific evidence. No remote command may run befo
 
 ---
 
-## Documentation and Operational Notes
+## Documentation and operational notes
 
 This plan is the explicit amendment required before post-freeze administrative interpretation. It narrows the predecessor plan only for finalization recovery. The predecessor's scientific authority, one-run rule, test-separation rule, schedule, data, environment, and audit contract remain unchanged.

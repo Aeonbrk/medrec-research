@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 — Exposure-Conditioned Learning vs Direct Exposure Controls
+# Gate 01: exposure-conditioned learning vs direct exposure controls
 
 ## 0. Protocol identity
 
@@ -48,7 +48,7 @@ R0 already created patient-disjoint Discovery/Dev/Holdout partitions from `subje
 
 Gate 01 must preserve those exact assignments.
 
-### 3.1 Inner split inside R0 Discovery
+### 3.1 inner split inside R0 discovery
 
 Before constructing any model-dependent statistic, repartition **R0 Discovery patients only** with a second deterministic subject-only hash:
 
@@ -68,7 +68,7 @@ R0 Discovery was used for resource/premise admission; therefore InnerTune is not
 
 ## 4. Decision-event construction
 
-### 4.1 Eligible medication orders
+### 4.1 eligible medication orders
 
 Use provider medication orders in MIMIC-IV `poe` linked deterministically to the R0-selected 131-concept medication identity.
 
@@ -154,7 +154,7 @@ A burst may enter $\mathcal Q$ even when the eventual target contains no interac
 
 Gate 01 deliberately uses one small, non-novel causal backbone. Architecture search is prohibited.
 
-### 7.1 Inputs
+### 7.1 inputs
 
 For every burst at $t$:
 
@@ -166,7 +166,7 @@ For every burst at $t$:
 
 No labs, vitals, notes, current-visit discharge diagnosis/procedure codes, molecular representations, knowledge graphs, or LLM features are allowed in Gate 01.
 
-### 7.2 Architecture
+### 7.2 architecture
 
 Freeze:
 
@@ -210,7 +210,7 @@ No architecture, optimizer, learning-rate, sequence-length, or seed search is au
 
 Let $p_t(m)=\sigma(z_t(m))$ and $D$ be the frozen binary DDI matrix.
 
-### 8.1 Conventional new-set term
+### 8.1 conventional new-set term
 
 $$
 L_{new}(t)
@@ -232,7 +232,7 @@ $$
 
 For $|A_t|=0$, set $L_{active}(t)=0$.
 
-### 8.3 Candidate objective
+### 8.3 candidate objective
 
 $$
 L_{EC}(t)=L_{pred}(t)+\lambda\left[L_{new}(t)+L_{active}(t)\right].
@@ -246,7 +246,7 @@ $$
 
 ## 9. Frozen method/control matrix
 
-### 9.1 `GlobalFrequency@5` — sanity only
+### 9.1 `GlobalFrequency@5`: sanity only
 
 Rank medications by InnerTrain target-burst frequency. No patient-specific input. This is reported only to verify task non-triviality and cannot determine Gate PASS.
 
@@ -264,7 +264,7 @@ Frozen InnerTune grid:
 lambda_static ∈ {0.1, 0.5, 2.0, 8.0}
 ```
 
-### 9.4 `DirectExposureRerank` — primary killer control
+### 9.4 `DirectExposureRerank`: primary killer control
 
 Use frozen `Base` logits. No retraining.
 
@@ -305,7 +305,7 @@ At each greedy step:
 
 There is no tuned parameter.
 
-### 9.6 `ExposureConditional` — candidate method
+### 9.6 `ExposureConditional`: candidate method
 
 Same backbone and inputs as `Base`, trained with $L_{EC}$.
 
@@ -377,7 +377,7 @@ NewDDI@K(t)
 {\binom{K}{2}}.
 $$
 
-### 12.3 Incremental exposure DDI — primary safety metric
+### 12.3 Incremental exposure DDI: primary safety metric
 
 $$
 IncrementalExposureDDI@K(t)
@@ -402,7 +402,7 @@ These are DDI exposure surrogates, not ADE, clinical-harm, or pharmacokinetic ou
 
 ## 13. InnerTune selection contract
 
-### 13.1 Safety budget
+### 13.1 safety budget
 
 After training `Base`, compute its mean `IncrementalExposureDDI@5` on InnerTune $\mathcal Q$ exactly once:
 
@@ -418,7 +418,7 @@ $$
 
 No later method may redefine $B$.
 
-### 13.2 Learned configuration selection
+### 13.2 learned configuration selection
 
 For `StaticLoss` and `ExposureConditional` separately:
 
@@ -429,7 +429,7 @@ For `StaticLoss` and `ExposureConditional` separately:
 5. tie-break by lower primary risk, then smaller lambda;
 6. if no configuration reaches $B$, select the configuration with lowest primary risk, tie-break by higher Recall@5, and mark `TUNE_BUDGET_MISS`.
 
-### 13.3 Direct reranker selection
+### 13.3 direct reranker selection
 
 For all seven frozen gamma settings:
 
@@ -440,7 +440,7 @@ For all seven frozen gamma settings:
 
 `ExposureHardConstraint` has no tuning.
 
-### 13.4 Freeze before Dev
+### 13.4 freeze before dev
 
 After this selection:
 
@@ -459,7 +459,7 @@ Run each frozen method once on R0 Dev.
 
 No Dev-derived hyperparameter, checkpoint, threshold, K, risk budget, or subgroup selection is permitted.
 
-### 14.1 Bootstrap
+### 14.1 bootstrap
 
 Use paired patient-clustered bootstrap:
 
@@ -481,11 +481,11 @@ Return:
 
 only if **all** conditions below hold on frozen R0 Dev $\mathcal Q$.
 
-### Condition 1 — method reaches the preregistered Tune risk budget
+### Condition 1: method reaches the preregistered Tune risk budget
 
 The selected `ExposureConditional` configuration must not carry `TUNE_BUDGET_MISS`.
 
-### Condition 2 — material and reproducible safety improvement over Base
+### Condition 2: material and reproducible safety improvement over Base
 
 At full precision:
 
@@ -495,7 +495,7 @@ $$
 
 where $R$ is mean `IncrementalExposureDDI@5`.
 
-Additionally, for
+Also, for
 
 $$
 \Delta R_{EC-Base}=R_{EC}^{Dev}-R_{Base}^{Dev},
@@ -503,7 +503,7 @@ $$
 
 the 95% patient-clustered bootstrap CI upper bound must be strictly below zero.
 
-### Condition 3 — bounded fidelity cost versus Base
+### Condition 3: bounded fidelity cost versus Base
 
 At full precision:
 
@@ -511,7 +511,7 @@ $$
 Recall@5_{EC}^{Dev}-Recall@5_{Base}^{Dev}\ge-0.010.
 $$
 
-### Condition 4 — learned value beyond the direct exposure-aware killer control
+### Condition 4: learned value beyond the direct exposure-aware killer control
 
 Let `DirectExposureRerank` be the single InnerTune-selected gamma setting.
 
@@ -537,7 +537,7 @@ must be strictly above zero.
 
 This is the primary scientific admission condition.
 
-### Condition 5 — no required simple control weakly dominates the method
+### Condition 5: no required simple control weakly dominates the method
 
 Neither `StaticLoss` nor `ExposureHardConstraint` may satisfy both:
 

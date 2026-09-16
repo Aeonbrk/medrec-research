@@ -27,7 +27,7 @@ Both `safedrug-archived` and `molerec` Reproduction Programs declare this compat
 > [!NOTE]
 > **Hardware Compatibility Deviation**: Official MoleRec records CUDA 10.2, which predates NVIDIA Ampere (RTX 3090 / SM86) architecture support. `CUDA 11.1` (`torch==1.9.0+cu111`) is the minimal necessary deviation to support RTX 3090 hardware while preserving Python 3.8, PyTorch 1.9, and PyG 2.0.3 package versions.
 
-## Package Resolution and Mirror Policy
+## Package resolution and mirror policy
 
 - Conda and pip package resolution prioritizes China mirrors (e.g. TUNA, BFSU, Aliyun) via command-scoped or repository-scoped configuration.
 - Exact version-specific wheels unavailable from mirrors (e.g., official PyTorch/PyG cu111 builds) fall back to official HTTPS authorities (`https://download.pytorch.org`, `https://data.pyg.org`).

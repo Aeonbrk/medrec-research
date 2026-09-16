@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea 005 Review — Safety-Preserving Substitution Structure
+# Idea 005 review: safety-preserving substitution structure
 
 ## Verdict
 
@@ -41,7 +41,7 @@ FineMed decomposes visit-level medication recommendation into diagnosis-aware su
 
 Recent safe-medication work already studies personalized safety boundaries and differentiable contraindication / safety knowledge. Therefore generic individualized safety or another DDI-aware loss is not a novelty claim.
 
-### Beyond Accuracy
+### Beyond accuracy
 
 Beyond Accuracy makes undertreatment / clinical-goal preservation an important evaluation concern. It motivates asking whether low-risk recommendations are achieved by suppression, but it does not by itself establish the proposed output-allocation mechanism.
 

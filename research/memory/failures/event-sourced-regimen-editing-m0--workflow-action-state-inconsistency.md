@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Memory — Event-Sourced Regimen Editing M0: Workflow-Action State Inconsistency
+# Failure memory. Event-sourced regimen editing M0: workflow-action state inconsistency
 
 ## Failure class
 

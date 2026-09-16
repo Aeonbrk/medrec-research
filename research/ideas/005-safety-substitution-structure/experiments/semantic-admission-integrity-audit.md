@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Semantic Admission Integrity Audit Report — Safety-Preserving Substitution Structure
+# Semantic admission integrity audit report: safety-preserving substitution structure
 
 - **Idea**: `005-safety-substitution-structure`
 - **Gate**: `semantic-admission`
@@ -12,7 +12,7 @@
 
 ---
 
-## Output Contract Summary
+## Output contract summary
 
 ```text
 Mode: full (claim-audit + citation-audit + numeric-audit)
@@ -41,7 +41,7 @@ Research decision unlocked: yes
 
 ---
 
-## 1. Claim-Evidence Matrix
+## 1. Claim-evidence matrix
 
 | Claim Location | Claim Statement | Evidence Status | Finding / Category | Verification Result |
 | :--- | :--- | :--- | :--- | :--- |
@@ -54,7 +54,7 @@ Research decision unlocked: yes
 
 ---
 
-## 2. Evidence Hierarchy & Citation Audit
+## 2. Evidence hierarchy & citation audit
 
 1. **Tier-A Verification for ADMIT**:
    - `C09A -> C09C`: 2017 ACC/AHA High Blood Pressure Guideline ([10.1161/HYP.0000000000000065](https://doi.org/10.1161/HYP.0000000000000065)) & 2022 AHA/ACC/HFSA Heart Failure Guideline ([10.1161/CIR.0000000000001063](https://doi.org/10.1161/CIR.0000000000001063)). Explicit first-line alternatives for hypertension/HFrEF; ARB alternative when ACEi intolerant; dual blockade contraindicated. (Tier A validated at class resolution).
@@ -70,7 +70,7 @@ Research decision unlocked: yes
 
 ---
 
-## 3. Blinding & Process Audit
+## 3. Blinding & process audit
 
 1. **Extraction Consistency**:
    - The extraction script strictly implemented the frozen candidate selection formulas for SplitMassFN and DuplicateSiblingFP on the frozen Gate-01 run `gate-01-output-structure-signature-20260904-155810`.
@@ -86,7 +86,7 @@ Research decision unlocked: yes
 
 ---
 
-## 4. Numerical Audit
+## 4. Numerical audit
 
 | Parameter | Preregistered Rule / Target | Audited Observed Value | Status |
 | :--- | :--- | :--- | :--- |
@@ -105,7 +105,7 @@ Research decision unlocked: yes
 
 ---
 
-## 5. Test Isolation & Scope Boundary Audit
+## 5. Test isolation & scope boundary audit
 
 1. **Test Split Isolation**:
    - The test partition ($N=1,058$ patients, $1,206$ visits) remained completely unindexed, unstaged, unpredicted, unevaluated, and untouched.
@@ -118,7 +118,7 @@ Research decision unlocked: yes
 
 ---
 
-## 6. Audit Verdict
+## 6. Audit verdict
 
 All protocol, evidence hierarchy, blinding, numeric, and boundary invariants have been satisfied.
 

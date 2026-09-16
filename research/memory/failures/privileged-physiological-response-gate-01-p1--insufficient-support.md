@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Failure Record: Privileged Physiological Response Supervision — Gate 01 P1 Support
+# Failure record. Privileged physiological response supervision: Gate 01 P1 support
 
 ## Status
 

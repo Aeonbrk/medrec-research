@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Protocol — BudgetSet Residual-Budget Marginal-DDI Set Refinement
+# Gate 01 protocol: BudgetSet residual-budget marginal-DDI set refinement
 
 ## Protocol status
 
@@ -181,7 +181,7 @@ sampled independently per recommendation example. Evaluation reports all three t
 
 ## 5. BudgetSet definition
 
-### 5.1 Relaxed state
+### 5.1 relaxed state
 
 Use frozen MoleRec logits:
 
@@ -301,7 +301,7 @@ The current epoch becomes the new best checkpoint only when it is strictly bette
 
 Retain exactly one best checkpoint for each `seed × configuration`.
 
-### 6.2 Configuration selection
+### 6.2 configuration selection
 
 For a configuration, evaluate the three retained seed checkpoints and first form the seed-aggregate Dev quantities using Section 10's learned-family aggregation rules. From those aggregate operating points compute:
 
@@ -321,7 +321,7 @@ then smaller eta
 
 After the configuration is selected, Audit uses exactly the three retained checkpoints belonging to that single configuration. Gate01-Audit never selects epoch, seed, configuration, or hyperparameter.
 
-## 7. Killer 1 — Fixed-K Budget-Aware Greedy + 1-Swap
+## 7. Killer 1: Fixed-K Budget-Aware greedy + 1-Swap
 
 This deterministic control receives exactly `s`, `D`, `C_x`, `b`, and `K_x`. It has no learned parameters.
 
@@ -365,7 +365,7 @@ For `K_x >= 2`, deterministic construction is:
 
 If Step 3 cannot reach feasibility, return the locally minimum-violation fixed-K set and record the violation. Do not add another solver, restart family, MILP, MIQP, beam search, or evolutionary method.
 
-## 8. Killer 2 — Budget-Conditioned Independent Scorer
+## 8. Killer 2: Budget-Conditioned independent scorer
 
 Train-only static DDI summaries for medication `i` are:
 
@@ -532,7 +532,7 @@ For every method and budget report:
 
 Exact cardinality compliance must be `100%` for every compared method.
 
-### 10.3 Responsiveness
+### 10.3 responsiveness
 
 For BudgetSet, define `R_L`, `R_M`, and `R_H` as the family-level mean-across-seeds achieved hard-DDI rates from Section 10.2.
 
@@ -546,7 +546,7 @@ $$
 R_M+0.005\le R_H.
 $$
 
-### 10.4 Composition response
+### 10.4 composition response
 
 For a seed and two budgets, a visit changes composition iff the hard sets are literally unequal:
 
@@ -652,7 +652,7 @@ $$
 
 The seed-level comparator is total whenever the required control family contains at least one sampled operating point.
 
-**Branch A — non-empty eligible frontier.** If $E_{r,C}\ne\varnothing$, define
+**Branch A, non-empty eligible frontier.** If $E_{r,C}\ne\varnothing$, define
 
 $$
 F_{r,C}=\max_{j\in E_{r,C}}U_{C,j},
@@ -670,7 +670,7 @@ G_{r,C} > 0
 
 This is the existing ordinary-frontier rule.
 
-**Branch B — empty eligible frontier.** If $E_{r,C}=\varnothing$, every sampled control point satisfies $R_{C,j}>R_{B,r}+\delta_R$. Select one unique control reference endpoint
+**Branch B, empty eligible frontier.** If $E_{r,C}=\varnothing$, every sampled control point satisfies $R_{C,j}>R_{B,r}+\delta_R$. Select one unique control reference endpoint
 
 $$
 j^\star=\operatorname*{arg\,min}_j\left(R_{C,j},-U_{C,j},o_j\right)

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Search Notes — 2026-09-03 Residual FP Routing
+# Search Notes: 2026-09-03 residual FP routing
 
 ## CCFA mode
 
@@ -43,7 +43,7 @@ Low-quality paper aggregators were not used as novelty authority. Search-engine 
 
 ### 1. Longitudinal history is crowded at the action-semantic level
 
-COGNet already uses copy-or-predict from historical prescriptions. KERL models reusable historical drugs. HeteroMed explicitly models drug expansion and inheritance. DMRNet recalibrates recommendations using temporal prescription records. This blocks any novelty claim based only on “previous prescription membership,” “repeat versus novel,” or “history matters.”
+COGNet already uses copy-or-predict from historical prescriptions. KERL models reusable historical drugs. HeteroMed explicitly models drug expansion and inheritance. DMRNet recalibrates recommendations using temporal prescription records. This blocks any novelty claim based only on "previous prescription membership," "repeat versus novel," or "history matters."
 
 A one-bit continuation diagnostic remains scientifically falsifiable, but its novelty delta is only the conditional medication-level error-routing test.
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Implementation / Mechanical Preflight Authorization — Idea 008
+# Gate 01 implementation / mechanical preflight Authorization: Idea 008
 
 ## Authorization status
 

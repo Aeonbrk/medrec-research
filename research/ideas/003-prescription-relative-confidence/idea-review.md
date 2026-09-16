@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Idea Review — Post-Idea-002 Residual Routing
+# Idea review: post-idea-002 residual routing
 
 - **CCFA flow**: `ccf-idea-optimizer` exploratory → `ccf-idea-reviewer` standard
 - **Target venue assumption**: generic CCF-A AI/ML/KDD-family target
@@ -9,7 +9,7 @@
 
 ## Exploratory candidate set
 
-### Candidate 1 — Prescription-Relative Confidence Residual
+### Candidate 1: Prescription-Relative confidence residual
 
 - **Parent / operation**: Idea 002 residual opportunity / `refine` with a materially new output-set observable
 - **Problem**: identical absolute medication confidence may occur in visits with different local competition among predicted medications.
@@ -36,7 +36,7 @@
 - **Scientific value if FAIL**: rules out the cheapest within-output-set context signal before relational/history/ensemble investment.
 - **Main confound**: relative rank partly encodes prescription size and medication popularity; both are therefore controlled explicitly.
 
-### Candidate 2 — Train-Only Co-Selection Compatibility Residual
+### Candidate 2: Train-Only Co-Selection compatibility residual
 
 - **Parent / operation**: residual opportunity / `instrument` with train-only set structure
 - **Problem**: a predicted medication may be individually confident yet weakly supported by the rest of the predicted medication set under historical co-prescription structure.
@@ -57,7 +57,7 @@
 - **Scientific value if FAIL**: removes the strongest simple co-selection mechanism before neural relational modeling.
 - **Main confound**: compatibility can collapse to popularity/frequency; controls must absorb that explanation.
 
-### Candidate 3 — Previous-Prescription Membership Residual
+### Candidate 3: Previous-Prescription membership residual
 
 - **Parent / operation**: residual opportunity / `refine` temporal semantics to one bit
 - **Problem**: continuation candidates and newly proposed medications may have different error profiles at the same confidence.
@@ -78,7 +78,7 @@
 - **Scientific value if FAIL**: eliminates the simplest history signal.
 - **Main confound**: medication popularity and chronic-drug persistence.
 
-### Candidate 4 — Cross-Backbone Corroboration Residual
+### Candidate 4: Cross-Backbone corroboration residual
 
 - **Parent / operation**: residual opportunity / `combine` independent frozen predictors
 - **Problem**: primary confidence may be high even when other independently trained/reproduced backbones disagree.
@@ -88,7 +88,7 @@
 - **Mechanistic rationale**: model-specific epistemic disagreement may expose fragile predictions.
 - **Closest prior-art risk**: generic ensemble/selective-prediction literature and Multi-LLM Collaboration for Medication Recommendation.
 - **Novelty delta**: confidence-conditional medication-level routing across frozen MedRec backbones rather than collaborative generation.
-- **Strongest simple control**: primary score + best simple ensemble prediction; otherwise “disagreement” is merely ensemble gain.
+- **Strongest simple control**: primary score + best simple ensemble prediction; otherwise "disagreement" is merely ensemble gain.
 - **Cheapest falsification**: reuse frozen outputs from multiple qualified backbones and compare one disagreement statistic.
 - **PASS criterion**: disagreement adds held-out routing value beyond the ensemble control.
 - **FAIL criterion**: terminate disagreement mechanism.
@@ -101,7 +101,7 @@
 
 ## Closest-work deductions
 
-1. **Candidate 1** survives the closest-work subtraction only if its claim remains conditional and within-prescription. Calling it “relative confidence” without that qualification would collide with existing margin/confidence work.
+1. **Candidate 1** survives the closest-work subtraction only if its claim remains conditional and within-prescription. Calling it "relative confidence" without that qualification would collide with existing margin/confidence work.
 2. **Candidate 2** is scientifically testable but crowded. MSAM, DMRNet, and GenRxR make generic set compatibility/composition a weak novelty story.
 3. **Candidate 3** has a high-confidence novelty blocker. Continuation/history is already explicit in multiple MedRec architectures.
 4. **Candidate 4** risks collapsing into ordinary ensemble uncertainty unless it beats the best simple ensemble using the same frozen model outputs.
@@ -124,7 +124,7 @@ The ranking is serious-risk-adjusted rather than a simple sort of weighted score
 | Dimension | Weight | Score | Confidence | Deduction / evidence basis | Repair condition |
 | --- | ---: | ---: | ---: | --- | --- |
 | Problem importance | 12 | 4 | 4 | residual error routing is real, but currently shown only on retrospective validation | preserve narrow evidence language |
-| Novelty against prior work | 14 | 4 | 4 | calibration, boundary selection, and relative confidence exist; exact conditional multi-label routing test was not found | keep novelty delta on within-prescription conditional information, not “relative confidence” generally |
+| Novelty against prior work | 14 | 4 | 4 | calibration, boundary selection, and relative confidence exist; exact conditional multi-label routing test was not found | keep novelty delta on within-prescription conditional information, not "relative confidence" generally |
 | Conceptual innovation | 12 | 4 | 4 | one new observable and conditional-information framing are nontrivial but intentionally small | do not inflate into a new architecture claim |
 | Method soundness | 14 | 4 | 4 | mechanism is coherent; strongest risk is trivial set-size/popularity encoding | control set size, train-only prevalence, and score×size interaction |
 | Elegance and simplicity | 8 | 5 | 5 | one scalar derived from frozen outputs; no retraining | retain one-scalar Gate 01 |
@@ -140,7 +140,7 @@ The ranking is serious-risk-adjusted rather than a simple sort of weighted score
 
 **Development potential**: high.
 
-**Main rejection risk**: a reviewer can say “this is another confidence-calibration/boundary heuristic.” The idea survives only because it asks a different conditional question and faces controls designed to eliminate set-size and popularity explanations.
+**Main rejection risk**: a reviewer can say "this is another confidence-calibration/boundary heuristic." The idea survives only because it asks a different conditional question and faces controls designed to eliminate set-size and popularity explanations.
 
 **Score-change conditions**:
 
@@ -153,7 +153,7 @@ The ranking is serious-risk-adjusted rather than a simple sort of weighted score
 - **Method expert**: mechanism is coherent because $r_t(m)$ contains other-score information; strongest concern is confounding by set size/popularity. Repair: include these in the primary control rather than as post-hoc analyses.
 - **Experiment expert**: the winner has the cleanest kill test and useful negative result. No architecture is needed before the gate.
 - **AC / venue expert**: Gate 01 alone is not a paper contribution; it is a strong research-selection experiment. Broader backbone/test evidence becomes relevant only after a PASS and later authorization.
-- **Skeptical prior-art expert**: the wording must explicitly subtract KDD'25 calibration, GiantMed, and relative-margin work; generic “relative confidence” novelty is not defensible.
+- **Skeptical prior-art expert**: the wording must explicitly subtract KDD'25 calibration, GiantMed, and relative-margin work; generic "relative confidence" novelty is not defensible.
 
 ## Winner
 

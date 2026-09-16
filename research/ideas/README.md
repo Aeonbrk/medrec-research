@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Formal Research Ideas
+# Formal research ideas
 
 A formal Idea is a research line that survived enough exploratory work to justify a frozen scientific protocol. Exploratory architecture search belongs under `research/prototypes/` first; it does not need an Idea number.
 

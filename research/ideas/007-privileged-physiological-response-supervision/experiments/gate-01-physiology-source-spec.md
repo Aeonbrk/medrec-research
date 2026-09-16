@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD013 -->
 
-# Gate 01 Physiology Source Specification
+# Gate 01 physiology source specification
 
 This Idea-007-local, public-safe declaration is the single source of truth for
 the six physiology channels used by Gate 01. It identifies source metadata only;
