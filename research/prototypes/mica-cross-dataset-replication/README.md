@@ -70,3 +70,49 @@ is available, and the observed-set-size/coverage correlation.  A missing
 MIMIC-III raw provenance artifact is reported as unavailable rather than
 treated as 100% coverage.
 
+## Stage -1F execution result
+
+The four authorized arms completed at source revision
+`ffdaec8a6c0cdc20d071ad00eca8bb025f336ef0`.  MIMIC-III completed 60 epochs
+(656 updates per epoch); MIMIC-IV completed exactly 39,360 updates (19,302
+updates per full pass) with 12 full Dev evaluations.  No Test
+targets were loaded.  Selected checkpoints and terminal Dev surfaces are:
+
+| dataset / arm | parameters | selected update (epoch-equivalent) | selected J | selected F1 | selected PRAUC | selected DDI | selected NLL | terminal J | terminal PRAUC | terminal NLL |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| MIMIC-III SharedPool | 848900 | 2624 (4.000) | 0.531796 | 0.685760 | 0.785189 | 0.076841 | 0.206553 | 0.437912 | 0.672784 | 1.266637 |
+| MIMIC-III DrugQuery | 848900 | 1968 (3.000) | 0.539316 | 0.692880 | 0.788679 | 0.078599 | 0.204234 | 0.445612 | 0.675816 | 1.324851 |
+| MIMIC-IV SharedPool | 5436718 | 36080 (1.869) | 0.552883 | 0.698327 | 0.789836 | 0.063074 | 0.115632 | 0.551189 | 0.789019 | 0.116182 |
+| MIMIC-IV DrugQuery | 5436718 | 36080 (1.869) | 0.559369 | 0.703702 | 0.796329 | 0.061812 | 0.112925 | 0.557984 | 0.795794 | 0.113301 |
+
+The primary deltas (DrugQuery minus its matched SharedPool) are:
+
+| dataset | ΔJaccard | ΔF1 | ΔPRAUC | ΔNLL | ΔDDI | interpretation |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| MIMIC-III | +0.007520 | +0.007120 | +0.003489 | -0.002319 | +0.001758 | meaningful; below the ~+0.008 strong range |
+| MIMIC-IV | +0.006486 | +0.005375 | +0.006493 | -0.002707 | -0.001262 | meaningful; below the ~+0.008 strong range |
+
+Both MIMIC-IV arms selected update 36,080 rather than the terminal update;
+their terminal Jaccard changes were -0.001385 (DrugQuery) and -0.001694
+(SharedPool).  The predeclared terminal-improvement rule therefore does not
+make the MIMIC-IV budget inconclusive.  The aggregate verdict is
+`MICA_MECHANISM_REPLICATED_BOTH_DATASETS`: medication-specific evidence
+selection clears the +0.004 meaningful threshold on both datasets.  This is
+single-seed Train/Dev evidence only, not a held-out or paper claim.
+
+The no-training diagnostics are in [`diagnostics.json`](diagnostics.json).
+Target cardinality means (median; range) are MIMIC-III Train 18.959 (19; 1–53),
+Dev 19.695 (19; 1–51), and MIMIC-IV Train 14.596 (13; 1–67), Dev 14.604 (13;
+1–63).  Mean per-visit normalization coverage is 0.762594/0.801292 for
+MIMIC-III Train/Dev (the Dev estimate covers 2,129 of 2,130 target visits with
+an eligible row) and 0.799133/0.798783 for MIMIC-IV Train/Dev.  Pearson
+correlations between target cardinality and coverage are 0.126171/0.012016
+and 0.007457/0.002894, respectively.  Full histograms, row denominators, and
+the fixed lineage are retained in the public-safe diagnostic JSON.
+
+The complete public-safe aggregate, including all evaluation points, is
+[`result.json`](result.json).  Private checkpoints, logits, patient
+membership, targets, raw rows, and logs remain on 319.  The only next action
+authorized by this screen is scientific review of this frozen Train/Dev
+result; do not run another seed, open Test, implement RSM, or enter Stage 0
+automatically.

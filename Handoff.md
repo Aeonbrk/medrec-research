@@ -1,4 +1,4 @@
-# Handoff: STAGE -1 — MICA Core consolidation + MIMIC-IV readiness
+# Handoff: STAGE -1F — Cross-dataset MICA mechanism replication
 
 Updated: 2026-09-16.
 
@@ -7,16 +7,31 @@ Updated: 2026-09-16.
 ```text
 Stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
 Status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
-AUTHORITATIVE_START_REVISION: de07bc22b8f05272b62417b769307dfb22754435
-FINAL_REVISION: final Stage -1E materialization commit (see final report)
+AUTHORITATIVE_START_REVISION: 05acf0d6eccfefb6aeda526937136bbf6a24cbd5
+EXPERIMENT_SOURCE_REVISION: ffdaec8a6c0cdc20d071ad00eca8bb025f336ef0
+FINAL_REVISION: final Stage -1F public-safe evidence commit (see final report)
 Active formal Idea: none
 Idea 009: not created
 Active formal Gate: none
 ```
 
-Stage -1E is complete for its bounded scope. No Test target partition was
-opened, no model or new seed was run, no new method family was added, and no
-paper or novelty claim follows.
+Stage -1F is complete for its bounded scope. The four authorized matched
+Train/Dev arms completed: MIMIC-III SharedPool and DrugQuery each ran 60
+complete epochs; MIMIC-IV SharedPool and DrugQuery each ran exactly 39,360
+optimizer updates with 12 full Dev evaluations. No Test target partition was
+opened, no additional seed or method family was run, and no paper or novelty
+claim follows.
+
+The aggregate verdict is `MICA_MECHANISM_REPLICATED_BOTH_DATASETS`.
+DrugQuery minus SharedPool is +0.007520 Jaccard on MIMIC-III and +0.006486 on
+MIMIC-IV; both exceed the predeclared +0.004 meaningful threshold but are below
+the approximate +0.008–0.010 strong range. MIMIC-IV selected update 36,080 in
+both arms and declined at the terminal update, so the fixed budget is
+conclusive rather than inconclusive. Full public-safe metrics and trajectories
+are in
+[`result.json`](research/prototypes/mica-cross-dataset-replication/result.json);
+the no-training cardinality/normalization diagnostics are in
+[`diagnostics.json`](research/prototypes/mica-cross-dataset-replication/diagnostics.json).
 
 ## Stage -1A — training diagnosis
 
@@ -76,8 +91,9 @@ The terminal status is `MIMIC_IV_BENCHMARK_FROZEN_READY_FOR_TRAINDEV`; see the
 
 ## One next action
 
-Review the prepared MIMIC-IV Train/Dev SharedPool versus MICA-Core/DrugQuery
-screen contract. Do not run it automatically or enter Stage 0.
+Review the frozen cross-dataset Train/Dev result. Do not enter Stage 0,
+implement RSM, read Test, add a seed, create Idea 009, or launch another
+screen automatically.
 
 ---
 

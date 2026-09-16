@@ -15,7 +15,7 @@ Current stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC
 Stage status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 Modern-backbone calibration: complete
 Strong-unary residual-correction route: deprioritized as a primary direction
-Current action: review the frozen MIMIC-IV Train/Dev screen contract; remain in Stage -1
+Current action: review the frozen Stage -1F cross-dataset Train/Dev result; remain in Stage -1
 ```
 
 No new architecture family, Idea 009, formal Gate, held-out evaluation, or
@@ -263,9 +263,9 @@ test, or Idea 009 follows.
 
 This is the current bounded state. It is exploratory Train/Dev evidence and a
 protocol-readiness record, not a paper claim or a new method proposal. The
-authoritative start revision was `fccd2484c10aa9cf7a48cb02504a8fa78b61dde6`;
-the Stage -1 experiment source revision was
-`5864011a864851c7eba1ed2a0742221c9e7dcf5f`.
+The Stage -1F authoritative start revision was
+`05acf0d6eccfefb6aeda526937136bbf6a24cbd5`; its four-arm experiment source
+revision was `ffdaec8a6c0cdc20d071ad00eca8bb025f336ef0`.
 
 ### Training-dynamics diagnosis (Stage -1A)
 
@@ -343,9 +343,43 @@ were not loaded, fitted, tuned, or evaluated. The terminal readiness is
 [`public-safe manifest`](../benchmarks/mimiciv-medrec/manifest.json) and
 [`mechanical checks`](../benchmarks/mimiciv-medrec/mechanical-checks.json).
 
-The next and only authorized action is a separate review of the prepared
-MIMIC-IV Train/Dev SharedPool versus MICA-Core/DrugQuery screen. Do not run it,
-open Stage 0, create Idea 009, or open a formal Gate automatically.
+### Cross-dataset MICA mechanism replication (Stage -1F)
+
+Observed result: four matched single-seed Train/Dev arms completed on the
+approved 319 plane at source revision `ffdaec8a6c0cdc20d071ad00eca8bb025f336ef0`.
+MIMIC-III ran 60 complete epochs (656 updates per epoch); MIMIC-IV ran exactly
+39,360 updates with full Dev evaluation every 3,280 updates. Both datasets
+used AdamW `1e-4`, weight decay `1e-4`, batch 16, threshold `0.35`, the same
+MICA dimensions/loss/DDI weight, and earliest-tie best complete-Dev-Jaccard
+selection. Test targets were not loaded.
+
+| Dataset | SharedPool J | DrugQuery J | Δquery J | ΔF1 | ΔPRAUC | ΔNLL | ΔDDI | Selected updates |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| MIMIC-III | 0.531796 | 0.539316 | +0.007520 | +0.007120 | +0.003489 | -0.002319 | +0.001758 | 2624 / 1968 (epochs 4 / 3) |
+| MIMIC-IV | 0.552883 | 0.559369 | +0.006486 | +0.005375 | +0.006493 | -0.002707 | -0.001262 | 36080 / 36080 (1.869 / 1.869 epoch-equivalent) |
+
+Both primary deltas exceed the predeclared `+0.004` meaningful threshold, but
+neither reaches the approximate `+0.008–0.010` strong range. MIMIC-IV selected
+at update 36,080 for both arms; terminal Jaccard fell by `0.001694` for
+SharedPool and `0.001385` for DrugQuery, so the fixed budget is conclusive.
+The no-training diagnostic reports Train/Dev target-cardinality means of
+18.959/19.695 (MIMIC-III) and 14.596/14.604 (MIMIC-IV), mean per-visit
+normalization coverage of 0.762594/0.801292 and 0.799133/0.798783, and
+cardinality/coverage Pearson correlations of 0.126171/0.012016 and
+0.007457/0.002894, respectively.
+
+Interpretation: medication-specific evidence selection replicates on both
+datasets under the matched Train/Dev contract. The frozen routing verdict is
+`MICA_MECHANISM_REPLICATED_BOTH_DATASETS`; this is not a held-out result, a
+formal Gate, or a paper/novelty claim. The public-safe aggregate and full
+evaluation trajectories are in
+[`result.json`](../prototypes/mica-cross-dataset-replication/result.json),
+with no-training diagnostics in
+[`diagnostics.json`](../prototypes/mica-cross-dataset-replication/diagnostics.json).
+
+The next and only authorized action is scientific review of this frozen
+Train/Dev result. Do not open Stage 0, create Idea 009, implement RSM, read
+Test, add a seed, or launch another screen automatically.
 
 ## 7. Cross-project lessons
 
@@ -398,8 +432,7 @@ Do not assume the next model must use MoleRec, GraphRefine, hypergraphs, MoE, re
 
 ## 9. Next workflow
 
-1. Review the frozen MIMIC-IV Train/Dev screen contract; implementation is
-   prepared but no model run is authorized in Stage -1E.
+1. Review the frozen Stage -1F cross-dataset Train/Dev mechanism result.
 
 No Stage 0, Idea 009, formal Gate, Audit, held-out Test, or additional seed
 follows automatically from this handoff.
