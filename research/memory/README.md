@@ -1,83 +1,52 @@
-<!-- markdownlint-disable MD013 -->
+# Research memory
 
-# Cross-project research memory
+This directory carries cross-project scientific context without replacing source-bound experiment evidence.
 
-This directory stores the current research-state synthesis, reusable lessons, failure records, and historical search/literature snapshots.
+## Authority
 
-## Authority and precedence
+When records disagree:
 
-Use the following order when documents disagree:
+1. Run-local result JSON, audits, source-bound experiment README files, formal Idea artifacts, and frozen benchmark records describe what actually happened.
+2. [`current-research-state.md`](current-research-state.md) is the live scientific synthesis and routing authority.
+3. [`decisions/`](decisions/) contains append-only scientific belief updates that explain why project interpretation changed.
+4. Root/research indexes and `Handoff.md` are navigation and handoff surfaces.
+5. Failure records, dated literature/search packets, reset packets, and [`archive/`](archive/) are historical context.
 
-1. **Run-local evidence**: aggregate result JSON, audit records, formal Idea artifacts, and source-bound experiment README files describe what actually happened in that run.
-2. **Current synthesis**: [`current-research-state.md`](current-research-state.md) is the authoritative current scientific-state and routing summary.
-3. **Indexes / handoff**: `research/README.md`, `research/ideas/README.md`, `research/prototypes/README.md`, and `Handoff.md` summarize the current synthesis.
-4. **Historical memory**: older literature maps, reset packets, review notes, failure records, and reorientation documents preserve what was believed or decided at their recorded time. Old `CLOSED`, `CROWDED`, `PRIOR ART`, `NOT AUTHORIZED`, or routing labels do not override later evidence.
+Do not edit historical evidence to make an old state label look current. Update the live synthesis or add a new decision note.
 
-Do not edit historical result records merely to make their old state labels look current. Resolve contradictions by fixing the current synthesis and clearly marking historical snapshots.
+## Directory roles
 
-Within current synthesis, distinguish:
+- `current-research-state.md`: concise current synthesis only.
+- `decisions/`: append-only scientific belief updates linked to decisive evidence.
+- `failures/`: durable records of falsified or demoted formulations.
+- `archive/`: superseded live syntheses and mixed ledgers preserved for provenance.
+- `reusable-lessons.md`: lessons supported across multiple routes.
+- `accumulated-experience.md`: historical synthesis, not live routing authority.
+- `literature-memory.md`, `literature-opportunity-map.md`, dated `literature-search-*` packets: discovery and prior-search provenance.
+- `model-reset-*`, `resource-reset-*`, and other dated packets: scoped historical search/reset material.
 
-- **observed result**: directly produced by a run or audit;
-- **interpretation**: scientific reading of the evidence;
-- **routing guidance**: current prioritization for future work.
+## Epistemic labels
 
-Do not present routing guidance as if it were a runner-produced terminal verdict.
+Current synthesis and scientific decision notes distinguish:
 
-## Current state
+- **Observed result**: produced directly by a run, audit, or source review.
+- **Interpretation**: scientific reading of one or more observed results.
+- **Routing guidance**: what the project should prioritize next.
 
-See [`current-research-state.md`](current-research-state.md).
+A routing recommendation is not a runner-produced verdict.
 
-As of 2026-09-15:
+## Failure memory
 
-```text
-Active formal Idea: none
-Ideas 001--008: terminated
-Idea 009: absent
-Active formal Gate: none
-Modern backbone calibration: MODERN_BACKBONE_CALIBRATION_COMPLETE
-Strong-unary pairwise residual-correction route: deprioritized
-Current phase: architecture-first open search
-```
-
-The frozen-unary residual run itself returned `DEPENDENCE_NOT_ALIGNED_WITH_SET_ACCURACY`; the project-level decision to deprioritize repeated strong-unary pairwise residual correction is a routing interpretation, not a replacement of that run-local verdict.
-
-The project is deliberately **not** precommitted to a named architecture. New models, representations, prediction granularities, training paradigms, decoders, and coherent combinations are open for search.
-
-## Durable evidence bundles
-
-- [`modern-backbone-calibration.md`](modern-backbone-calibration.md): faithful recent-baseline calibration and information-budget lessons.
-- [`../prototypes/README.md`](../prototypes/README.md): current inventory of pre-Idea prototypes, mechanism screens, and observed terminal decisions.
-- [`../ideas/README.md`](../ideas/README.md): formal Ideas 001--008 and their terminal scope.
-- [`failures/`](failures/): failure records. These are formulation-local evidence, not universal architectural prohibitions.
-- [`reusable-lessons.md`](reusable-lessons.md): methodological lessons from multiple routes.
-- [`accumulated-experience.md`](accumulated-experience.md): historical archive synthesis; not live routing authority.
-
-## Historical discovery material
-
-- [`literature-opportunity-map.md`](literature-opportunity-map.md): historical literature/opportunity snapshot. Use it for discovery and prior search provenance, not as a current novelty gate.
-- [`research-space-reorientation.md`](research-space-reorientation.md): current directional synthesis, with historical boundaries explicitly scoped.
-- `model-reset-*`, `literature-search-*`, and `resource-reset-*` directories: dated search/reset packets. Their authorization language belongs to those packets only.
-
-## How to use failure memory
-
-Failure memory should answer:
+A failure record should make it possible to answer:
 
 ```text
 What exact formulation was tested?
-What strong control absorbed it?
-What information budget and target semantics were used?
-What should we avoid repeating unchanged?
-What components remain reusable in a materially different mechanism?
+What matched control absorbed or beat it?
+What information budget and target semantics applied?
+What should not be repeated unchanged?
+What primitives remain reusable in a materially different mechanism?
 ```
 
-Do not generalize `a tested formulation failed` into `the entire method family is impossible`. Conversely, do not rename an equivalent failed formulation and rerun it without a new scientific reason.
+Negative evidence is formulation-local unless a broader claim is directly tested.
 
-## Research posture
-
-- Search broadly, execute narrowly, kill weak directions quickly.
-- Prefer architecture-level hypotheses over small residual corrections when the evidence supports a reset.
-- Use strong simple baselines and equal-information controls.
-- Treat novelty as a survivor/paper requirement, not a barrier to cheap discovery.
-- Preserve raw negative evidence, but keep the search space open to genuinely different capabilities, objects, inductive biases, and information flows.
-- Stop diagnostic chains once they answer the scoped scientific question.
-- Treat prototype-first execution as the default, not an absolute rule; formalize earlier when the scientific contract itself requires it.
+Engineering architecture/dependency decisions are not stored here; they belong in `.agents/notes/`.

@@ -1,106 +1,87 @@
 # MedRec research agent instructions
 
-## Research objective
-
-This repository is the active research home for medication-recommendation method research. Optimize for:
+This repository is the Active Research Home for medication-recommendation method research. Optimize for:
 
 ```text
 scientific value × iteration speed × trustworthy evidence
 ```
 
-The immediate publication goal is a credible first method paper with CCF-B as the practical floor. Research quality should remain CCF-A-oriented, with CCF-A as the stretch publication target. New architectures, representations, prediction granularities, decoders/inference procedures, supervision paradigms, and coherent combinations of known primitives are all allowed.
+The practical publication floor is CCF-B; research quality remains CCF-A-oriented.
 
-Use `docs/guides/first-principles-research-practice-sources.md` as methodological background, but do not turn any checklist, novelty heuristic, prior failure, or workflow artifact into a substitute for scientific judgment.
+## Start here
 
-## Research execution principles
+Before changing anything:
 
-Default exploratory workflow:
+1. Verify the authoritative `origin/main` revision.
+2. Read `CONTEXT.md`, `Handoff.md`, and the nearest directory-level `AGENTS.md`.
+3. Use `docs/START_HERE.md` to find the current source of truth.
+4. For research work, read `research/memory/current-research-state.md` before acting on historical notes.
 
-```text
-step back
-→ broad literature / method search
-→ choose one mechanism-bearing candidate
-→ fast Train/Dev prototype
-→ decisive comparison / ablation
-→ continue / redesign once / kill
-```
+Rules inherit downward. A nearer `AGENTS.md` may add or narrow rules for its subtree but must not weaken repository-wide safety, privacy, provenance, or evidence boundaries.
 
-Early prototypes normally use one seed, one main configuration, Train/Dev only, and a strong baseline. Formal claim-support rigor is paid after a method earns it. This is a default workflow, not a prohibition on earlier formalization when target semantics, information entitlement, or another scientific contract must be frozen before modeling.
+## Global invariants
 
-Architecture-first means changing what is modeled when the evidence calls for it. Prioritize candidates that introduce a materially different capability, object, interaction, information flow, inductive bias, prediction granularity, decision process, decoder, or supervision structure. Before implementation, answer:
+- Run-local result files, audits, and source-bound experiment records are authoritative for what a run actually did.
+- `research/memory/current-research-state.md` owns current cross-project scientific synthesis and routing.
+- `docs/` describes current system facts and operating contracts. Do not put historical decision narratives there.
+- `.agents/notes/` stores append-only engineering causality: why an architecture, dependency, or subsystem decision was made.
+- `research/memory/decisions/` stores append-only scientific belief updates caused by evidence. It does not replace run-local evidence.
+- `Handoff.md` is a short current-work pointer, not a historical archive.
+- Historical evidence is never rewritten merely to match the latest interpretation. Archive or supersede it explicitly.
+- No global notes index is maintained; use directory structure and semantic filenames.
 
-```text
-What capability, object, interaction, information flow, inductive bias,
-or decision process is changed?
+## Research boundaries
 
-What matched strong control can test whether that change, not merely
-extra capacity or optimization budget, causes any gain?
-```
+- Default early screen: one seed, one main configuration, Train/Dev only, full intended training budget, and a strong matched control.
+- Prefer architecture-level changes in representation, information flow, prediction granularity, decoder/inference, or supervision over repeated small correction heads.
+- Two bounded weak prototypes in one family normally trigger a family reset. Do not rescue weak mechanisms with broad hyperparameter sweeps.
+- Historical failures constrain the tested formulation; they are not universal bans on primitives such as GNNs, retrieval, MoE, structured prediction, or attention.
+- Novelty, closest-work, SOTA, and benchmark-comparability claims that matter to a survivor or paper must be verified from primary sources.
+- Held-out Test, G3/G4, R0 Holdout, or any quarantined evaluation surface is not used for exploratory architecture selection.
 
-If the current backbone did not exist, periodically ask how the task would be formulated from scratch.
+Detailed research execution rules live in `research/AGENTS.md`.
 
-Search beyond Medication Recommendation when useful: structured prediction, set/list generation, optimization, energy models, graph learning, mixture-of-experts, retrieval/ranking, counterfactual learning, reinforcement learning, multimodal learning, and adjacent recommendation research. Do not force fashionable methods into the problem.
+## Execution and privacy
 
-Historical failures are evidence about the tested formulation, information budget, controls, and data. They are not universal bans on words such as GNN, hypergraph, retrieval, MoE, interaction, or structured prediction. A primitive from a failed route may be reused inside a materially different mechanism. Two bounded weak prototypes in the same family should normally trigger a family reset rather than repeated rescue.
+- The local MacBook Air is the Harness Terminal. Use it for core tests, synthetic fixtures, protocol checks, submission, monitoring, and public-safe intake.
+- Real EHR processing, model training, GPU inference, and baseline Conda environments run only on the 319 Execution Plane after the remote preflight.
+- Patient data, split membership, patient-level predictions, model weights, private traces, and restricted paths never enter Git.
+- The Local Data Root stays outside the repository. Git stores only public-safe manifests, aggregate evidence, synthetic fixtures, code, and compact research records.
+- `New-Search` is a read-only Research Archive. Cite its revision and path when migrated evidence depends on it.
 
-Novelty is important for a paper, but it is not the admission gate for a cheap prototype. Early literature search should prevent obvious duplication and expose strong controls. Rigorous closest-work and novelty verification from primary sources is required for survivors before formal paper claims. A coherent A+B+C mechanism can be publishable even when its individual components are known.
+## Directory routing
 
-Do not spend repeated cycles tuning thresholds, hidden sizes, loss weights, retrieval K, layer counts, or small heads to rescue a weak mechanism. One cheap diagnostic is acceptable when it can distinguish implementation/decoding failure from scientific failure.
+| Work | Read first |
+| --- | --- |
+| Current docs, specs, playbooks, plans | `docs/AGENTS.md` |
+| Scientific prototypes, ideas, memory, benchmarks | `research/AGENTS.md` |
+| External baselines and reproduction/comparison code | `baselines/AGENTS.md` |
+| Reusable core library | `src/medrec_research/AGENTS.md` |
+| Publication-facing survivor packages | `papers/AGENTS.md` |
 
-Useful screening magnitudes include roughly Jaccard `+0.010`, or DDI `-0.010` with Jaccard loss no worse than about `0.005`, or a clear accuracy–safety Pareto improvement. These are heuristics, not laws.
+Canonical sources:
 
-## Evidence and provenance
-
-- `research/memory/current-research-state.md` is the current scientific-state synthesis and routing authority.
-- Raw experiment result files, audit records, and idea-local artifacts remain the evidence authority for the runs they describe.
-- The current synthesis must distinguish observed run results, cross-project interpretation, and routing guidance. A routing recommendation must not be presented as if it were a runner-produced terminal verdict.
-- Historical memory documents are discovery aids and provenance records. Their old `CLOSED`, `CROWDED`, `PRIOR ART`, authorization, or routing labels apply to the recorded scope and date; they do not override the current-state synthesis.
-- Novelty, closest-work, SOTA, and benchmark-comparability claims must be verified from primary sources when they matter to a survivor decision or paper claim.
-- Public baseline adaptation is fidelity-first: prefer official source plus a thin data/evaluation wrapper. A semantically inspired rewrite cannot be used to reject a published method.
-- Reported literature performance is not automatically a comparable frontier. Information budget, prediction-time semantics, split, vocabulary, and evaluation must match.
-
-Run a check only when it can detect a concrete failure that would change trust or action. Do not manufacture review findings or add verification ceremony without a decision consequence.
-
-## Architecture invariants
-
-- The Unified Research Protocol owns first-party comparison semantics.
-- Reproduction Mode preserves recorded upstream behavior. Comparison Mode uses the shared protocol.
-- A Baseline Core remains unchanged in Comparison Mode. Prediction Adapters may translate representations but must not change scientific behavior.
-- Core development uses Python 3.11 and Homebrew `/opt/homebrew/bin/uv`. Each external baseline runs in an isolated Conda environment and process.
-- Conda, pip, and uv package resolution prioritizes repository/command-scoped China mirrors; unavailable exact artifacts fall back to official HTTPS authorities with TLS verification enabled. Never disable TLS verification or mutate machine/user-global package-manager configuration.
-- The local MacBook Air is the harness terminal. Run only core tests, synthetic fixtures, protocol checks, submission, monitoring, and public-safe audits locally.
-- Run real-data experiments, model training, GPU inference, and baseline Conda environments only on `319-wild` after the remote-execution preflight passes.
-- Patient data, split membership, patient-level predictions, model weights, and private traces never enter Git.
-- The Local Data Root lives outside every Git repository. Version only public-safe Dataset Manifests, aggregate evidence, and synthetic fixtures.
-- Git may contain compact public-safe prototype contracts, aggregate results, failure records, audits, and current-state syntheses. A formal Gate is not required merely to record an exploratory Train/Dev prototype.
-- `New-Search` is a read-only Research Archive. Cite its commit and path when migrated evidence depends on it.
-
-## Sources of truth
-
-- `CONTEXT.md`: canonical domain language.
-- `ARCHITECTURE.md`: module and seam map.
-- `docs/PLANS.md`: accepted multi-step work tracker.
-- `docs/plans/`: implementation plans.
+- `CONTEXT.md`: domain language.
+- `ARCHITECTURE.md`: current module, ownership, and dependency map.
+- `docs/KNOWLEDGE_HOMES.md`: where current facts, decisions, evidence, and handoff state belong.
 - `docs/specs/UNIFIED_RESEARCH_PROTOCOL.md`: comparison contract.
 - `baselines/registry.toml`: baseline identity and readiness.
-- `research/memory/current-research-state.md`: current scientific state and next-phase boundary.
-- `research/prototypes/README.md`: exploratory prototype inventory.
-- `research/ideas/README.md`: formal Idea inventory.
-- `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`: Mac harness and 319 execution contract.
-- `Handoff.md`: concise current handoff for the next agent/session.
+- `research/memory/current-research-state.md`: current scientific state.
+- `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md`: remote execution contract.
+- `Handoff.md`: concise next-agent handoff.
 
-## Work rules
+## Engineering rules
 
-- Prefer standard-library modules in the core package. Add dependencies only when they remove real complexity.
-- Use `apply_patch` for manual file edits.
-- Use `rg` for literal searches. Use CodeGraph or Semble before exploratory code search when available.
-- Keep imported baseline source out of this repository unless its license, provenance, and need have been reviewed.
-- Run lightweight Python commands through `rtk proxy /opt/homebrew/bin/uv run`. Run baseline commands through their declared Conda environment.
-- Follow `docs/playbooks/REMOTE_319_EXECUTION_PLAYBOOK.md` before real-data or GPU commands. A local synthetic run proves harness behavior only.
-- Use available GPUs to parallelize distinct hypotheses, strong controls, or survivor seeds rather than broad hyperparameter sweeps.
-- Record substantial engineering work in `docs/PLANS.md` when useful; do not require a planning artifact for a tiny bounded scientific probe.
+- Prefer standard-library modules in the reusable core. Add dependencies only when they remove real complexity.
+- Keep external baseline dependencies isolated from the core package.
+- Do not refactor adjacent code during a scoped bug fix unless the bug proves the shared abstraction is wrong.
+- Run a check only when it can detect a concrete failure that would change trust or action.
+- Do not add migration frameworks, compatibility layers, feature flags, hashes, or defensive scaffolding without a concrete project need.
+- Use available GPUs for distinct hypotheses, matched controls, or survivor seeds, not parameter fishing.
 
 ## Completion checks
+
+For code or contract changes, run the applicable repository checks:
 
 ```bash
 rtk proxy /opt/homebrew/bin/uv run pytest
@@ -109,13 +90,4 @@ rtk proxy /opt/homebrew/bin/uv run ruff format --check .
 markdownlint '**/*.md' --ignore '.agents/**'
 ```
 
-## Scope limits
-
-These bound what you propose, never what you look for.
-
-1. This is not a security paper. Verification is welcome; over-defense is not. Unless the project states otherwise, assume a cooperating operator on their own machine.
-2. Do not add hashes, checksums, fingerprints, feature flags, migration frameworks, compatibility layers, or wrappers unless they solve a concrete observed need and change execution or trust.
-3. Do not optimize for exotic corner cases that are not reachable through supported inputs, published interfaces, or real project data.
-4. Where judgment is needed, judge. Do not replace it with scoring tables, authorization churn, or repeated re-review of settled evidence.
-5. Before running any check, answer: what specific failure would this detect, and what would change if it occurred? If there is no answer, do not run the check.
-6. Say plainly when something is correct. Do not manufacture findings.
+Documentation-only changes may use the relevant Markdown/reference checks rather than unrelated GPU or real-data work.

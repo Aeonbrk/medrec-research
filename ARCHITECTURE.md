@@ -1,85 +1,113 @@
 # Architecture
 
-MedRec Research separates reusable scientific semantics from workflow orchestration and imported baseline runtimes. The central design question is whether two result rows mean the same thing. Shared folders or identical metric names do not make methods comparable; shared cohort identity, split membership, prediction semantics, evaluation, adaptation limits, and provenance do.
+MedRec Research separates reusable scientific semantics, external baseline runtimes, research evidence, and restricted execution. The main architectural question is whether two result rows mean the same thing; identical metric names are insufficient without aligned cohort, split, information budget, prediction semantics, adaptation limits, and evaluation.
 
 ## System map
 
 ```mermaid
 flowchart LR
-    Mac["MacBook Harness Terminal"] -->|"frozen plan + source revision"| Preflight["Read-only 319 Preflight"]
+    Mac["Harness Terminal"] -->|"source revision + frozen plan"| Preflight["Read-only 319 preflight"]
     Registry["Baseline Registry"] --> Preflight
-    Registry --> Program["Reproduction Program"]
-    Program --> Preflight
-    Preflight -->|"verified declaration + capacity"| Remote["319 Execution Plane"]
-    Data["319 Local Data Root"] -->|"local snapshot"| Remote
-    Remote -->|"aggregate public-safe evidence"| Mac
-    Mac --> Core["MedRec Research Library"]
-    Remote --> Core
-    Protocol["Unified Research Protocol"] --> Reference["Reference Baseline"]
-    Protocol --> Adapter["Process Adapter"]
-    Adapter --> Conda["Isolated Conda Baseline Environment"]
-    Reference --> Check["Protocol Check Record"]
-    Conda --> Wire["Target-free Adapter Prediction Payloads"]
-    Wire --> Adapter
-    Adapter --> Prediction["Core-owned Prediction Records"]
-    Prediction --> Evaluation["Evaluation Module"]
-    Evaluation --> Evaluator["319 Core Evaluator Environment"]
-    Evaluator --> Run["Accepted Comparison Run Record"]
-    Run --> Memory["Research Memory"]
+    Protocol["Unified Research Protocol"] --> Core["MedRec Research Library"]
+    Preflight --> Remote["319 Execution Plane"]
+    Data["Local Data Root"] --> Remote
+    Remote -->|"public-safe aggregate evidence"| Core
+    Registry --> Baseline["Isolated Baseline Environment"]
+    Baseline -->|"target-free payload"| Adapter["Prediction Adapter"]
+    Adapter --> Eval["Core Evaluator Environment"]
+    Protocol --> Eval
+    Eval --> Record["Protocol / Run Record"]
+    Record --> Research["Research evidence + memory"]
 ```
 
-## Deep modules
+## Execution boundary
 
-The core library exposes a small set of scientific interfaces. Dataset Manifest construction concentrates membership checks, dataset identity, and privacy constraints. Prediction Adapter validation keeps targets in the core and joins target-free wire payloads to eligible visits. Evaluation owns Comparison Mode metrics and edge cases. Run Record creation binds public-safe provenance to authoritative registry and manifest state. The Baseline Registry owns source and smoke readiness; Comparison Qualifications bind later gates to one protocol version, Dataset Manifest, and Adaptation Budget. Comparison Scope owns those identity comparisons. CLI handlers own path I/O and presentation, while `commands.py` holds only deterministic value transformations shared by those handlers.
+The local MacBook Air is the Harness Terminal. It owns core tests, synthetic protocol checks, submission, monitoring, and public-safe evidence intake.
 
-These modules are deep because callers do not reimplement their invariants. Their public interfaces are the test surface.
+The 319 Execution Plane owns real EHR processing, model training, GPU inference, external Baseline Environments, and restricted artifacts. Real-data work is submitted only after the remote preflight.
 
-The Comparison Mode process seam uses `ProcessPredictionAdapter.predict_comparison(...)` (Schema v2) and fake subprocesses in tests. Baseline-specific libraries, CUDA stacks, and working-directory assumptions stay behind it; no second adapter interface is maintained.
-
-Reproduction Mode uses a different deep module. A Reproduction Program owns the source-native data gate, mechanical invocation adaptation, training, checkpoint selection, upstream test procedure, and aggregate result finalization for one shared lineage. Programmatic callers interact strictly through `probe(request)` and `execute(request)` façades, with CLI `main()` as a thin transport wrapper. `RemoteExecutor` consumes the program declaration from the Baseline Registry, generates complete external data and run paths, accepts only approved 319 aliases, and performs the read-only preflight immediately before submission. Dry-run exercises this same interface without SSH; real submission also requires an exact clean harness revision and a 319-verified environment identity. Root CLI orchestration delegates reproduction command registration and argument parsing strictly to `src/medrec_research/reproduction/cli_commands.py`.
+The Local Data Root is repository-independent. Patient data, split membership, patient-level predictions, checkpoints, and private traces remain outside Git.
 
 ## Scientific modes
 
-Reproduction Mode and Comparison Mode answer different questions. Reproduction Mode asks whether a pinned source can reproduce its recorded behavior. Comparison Mode asks how methods behave under one shared protocol. A result from one mode cannot support a claim in the other.
+### Reproduction Mode
 
-The current Run Record schema accepts Comparison Mode evidence only. The synthetic reference emits a Protocol Check Record, not research evidence.
+Reproduction Mode asks whether a pinned upstream source can reproduce its recorded behavior. A Reproduction Program owns source-native data gates, mechanical invocation adaptation, training, checkpoint selection, upstream evaluation semantics, and aggregate finalization for one source lineage.
 
-Comparison Mode freezes the Baseline Core. A Prediction Adapter can map files, identifiers, tensors, and output records. If integration changes model logic, loss, feature availability, thresholding, or selection behavior, the result is a modified method and must receive a separate registry identity.
+Concrete program callers use narrow `probe(request)` and `execute(request)` façades. CLI entrypoints are transport wrappers rather than a second scientific interface.
 
-## Ownership
+### Comparison Mode
 
-The core Python package owns public-safe schemas, deterministic evaluation, registry validation, process validation, and the synthetic vertical slice. Code promotion into `src/medrec_research/` follows demonstrated reuse, stable semantics, and clear ownership (`idea-local prototype → demonstrated reuse in real experiments → stable semantics and clear ownership → reusable research capability → src/medrec_research/`), rather than whether the originating scientific hypothesis was confirmed or killed. Scientific ideas may fail while leaving durable instrumentation, profilers, dataset abstractions, or evaluation utilities. The MacBook owns protocol checks, remote submission, monitoring, and public-safe intake. The 319 execution plane owns real-data computation, external Baseline Environments, the separate Core Evaluator Environment, GPU jobs, and restricted outputs. `research/ideas/` owns early-stage hypothesis-selection experiments; `papers/` owns publication-facing claim-support packages (gathering decisive evidence around candidate claims under frozen evaluation contracts); `research/memory/` owns cross-idea generalizable lessons; `research/baselines/` owns baseline infrastructure; and the 319 Local Data Root owns all restricted data and private run artifacts.
+Comparison Mode asks how methods behave under the Unified Research Protocol. The protocol owns shared cohort/split semantics, information entitlement, evaluation, and adaptation limits.
 
-## Dependency direction
+A Baseline Core is frozen in Comparison Mode. A Prediction Adapter may translate representations and target-free wire payloads but may not change model logic, loss, feature availability, thresholding, or checkpoint selection. A scientific change receives a separate method identity.
 
-The core package has no baseline-framework dependency. Baseline processes emit target-free payloads on 319. The Core Evaluator Environment attaches core-owned targets, validates complete eligible-visit coverage, recomputes metrics, and emits a candidate Run Record. Only audited aggregate evidence crosses back to the Mac. None of these modules may place private paths in a public interface.
+Reproduction and Comparison evidence are not interchangeable.
+
+## Core ownership
+
+`src/medrec_research/` owns reusable idea-agnostic research capability: public-safe schemas, deterministic evaluation, registry validation, process validation, remote orchestration primitives, and protocol-facing abstractions.
+
+Promotion follows demonstrated reuse:
+
+```text
+idea/baseline-local code
+→ repeated real use
+→ stable semantics
+→ clear owner
+→ reusable core interface
+```
+
+Scientific hypotheses may fail while leaving reusable instrumentation, dataset abstractions, evaluation code, or execution utilities.
+
+The core package does not depend on external baseline frameworks. Baseline-specific Conda/CUDA/runtime assumptions stay behind process boundaries.
+
+## Baselines
+
+`baselines/registry.toml` is the authority for baseline identity, pinned source, supported scientific modes, Reproduction Program/profile bindings, environment identity, and readiness.
+
+Root `baselines/` contains harness-owned baseline programs and integration code, not copied upstream repositories. Imported source remains external unless provenance, license, and need justify bringing it into the Active Research Home.
+
+Baseline processes emit target-free payloads. Core-owned targets are attached and evaluated only in the core evaluation boundary.
+
+## Research ownership
+
+`research/` owns early scientific work:
+
+- `prototypes/`: bounded pre-Idea screens;
+- `ideas/`: formal Ideas and frozen scientific contracts;
+- `benchmarks/`: dataset/task contracts and public-safe benchmark records;
+- `diagnostics/`: decision-changing bounded diagnostics;
+- `memory/`: current synthesis, scientific decisions, failure memory, literature/search provenance, and archives.
+
+Run-local evidence remains with the owning experiment. `research/memory/current-research-state.md` is the short live synthesis; `research/memory/decisions/` records append-only scientific belief changes.
+
+`papers/` owns mature publication-facing survivor packages and claim-support experiments. It is not an archive for speculative ideas.
+
+## Knowledge ownership
+
+Current facts and historical causality are separate:
+
+- `docs/`, this file, and `CONTEXT.md`: current system facts;
+- `.agents/notes/`: append-only engineering decisions and trade-offs;
+- research run artifacts: scientific evidence;
+- `research/memory/decisions/`: scientific belief updates;
+- `Handoff.md`: current task pointer.
+
+See `docs/KNOWLEDGE_HOMES.md` for the full ownership contract.
 
 ## Repository layout
 
 ```text
-baselines/      Baseline Registry plus implemented Reproduction Programs
-docs/           Decisions, specifications, plans, and operational playbooks
-environments/   Verified or explicitly provisional 319 environment declarations
-fixtures/       Public synthetic data only
-papers/         Publication-facing paper projects (CCFA lifecycle, manuscript, claim-support experiments)
-research/       Early-stage ideas (ideas/), baseline infrastructure (baselines/), and cross-idea memory (memory/)
-src/            Reusable protocol and library implementation
-tests/          Tests through public module interfaces
+.agents/notes/          Engineering decision history
+baselines/              Baseline Registry and harness-owned baseline programs
+docs/                   Current specs, playbooks, guides, and active plans
+environments/           Verified/provisional execution environment declarations
+fixtures/               Public synthetic data only
+papers/                 Publication-facing survivor packages
+research/               Scientific prototypes, Ideas, benchmarks, diagnostics, memory
+src/medrec_research/     Reusable research library
+tests/                   Tests through supported public interfaces
 ```
 
-Runtime logs, checkpoints, data snapshots, and patient-level outputs are ignored local state, not architecture.
-
-### Baselines
-
-`baselines/registry.toml` is the only authority for baseline identity, Reproduction Program declarations, and Reproduction Lanes. A program declaration owns its repository-relative entrypoint, external 319 source root, dataset and run subdirectories, Conda environment name, required inputs, import probe, and verified identities. Each baseline and reproduction lane points to its declared program and profile rather than duplicating launch configuration.
-
-For the MoleRec Table 1 attempt, the two programs intentionally bind to the same `medrec-molerec-table1` compatibility environment so all seven lanes share one frozen runtime contract. `environments/safedrug-archived.yml` and its lock remain historical recovery declarations until the authorized post-attempt cleanup decision.
-
-Two standalone Reproduction Programs are provided:
-
-1. `baselines/safedrug_archived.py`: The SafeDrug archived reproduction program (covering `gamenet`, `safedrug`, `retain`, `leap-safedrug`).
-2. `baselines/molerec.py`: The MoleRec Table 1 reproduction program (covering `molerec`, `molerec-embedding`).
-
-Both programs are deep entries with internal collaborators (`*_data.py`, `*_logs.py`, `*_probe.py`) exposing narrowed public programmatic surfaces (`__all__ = ("execute", "probe")`) and CLI transport wrappers. Attempt-level orchestration and Table-1 schedule policy live in `src/medrec_research/reproduction/molerec_table1_attempt.py`, keeping `RemoteExecutor` and evaluation queue management strictly attempt-agnostic.
-
-There are no `adapters/`, `audits/`, `programs/`, `runners/`, or `scripts/` subdirectories under `baselines/`. A Prediction Adapter belongs there only after Comparison Mode needs a target-free translation module. Audits are durable evidence under `research/`; operating instructions belong in `docs/playbooks/`; run artifacts remain outside Git. Empty directories do not define modules or seams.
+Runtime logs, checkpoints, private data snapshots, patient-level outputs, and restricted traces are local execution state, not repository architecture.
