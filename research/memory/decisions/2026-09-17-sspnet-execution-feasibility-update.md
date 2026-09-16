@@ -42,14 +42,29 @@ The checked source has the following concrete execution blockers:
 - Probe values are non-evidence diagnostics and are excluded from all result
   tables.
 
+## Follow-up edge-case probe
+
+The frozen core evaluator defines both-empty set metrics as `1.0` and empty
+target average precision as `0.0`. Injecting exactly those rules into the
+bounded adapter, while suppressing only visualization and threading the
+declared DDI adjacency through the unused source argument, allowed a
+one-patient/one-epoch source optimizer and evaluation smoke to finish with
+finite loss and metrics. This follow-up also produced no terminal evidence
+artifact and no Test access.
+
+The successful smoke proves only that the identified call-site and metric
+edge-case defects can be isolated mechanically. It does not establish a
+frozen-profile adapter, source-metric equivalence, checkpoint/operating-point
+selection, or a credible full-budget baseline.
+
 ## Decision
 
-`SSPNET_EXECUTION_UNRESOLVED` remains the correct status. The plotting and
-argument issues appear mechanically isolable, but the empty-set convention
-must be bound to the frozen evaluator rather than guessed, and the resulting
-adapter needs an independent source-fidelity review. No formal SSPNet run,
-structured prototype, or SSPNet-inspired substitute is authorized from this
-probe.
+`SSPNET_EXECUTION_UNRESOLVED` remains the correct status. The plotting,
+argument, and empty-set issues are mechanically isolable, but the resulting
+adapter still needs an independent source-fidelity review, explicit frozen
+profile/evaluator binding, and a bounded cost decision. No formal SSPNet run,
+structured prototype, or SSPNet-inspired substitute is authorized from these
+probes.
 
 Required before reconsideration: an independently reviewed adapter that
 isolates visualization, threads the declared DDI inputs, removes the undefined
