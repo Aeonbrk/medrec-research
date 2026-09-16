@@ -48,6 +48,52 @@
     "freeze seed, mapping version, split assignment, coverage, and row-count manifest",
     "run target-free leakage and split-disjointness checks before any Train/Dev run"
   ],
+  "resource_checks": {
+    "admissions_visits": {
+      "status": "AVAILABLE",
+      "tables": ["hosp.admissions"],
+      "keys": ["subject_id", "hadm_id", "admittime"]
+    },
+    "diagnoses": {
+      "status": "AVAILABLE",
+      "tables": ["hosp.diagnoses_icd"],
+      "join_key": "hadm_id"
+    },
+    "procedures": {
+      "status": "AVAILABLE",
+      "tables": ["hosp.procedures_icd"],
+      "join_key": "hadm_id"
+    },
+    "prescriptions_medication_orders": {
+      "status": "AVAILABLE",
+      "tables": ["hosp.prescriptions"],
+      "identifiers": ["ndc", "formulary_drug_cd"],
+      "join_key": "hadm_id"
+    },
+    "patient_identity": {
+      "status": "AVAILABLE",
+      "key": "subject_id"
+    },
+    "visit_chronology": {
+      "status": "AVAILABLE",
+      "ordering": "admittime then hadm_id"
+    },
+    "drug_normalization_source": {
+      "status": "REUSABLE",
+      "candidate": "NDC/formulary to RxNorm to ATC4 with deterministic fallback",
+      "freeze_required": true
+    },
+    "atc_mapping_capability": {
+      "status": "REUSABLE",
+      "level": "ATC4",
+      "dataset_native_vocabulary": true
+    },
+    "ddi_mapping_capability": {
+      "status": "REUSABLE",
+      "asset": "frozen SafeDrug/MoleRec DDI matrix projected by ATC4",
+      "coverage_report_required": true
+    }
+  },
   "protocol": {
     "input": "current diagnosis and procedure sets plus strictly previous visit diagnosis/procedure/medication history",
     "target": "current visit medication set",
