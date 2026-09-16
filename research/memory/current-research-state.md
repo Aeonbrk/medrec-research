@@ -9,19 +9,20 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Current phase: pre-Stage 0 bounded candidate review
+Current phase: STAGE -1G — COMPETITIVE SUBSTRATE CALIBRATION
+Stage -1G status: DESIGNED_NOT_EXECUTED
 Paper claim: none
 Held-out evaluation: untouched for current architecture search
 Knowledge-home migration review: PASS
 ```
 
-Stage -1 substrate work is complete enough to support the next bounded architecture decision. The knowledge-organization migration has passed independent adversarial review; no scientific or engineering defect was found that blocks further work.
+Stage -1F established a reusable cross-dataset MICA mechanism. Stage -1G is now authorized to resolve the remaining external-comparison weakness before any Stage 0 RSM implementation.
 
 ## Validated substrate
 
 ### Medication-specific evidence selection
 
-Stage -1F replicated the MICA `DrugQuery` mechanism against matched `SharedPool` controls on both frozen Train/Dev surfaces:
+Stage -1F replicated MICA `DrugQuery` against matched `SharedPool` controls on both frozen Train/Dev surfaces:
 
 | Dataset | SharedPool J | DrugQuery J | ΔJ | ΔF1 | ΔPRAUC | ΔNLL | ΔDDI |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -30,7 +31,7 @@ Stage -1F replicated the MICA `DrugQuery` mechanism against matched `SharedPool`
 
 Observed verdict: `MICA_MECHANISM_REPLICATED_BOTH_DATASETS`.
 
-Interpretation: medication-specific clinical evidence selection is a reusable cross-dataset Train/Dev mechanism. It is not a stable safety claim and not held-out paper evidence.
+Interpretation: medication-specific clinical evidence selection is a reusable cross-dataset Train/Dev mechanism. It is not a stable safety claim, SOTA claim, or held-out paper result.
 
 Evidence:
 
@@ -40,13 +41,13 @@ Evidence:
 
 ### Training dynamics
 
-Stage -1A diagnosed the MIMIC-III MICA family as `OVERFIT_DOMINANT`: Train BCE continued to fall while Dev NLL rose and Dev Jaccard/PRAUC declined. This is shared family/training behavior rather than a DrugQuery-specific failure.
+Stage -1A diagnosed the MIMIC-III MICA family as `OVERFIT_DOMINANT`: Train BCE continued to fall while Dev NLL rose and Dev Jaccard/PRAUC declined. Stage -1B selected AdamW constant `1e-4` as the working MICA-family recipe; it reduces but does not remove late overfitting.
 
-Stage -1B selected AdamW constant `1e-4` as the working recipe for subsequent matched screens. It reduces, but does not remove, late overfitting. Validation checkpoint selection remains necessary.
+This recipe is not a universal baseline recipe. External methods in Stage -1G retain method-appropriate training semantics.
 
 ### MIMIC-IV benchmark
 
-The visit-level MIMIC-IV v3.1 Train/Dev benchmark is frozen and passed source, split, chronology, strict-history, target-leakage, Train-only vocabulary, normalization, DDI, and serialization checks.
+The visit-level MIMIC-IV v3.1 Train/Dev benchmark is frozen and passed source, split, chronology, strict-history, current-target leakage, Train-only vocabulary, normalization, DDI, and serialization checks.
 
 Task semantics:
 
@@ -56,7 +57,7 @@ current diagnoses + current procedures
 → current medication set
 ```
 
-MIMIC-IV uses dataset-native vocabularies with ATC4 medication targets. Test membership remains sealed; Test medication targets were not loaded for Stage -1E/-1F.
+MIMIC-IV uses dataset-native vocabularies with ATC4 medication targets. Test membership remains sealed; Test medication targets were not loaded for Stage -1E/-1F and remain unavailable in Stage -1G.
 
 ## Current architecture evidence
 
@@ -84,34 +85,67 @@ MIMIC-III canonical/reference surfaces retained in project memory:
 
 | Surface | Jaccard | PRAUC | DDI | Role |
 | --- | ---: | ---: | ---: | --- |
-| MoleRec | 0.529174 | 0.773576 | 0.072223 | strong simple canonical anchor |
+| MoleRec | 0.529174 | 0.773576 | 0.072223 | strong canonical anchor |
 | GraphRefine-SameK | 0.533650 | 0.784240 | 0.073328 | executed admissible reference |
 | HypeMed-LeakageSafe | 0.512112 | 0.753822 | 0.059404 | faithful recent reference |
 | Rx-Expert coarse | 0.510522 | 0.757858 | 0.077303 | faithful architecture-family reference |
 
-Literature scores are not automatically comparable when information budget, split, vocabulary, or evaluation differs.
+These surfaces do not establish a complete paper benchmark. MIMIC-IV currently lacks strong external methods under the frozen project protocol. Literature scores are not directly comparable when cohort, information budget, vocabulary, split, or evaluation differs.
+
+## Stage -1G contract
+
+Scientific question:
+
+> Is MICA-Core competitive enough against strong faithful external methods on both frozen datasets to justify building the next architecture on top of it?
+
+Frozen contract:
+
+- `research/prototypes/mica-competitive-substrate-calibration/protocol.md`
+- `research/memory/decisions/2026-09-16-stage-minus-1g-competitive-substrate-calibration.md`
+
+Stage -1G phases:
+
+1. no-training fixed-131/generalized-MICA equivalence audit;
+2. primary-source and official-code baseline qualification;
+3. exactly three qualified baseline families × MIMIC-III/MIMIC-IV using six GPUs;
+4. common accuracy/safety/efficiency readout plus Dev-only paired patient-cluster bootstrap diagnostics;
+5. substrate competitiveness decision.
+
+External baselines share the frozen task, information budget, split roles, target semantics, and evaluator. They do not share one forced optimizer. The Baseline Core keeps its documented method-specific training and prediction behavior.
+
+Preferred recent candidates are ARMR, HypeMed, and SSPNet. SSPNet is executable only with trustworthy implementation provenance; otherwise a faithful compatible fallback such as GAMENet is used. Molecular methods require valid method-native medication assets across the frozen output vocabulary.
+
+Terminal Stage -1G verdicts:
+
+- `MICA_SUBSTRATE_COMPETITIVE_BOTH_DATASETS`
+- `MICA_SUBSTRATE_BORDERLINE`
+- `MICA_SUBSTRATE_OUTCLASSED`
+- `INSUFFICIENT_COMPETITIVE_CALIBRATION`
+- `STOP_MICA_GENERALIZATION_EQUIVALENCE_FAILURE`
+
+Only the first verdict permits returning to Stage 0 RSM contract review.
 
 ## Current candidate
 
-The leading bounded architecture candidate is direct partial regimen assignment (RSM): medication-specific evidence proposals feed anonymous regimen slots that predict medication-or-NULL assignments instead of only independent medication membership probabilities.
+Direct Partial Regimen Assignment / RSM remains the leading bounded architecture candidate, but it is deferred behind Stage -1G. It has not been implemented, trained, admitted as Idea 009, or opened as a formal Gate.
 
-This candidate has not been implemented, trained, admitted as Idea 009, or opened as a formal Gate. Before execution, its exact matched controls and attribution must remain able to separate representation capacity, structured supervision, and assignment decoding.
-
-One implementation-equivalence concern remains from Stage -1F: the generalized variable-medication MICA path produced a lower MIMIC-III DrugQuery peak than the earlier fixed-131 implementation under nominally matched settings. This is not evidence against the mechanism because the Stage -1F matched delta replicated on both datasets, but it should be resolved before using the generalized path as the RSM substrate.
+The candidate remains scientifically interesting because it changes the final decision from independent medication membership to direct medication-or-NULL partial set assignment over medication-specific evidence proposals. Its value should not be tested until the substrate is shown to be externally competitive.
 
 ## Evaluation boundaries
 
-- Current exploratory evidence is Train/Dev and single-seed unless a run explicitly states otherwise.
-- G3/G4, R0 Holdout, historical Test, and MIMIC-IV Test remain unavailable for exploratory architecture selection.
-- DDI is interpreted within a dataset's measurement surface; cross-dataset absolute DDI values are not treated as directly equivalent safety measurements.
-- Lower DDI caused by fewer medications is not sufficient evidence of safer treatment.
+- Stage -1G is Train/Dev and one seed per baseline arm unless a run explicitly states otherwise.
+- G3/G4, R0 Holdout, historical Test, and MIMIC-IV Test remain unavailable for architecture or substrate selection.
+- DDI is interpreted within a dataset's measurement surface; cross-dataset absolute DDI values are not one common safety scale.
+- Lower DDI caused by under-prescription is not sufficient evidence of safer treatment.
+- Published scores from differently processed MIMIC datasets remain literature context, not direct comparison rows.
+- Final paper confirmation, if a model survives, requires broader baselines, multiple training seeds, untouched Test, decisive ablations, and final statistical evidence.
 
 ## Knowledge-organization status
 
-The migration at `3c420eb0d810c10f629f575495a767aef5698436` passed independent adversarial review with no blocker, major, or minor findings. The review confirmed history preservation, scientific-state preservation, reference integrity, rule precedence, and no material over-migration. The accepted engineering record is `.agents/notes/migrations/2026-09-16-knowledge-home-review-pass.md`.
+The migration at `3c420eb0d810c10f629f575495a767aef5698436` passed independent adversarial review with no blocker, major, or minor findings. The accepted engineering record is `.agents/notes/migrations/2026-09-16-knowledge-home-review-pass.md`.
 
 ## Next scientific action
 
-Run one bounded, target-free, no-training exact-equivalence audit between the prior fixed-131 MICA implementation and the generalized MICA implementation on the 131-medication path. Compare parameter names/shapes, initialized tensors under the same seed, forward logits, and objective values on the same synthetic or target-free batch.
+Execute Stage -1G exactly as frozen in `research/prototypes/mica-competitive-substrate-calibration/protocol.md`.
 
-If equivalent, return to final review of the bounded RSM experiment contract. Do not launch RSM, add seeds, create Idea 009, open a Gate, or use held-out evaluation automatically.
+Start with the no-training equivalence audit and baseline qualification. If both pass, freeze the three paired baseline families and launch the six Train/Dev lanes across the available GPUs. Do not read Test, implement RSM, create Idea 009, open a Gate, or broaden into a final-paper benchmark automatically.
