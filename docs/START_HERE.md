@@ -11,7 +11,10 @@ Use this page to find the source of truth for the question in front of you.
 
 ## Current paper experiment contract
 
-- [`specs/PAPER_EXPERIMENT_CONTRACT.md`](specs/PAPER_EXPERIMENT_CONTRACT.md): current paper-facing experiment governance, evidence roles, baseline adaptation, Dev selection, seeds, Test use, statistics, and research lifecycle.
+Read these together:
+
+- [`specs/PAPER_EXPERIMENT_CONTRACT.md`](specs/PAPER_EXPERIMENT_CONTRACT.md): v1.0 base paper-facing experiment governance, evidence roles, baseline adaptation, Dev selection, seeds, Test use, statistics, and research lifecycle.
+- [`specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`](specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md): current additive amendment covering asymmetric development effort, anti-underoptimization baseline fairness, benchmark-role defaults, harmonized-131 lineage audit, and control/ablation optimization.
 - [`specs/PAPER_EVALUATOR_SPEC.md`](specs/PAPER_EVALUATOR_SPEC.md): current core metric and aggregation semantics.
 - [`guides/PAPER_METHOD_CARD_TEMPLATE.md`](guides/PAPER_METHOD_CARD_TEMPLATE.md): concise per-method identity/adaptation/selection record.
 

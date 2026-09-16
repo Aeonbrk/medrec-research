@@ -10,7 +10,7 @@ Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
 Human-facing phase: CREDIBLE REFERENCE SETUP
-Paper Experiment Contract: v1.0 CURRENT
+Paper Experiment Contract: v1.0 + v1.1 amendment CURRENT
 Paper claim: none
 New Test access: not authorized
 Available concurrent GPU capacity: 8 × RTX 3090-class
@@ -19,10 +19,19 @@ Available concurrent GPU capacity: 8 × RTX 3090-class
 Historical `Stage -1*`, Gate, Reproduction Mode, and Comparison Mode names remain provenance only. New paper-facing work is governed by:
 
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EVALUATOR_SPEC.md`
 - `docs/guides/PAPER_METHOD_CARD_TEMPLATE.md`
 
 The former Unified Research Protocol v1.0/v1.1 and `baselines/registry.toml` remain historical integration/provenance records; they do not automatically certify a future paper row.
+
+## Development philosophy
+
+The proposed method may receive substantially greater Train/Dev research effort than external baselines. Equal cumulative architecture/HPO budgets are not a fairness requirement.
+
+Fairness requires that a competitor is not weakened by our execution choices: trustworthy method identity, required assets, legal information budget, reasonable training horizon, declared Dev-only checkpoint/operating-point selection, and source-informed investigation of obvious failures. Baseline tuning is an anti-underoptimization safeguard, not a symmetric-search requirement.
+
+Central ablations and matched controls also need a reasonable Dev selection opportunity when mechanically reusing the full model's recipe would materially disadvantage them.
 
 ## Valid development evidence
 
@@ -39,19 +48,27 @@ Current interpretation:
 
 These results are `DEVELOPMENT` evidence. They are not final-table superiority, SOTA, universal safety improvement, or a calibration claim. The fixed-131/generalized MICA implementation passed exact no-training equivalence on the 131-medication path.
 
-## Benchmark surfaces
+## Benchmark strategy
 
-- **MIMIC-III canonical-131**: canonical medication-space/literature interface. Direct numerical comparability still depends on cohort, split, input, selection, and evaluator semantics. Historical Test feedback remains to be audited.
-- **MIMIC-IV native-173**: frozen dataset-native surface and preferred candidate for the second main benchmark, subject to baseline feasibility and timing/feedback audits.
-- **MIMIC-IV common-131**: harmonized projected compatibility surface. It changes target space/cardinality and is not the full native MIMIC-IV medication task.
+Default paper routing is now:
+
+- **MIMIC-III canonical-131**: main literature-facing comparison surface.
+- **MIMIC-IV harmonized/common-131**: default main MIMIC-IV literature-facing comparison surface, pending canonical-lineage identity audit.
+- **MIMIC-IV native-173**: broader-target validation surface.
+
+`Literature-facing` does not mean identical benchmark identity. Equal medication count does not establish equal cohort, preprocessing, split, eligibility, input semantics, or evaluator.
+
+Before Paper Candidate Freeze, benchmark roles may change only for structural reasons such as faithful-baseline feasibility, missing scientific assets, target-space relevance, or the final mechanism's dependence on long-tail/cardinality structure. They may not change because one observed surface is easier to win.
+
+The MIV harmonized/common-131 lineage audit must compare exact medication identities, ATC terminology/semantics, mapping rules where reconstructable, zero-support coordinates, eligible-visit/projected-empty rules, cardinality changes, DDI identity/projection, and what is actually known to match published benchmark lineages.
+
+Native-173 with only internal controls supports an internal mechanism/broader-target claim. Competitive superiority on native-173 requires at least one credible external comparator relevant to the claim.
 
 Two MIMIC-IV vocabulary surfaces are not two independent datasets.
 
 ## Competitive baseline fidelity state
 
-The cleanup and independent fidelity review remain authoritative for the failed temporary calibration runners.
-
-Temporary project-side ARMR, MoleRec, GAMENet, and RETAIN outputs from the former Stage -1G path are diagnostic only and must not support method ranking or paper superiority claims. The invalidation does **not** mean every departure from official code is forbidden under the new contract; benchmark-specific Dev selection is allowed when declared and bounded, while changes that materially alter the scientific method/training process require equivalence evidence or a variant identity.
+Temporary project-side ARMR, MoleRec, GAMENet, and RETAIN outputs from the former Stage -1G path are diagnostic only and must not support method ranking or paper superiority claims. The invalidation does **not** mean every departure from official code is forbidden. Benchmark-specific Dev selection is allowed when declared and bounded, while changes that materially alter scientific method/training semantics require equivalence evidence or a variant identity.
 
 The earlier separately qualified five-model MIMIC-III program remains historical reference evidence, not automatic final-paper evidence.
 
@@ -63,25 +80,30 @@ If pursued, its question must be framed around explicit set-level competition, v
 
 A 2×2 evidence-by-decoder experiment is preferred only when the two factors can be independently manipulated without changing information access or introducing confounds. Otherwise use narrower matched controls.
 
-## Current bounded audits
+The proposed method should be optimized toward the strongest defensible form, considering predictive effect, seed stability, mechanism clarity, closest-work distinction, DDI/cardinality behavior when relevant, robustness, and cost—not only the largest single Dev metric.
 
-Three audits are active decision dependencies, not one global training gate:
+## Current bounded dependencies
 
-1. **Prediction-time semantics** — establish what current diagnosis/procedure timing supports in the claim language.
-2. **Evaluation feedback history** — establish MIMIC-III/MIMIC-IV Test exposure and whether claimed confirmation populations are known to overlap at patient/record level; unknown remains unknown.
-3. **MIMIC-IV native-173 baseline feasibility** — for relevant external methods, distinguish mechanical output-space adaptation from missing scientific assets or a scientific rewrite.
+These are scoped dependencies, not one global training gate:
 
-Only resolve the unknowns that can change the experiment being launched.
+1. **MIMIC-III evaluator/selection freeze** — enough to launch SharedPool-vs-DrugQuery stability.
+2. **MIV harmonized-131 canonical-lineage audit** — enough to justify its paper-facing role and naming.
+3. **Baseline Method Cards/recovery** — source-backed MoleRec and ARMR first; each may start independently when its identity, reference-sanity conditions, and selection procedure are frozen.
+4. **Prediction-time semantics / evaluation-feedback history** — continue only where the result can change an upcoming experiment or manuscript claim.
+5. **Structured-set closest-work boundary** — required before expensive RSM/set-model training.
 
-## Near-term experiment routing after relevant audits
+## Near-term experiment routing
 
-Once the MIMIC-III task/evaluator/selection profile is fixed, a three-seed SharedPool-vs-DrugQuery stability experiment is authorized as an architecture-decision experiment without waiting for unrelated native-173 or SSPNet work.
+Once dependency 1 is complete, run:
 
-A source-backed baseline recovery run may start once that method's Method Card, benchmark profile, reference-sanity conditions, and bounded Dev selection are frozen.
+```text
+MIMIC-III SharedPool × 3 development seeds
+MIMIC-III DrugQuery × 3 development seeds
+```
 
-A structured-set prototype must wait until the closest-work computational distinction and minimum model definition are clear.
+This is an architecture-decision stability test, not final paper confirmation.
 
-With eight GPUs, a useful later parallel layout is six MIMIC-III MICA stability runs plus two independent credible baseline recovery lanes, but GPU occupancy is not a requirement and unresolved experiments should not be launched merely to fill devices.
+With eight GPUs, the six MICA stability runs may execute in parallel. The remaining two GPUs may run credible MoleRec/ARMR recovery when those paths are ready. GPU occupancy is not a goal; do not launch unresolved work merely to fill devices.
 
 ## Final evidence boundary
 
@@ -91,4 +113,4 @@ MIMIC-IV Test remains the highest-value currently sealed confirmation surface. D
 
 ## Next action
 
-Execute the bounded audits above and create Method Cards only for baselines that are about to be recovered. Do not resume the invalidated temporary runners or start broad baseline sweeps.
+Finish only the bounded dependencies required for the first credible parallel experiment wave: MIII evaluator/selection freeze, harmonized-131 identity audit, and source-backed MoleRec/ARMR Method Cards/recovery. Do not resume invalidated runners or start broad baseline sweeps.
