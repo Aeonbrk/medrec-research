@@ -4,8 +4,8 @@
 
 `DISPLAY_NAME`: ARMR (adaptively responsive medication recommendation)
 
-`SCIENTIFIC_ROLE`: external longitudinal baseline; development-only until a
-current paper-profile run passes the fidelity and evaluator checks.
+`SCIENTIFIC_ROLE`: external longitudinal baseline; development-only for current
+paper development and not a final-confirmation claim.
 
 ## SOURCE
 
@@ -69,8 +69,11 @@ that released behavior is preserved and recorded rather than silently repaired.
 - Admission checks require finite logits, non-collapsed predictions,
   non-pathological medication cardinality, correct graph/input use, and a
   complete terminal artifact before any ranking use.
-- Verdict: `FIDELITY_UNRESOLVED` until a current-profile run and independent
-  audit pass.
+- Formal run `armr-20260917-1203-paperdev-v2` completed at the pinned source,
+  clean harness, and explicit environment identity; its run-local integrity
+  audit passed all artifact, selection, numerical, and Test-boundary checks.
+- Verdict: `DEVELOPMENT_CREDIBLE`; this does not authorize Paper Candidate
+  Freeze, final-training freeze, or any Test evaluation.
 
 ## VALIDATION_AND_DECODING
 
@@ -94,5 +97,6 @@ that released behavior is preserved and recorded rather than silently repaired.
 - The source's procedure-channel zeroing is surprising but is part of the
   pinned implementation; no stronger procedure-enabled variant is called
   ARMR.
-- The alternate environment differs from the historical lock; its complete
-  identity and run-specific hashes must be recorded before formal execution.
+- The alternate environment differs from the historical lock; its explicit
+  identity and run-specific source/checkpoint hashes are recorded in the
+  restricted run-local artifacts.

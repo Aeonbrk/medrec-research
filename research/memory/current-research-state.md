@@ -73,13 +73,13 @@ MIV harmonized131 and native173 are target-space views of the same underlying MI
 
 ## Competitive baseline fidelity state
 
-Temporary project-side ARMR, MoleRec, GAMENet, and RETAIN outputs from the former Stage -1G path are diagnostic only and must not support method ranking or paper superiority claims.
+Temporary project-side MoleRec, GAMENet, and RETAIN outputs from the former Stage -1G path remain diagnostic only and must not support method ranking or paper superiority claims. The current ARMR lane is separate and source-pinned.
 
-MoleRec is the first recovery priority. The second recovery lane is conditional rather than permanently fixed:
+MoleRec remains the first recovery priority. Its source-native training lane is still running and has no terminal artifact; because the released entrypoint uses its own source split, partial or source-split values cannot enter the frozen paper-profile table.
 
-- use ARMR when it is ready and structured-set prediction is not yet the active paper hypothesis;
+- ARMR current-profile formal recovery is complete and passed an independent integrity audit. It is a credible DEVELOPMENT external anchor, not a Paper Candidate or final superiority claim;
 - promote SSPNet when structured/set prediction becomes the active hypothesis, SSPNet is confirmed as the closest relevant comparator, and a trustworthy execution path exists;
-- otherwise allow ARMR to proceed while SSPNet remains a bounded source/CPU recovery task.
+- otherwise keep SSPNet as a bounded source/CPU recovery task while the closest-work distinction remains unresolved.
 
 SafeDrug rises in priority only if safety/molecular claims become central. GAMENet, RETAIN, and HypeMed are added only when they fill a distinct scientific role.
 
@@ -178,4 +178,4 @@ MIMIC-IV Test remains sealed throughout reference setup and architecture search.
 
 ## Next action
 
-Freeze the minimum MIMIC-III run contract, start MoleRec recovery, choose the conditional second recovery lane, finish the time-bounded structured closest-work audit, and begin architecture implementation as soon as its local prerequisites are satisfied. Do not wait for unrelated audits or ceremonial seed completion.
+Audit the detached MoleRec lane only when it reaches a terminal artifact; do not promote its source-split values. In parallel, keep the structured candidate paused at the `NOVELTY_UNRESOLVED` / `SSPNET_EXECUTION_UNRESOLVED` boundary until the closest-work and evaluator prerequisites are resolved.
