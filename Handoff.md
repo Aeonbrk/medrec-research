@@ -8,7 +8,7 @@ Updated: 2026-09-16.
 Stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
 Status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 AUTHORITATIVE_START_REVISION: fccd2484c10aa9cf7a48cb02504a8fa78b61dde6
-FINAL_REVISION: 2721546 (Stage -1 evidence closeout commit)
+FINAL_REVISION: 27215468571571e680902bace3c095ba531f77a1 (Stage -1 evidence closeout commit)
 Active formal Idea: none
 Idea 009: not created
 Active formal Gate: none
