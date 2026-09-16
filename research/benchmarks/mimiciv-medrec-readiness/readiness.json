@@ -1,0 +1,110 @@
+{
+  "stage": "STAGE -1",
+  "stage_name": "MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS",
+  "status": [
+    "PRE-IDEA",
+    "PRE-GATE",
+    "NO PAPER CLAIM",
+    "NO HOLDOUT TEST",
+    "NO NEW METHOD FAMILY"
+  ],
+  "readiness": "MIMIC_IV_PROTOCOL_READY_FOR_IMPLEMENTATION",
+  "decision_scope": "resource_and_protocol_freeze_only",
+  "authoritative_release": "MIMIC-IV v3.1",
+  "training_run": "not_run",
+  "holdout_access": "not_accessed",
+  "available": [
+    "hosp.admissions with subject_id, hadm_id, and admission chronology",
+    "hosp.diagnoses_icd linked by hadm_id",
+    "hosp.procedures_icd linked by hadm_id",
+    "hosp.prescriptions with medication identifiers and course times",
+    "patient identity and deterministic visit chronology",
+    "credentialed raw-data access on the approved 319 execution plane"
+  ],
+  "missing": [
+    "repository-owned MIMIC-IV visit-level adapter and frozen manifest",
+    "public-safe normalization coverage report for the final cohort",
+    "untouched test-side materialization in this stage",
+    "MICA-IV training and evaluation result"
+  ],
+  "reusable": [
+    "319-side MIMIC-IV 3.1 rebuild mechanical joins",
+    "deterministic NDC/formulary to RxNorm to ATC4 normalization path",
+    "dataset-native vocabulary and frozen SafeDrug/MoleRec DDI projection machinery",
+    "patient-level split and chronology utilities",
+    "MICA Jaccard/F1/PRAUC/DDI/NLL metric and strict best-Dev-Jaccard philosophy"
+  ],
+  "incompatible": [
+    "existing MIMIC-IV order-time or exposure task treated as a visit-level MICA benchmark",
+    "literature pipelines using ATC3 when the MICA contract is ATC4",
+    "drug text, molecular features, eMAR, future fields, or target-derived artifacts as MICA inputs",
+    "forcing identical diagnosis/procedure/medication vocabularies across MIMIC-III and MIMIC-IV",
+    "existing candidate 80/10/10 split as the frozen MICA role split"
+  ],
+  "needs_implementation": [
+    "construct current D_t and P_t plus strictly prior H_<t from admissions chronology",
+    "materialize prescription-derived current M_t as target-only",
+    "fit vocabularies and DDI projection on Train patients only",
+    "freeze seed, mapping version, split assignment, coverage, and row-count manifest",
+    "run target-free leakage and split-disjointness checks before any Train/Dev run"
+  ],
+  "protocol": {
+    "input": "current diagnosis and procedure sets plus strictly previous visit diagnosis/procedure/medication history",
+    "target": "current visit medication set",
+    "split": "patient-level 2/3 Train, 1/6 Dev, 1/6 untouched Test",
+    "medication_normalization": "versioned deterministic NDC/formulary to RxNorm to ATC4 path",
+    "vocabulary_policy": "dataset-native; no forced cross-dataset identity",
+    "metrics": ["Jaccard", "F1", "PRAUC", "DDI", "NLL"],
+    "decoder": "fixed sigmoid threshold 0.35",
+    "checkpoint": "highest complete-Dev Jaccard; strict improvement; earliest exact tie"
+  },
+  "resource_evidence": {
+    "candidate_rebuild_patients": 77615,
+    "candidate_rebuild_visits": 209358,
+    "candidate_rebuild_medication_axis": 131,
+    "candidate_rebuild_note": "aggregate resource evidence only; not the frozen MICA-IV cohort"
+  },
+  "primary_sources": [
+    {
+      "work": "MIMIC-IV v3.1",
+      "url": "https://physionet.org/content/mimiciv/3.1/",
+      "used_for": "release and hospital-table availability"
+    },
+    {
+      "work": "KATMed",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41621768/",
+      "used_for": "dual-dataset preprocessing and ATC3 precedent; exact split details remain unknown"
+    },
+    {
+      "work": "RaVSNet",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40679883/",
+      "used_for": "dual-dataset method precedent; preprocessing details remain unknown"
+    },
+    {
+      "work": "DPID",
+      "url": "https://www.sciencedirect.com/science/article/pii/S095741742501406X",
+      "used_for": "dual-dataset method precedent; preprocessing details remain unknown"
+    },
+    {
+      "work": "HypeMed",
+      "url": "https://doi.org/10.1145/3803851",
+      "used_for": "dual-dataset cohort and metric precedent"
+    },
+    {
+      "work": "Rx-Expert",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0957417426022839",
+      "used_for": "dual-dataset method precedent"
+    },
+    {
+      "work": "NLA-MMR",
+      "url": "https://www1.se.cuhk.edu.hk/~hccl/publications/pub/CIKM%2724.pdf",
+      "used_for": "primary 2/3-1/6-1/6 split and ATC3 precedent"
+    },
+    {
+      "work": "ARMR",
+      "url": "https://www.ijcai.org/proceedings/2025/0871.pdf",
+      "used_for": "primary dual-dataset metric and ATC3 precedent"
+    }
+  ],
+  "test_policy": "Do not materialize or inspect held-out MIMIC-IV test events in Stage -1."
+}
