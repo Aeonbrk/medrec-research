@@ -1,5 +1,41 @@
 # Stage -1G protocol — Competitive substrate calibration
 
+## Protocol amendment — 2026-09-16 common131 comparability correction
+
+This amendment is part of the committed Stage -1G record and does not erase
+the original design below. The primary surface is now a canonical common-131
+ATC4 benchmark for both MIMIC-III and MIMIC-IV. The pre-existing MIMIC-IV
+native-173 surface remains an additive secondary robustness surface; existing
+native-173 jobs are preserved and no new native-173 lane is admitted after the
+freeze.
+
+The change is driven by primary-source benchmark comparability, before any
+external result is used for a substrate verdict. The MoleRec/SafeDrug/Carmen
+lineage and official ARMR MIMIC-III/MIMIC-IV vocabularies were audited and
+found to share one 131-code identity, with only ARMR MIMIC-IV insertion order
+differing. MIMIC-IV common131 is materialized by exact uppercase ATC4 identity
+projection from the frozen native benchmark. The two canonical codes without
+native support are retained as explicit zero-support columns; no top-131 or
+performance-dependent selection is permitted.
+
+The semantic decision is
+`COMMON_131_RECONSTRUCTABLE_WITH_DOCUMENTED_MAPPING`. The full source and
+asset audit is in
+[`research/benchmarks/mimiciv-medrec-common131/semantic-audit.json`](../../benchmarks/mimiciv-medrec-common131/semantic-audit.json),
+and the additive materialization contract is in
+[`research/benchmarks/mimiciv-medrec-common131/protocol.md`](../../benchmarks/mimiciv-medrec-common131/protocol.md).
+
+For the amended primary matrix, the selected families are ARMR, MoleRec, and
+GAMENet. RETAIN and SafeDrug are supplementary candidates. HypeMed and SSPNet
+remain excluded unless a faithful, pinned two-dataset execution path becomes
+available; no inspired rewrite is allowed.
+
+The pinned ARMR source is executed verbatim: its official `MyNet.forward`
+zeroes the supplied procedure tensor before representation learning. This is
+recorded as source-faithful behavior and is not repaired or ablated during
+Stage -1G; any effect is interpreted as a method/source limitation rather
+than silently attributed to the shared benchmark.
+
 ## 1. Scientific question
 
 Stage -1F answered whether medication-specific evidence selection replicates across MIMIC-III and MIMIC-IV. Stage -1G asks whether the resulting MICA-Core surface is competitive enough against strong faithful external methods to justify using it as the substrate for the next model-level hypothesis.
@@ -22,14 +58,19 @@ Every compared method must share:
 
 Every external baseline keeps its own scientific core, loss, architecture, optimizer family, thresholding/checkpoint logic, and documented training recipe unless the upstream method leaves a choice unspecified. Mechanical adaptation may translate dataset files, identifiers, tensor shapes, or target-free payloads; it must not improve or weaken the model logic.
 
+The evaluator consumes model logits: a method's documented probability
+threshold is applied after sigmoid, while ranking and NLL use the logits. Dev
+checkpoint selection and the final aggregate therefore use the same explicit
+logit/probability convention.
+
 This follows the experimental logic used in MoleRec (WWW 2023), which compares many model families under one task while using original/default or validation-tuned baseline settings rather than forcing one optimizer recipe. MoleRec also reports accuracy, DDI safety, medication count, bootstrap variability, and ablations. Stage -1G adopts that evidence shape but modernizes it with dual-dataset calibration and patient-clustered paired diagnostics.
 
 Primary sources:
 
-- MoleRec, WWW 2023: https://doi.org/10.1145/3543507.3583872
-- ARMR, IJCAI 2025: https://doi.org/10.24963/ijcai.2025/871
-- SSPNet, IJCAI 2025: https://doi.org/10.24963/ijcai.2025/1052
-- HypeMed, ACM TOIS 2026: https://doi.org/10.1145/3803851
+- MoleRec, WWW 2023: [DOI](https://doi.org/10.1145/3543507.3583872)
+- ARMR, IJCAI 2025: [DOI](https://doi.org/10.24963/ijcai.2025/871)
+- SSPNet, IJCAI 2025: [DOI](https://doi.org/10.24963/ijcai.2025/1052)
+- HypeMed, ACM TOIS 2026: [DOI](https://doi.org/10.1145/3803851)
 
 ## 3. Frozen MICA references
 
@@ -224,6 +265,12 @@ Use when three faithful paired baseline families cannot be established or key la
 ### `STOP_MICA_GENERALIZATION_EQUIVALENCE_FAILURE`
 
 Use when G0 exposes a real generalized-MICA computation drift that is not mechanically resolved.
+
+### `BENCHMARK_SEMANTICS_REQUIRE_REVIEW`
+
+Use when the primary-source audit cannot establish a defensible single
+common-131 semantic surface. This semantic stop takes precedence over
+training or competitiveness interpretation.
 
 ## 10. Public-safe artifacts
 

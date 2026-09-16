@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "stage": "STAGE -1G — common131 semantic freeze",
+  "authoritative_revision": "53765aa3c4ca5197bad38f768aea48c36ef48fa6",
+  "verdict": "COMMON_131_RECONSTRUCTABLE_WITH_DOCUMENTED_MAPPING",
+  "atc_level_comparison": {
+    "our_mimic_iii": "ATC4",
+    "molerec": "ATC4 (ATC5 prefix truncated to four characters)",
+    "safedrug": "ATC4 (shared c7218d0 preprocessing lineage)",
+    "armr_mimic_iii": "ATC4",
+    "armr_mimic_iv": "ATC4",
+    "identity_rule": "uppercase ATC4 token identity"
+  },
+  "canonical_lineage": {
+    "our_mimic_iii": {
+      "benchmark_id": "mimic-iii-stage-1f-canonical131",
+      "source_snapshot": "molerec-table1-c721-www23",
+      "source_rule": "frozen MIMIC-III NDC -> RxNorm -> ATC5 -> ATC4 prefix projection from the c721 MoleRec/Carmen lineage",
+      "identity_evidence": "the frozen med_voc medication code set equals the canonical MoleRec/SafeDrug/Carmen 131-code set"
+    },
+    "mole_rec": {
+      "paper": "MoleRec: Molecule-based Drug Recommendation for Drug Combination Prediction",
+      "venue_year": "WWW 2023",
+      "official_source_url": "https://github.com/yangnianzu0515/MoleRec",
+      "pinned_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+      "source_rule": "NDC -> RxNorm -> ATC5 -> ATC4 prefix; retain codes represented by idx2SMILES and apply the upstream top-300 preprocessing lineage",
+      "identity_evidence": "the pinned idx2SMILES asset has 131 non-special ATC4 keys; one source-native L01X SMILES is rejected by the upstream RDKit parser and is handled by the official buildPrjSmiles path (no ad hoc mapping)"
+    },
+    "safe_drug": {
+      "paper": "SafeDrug: Dual Molecular Graph Encoders for Safe Drug Recommendations",
+      "venue_year": "IJCAI 2021",
+      "official_source_url": "https://github.com/ycq091044/SafeDrug",
+      "pinned_revision": "c7218d0976e5ee5588aeaf5bdbc86b338126bba5",
+      "source_rule": "same Carmen/MoleRec ATC4 vocabulary and medication ordering used by the c7218d0 data lineage",
+      "identity_evidence": "voc_final.pkl and idx2SMILES medication key sets match the canonical 131 list"
+    },
+    "armr_mimic_iii": {
+      "paper": "ARMR: Adaptively Responsive Network for Medication Recommendation",
+      "venue_year": "IJCAI 2025",
+      "official_source_url": "https://github.com/seucoin/armr2",
+      "pinned_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
+      "source_rule": "official data/readme.md delegates preprocessing to Carmen; voc_final.json contains the same ATC4 code set",
+      "identity_evidence": "131-code set equals the canonical MoleRec/SafeDrug set; insertion order is identical on MIMIC-III"
+    },
+    "armr_mimic_iv": {
+      "paper": "ARMR: Adaptively Responsive Network for Medication Recommendation",
+      "venue_year": "IJCAI 2025",
+      "official_source_url": "https://github.com/seucoin/armr2",
+      "pinned_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
+      "source_rule": "official Carmen-derived MIMIC-IV preprocessing",
+      "identity_evidence": "voc_final.json contains the same 131-code set as canonical common131, with a different insertion order"
+    },
+    "carmen_inherited_processing": {
+      "official_source_url": "https://github.com/seucoin/armr2",
+      "pinned_revision": "3b895c647a96ff19c3339fae54fbed8dd4b69a13",
+      "source_rule": "NDC -> RxNorm -> ATC5 -> ATC4 prefix, restrict to NDCList, then the documented frequency preprocessing",
+      "identity_evidence": "MIMIC-III and MIMIC-IV voc_final assets each contain 131 codes and have equal code sets"
+    }
+  },
+  "identity_comparison": {
+    "canonical_order_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+    "our_mimic_iii_set_equals_canonical": true,
+    "molerec_set_equals_canonical": true,
+    "safedrug_set_equals_canonical": true,
+    "armr_mimic_iii_set_equals_canonical": true,
+    "armr_mimic_iv_set_equals_canonical": true,
+    "armr_mimic_iv_order_equals_canonical": false,
+    "mimic_iv_native_count": 173,
+    "mimic_iv_native_overlap_count": 129,
+    "mimic_iv_native_only_count": 44,
+    "canonical_codes_without_native_support": ["A11G", "G02C"]
+  },
+  "explanation_of_armr_mimic_iv_131": "ARMR ships generated MIMIC-III and MIMIC-IV vocabularies with the same 131-code ATC4 set, and its data README points to Carmen for preprocessing. The pinned ARMR commit does not include the Carmen generation run or expose one uniquely attributable frequency/mapping threshold, so the evidence supports a lineage-level reconstruction rather than an unsupported claim about one hidden subrule. The project native-173 surface is an independent MIMIC-IV v3.1 vocabulary. The benchmark difference is therefore a documented preprocessing-lineage difference, not evidence that MIMIC-IV cannot support MoleRec or ARMR.",
+  "mapping_to_project_benchmark": {
+    "rule": "exact uppercase ATC4 identity projection from the frozen native MIMIC-IV examples",
+    "performance_independent": true,
+    "top_131_frequency_selection": false,
+    "manual_selection": false,
+    "dev_or_test_target_statistics": false,
+    "unsupported_canonical_columns": "retained as explicit zero-support output columns; no ad hoc molecular imputation",
+    "empty_target_policy": "retain chronology/history evidence while excluding projected-empty recommendation examples; report every exclusion"
+  },
+  "asset_alignment": {
+    "canonical_ddi_shape": [131, 131],
+    "canonical_ddi_undirected_pairs": 448,
+    "canonical_ddi_sha256": "330707ad2bdb1e35464b56c1747f09504c8b35625d01a8a305e34910be923aa6",
+    "molerec_molecular_mask_shape": [131, 491],
+    "molerec_molecular_mask_sha256": "44d3abd5da6239fe84a55cbd2e1c7d94a1380115730a241f618834a3ee7be461",
+    "safedrug_molecular_mask_shape": [131, 491],
+    "row_identity_aligned": true,
+    "source_native_invalid_smiles": {
+      "count": 1,
+      "medication_code": "L01X",
+      "handling": "upstream MoleRec buildPrjSmiles drops the invalid molecule from that row's projection; the canonical medication row remains present"
+    },
+    "brics_column_order": "method asset hashes differ across MoleRec and SafeDrug; columns are method-local while medication rows share canonical ordering",
+    "common_evaluator_order": "canonical vocabulary order"
+  },
+  "sources_are_primary_or_official": true,
+  "test_loaded": false
+}

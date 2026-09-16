@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "mimiciv-visit-medrec-stage-minus-1g-common131",
+  "source_benchmark_id": "mimiciv-visit-medrec-stage-minus-1e",
+  "source_manifest_sha256": "f32d42f340ac410dbcd074486e844f0aa71181f126b9ae6c4b456d7a7d2864c3",
+  "authoritative_revision": "53765aa3c4ca5197bad38f768aea48c36ef48fa6",
+  "native_medication_count": 173,
+  "canonical_medication_count": 131,
+  "canonical_sorted_vocabulary_sha256": "6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08",
+  "roles": {
+    "train": {
+      "source_examples": 308824,
+      "projected_examples": 308474,
+      "subjects_with_projected_examples": 130886,
+      "target_rows_before": 4507583,
+      "target_rows_retained": 3429260,
+      "target_rows_dropped": 1078323,
+      "history_rows_before": 13588610,
+      "history_rows_retained": 10265472,
+      "history_rows_dropped": 3323138,
+      "changed_visits": 288774,
+      "empty_projected_target_visits": 350,
+      "cardinality_before": {"mean": 14.595960816012086, "median": 13.0},
+      "cardinality_after": {"mean": 11.104253583289436, "median": 10.0}
+    },
+    "dev": {
+      "source_examples": 76529,
+      "projected_examples": 76443,
+      "subjects_with_projected_examples": 32656,
+      "target_rows_before": 1117597,
+      "target_rows_retained": 850358,
+      "target_rows_dropped": 267239,
+      "history_rows_before": 3187404,
+      "history_rows_retained": 2406206,
+      "history_rows_dropped": 781198,
+      "changed_visits": 71625,
+      "empty_projected_target_visits": 86,
+      "cardinality_before": {"mean": 14.603575145931446, "median": 13.0},
+      "cardinality_after": {"mean": 11.11157864229795, "median": 10.0}
+    }
+  },
+  "projection": {
+    "changed_patients": 154578,
+    "patients_with_empty_projected_target": 433,
+    "native_only_codes": 44,
+    "canonical_codes_without_native_support": ["A11G", "G02C"],
+    "policy": "keep chronology/history for projected-empty rows, exclude them from recommendation examples, and report every exclusion"
+  },
+  "ddi": {
+    "shape": [131, 131],
+    "undirected_pairs": 448,
+    "sha256": "330707ad2bdb1e35464b56c1747f09504c8b35625d01a8a305e34910be923aa6"
+  },
+  "molecular_assets": {
+    "medication_row_order_aligned": true,
+    "molerec_mask_shape": [131, 491],
+    "safedrug_mask_shape": [131, 491],
+    "brics_columns_method_local": true
+  },
+  "mechanical_checks": {
+    "SOURCE_IDENTITY_PASS": true,
+    "PATIENT_SPLIT_DISJOINT_PASS": true,
+    "VISIT_CHRONOLOGY_PASS": true,
+    "STRICT_HISTORY_PASS": true,
+    "CURRENT_TARGET_NOT_IN_INPUT_PASS": true,
+    "TRAIN_ONLY_VOCAB_FIT_PASS": true,
+    "NORMALIZATION_DETERMINISM_PASS": true,
+    "DDI_MATRIX_VALID_PASS": true,
+    "TRAIN_DEV_SERIALIZATION_RELOAD_PASS": true
+  },
+  "test_policy": "Test membership and targets were not loaded; source Test split remains outside this variant."
+}

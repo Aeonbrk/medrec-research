@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "lineage": {
+    "atc_level": "ATC4",
+    "identity_rule": "uppercase four-character ATC prefix",
+    "mole_rec_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+    "safe_drug_revision": "c7218d0976e5ee5588aeaf5bdbc86b338126bba5",
+    "armr_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
+    "carmen_revision": "3b895c647a96ff19c3339fae54fbed8dd4b69a13",
+    "selection": "the 131 medication keys of the pinned MoleRec idx2SMILES asset; not a frequency or model-performance selection"
+  },
+  "medication_vocabulary": [
+    "N02B", "A01A", "A02B", "A06A", "B05C", "A12A", "A12C", "C01C", "A07A", "M01A",
+    "N01A", "C07A", "C03C", "A12B", "N07A", "C02D", "N02A", "N06A", "A02A", "J01M",
+    "C02A", "B01A", "A11C", "C03A", "A03B", "C10A", "C01B", "N05C", "C09A", "D01A",
+    "H03A", "J01D", "B02B", "R06A", "J01X", "N03A", "N05A", "C08C", "D11A", "C01D",
+    "A04A", "M03A", "A07E", "R03A", "B03B", "D07A", "N07B", "N05B", "R05C", "D06A",
+    "A03F", "R01A", "G04B", "C01E", "L01A", "A07D", "D04A", "A05A", "P01C", "D06B",
+    "L01B", "C01A", "C05A", "C03D", "P01A", "J02A", "J05A", "L01X", "H02A", "V03A",
+    "J01F", "G03A", "J01E", "J04A", "D10A", "P01B", "R05D", "N04B", "G04C", "J01C",
+    "S01E", "H05B", "M04A", "C09C", "J01G", "C08D", "N06D", "H01C", "M03B", "A10B",
+    "M05B", "C05B", "B02A", "D08A", "A16A", "A11D", "C02C", "J01A", "L04A", "A11G",
+    "H03B", "L01D", "N06B", "C03B", "N01B", "G03C", "N04A", "N02C", "A07B", "A11H",
+    "S01F", "A09A", "L01C", "L02B", "H01B", "R01B", "G02C", "A03A", "M02A", "D05A",
+    "J06B", "S01H", "G01A", "C03X", "G03B", "M01C", "R02A", "V04C", "S01K", "S01A",
+    "P02C"
+  ],
+  "ordering": "MoleRec/SafeDrug MIMIC-III med_voc insertion order; all consumers reindex by this list",
+  "medication_count": 131
+}

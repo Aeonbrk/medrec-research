@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "mimiciv-visit-medrec-stage-minus-1g-common131",
+  "source_benchmark_id": "mimiciv-visit-medrec-stage-minus-1e",
+  "test_loaded": false,
+  "checks": {
+    "SOURCE_IDENTITY_PASS": true,
+    "PATIENT_SPLIT_DISJOINT_PASS": true,
+    "VISIT_CHRONOLOGY_PASS": true,
+    "STRICT_HISTORY_PASS": true,
+    "CURRENT_TARGET_NOT_IN_INPUT_PASS": true,
+    "TRAIN_ONLY_VOCAB_FIT_PASS": true,
+    "NORMALIZATION_DETERMINISM_PASS": true,
+    "DDI_MATRIX_VALID_PASS": true,
+    "TRAIN_DEV_SERIALIZATION_RELOAD_PASS": true
+  },
+  "train": {
+    "source_examples": 308824,
+    "projected_examples": 308474,
+    "subjects_with_projected_examples": 130886,
+    "target_rows": 3429260,
+    "history_rows": 10260040
+  },
+  "dev": {
+    "source_examples": 76529,
+    "projected_examples": 76443,
+    "subjects_with_projected_examples": 32656,
+    "target_rows": 850358,
+    "history_rows": 2405308
+  },
+  "validator": "validate_common131.py",
+  "counting_note": "validator target/history rows are serialized recommendation rows after empty-target exclusion; manifest.json additionally reports all source-row history counts used by the restricted materializer"
+}
