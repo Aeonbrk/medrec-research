@@ -1,0 +1,33 @@
+{
+  "stage": "STAGE -1C",
+  "status": "complete",
+  "preflight_only": true,
+  "source_revision": "5864011a864851c7eba1ed2a0742221c9e7dcf5f",
+  "recipe": "t1_lower_constant",
+  "checks": [
+    "clean exact source checkout",
+    "canonical snapshot and Train/Dev identities",
+    "target alignment and canonical split counts",
+    "finite target-free CUDA forward/backward",
+    "finite nonzero parameter gradients"
+  ],
+  "controls": {
+    "core": {
+      "parameter_count": 848900,
+      "clinical_attention_blocks": 2
+    },
+    "one_clinical_block": {
+      "parameter_count": 716420,
+      "clinical_attention_blocks": 1
+    },
+    "no_post_read_conditioner": {
+      "parameter_count": 815876,
+      "clinical_attention_blocks": 2
+    },
+    "simplified_head": {
+      "parameter_count": 799876,
+      "clinical_attention_blocks": 2
+    }
+  },
+  "evidence_boundary": "target-free preflight only; no epoch, test, or private artifact was copied"
+}

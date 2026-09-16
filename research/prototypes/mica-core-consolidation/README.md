@@ -47,6 +47,9 @@ The stabilized Stage -1C recipe is AdamW with constant learning rate `1e-4`,
 seed `20260914`, batch 16, weight decay `1e-4`, the current DDI objective and
 decoder, and 60 complete epochs.
 
+The target-free CUDA/data preflight for all four controls passed on the exact
+source revision; its public-safe summary is [`preflight-result.json`](preflight-result.json).
+
 ## Execution and evidence boundary
 
 `run_consolidation.py` requires an exact clean source revision, the canonical
