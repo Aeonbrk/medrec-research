@@ -438,7 +438,10 @@ def _ddi_pairs(vocabulary: Sequence[str], ddi: Any) -> tuple[tuple[str, str], ..
     import numpy as np
 
     left, right = np.triu(np.asarray(ddi, dtype=np.float32), 1).nonzero()
-    return tuple((vocabulary[int(a)], vocabulary[int(b)]) for a, b in zip(left, right, strict=True))
+    return tuple(
+        (vocabulary[int(a)], vocabulary[int(b)])
+        for a, b in zip(left, right)  # noqa: B905
+    )
 
 
 def _profile_metrics(
