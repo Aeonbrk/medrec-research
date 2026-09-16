@@ -78,6 +78,11 @@ The four authorized arms completed at source revision
 updates per full pass) with 12 full Dev evaluations.  No Test
 targets were loaded.  Selected checkpoints and terminal Dev surfaces are:
 
+The canonical MIMIC-III snapshot supplies 1,958 diagnosis, 1,430 procedure,
+and 131 medication IDs.  The frozen MIMIC-IV adapter fits 26,070 diagnosis,
+13,118 procedure, and 173 medication IDs on Train only; its Dev input uses
+explicit unknown tokens and does not extend those axes.
+
 | dataset / arm | parameters | selected update (epoch-equivalent) | selected J | selected F1 | selected PRAUC | selected DDI | selected NLL | terminal J | terminal PRAUC | terminal NLL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | MIMIC-III SharedPool | 848900 | 2624 (4.000) | 0.531796 | 0.685760 | 0.785189 | 0.076841 | 0.206553 | 0.437912 | 0.672784 | 1.266637 |
