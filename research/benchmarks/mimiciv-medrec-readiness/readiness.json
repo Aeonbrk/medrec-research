@@ -8,8 +8,8 @@
     "NO HOLDOUT TEST",
     "NO NEW METHOD FAMILY"
   ],
-  "readiness": "MIMIC_IV_PROTOCOL_READY_FOR_IMPLEMENTATION",
-  "decision_scope": "resource_and_protocol_freeze_only",
+  "readiness": "MIMIC_IV_BENCHMARK_FROZEN_READY_FOR_TRAINDEV",
+  "decision_scope": "frozen_train_dev_materialization_and_mechanical_checks_only",
   "authoritative_release": "MIMIC-IV v3.1",
   "training_run": "not_run",
   "holdout_access": "not_accessed",
@@ -19,11 +19,10 @@
     "hosp.procedures_icd linked by hadm_id",
     "hosp.prescriptions with medication identifiers and course times",
     "patient identity and deterministic visit chronology",
-    "credentialed raw-data access on the approved 319 execution plane"
+    "credentialed raw-data access on the approved 319 execution plane",
+    "repository-owned frozen visit-level adapter and public-safe Train/Dev manifest"
   ],
   "missing": [
-    "repository-owned MIMIC-IV visit-level adapter and frozen manifest",
-    "public-safe normalization coverage report for the final cohort",
     "untouched test-side materialization in this stage",
     "MICA-IV training and evaluation result"
   ],
@@ -42,11 +41,7 @@
     "existing candidate 80/10/10 split as the frozen MICA role split"
   ],
   "needs_implementation": [
-    "construct current D_t and P_t plus strictly prior H_<t from admissions chronology",
-    "materialize prescription-derived current M_t as target-only",
-    "fit vocabularies and DDI projection on Train patients only",
-    "freeze seed, mapping version, split assignment, coverage, and row-count manifest",
-    "run target-free leakage and split-disjointness checks before any Train/Dev run"
+    "run the prepared MIMIC-IV Train/Dev SharedPool versus MICA-Core screen after separate review"
   ],
   "resource_checks": {
     "admissions_visits": {
@@ -110,11 +105,13 @@
     "candidate_rebuild_medication_axis": 131,
     "candidate_rebuild_note": "aggregate resource evidence only; not the frozen MICA-IV cohort",
     "mapping_inputs_present_on_execution_plane": [
-      "CafeMed ndc2rxnorm_mapping.txt",
-      "CafeMed ndc2atc_level4.csv",
-      "ARMR MIMIC-IV ddi_A_final.json"
+      "KGDNet ndc2rxnorm_mapping.txt",
+      "KGDNet ndc2atc_level4.csv",
+      "KGDNet drug_codes_mapping.csv",
+      "SafeDrug/MoleRec molerec-table1-c721-www23/voc_final.pkl",
+      "SafeDrug/MoleRec molerec-table1-c721-www23/ddi_A_final.pkl"
     ],
-    "mapping_freeze_note": "presence was checked; version, coverage, and final cohort projection still need an implementation manifest"
+    "mapping_freeze_note": "Stage -1E manifest freezes file hashes, precedence, Train-only formulary rules, cohort coverage, and DDI projection"
   },
   "primary_sources": [
     {
@@ -158,5 +155,46 @@
       "used_for": "primary dual-dataset metric and ATC3 precedent"
     }
   ],
-  "test_policy": "Do not materialize or inspect held-out MIMIC-IV test events in Stage -1."
+  "test_policy": "Test membership is sealed by count/digest only; do not materialize or inspect held-out MIMIC-IV medication targets in Stage -1.",
+  "stage_minus_1e": {
+    "adapter_revision": "e87411be3df305f55a4a68d10a9db3eb505e1232",
+    "manifest_sha256": "110090bb79411ecf9f8057e75e16a1f6cb0c0e4b4e159bc29d4434018628da23",
+    "verdict": "MIMIC_IV_BENCHMARK_FROZEN_READY_FOR_TRAINDEV",
+    "split_patient_counts": {"train": 149001, "dev": 37076, "test_sealed": 37375},
+    "train": {
+      "visits": 364492,
+      "recommendation_examples": 308824,
+      "diagnosis_vocab_size": 26070,
+      "procedure_vocab_size": 13118,
+      "medication_vocab_size": 173
+    },
+    "dev": {
+      "visits": 90033,
+      "recommendation_examples": 76529,
+      "diagnosis_oov_rate": 0.0011093200125705776,
+      "procedure_oov_rate": 0.005854129784647527,
+      "medication_target_oov_rate": 0.0
+    },
+    "normalization": {
+      "train_eligible_rows": 13490898,
+      "train_mapped_rows": 10602979,
+      "train_coverage": 0.7859357471978514,
+      "dev_eligible_rows": 3349376,
+      "dev_mapped_rows": 2630601,
+      "dev_coverage": 0.7854003253143272
+    },
+    "ddi_projection": {
+      "source_concepts": 131,
+      "source_supported_concepts": 91,
+      "source_pairs": 448,
+      "projected_vocab_size": 173,
+      "represented_source_concepts": 129,
+      "projected_supported_concepts": 90,
+      "projected_pairs": 443,
+      "concept_coverage": 0.9847328244274809,
+      "supported_concept_coverage": 0.989010989010989
+    },
+    "training": "not_run",
+    "test_targets_loaded": false
+  }
 }

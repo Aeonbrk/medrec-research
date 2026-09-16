@@ -1,10 +1,16 @@
 <!-- markdownlint-disable MD013 -->
 
-# MIMIC-IV visit-level medication-set protocol (draft to freeze)
+# MIMIC-IV visit-level medication-set protocol (Stage -1E frozen)
 
-This draft defines the MIMIC-IV surface that is intended to be semantically
-aligned with the current MIMIC-III MICA task. It is a benchmark contract, not a
-training result. No test partition is opened in Stage -1.
+This document defines the MIMIC-IV surface that is semantically aligned with
+the current MIMIC-III MICA task. Stage -1E materialized the contract without a
+model run. It is a benchmark contract, not a training result; no Test target
+partition was opened.
+
+The public-safe implementation record is
+[`../mimiciv-medrec/manifest.json`](../mimiciv-medrec/manifest.json), bound to
+adapter revision `e87411be3df305f55a4a68d10a9db3eb505e1232`. The terminal
+materialization verdict is `MIMIC_IV_BENCHMARK_FROZEN_READY_FOR_TRAINDEV`.
 
 ## 1. Prediction object and information entitlement
 
@@ -121,5 +127,7 @@ are recorded in a public-safe manifest:
 7. DDI matrix shape, symmetry, diagonal, and projection coverage pass;
 8. Train/Dev row counts and target alignment are reproducible from the manifest.
 
-Failure of any check means `STOP_MIMIC_IV_NOT_READY`; it is not repaired by
+Failure of any core check means `STOP_MIMIC_IV_ADAPTER_INVALID` (with the
+normalization- or DDI-specific stop code used when that branch is the first
+failure); it is not repaired by
 changing the target definition or opening the test partition.

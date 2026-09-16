@@ -7,15 +7,16 @@ Updated: 2026-09-16.
 ```text
 Stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC-IV READINESS
 Status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
-AUTHORITATIVE_START_REVISION: fccd2484c10aa9cf7a48cb02504a8fa78b61dde6
-FINAL_REVISION: 27215468571571e680902bace3c095ba531f77a1 (Stage -1 evidence closeout commit)
+AUTHORITATIVE_START_REVISION: de07bc22b8f05272b62417b769307dfb22754435
+FINAL_REVISION: final Stage -1E materialization commit (see final report)
 Active formal Idea: none
 Idea 009: not created
 Active formal Gate: none
 ```
 
-Stage -1 is complete for its bounded scope. No Test partition was opened, no
-new method family or seed was added, and no paper or novelty claim follows.
+Stage -1E is complete for its bounded scope. No Test target partition was
+opened, no model or new seed was run, no new method family was added, and no
+paper or novelty claim follows.
 
 ## Stage -1A — training diagnosis
 
@@ -48,7 +49,7 @@ the PRAUC floor and has worse late J/PRAUC degradation; NoPostReadConditioner
 is slightly worse on late PRAUC drop despite fewer parameters; SimplifiedHead
 misses both peak floors. No intrinsic simplification is promoted.
 
-## Stage -1D — MIMIC-IV readiness
+## Stage -1D/-1E — MIMIC-IV readiness and materialization
 
 The frozen protocol is a dataset-native visit-level task:
 `(current diagnoses, current procedures, strictly previous visit
@@ -56,15 +57,27 @@ diagnosis/procedure/medication history) -> current medication set`. It uses
 patient-level `2/3, 1/6, 1/6` roles, target-only current medications,
 versioned deterministic NDC/formulary → RxNorm → ATC4 normalization, fixed
 MICA metrics/threshold/checkpoint semantics, and pre-training leakage/split/
-DDI checks. The status is `MIMIC_IV_PROTOCOL_READY_FOR_IMPLEMENTATION`.
-The repository adapter and final public-safe mapping manifest remain to be
-implemented; no MICA-IV training or Test materialization occurred.
+DDI checks. Stage -1E materialized this contract on 319 with adapter revision
+`e87411be3df305f55a4a68d10a9db3eb505e1232`.
+The public manifest digest is
+`110090bb79411ecf9f8057e75e16a1f6cb0c0e4b4e159bc29d4434018628da23`.
+
+The public-safe manifest freezes 149,001 Train patients / 364,492 visits /
+308,824 examples and 37,076 Dev patients / 90,033 visits / 76,529 examples.
+Train normalization coverage is `0.785936`, Dev coverage `0.785400`, Dev
+medication-target OOV is `0.0`, and the 131-concept / 448-pair SafeDrug/MoleRec
+DDI authority represents 129 of 131 source concepts, retains 90 of 91
+DDI-supported concepts, and projects 443 of 448 pairs on the 173-concept Train
+vocabulary. All required mechanical checks pass. Test membership is sealed by
+count/digest only; no Test medication target was loaded or evaluated.
+
+The terminal status is `MIMIC_IV_BENCHMARK_FROZEN_READY_FOR_TRAINDEV`; see the
+[`public-safe benchmark record`](research/benchmarks/mimiciv-medrec/README.md).
 
 ## One next action
 
-Implement and freeze the MIMIC-IV adapter from
-[`protocol-draft.md`](research/benchmarks/mimiciv-medrec-readiness/protocol-draft.md),
-then run its mechanical contract checks. Do not enter Stage 0 automatically.
+Review the prepared MIMIC-IV Train/Dev SharedPool versus MICA-Core/DrugQuery
+screen contract. Do not run it automatically or enter Stage 0.
 
 ---
 

@@ -15,7 +15,7 @@ Current stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC
 Stage status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 Modern-backbone calibration: complete
 Strong-unary residual-correction route: deprioritized as a primary direction
-Current action: implement and freeze the MIMIC-IV benchmark protocol; remain in Stage -1
+Current action: review the frozen MIMIC-IV Train/Dev screen contract; remain in Stage -1
 ```
 
 No new architecture family, Idea 009, formal Gate, held-out evaluation, or
@@ -313,23 +313,39 @@ NoPostReadConditioner reduced parameters and met the peak floors, but its
 PRAUC drop (`0.075625`) was slightly worse than Core (`0.074983`); the linear
 SimplifiedHead also missed both peak floors.
 
-### MIMIC-IV readiness (Stage -1D)
+### MIMIC-IV readiness and materialization (Stage -1D/-1E)
 
-The frozen draft defines `(D_t, P_t, H_<t) -> M_t`, where history contains
+The frozen contract defines `(D_t, P_t, H_<t) -> M_t`, where history contains
 only strictly earlier visits and the current prescription-derived medication
 set is target-only. It uses patient-level `2/3, 1/6, 1/6` roles, dataset-native
 vocabularies, deterministic versioned NDC/formulary → RxNorm → ATC4 mapping,
 the fixed MICA metric/threshold/checkpoint semantics, and a pre-training
-leakage/split/DDI coverage contract. MIMIC-IV v3.1 tables and mapping inputs
-are available or reusable, while the repository-owned adapter, final mapping
-coverage manifest, and any MICA-IV run remain missing. Therefore readiness is
-`MIMIC_IV_PROTOCOL_READY_FOR_IMPLEMENTATION`; no MICA-IV training or Test
-materialization was performed. See the
-[`readiness record`](../benchmarks/mimiciv-medrec-readiness/README.md) and
-[`protocol draft`](../benchmarks/mimiciv-medrec-readiness/protocol-draft.md).
+leakage/split/DDI coverage contract.
 
-The one next action is to implement and freeze this MIMIC-IV adapter and run
-its mechanical contract checks. Do not enter Stage 0 automatically.
+Observed Stage -1E materialization on the approved 319 plane (adapter revision
+`e87411be3df305f55a4a68d10a9db3eb505e1232`) produced 149,001 Train patients /
+364,492 visits / 308,824 target-bearing examples and 37,076 Dev patients /
+90,033 visits / 76,529 examples. Diagnosis, procedure, and medication target
+vocabularies were fitted/reported with Train-only rules; Dev diagnosis OOV is
+`0.001109`, procedure OOV `0.005854`, and medication-target OOV `0.0`.
+Normalization covers `0.785936` Train and `0.785400` Dev eligible prescription
+rows. The frozen 131-concept, 91-supported-concept, 448-pair SafeDrug/MoleRec
+DDI authority represents 129 source concepts, retains 90 supported concepts,
+and projects 443 pairs on the 173-concept Train medication vocabulary; the
+projected matrix is finite, binary, symmetric, and zero-diagonal.
+
+All required mechanical checks pass: source identity, patient disjointness,
+chronology, strict history, current-target exclusion, Train-only vocabulary
+fit, deterministic normalization, DDI validity, and Train/Dev serialization
+reload. Test membership is sealed by count/digest only; Test medication targets
+were not loaded, fitted, tuned, or evaluated. The terminal readiness is
+`MIMIC_IV_BENCHMARK_FROZEN_READY_FOR_TRAINDEV`, recorded in the
+[`public-safe manifest`](../benchmarks/mimiciv-medrec/manifest.json) and
+[`mechanical checks`](../benchmarks/mimiciv-medrec/mechanical-checks.json).
+
+The next and only authorized action is a separate review of the prepared
+MIMIC-IV Train/Dev SharedPool versus MICA-Core/DrugQuery screen. Do not run it,
+open Stage 0, create Idea 009, or open a formal Gate automatically.
 
 ## 7. Cross-project lessons
 
@@ -382,9 +398,8 @@ Do not assume the next model must use MoleRec, GraphRefine, hypergraphs, MoE, re
 
 ## 9. Next workflow
 
-1. Implement and freeze the MIMIC-IV visit-level adapter from the Stage -1
-   protocol draft, then run the target-free mechanical leakage, split,
-   normalization, and DDI-coverage checks.
+1. Review the frozen MIMIC-IV Train/Dev screen contract; implementation is
+   prepared but no model run is authorized in Stage -1E.
 
 No Stage 0, Idea 009, formal Gate, Audit, held-out Test, or additional seed
 follows automatically from this handoff.
