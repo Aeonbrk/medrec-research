@@ -22,13 +22,13 @@ Read first:
 
 Current routing is dependency-driven, not serial. Do not wait for all baselines or all MICA seeds before architecture work. Make the evidence most capable of killing or redirecting the paper arrive early.
 
-Immediate work:
+Current session evidence:
 
-1. freeze the minimum MIMIC-III task/evaluator/selection profile and legal information budget;
-2. start source-backed MoleRec recovery; use ARMR as the default second lane, but promote SSPNet if structured-set prediction becomes the active hypothesis and a trustworthy path is available;
-3. time-box the structured/set closest-work computation audit; expensive structured training stays blocked until the computational distinction and minimal matched control are clear;
-4. audit harmonized/common-131 run-critical identity/alignment now; paper-lineage wording can finish asynchronously;
-5. continue prediction-time and historical Test-feedback audits only where they change an upcoming experiment or claim.
+- The frozen `mimic-iii-canonical-131-paper-dev-v1` profile and MIV common-131 run-critical audit are committed. MICA SharedPool/DrugQuery pairs for seeds `20260917` and `20260918` completed under that profile; the paired decision is recorded in `research/memory/decisions/2026-09-17-mica-paired-stability-update.md`.
+- A source-native MoleRec lane is still running remotely under the pinned MoleRec source and current clean harness revision. It has no terminal result yet; monitor its detached run and do not promote partial values.
+- The first MoleRec launch failed before creating a run root because the generic CLI omitted a preprocessing revision. The replacement lane explicitly binds `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`; preserve both identities in the review packet.
+- ARMR remains conditional and was not launched because the pinned runtime lacks the official `einops` dependency. SSPNet remains `NOVELTY_UNRESOLVED` / `SSPNET_EXECUTION_UNRESOLVED`; expensive structured training is blocked.
+- MIV paper-lineage wording remains asynchronous. MIMIC-IV Test stays sealed; no MIV sentinel or structured Full/control run is authorized by this evidence.
 
 MICA stability is not an architecture gate. Default next evidence is two new paired MIMIC-III seeds per arm under the frozen profile; add the third pair when MICA remains central, the first pairs disagree, or otherwise-ready GPU capacity makes completion cheapest. If MICA runs are short and no higher-value task is ready, six-way parallel completion is acceptable.
 
