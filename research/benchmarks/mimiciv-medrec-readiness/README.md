@@ -54,6 +54,13 @@ filtering, with 131 normalized medication concepts. Those counts are resource
 evidence only; they do not freeze the MICA-IV cohort or assert that MIMIC-IV
 must have 131 medications.
 
+The earlier resource reset independently verified the raw v3.1 hospital tables
+and a combined NDC/formulary normalization path (reported coverage 81.92% for
+eligible orders and 81.89% for eligible eMAR rows). That record concerns a
+strict pre-order exposure task, so it is reused here only as availability and
+mapping evidence; its order-time target, exposure state, and quarantine split
+are not imported into the MICA benchmark ([resource-reset decision](../../memory/resource-reset-20260905-exposure-localized-safety/r0-decision.md)).
+
 The current MIMIC-III MICA contract is therefore implementable on MIMIC-IV
 without importing future information: for visit `t`, use `D_t`, `P_t`, and
 `(D_j, P_j, M_j)` only for `j < t`, and use `M_t` only as the loss/evaluation
