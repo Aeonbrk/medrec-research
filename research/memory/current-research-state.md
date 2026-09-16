@@ -9,12 +9,13 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Current phase: post-Stage -1F scientific review
+Current phase: pre-Stage 0 bounded candidate review
 Paper claim: none
 Held-out evaluation: untouched for current architecture search
+Knowledge-home migration review: PASS
 ```
 
-The Stage -1 substrate work is complete enough for scientific review. No Stage 0 experiment is authorized by the knowledge-governance migration.
+Stage -1 substrate work is complete enough to support the next bounded architecture decision. The knowledge-organization migration has passed independent adversarial review; no scientific or engineering defect was found that blocks further work.
 
 ## Validated substrate
 
@@ -92,9 +93,11 @@ Literature scores are not automatically comparable when information budget, spli
 
 ## Current candidate
 
-The leading bounded architecture candidate from scientific review is direct partial regimen assignment (RSM): medication-specific evidence proposals feed anonymous regimen slots that predict medication-or-NULL assignments instead of only independent medication membership probabilities.
+The leading bounded architecture candidate is direct partial regimen assignment (RSM): medication-specific evidence proposals feed anonymous regimen slots that predict medication-or-NULL assignments instead of only independent medication membership probabilities.
 
 This candidate has not been implemented, trained, admitted as Idea 009, or opened as a formal Gate. Before execution, its exact matched controls and attribution must remain able to separate representation capacity, structured supervision, and assignment decoding.
+
+One implementation-equivalence concern remains from Stage -1F: the generalized variable-medication MICA path produced a lower MIMIC-III DrugQuery peak than the earlier fixed-131 implementation under nominally matched settings. This is not evidence against the mechanism because the Stage -1F matched delta replicated on both datasets, but it should be resolved before using the generalized path as the RSM substrate.
 
 ## Evaluation boundaries
 
@@ -103,6 +106,12 @@ This candidate has not been implemented, trained, admitted as Idea 009, or opene
 - DDI is interpreted within a dataset's measurement surface; cross-dataset absolute DDI values are not treated as directly equivalent safety measurements.
 - Lower DDI caused by fewer medications is not sufficient evidence of safer treatment.
 
+## Knowledge-organization status
+
+The migration at `3c420eb0d810c10f629f575495a767aef5698436` passed independent adversarial review with no blocker, major, or minor findings. The review confirmed history preservation, scientific-state preservation, reference integrity, rule precedence, and no material over-migration. The accepted engineering record is `.agents/notes/migrations/2026-09-16-knowledge-home-review-pass.md`.
+
 ## Next scientific action
 
-After the knowledge-organization migration receives adversarial engineering review, return to scientific review of the bounded RSM contract. Do not launch a new model, seed, Gate, Idea, or held-out evaluation merely because this file names the candidate.
+Run one bounded, target-free, no-training exact-equivalence audit between the prior fixed-131 MICA implementation and the generalized MICA implementation on the 131-medication path. Compare parameter names/shapes, initialized tensors under the same seed, forward logits, and objective values on the same synthetic or target-free batch.
+
+If equivalent, return to final review of the bounded RSM experiment contract. Do not launch RSM, add seeds, create Idea 009, open a Gate, or use held-out evaluation automatically.
