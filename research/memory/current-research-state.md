@@ -75,7 +75,7 @@ MIV harmonized131 and native173 are target-space views of the same underlying MI
 
 Temporary project-side MoleRec, GAMENet, and RETAIN outputs from the former Stage -1G path remain diagnostic only and must not support method ranking or paper superiority claims. The current ARMR lane is separate and source-pinned.
 
-MoleRec remains the first recovery priority. Its source-native training lane is still running and has no terminal artifact; because the released entrypoint uses its own source split, partial or source-split values cannot enter the frozen paper-profile table.
+MoleRec remains the first recovery priority. The released source-native training lane is still running and has no terminal artifact; because that entrypoint uses its own source split, partial or source-split values cannot enter the frozen paper-profile table. A separate source-faithful adapter now binds the canonical MIMIC-III profile: its one-epoch smoke completed as non-evidence with no Test access, and its 50-epoch formal lane is running detached under the same pinned source and environment. Until the formal lane reaches a terminal artifact and independent audit, its partial values remain excluded.
 
 - ARMR current-profile formal recovery is complete and passed an independent integrity audit. It is a credible DEVELOPMENT external anchor, not a Paper Candidate or final superiority claim;
 - promote SSPNet when structured/set prediction becomes the active hypothesis, SSPNet is confirmed as the closest relevant comparator, and a trustworthy execution path exists;
@@ -178,4 +178,4 @@ MIMIC-IV Test remains sealed throughout reference setup and architecture search.
 
 ## Next action
 
-Audit the detached MoleRec lane only when it reaches a terminal artifact; do not promote its source-split values. In parallel, keep the structured candidate paused at the `NOVELTY_UNRESOLVED` / `SSPNET_EXECUTION_UNRESOLVED` boundary until the closest-work and evaluator prerequisites are resolved.
+Audit each detached MoleRec lane only when it reaches a terminal artifact; do not promote source-split or partial values. In parallel, keep the structured candidate paused at the `NOVELTY_UNRESOLVED` / `SSPNET_EXECUTION_UNRESOLVED` boundary until the closest-work and evaluator prerequisites are resolved.
