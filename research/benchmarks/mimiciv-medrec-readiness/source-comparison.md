@@ -7,6 +7,11 @@ or author full-text sources. `UNKNOWN` means that the accessible primary text
 did not expose the requested preprocessing detail; it is not an inference.
 Reported paper statistics are not treated as comparable project results.
 
+Most cited papers use older MIMIC-IV releases (often v2.0 or v2.2) and a
+filtered 9,000-patient-scale cohort, whereas the present resource check is on
+raw v3.1 and a much larger candidate rebuild. Release and cohort differences
+are another reason to freeze a fresh manifest rather than copy paper counts.
+
 | Work (primary source) | MIMIC-IV preprocessing / visit construction | Medication mapping / ATC | Split protocol | Vocabulary / DDI | Metrics | MICA-IV compatibility |
 | --- | --- | --- | --- | --- | --- | --- |
 | [KATMed](https://pubmed.ncbi.nlm.nih.gov/41621768/) | MIMIC-III/IV and eICU are used; accessible record says a SafeDrug-like preprocessing pipeline. Exact visit-row and chronology details: UNKNOWN. | NDC → ATC level 3 is stated. | Train/validation/test are stated; ratio and patient assignment: UNKNOWN. | Vocabulary size and DDI construction: UNKNOWN. | Accuracy, F1, DDCC-VR, and number of medications are reported. | INCOMPATIBLE as a direct contract: ATC3 and undisclosed split/visit rules; useful mapping/safety precedent only. |
