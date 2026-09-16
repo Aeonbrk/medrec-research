@@ -57,7 +57,7 @@
       "target_cardinality_mean": 19.695305164,
       "target_cardinality_median": 19.0,
       "empty_target_visits": 0,
-      "target_array_sha256": "99441a3bf3e44119b747871e4aa9345f34e2ebeab27c9b6ea1ff2e4e93ee10bf"
+      "target_array_sha256": "99441a3bf3e44119b7478714eaa9345f34e2ebeab27c9b6ea1ff2e4e93ee10bf"
     },
     "membership_digest_algorithm": "SHA256(concatenated decimal snapshot patient indices with one trailing newline)",
     "test": {
