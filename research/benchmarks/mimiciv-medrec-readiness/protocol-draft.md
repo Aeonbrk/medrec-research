@@ -67,7 +67,10 @@ visit counts, patient counts, and the fraction of visits removed by each rule.
 - Project the frozen SafeDrug/MoleRec DDI matrix onto the dataset-native
   medication IDs using the same ATC4 identity. Report matrix shape,
   symmetry/zero-diagonal checks, represented concepts, and unmapped relations.
-  DDI is a training/evaluation knowledge asset, not a clinical safety label.
+  Never interpret an unmapped pair as known non-interacting; if coverage is
+  below the declared implementation floor, stop rather than publish a DDI
+  comparison. DDI is a training/evaluation knowledge asset, not a clinical
+  safety label.
 
 ## 4. Patient split and role semantics
 
