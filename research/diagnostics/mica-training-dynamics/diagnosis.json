@@ -754,6 +754,52 @@
     "updates_per_epoch": 656
   },
   "evidence_class": "aggregate_progress_only",
+  "historical_baselines": {
+    "GAMENet": {
+      "approx_updates_per_epoch": 4233,
+      "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+      "learning_rate": 0.0005,
+      "logged_best_epoch_human": 49,
+      "logged_best_epoch_index": 48,
+      "optimizer": "Adam",
+      "scheduler": "none observed",
+      "total_epochs": 50,
+      "train_patients": 4233
+    },
+    "MoleRec": {
+      "approx_updates_per_epoch": 4233,
+      "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+      "learning_rate": 0.0005,
+      "logged_best_epoch_human": 45,
+      "logged_best_epoch_index": 44,
+      "optimizer": "Adam",
+      "scheduler": "none observed",
+      "total_epochs": 50,
+      "train_patients": 4233
+    },
+    "RETAIN": {
+      "approx_updates_per_epoch": 4233,
+      "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+      "learning_rate": 0.0005,
+      "logged_best_epoch_human": 50,
+      "logged_best_epoch_index": 49,
+      "optimizer": "Adam",
+      "scheduler": "none observed",
+      "total_epochs": 50,
+      "train_patients": 4233
+    },
+    "SafeDrug": {
+      "approx_updates_per_epoch": 4233,
+      "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+      "learning_rate": 0.0005,
+      "logged_best_epoch_human": 30,
+      "logged_best_epoch_index": 29,
+      "optimizer": "Adam",
+      "scheduler": "none observed",
+      "total_epochs": 50,
+      "train_patients": 4233
+    }
+  },
   "missing_or_not_used": [
     "Raw logs, patient IDs, logits, targets, checkpoints, and private paths were not read or copied.",
     "Baseline progress is summarized separately because its source logs use different evaluation semantics."

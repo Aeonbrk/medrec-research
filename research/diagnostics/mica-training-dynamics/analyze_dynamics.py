@@ -67,6 +67,53 @@ MISSING_PROGRESS = {
     }
 }
 
+BASELINE_METADATA = {
+    "MoleRec": {
+        "total_epochs": 50,
+        "train_patients": 4233,
+        "approx_updates_per_epoch": 4233,
+        "optimizer": "Adam",
+        "learning_rate": 5e-4,
+        "scheduler": "none observed",
+        "logged_best_epoch_index": 44,
+        "logged_best_epoch_human": 45,
+        "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+    },
+    "GAMENet": {
+        "total_epochs": 50,
+        "train_patients": 4233,
+        "approx_updates_per_epoch": 4233,
+        "optimizer": "Adam",
+        "learning_rate": 5e-4,
+        "scheduler": "none observed",
+        "logged_best_epoch_index": 48,
+        "logged_best_epoch_human": 49,
+        "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+    },
+    "RETAIN": {
+        "total_epochs": 50,
+        "train_patients": 4233,
+        "approx_updates_per_epoch": 4233,
+        "optimizer": "Adam",
+        "learning_rate": 5e-4,
+        "scheduler": "none observed",
+        "logged_best_epoch_index": 49,
+        "logged_best_epoch_human": 50,
+        "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+    },
+    "SafeDrug": {
+        "total_epochs": 50,
+        "train_patients": 4233,
+        "approx_updates_per_epoch": 4233,
+        "optimizer": "Adam",
+        "learning_rate": 5e-4,
+        "scheduler": "none observed",
+        "logged_best_epoch_index": 29,
+        "logged_best_epoch_human": 30,
+        "checkpoint_rule": "strict native validation Jaccard on data_eval; checkpoint per epoch",
+    },
+}
+
 METRIC_KEYS = ("jaccard", "prauc", "nll", "f1")
 TRAIN_KEYS = ("train_loss", "train_bce", "train_ddi")
 
@@ -261,6 +308,7 @@ def main() -> None:
         "status": "complete",
         "stage": "STAGE -1A",
         "evidence_class": "aggregate_progress_only",
+        "historical_baselines": BASELINE_METADATA,
         "data_contract": {
             "train_visits": TRAIN_VISITS,
             "batch_size": BATCH_SIZE,
