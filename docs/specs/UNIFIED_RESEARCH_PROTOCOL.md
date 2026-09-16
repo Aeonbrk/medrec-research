@@ -1,11 +1,12 @@
 # Unified research protocol
 
 Protocol version: `1.0`
-Status: `Current Base Protocol (Active Comparison Mode requires v1.1 amendment)`
+Status: `HISTORICAL — SUPERSEDED FOR NEW PAPER-FACING EXPERIMENTS`
 
 > [!IMPORTANT]
-> **Active Comparison Mode Notice**:
-> Protocol v1.0 defines the base scientific contract (cohort identity, split rules, prediction task seam, baseline integrity). For active Comparison Mode qualifications, this document must be read in conjunction with the additive [v1.1 Amendment](UNIFIED_RESEARCH_PROTOCOL_V1_1.md). Protocol v1.0 alone does not define the complete active comparison specification. (If future amendments accumulate beyond v1.1, they should be consolidated into a single current specification rather than stacked indefinitely.)
+> This document is preserved as historical governance for earlier Reproduction/Comparison records. New paper-facing experiments use [`PAPER_EXPERIMENT_CONTRACT.md`](PAPER_EXPERIMENT_CONTRACT.md) and [`PAPER_EVALUATOR_SPEC.md`](PAPER_EVALUATOR_SPEC.md). Do not create new Comparison Mode qualifications from this protocol.
+
+The remainder preserves the historical v1.0 contract semantics.
 
 ## Purpose
 

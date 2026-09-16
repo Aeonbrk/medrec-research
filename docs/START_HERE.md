@@ -9,6 +9,14 @@ Use this page to find the source of truth for the question in front of you.
 - [`KNOWLEDGE_HOMES.md`](KNOWLEDGE_HOMES.md): where current facts, engineering decisions, scientific evidence, scientific belief updates, plans, and handoff state belong.
 - [`../AGENTS.md`](../AGENTS.md): repository-wide invariants and routing to subtree rules.
 
+## Current paper experiment contract
+
+- [`specs/PAPER_EXPERIMENT_CONTRACT.md`](specs/PAPER_EXPERIMENT_CONTRACT.md): current paper-facing experiment governance, evidence roles, baseline adaptation, Dev selection, seeds, Test use, statistics, and research lifecycle.
+- [`specs/PAPER_EVALUATOR_SPEC.md`](specs/PAPER_EVALUATOR_SPEC.md): current core metric and aggregation semantics.
+- [`guides/PAPER_METHOD_CARD_TEMPLATE.md`](guides/PAPER_METHOD_CARD_TEMPLATE.md): concise per-method identity/adaptation/selection record.
+
+The historical [`specs/UNIFIED_RESEARCH_PROTOCOL.md`](specs/UNIFIED_RESEARCH_PROTOCOL.md) and [`specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md`](specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md) remain provenance for earlier Reproduction/Comparison work. They do not govern new paper-facing experiments.
+
 ## Scientific state
 
 - [`../research/memory/current-research-state.md`](../research/memory/current-research-state.md): live scientific synthesis and next-phase boundary.
@@ -17,11 +25,10 @@ Use this page to find the source of truth for the question in front of you.
 - [`../papers/README.md`](../papers/README.md): publication-facing survivor boundary.
 - [`../Handoff.md`](../Handoff.md): short current task handoff.
 
-## Protocols and baselines
+## Baselines
 
-- [`specs/UNIFIED_RESEARCH_PROTOCOL.md`](specs/UNIFIED_RESEARCH_PROTOCOL.md): Comparison Mode base contract.
-- [`specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md`](specs/UNIFIED_RESEARCH_PROTOCOL_V1_1.md): current additive amendment; read it with the base contract.
-- [`../baselines/registry.toml`](../baselines/registry.toml): baseline identity, Reproduction Programs, and readiness.
+- [`../baselines/registry.toml`](../baselines/registry.toml): historical integration identities, pinned source/environment records, and earlier qualification provenance. Its Reproduction/Comparison fields are not the active paper experiment abstraction.
+- [`../baselines/AGENTS.md`](../baselines/AGENTS.md): current baseline-subtree operating rules.
 
 ## Work on the repository
 

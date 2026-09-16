@@ -1,10 +1,11 @@
 # Unified research protocol v1.1 amendment
 
-Status: `Current Active Amendment (Additive to Protocol v1.0)`
+Status: `HISTORICAL — SUPERSEDED FOR NEW PAPER-FACING EXPERIMENTS`
 
 > [!IMPORTANT]
-> **Additive Contract**:
-> Protocol v1.1 is an additive amendment to [Unified Research Protocol 1.0](UNIFIED_RESEARCH_PROTOCOL.md). It does not replace the base contract. An active Comparison Mode qualification must satisfy both the base v1.0 invariants and these v1.1 additions.
+> This amendment is preserved for earlier Comparison Mode provenance. New paper-facing experiments use [`PAPER_EXPERIMENT_CONTRACT.md`](PAPER_EXPERIMENT_CONTRACT.md) and [`PAPER_EVALUATOR_SPEC.md`](PAPER_EVALUATOR_SPEC.md). Do not create new qualifications under v1.1.
+
+The remainder preserves the historical additive amendment semantics.
 
 Protocol v1.1 is an additive Comparison Mode amendment to
 [Unified Research Protocol 1.0](UNIFIED_RESEARCH_PROTOCOL.md). Existing v1.0

@@ -9,15 +9,22 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Current work: PAPER EXPERIMENT STANDARD DESIGN — PENDING
-Previous work: competitive baseline fidelity review — COMPLETE
+Human-facing phase: CREDIBLE REFERENCE SETUP
+Paper Experiment Contract: v1.0 CURRENT
 Paper claim: none
-Held-out/Test use: untouched for current architecture development
+New Test access: not authorized
+Available concurrent GPU capacity: 8 × RTX 3090-class
 ```
 
-The former `Stage -1G` name is retained only in historical artifact paths. Human-facing current state now uses descriptive research-purpose names.
+Historical `Stage -1*`, Gate, Reproduction Mode, and Comparison Mode names remain provenance only. New paper-facing work is governed by:
 
-## Validated development evidence
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
+- `docs/specs/PAPER_EVALUATOR_SPEC.md`
+- `docs/guides/PAPER_METHOD_CARD_TEMPLATE.md`
+
+The former Unified Research Protocol v1.0/v1.1 and `baselines/registry.toml` remain historical integration/provenance records; they do not automatically certify a future paper row.
+
+## Valid development evidence
 
 Medication-specific evidence selection remains the strongest surviving mechanism.
 
@@ -26,57 +33,62 @@ Medication-specific evidence selection remains the strongest surviving mechanism
 | MIMIC-III | 0.531796 | 0.539316 | +0.007520 | +0.007120 | +0.003489 | -0.002319 | +0.001758 |
 | MIMIC-IV native | 0.552883 | 0.559369 | +0.006486 | +0.005375 | +0.006493 | -0.002707 | -0.001262 |
 
-Observed development verdict: `MICA_MECHANISM_REPLICATED_BOTH_DATASETS`.
+Current interpretation:
 
-Interpretation: medication-specific clinical evidence selection has cross-dataset Train/Dev support. It is not a held-out paper result, SOTA claim, or stable safety claim.
+> In the tested single-seed Train/Dev comparisons, medication-specific evidence selection moved accuracy in the same favorable direction on MIMIC-III and MIMIC-IV surfaces. Stability across training randomness is not yet established.
 
-The fixed-131 and generalized MICA implementations also passed exact no-training equivalence on the 131-medication path.
+These results are `DEVELOPMENT` evidence. They are not final-table superiority, SOTA, universal safety improvement, or a calibration claim. The fixed-131/generalized MICA implementation passed exact no-training equivalence on the 131-medication path.
 
 ## Benchmark surfaces
 
-- **MIMIC-III canonical-131**: established literature-compatible development/reference surface.
-- **MIMIC-IV common-131**: harmonized cross-method Train/Dev surface created by exact ATC4 identity projection. It is not an official universal MIMIC-IV benchmark.
-- **MIMIC-IV native-173**: frozen dataset-native benchmark and candidate robustness/generalization surface.
+- **MIMIC-III canonical-131**: canonical medication-space/literature interface. Direct numerical comparability still depends on cohort, split, input, selection, and evaluator semantics. Historical Test feedback remains to be audited.
+- **MIMIC-IV native-173**: frozen dataset-native surface and preferred candidate for the second main benchmark, subject to baseline feasibility and timing/feedback audits.
+- **MIMIC-IV common-131**: harmonized projected compatibility surface. It changes target space/cardinality and is not the full native MIMIC-IV medication task.
 
-The final paper roles of these surfaces are not yet frozen. MIMIC-IV Test remains sealed.
+Two MIMIC-IV vocabulary surfaces are not two independent datasets.
 
-## Competitive baseline fidelity review
+## Competitive baseline fidelity state
 
-The cleanup commit `e99e06ce3022c499525b286c2ee5781cf755e478` correctly stopped and compacted the incomplete external MIMIC-IV lanes without broad deletion or Test access.
+The cleanup and independent fidelity review remain authoritative for the failed temporary calibration runners.
 
-The subsequent independent fidelity review invalidates the former external-run admission for scientific comparison:
+Temporary project-side ARMR, MoleRec, GAMENet, and RETAIN outputs from the former Stage -1G path are diagnostic only and must not support method ranking or paper superiority claims. The invalidation does **not** mean every departure from official code is forbidden under the new contract; benchmark-specific Dev selection is allowed when declared and bounded, while changes that materially alter the scientific method/training process require equivalence evidence or a variant identity.
 
-- **ARMR**: the project runner selected the best Dev Jaccard checkpoint, while pinned official training selects the best PRAUC checkpoint and early-stops after two consecutive PRAUC declines.
-- **MoleRec**: pinned official training performs an optimizer update for each visit inside each patient sequence; the project temporary runner rewrote forward/training into shuffled mini-batches of 32 with one optimizer step per batch.
-- **GAMENet**: pinned official training performs per-admission optimizer updates with the official model; the temporary runner used a project-side `ProtocolGAMENet` batched implementation.
-- **RETAIN**: the temporary lane used a project-side `ProtocolRETAIN` path rather than establishing an unchanged published-method execution identity.
-
-Consequences:
-
-- temporary MIMIC-III ARMR/MoleRec/GAMENet/RETAIN results from these runners are diagnostic only;
-- stopped MIMIC-IV common-131/native-173 external lanes are diagnostic only;
-- bootstrap comparisons that depend on those temporary external outputs are diagnostic only;
-- no competitive-substrate verdict exists;
-- the old prototype `protocol.md` and `qualification.json` are historical pre-audit records and must not be resumed as the current execution contract.
-
-Machine-readable review: `research/prototypes/mica-competitive-substrate-calibration/fidelity-review.json`.
-
-Scientific belief update: `research/memory/decisions/2026-09-17-competitive-baseline-fidelity-review.md`.
-
-## Baseline evidence that remains useful
-
-The earlier five-model MIMIC-III baseline program remains useful historical reference evidence because it used separately qualified, frozen Baseline Cores and an independent evaluator. Its approximate Jaccard results were RETAIN 0.4872, LEAP 0.4565, GAMENet 0.5034, SafeDrug 0.5142, and MoleRec 0.5269.
-
-Those rows are not automatically final-paper results. The new paper experiment standard may change aggregation, seed, tuning, checkpoint, threshold, or final Test requirements; if so, paper-facing rows must be regenerated under the frozen final standard.
+The earlier separately qualified five-model MIMIC-III program remains historical reference evidence, not automatic final-paper evidence.
 
 ## Architecture status
 
-Direct Partial Regimen Assignment / RSM remains an untested model-level candidate, not an admitted idea. It must not be started merely because MICA has internal mechanism signal.
+Direct Partial Regimen Assignment / structured-set prediction remains an untested candidate, not an admitted paper method.
 
-Current MICA checkpoints remain development evidence. Do not spend paper-level multi-seed/Test compute on MICA until the paper experiment standard and the next architecture decision are resolved.
+If pursued, its question must be framed around explicit set-level competition, variable cardinality, and uniqueness in training/decoding—not the false claim that independent-label models contain no medication dependence, and not an unsupported claim that anonymous slots are clinical regimen roles.
+
+A 2×2 evidence-by-decoder experiment is preferred only when the two factors can be independently manipulated without changing information access or introducing confounds. Otherwise use narrower matched controls.
+
+## Current bounded audits
+
+Three audits are active decision dependencies, not one global training gate:
+
+1. **Prediction-time semantics** — establish what current diagnosis/procedure timing supports in the claim language.
+2. **Evaluation feedback history** — establish MIMIC-III/MIMIC-IV Test exposure and whether claimed confirmation populations are known to overlap at patient/record level; unknown remains unknown.
+3. **MIMIC-IV native-173 baseline feasibility** — for relevant external methods, distinguish mechanical output-space adaptation from missing scientific assets or a scientific rewrite.
+
+Only resolve the unknowns that can change the experiment being launched.
+
+## Near-term experiment routing after relevant audits
+
+Once the MIMIC-III task/evaluator/selection profile is fixed, a three-seed SharedPool-vs-DrugQuery stability experiment is authorized as an architecture-decision experiment without waiting for unrelated native-173 or SSPNet work.
+
+A source-backed baseline recovery run may start once that method's Method Card, benchmark profile, reference-sanity conditions, and bounded Dev selection are frozen.
+
+A structured-set prototype must wait until the closest-work computational distinction and minimum model definition are clear.
+
+With eight GPUs, a useful later parallel layout is six MIMIC-III MICA stability runs plus two independent credible baseline recovery lanes, but GPU occupancy is not a requirement and unresolved experiments should not be launched merely to fill devices.
+
+## Final evidence boundary
+
+A result can be final-table eligible without being an untouched confirmation result. Every paper-facing evaluation surface must declare its feedback status. The primary confirmatory conclusion for a new method should have at least one population that did not feed back into model/protocol selection when such a population can be supported honestly.
+
+MIMIC-IV Test remains the highest-value currently sealed confirmation surface. Do not access it during Credible Reference Setup or Architecture Hypothesis Testing.
 
 ## Next action
 
-Design one simple paper-oriented experimental standard that separates development evidence from paper-producing evidence and defines published-baseline fidelity, allowed adaptation, Dev tuning, checkpoint/threshold semantics, seed policy, uncertainty, metric aggregation, and Test use.
-
-Use the independent Astra review as input, not as authority. Reconcile it against the verified project evidence above before launching any new experiment.
+Execute the bounded audits above and create Method Cards only for baselines that are about to be recovered. Do not resume the invalidated temporary runners or start broad baseline sweeps.
