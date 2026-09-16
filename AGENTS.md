@@ -29,6 +29,7 @@ Rules inherit downward. A nearer `AGENTS.md` may add or narrow rules for its sub
 - `Handoff.md` is a short current-work pointer, not a historical archive.
 - Historical evidence is never rewritten merely to match the latest interpretation. Archive or supersede it explicitly.
 - No global notes index is maintained; use directory structure and semantic filenames.
+- Always follow `unslop` to reduce AI slop.
 
 ## Research boundaries
 
@@ -51,13 +52,13 @@ Detailed research execution rules live in `research/AGENTS.md`.
 
 ## Directory routing
 
-| Work | Read first |
-| --- | --- |
-| Current docs, specs, playbooks, plans | `docs/AGENTS.md` |
-| Scientific prototypes, ideas, memory, benchmarks | `research/AGENTS.md` |
-| External baselines and reproduction/comparison code | `baselines/AGENTS.md` |
-| Reusable core library | `src/medrec_research/AGENTS.md` |
-| Publication-facing survivor packages | `papers/AGENTS.md` |
+| Work                                                | Read first                      |
+| --------------------------------------------------- | ------------------------------- |
+| Current docs, specs, playbooks, plans               | `docs/AGENTS.md`                |
+| Scientific prototypes, ideas, memory, benchmarks    | `research/AGENTS.md`            |
+| External baselines and reproduction/comparison code | `baselines/AGENTS.md`           |
+| Reusable core library                               | `src/medrec_research/AGENTS.md` |
+| Publication-facing survivor packages                | `papers/AGENTS.md`              |
 
 Canonical sources:
 
