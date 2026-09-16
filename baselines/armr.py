@@ -429,9 +429,7 @@ def _source_metrics(
         "avg_recall": float(aggregate[3]),
         "avg_f1": float(aggregate[4]),
         "ddi_rate": float(aggregate[5]),
-        "mean_medication_count": float(
-            np.asarray(predictions, dtype=np.float32).sum(axis=1).mean()
-        ),
+        "mean_medication_count": float(np.mean([len(item) for item in predictions])),
         "loss": float(stable_nll.mean()),
     }
 
