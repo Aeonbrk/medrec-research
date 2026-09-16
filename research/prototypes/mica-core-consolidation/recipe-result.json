@@ -1,0 +1,163 @@
+{
+  "evidence_class": "aggregate_result_only",
+  "private_artifacts": "checkpoints, predictions, IDs, targets, and raw logs remain on 319",
+  "recipes": [
+    {
+      "best_dev": {
+        "ddi_rate": 0.07629963604758543,
+        "f1": 0.6950055191031947,
+        "jaccard": 0.5422441561252869,
+        "mean_medication_count": 19.953521126760563,
+        "nll": 0.20248271524906158,
+        "prauc": 0.7927301263294768,
+        "precision": 0.7028299038479917,
+        "recall": 0.7119264495618668,
+        "std_medication_count": 7.344839572906494,
+        "visit_count": 2130.0
+      },
+      "config": {
+        "batch_size_visits": 16,
+        "clinical_attention_blocks": 2,
+        "epochs": 60,
+        "optimizer": "AdamW",
+        "seed": 20260914,
+        "weight_decay": 0.0001
+      },
+      "control": "core",
+      "epoch_60_dev": {
+        "ddi_rate": 0.08032331668675737,
+        "f1": 0.6338637160545393,
+        "jaccard": 0.4740902602140073,
+        "mean_medication_count": 20.207042253521127,
+        "nll": 0.5402646064758301,
+        "prauc": 0.7145235242314353,
+        "precision": 0.6391300081540162,
+        "recall": 0.6576620125314528,
+        "std_medication_count": 6.934627532958984,
+        "visit_count": 2130.0
+      },
+      "j_drop": 0.06815389591127957,
+      "learning_rate_epoch_60": 0.0003,
+      "learning_rate_start": 0.0003,
+      "nll_drift": 0.3377818912267685,
+      "parameter_count": 848900,
+      "prauc_drop": 0.07820660209804153,
+      "recipe": "t0_current_anchor",
+      "schedule": "constant",
+      "selected_epoch": 3,
+      "source_revision": "5864011a864851c7eba1ed2a0742221c9e7dcf5f"
+    },
+    {
+      "best_dev": {
+        "ddi_rate": 0.07652388111382374,
+        "f1": 0.6950950049104646,
+        "jaccard": 0.542279678230869,
+        "mean_medication_count": 19.930985915492958,
+        "nll": 0.2045568972826004,
+        "prauc": 0.7908480268494116,
+        "precision": 0.7034205578538867,
+        "recall": 0.7126720491685219,
+        "std_medication_count": 7.151179313659668,
+        "visit_count": 2130.0
+      },
+      "config": {
+        "batch_size_visits": 16,
+        "clinical_attention_blocks": 2,
+        "epochs": 60,
+        "optimizer": "AdamW",
+        "seed": 20260914,
+        "weight_decay": 0.0001
+      },
+      "control": "core",
+      "epoch_60_dev": {
+        "ddi_rate": 0.08012814649495097,
+        "f1": 0.6342396681570536,
+        "jaccard": 0.474698730945359,
+        "mean_medication_count": 19.661971830985916,
+        "nll": 0.5137633681297302,
+        "prauc": 0.715864956514521,
+        "precision": 0.6482748410287554,
+        "recall": 0.6498914050741541,
+        "std_medication_count": 6.6098737716674805,
+        "visit_count": 2130.0
+      },
+      "j_drop": 0.06758094728550995,
+      "late_degradation_reduced": true,
+      "learning_rate_epoch_60": 0.0001,
+      "learning_rate_start": 0.0001,
+      "nll_drift": 0.3092064708471298,
+      "parameter_count": 848900,
+      "peak_j_floor_pass": true,
+      "peak_prauc_floor_pass": true,
+      "prauc_drop": 0.0749830703348906,
+      "recipe": "t1_lower_constant",
+      "schedule": "constant",
+      "selected_epoch": 5,
+      "source_revision": "5864011a864851c7eba1ed2a0742221c9e7dcf5f"
+    },
+    {
+      "best_dev": {
+        "ddi_rate": 0.07629990745206408,
+        "f1": 0.6950127642872175,
+        "jaccard": 0.5422617980481574,
+        "mean_medication_count": 19.954460093896714,
+        "nll": 0.20247745513916016,
+        "prauc": 0.792760894696007,
+        "precision": 0.7028282979144204,
+        "recall": 0.7119481195427659,
+        "std_medication_count": 7.347273826599121,
+        "visit_count": 2130.0
+      },
+      "config": {
+        "batch_size_visits": 16,
+        "clinical_attention_blocks": 2,
+        "epochs": 60,
+        "optimizer": "AdamW",
+        "seed": 20260914,
+        "weight_decay": 0.0001
+      },
+      "control": "core",
+      "epoch_60_dev": {
+        "ddi_rate": 0.07927900556135321,
+        "f1": 0.6358919126470047,
+        "jaccard": 0.476628727737981,
+        "mean_medication_count": 19.988262910798124,
+        "nll": 0.6328829526901245,
+        "prauc": 0.7179837068983541,
+        "precision": 0.6442712170548359,
+        "recall": 0.6562247226741561,
+        "std_medication_count": 6.851431846618652,
+        "visit_count": 2130.0
+      },
+      "j_drop": 0.06563307031017646,
+      "late_degradation_reduced": false,
+      "learning_rate_epoch_60": 3.203514088945786e-06,
+      "learning_rate_start": 0.0003,
+      "nll_drift": 0.43040549755096436,
+      "parameter_count": 848900,
+      "peak_j_floor_pass": true,
+      "peak_prauc_floor_pass": true,
+      "prauc_drop": 0.07477718779765286,
+      "recipe": "t2_cosine_decay",
+      "schedule": "cosine_decay",
+      "selected_epoch": 3,
+      "source_revision": "5864011a864851c7eba1ed2a0742221c9e7dcf5f"
+    }
+  ],
+  "source_result_files": {
+    "t0_current_anchor": "t0_current_anchor.json",
+    "t1_lower_constant": "t1_lower_constant.json",
+    "t2_cosine_decay": "t2_cosine_decay.json"
+  },
+  "stage": "STAGE -1B",
+  "status": "complete",
+  "training_recipe_decision": {
+    "anchor": "t0_current_anchor",
+    "decision": "ADOPT_STABLE_RECIPE_FOR_STAGE_MINUS_1C",
+    "eligible_recipes": [
+      "t1_lower_constant"
+    ],
+    "rule": "peak J >= anchor - 0.002, peak PRAUC >= anchor - 0.002, and J/PRAUC drops plus NLL drift all lower than anchor",
+    "selected_recipe": "t1_lower_constant"
+  }
+}
