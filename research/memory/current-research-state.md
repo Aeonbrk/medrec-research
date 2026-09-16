@@ -15,7 +15,7 @@ Current stage: STAGE -1 — MICA CORE CONSOLIDATION + TRAINING DIAGNOSIS + MIMIC
 Stage status: PRE-IDEA / PRE-GATE / NO PAPER CLAIM / NO HOLDOUT TEST / NO NEW METHOD FAMILY
 Modern-backbone calibration: complete
 Strong-unary residual-correction route: deprioritized as a primary direction
-Current action: MICA Core consolidation + training diagnosis + MIMIC-IV readiness
+Current action: implement and freeze the MIMIC-IV benchmark protocol; remain in Stage -1
 ```
 
 No new architecture family, Idea 009, formal Gate, held-out evaluation, or
