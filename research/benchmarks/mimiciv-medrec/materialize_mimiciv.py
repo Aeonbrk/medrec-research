@@ -769,7 +769,9 @@ def materialize(args: argparse.Namespace) -> dict[str, Any]:
     public_dir = args.public_output_dir.resolve()
     script_root: Path | None = None
     for parent in Path(__file__).resolve().parents:
-        if (parent / ".git").exists():
+        if (parent / ".git").exists() and (
+            parent / "research" / "benchmarks" / "mimiciv-medrec"
+        ).is_dir():
             script_root = parent
             break
     if script_root is not None:
