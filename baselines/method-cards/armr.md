@@ -61,6 +61,8 @@ that released behavior is preserved and recorded rather than silently repaired.
 - The pinned source imports `einops`; the locked MoleRec environment does not
   provide it. A separate remote Python 3.8 environment with Torch 2.4.1+cu121
   and `einops` 0.8.1 passed static compilation and a CUDA forward smoke.
+- Formal execution uses `/root/anaconda3/envs/xytf/armr_irsa_py38` with explicit
+  environment hash `6af6bd1e97fc0ea5991e09bcf2f99e18326fa1d88871e53cc6496230310f3921`.
 - The bundled source data are identical to the audited ARMR vocabulary/DDI
   assets, but their source split and evaluator are not the paper-profile
   contract. Source-native smoke values are non-evidence.
