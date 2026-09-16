@@ -1,8 +1,10 @@
 {
-  "schema_version": 1,
-  "stage": "STAGE -1G",
-  "authoritative_revision": "53765aa3c4ca5197bad38f768aea48c36ef48fa6",
-  "status": "EXECUTION_STOPPED_FOR_INDEPENDENT_FIDELITY_REVIEW",
+  "schema_version": 2,
+  "historical_stage": "STAGE -1G",
+  "cleanup_base_revision": "d33909b178356613e9eb75a57c9dba8efafc0940",
+  "cleanup_revision": "e99e06ce3022c499525b286c2ee5781cf755e478",
+  "post_cleanup_fidelity_review": "fidelity-review.json",
+  "status": "EXECUTION_STOPPED_AND_FIDELITY_INVALIDATED",
   "evidence_scope": {
     "roles": ["Train", "Dev"],
     "test_loaded": false,
@@ -27,7 +29,8 @@
       },
       "natural_complete": false,
       "termination": "SIGTERM",
-      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as execution diagnostics, not a primary comparison row.",
+      "execution_invalidation_reason": "Stopped before the documented terminal budget and without a terminal result.",
+      "fidelity_invalidation_reason": "The temporary runner selected best Dev Jaccard and omitted the pinned official source's best-PRAUC selection plus PRAUC-decline early stopping.",
       "test_loaded": false
     },
     {
@@ -48,7 +51,8 @@
       },
       "natural_complete": false,
       "termination": "SIGTERM",
-      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as execution diagnostics, not a primary comparison row.",
+      "execution_invalidation_reason": "Stopped before the documented terminal budget and without a terminal result.",
+      "fidelity_invalidation_reason": "The temporary runner replaced official patient/visit per-visit optimizer updates with shuffled batch-32 optimization through a custom batched forward path.",
       "test_loaded": false
     },
     {
@@ -69,7 +73,8 @@
       },
       "natural_complete": false,
       "termination": "SIGTERM",
-      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as execution diagnostics, not a primary comparison row.",
+      "execution_invalidation_reason": "Stopped before the documented terminal budget and without a terminal result.",
+      "fidelity_invalidation_reason": "The temporary runner used project-side ProtocolGAMENet and shuffled mini-batch optimization instead of the pinned official model's per-admission optimizer-update process.",
       "test_loaded": false
     },
     {
@@ -90,7 +95,8 @@
       },
       "natural_complete": false,
       "termination": "SIGTERM",
-      "invalidation_reason": "Stopped before the documented terminal budget and without a terminal result; retained only as supplementary execution diagnostics.",
+      "execution_invalidation_reason": "Stopped before the documented terminal budget and without a terminal result.",
+      "fidelity_invalidation_reason": "The temporary lane used project-side ProtocolRETAIN batched execution and did not establish an unchanged published-method core for this calibration lane.",
       "test_loaded": false
     }
   ],
@@ -103,6 +109,7 @@
       "source_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
       "natural_complete": false,
       "termination": "SIGTERM",
+      "fidelity_invalidation_reason": "Same temporary runner family as the common131 lane; published-method fidelity was not established.",
       "test_loaded": false
     },
     {
@@ -113,6 +120,7 @@
       "source_revision": "da695b4fc9390882f3a681c82115e81291ae6380",
       "natural_complete": false,
       "termination": "SIGTERM",
+      "fidelity_invalidation_reason": "Same project-side batched ProtocolGAMENet runner family as the common131 lane.",
       "test_loaded": false
     },
     {
@@ -123,7 +131,16 @@
       "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
       "natural_complete": false,
       "termination": "SIGTERM",
+      "fidelity_invalidation_reason": "Same project-side ProtocolRETAIN runner family as the common131 lane.",
       "test_loaded": false
     }
-  ]
+  ],
+  "completed_mimic_iii_temporary_runs": {
+    "status": "INVALIDATED_FOR_PUBLISHED_METHOD_COMPARISON",
+    "reason": "Completed temporary MIMIC-III outputs produced by the same ARMR/MoleRec/GAMENet/RETAIN runner family inherit the fidelity defects documented in fidelity-review.json. Preserve them only as historical execution diagnostics."
+  },
+  "dependent_bootstrap_evidence": {
+    "status": "INVALIDATED_FOR_COMPETITIVE_INFERENCE",
+    "reason": "Patient-cluster bootstrap cannot repair upstream baseline-identity and training-semantics mismatch."
+  }
 }

@@ -1,78 +1,48 @@
-# Stage -1G — Competitive substrate calibration
+# Competitive baseline calibration — historical execution record
 
-Status: `COMMON131_PRESERVED; EXTERNAL_MIV_LANES_INVALIDATED; EXECUTION_STOPPED_FOR_INDEPENDENT_REVIEW`
+Former internal name: `Stage -1G — Competitive substrate calibration`.
 
-## Current cleanup boundary — 2026-09-16
+Status: `TERMINATED_AFTER_INDEPENDENT_FIDELITY_REVIEW`
 
-The common-131 benchmark materialization, qualification record, G0 evidence,
-and completed MICA/MIMIC-III aggregate evidence remain preserved. The
-incomplete MIMIC-IV external lanes and the prior native-173 diagnostic lanes
-were stopped before terminal comparison and are not primary comparison rows.
-Their public-safe stop and invalidation records are in
-[`cleanup-invalidation.json`](cleanup-invalidation.json). Stage -1G has no
-substrate verdict. An independent fidelity review is required before any new
-experiment or continuation.
+This directory preserves the historical design, qualification attempt, common-131 benchmark linkage, temporary runners, cleanup records, and fidelity review for the competitive-baseline calibration attempt. It is not the current execution contract.
 
-## 2026-09-16 protocol amendment — comparability-driven common131 primary
+## Current authority
 
-During Stage -1G execution, the literature/source audit established that the
-MoleRec/SafeDrug/Carmen lineage and official ARMR MIMIC-III/MIMIC-IV assets
-share one 131-code ATC4 identity (ARMR MIMIC-IV uses a different insertion
-order). Therefore the primary comparison surface is now the additive
-canonical common-131 benchmark on both datasets. The pre-existing native-173
-MIMIC-IV jobs and results are preserved as secondary robustness evidence; no
-new native-173 lanes are started after this freeze.
+The independent post-cleanup review is recorded in:
 
-This is a comparability-driven correction made before interpreting the external
-comparison, not a performance-driven vocabulary choice. The exact source
-audit and mapping are in
-[`research/benchmarks/mimiciv-medrec-common131/semantic-audit.json`](../../benchmarks/mimiciv-medrec-common131/semantic-audit.json).
+- [`fidelity-review.json`](fidelity-review.json)
+- [`cleanup-invalidation.json`](cleanup-invalidation.json)
+- [`../../memory/decisions/2026-09-17-competitive-baseline-fidelity-review.md`](../../memory/decisions/2026-09-17-competitive-baseline-fidelity-review.md)
 
-The common-131 semantic verdict is
-`COMMON_131_RECONSTRUCTABLE_WITH_DOCUMENTED_MAPPING`. The canonical hash of
-the sorted code set is
-`6f24de0f8d438b943814094964dee0287697b8951a174321d19a3c17ee504c08`.
+The frozen historical [`protocol.md`](protocol.md) and [`qualification.json`](qualification.json) are preserved for provenance. Their external-baseline admission is superseded for execution and must not be resumed without a new paper-oriented experimental standard.
 
-Stage -1F established that medication-specific evidence selection (`DrugQuery`) improves over matched `SharedPool` on both frozen Train/Dev surfaces. Stage -1G asks a different question:
+## What remains valid
 
-> Is MICA-Core competitive enough against strong, faithful external methods on both MIMIC-III and MIMIC-IV to justify building the next architecture on top of it?
+- G0 fixed-131/generalized-MICA exact-equivalence evidence.
+- MIMIC-IV common-131 materialization and semantic audit.
+- MICA common-131 SharedPool/DrugQuery development aggregates.
+- The fact that the temporary external runs occurred under the recorded code/configuration.
+- Cleanup accounting and stop provenance.
 
-This is a pre-Idea, pre-Gate calibration stage. It does not create a paper claim, open Test, implement RSM, or perform final benchmark confirmation.
+## What is invalidated for scientific comparison
 
-The frozen execution contract is in [`protocol.md`](protocol.md).
+All temporary external results produced by the former Stage -1G runner family are diagnostic only, including completed MIMIC-III outputs and stopped MIMIC-IV outputs.
 
-## Why this stage exists
+The fidelity audit found:
 
-The current evidence has strong internal mechanism attribution but uneven external coverage. MIMIC-III has several high-quality reproduction/reference surfaces; MIMIC-IV currently has only the matched SharedPool/DrugQuery pair under the frozen project protocol. That is sufficient to establish cross-dataset mechanism replication, but not enough to judge whether MICA is a competitive paper substrate.
+- ARMR checkpoint/model-selection semantics diverged from the pinned official source.
+- MoleRec changed the official per-visit optimizer-update semantics into shuffled batch-32 training through a custom batched forward path.
+- GAMENet used a project-side batched `ProtocolGAMENet` rather than the unchanged official model/training path.
+- RETAIN used a project-side `ProtocolRETAIN` path and did not establish published-method identity for this calibration lane.
 
-The design follows the experimental logic used by strong medication-recommendation papers rather than forcing every model into one optimizer recipe:
+Therefore these outputs cannot support statements that MICA outperforms the corresponding published methods. Dependent bootstrap intervals do not repair the upstream identity problem.
 
-- same task semantics, data roles, information budget, and evaluator;
-- faithful method-specific training and model logic;
-- strong baselines spanning recent and established families;
-- accuracy, safety, prescribing-size, calibration, and efficiency reporting;
-- dual-dataset evidence;
-- final multi-seed/Test/statistical confirmation deferred until a method survives.
+## Common-131 boundary
 
-Primary-source reference points include MoleRec (WWW 2023), ARMR and SSPNet (IJCAI 2025), and HypeMed (TOIS 2026).
+`research/benchmarks/mimiciv-medrec-common131/` remains a preserved harmonized Train/Dev development surface. It is not an official universal MIMIC-IV benchmark. The final paper role of common-131 versus native-173 is intentionally left for the next experimental-standard design.
 
-## Planned phases
+## No terminal substrate verdict
 
-1. `G0_EQUIVALENCE`: no-training fixed-131 vs generalized-MICA equivalence audit.
-2. `COMMON131_FREEZE`: primary-source identity audit, additive MIMIC-IV projection, and mechanical checks.
-3. `G1_QUALIFICATION`: primary-source and official-code compatibility qualification for external baselines.
-4. `G2_SIX_GPU_SCREEN`: ARMR, MoleRec, and GAMENet on common131, one seed, full method-specific Train/Dev budget; preserved native-173 jobs remain secondary.
-5. `READOUT`: common evaluation, paired patient-cluster bootstrap diagnostics, Pareto/competitiveness decision.
+No `MICA_SUBSTRATE_*` verdict is issued. The failed element was the external-comparison execution identity, not the already established MICA DrugQuery-vs-SharedPool mechanism replication.
 
-## Terminal verdicts
-
-Exactly one:
-
-- `MICA_SUBSTRATE_COMPETITIVE_BOTH_DATASETS`
-- `MICA_SUBSTRATE_BORDERLINE`
-- `MICA_SUBSTRATE_OUTCLASSED`
-- `INSUFFICIENT_COMPETITIVE_CALIBRATION`
-- `STOP_MICA_GENERALIZATION_EQUIVALENCE_FAILURE`
-- `BENCHMARK_SEMANTICS_REQUIRE_REVIEW`
-
-Only `MICA_SUBSTRATE_COMPETITIVE_BOTH_DATASETS` authorizes returning to the bounded Stage 0 RSM contract review. It still does not authorize Test or paper claims.
+No new experiment should be launched from the historical protocol. The next research task is to define a paper-oriented experimental standard and then decide whether competitive calibration, architecture development, or both should be rerun under that standard.

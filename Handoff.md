@@ -1,33 +1,35 @@
 # Handoff
 
-Updated: 2026-09-16.
+Updated: 2026-09-17.
 
 ```text
-Verified cleanup starting revision: d33909b178356613e9eb75a57c9dba8efafc0940
-Scientific phase: STAGE -1G — COMPETITIVE SUBSTRATE CALIBRATION
-Stage -1G status: EXECUTION_PAUSED_AFTER_INVALIDATED_EXTERNAL_LANES
+Verified revision before independent review: e99e06ce3022c499525b286c2ee5781cf755e478
+Current work: COMPETITIVE BASELINE FIDELITY REVIEW — COMPLETE
+Historical execution record: former Stage -1G competitive calibration
 Active formal Idea: none
 Idea 009: absent
 Active formal Gate: none
-Held-out/Test use: not authorized
+Held-out/Test use: untouched / not authorized
 ```
 
-Preserved authoritative evidence:
+Independent review verdict: the cleanup itself is accepted, but the former Stage -1G external-run qualification is not. The temporary ARMR, MoleRec, GAMENet, and RETAIN runners do not establish published-method fidelity, so their MIMIC-III/MIMIC-IV outputs and dependent bootstrap comparisons are diagnostic only. Do not resume those runners.
 
-- Stage -1F MICA mechanism replication on MIMIC-III and MIMIC-IV.
-- G0 fixed-131/generalized-MICA equivalence pass.
-- MIMIC-IV common-131 materialization and semantic audit.
-- Valid common-131 MICA SharedPool/DrugQuery aggregates.
-- Completed MIMIC-III baseline aggregates and their source revisions.
+Still valid for their stated development scope:
 
-Stopped and invalidated before primary comparison:
+- MICA DrugQuery vs SharedPool cross-dataset Train/Dev mechanism replication;
+- fixed-131/generalized-MICA exact-equivalence evidence;
+- frozen MIMIC-IV native-173 benchmark;
+- harmonized MIMIC-IV common-131 materialization and semantic audit;
+- MICA common-131 aggregates;
+- the earlier separately qualified five-model MIMIC-III baseline evidence as historical reference, not automatically as final-paper rows.
 
-- MIMIC-IV common-131 ARMR, MoleRec, GAMENet, and RETAIN lanes.
-- Earlier MIMIC-IV native-173 diagnostic lanes.
-- Public-safe records: `research/prototypes/mica-competitive-substrate-calibration/cleanup-invalidation.json`.
+Current review authority:
 
-Current interpretation: no Stage -1G substrate verdict and no external MIMIC-IV primary comparison row.
+- `research/prototypes/mica-competitive-substrate-calibration/fidelity-review.json`
+- `research/memory/decisions/2026-09-17-competitive-baseline-fidelity-review.md`
 
-One next action: independent fidelity/cleanup review.
+The old `protocol.md` and `qualification.json` in that prototype are preserved as historical pre-audit records and are superseded for execution.
 
-Hard prohibitions: do not resume training, read Test, run RSM, create Idea 009, open a Gate, tune baselines, or redesign the Stage -1G protocol before that review.
+Next action: synthesize the independent experimental-standard review (including Astra's advice) and define a simple paper-oriented experiment standard before any new GPU run.
+
+Do not read Test, resume the invalidated external runners, start RSM, create Idea 009, or treat temporary baseline rankings as scientific superiority evidence before that standard is frozen.

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-09-17",
+  "reviewed_revision": "e99e06ce3022c499525b286c2ee5781cf755e478",
+  "status": "FIDELITY_REVIEW_COMPLETE",
+  "verdict": "CLEANUP_PASS_EXTERNAL_BASELINE_ADMISSION_FAIL",
+  "test_loaded": false,
+  "cleanup_review": {
+    "verdict": "PASS",
+    "reason": "The cleanup stopped the targeted invalid lanes, preserved benchmark/MICA evidence, avoided broad deletion, retained public-safe provenance, and did not access Test."
+  },
+  "historical_execution_contract": {
+    "protocol": "protocol.md",
+    "qualification": "qualification.json",
+    "execution_status": "SUPERSEDED_FOR_EXECUTION",
+    "note": "Preserved for provenance; do not resume as the current comparison contract."
+  },
+  "baseline_findings": [
+    {
+      "baseline": "ARMR",
+      "source_revision": "c0de843d43a1f2867d45ede836b918abd11a0fda",
+      "official_source_path": "code/train_mynet.py",
+      "project_runner": "stage1g_external_runner.py",
+      "verdict": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "official_behavior": "Best checkpoint is selected by Dev PRAUC; training early-stops after two consecutive PRAUC declines; source threshold is 0.30.",
+      "project_behavior": "The temporary runner selected best Dev Jaccard and did not implement the official PRAUC early-stop rule.",
+      "scientific_consequence": "Temporary ARMR results cannot be treated as the published ARMR method under a paper comparison."
+    },
+    {
+      "baseline": "MoleRec",
+      "source_revision": "dd5afaf0a503fd3de3229f86ec7f26b345d10e3a",
+      "official_source_path": "src/training.py",
+      "project_runner": "run_molerec_common131.py",
+      "verdict": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "official_behavior": "Training loops over patients and visits and performs optimizer.zero_grad/backward/step for each visit; Dev selects best Jaccard; threshold is 0.50.",
+      "project_behavior": "The temporary runner defines BATCH_SIZE=32, shuffles recommendation examples, uses a custom batched forward path, and performs one optimizer step per batch.",
+      "scientific_consequence": "The optimization process is materially different; temporary MoleRec results cannot be used to rank MICA against published MoleRec."
+    },
+    {
+      "baseline": "GAMENet",
+      "source_revision": "da695b4fc9390882f3a681c82115e81291ae6380",
+      "official_source_path": "code/train_GAMENet.py",
+      "project_runner": "stage1g_external_runner.py",
+      "verdict": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "official_behavior": "Official GAMENet loops over patient admissions and performs one optimizer update per admission with the official model and 0.9*BCE + 0.01*multilabel-margin loss in the default non-DDI mode.",
+      "project_behavior": "The temporary runner instantiated project-side ProtocolGAMENet and trained shuffled mini-batches with one optimizer update per batch.",
+      "scientific_consequence": "Forward similarity is insufficient to establish training identity; temporary GAMENet results are diagnostic only."
+    },
+    {
+      "baseline": "RETAIN",
+      "source_revision": "8deee38cfdb2a38882377ff95cce5922d6d9e8d6",
+      "project_runner": "stage1g_external_runner.py",
+      "verdict": "INVALIDATED_BASELINE_FIDELITY_DIAGNOSTIC",
+      "project_behavior": "The temporary calibration lane used project-side ProtocolRETAIN batched execution rather than an unchanged, source-qualified published-method core.",
+      "scientific_consequence": "The lane does not establish a paper-grade RETAIN identity and remains supplementary diagnostic evidence only."
+    }
+  ],
+  "affected_evidence": {
+    "temporary_mimic_iii_external_runs": "INVALIDATED_FOR_PUBLISHED_METHOD_COMPARISON",
+    "temporary_mimic_iv_common131_external_runs": "INVALIDATED_FOR_PUBLISHED_METHOD_COMPARISON",
+    "temporary_mimic_iv_native173_external_runs": "INVALIDATED_FOR_PUBLISHED_METHOD_COMPARISON",
+    "bootstrap_comparisons_using_temporary_external_outputs": "INVALIDATED_FOR_COMPETITIVE_INFERENCE"
+  },
+  "unaffected_evidence": [
+    "MICA DrugQuery-vs-SharedPool cross-dataset Train/Dev mechanism replication",
+    "fixed-131/generalized-MICA exact-equivalence evidence",
+    "MIMIC-IV native-173 frozen benchmark",
+    "MIMIC-IV common-131 materialization and semantic audit",
+    "valid MICA common-131 development aggregates",
+    "earlier separately qualified five-model MIMIC-III baseline program as historical reference evidence"
+  ],
+  "routing": {
+    "competitive_substrate_verdict": "NONE",
+    "resume_old_external_runners": false,
+    "paper_claim_authorized": false,
+    "next_action": "Define a paper-oriented experiment standard before any new GPU run."
+  }
+}
