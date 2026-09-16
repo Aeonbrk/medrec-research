@@ -12,7 +12,7 @@ weight decay `1e-4`, current dropout/DDI loss/decoder, 60 complete epochs, and
 the existing Train/Dev split and strict best-Dev-Jaccard checkpoint rule:
 
 | Arm | Optimizer schedule |
-|---|---|
+| --- | --- |
 | `t0_current_anchor` | AdamW, constant `3e-4` |
 | `t1_lower_constant` | AdamW, constant `1e-4` |
 | `t2_cosine_decay` | AdamW, initial `3e-4`, cosine to `3e-6`, no warmup |
@@ -21,7 +21,7 @@ Stage -1C reuses the recipe selected (or the current recipe with early
 checkpointing if no new recipe passes) and runs exactly:
 
 | Control | Change from Core |
-|---|---|
+| --- | --- |
 | `core` | current MICA-Core |
 | `one_clinical_block` | clinical blocks `2 → 1` |
 | `no_post_read_conditioner` | retain DrugQuery; remove `condition_context` and its parameters |
@@ -45,4 +45,3 @@ the repository.
 
 This remains exploratory Train/Dev evidence. It is not a formal Gate, an
 Audit, a held-out Test, a multi-seed result, or a paper/novelty claim.
-
