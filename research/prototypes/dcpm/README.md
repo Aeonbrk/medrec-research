@@ -97,3 +97,31 @@ Enforcement:
 No DCPM-v2, K search, temperature search, extra loss, or extra seed
 if the mechanism is negative.
 ```
+
+## Empirical Results
+
+Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 319 NVIDIA RTX 3090):
+
+| Metric | SharedPrecedent (Control) | DCPM (Candidate-Conditioned) | Delta (DCPM - Control) |
+| :--- | :--- | :--- | :--- |
+| **Dev Jaccard (Primary)** | **0.543606** | 0.542203 | **-0.001403** |
+| Dev F1 | 0.696129 | 0.694874 | -0.001255 |
+| Dev PR-AUC | 0.792335 | 0.792684 | +0.000349 |
+| Dev DDI Rate | 0.072298 | 0.074479 | +0.002181 |
+| Dev Avg Med Count | 19.9901 | 21.9982 | +2.008113 |
+| Selected Checkpoint | Epoch 3 @ threshold 0.40 | Epoch 3 @ threshold 0.35 | - |
+| Parameter Count | 1,079,428 | 1,079,428 | 0 (exact match) |
+| Test Access | None (Dev only) | None (Dev only) | - |
+
+## Verdict and Decision
+
+```text
+VERDICT: KILL_DCPM_MECHANISM
+REASON: ΔJ = -0.001403 <= +0.002: drug-conditioned precedent relevance falsified
+```
+
+### Scientific Takeaways
+
+1. **Precedent relevance is patient-level, not drug-level**: Conditioning precedent retrieval queries on individual candidate medications ($q_{im}$) yielded no predictive gain ($\Delta J = -0.001403$) compared to a single shared patient-level precedent query ($q_i$).
+2. **Safety did not improve**: DDI rate slightly increased (+0.002181) alongside higher average prescription count (+2.008 medications/visit), ruling out any safety override.
+3. **Strict Protocol Compliance**: No post-hoc hyperparameter search, no K/temperature tuning, no auxiliary loss addition, and zero Test set access. Per the frozen research boundary, the DCPM mechanism is terminated without iteration.

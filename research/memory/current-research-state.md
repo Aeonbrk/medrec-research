@@ -52,6 +52,10 @@ These results are `DEVELOPMENT` evidence. They are not final-table superiority, 
 
 MICA remains a possible building block and mechanism control, not a mandatory backbone or permission gate for a distinct architecture.
 
+### Terminated mechanism screens
+
+- **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
+
 ## Benchmark strategy
 
 Default paper routing remains:

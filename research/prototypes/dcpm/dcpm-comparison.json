@@ -1,0 +1,42 @@
+{
+  "comparison": "dcpm_minus_shared_precedent",
+  "dcpm": {
+    "dev_avg_med": 21.998247486245493,
+    "dev_ddi": 0.07447919812678323,
+    "dev_f1": 0.6948738456319639,
+    "dev_jaccard": 0.5422034930676592,
+    "dev_prauc": 0.7926839203165749,
+    "mechanism": "candidate-medication-specific query q_im = LN(W_h h_i + W_l l_im + W_d d_m)",
+    "selected_epoch": 3,
+    "selected_threshold": 0.35,
+    "variant": "dcpm"
+  },
+  "deltas": {
+    "delta_average_medication_count": 2.00811296936795,
+    "delta_ddi": 0.002181307845946223,
+    "delta_f1": -0.0012547348113988166,
+    "delta_jaccard": -0.0014029164972662045,
+    "delta_prauc": 0.0003492720085723766
+  },
+  "parameter_count_control": 1079428,
+  "parameter_count_dcpm": 1079428,
+  "protocol": "MIMIC-III canonical-131 Paper Dev Screen",
+  "schema_version": 1,
+  "scientific_question": "Does candidate-medication-specific relevance over cross-patient Train precedents improve prediction over one shared patient-level precedent weighting, when both arms receive identical local evidence, memory cases, peer labels, parameters, and optimization?",
+  "seed": 20260921,
+  "shared_precedent": {
+    "dev_avg_med": 19.990134516877543,
+    "dev_ddi": 0.07229789028083701,
+    "dev_f1": 0.6961285804433627,
+    "dev_jaccard": 0.5436064095649255,
+    "dev_prauc": 0.7923346483080025,
+    "mechanism": "shared patient query q_i = LN(W_h h_i + W_l l_bar_i + W_d d_bar)",
+    "selected_epoch": 3,
+    "selected_threshold": 0.4,
+    "variant": "shared_precedent"
+  },
+  "source_revision": "98f334fef9af6c78d8b8ad8701819e7eb9805bfd",
+  "test_accessed": false,
+  "verdict": "KILL_DCPM_MECHANISM",
+  "verdict_reason": "\u0394J = -0.001403 <= +0.002: drug-conditioned precedent relevance falsified"
+}
