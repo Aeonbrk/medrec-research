@@ -382,8 +382,8 @@ def _surface(
 ) -> dict[str, Any]:
     ddi_pairs = tuple(
         (vocabulary[left], vocabulary[right])
-        for left, right in zip(
-            *np.triu(np.asarray(ddi, dtype=np.float32), 1).nonzero(), strict=True
+        for left, right in zip(  # noqa: B905 - NumPy returns equal-length coordinate arrays
+            *np.triu(np.asarray(ddi, dtype=np.float32), 1).nonzero()
         )
     )
     return evaluate(

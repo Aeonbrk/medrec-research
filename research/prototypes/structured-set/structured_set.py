@@ -302,7 +302,9 @@ def matching_labels(
         rows, columns = linear_sum_assignment(cost)
         if len(rows) != len(canonical):
             raise RuntimeError("matching solver did not assign every target")
-        for row, column in zip(rows.tolist(), columns.tolist(), strict=True):
+        if len(rows) != len(columns):
+            raise RuntimeError("matching solver returned unequal row and column counts")
+        for row, column in zip(rows.tolist(), columns.tolist()):  # noqa: B905 - equal solver outputs; Python 3.8
             labels[batch_index, row] = canonical[column]
     return labels
 
@@ -363,7 +365,7 @@ def assignment_pairs(utility: np.ndarray, beta: float) -> tuple[tuple[int, int],
     rows, columns = linear_sum_assignment(-weights)
     selected = [
         (int(row), int(column))
-        for row, column in zip(rows.tolist(), columns.tolist(), strict=True)
+        for row, column in zip(rows.tolist(), columns.tolist())  # noqa: B905 - equal solver outputs; Python 3.8
         if column < medication_count and weights[row, column] > 0.0
     ]
     medications = [medication for _slot, medication in selected]

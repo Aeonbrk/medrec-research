@@ -249,7 +249,7 @@ def summarize(args: argparse.Namespace) -> dict[str, Any]:
     vocabulary = tuple(_word(voc["med_voc"].idx2word, index) for index in range(MEDICATIONS))
     ddi_pairs = tuple(
         (vocabulary[left], vocabulary[right])
-        for left, right in zip(*np.triu(ddi, 1).nonzero(), strict=True)
+        for left, right in zip(*np.triu(ddi, 1).nonzero())  # noqa: B905 - NumPy returns equal-length coordinate arrays
     )
     control_utility = np.load(args.control_dir / "selected_dev_utility.npy")
     full_utility = np.load(args.full_dir / "selected_dev_utility.npy")
