@@ -92,3 +92,22 @@ A_m = log1p(S_pos_m) - log1p(S_neg_m)
 ΔJ >= +0.008:
     STRONG signal (reconsider as architecture candidate)
 ```
+
+## Screen Evidence and Status
+
+> **Caveat**: This is **NOT** a completed 60-epoch protocol result. Both training arms were terminated early after consistent negative Dev trajectory through 51–54 completed epochs.
+
+### Mid-Run Dev Checkpoint Summary (51/60 epochs observed)
+
+| Arm | Mechanism | Selected Epoch | Selected Threshold | Dev Patient-Macro Jaccard |
+| --- | --- | ---: | ---: | ---: |
+| **MedLedger** (Full) | Independent Sigmoid ($g_{mk}$) | 4 | 0.35 | 0.5347 |
+| **NormalizedLedger** (Control) | Softmax Competition ($\alpha_{mk}$) | 5 | 0.30 | 0.5389 |
+| **Delta** | Full − Control | − | − | **−0.0042** |
+
+### Decision
+
+- **Status**: `TERMINATED_EARLY_NEGATIVE`
+- **Verdict**: `KILL_MEDLEDGER_FAMILY_FOR_FURTHER_RESCUE`
+- **Core Scientific Conclusion**: Independent evidence accumulation failed to outperform normalized evidence competition on the canonical MIMIC-III Dev surface ($\Delta J \approx -0.0042$). The hypothesis that removing softmax competition over evidence tokens yields predictive gains is falsified in this formulation.
+- **Rule Enforcement**: No MedLedger-v2, no gate-temperature rescue, no alternative saturation, no extra seeds, and no diagnostic expansion.

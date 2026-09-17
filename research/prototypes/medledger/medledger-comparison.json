@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "TERMINATED_EARLY_NEGATIVE",
+  "protocol_note": "This is NOT a completed 60-epoch protocol result. Both jobs were terminated early after consistent negative Dev trajectory through 51-54 completed epochs.",
+  "comparison": "medledger_minus_normalized",
+  "source_revision": "c09cd3f42599f4faadb8b1b6e6949d170c8da5c4",
+  "parameter_count": 766989,
+  "seed": 20260920,
+  "epochs_completed": "51/60 (terminated at 54)",
+  "medledger": {
+    "variant": "medledger",
+    "mechanism": "independent sigmoid gates g_mk = sigmoid(r_mk), c_mk = g_mk * a_mk",
+    "selected_epoch": 4,
+    "selected_threshold": 0.35,
+    "selected_dev_jaccard": 0.5347133967558292
+  },
+  "normalized": {
+    "variant": "normalized",
+    "mechanism": "normalized softmax competition alpha_mk = softmax_k(r_mk), c_mk = alpha_mk * a_mk",
+    "selected_epoch": 5,
+    "selected_threshold": 0.3,
+    "selected_dev_jaccard": 0.5388666618841644
+  },
+  "deltas": {
+    "delta_jaccard": -0.004153265128335222,
+    "approx_delta_jaccard": -0.0042
+  },
+  "decision": "KILL_MEDLEDGER_FAMILY_FOR_FURTHER_RESCUE",
+  "decision_label": "KILL_MEDLEDGER_FAMILY_FOR_FURTHER_RESCUE (ΔJ ≈ -0.0042 <= +0.002; independent evidence accumulation underperforms normalized competition)",
+  "test_accessed": false
+}
