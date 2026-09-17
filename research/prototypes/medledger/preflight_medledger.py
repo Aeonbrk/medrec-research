@@ -114,7 +114,7 @@ def _test_leakage_and_packing() -> None:
     _assert(offsets[1] == 0, "NULL token must be empty bag (offset 0)")
 
     # History lag check:
-    lags = batch["lags"].tolist()
+    lags = batch["lags"].reshape(*batch["mask"].shape).tolist()
     # Row 0: no history, all lags must be 0.0
     _assert(all(lag_val == 0.0 for lag_val in lags[0]), "Row 0 has no history but non-zero lags")
     # Row 1 has 2 history visits: lags should be 2.0 then 1.0
