@@ -87,8 +87,9 @@ def _matching_shape_checks() -> None:
     )
     full = matching_labels(utility, [(0, 1, 2)], 3, 3)
     _assert(set(full[0].tolist()) == {0, 1, 2}, "|Y| = K did not fill every slot")
+    capacity_probe = torch.zeros((1, 3, 4), dtype=torch.float32)
     try:
-        matching_labels(utility, [(0, 1, 2, 3)], 3, 3)
+        matching_labels(capacity_probe, [(0, 1, 2, 3)], 4, 3)
     except ValueError as error:
         _assert("exceeds slot capacity" in str(error), "wrong rejection for |Y| > K")
     else:
