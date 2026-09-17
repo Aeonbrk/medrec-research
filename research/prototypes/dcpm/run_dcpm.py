@@ -299,7 +299,7 @@ def _evaluate_operating_point(
                 medication_scores=scores,
             )
         )
-    return evaluate(predictions, canonical_vocabulary=vocabulary, ddi_pairs=ddi_pairs)
+    return evaluate(predictions, vocabulary=vocabulary, ddi_pairs=ddi_pairs)
 
 
 def refresh_train_memory(
