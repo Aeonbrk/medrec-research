@@ -34,7 +34,7 @@ class RouteFactModel(MICA):
     intentionally outside the RouteFact medication decision path.
     """
 
-    VARIANTS = ("route_aux", "route_fact")
+    ROUTE_VARIANTS = ("route_aux", "route_fact")
 
     def __init__(
         self,
@@ -44,7 +44,7 @@ class RouteFactModel(MICA):
         variant: str,
         medication_count: int = MEDICATIONS,
     ) -> None:
-        if variant not in self.VARIANTS:
+        if variant not in self.ROUTE_VARIANTS:
             raise ValueError("variant must be route_aux or route_fact")
         if route_count <= 0:
             raise ValueError("route_count must be positive")
