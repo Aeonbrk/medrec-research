@@ -324,6 +324,9 @@ def summarize(args: argparse.Namespace) -> dict[str, Any]:
     }
     control_validity["valid"] = all(control_validity.values())
     timing_record = json.loads(args.timing_preflight.read_text(encoding="utf-8"))
+    matching_timing_record = None
+    if args.timing_matching_audit is not None:
+        matching_timing_record = json.loads(args.timing_matching_audit.read_text(encoding="utf-8"))
     packet = {
         "schema_version": 1,
         "status": "complete",
@@ -338,6 +341,7 @@ def summarize(args: argparse.Namespace) -> dict[str, Any]:
         "arms": {"control": control, "full": full},
         "gpu_state": args.gpu_state,
         "timing_preflight": timing_record,
+        "timing_matching_audit": matching_timing_record,
         "validation_schedule": control["validation_schedule"],
         "beta_grid": list(beta_grid),
         "native_beta": float(control["config"]["native_beta"]),
@@ -386,6 +390,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--gpu-state", default="recorded on 319 at preflight")
     parser.add_argument("--timing-preflight", type=Path, required=True)
+    parser.add_argument("--timing-matching-audit", type=Path)
     return parser.parse_args(argv)
 
 

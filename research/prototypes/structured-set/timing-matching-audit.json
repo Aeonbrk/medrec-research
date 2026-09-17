@@ -1,0 +1,13 @@
+{
+  "batch_size_visits": 16,
+  "device": "NVIDIA GeForce RTX 3090",
+  "forward_backward_matching_batch_seconds": 0.05216492246836424,
+  "loss_finite": true,
+  "matching_objective": "categorical CE after Hungarian matching with cost -u",
+  "profile_id": "mimic-iii-canonical-131-paper-dev-v1",
+  "schedule_authority": "formal schedule was frozen before training; this audit is supplementary",
+  "snapshot_id": "molerec-table1-c721-www23",
+  "status": "POST_RUN_MATCHING_TIMING_AUDIT_PASS",
+  "test_accessed": false,
+  "timing_is_execution_check_only": true
+}
