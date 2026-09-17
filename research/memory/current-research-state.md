@@ -1,4 +1,4 @@
-# Current research state — 2026-09-17
+# Current research state — 2026-09-18
 
 This file is the live scientific synthesis and routing authority. It does not replace run-local evidence.
 
@@ -55,6 +55,7 @@ MICA remains a possible building block and mechanism control, not a mandatory ba
 ### Terminated mechanism screens
 
 - **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
+- **Route-Factored Medication Recommendation (RouteFact)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260922`, 60 complete epochs, 914,497 parameters in both arms, source revision `8eee27ad88b63990cc8f1c5355b4a47bd84c7923`, zero Test access). Tested whether forcing medication prediction through a noisy-OR over Train-supported multi-hot administration routes improves prediction over direct medication prediction with identical auxiliary route supervision. Result: $\Delta J = -0.008252$ (RouteFact 0.534931 vs RouteAux control 0.543183), $\Delta \text{F1} = -0.006919$, $\Delta \text{PR-AUC} = -0.005145$, $\Delta \text{DDI} = -0.001539$, $\Delta \text{AvgMed} = +0.115149$. Falsified and terminated per the frozen decision boundary (`KILL_ROUTEFACT_MECHANISM`); no post-hoc tuning, taxonomy merging, loss sweeps, or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-routefact-mechanism-screen-falsification.md`.
 
 ## Benchmark strategy
 

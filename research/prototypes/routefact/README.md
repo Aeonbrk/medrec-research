@@ -186,3 +186,33 @@ python research/prototypes/routefact/summarize_routefact.py \
 Only the public-safe aggregate comparison and decision record should later be
 committed. Checkpoints, logits, dense route targets, raw prescription rows, and
 patient/admission-level material remain outside Git.
+
+## Empirical Results
+
+Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260922`, 60 complete epochs, 319 NVIDIA RTX 3090, Train/Dev only, zero Test access, source revision `8eee27ad88b63990cc8f1c5355b4a47bd84c7923`):
+
+| Metric | RouteAux (Control) | RouteFact (Candidate) | Delta (RouteFact - Control) |
+| :--- | :--- | :--- | :--- |
+| **Dev Jaccard (Primary)** | **0.543183** | 0.534931 | **-0.008252** |
+| Dev F1 | 0.695431 | 0.688512 | -0.006919 |
+| Dev PR-AUC | 0.789858 | 0.784713 | -0.005145 |
+| Dev DDI Rate | 0.076354 | 0.074816 | -0.001539 |
+| Dev Avg Med Count | 20.059969 | 20.175118 | +0.115149 |
+| Selected Checkpoint | Epoch 6 @ threshold 0.35 | Epoch 5 @ threshold 0.35 | - |
+| Parameter Count | 914,497 | 914,497 | 0 (exact match) |
+| Route Vocabulary Size | 63 (62 real + 1 fallback) | 63 (62 real + 1 fallback) | 0 (exact match) |
+| Train Fallback Pairs | 12 | 12 | 0 (exact match) |
+| Test Access | None (Dev only) | None (Dev only) | - |
+
+## Verdict and Decision
+
+```text
+VERDICT: KILL_ROUTEFACT_MECHANISM
+REASON: ΔJ = -0.008252 <= +0.002: route-level noisy-OR decision factorization falsified
+```
+
+### Scientific Takeaways
+
+1. **Route factorization degrades medication prediction**: Forcing medication probabilities through a noisy-OR over Train-supported route coordinates severely hurts predictive accuracy ($\Delta J = -0.008252$, $\Delta \text{F1} = -0.006919$, $\Delta \text{PR-AUC} = -0.005145$).
+2. **Auxiliary route supervision is harmless but insufficient**: RouteAux achieved strong DrugQuery-level performance ($J = 0.543183$), showing that predicting routes as an auxiliary loss does not damage representations, but making route coordinates the decision bottleneck forces an uncalibrated independent-route assumption.
+3. **Strict Protocol Compliance**: No route taxonomy merging, no loss sweeps, no temperature tuning, no route-count sweeps, no dose extension, no second seed, and zero Test access. The RouteFact formulation is terminated without iteration.
