@@ -450,6 +450,8 @@ def run_experiment(args: argparse.Namespace) -> dict[str, Any]:
 
     ddi_tensor = torch.from_numpy(ddi).to(device)
     y_mem = torch.from_numpy(train_targets).to(device)
+    train_peer_pool = torch.from_numpy(train_peer_pool).to(device)
+    dev_peer_pool = torch.from_numpy(dev_peer_pool).to(device)
 
     progress_state: dict[str, Any] = {
         "schema_version": PROGRESS_SCHEMA,
@@ -502,7 +504,8 @@ def run_experiment(args: argparse.Namespace) -> dict[str, Any]:
             }
             targets = torch.from_numpy(train_targets[batch_indices]).to(device)
 
-            batch_peer_idx = train_peer_pool[batch_indices]
+            batch_indices_tensor = torch.tensor(batch_indices, dtype=torch.long, device=device)
+            batch_peer_idx = train_peer_pool[batch_indices_tensor]
             peer_h = h_mem[batch_peer_idx]
             peer_y = y_mem[batch_peer_idx]
 

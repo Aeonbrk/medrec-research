@@ -294,7 +294,7 @@ def run_preflight(args: argparse.Namespace) -> dict[str, Any]:
     h_mem = torch.randn(10489, DIM, device=device)
     y_mem = torch.from_numpy(np.array(train_targets, dtype=np.float32)).to(device)
 
-    peer_indices = train_peer_pool[:batch_size]
+    peer_indices = torch.from_numpy(train_peer_pool[:batch_size]).to(device)
     b_peer_h = h_mem[peer_indices]
     b_peer_y = y_mem[peer_indices]
 
