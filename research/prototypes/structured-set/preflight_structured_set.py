@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT.parents[2]))
 from run_structured_set import (  # noqa: E402
+    BETA_GRID,
     MEDICATIONS,
     PROFILE_ID,
     PROFILE_PATH,
@@ -164,6 +165,26 @@ def _model_checks(device: str) -> dict[str, Any]:
     }
 
 
+def _cached_u_check(device: str) -> None:
+    _seed_everything(20260919)
+    model = StructuredSetModel(5, 4).to(device)
+    rows = [{"diagnoses": [1], "procedures": [0], "history": []}]
+    packed = {key: value.to(device) for key, value in pack_inputs(rows, 5, 4).items()}
+    forward_calls = 0
+
+    def forward_once() -> np.ndarray:
+        nonlocal forward_calls
+        forward_calls += 1
+        with torch.no_grad():
+            return model(packed)["utility"].detach().cpu().numpy()[0]
+
+    cached = forward_once()
+    for beta in BETA_GRID:
+        threshold_decode(cached, beta)
+        assignment_decode(cached, beta)
+    _assert(forward_calls == 1, "neural forward was rerun while evaluating cached U across beta")
+
+
 def _identity_and_leakage_checks(snapshot: Path, train_dev: Path) -> dict[str, Any]:
     _validate_profile(snapshot, train_dev)
     profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
@@ -238,6 +259,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     _matching_fixture()
     _decoder_checks()
     _matching_shape_checks()
+    _cached_u_check(device)
     samples = [
         VisitPrediction("p", "v", ("m0",), ("m0",), (0.3, 0.1)),
     ]
