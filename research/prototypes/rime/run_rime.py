@@ -63,7 +63,7 @@ from research.prototypes.paper_contract.evaluator import (  # noqa: E402
 
 PROFILE_ID = "mimic-iii-canonical-131-paper-dev-v1"
 SNAPSHOT_ID = "molerec-table1-c721-www23"
-TRAIN_DEV_ID = "gate01-train-dev-5752596a-20260913"
+TRAIN_DEV_ID = "gate01-train-dev-5752596a-20260913a"
 PROFILE_PATH = REPO_ROOT / "research" / "benchmarks" / "mimiciii-medrec" / "profile.json"
 SEED = 20260920
 EPOCHS = 60
