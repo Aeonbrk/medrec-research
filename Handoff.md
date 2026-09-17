@@ -1,9 +1,9 @@
 # Handoff
 
-Updated: 2026-09-17.
+Updated: 2026-09-18.
 
 ```text
-Current phase: CREDIBLE REFERENCE SETUP + ARCHITECTURE PREPARATION
+Current phase: ARCHITECTURE SEARCH — ROUTEFACT BOUNDED SCREEN
 Paper Experiment Contract: v1.0 + v1.1 amendment CURRENT
 Active formal Idea: none
 Idea 009: absent
@@ -14,37 +14,51 @@ Available concurrent GPU capacity: 8 × RTX 3090-class
 
 Read first:
 
+- `AGENTS.md`
+- `research/AGENTS.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EVALUATOR_SPEC.md`
 - `research/memory/current-research-state.md`
-- `research/memory/decisions/2026-09-17-evidence-first-execution-sequencing.md`
+- `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`
+- `research/memory/decisions/2026-09-18-routefact-bounded-screen-authorization.md`
+- `research/prototypes/routefact/README.md`
 
-Current routing is dependency-driven, not serial. Do not wait for all baselines or all MICA seeds before architecture work. Make the evidence most capable of killing or redirecting the paper arrive early.
+## Current evidence
 
-Current session evidence:
+Medication-specific local evidence selection (DrugQuery) remains the strongest surviving positive mechanism. DCPM completed its frozen two-arm Train/Dev screen and was killed: Dev Jaccard `0.542203` vs `0.543606` for SharedPrecedent, `Delta J = -0.001403`, with no safety gain. Do not rescue DCPM or reinterpret it as a universal claim that medication-conditioned retrieval can never work.
 
-- The frozen `mimic-iii-canonical-131-paper-dev-v1` profile and MIV common-131 run-critical audit are committed. MICA SharedPool/DrugQuery pairs for seeds `20260917` and `20260918` completed under that profile; the paired decision is recorded in `research/memory/decisions/2026-09-17-mica-paired-stability-update.md`.
-- Two detached MoleRec lanes are now running remotely under the pinned MoleRec source: the original source-native lane (released source split, still provisional) and a frozen-profile adapter lane on the canonical MIMIC-III Train/Dev surface. The adapter's 1-epoch smoke completed as non-evidence with identity, finite-output, and no-Test checks; its 50-epoch formal run is now healthy on a separate GPU and has no terminal result yet. Monitor both runs and do not promote partial values.
-- Natural stop is active while both long jobs remain healthy: source-native tmux `medrec-baseline-molerec-20260917-180500-paperdev` at `/root/zhb/medrec-data/runs/molerec/medrec-baseline-molerec-20260917-180500-paperdev`, and frozen-profile formal tmux `medrec-profile-formal-20260917` at `/root/zhb/medrec-data/runs/molerec/medrec-profile-formal-20260917` (multiple epochs complete at the latest snapshot). Recheck terminal artifacts and independent audits before any table promotion.
-- The first MoleRec launch failed before creating a run root because the generic CLI omitted a preprocessing revision. The replacement lane explicitly binds `c7218d0976e5ee5588aeaf5bdbc86b338126bba5`; preserve both identities in the review packet.
-- RIME is now implemented as a bounded, one-seed MIMIC-III canonical-131 Train/Dev screen under `research/prototypes/rime/`. The composition arm and parameter-matched count-only control share the 64-dimensional DrugQuery encoder, use exact candidate-specific `C \ {m}` marginal contexts, native greedy positive-gain flips, and the current patient-macro-Jaccard checkpoint procedure. The preflight, remote runner, aggregate comparator, and unit tests are included in this handoff. No remote preflight, 60-epoch arm, result audit, or Test evaluation has run.
-- A source-faithful ARMR formal lane completed on the frozen MIII profile at source `c0de843d43a1f2867d45ede836b918abd11a0fda`, harness `40f4e1015ef656dff75d14aac167bfa769b727a5`, and explicit environment hash `6af6bd1e97fc0ea5991e09bcf2f99e18326fa1d88871e53cc6496230310f3921`. Its run-local integrity audit passed; it is development-credible only, with no Test access.
-- Drug-Conditioned Precedent Memory (DCPM) completed its frozen two-arm Train/Dev screen on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). DCPM achieved Dev Jaccard 0.542203 vs 0.543606 for the matched SharedPrecedent control ($\Delta J = -0.001403$, $\Delta \text{DDI} = +0.002181$). The mechanism is falsified and terminated per the frozen rule (`KILL_DCPM_MECHANISM`), recorded in `research/prototypes/dcpm/dcpm-comparison.json` and `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
-- Earlier ARMR ragged-count and Python-3.8 smoke failures remain preserved as engineering failures and are excluded from ranking. Bounded SSPNet probes now show a finite multi-visit forward and a one-patient/one-epoch source loop after explicit mechanical edge-case isolation; they remain non-evidence, no source repair was promoted, and SSPNet remains `NOVELTY_UNRESOLVED` / `SSPNET_EXECUTION_UNRESOLVED` with expensive structured training blocked. Details are in `research/memory/decisions/2026-09-17-sspnet-execution-feasibility-update.md`.
-- MIV paper-lineage wording remains asynchronous. MIMIC-IV Test stays sealed; no MIV sentinel or structured Full/control run is authorized by this evidence.
+The next family reset is **RouteFact**. It does not extend DrugQuery retrieval/routing. It changes the supervised intermediate prediction object from a flat medication label to a medication-conditioned **multi-hot administration-route set**, then tests whether medication presence should be forced through that route-level factorization.
 
-MICA stability is not an architecture gate. The default two new paired MIMIC-III seeds per arm are complete; add a third pair only when MICA remains central, the first pairs disagree and another pair can change routing, or no higher-value ready experiment exists.
+This is not a revival of the terminated RxUnitSet target. RxUnitSet required a unique stable `(drug,dose,route)` unit or causally aligned prescription episode. RouteFact uses only route, permits multiple routes for one medication/admission, and reuses existing supportability evidence showing near-complete route observability and non-trivial per-medication route variation.
 
-A structured-set or set-energy prototype may begin before baseline recovery finishes once its legal I/O contract, closest-work difference, minimum model, and strongest matched independent-label control are clear. Do not protect the MICA narrative by forcing the new model to use MICA.
+## Frozen screen
 
-If the first valid MIII full/control result plus an additional paired check show a signal worth pursuing, move early to MIV harmonized131 and native173 sentinel pairs rather than waiting for complete MIII three-seed evidence. The two MIV surfaces are target-space views of the same dataset, not independent replications.
+Two arms only, seed `20260922`, 60 complete epochs, `mimic-iii-canonical-131-paper-dev-v1`, Train/Dev only:
 
-Management targets: architecture route decision by 2026-10-05; normal Paper Candidate target 2026-10-09 to 2026-10-13; hard stop for this architecture-search cycle 2026-10-16. Dates do not override evidence.
+- `route_aux`: ordinary DrugQuery medication head is the decision path; the identical medication-route head receives auxiliary Train route supervision.
+- `route_fact`: the same medication-route logits are the decision path; medication probability is noisy-OR over Train-supported route coordinates.
 
-Do not access MIMIC-IV Test, resume invalidated former Stage -1G runners, change benchmark roles because one surface is easier to win, or extend a weak architecture by unrelated retrieval/DDI/refinement patches.
+Both arms share the same DrugQuery substrate, route head, Train-only route vocabulary/support mask, route labels, loss weights, optimizer, and parameter count. Dev raw route labels are not read. Dev is used only for the frozen medication-set evaluator and checkpoint/threshold selection. Test remains sealed.
 
-Next action:
+Decision rule:
 
-- Audit each detached MoleRec lane only when it reaches a terminal artifact; do not promote source-split or partial values.
-- For RIME, run the 319 CUDA preflight from a clean checkout, then launch the composition and count-only arms only as the same frozen Train/Dev comparison. Keep RIME unpromoted until both arms have terminal artifacts and an independent aggregate audit. Do not use partial values to choose a redesign.
+```text
+Delta J <= +0.002                         -> KILL_ROUTEFACT_MECHANISM
++0.002 < Delta J <= +0.004               -> WEAK_ROUTEFACT_SIGNAL_STOP_NO_RESCUE
+Delta J > +0.004 with F1/PRAUC >= -0.002 -> advance
+Delta J >= +0.008                         -> strong signal
+```
+
+No route taxonomy merge, route-loss sweep, dose extension, second seed, or RouteFact-v2 after a negative result.
+
+## Next action on 319
+
+1. Pull the final `origin/main` revision and require a clean checkout.
+2. Materialize private Train-only route targets with `research/prototypes/routefact/build_route_targets.py` exactly as documented in the RouteFact README. Keep all dense targets outside Git.
+3. Run both `route_aux` and `route_fact` preflights through `run_routefact_trainonly.py`. Require identical parameter counts and route-target hash, exact split counts, finite forward/backward, and `test_loaded=false`.
+4. If preflight passes, launch both 60-epoch arms concurrently on two RTX 3090s. Do not stop based on partial Dev values unless there is a clear implementation fault.
+5. Run `summarize_routefact.py` only after both arms complete. Apply its frozen decision directly.
+6. Commit only public-safe aggregate comparison/decision evidence. Do not commit checkpoints, logits, dense route targets, raw prescription rows, patient IDs, or admission IDs.
+
+Detached baseline recovery can continue independently, but it must not delay this matched mechanism screen and partial baseline values must not be promoted.
