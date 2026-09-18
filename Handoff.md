@@ -3,8 +3,8 @@
 Updated: 2026-09-18.
 
 ```text
-Current phase: ARCHITECTURE HYPOTHESIS TESTING — ECRC TERMINATED
-Paper Experiment Contract: v1.0 + v1.1 amendment CURRENT
+Current phase: ARCHITECTURE SEARCH — POST-ECRC RESET
+Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Active formal Idea: none
 Idea 009: absent
 Active formal Gate: none
@@ -18,6 +18,7 @@ Read first:
 - `research/AGENTS.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
 - `research/memory/current-research-state.md`
 - `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`
 - `research/prototypes/ecrc-cardinality-context/README.md`
@@ -45,8 +46,21 @@ Executed on `mimic-iii-canonical-131-paper-dev-v1` at revision `c668a8e4a194c92a
 
 ### Scientific takeaway
 
-Regimen cardinality does not act as an informative decision context for medication preference ($u_m(x, K) \approx u_m(x)$). The fixed ranking Top-$K$ assumption holds; conditioning medication identity preference on hypothesized size produces negligible re-ranking even under oracle cardinality.
+Under the tested rank-8 ECRC formulation and DrugQuery evidence path, cardinality-conditioned medication utilities produced negligible oracle-K re-ranking value. This kills that formulation and does not justify a size-head rescue. It does not establish a universal fixed-ranking theorem for all future medication-recommendation models.
 
-No size-head tuning, rank sweeps, temperature tuning, or HPO is authorized.
+No size-head tuning, rank sweeps, temperature tuning, or HPO is authorized as an ECRC rescue.
+
+## Development seed convention
+
+For all new project-owned initial DEVELOPMENT architecture/mechanism screens, use the MoleRec-derived canonical RNG convention:
+
+```python
+torch.manual_seed(1203)
+torch.cuda.manual_seed_all(1203)
+np.random.seed(2048)
+random.seed(1203)
+```
+
+Internal matched controls use the same convention. External published baselines preserve source-native seed policies when available. Survivors still require a predeclared multi-seed stability experiment; the canonical seed is not robustness evidence.
 
 Test remained sealed throughout this screen.
