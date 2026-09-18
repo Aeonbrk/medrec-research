@@ -217,7 +217,7 @@ Both use non-separable fine-code pair relations.
 
 Control normalizes D-P, D-H and P-H relation evidence separately, so every available relation type receives its own normalized evidence channel.
 
-Candidate uses one joint normalized evidence budget across all valid cross-type pairs while preserving three typed output contexts.
+Candidate uses one joint normalized evidence budget across all valid cross-type pairs while preserving three typed output contexts. Before joint normalization, each relation type receives a fixed correction of minus log(valid pair count), so relation types with more combinatorial pairs do not receive extra probability mass merely because they contain more pairs.
 
 Question: should a medication be allowed to suppress an irrelevant relation type rather than forcing D-P, D-H and P-H to contribute independently?
 
@@ -233,9 +233,9 @@ Both use non-separable joint relation competition.
 
 Neither performs visit pooling or recurrent temporal compression.
 
-Control gives every pair only a constant edge intercept.
+Control exposes only relation-type identity (D-P / D-H / P-H) to the edge scorer.
 
-Candidate additionally exposes:
+Candidate uses the same scorer and additionally exposes:
 
 ~~~text
 same-visit indicator
