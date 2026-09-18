@@ -24,7 +24,7 @@ from portfolio_model import (  # noqa: E402
     parameter_count,
 )
 
-RELATION_DIM = 64
+RELATION_DIM = DIM
 RELATION_CHUNK = 8
 
 ARCH_VARIANTS = (
