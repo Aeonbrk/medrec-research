@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import sys
 from pathlib import Path
-from typing import Dict, Mapping, Tuple
+from typing import Dict, Mapping, Optional, Tuple
 
 import torch
 from torch import nn
@@ -292,7 +292,7 @@ class FinalRelationalModel(PortfolioModel):
         torch.Tensor,
         torch.Tensor,
         torch.Tensor,
-        torch.Tensor | None,
+        Optional[torch.Tensor],
     ]:
         left_memory, left_mask, left_lag = fields[left_name]
         right_memory, right_mask, right_lag = fields[right_name]
