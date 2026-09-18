@@ -1,7 +1,7 @@
 
 # Fine-Code Stability + Relational Evidence Screen
 
-Status: DESIGN FROZEN / IMPLEMENTED / NOT EXECUTED
+Status: **COMPLETED / ROUTING ENFORCED: PROMOTE_RELATIONAL_EVIDENCE_TO_STABILITY_SCREEN**
 
 This bounded eight-lane DEVELOPMENT round has two purposes:
 
@@ -234,3 +234,50 @@ If fine-code access is unstable:
 REASSESS_FINE_CODE_FOUNDATION
 
 None authorizes Test, MIMIC-IV, paper superiority claims, or an automatic compound model.
+
+## Terminal execution results (2026-09-18)
+
+Executed concurrently on physical GPUs 0–7 on the 319 Execution Plane from clean worktree at revision `18ae6c89dcb6ca52137e18ebeabe36bd5a303002` on `mimic-iii-canonical-131-paper-dev-v1` (4,233 Train patients / 10,489 visits; 1,004 Dev patients / 2,130 visits; all 60 epochs completed; Test strictly sealed with `test_loaded = false`).
+
+### Part A: Fine-Code Stability (4 Conditions)
+
+| Condition | Source | Control Ckpt / OP (Jaccard) | Candidate Ckpt / OP (Jaccard) | $\Delta$ Jaccard | $\Delta$ F1 | $\Delta$ PR-AUC | $\Delta$ DDI Rate | $\Delta$ Avg Meds |
+| :--- | :--- | :---: | :---: | ---: | ---: | ---: | ---: | ---: |
+| `canonical` | Prior Portfolio (`result.json`) | Ep 7 / 0.35 (0.535091) | Ep 5 / 0.30 (0.546626) | **+0.011536** | +0.010238 | +0.007785 | -0.005589 | +0.4715 |
+| `stability_1` | Screen Lane (`results.json`) | Ep 7 / 0.30 (0.534789) | Ep 6 / 0.30 (0.545625) | **+0.010836** | +0.009038 | +0.007899 | +0.004406 | -0.7084 |
+| `stability_2` | Screen Lane (`results.json`) | Ep 8 / 0.35 (0.533419) | Ep 6 / 0.35 (0.547681) | **+0.014262** | +0.012560 | +0.008141 | +0.000820 | +0.5093 |
+| `stability_3` | Screen Lane (`results.json`) | Ep 6 / 0.30 (0.535859) | Ep 5 / 0.35 (0.546163) | **+0.010303** | +0.008637 | +0.008077 | -0.006196 | -1.3872 |
+| **Mean** | **4 Conditions** | — | — | **+0.011734** | **+0.010118** | **+0.007976** | **-0.001640** | **-0.2787** |
+
+Summary Statistics:
+
+- Positive Jaccard conditions: 4 / 4 (passes strict 4/4 requirement);
+- Material Jaccard conditions ($> +0.0020$): 4 / 4 (passes strict $\ge 3/4$ requirement);
+- Mean $\Delta$ Jaccard: $+0.011734$ (well above the $> +0.0040$ threshold);
+- Median $\Delta$ Jaccard: $+0.011186$;
+- Std $\Delta$ Jaccard: $0.001759$;
+- Range: $[+0.010303, +0.014262]$;
+- Mean guardrails pass: `True` (mean $\Delta \text{F1} = +0.010118 \ge -0.002$, mean $\Delta \text{PRAUC} = +0.007976 \ge -0.002$, mean $\Delta \text{DDI} = -0.001640 \le +0.0020$).
+
+Fine-Code Stability Verdict: **`STABLE_FINE_CODE_ACCESS`**
+
+### Part B: Relational Evidence Hypothesis
+
+| Model Variant | Role | Trainable Params | Selected Ckpt / OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI Rate | Avg Med Count |
+| :--- | :--- | :---: | :---: | ---: | ---: | ---: | ---: | ---: |
+| `unary_code_canonical` | Control (`unary_code`) | 1,427,080 | Ep 7 / 0.35 | 0.538877 | 0.691721 | 0.789186 | 0.075167 | 20.2265 |
+| `relational_code_canonical` | Candidate (`relational_code`) | 1,427,080 | Ep 5 / 0.35 | 0.542982 | 0.695092 | 0.790317 | 0.069825 | 20.0954 |
+| **Delta ($\Delta$)** | **Gain** | **0** | — | **+0.004105** | **+0.003371** | **+0.001131** | **-0.005341** | **-0.1311** |
+
+Relational Evidence Verdict: **`RELATIONAL_EVIDENCE_SIGNAL`**
+
+- $\Delta \text{Jaccard} = +0.004105 > +0.004000$;
+- Guardrails pass: `True` ($\Delta \text{F1} = +0.003371 \ge -0.002$, $\Delta \text{PRAUC} = +0.001131 \ge -0.002$, $\Delta \text{DDI} = -0.005341 \le +0.0020$).
+
+### Final Routing Verdict
+
+~~~text
+PROMOTE_RELATIONAL_EVIDENCE_TO_STABILITY_SCREEN
+~~~
+
+Fine-code evidence access is strictly stable across prospective seed conditions ($\Delta J > +0.010$ across all 4 conditions). Candidate-conditioned cross-type evidence conjunction delivers a clean $+0.004105$ Jaccard increment over matched additive composition while lowering DDI rate by over 0.5%. The mechanism is promoted to multi-seed stability screening.

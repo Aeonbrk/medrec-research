@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: ARCHITECTURE SEARCH — POST-SURVIVOR RESET
+Human-facing phase: ARCHITECTURE SEARCH — RELATIONAL EVIDENCE STABILITY PREPARATION
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -74,6 +74,15 @@ An eight-lane 60-epoch survivor screen on `mimic-iii-canonical-131-paper-dev-v1`
 2. **Depth stability across prospective seeds (`depth_reread` vs `depth_state`)**: Evaluated across 4 conditions (`canonical` inherited from portfolio, plus prospective offsets `stability_1`, `stability_2`, `stability_3`). Results: `canonical` $\Delta J = +0.004144$; `stability_1` $\Delta J = -0.000650$; `stability_2` $\Delta J = +0.001365$; `stability_3` $\Delta J = +0.003033$. Positive conditions: 3/4; material ($> +0.002$) conditions: 2/4; mean $\Delta J = +0.001973$ (below $+0.004$ threshold); mean $\Delta \text{DDI} = +0.002130$ (violating guardrail). Verdict: `UNSTABLE_DEPTH_REREAD`.
 
 Survivor screen routing: `RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE`. Iterative re-reading is not promoted to Paper Candidate review; the project returns to architecture search.
+
+### Relational evidence architecture screen (2026-09-18)
+
+An eight-lane 60-epoch architecture screen on `mimic-iii-canonical-131-paper-dev-v1` at revision `18ae6c89dcb6ca52137e18ebeabe36bd5a303002` (zero Test access) evaluated:
+
+1. **Fine-code stability across prospective random seeds**: Medication-specific fine-code selection is strictly stable across 4 conditions (`canonical`, `stability_1`, `stability_2`, `stability_3`), with 4/4 positive conditions, 4/4 conditions $> +0.010$ Jaccard gain, mean $\Delta J = +0.011734$, and favorable safety (mean $\Delta \text{DDI} = -0.001640$). Verdict: `STABLE_FINE_CODE_ACCESS`. Fine-code access is frozen as a verified foundational component.
+2. **Relational evidence hypothesis**: Candidate-conditioned multiplicative conjunction ($u_D \odot u_P$, $u_D \odot u_H$, $u_P \odot u_H$) outperforms matched additive/unary composition at 1,427,080 parameters by $\Delta J = +0.004105$ (0.542982 vs 0.538877), $\Delta \text{F1} = +0.003371$, $\Delta \text{PRAUC} = +0.001131$, with a substantial reduction in DDI rate ($\Delta \text{DDI} = -0.005341$). Verdict: `RELATIONAL_EVIDENCE_SIGNAL`.
+
+Screen routing: `PROMOTE_RELATIONAL_EVIDENCE_TO_STABILITY_SCREEN`. Relational cross-type evidence conjunction qualifies for multi-seed stability evaluation.
 
 ### Terminated mechanism screens
 
