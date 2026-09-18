@@ -29,10 +29,9 @@ launch() {
     echo "refusing to reuse existing output: ${out}" >&2
     exit 3
   fi
-  mkdir -p "${out}"
-  nohup env CUDA_VISIBLE_DEVICES="${gpu}" "${PYTHON_BIN}"     "${SCRIPT_DIR}/run_ecrc.py"     --variant "${variant}"     --seed "${seed}"     --snapshot-root "${SNAPSHOT_ROOT}"     --train-dev-root "${TRAIN_DEV_ROOT}"     --source-revision "${RUN_REVISION}"     --output-dir "${out}"     > "${out}/stdout.log" 2>&1 &
-  echo "$!" > "${out}/pid"
-  echo "launched ${name} on GPU ${gpu}, pid $(cat "${out}/pid")"
+  nohup env CUDA_VISIBLE_DEVICES="${gpu}" "${PYTHON_BIN}"     "${SCRIPT_DIR}/run_ecrc.py"     --variant "${variant}"     --seed "${seed}"     --snapshot-root "${SNAPSHOT_ROOT}"     --train-dev-root "${TRAIN_DEV_ROOT}"     --source-revision "${RUN_REVISION}"     --output-dir "${out}"     > "${OUTPUT_ROOT}/_launcher/${name}.log" 2>&1 &
+  echo "$!" > "${OUTPUT_ROOT}/_launcher/${name}.pid"
+  echo "launched ${name} on GPU ${gpu}, pid $(cat "${OUTPUT_ROOT}/_launcher/${name}.pid")"
 }
 
 launch "${GPUS[0]}" kind_bce   20260923 kind_bce_a
