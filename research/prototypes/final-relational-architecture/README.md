@@ -1,6 +1,6 @@
 # Final Relational Architecture Search
 
-Status: **DESIGN FROZEN / IMPLEMENTATION IN PROGRESS / NOT EXECUTED**
+Status: **DESIGN FROZEN / IMPLEMENTED / NOT EXECUTED**
 
 This round is intentionally placed before relational multi-seed stability.
 
@@ -371,3 +371,7 @@ numpy = 2048
 ~~~
 
 No Test, MIMIC-IV, HPO, relation-rank sweep, extra relation type, safety rescue or additional seed is authorized by this architecture-search round.
+
+## Execution note
+
+The originating cloud environment could not resolve raw.githubusercontent.com, so server-side py_compile/import checks remain execution-blocking. The 319 local agent must complete static syntax/import checks and the committed CUDA/data preflight before any training lane is launched.
