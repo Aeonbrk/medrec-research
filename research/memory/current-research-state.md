@@ -56,6 +56,7 @@ MICA remains a possible building block and mechanism control, not a mandatory ba
 
 - **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
 - **Route-Factored Medication Recommendation (RouteFact)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260922`, 60 complete epochs, 914,497 parameters in both arms, source revision `8eee27ad88b63990cc8f1c5355b4a47bd84c7923`, zero Test access). Tested whether forcing medication prediction through a noisy-OR over Train-supported multi-hot administration routes improves prediction over direct medication prediction with identical auxiliary route supervision. Result: $\Delta J = -0.008252$ (RouteFact 0.534931 vs RouteAux control 0.543183), $\Delta \text{F1} = -0.006919$, $\Delta \text{PR-AUC} = -0.005145$, $\Delta \text{DDI} = -0.001539$, $\Delta \text{AvgMed} = +0.115149$. Falsified and terminated per the frozen decision boundary (`KILL_ROUTEFACT_MECHANISM`); no post-hoc tuning, taxonomy merging, loss sweeps, or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-routefact-mechanism-screen-falsification.md`.
+- **Exact-Cardinality Regimen Choice (ECRC)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seeds `20260923` and `20260924`, 60 complete epochs across 6 lanes, 437,571 parameters in all four variants, source revision `c668a8e4a194c92a8933068e8ff99991d014c185`, zero Test access). Tested whether regimen cardinality acts as an informative decision context that changes named-medication preference utilities ($u_m(x, K)$) under exact fixed-cardinality and BCE formulations. Result: mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value), mean candidate Jaccard $0.531769$ (below the $0.537316$ floor). Falsified and terminated per the frozen decision boundary (`KILL_ECRC_CHOICE_MECHANISM`); no size-head tuning, rank sweeps, or re-tests authorized. Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
 
 ## Benchmark strategy
 
@@ -92,39 +93,23 @@ Architecture work does not wait for baseline completion, but Paper Candidate Fre
 
 ## Architecture status
 
-### Active bounded development screen: ECRC cardinality context
+## Architecture status
 
-A post-RouteFact closest-work/mechanism audit has authorized one bounded
-DEVELOPMENT screen for **cardinality-conditioned named-medication choice**.
-This is not Idea 009 and not a Paper Candidate.
+### Terminated screen: ECRC cardinality context (2026-09-18)
 
-The tested distinction is:
+The bounded DEVELOPMENT screen for **cardinality-conditioned named-medication choice** (ECRC) completed all 60 epochs across 6 lanes on physical GPUs 0–5 on 319.
 
-```text
-K-independent control:
-patient evidence -> named-medication utilities
-predicted K -> Top-K only
+Result:
 
-ECRC candidate:
-patient evidence + regimen-cardinality context
--> named-medication utilities
-predicted K -> Top-K
-```
+- Exact primary oracle-K $\Delta J = +0.000341$ (failing the $+0.004$ mechanism gate; triggering $\le +0.002$ kill rule).
+- Exact primary predicted-K $\Delta J = -0.000491$ (negative deployable value; Seed B $\Delta J = -0.001015$).
+- Absolute candidate Jaccard: $0.531769$ (below the $0.537316$ anchor floor).
+- Verdict: `KILL_ECRC_CHOICE_MECHANISM`.
 
-Generic joint cardinality/set prediction, fixed-cardinality subset likelihood,
-set decoding, and count normalization are treated as prior art. The exact
-fixed-cardinality KCond-vs-KInd pair is the primary mechanism comparison.
-Oracle-K is privileged mechanism attribution only; predicted-K is deployable
-evidence.
+Regimen cardinality does not act as an informative decision context for medication preference ($u_m(x, K) \approx u_m(x)$). The tested formulation is permanently closed.
 
-The implementation and frozen six-lane contract are:
-
-- `research/prototypes/ecrc-cardinality-context/README.md`
-- `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-authorization.md`
-
-Six lanes use two paired seeds for the primary exact mechanism plus one
-supporting BCE pair. No Test access or parameter sweep is authorized.
-
+Artifact: `research/prototypes/ecrc-cardinality-context/ecrc-comparison.json`.
+Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
 
 Direct Partial Regimen Assignment / structured-set prediction remains an untested candidate, not an admitted paper method.
 

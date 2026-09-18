@@ -3,7 +3,7 @@
 Updated: 2026-09-18.
 
 ```text
-Current phase: ARCHITECTURE HYPOTHESIS TESTING — ECRC CARDINALITY CONTEXT
+Current phase: ARCHITECTURE HYPOTHESIS TESTING — ECRC TERMINATED
 Paper Experiment Contract: v1.0 + v1.1 amendment CURRENT
 Active formal Idea: none
 Idea 009: absent
@@ -19,71 +19,34 @@ Read first:
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `research/memory/current-research-state.md`
-- `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-authorization.md`
+- `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`
 - `research/prototypes/ecrc-cardinality-context/README.md`
 
 ## Current evidence
 
-Medication-specific late evidence selection remains the strongest repeated
-positive mechanism. DCPM and RouteFact are falsified and closed.
+Medication-specific late evidence selection (DrugQuery) remains the strongest repeated positive mechanism.
 
-The post-RouteFact audit identified one narrower unresolved global structure:
-regimen cardinality may change **which named medications are preferred**, not
-merely how many medications are selected.
+Three recent bounded mechanism screens are decisively falsified and closed:
 
-Relevant prior project evidence:
+1. **DCPM (Precedent Memory)**: $\Delta J = -0.001403$. Closed (`KILL_DCPM_MECHANISM`).
+2. **RouteFact (Administration Routes)**: $\Delta J = -0.008252$. Closed (`KILL_ROUTEFACT_MECHANISM`).
+3. **ECRC (Cardinality Context)**: Mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value). Closed (`KILL_ECRC_CHOICE_MECHANISM`).
 
-- B0 oracle-count: frozen MoleRec ranking with target cardinality changed Dev
-  Jaccard by approximately `+0.01285`; B0's original normalized-DDI premise
-  remains falsified.
-- frozen-unary pairwise oracle headroom: approximately `+0.00026` Jaccard.
-- RIME composition minus count-only: approximately `-0.00199` Jaccard.
+## Terminal ECRC Screen Results
 
-Closest-work audit does **not** support novelty claims for joint
-cardinality/set prediction, random finite sets, conditional Bernoulli
-likelihoods, generic set decoding, or medication-count normalization. The only
-candidate paper identity is cardinality-conditioned named-medication choice.
+Executed on `mimic-iii-canonical-131-paper-dev-v1` at revision `c668a8e4a194c92a8933068e8ff99991d014c185` across 6 lanes (GPUs 0–5 on 319, 60 complete epochs per lane, Test strictly sealed):
 
-## Frozen screen
+| Pair | Arm | Seed | Dev Jaccard (Predicted K) | Dev Jaccard (Oracle K) | Verdict |
+| :--- | :--- | :--- | ---: | ---: | :--- |
+| Exact Primary A | `kind_exact_a` / `kcond_exact_a` | 20260923 | 0.531435 vs 0.531469 (+0.000033) | 0.553597 vs 0.553793 (+0.000196) | FAILS gate |
+| Exact Primary B | `kind_exact_b` / `kcond_exact_b` | 20260924 | 0.533083 vs 0.532068 (-0.001015) | 0.552653 vs 0.553139 (+0.000486) | FAILS gate |
+| **Exact Mean** | **Mean Delta** | Both | **-0.000491** | **+0.000341** | **`KILL_ECRC_CHOICE_MECHANISM`** |
+| BCE Supporting | `kind_bce_a` / `kcond_bce_a` | 20260923 | 0.534076 vs 0.534389 (+0.000312) | 0.555077 vs 0.557760 (+0.002683) | Supporting only |
 
-Implementation:
+### Scientific takeaway
 
-`research/prototypes/ecrc-cardinality-context/`
+Regimen cardinality does not act as an informative decision context for medication preference ($u_m(x, K) \approx u_m(x)$). The fixed ranking Top-$K$ assumption holds; conditioning medication identity preference on hypothesized size produces negligible re-ranking even under oracle cardinality.
 
-Six lanes:
+No size-head tuning, rank sweeps, temperature tuning, or HPO is authorized.
 
-```text
-GPU 0  kind_bce    seed 20260923
-GPU 1  kcond_bce   seed 20260923
-GPU 2  kind_exact  seed 20260923
-GPU 3  kcond_exact seed 20260923
-GPU 4  kind_exact  seed 20260924
-GPU 5  kcond_exact seed 20260924
-```
-
-The exact pair is primary. The BCE pair is supporting attribution. The second
-exact seed is stability evidence, not HPO.
-
-Before launch:
-
-1. verify a clean checkout at the exact implementation revision;
-2. verify six admissible GPUs and map them through `GPU_IDS`;
-3. run the committed CUDA preflight;
-4. do not access Test.
-
-Launch with `launch_six_lane.sh`. Keep checkpoints, predictions, logs, and
-patient-level artifacts only on the 319 Execution Plane. Only
-`ecrc-comparison.json` and compact public-safe aggregate results may return
-to Git.
-
-## Frozen interpretation
-
-- Oracle-K is privileged mechanism attribution only.
-- Predicted-K is deployable evidence.
-- If oracle-K exact KCond-vs-KInd is not material, kill the choice mechanism.
-- If oracle-K is material but predicted-K is not, exactly one bounded
-  size-predictor redesign is authorized.
-- Do not promote a count head alone as the method.
-- Do not sweep rank, losses, learning rate, K bins, temperatures, or decoders.
-
-Test remains sealed.
+Test remained sealed throughout this screen.

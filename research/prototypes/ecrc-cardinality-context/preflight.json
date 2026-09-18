@@ -1,0 +1,27 @@
+{
+  "checks": [
+    "paired initialization equality",
+    "exact parameter-count matching",
+    "KInd cardinality invariance",
+    "KCond cardinality sensitivity",
+    "finite BCE and exact forward/backward",
+    "fixed-cardinality DP brute-force equivalence",
+    "native inference uses predicted K only"
+  ],
+  "device": "cuda",
+  "fixed_cardinality_dp_max_abs_error": 1.709743457922741e-14,
+  "parameter_counts": {
+    "kcond_bce": 437571,
+    "kcond_exact": 437571,
+    "kind_bce": 437571,
+    "kind_exact": 437571
+  },
+  "seed": 20260923,
+  "status": "PASS",
+  "synthetic_losses": {
+    "kcond_bce": 0.5076074004173279,
+    "kcond_exact": 0.10841802507638931,
+    "kind_bce": 0.46806687116622925,
+    "kind_exact": 0.1110578179359436
+  }
+}

@@ -1,6 +1,6 @@
 # ECRC cardinality-context mechanism screen
 
-Status: **DESIGN FROZEN / IMPLEMENTATION READY / NOT YET EXECUTED**
+Status: **EXECUTED / DECISION ENFORCED: KILL_ECRC_CHOICE_MECHANISM**
 
 This bounded DEVELOPMENT experiment tests one scientific hypothesis:
 
@@ -212,3 +212,45 @@ decoder biases.  Do not add DDI repair, retrieval, graphs, MoE, semantic
 routes, or pairwise medication interactions.  A size-head redesign is allowed
 only under the oracle-K bottleneck condition above.  Otherwise kill the tested
 formulation and reassess the paper route.
+
+## Terminal Execution Evidence (2026-09-18)
+
+Source revision: `c668a8e4a194c92a8933068e8ff99991d014c185` (319 Execution Plane, GPUs 0–5).
+All six lanes completed 60 epochs on Train/Dev. Test remained sealed (`test_accessed = false`).
+
+### Deployable Evaluation (`predicted_k`, native argmax size head decoder)
+
+| Pair | Arm | Seed | Selected Epoch | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI | Dev AvgMed | Visit Count MAE |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| BCE Supporting | `kind_bce_a` (Control) | 20260923 | Epoch 4 | 0.534076 | 0.688026 | 0.789880 | 0.083644 | 18.7496 | 3.9516 |
+| BCE Supporting | `kcond_bce_a` (Candidate) | 20260923 | Epoch 4 | 0.534389 | 0.688349 | 0.790694 | 0.082988 | 18.8266 | 4.0047 |
+| **BCE Delta** | **KCond − KInd** | 20260923 | - | **+0.000312** | **+0.000323** | **+0.000814** | **-0.000655** | **+0.0770** | **+0.0531** |
+| Exact Primary A | `kind_exact_a` (Control) | 20260923 | Epoch 4 | 0.531435 | 0.685587 | 0.788413 | 0.084173 | 18.8544 | 4.1131 |
+| Exact Primary A | `kcond_exact_a` (Candidate) | 20260923 | Epoch 4 | 0.531469 | 0.685620 | 0.788232 | 0.084457 | 18.8087 | 4.1099 |
+| **Exact Delta A** | **KCond − KInd** | 20260923 | - | **+0.000033** | **+0.000034** | **-0.000181** | **+0.000284** | **-0.0457** | **-0.0033** |
+| Exact Primary B | `kind_exact_b` (Control) | 20260924 | Epoch 4 | 0.533083 | 0.687122 | 0.788022 | 0.086308 | 19.4603 | 4.1779 |
+| Exact Primary B | `kcond_exact_b` (Candidate) | 20260924 | Epoch 4 | 0.532068 | 0.686217 | 0.787800 | 0.086659 | 19.4319 | 4.1700 |
+| **Exact Delta B** | **KCond − KInd** | 20260924 | - | **-0.001015** | **-0.000905** | **-0.000223** | **+0.000351** | **-0.0284** | **-0.0080** |
+| **Exact Mean** | **Mean Delta** | Both | - | **-0.000491** | **-0.000435** | **-0.000202** | **+0.000318** | **-0.0370** | **-0.0056** |
+
+### Privileged Diagnostic Evaluation (`oracle_k`, ground-truth target cardinality)
+
+| Pair | Arm | Seed | Selected Epoch | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI | Dev AvgMed |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BCE Supporting | `kind_bce_a` (Control) | 20260923 | Epoch 4 | 0.555077 | 0.705100 | 0.789880 | 0.083657 | 19.4882 |
+| BCE Supporting | `kcond_bce_a` (Candidate) | 20260923 | Epoch 4 | 0.557760 | 0.707341 | 0.791294 | 0.082945 | 19.4882 |
+| **BCE Delta** | **KCond − KInd** | 20260923 | - | **+0.002683** | **+0.002242** | **+0.001414** | **-0.000712** | **0.0000** |
+| Exact Primary A | `kind_exact_a` (Control) | 20260923 | Epoch 4 | 0.553597 | 0.703839 | 0.788413 | 0.083942 | 19.4882 |
+| Exact Primary A | `kcond_exact_a` (Candidate) | 20260923 | Epoch 4 | 0.553793 | 0.704004 | 0.788353 | 0.083857 | 19.4882 |
+| **Exact Delta A** | **KCond − KInd** | 20260923 | - | **+0.000196** | **+0.000165** | **-0.000060** | **-0.000085** | **0.0000** |
+| Exact Primary B | `kind_exact_b` (Control) | 20260924 | Epoch 4 | 0.552653 | 0.703161 | 0.788022 | 0.085799 | 19.4882 |
+| Exact Primary B | `kcond_exact_b` (Candidate) | 20260924 | Epoch 4 | 0.553139 | 0.703587 | 0.788111 | 0.085927 | 19.4882 |
+| **Exact Delta B** | **KCond − KInd** | 20260924 | - | **+0.000486** | **+0.000426** | **+0.000089** | **+0.000128** | **0.0000** |
+| **Exact Mean** | **Mean Delta** | Both | - | **+0.000341** | **+0.000295** | **+0.000014** | **+0.000021** | **0.0000** |
+
+### Decision Summary
+
+- **Verdict**: `KILL_ECRC_CHOICE_MECHANISM`.
+- **Reason**: The mean oracle-K exact delta is $+0.000341$ Jaccard (+0.034%), failing the gate threshold ($+0.004$) and triggering the termination rule ($\le +0.002$). Deployable predicted-K delta is negative ($-0.000491$). Regimen cardinality does not act as an informative decision context for medication preference.
+- Artifact: `research/prototypes/ecrc-cardinality-context/ecrc-comparison.json`.
+- Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
