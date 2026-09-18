@@ -176,24 +176,30 @@ Primary statistic is the mean paired exact delta over seeds A and B:
 
 `DeltaJ_exact = mean[J(KCond-Exact_s) - J(KInd-Exact_s)]`.
 
-Kill / stop:
+The exact pair is interpreted in two stages.
 
-- `DeltaJ_exact <= +0.002` -> `KILL_ECRC`;
-- `+0.002 < DeltaJ_exact <= +0.004` -> `WEAK_STOP_ECRC`;
-- any exact seed with non-positive Jaccard delta -> no clean survival;
-- an apparent gain against a collapsed control is not a survivor.
+**Mechanism attribution (oracle-K, privileged diagnostic):**
 
-Survive only if:
+- mean oracle-K KCond-vs-KInd Jaccard must exceed `+0.004`;
+- both oracle-K seed deltas must be positive.
+- if mean oracle-K delta <= `+0.002`, return
+  `KILL_ECRC_CHOICE_MECHANISM`; do not rescue the size head.
 
-- `DeltaJ_exact > +0.004`;
-- both exact seed deltas are positive;
+**Deployable value (predicted-K):**
+
+- mean predicted-K KCond-vs-KInd Jaccard must exceed `+0.004`;
+- both predicted-K exact seed deltas must be positive;
 - mean F1 delta >= `-0.002`;
 - mean PRAUC delta >= `-0.002`;
 - mean DDI delta <= `+0.002`;
-- mean KCond-Exact Jaccard is at least `0.537316`, i.e. no more than `0.002`
-  below the current MIMIC-III DrugQuery development anchor `0.539316`.
+- mean KCond-Exact Jaccard must be at least `0.537316`, i.e. no more than
+  `0.002` below the current MIMIC-III DrugQuery development anchor `0.539316`.
 
-`DeltaJ_exact >= +0.008` is a strong mechanism signal.
+If oracle-K shows a material mechanism but predicted-K fails the deployable
+criterion, return `REDESIGN_SIZE_HEAD_ONLY`.  This is the only pre-authorized
+scientific redesign.  If both mechanism and deployable criteria pass, return
+`SURVIVE_ECRC`; predicted-K mean delta >= `+0.008` returns
+`STRONG_SURVIVE_ECRC`.
 
 The BCE pair is supporting attribution, not a second gate.  Same-direction
 BCE and Exact gains strengthen the claim that cardinality context, rather than
