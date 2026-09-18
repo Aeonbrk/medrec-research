@@ -73,7 +73,9 @@ def _targets(device: torch.device) -> tuple[torch.Tensor, torch.Tensor]:
 def _state_equal(left: ECRC, right: ECRC) -> bool:
     if left.state_dict().keys() != right.state_dict().keys():
         return False
-    return all(torch.equal(left.state_dict()[key], right.state_dict()[key]) for key in left.state_dict())
+    return all(
+        torch.equal(left.state_dict()[key], right.state_dict()[key]) for key in left.state_dict()
+    )
 
 
 def _dp_fixture() -> float:
@@ -87,7 +89,7 @@ def _dp_fixture() -> float:
     k = torch.tensor([2, 3], dtype=torch.long)
     observed = fixed_cardinality_log_normalizer(logits, k)
     expected = []
-    for row, count in zip(logits.tolist(), k.tolist()):
+    for row, count in zip(logits.tolist(), k.tolist(), strict=True):
         terms = []
         for combo in itertools.combinations(range(MEDICATIONS), int(count)):
             terms.append(sum(row[index] for index in combo))
@@ -160,11 +162,11 @@ def run(device: torch.device) -> dict[str, object]:
         if not torch.isfinite(loss):
             raise RuntimeError("non-finite synthetic loss")
         loss.backward()
-        if not any(
+        if not all(
             parameter.grad is not None and torch.isfinite(parameter.grad).all()
             for parameter in model.parameters()
         ):
-            raise RuntimeError("no finite ECRC gradient")
+            raise RuntimeError("non-finite ECRC gradient")
         losses[variant] = float(loss.item())
 
     dp_error = _dp_fixture()

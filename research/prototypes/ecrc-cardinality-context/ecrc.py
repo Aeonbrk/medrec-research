@@ -10,7 +10,6 @@ from __future__ import annotations
 import math
 import sys
 from pathlib import Path
-from typing import Any
 
 import torch
 from torch import nn
@@ -19,8 +18,16 @@ MICA_DIR = Path(__file__).resolve().parents[1] / "mica"
 if str(MICA_DIR) not in sys.path:
     sys.path.insert(0, str(MICA_DIR))
 
-from mica import CHUNK, DIM, MEDICATIONS, MICA as BaseMICA  # noqa: E402
-from mica import configure_numeric_policy, pack_inputs  # noqa: E402
+from mica import (  # noqa: E402
+    CHUNK,
+    DIM,
+    MEDICATIONS,
+    configure_numeric_policy,
+    pack_inputs,
+)
+from mica import (  # noqa: E402
+    MICA as BaseMICA,
+)
 
 RANK = 8
 VARIANTS = ("kind_bce", "kcond_bce", "kind_exact", "kcond_exact")
@@ -151,9 +158,7 @@ class ECRC(nn.Module):
         }
 
 
-def fixed_cardinality_log_normalizer(
-    logits: torch.Tensor, k: torch.Tensor
-) -> torch.Tensor:
+def fixed_cardinality_log_normalizer(logits: torch.Tensor, k: torch.Tensor) -> torch.Tensor:
     """Compute log sum exp over all subsets with exactly k selected labels."""
 
     if logits.ndim != 2 or logits.shape[1] != MEDICATIONS:
@@ -163,15 +168,20 @@ def fixed_cardinality_log_normalizer(
     if torch.any(k < 0) or torch.any(k > MEDICATIONS):
         raise ValueError("k is outside valid medication cardinality")
     max_k = int(k.max().item())
-    dp = logits.new_full((logits.shape[0], max_k + 1), float("-inf"))
-    dp[:, 0] = 0.0
+    dp = logits.new_zeros((logits.shape[0], 1))
     for index in range(MEDICATIONS):
         if max_k == 0:
             break
-        shifted = dp[:, :-1] + logits[:, index : index + 1]
-        updated = dp.clone()
-        updated[:, 1:] = torch.logaddexp(dp[:, 1:], shifted)
-        dp = updated
+        col = logits[:, index : index + 1]
+        if dp.shape[1] <= max_k:
+            if dp.shape[1] == 1:
+                dp = torch.cat([dp, dp + col], dim=1)
+            else:
+                mid = torch.logaddexp(dp[:, 1:], dp[:, :-1] + col)
+                dp = torch.cat([dp[:, :1], mid, dp[:, -1:] + col], dim=1)
+        else:
+            mid = torch.logaddexp(dp[:, 1:], dp[:, :-1] + col)
+            dp = torch.cat([dp[:, :1], mid], dim=1)
     return dp.gather(1, k[:, None]).squeeze(1)
 
 
@@ -205,9 +215,11 @@ def joint_objective(
     if exact:
         medication_nll = fixed_cardinality_nll(logits, targets, target_k)
     else:
-        medication_nll = nn.functional.binary_cross_entropy_with_logits(
-            logits, targets, reduction="none"
-        ).sum(dim=-1).mean()
+        medication_nll = (
+            nn.functional.binary_cross_entropy_with_logits(logits, targets, reduction="none")
+            .sum(dim=-1)
+            .mean()
+        )
     size_nll = nn.functional.cross_entropy(size_logits, target_k)
     loss = (medication_nll + size_nll) / float(MEDICATIONS)
     return loss, {
@@ -224,7 +236,7 @@ def topk_indices(scores: torch.Tensor, k: torch.Tensor) -> list[list[int]]:
     values = scores.detach().cpu().tolist()
     counts = k.detach().cpu().tolist()
     output: list[list[int]] = []
-    for row, count in zip(values, counts):
+    for row, count in zip(values, counts, strict=True):
         ordered = sorted(range(MEDICATIONS), key=lambda index: (-float(row[index]), index))
         output.append(ordered[: int(count)])
     return output

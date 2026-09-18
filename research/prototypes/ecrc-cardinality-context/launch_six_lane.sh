@@ -41,7 +41,7 @@ launch "${GPUS[3]}" kcond_exact 20260923 kcond_exact_a
 launch "${GPUS[4]}" kind_exact 20260924 kind_exact_b
 launch "${GPUS[5]}" kcond_exact 20260924 kcond_exact_b
 
-cat <<EOF
+cat <<'EOF'
 All six lanes launched.
 
 Monitor:
