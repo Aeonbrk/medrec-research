@@ -92,6 +92,40 @@ Architecture work does not wait for baseline completion, but Paper Candidate Fre
 
 ## Architecture status
 
+### Active bounded development screen: ECRC cardinality context
+
+A post-RouteFact closest-work/mechanism audit has authorized one bounded
+DEVELOPMENT screen for **cardinality-conditioned named-medication choice**.
+This is not Idea 009 and not a Paper Candidate.
+
+The tested distinction is:
+
+```text
+K-independent control:
+patient evidence -> named-medication utilities
+predicted K -> Top-K only
+
+ECRC candidate:
+patient evidence + regimen-cardinality context
+-> named-medication utilities
+predicted K -> Top-K
+```
+
+Generic joint cardinality/set prediction, fixed-cardinality subset likelihood,
+set decoding, and count normalization are treated as prior art. The exact
+fixed-cardinality KCond-vs-KInd pair is the primary mechanism comparison.
+Oracle-K is privileged mechanism attribution only; predicted-K is deployable
+evidence.
+
+The implementation and frozen six-lane contract are:
+
+- `research/prototypes/ecrc-cardinality-context/README.md`
+- `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-authorization.md`
+
+Six lanes use two paired seeds for the primary exact mechanism plus one
+supporting BCE pair. No Test access or parameter sweep is authorized.
+
+
 Direct Partial Regimen Assignment / structured-set prediction remains an untested candidate, not an admitted paper method.
 
 If pursued, its question must be framed around explicit set-level competition, variable cardinality, and uniqueness in training/decoding—not the false claim that independent-label models contain no medication dependence, and not an unsupported claim that anonymous slots are clinical regimen roles.
@@ -183,4 +217,8 @@ MIMIC-IV Test remains sealed throughout reference setup and architecture search.
 
 ## Next action
 
-Audit each detached MoleRec lane only when it reaches a terminal artifact; do not promote source-split or partial values. In parallel, keep the structured candidate paused at the `NOVELTY_UNRESOLVED` / `SSPNET_EXECUTION_UNRESOLVED` boundary until the closest-work and evaluator prerequisites are resolved.
+Execute the frozen ECRC six-lane Train/Dev screen from a clean source-bound
+checkout after the committed CUDA/data preflight. Use the committed summarizer
+without changing its decision thresholds after observing results. Keep Test
+sealed. Detached baseline recovery may continue independently and must not
+delay this architecture decision.
