@@ -396,8 +396,13 @@ class FinalRelationalModel(PortfolioModel):
                 scores = torch.einsum(
                     "mr,bir,bjr->bmij", q, left_key, right_key
                 ) / scale
+                pair_count = pair_mask.sum(dim=(1, 2)).clamp_min(1).to(scores.dtype)
+                scores = scores - pair_count.log()[:, None, None, None]
                 if edge is not None:
-                    scores = scores + torch.einsum("me,bije->bmij", edge_q, edge)
+                    scores = scores + (
+                        torch.einsum("me,bije->bmij", edge_q, edge)
+                        / math.sqrt(7.0)
+                    )
                 b, m, i, j = scores.shape
                 shapes.append((i, j))
                 flat_scores.append(scores.reshape(b, m, i * j))
