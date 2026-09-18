@@ -227,6 +227,9 @@ FREEZE_FINE_CODE_FOUNDATION_CONTINUE_ARCHITECTURE_SEARCH
 If relational evidence has an accuracy signal with supporting cost:
 QUARANTINE_RELATIONAL_SIGNAL_WITH_COST
 
+If fine-code access is positive but below the strict stability bar:
+HOLD_FINE_CODE_FOUNDATION_NO_PROMOTION
+
 If fine-code access is unstable:
 REASSESS_FINE_CODE_FOUNDATION
 
