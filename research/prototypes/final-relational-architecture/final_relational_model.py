@@ -8,6 +8,7 @@ from typing import Dict, Mapping, Optional, Tuple
 
 import torch
 from torch import nn
+from torch.utils.checkpoint import checkpoint
 
 HERE = Path(__file__).resolve().parent
 PORTFOLIO_DIR = HERE.parents[0] / "evidence-access-portfolio"
@@ -25,7 +26,7 @@ from portfolio_model import (  # noqa: E402
 )
 
 RELATION_DIM = DIM
-RELATION_CHUNK = 8
+RELATION_CHUNK = 1
 
 ARCH_VARIANTS = (
     "summary_add",
@@ -46,6 +47,94 @@ def _masked_softmax(
     masked = scores.masked_fill(~mask, -1e9)
     weights = torch.softmax(masked, dim=dim) * mask.to(scores.dtype)
     return weights / weights.sum(dim=dim, keepdim=True).clamp_min(1e-12)
+
+
+class EdgeScoreFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(
+        ctx,
+        eq: torch.Tensor,
+        left_lag: torch.Tensor,
+        right_lag: torch.Tensor,
+        type_idx: int,
+        temporal: bool,
+    ) -> torch.Tensor:
+        ctx.save_for_backward(eq, left_lag, right_lag)
+        ctx.type_idx = type_idx
+        ctx.temporal = temporal
+
+        sqrt_7 = math.sqrt(7.0)
+        c_type = eq[:, type_idx : type_idx + 1] / sqrt_7
+        b, i = left_lag.shape
+        j = right_lag.shape[1]
+
+        score = c_type.unsqueeze(-1).expand(b, eq.shape[0], i, j).clone()
+        if temporal:
+            c3 = eq[:, 3 : 4].unsqueeze(-1) / sqrt_7
+            c4 = eq[:, 4 : 5].unsqueeze(-1) / sqrt_7
+            c5 = eq[:, 5 : 6].unsqueeze(-1) / sqrt_7
+            c6 = eq[:, 6 : 7].unsqueeze(-1) / sqrt_7
+
+            left = left_lag[:, :, None]
+            right = right_lag[:, None, :]
+
+            diff = left - right
+            same_visit = (diff == 0).to(left_lag.dtype).unsqueeze(1)
+            score = score + c3 * same_visit
+            del same_visit
+
+            cur_hist = torch.logical_xor(left == 0, right == 0).to(left_lag.dtype).unsqueeze(1)
+            score = score + c4 * cur_hist
+            del cur_hist
+
+            both_hist = ((left > 0) & (right > 0)).to(left_lag.dtype).unsqueeze(1)
+            score = score + c5 * both_hist
+            del both_hist
+
+            lag_gap = torch.log1p(diff.abs()).unsqueeze(1)
+            score = score + c6 * lag_gap
+            del lag_gap
+
+        return score
+
+    @staticmethod
+    def backward(
+        ctx, grad_output: torch.Tensor
+    ) -> Tuple[
+        torch.Tensor,
+        Optional[torch.Tensor],
+        Optional[torch.Tensor],
+        Optional[torch.Tensor],
+        Optional[torch.Tensor],
+    ]:
+        eq, left_lag, right_lag = ctx.saved_tensors
+        sqrt_7 = math.sqrt(7.0)
+        grad_eq = torch.zeros_like(eq)
+
+        grad_eq[:, ctx.type_idx] = grad_output.sum(dim=(0, 2, 3)) / sqrt_7
+
+        if ctx.temporal:
+            left = left_lag[:, :, None]
+            right = right_lag[:, None, :]
+            diff = left - right
+
+            same_visit = (diff == 0).to(grad_output.dtype).unsqueeze(1)
+            grad_eq[:, 3] = (grad_output * same_visit).sum(dim=(0, 2, 3)) / sqrt_7
+            del same_visit
+
+            cur_hist = torch.logical_xor(left == 0, right == 0).to(grad_output.dtype).unsqueeze(1)
+            grad_eq[:, 4] = (grad_output * cur_hist).sum(dim=(0, 2, 3)) / sqrt_7
+            del cur_hist
+
+            both_hist = ((left > 0) & (right > 0)).to(grad_output.dtype).unsqueeze(1)
+            grad_eq[:, 5] = (grad_output * both_hist).sum(dim=(0, 2, 3)) / sqrt_7
+            del both_hist
+
+            lag_gap = torch.log1p(diff.abs()).unsqueeze(1)
+            grad_eq[:, 6] = (grad_output * lag_gap).sum(dim=(0, 2, 3)) / sqrt_7
+            del lag_gap
+
+        return grad_eq, None, None, None, None
 
 
 class FinalRelationalModel(PortfolioModel):
@@ -337,22 +426,32 @@ class FinalRelationalModel(PortfolioModel):
         outputs = []
         scale = math.sqrt(RELATION_DIM)
 
+        def _chunk_fn(q, lk, rk, lv, rv, pm):
+            s = torch.einsum("mr,bir,bjr->bmij", q, lk, rk) / scale
+            b, m, i, j = s.shape
+            fs = s.reshape(b, m, i * j)
+            fm = pm.reshape(b, 1, i * j).expand(-1, m, -1)
+            w = _masked_softmax(fs, fm, dim=-1).reshape(b, m, i, j)
+            temp = torch.matmul(w, rv.unsqueeze(1))
+            return torch.sum(lv.unsqueeze(1) * temp, dim=2)
+
         for start in range(0, MEDICATIONS, RELATION_CHUNK):
             q = q_all[start : start + RELATION_CHUNK]
-            scores = torch.einsum(
-                "mr,bir,bjr->bmij", q, left_key, right_key
-            ) / scale
-            b, m, i, j = scores.shape
-            flat_scores = scores.reshape(b, m, i * j)
-            flat_mask = pair_mask.reshape(b, 1, i * j).expand(-1, m, -1)
-            weights = _masked_softmax(flat_scores, flat_mask, dim=-1).reshape(
-                b, m, i, j
-            )
-            outputs.append(
-                torch.einsum(
-                    "bmij,bir,bjr->bmr", weights, left_value, right_value
+            if self.training:
+                chunk_out = checkpoint(
+                    _chunk_fn,
+                    q,
+                    left_key,
+                    right_key,
+                    left_value,
+                    right_value,
+                    pair_mask,
                 )
-            )
+            else:
+                chunk_out = _chunk_fn(
+                    q, left_key, right_key, left_value, right_value, pair_mask
+                )
+            outputs.append(chunk_out)
         return torch.cat(outputs, dim=1)
 
     def _joint_pair_relations(
@@ -368,72 +467,130 @@ class FinalRelationalModel(PortfolioModel):
                 right,
                 fields,
                 drugs,
-                edge_mode=edge_mode,
+                edge_mode="none",
                 relation_type_index=type_index,
             )
             for type_index, (left, right) in enumerate(relation_types)
         ]
         q_all = self._relation_query(drugs)
         edge_q_all = self.edge_query(drugs)
-        outputs_by_type = [[], [], []]
         scale = math.sqrt(RELATION_DIM)
 
-        for start in range(0, MEDICATIONS, RELATION_CHUNK):
-            q = q_all[start : start + RELATION_CHUNK]
-            edge_q = edge_q_all[start : start + RELATION_CHUNK]
-            flat_scores = []
-            flat_masks = []
-            shapes = []
+        left_keys = [c[0] for c in components]
+        right_keys = [c[1] for c in components]
+        left_values = [c[2] for c in components]
+        right_values = [c[3] for c in components]
+        pair_masks = [c[4] for c in components]
 
-            for (
-                left_key,
-                right_key,
-                _left_value,
-                _right_value,
-                pair_mask,
-                edge,
-            ) in components:
-                scores = torch.einsum(
-                    "mr,bir,bjr->bmij", q, left_key, right_key
-                ) / scale
-                pair_count = pair_mask.sum(dim=(1, 2)).clamp_min(1).to(scores.dtype)
-                scores = scores - pair_count.log()[:, None, None, None]
-                if edge is not None:
-                    scores = scores + (
-                        torch.einsum("me,bije->bmij", edge_q, edge)
-                        / math.sqrt(7.0)
+        lags = [
+            (fields[left][2], fields[right][2])
+            for left, right in relation_types
+        ]
+
+        def _chunk_joint_fn(
+            q,
+            eq,
+            lk0,
+            lk1,
+            lk2,
+            rk0,
+            rk1,
+            rk2,
+            lv0,
+            lv1,
+            lv2,
+            rv0,
+            rv1,
+            rv2,
+            pm0,
+            pm1,
+            pm2,
+            l_lag0,
+            r_lag0,
+            l_lag1,
+            r_lag1,
+            l_lag2,
+            r_lag2,
+        ):
+            lks = [lk0, lk1, lk2]
+            rks = [rk0, rk1, rk2]
+            lvs = [lv0, lv1, lv2]
+            rvs = [rv0, rv1, rv2]
+            pms = [pm0, pm1, pm2]
+            l_lags = [l_lag0, l_lag1, l_lag2]
+            r_lags = [r_lag0, r_lag1, r_lag2]
+
+            flat_scores = []
+            shapes = []
+            for t in range(3):
+                s = torch.einsum("mr,bir,bjr->bmij", q, lks[t], rks[t]) / scale
+                pc = pms[t].sum(dim=(1, 2)).clamp_min(1).to(s.dtype)
+                s = s - pc.log()[:, None, None, None]
+                if edge_mode in {"type_only", "temporal"}:
+                    edge_score = EdgeScoreFunction.apply(
+                        eq, l_lags[t], r_lags[t], t, edge_mode == "temporal"
                     )
-                b, m, i, j = scores.shape
+                    s = s + edge_score
+                b, m, i, j = s.shape
                 shapes.append((i, j))
-                flat_scores.append(scores.reshape(b, m, i * j))
-                flat_masks.append(
-                    pair_mask.reshape(b, 1, i * j).expand(-1, m, -1)
-                )
+                flat_scores.append(s.reshape(b, m, i * j))
 
             all_scores = torch.cat(flat_scores, dim=-1)
+            flat_masks = [
+                pms[t].reshape(b, 1, shapes[t][0] * shapes[t][1]).expand(-1, m, -1)
+                for t in range(3)
+            ]
             all_mask = torch.cat(flat_masks, dim=-1)
             all_weights = _masked_softmax(all_scores, all_mask, dim=-1)
 
+            out_types = []
             offset = 0
-            for type_index, (
-                _left_key,
-                _right_key,
-                left_value,
-                right_value,
-                _pair_mask,
-                _edge,
-            ) in enumerate(components):
-                i, j = shapes[type_index]
+            for t in range(3):
+                i, j = shapes[t]
                 length = i * j
-                weights = all_weights[:, :, offset : offset + length].reshape(
+                w = all_weights[:, :, offset : offset + length].reshape(
                     all_weights.shape[0], q.shape[0], i, j
                 )
-                outputs_by_type[type_index].append(
-                    torch.einsum(
-                        "bmij,bir,bjr->bmr", weights, left_value, right_value
-                    )
-                )
+                temp = torch.matmul(w, rvs[t].unsqueeze(1))
+                out_types.append(torch.sum(lvs[t].unsqueeze(1) * temp, dim=2))
                 offset += length
+            return torch.stack(out_types, dim=0)
+
+        outputs_by_type = [[], [], []]
+        for start in range(0, MEDICATIONS, RELATION_CHUNK):
+            q = q_all[start : start + RELATION_CHUNK]
+            eq = edge_q_all[start : start + RELATION_CHUNK]
+            args = (
+                q,
+                eq,
+                left_keys[0],
+                left_keys[1],
+                left_keys[2],
+                right_keys[0],
+                right_keys[1],
+                right_keys[2],
+                left_values[0],
+                left_values[1],
+                left_values[2],
+                right_values[0],
+                right_values[1],
+                right_values[2],
+                pair_masks[0],
+                pair_masks[1],
+                pair_masks[2],
+                lags[0][0],
+                lags[0][1],
+                lags[1][0],
+                lags[1][1],
+                lags[2][0],
+                lags[2][1],
+            )
+            if self.training:
+                stacked = checkpoint(_chunk_joint_fn, *args)
+            else:
+                stacked = _chunk_joint_fn(*args)
+            for t in range(3):
+                outputs_by_type[t].append(stacked[t])
 
         return tuple(
             torch.cat(type_outputs, dim=1) for type_outputs in outputs_by_type
