@@ -116,9 +116,9 @@ medication logit
 
 The relation branch never replaces the stable FineCode foundation.
 
-## Low-rank pair relation
+## Explicit hidden-rank pair relation
 
-For a relation type such as D-P, projected token factors are:
+For a relation type such as D-P, projected token factors use the full model hidden rank (128 dimensions):
 
 ~~~text
 a_i = U_D x_i
@@ -139,7 +139,7 @@ beta_mij = softmax over valid code pairs
 r_DP,m = sum_i sum_j beta_mij (V_D x_i * V_P y_j)
 ~~~
 
-The execution target is 8 NVIDIA RTX 3090 GPUs with 24 GB each. The model therefore keeps the complete legal cross-type pair search space instead of introducing top-K pair pruning or summary-only approximations. Medication chunking is only an exact memory-scheduling device: it changes peak activation memory and throughput, not the mathematical relation scores or outputs.
+The execution target is 8 NVIDIA RTX 3090 GPUs with 24 GB each. Relation space is therefore kept at the full 128-dimensional model hidden width rather than an artificial 64-dimensional bottleneck. The model therefore keeps the complete legal cross-type pair search space instead of introducing top-K pair pruning or summary-only approximations. Medication chunking is only an exact memory-scheduling device: it changes peak activation memory and throughput, not the mathematical relation scores or outputs.
 
 The implementation computes explicit medication-by-code-pair attention score tensors in chunks and immediately contracts them into relation contexts rather than materializing a persistent medication-by-pair-by-relation-dimension feature tensor.
 
