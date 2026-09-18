@@ -111,7 +111,7 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
         model.train()
         output = model(packed)
         loss, bce, ddi_loss = objective(output, target, ddi_tensor)
-        if not all(torch.isfinite(value) for value in (output, loss, bce, ddi_loss)):
+        if not all(torch.isfinite(value).all() for value in (output, loss, bce, ddi_loss)):
             raise RuntimeError("non-finite preflight output for " + variant)
         loss.backward()
         grad_count = sum(
