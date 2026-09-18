@@ -60,6 +60,7 @@ MICA remains a possible building block and mechanism control, not a mandatory ba
 - **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
 - **Route-Factored Medication Recommendation (RouteFact)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260922`, 60 complete epochs, 914,497 parameters in both arms, source revision `8eee27ad88b63990cc8f1c5355b4a47bd84c7923`, zero Test access). Tested whether forcing medication prediction through a noisy-OR over Train-supported multi-hot administration routes improves prediction over direct medication prediction with identical auxiliary route supervision. Result: $\Delta J = -0.008252$ (RouteFact 0.534931 vs RouteAux control 0.543183), $\Delta \text{F1} = -0.006919$, $\Delta \text{PR-AUC} = -0.005145$, $\Delta \text{DDI} = -0.001539$, $\Delta \text{AvgMed} = +0.115149$. Falsified and terminated per the frozen decision boundary (`KILL_ROUTEFACT_MECHANISM`); no post-hoc tuning, taxonomy merging, loss sweeps, or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-routefact-mechanism-screen-falsification.md`.
 - **Exact-Cardinality Regimen Choice (ECRC)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seeds `20260923` and `20260924`, 60 complete epochs across 6 lanes, 437,571 parameters in all four variants, source revision `c668a8e4a194c92a8933068e8ff99991d014c185`, zero Test access). Tested whether regimen cardinality acts as an informative decision context that changes named-medication preference utilities ($u_m(x, K)$) under exact fixed-cardinality and BCE formulations. Result: mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value), mean candidate Jaccard $0.531769$ (below the $0.537316$ floor). Falsified and terminated per the frozen decision boundary (`KILL_ECRC_CHOICE_MECHANISM`); no size-head tuning, rank sweeps, or re-tests authorized. Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
+- **Clinical Concept Trajectory Memory (CCTM)**: Evaluated via Train-only data supportability audit on `mimic-iii-canonical-131-paper-dev-v1` at source revision `fbdcdafdf93aa4d14fa0cea2d19039ff7b02c488` (4,233 Train patients, 10,489 visits, 6,256 history-bearing prediction events, zero Dev/Test access). Tested whether repeated typed clinical concepts are sufficiently dense across prediction events to justify an addressable concept-trajectory evidence memory. Result: all-history coverage 47.6% (pass), non-med coverage 37.4% (pass), events with $\ge 3$ recurrent D/P trajectories 36.5% (fail, threshold $\ge 50\%$), events with $\ge 5$ recurrent D/P/M trajectories 40.6% (fail, threshold $\ge 50\%$). Falsified and terminated per the frozen decision boundary (`KILL_CCTM_SUPPORTABILITY`); the median history-bearing event has zero recurrent trajectories. Decision note: `research/memory/decisions/2026-09-18-cctm-trajectory-support-falsification.md`.
 
 ## Benchmark strategy
 
@@ -111,6 +112,22 @@ Under the tested rank-8 ECRC formulation and DrugQuery evidence path, conditioni
 
 Artifact: `research/prototypes/ecrc-cardinality-context/ecrc-comparison.json`.
 Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
+
+### Terminated diagnostic: CCTM trajectory supportability (2026-09-18)
+
+The bounded pre-architecture data supportability audit for **Clinical Concept Trajectory Memory** (CCTM) completed against `mimic-iii-canonical-131-paper-dev-v1` Train split (4,233 patients, 10,489 visits, 6,256 history-bearing prediction events, zero Dev/Test access).
+
+Result:
+
+- Event-level non-med recurrent support: $36.52\%$ of history-bearing events have $\ge 3$ recurrent D/P trajectories (failing the $\ge 50\%$ supportability gate).
+- Event-level all-concept recurrent support: $40.58\%$ of history-bearing events have $\ge 5$ recurrent D/P/M trajectories (failing the $\ge 50\%$ supportability gate).
+- Pervasiveness failure: $59.26\%$ of history-bearing visits have zero recurrent trajectories; median recurrent trajectory count across prediction events is 0.0.
+- Verdict: `KILL_CCTM_SUPPORTABILITY`.
+
+Concept trajectories are not a pervasive substrate across the clinical population. CCTM architecture exploration is permanently terminated without model implementation, threshold relaxation, or ontology restructuring.
+
+Artifact: `research/diagnostics/cctm-trajectory-support/result.json`.
+Decision note: `research/memory/decisions/2026-09-18-cctm-trajectory-support-falsification.md`.
 
 Direct Partial Regimen Assignment / structured-set prediction remains an untested candidate, not an admitted paper method.
 

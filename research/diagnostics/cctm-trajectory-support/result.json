@@ -1,0 +1,111 @@
+{
+  "conditions": {
+    "all_recurrent_occurrence_coverage": true,
+    "events_ge3_recurrent_nonmed": false,
+    "events_ge5_recurrent_all": false,
+    "nonmed_recurrent_occurrence_coverage": true
+  },
+  "decision": "KILL_CCTM_SUPPORTABILITY",
+  "evidence_role": "TRAIN_ONLY_SUPPORTABILITY",
+  "frozen_thresholds": {
+    "all_recurrent_occurrence_coverage": 0.3,
+    "events_ge3_recurrent_nonmed": 0.5,
+    "events_ge5_recurrent_all": 0.5,
+    "nonmed_recurrent_occurrence_coverage": 0.2
+  },
+  "population": {
+    "history_bearing_prediction_events": 6256,
+    "patients_with_history_bearing_event": 3707,
+    "train_patients": 4233,
+    "train_visits": 10489
+  },
+  "primary": {
+    "all_history_occurrences": 480303,
+    "all_recurrent_occurrence_coverage": 0.4763368123871806,
+    "all_recurrent_occurrences": 228786,
+    "events_ge3_recurrent_nonmed": 2285,
+    "events_ge3_recurrent_nonmed_fraction": 0.36524936061381075,
+    "events_ge5_recurrent_all": 2539,
+    "events_ge5_recurrent_all_fraction": 0.40585038363171355,
+    "nonmed_history_occurrences": 233640,
+    "nonmed_recurrent_occurrence_coverage": 0.3735362095531587,
+    "nonmed_recurrent_occurrences": 87273
+  },
+  "privacy": {
+    "current_medication_used_as_same_event_evidence": false,
+    "dev_loaded": false,
+    "patient_level_output": false,
+    "test_loaded": false
+  },
+  "profile_id": "mimic-iii-canonical-131-paper-dev-v1",
+  "schema_version": 1,
+  "source_revision": "fbdcdafdf93aa4d14fa0cea2d19039ff7b02c488",
+  "status": "complete",
+  "supporting": {
+    "current_diag_prior_identity_overlap": 0.38429857491708275,
+    "current_nonmed_prior_identity_overlap": 0.35563459143724857,
+    "current_proc_prior_identity_overlap": 0.27514328602620086,
+    "events_ge1_recurrent_all_fraction": 0.40744884910485935,
+    "per_modality": {
+      "diag": {
+        "history_occurrences": 179219,
+        "history_unique_concepts_event_sum": 131564,
+        "recurrent_history_occurrences": 71977,
+        "recurrent_occurrence_coverage": 0.40161478414677015,
+        "recurrent_trajectory_length_quantiles": {
+          "max": 27.0,
+          "p25": 2.0,
+          "p50": 2.0,
+          "p75": 3.0,
+          "p90": 5.0
+        },
+        "recurrent_unique_concepts_event_sum": 24322,
+        "recurrent_unique_fraction": 0.18486820102763674
+      },
+      "med": {
+        "history_occurrences": 246663,
+        "history_unique_concepts_event_sum": 149396,
+        "recurrent_history_occurrences": 141513,
+        "recurrent_occurrence_coverage": 0.5737098794711813,
+        "recurrent_trajectory_length_quantiles": {
+          "max": 27.0,
+          "p25": 2.0,
+          "p50": 2.0,
+          "p75": 3.0,
+          "p90": 5.0
+        },
+        "recurrent_unique_concepts_event_sum": 44246,
+        "recurrent_unique_fraction": 0.2961658946692013
+      },
+      "proc": {
+        "history_occurrences": 54421,
+        "history_unique_concepts_event_sum": 44721,
+        "recurrent_history_occurrences": 15296,
+        "recurrent_occurrence_coverage": 0.28106797008507745,
+        "recurrent_trajectory_length_quantiles": {
+          "max": 24.0,
+          "p25": 2.0,
+          "p50": 2.0,
+          "p75": 3.0,
+          "p90": 4.0
+        },
+        "recurrent_unique_concepts_event_sum": 5596,
+        "recurrent_unique_fraction": 0.12513137004986472
+      }
+    },
+    "recurrent_all_trajectory_count_quantiles": {
+      "max": 130.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 20.0,
+      "p90": 38.0
+    },
+    "recurrent_nonmed_trajectory_count_quantiles": {
+      "max": 75.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 6.0,
+      "p90": 16.0
+    }
+  }
+}

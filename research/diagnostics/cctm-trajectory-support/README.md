@@ -1,6 +1,6 @@
 # CCTM trajectory-support audit
 
-Status: **FROZEN / TRAIN-ONLY / NOT YET EXECUTED**
+Status: **AUDIT EXECUTED / DECISION ENFORCED: KILL_CCTM_SUPPORTABILITY**
 
 This diagnostic asks one structural question before any new architecture is built:
 
@@ -93,3 +93,36 @@ python research/diagnostics/cctm-trajectory-support/audit_cctm_support.py \
 ```
 
 Only the aggregate JSON should return to Git.
+
+## Terminal Audit Results (2026-09-18)
+
+Executed on the 319 Execution Plane against canonical snapshot `molerec-table1-c721-www23` at source revision `fbdcdafdf93aa4d14fa0cea2d19039ff7b02c488` (4,233 Train patients, 10,489 Train visits, 6,256 history-bearing prediction events, zero Dev/Test access).
+
+### Primary Support Metrics
+
+| Metric | Definition | Observed Value | Threshold | Result |
+| :--- | :--- | ---: | ---: | :--- |
+| **A. All-history recurrent occurrence coverage** | Recurrent D/P/M tokens / all history tokens | 0.476337 (228,786 / 480,303) | $\ge 0.30$ | **PASS** |
+| **B. Non-med recurrent occurrence coverage** | Recurrent D/P tokens / all non-med history tokens | 0.373536 (87,273 / 233,640) | $\ge 0.20$ | **PASS** |
+| **C. Event-level recurrent non-med support** | Fraction of history events with $\ge 3$ recurrent D/P | 0.365249 (2,285 / 6,256) | $\ge 0.50$ | **FAIL** |
+| **D. Event-level recurrent all-concept support** | Fraction of history events with $\ge 5$ recurrent D/P/M | 0.405850 (2,539 / 6,256) | $\ge 0.50$ | **FAIL** |
+
+### Supporting Diagnostics
+
+- **Event-level recurrence presence**: Only 40.74% of history-bearing events contain even one recurrent trajectory of any type (`events_ge1_recurrent_all_fraction = 0.407449`).
+- **Trajectory-count quantiles (recurrent D/P/M)**: p25 = 0.0, p50 = 0.0, p75 = 20.0, p90 = 38.0, max = 130.0. The median history-bearing event has zero recurrent trajectories.
+- **Trajectory-count quantiles (recurrent non-med D/P)**: p25 = 0.0, p50 = 0.0, p75 = 6.0, p90 = 16.0, max = 75.0.
+- **Current D/P prior-identity overlap**:
+  - Diagnosis: 38.43%
+  - Procedure: 27.51%
+  - Non-med combined: 35.56%
+- **Per-modality recurrence**:
+  - Diagnosis: 40.16% recurrent occurrence coverage (18.49% recurrent unique concept fraction, median recurrent trajectory length 2.0)
+  - Procedure: 28.11% recurrent occurrence coverage (12.51% recurrent unique concept fraction, median recurrent trajectory length 2.0)
+  - Medication: 57.37% recurrent occurrence coverage (29.62% recurrent unique concept fraction, median recurrent trajectory length 2.0)
+
+### Decision & Scientific Conclusion
+
+- **Verdict**: `KILL_CCTM_SUPPORTABILITY`.
+- **Reason**: The canonical Train data do not support sufficiently dense patient-specific concept trajectories under the frozen identity definition. While occurrence token counts show recurrence in heavy-utilizer visits, over 59% of prediction events with prior history have zero recurrent trajectories, and only 36.5% reach the $\ge 3$ non-med trajectory threshold (failing the 50% density floor). Concept trajectories are a sparse minority phenomenon in MIMIC-III rather than a pervasive modeling substrate.
+- **Policy enforcement**: The CCTM route is terminated before model implementation. Per the frozen protocol, no ontology merging, CCS grouping, ICD hierarchy collapse, external knowledge, or threshold relaxation is permitted.

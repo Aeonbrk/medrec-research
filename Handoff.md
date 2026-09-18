@@ -3,7 +3,7 @@
 Updated: 2026-09-18.
 
 ```text
-Current phase: ARCHITECTURE SEARCH — POST-ECRC RESET
+Current phase: ARCHITECTURE SEARCH — POST-CCTM RESET
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Active formal Idea: none
 Idea 009: absent
@@ -20,18 +20,33 @@ Read first:
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
 - `research/memory/current-research-state.md`
-- `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`
-- `research/prototypes/ecrc-cardinality-context/README.md`
+- `research/memory/decisions/2026-09-18-cctm-trajectory-support-falsification.md`
+- `research/diagnostics/cctm-trajectory-support/README.md`
 
 ## Current evidence
 
 Medication-specific late evidence selection (DrugQuery) remains the strongest repeated positive mechanism.
 
-Three recent bounded mechanism screens are decisively falsified and closed:
+Four recent bounded mechanism/premise investigations are decisively falsified and closed:
 
 1. **DCPM (Precedent Memory)**: $\Delta J = -0.001403$. Closed (`KILL_DCPM_MECHANISM`).
 2. **RouteFact (Administration Routes)**: $\Delta J = -0.008252$. Closed (`KILL_ROUTEFACT_MECHANISM`).
 3. **ECRC (Cardinality Context)**: Mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value). Closed (`KILL_ECRC_CHOICE_MECHANISM`).
+4. **CCTM (Trajectory Memory Premise)**: Train-only supportability audit showed only 36.5% event support for non-med trajectories and 40.6% for all concepts (both failing $\ge 50\%$ gate); 59.3% of history-bearing events have zero recurrent trajectories (median 0.0). Premise falsified before architecture build (`KILL_CCTM_SUPPORTABILITY`).
+
+## Terminal CCTM Supportability Audit Results
+
+Executed on the 319 Execution Plane against canonical snapshot `molerec-table1-c721-www23` at source revision `fbdcdafdf93aa4d14fa0cea2d19039ff7b02c488` (4,233 Train patients, 10,489 Train visits, 6,256 history-bearing prediction events, zero Dev/Test access):
+
+| Metric | Definition | Observed Value | Threshold | Result |
+| :--- | :--- | ---: | ---: | :--- |
+| **A. All-history recurrent occurrence coverage** | Recurrent D/P/M tokens / all history tokens | 0.476337 (228,786 / 480,303) | $\ge 0.30$ | **PASS** |
+| **B. Non-med recurrent occurrence coverage** | Recurrent D/P tokens / all non-med history tokens | 0.373536 (87,273 / 233,640) | $\ge 0.20$ | **PASS** |
+| **C. Event-level recurrent non-med support** | Fraction of history events with $\ge 3$ recurrent D/P | 0.365249 (2,285 / 6,256) | $\ge 0.50$ | **FAIL** |
+| **D. Event-level recurrent all-concept support** | Fraction of history events with $\ge 5$ recurrent D/P/M | 0.405850 (2,539 / 6,256) | $\ge 0.50$ | **FAIL** |
+
+Verdict: **`KILL_CCTM_SUPPORTABILITY`**.
+Concept trajectories are not a pervasive modeling substrate across the patient population. Over 59% of history-bearing visits have zero recurrent trajectories; the median count is 0.0. The premise is permanently terminated without model implementation, ontology relaxation, or parameter tuning.
 
 ## Terminal ECRC Screen Results
 
