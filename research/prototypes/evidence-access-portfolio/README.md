@@ -1,6 +1,6 @@
 # Evidence-access architecture portfolio screen
 
-Status: **DESIGN FROZEN / IMPLEMENTED / NOT EXECUTED**
+Status: **PORTFOLIO EXECUTED / COMPLETED (2026-09-18)**
 
 This directory defines one bounded eight-lane DEVELOPMENT screen on the canonical MIMIC-III 131-medication Train/Dev profile. It uses four matched candidate/control pairs to test four orthogonal bottlenecks between longitudinal EHR evidence and a candidate-medication decision.
 
@@ -284,3 +284,44 @@ All eight jobs must use one clean immutable revision.
 Run the preflight once, then use `launch_8gpu.sh`. Private checkpoints, logits and logs stay outside Git. After all eight jobs finish, use `summarize_portfolio.py` to produce the aggregate matched comparison.
 
 No Test access, no HPO, no additional seed, no early scientific redesign, and no automatic compound model are authorized by this screen.
+
+## Terminal portfolio results (2026-09-18)
+
+Executed on the 319 Execution Plane across 8 physical RTX 3090 GPUs (0–7) in parallel from clean detached worktree revision `aec07f311c5fc2f137d07bb172b67e12a89eeee3` (starting authoritative revision `ecf32d7737f855e3ac713c5e3b694a8b3d845f49`, preflight bug fixed in `aec07f311c5fc2f137d07bb172b67e12a89eeee3`). All 8 variants instantiate exactly 1,295,367 trainable parameters and completed all 60 epochs under canonical RNG (`torch=1203`, `cuda=1203`, `random=1203`, `numpy=2048`). Test strictly sealed (`test_loaded = false`).
+
+### Matched-pair results
+
+| Pair | Control (Selected Ckpt / OP) | Candidate (Selected Ckpt / OP) | Control J | Candidate J | ΔJ | ΔF1 | ΔPRAUC | ΔDDI | ΔAvgMed | Verdict |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
+| **Temporal** | `temporal_shared` (Ep 3 / 0.30) | `temporal_med` (Ep 3 / 0.30) | 0.544485 | 0.544932 | +0.000447 | +0.000415 | -0.000049 | +0.000292 | -0.0053 | **`KILL_NO_MATERIAL_SIGNAL`** |
+| **Resolution** | `resolution_visit` (Ep 7 / 0.35) | `resolution_code` (Ep 5 / 0.30) | 0.535091 | 0.546626 | **+0.011536** | +0.010238 | +0.007785 | -0.005589 | +0.4715 | **`MECHANISM_SIGNAL`** |
+| **Depth** | `depth_state` (Ep 5 / 0.35) | `depth_reread` (Ep 4 / 0.35) | 0.547115 | 0.551259 | **+0.004144** | +0.003790 | +0.005406 | -0.000731 | +0.3433 | **`MECHANISM_SIGNAL`** |
+| **Prediction** | `prediction_aggregate` (Ep 5 / 0.35) | `prediction_local` (Ep 3 / 0.35) | 0.535935 | 0.548911 | **+0.012976** | +0.011286 | +0.009895 | +0.003843 | -0.3692 | **`SIGNAL_WITH_SUPPORTING_METRIC_COST`** |
+
+### Absolute candidate performance
+
+| Candidate | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI Rate | Avg Med Count |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| `temporal_med` | 0.544932 | 0.697154 | 0.788846 | 0.078785 | 20.8596 |
+| `resolution_code` | 0.546626 | 0.698386 | 0.792678 | 0.071069 | 21.4289 |
+| `depth_reread` | 0.551259 | 0.702581 | 0.796649 | 0.071966 | 20.7648 |
+| `prediction_local` | 0.548911 | 0.700462 | 0.794832 | 0.075148 | 19.9647 |
+
+### Scientific takeaways
+
+1. **Temporal placement falsified**: Feeding candidate medication identity into history before longitudinal compression (`temporal_med`) yielded only $\Delta J = +0.000447$ over shared history (`temporal_shared`). When explicit medication persistence features (previous-visit presence, frequency, recency) are provided, pre-temporal medication tracking does not add value.
+2. **Code resolution validated**: Direct medication-specific attention over fine clinical code tokens (`resolution_code`) beats within-visit pooling (`resolution_visit`) by $\Delta J = +0.011536$, with favorable guardrails across all dimensions ($\Delta \text{F1} = +0.0102$, $\Delta \text{PR-AUC} = +0.0078$, $\Delta \text{DDI} = -0.0056$).
+3. **Iterative evidence re-access validated**: Using updated medication states to re-attend clinical evidence memory (`depth_reread`) beats state-only refinement (`depth_state`) at identical parameter count and depth by $\Delta J = +0.004144$ ($\Delta \text{F1} = +0.0038$, $\Delta \text{PR-AUC} = +0.0054$, $\Delta \text{DDI} = -0.0007$). The candidate achieves the highest absolute Jaccard in the portfolio ($0.551259$).
+4. **Prediction granularity trade-off**: Local token-interaction potentials (`prediction_local`) achieve strong Jaccard gain ($\Delta J = +0.012976$) over aggregate hidden state pooling, but incur a DDI penalty ($\Delta \text{DDI} = +0.003843 > +0.0020$). Classified as `SIGNAL_WITH_SUPPORTING_METRIC_COST`.
+
+### Portfolio routing
+
+```text
+MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION
+```
+
+Survivors: `resolution` (`resolution_code`), `depth` (`depth_reread`).
+Per the frozen contract, no automatic A+B combination is authorized. The surviving mechanisms must be arbitrated scientifically before any compound architecture is trained.
+
+Artifact: `research/prototypes/evidence-access-portfolio/result.json`.
+Decision record: `research/memory/decisions/2026-09-18-evidence-access-portfolio-screen.md`.

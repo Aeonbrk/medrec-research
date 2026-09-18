@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: ARCHITECTURE SEARCH — POST-ECRC RESET
+Human-facing phase: ARCHITECTURE SEARCH — POST-PORTFOLIO ARBITRATION
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -55,12 +55,24 @@ These results are `DEVELOPMENT` evidence. They are not final-table superiority, 
 
 MICA remains a possible building block and mechanism control, not a mandatory backbone or permission gate for a distinct architecture.
 
+### Evidence-access architecture portfolio (2026-09-18)
+
+An eight-lane 60-epoch portfolio screen on `mimic-iii-canonical-131-paper-dev-v1` (revision `aec07f311c5fc2f137d07bb172b67e12a89eeee3`, 1,295,367 parameters per variant, zero Test access) evaluated four orthogonal evidence-access bottlenecks against matched controls:
+
+- **Code-level evidence resolution (`resolution_code`)**: Medication-specific attention directly over fine clinical code tokens beats within-visit pooling (`resolution_visit`) by $\Delta J = +0.011536$ (0.546626 vs 0.535091), with uniform gains in F1 ($+0.0102$), PR-AUC ($+0.0078$), and lower DDI rate ($-0.005589$). Verdict: `MECHANISM_SIGNAL`.
+- **Iterative evidence re-access (`depth_reread`)**: Re-querying clinical evidence with updated medication states beats state-only refinement (`depth_state`) at identical depth and parameter count by $\Delta J = +0.004144$ (0.551259 vs 0.547115), achieving peak portfolio Dev Jaccard with favorable safety ($\Delta \text{DDI} = -0.000731$). Verdict: `MECHANISM_SIGNAL`.
+- **Prediction granularity (`prediction_local`)**: Local potential scoring per token delivers strong Jaccard gain ($\Delta J = +0.012976$ over `prediction_aggregate`), but violates the frozen DDI guardrail ($\Delta \text{DDI} = +0.003843 > +0.0020$). Verdict: `SIGNAL_WITH_SUPPORTING_METRIC_COST`.
+- **Pre-temporal medication state (`temporal_med`)**: Yields $\Delta J = +0.000447$ over `temporal_shared`, failing the $+0.0020$ threshold. Verdict: `KILL_NO_MATERIAL_SIGNAL`.
+
+Portfolio routing: `MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION`. Per the frozen contract, no compound model is automatically scheduled without prior scientific arbitration and primary-source closest-work audits.
+
 ### Terminated mechanism screens
 
 - **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
 - **Route-Factored Medication Recommendation (RouteFact)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260922`, 60 complete epochs, 914,497 parameters in both arms, source revision `8eee27ad88b63990cc8f1c5355b4a47bd84c7923`, zero Test access). Tested whether forcing medication prediction through a noisy-OR over Train-supported multi-hot administration routes improves prediction over direct medication prediction with identical auxiliary route supervision. Result: $\Delta J = -0.008252$ (RouteFact 0.534931 vs RouteAux control 0.543183), $\Delta \text{F1} = -0.006919$, $\Delta \text{PR-AUC} = -0.005145$, $\Delta \text{DDI} = -0.001539$, $\Delta \text{AvgMed} = +0.115149$. Falsified and terminated per the frozen decision boundary (`KILL_ROUTEFACT_MECHANISM`); no post-hoc tuning, taxonomy merging, loss sweeps, or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-routefact-mechanism-screen-falsification.md`.
 - **Exact-Cardinality Regimen Choice (ECRC)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seeds `20260923` and `20260924`, 60 complete epochs across 6 lanes, 437,571 parameters in all four variants, source revision `c668a8e4a194c92a8933068e8ff99991d014c185`, zero Test access). Tested whether regimen cardinality acts as an informative decision context that changes named-medication preference utilities ($u_m(x, K)$) under exact fixed-cardinality and BCE formulations. Result: mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value), mean candidate Jaccard $0.531769$ (below the $0.537316$ floor). Falsified and terminated per the frozen decision boundary (`KILL_ECRC_CHOICE_MECHANISM`); no size-head tuning, rank sweeps, or re-tests authorized. Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
 - **Clinical Concept Trajectory Memory (CCTM)**: Evaluated via Train-only data supportability audit on `mimic-iii-canonical-131-paper-dev-v1` at source revision `fbdcdafdf93aa4d14fa0cea2d19039ff7b02c488` (4,233 Train patients, 10,489 visits, 6,256 history-bearing prediction events, zero Dev/Test access). Tested whether repeated typed clinical concepts are sufficiently dense across prediction events to justify an addressable concept-trajectory evidence memory. Result: all-history coverage 47.6% (pass), non-med coverage 37.4% (pass), events with $\ge 3$ recurrent D/P trajectories 36.5% (fail, threshold $\ge 50\%$), events with $\ge 5$ recurrent D/P/M trajectories 40.6% (fail, threshold $\ge 50\%$). Falsified and terminated per the frozen decision boundary (`KILL_CCTM_SUPPORTABILITY`); the median history-bearing event has zero recurrent trajectories. Decision note: `research/memory/decisions/2026-09-18-cctm-trajectory-support-falsification.md`.
+- **Pre-Temporal Medication State (MedTemporal)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at revision `aec07f311c5fc2f137d07bb172b67e12a89eeee3` (canonical seed, 60 complete epochs, 1,295,367 parameters, zero Test access). Tested whether candidate medication identity entering before longitudinal GRU compression improves prediction over a shared longitudinal representation when explicit medication persistence features are provided. Result: $\Delta J = +0.000447$ (temporal_med 0.544932 vs temporal_shared control 0.544485), failing the $+0.002$ threshold. Terminated per the frozen decision rule (`KILL_NO_MATERIAL_SIGNAL`). Decision note: `research/memory/decisions/2026-09-18-evidence-access-portfolio-screen.md`.
 
 ## Benchmark strategy
 
@@ -128,6 +140,20 @@ Concept trajectories are not a pervasive substrate across the clinical populatio
 
 Artifact: `research/diagnostics/cctm-trajectory-support/result.json`.
 Decision note: `research/memory/decisions/2026-09-18-cctm-trajectory-support-falsification.md`.
+
+### Completed screen: Evidence-access architecture portfolio (2026-09-18)
+
+An eight-lane 60-epoch portfolio screen tested four orthogonal evidence-access bottlenecks against matched controls at equal parameter count (1,295,367) on physical GPUs 0–7 on 319 (revision `aec07f311c5fc2f137d07bb172b67e12a89eeee3`):
+
+- **Temporal placement**: `temporal_med` $\Delta J = +0.000447 \rightarrow$ `KILL_NO_MATERIAL_SIGNAL`. Pre-temporal medication identity does not add value when persistence features are present.
+- **Evidence resolution**: `resolution_code` $\Delta J = +0.011536 \rightarrow$ `MECHANISM_SIGNAL` (clean survivor; F1 $+0.0102$, PR-AUC $+0.0078$, DDI $-0.0056$).
+- **Interaction depth**: `depth_reread` $\Delta J = +0.004144 \rightarrow$ `MECHANISM_SIGNAL` (clean survivor; peak Dev Jaccard $0.551259$, F1 $+0.0038$, PR-AUC $+0.0054$, DDI $-0.0007$).
+- **Prediction granularity**: `prediction_local` $\Delta J = +0.012976 \rightarrow$ `SIGNAL_WITH_SUPPORTING_METRIC_COST` (strong Jaccard gain, but DDI penalty $+0.003843 > +0.0020$).
+
+Routing verdict: `MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION`. Per frozen contract, no compound model is automatically scheduled without prior scientific arbitration and primary-source closest-work audits.
+
+Artifact: `research/prototypes/evidence-access-portfolio/result.json`.
+Decision note: `research/memory/decisions/2026-09-18-evidence-access-portfolio-screen.md`.
 
 Direct Partial Regimen Assignment / structured-set prediction remains an untested candidate, not an admitted paper method.
 

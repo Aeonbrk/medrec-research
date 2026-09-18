@@ -3,7 +3,7 @@
 Updated: 2026-09-18.
 
 ```text
-Current phase: ARCHITECTURE SEARCH — POST-CCTM RESET
+Current phase: ARCHITECTURE SEARCH — POST-PORTFOLIO ARBITRATION
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Active formal Idea: none
 Idea 009: absent
@@ -20,19 +20,33 @@ Read first:
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
 - `research/memory/current-research-state.md`
-- `research/memory/decisions/2026-09-18-cctm-trajectory-support-falsification.md`
-- `research/diagnostics/cctm-trajectory-support/README.md`
+- `research/memory/decisions/2026-09-18-evidence-access-portfolio-screen.md`
+- `research/prototypes/evidence-access-portfolio/README.md`
 
 ## Current evidence
 
-Medication-specific late evidence selection (DrugQuery) remains the strongest repeated positive mechanism.
+The 8-lane evidence-access architecture portfolio identified two clean surviving mechanisms over matched controls at equal parameter count (1,295,367) under 60 complete epochs:
 
-Four recent bounded mechanism/premise investigations are decisively falsified and closed:
+1. **Code-level resolution (`resolution_code`)**: $\Delta J = +0.011536$ over within-visit pooling (`resolution_visit`), with improved F1 ($+0.0102$), PR-AUC ($+0.0078$), and lower DDI ($-0.005589$). Survives as `MECHANISM_SIGNAL`.
+2. **Iterative evidence re-access (`depth_reread`)**: $\Delta J = +0.004144$ over state-only refinement (`depth_state`), achieving peak Dev Jaccard $0.551259$ with lower DDI ($-0.000731$). Survives as `MECHANISM_SIGNAL`.
+3. **Local prediction (`prediction_local`)**: $\Delta J = +0.012976$ over hidden interaction aggregation, but failed DDI safety ($\Delta \text{DDI} = +0.003843 > +0.0020$). Classified as `SIGNAL_WITH_SUPPORTING_METRIC_COST`.
+4. **Pre-temporal candidate state (`temporal_med`)**: $\Delta J = +0.000447$ over shared history. Falsified and closed (`KILL_NO_MATERIAL_SIGNAL`).
 
-1. **DCPM (Precedent Memory)**: $\Delta J = -0.001403$. Closed (`KILL_DCPM_MECHANISM`).
-2. **RouteFact (Administration Routes)**: $\Delta J = -0.008252$. Closed (`KILL_ROUTEFACT_MECHANISM`).
-3. **ECRC (Cardinality Context)**: Mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value). Closed (`KILL_ECRC_CHOICE_MECHANISM`).
-4. **CCTM (Trajectory Memory Premise)**: Train-only supportability audit showed only 36.5% event support for non-med trajectories and 40.6% for all concepts (both failing $\ge 50\%$ gate); 59.3% of history-bearing events have zero recurrent trajectories (median 0.0). Premise falsified before architecture build (`KILL_CCTM_SUPPORTABILITY`).
+Previous falsified mechanisms: DCPM ($\Delta J = -0.001403$), RouteFact ($\Delta J = -0.008252$), ECRC ($\Delta J = +0.000341$), and CCTM data supportability (59.3% zero-recurrent visits).
+
+## Terminal Evidence-Access Portfolio Results
+
+Executed on the 319 Execution Plane across physical GPUs 0–7 in parallel at revision `aec07f311c5fc2f137d07bb172b67e12a89eeee3` (60 complete epochs per lane, 1,295,367 parameters in all 8 variants, canonical RNG, Test strictly sealed):
+
+| Pair | Control (Ckpt / OP) | Candidate (Ckpt / OP) | Control J | Candidate J | ΔJ | ΔF1 | ΔPRAUC | ΔDDI | ΔAvgMed | Verdict |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
+| **Temporal** | `temporal_shared` (Ep 3 / 0.30) | `temporal_med` (Ep 3 / 0.30) | 0.544485 | 0.544932 | +0.000447 | +0.000415 | -0.000049 | +0.000292 | -0.0053 | **`KILL_NO_MATERIAL_SIGNAL`** |
+| **Resolution** | `resolution_visit` (Ep 7 / 0.35) | `resolution_code` (Ep 5 / 0.30) | 0.535091 | 0.546626 | **+0.011536** | +0.010238 | +0.007785 | -0.005589 | +0.4715 | **`MECHANISM_SIGNAL`** |
+| **Depth** | `depth_state` (Ep 5 / 0.35) | `depth_reread` (Ep 4 / 0.35) | 0.547115 | 0.551259 | **+0.004144** | +0.003790 | +0.005406 | -0.000731 | +0.3433 | **`MECHANISM_SIGNAL`** |
+| **Prediction** | `prediction_aggregate` (Ep 5 / 0.35) | `prediction_local` (Ep 3 / 0.35) | 0.535935 | 0.548911 | **+0.012976** | +0.011286 | +0.009895 | +0.003843 | -0.3692 | **`SIGNAL_WITH_SUPPORTING_METRIC_COST`** |
+
+Portfolio routing: **`MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION`**.
+No automatic compound (A+B) model authorized. Next step is scientific arbitration and primary-source novelty audits between code-level resolution and iterative depth re-access.
 
 ## Terminal CCTM Supportability Audit Results
 
