@@ -9,8 +9,8 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: CREDIBLE REFERENCE SETUP + ARCHITECTURE PREPARATION
-Paper Experiment Contract: v1.0 + v1.1 amendment CURRENT
+Human-facing phase: ARCHITECTURE SEARCH — POST-ECRC RESET
+Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
 Available concurrent GPU capacity: 8 × RTX 3090-class
@@ -20,6 +20,7 @@ Historical `Stage -1*`, Gate, Reproduction Mode, and Comparison Mode names remai
 
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
 - `docs/specs/PAPER_EVALUATOR_SPEC.md`
 - `docs/guides/PAPER_METHOD_CARD_TEMPLATE.md`
 
@@ -34,6 +35,8 @@ The proposed method may receive substantially greater Train/Dev research effort 
 Fairness requires that a competitor is not weakened by our execution choices: trustworthy method identity, required assets, legal information budget, reasonable training horizon, declared Dev-only checkpoint/operating-point selection, and source-informed investigation of obvious failures. Baseline tuning is an anti-underoptimization safeguard, not a symmetric-search requirement.
 
 Central ablations and matched controls also need reasonable Dev selection when mechanically reusing the full model's recipe would materially disadvantage them.
+
+For new project-owned initial DEVELOPMENT screens, the canonical RNG convention is inherited from MoleRec: `torch=1203`, CUDA PyTorch `1203`, Python `random=1203`, and NumPy `2048`. Internal matched controls share that convention. External published baselines instead preserve their source-native seed policy when available. A survivor must still expand to a predeclared multi-seed stability experiment; the canonical seed is not stability evidence.
 
 ## Valid development evidence
 
@@ -93,8 +96,6 @@ Architecture work does not wait for baseline completion, but Paper Candidate Fre
 
 ## Architecture status
 
-## Architecture status
-
 ### Terminated screen: ECRC cardinality context (2026-09-18)
 
 The bounded DEVELOPMENT screen for **cardinality-conditioned named-medication choice** (ECRC) completed all 60 epochs across 6 lanes on physical GPUs 0–5 on 319.
@@ -106,7 +107,7 @@ Result:
 - Absolute candidate Jaccard: $0.531769$ (below the $0.537316$ anchor floor).
 - Verdict: `KILL_ECRC_CHOICE_MECHANISM`.
 
-Regimen cardinality does not act as an informative decision context for medication preference ($u_m(x, K) \approx u_m(x)$). The tested formulation is permanently closed.
+Under the tested rank-8 ECRC formulation and DrugQuery evidence path, conditioning named-medication utilities on regimen cardinality produced negligible oracle-K re-ranking value. That formulation is closed and receives no rescue. The result is strong negative evidence for this mechanism, not a universal proof that every future model containing a cardinality variable must fail.
 
 Artifact: `research/prototypes/ecrc-cardinality-context/ecrc-comparison.json`.
 Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
@@ -202,8 +203,4 @@ MIMIC-IV Test remains sealed throughout reference setup and architecture search.
 
 ## Next action
 
-Execute the frozen ECRC six-lane Train/Dev screen from a clean source-bound
-checkout after the committed CUDA/data preflight. Use the committed summarizer
-without changing its decision thresholds after observing results. Keep Test
-sealed. Detached baseline recovery may continue independently and must not
-delay this architecture decision.
+Return to architecture-family search after ECRC termination. Do not rescue ECRC by changing rank, size head, loss weighting, temperature, or decoder. The next project-owned initial architecture screen uses the canonical MoleRec development RNG convention from contract v1.2 and a strong matched control under the same convention. Search should change representation, information flow, prediction granularity, supervision, or decision process rather than another cardinality-conditioned correction. Detached baseline recovery may continue independently. Test remains sealed.
