@@ -251,6 +251,6 @@ All six lanes completed 60 epochs on Train/Dev. Test remained sealed (`test_acce
 ### Decision Summary
 
 - **Verdict**: `KILL_ECRC_CHOICE_MECHANISM`.
-- **Reason**: The mean oracle-K exact delta is $+0.000341$ Jaccard (+0.034%), failing the gate threshold ($+0.004$) and triggering the termination rule ($\le +0.002$). Deployable predicted-K delta is negative ($-0.000491$). Regimen cardinality does not act as an informative decision context for medication preference.
+- **Reason**: The mean oracle-K exact delta is $+0.000341$ Jaccard (+0.034%), failing the gate threshold ($+0.004$) and triggering the termination rule ($\le +0.002$). Deployable predicted-K delta is negative ($-0.000491$). Under the tested rank-8 ECRC formulation and current DrugQuery evidence path, cardinality-conditioned medication re-ranking has negligible value and does not justify a size-head rescue.
 - Artifact: `research/prototypes/ecrc-cardinality-context/ecrc-comparison.json`.
 - Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.
