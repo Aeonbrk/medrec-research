@@ -121,10 +121,15 @@ def run(device: torch.device) -> dict[str, object]:
         raise RuntimeError("ECRC variants are not parameter matched")
 
     # With zero cardinality embeddings, paired medication utilities must match exactly.
-    bce_ind = models["kind_bce"](batch, k=target_k)["medication_logits"]
-    bce_cond = models["kcond_bce"](batch, k=target_k)["medication_logits"]
+    models["kind_bce"].eval()
+    models["kcond_bce"].eval()
+    with torch.no_grad():
+        bce_ind = models["kind_bce"](batch, k=target_k)["medication_logits"]
+        bce_cond = models["kcond_bce"](batch, k=target_k)["medication_logits"]
     if not torch.equal(bce_ind, bce_cond):
         raise RuntimeError("paired zero-initialized medication logits are not identical")
+    models["kind_bce"].train()
+    models["kcond_bce"].train()
 
     # Force opposite K rows while preserving zero mean. KInd must remain K-invariant;
     # KCond must respond to cardinality identity.
@@ -144,6 +149,8 @@ def run(device: torch.device) -> dict[str, object]:
             raise RuntimeError("KInd medication ranking depends on K")
         if name.startswith("kcond_") and changed <= 1e-7:
             raise RuntimeError("KCond medication path is insensitive to K")
+        with torch.no_grad():
+            model.k_embedding.weight.zero_()
 
     losses: dict[str, float] = {}
     for variant, model in models.items():
@@ -166,6 +173,7 @@ def run(device: torch.device) -> dict[str, object]:
 
     # Inference does not accept a target tensor. Predicted K comes only from size logits.
     with torch.no_grad():
+        models["kcond_exact"].eval()
         primary = models["kcond_exact"](batch)
         if not torch.equal(primary["selected_k"], primary["predicted_k"]):
             raise RuntimeError("native inference is not using predicted cardinality")
