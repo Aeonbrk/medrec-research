@@ -236,7 +236,7 @@ def topk_indices(scores: torch.Tensor, k: torch.Tensor) -> list[list[int]]:
     values = scores.detach().cpu().tolist()
     counts = k.detach().cpu().tolist()
     output: list[list[int]] = []
-    for row, count in zip(values, counts, strict=True):
+    for row, count in zip(values, counts):  # noqa: B905
         ordered = sorted(range(MEDICATIONS), key=lambda index: (-float(row[index]), index))
         output.append(ordered[: int(count)])
     return output

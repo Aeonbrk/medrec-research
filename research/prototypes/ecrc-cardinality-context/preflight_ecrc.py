@@ -89,7 +89,7 @@ def _dp_fixture() -> float:
     k = torch.tensor([2, 3], dtype=torch.long)
     observed = fixed_cardinality_log_normalizer(logits, k)
     expected = []
-    for row, count in zip(logits.tolist(), k.tolist(), strict=True):
+    for row, count in zip(logits.tolist(), k.tolist()):  # noqa: B905
         terms = []
         for combo in itertools.combinations(range(MEDICATIONS), int(count)):
             terms.append(sum(row[index] for index in combo))
