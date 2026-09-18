@@ -15,7 +15,7 @@ if [[ "${#GPUS[@]}" -ne 6 ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-mkdir -p "${OUTPUT_ROOT}"
+mkdir -p "${OUTPUT_ROOT}" "${OUTPUT_ROOT}/_launcher"
 
 CUDA_VISIBLE_DEVICES="${GPUS[0]}" "${PYTHON_BIN}"   "${SCRIPT_DIR}/preflight_ecrc.py"   > "${OUTPUT_ROOT}/preflight.json"
 
