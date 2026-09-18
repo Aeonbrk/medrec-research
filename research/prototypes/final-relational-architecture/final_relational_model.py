@@ -74,8 +74,8 @@ class FinalRelationalModel(PortfolioModel):
         self.rel_query = nn.Linear(DIM, RELATION_DIM, bias=False)
         self.rel_query_norm = nn.LayerNorm(RELATION_DIM, eps=1e-5)
 
-        # [constant, same-visit, current-history, both-historical, log1p(lag gap)]
-        self.edge_query = nn.Linear(DIM, 5, bias=False)
+        # [DP, DH, PH, same-visit, current-history, both-historical, log1p(lag gap)]
+        self.edge_query = nn.Linear(DIM, 7, bias=False)
 
         feature_dim = 3 * DIM + 3 * RELATION_DIM
         self.final_relational_head = nn.Sequential(
@@ -230,16 +230,30 @@ class FinalRelationalModel(PortfolioModel):
     def _edge_features(
         left_lag: torch.Tensor,
         right_lag: torch.Tensor,
+        relation_type_index: int,
         temporal: bool,
     ) -> torch.Tensor:
         b, left_n = left_lag.shape
         right_n = right_lag.shape[1]
-        ones = torch.ones(
+        zeros = torch.zeros(
             b, left_n, right_n, dtype=left_lag.dtype, device=left_lag.device
         )
+        type_features = [zeros.clone(), zeros.clone(), zeros.clone()]
+        type_features[relation_type_index] = torch.ones_like(zeros)
+
         if not temporal:
-            zeros = torch.zeros_like(ones)
-            return torch.stack((ones, zeros, zeros, zeros, zeros), dim=-1)
+            return torch.stack(
+                (
+                    type_features[0],
+                    type_features[1],
+                    type_features[2],
+                    zeros,
+                    zeros,
+                    zeros,
+                    zeros,
+                ),
+                dim=-1,
+            )
 
         left = left_lag[:, :, None]
         right = right_lag[:, None, :]
@@ -252,7 +266,16 @@ class FinalRelationalModel(PortfolioModel):
         both_historical = ((left > 0) & (right > 0)).to(left_lag.dtype)
         lag_gap = torch.log1p((left - right).abs())
         return torch.stack(
-            (ones, same_visit, current_history, both_historical, lag_gap), dim=-1
+            (
+                type_features[0],
+                type_features[1],
+                type_features[2],
+                same_visit,
+                current_history,
+                both_historical,
+                lag_gap,
+            ),
+            dim=-1,
         )
 
     def _pair_components(
@@ -262,12 +285,14 @@ class FinalRelationalModel(PortfolioModel):
         fields: Dict[str, Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
         drugs: torch.Tensor,
         edge_mode: str,
+        relation_type_index: int,
     ) -> Tuple[
         torch.Tensor,
         torch.Tensor,
         torch.Tensor,
         torch.Tensor,
         torch.Tensor,
+        torch.Tensor | None,
     ]:
         left_memory, left_mask, left_lag = fields[left_name]
         right_memory, right_mask, right_lag = fields[right_name]
@@ -276,9 +301,12 @@ class FinalRelationalModel(PortfolioModel):
         pair_mask = left_mask[:, :, None] & right_mask[:, None, :]
 
         edge = None
-        if edge_mode in {"constant", "temporal"}:
+        if edge_mode in {"type_only", "temporal"}:
             edge = self._edge_features(
-                left_lag, right_lag, temporal=edge_mode == "temporal"
+                left_lag,
+                right_lag,
+                relation_type_index=relation_type_index,
+                temporal=edge_mode == "temporal",
             )
 
         return left_key, right_key, left_value, right_value, pair_mask, edge
@@ -298,7 +326,12 @@ class FinalRelationalModel(PortfolioModel):
             pair_mask,
             _edge,
         ) = self._pair_components(
-            left_name, right_name, fields, drugs, edge_mode="none"
+            left_name,
+            right_name,
+            fields,
+            drugs,
+            edge_mode="none",
+            relation_type_index=0,
         )
         q_all = self._relation_query(drugs)
         outputs = []
@@ -330,8 +363,15 @@ class FinalRelationalModel(PortfolioModel):
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         relation_types = (("d", "p"), ("d", "h"), ("p", "h"))
         components = [
-            self._pair_components(left, right, fields, drugs, edge_mode=edge_mode)
-            for left, right in relation_types
+            self._pair_components(
+                left,
+                right,
+                fields,
+                drugs,
+                edge_mode=edge_mode,
+                relation_type_index=type_index,
+            )
+            for type_index, (left, right) in enumerate(relation_types)
         ]
         q_all = self._relation_query(drugs)
         edge_q_all = self.edge_query(drugs)
@@ -418,7 +458,7 @@ class FinalRelationalModel(PortfolioModel):
         if self.variant == "joint_competition_pair":
             return self._joint_pair_relations(fields, drugs, edge_mode="none")
         if self.variant == "untyped_edge_pair":
-            return self._joint_pair_relations(fields, drugs, edge_mode="constant")
+            return self._joint_pair_relations(fields, drugs, edge_mode="type_only")
         return self._joint_pair_relations(fields, drugs, edge_mode="temporal")
 
     def forward(self, batch: Mapping[str, torch.Tensor]) -> torch.Tensor:
