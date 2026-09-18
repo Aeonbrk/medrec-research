@@ -3,7 +3,7 @@
 Updated: 2026-09-18.
 
 ```text
-Current phase: ARCHITECTURE SEARCH — POST-PORTFOLIO ARBITRATION
+Current phase: ARCHITECTURE SEARCH — POST-SURVIVOR RESET
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Active formal Idea: none
 Idea 009: absent
@@ -20,33 +20,31 @@ Read first:
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
 - `research/memory/current-research-state.md`
-- `research/memory/decisions/2026-09-18-evidence-access-portfolio-screen.md`
-- `research/prototypes/evidence-access-portfolio/README.md`
+- `research/memory/decisions/2026-09-18-iterative-evidence-survivor-screen.md`
+- `research/prototypes/iterative-evidence-survivor/README.md`
 
 ## Current evidence
 
-The 8-lane evidence-access architecture portfolio identified two clean surviving mechanisms over matched controls at equal parameter count (1,295,367) under 60 complete epochs:
+The 8-lane iterative-evidence survivor screen on `mimic-iii-canonical-131-paper-dev-v1` at revision `82fb054abefe3a4b6560c9a3a2fd8640a32bc944` evaluated final-architecture resolution attribution and 4-condition depth stability:
 
-1. **Code-level resolution (`resolution_code`)**: $\Delta J = +0.011536$ over within-visit pooling (`resolution_visit`), with improved F1 ($+0.0102$), PR-AUC ($+0.0078$), and lower DDI ($-0.005589$). Survives as `MECHANISM_SIGNAL`.
-2. **Iterative evidence re-access (`depth_reread`)**: $\Delta J = +0.004144$ over state-only refinement (`depth_state`), achieving peak Dev Jaccard $0.551259$ with lower DDI ($-0.000731$). Survives as `MECHANISM_SIGNAL`.
-3. **Local prediction (`prediction_local`)**: $\Delta J = +0.012976$ over hidden interaction aggregation, but failed DDI safety ($\Delta \text{DDI} = +0.003843 > +0.0020$). Classified as `SIGNAL_WITH_SUPPORTING_METRIC_COST`.
-4. **Pre-temporal candidate state (`temporal_med`)**: $\Delta J = +0.000447$ over shared history. Falsified and closed (`KILL_NO_MATERIAL_SIGNAL`).
+1. **Resolution Attribution (`reread_code` vs `reread_visit`)**: $\Delta J = +0.014651$, $\Delta \text{F1} = +0.013301$, $\Delta \text{PRAUC} = +0.011395$, $\Delta \text{DDI} = -0.002295$. Code-level evidence memory remains a primary structural driver. Verdict: `CODE_RESOLUTION_CARRIES_FINAL_ARCHITECTURE`.
+2. **Four-Condition Depth Stability (`depth_reread` vs `depth_state`)**: Evaluated across canonical + 3 prospective seed offsets (`stability_1`, `stability_2`, `stability_3`). Results: `canonical` $\Delta J = +0.004144$; `stability_1` $\Delta J = -0.000650$; `stability_2` $\Delta J = +0.001365$; `stability_3` $\Delta J = +0.003033$. Fails stability requirements: 3/4 positive conditions, 2/4 material ($> +0.0020$), mean $\Delta J = +0.001973 < +0.0040$, mean $\Delta \text{DDI} = +0.002130 > +0.0020$. Verdict: `UNSTABLE_DEPTH_REREAD`.
+3. **Enforced Routing**: **`RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE`**. Iterative re-reading is not promoted to Paper Candidate review. The project returns to architecture search. Future candidate architectures should build on fine code-level evidence selection while seeking more robust inductive structures than recurrent re-reading.
 
-Previous falsified mechanisms: DCPM ($\Delta J = -0.001403$), RouteFact ($\Delta J = -0.008252$), ECRC ($\Delta J = +0.000341$), and CCTM data supportability (59.3% zero-recurrent visits).
+## Terminal Iterative Evidence Survivor Screen Results
 
-## Terminal Evidence-Access Portfolio Results
+Executed on the 319 Execution Plane across physical GPUs 0–7 in parallel at revision `82fb054abefe3a4b6560c9a3a2fd8640a32bc944` (60 complete epochs per lane, 1,295,367 parameters in all 8 variants, Test strictly sealed with `test_loaded = false`):
 
-Executed on the 319 Execution Plane across physical GPUs 0–7 in parallel at revision `aec07f311c5fc2f137d07bb172b67e12a89eeee3` (60 complete epochs per lane, 1,295,367 parameters in all 8 variants, canonical RNG, Test strictly sealed):
+| Comparison | Control (Ckpt / OP) | Candidate (Ckpt / OP) | Control J | Candidate J | ΔJ | ΔF1 | ΔPRAUC | ΔDDI | Verdict |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
+| **Q1: Resolution** | `reread_visit` (Ep 8 / 0.35) | `reread_code` (Ep 4 / 0.35) | 0.536608 | 0.551259 | **+0.014651** | +0.013301 | +0.011395 | -0.002295 | **`CODE_RESOLUTION_CARRIES_FINAL_ARCHITECTURE`** |
+| **Q2: Cond 0 (Canonical)** | `depth_state` (Ep 5 / 0.35) | `depth_reread` (Ep 4 / 0.35) | 0.547115 | 0.551259 | **+0.004144** | +0.003790 | +0.005406 | -0.000731 | Portfolio prior |
+| **Q2: Cond 1 (Stability 1)** | `depth_state_s1` (Ep 4 / 0.35) | `depth_reread_s1` (Ep 5 / 0.35) | 0.551534 | 0.550884 | **-0.000650** | -0.000863 | +0.003052 | +0.004964 | Negative gain |
+| **Q2: Cond 2 (Stability 2)** | `depth_state_s2` (Ep 6 / 0.35) | `depth_reread_s2` (Ep 6 / 0.35) | 0.547138 | 0.548502 | **+0.001365** | +0.000824 | +0.002637 | +0.002049 | Subthreshold |
+| **Q2: Cond 3 (Stability 3)** | `depth_state_s3` (Ep 5 / 0.40) | `depth_reread_s3` (Ep 5 / 0.35) | 0.546843 | 0.549875 | **+0.003033** | +0.002590 | +0.003085 | +0.002240 | Modest gain |
+| **Q2: 4-Condition Mean** | — | — | — | — | **+0.001973** | **+0.001585** | **+0.003545** | **+0.002130** | **`UNSTABLE_DEPTH_REREAD`** |
 
-| Pair | Control (Ckpt / OP) | Candidate (Ckpt / OP) | Control J | Candidate J | ΔJ | ΔF1 | ΔPRAUC | ΔDDI | ΔAvgMed | Verdict |
-| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
-| **Temporal** | `temporal_shared` (Ep 3 / 0.30) | `temporal_med` (Ep 3 / 0.30) | 0.544485 | 0.544932 | +0.000447 | +0.000415 | -0.000049 | +0.000292 | -0.0053 | **`KILL_NO_MATERIAL_SIGNAL`** |
-| **Resolution** | `resolution_visit` (Ep 7 / 0.35) | `resolution_code` (Ep 5 / 0.30) | 0.535091 | 0.546626 | **+0.011536** | +0.010238 | +0.007785 | -0.005589 | +0.4715 | **`MECHANISM_SIGNAL`** |
-| **Depth** | `depth_state` (Ep 5 / 0.35) | `depth_reread` (Ep 4 / 0.35) | 0.547115 | 0.551259 | **+0.004144** | +0.003790 | +0.005406 | -0.000731 | +0.3433 | **`MECHANISM_SIGNAL`** |
-| **Prediction** | `prediction_aggregate` (Ep 5 / 0.35) | `prediction_local` (Ep 3 / 0.35) | 0.535935 | 0.548911 | **+0.012976** | +0.011286 | +0.009895 | +0.003843 | -0.3692 | **`SIGNAL_WITH_SUPPORTING_METRIC_COST`** |
-
-Portfolio routing: **`MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION`**.
-No automatic compound (A+B) model authorized. Next step is scientific arbitration and primary-source novelty audits between code-level resolution and iterative depth re-access.
+Enforced routing: **`RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE`**.
 
 ## Terminal CCTM Supportability Audit Results
 

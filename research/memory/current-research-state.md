@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: ARCHITECTURE SEARCH — POST-PORTFOLIO ARBITRATION
+Human-facing phase: ARCHITECTURE SEARCH — POST-SURVIVOR RESET
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -66,8 +66,18 @@ An eight-lane 60-epoch portfolio screen on `mimic-iii-canonical-131-paper-dev-v1
 
 Portfolio routing: `MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION`. Per the frozen contract, no compound model is automatically scheduled without prior scientific arbitration and primary-source closest-work audits.
 
+### Iterative evidence survivor screen (2026-09-18)
+
+An eight-lane 60-epoch survivor screen on `mimic-iii-canonical-131-paper-dev-v1` at revision `82fb054abefe3a4b6560c9a3a2fd8640a32bc944` (1,295,367 parameters per variant, zero Test access) evaluated:
+
+1. **Final-architecture resolution attribution (`reread_code` vs `reread_visit`)**: Code-level evidence resolution remains decisively supported inside the multi-hop re-reading computation graph: $\Delta J = +0.014651$ (0.551259 vs 0.536608), $\Delta \text{F1} = +0.013301$, $\Delta \text{PRAUC} = +0.011395$, $\Delta \text{DDI} = -0.002295$. Verdict: `CODE_RESOLUTION_CARRIES_FINAL_ARCHITECTURE`.
+2. **Depth stability across prospective seeds (`depth_reread` vs `depth_state`)**: Evaluated across 4 conditions (`canonical` inherited from portfolio, plus prospective offsets `stability_1`, `stability_2`, `stability_3`). Results: `canonical` $\Delta J = +0.004144$; `stability_1` $\Delta J = -0.000650$; `stability_2` $\Delta J = +0.001365$; `stability_3` $\Delta J = +0.003033$. Positive conditions: 3/4; material ($> +0.002$) conditions: 2/4; mean $\Delta J = +0.001973$ (below $+0.004$ threshold); mean $\Delta \text{DDI} = +0.002130$ (violating guardrail). Verdict: `UNSTABLE_DEPTH_REREAD`.
+
+Survivor screen routing: `RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE`. Iterative re-reading is not promoted to Paper Candidate review; the project returns to architecture search.
+
 ### Terminated mechanism screens
 
+- **Iterative Evidence Depth Re-Reading (`depth_reread`)**: Evaluated across a 4-condition stability screen on `mimic-iii-canonical-131-paper-dev-v1` at revision `82fb054abefe3a4b6560c9a3a2fd8640a32bc944` (60 complete epochs per lane, 1,295,367 parameters in all variants, zero Test access). While the canonical seed showed a $+0.004144$ gain, prospective seeds failed the strict stability criteria (mean $\Delta J = +0.001973$, 1 of 4 conditions negative at $\Delta J = -0.000650$, only 2 of 4 conditions $> +0.0020$, and mean $\Delta \text{DDI} = +0.002130$ violating safety guardrail). Terminated per frozen decision rule (`RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE`); no cherry-picked seeds or post-hoc rescue authorized. Decision note: `research/memory/decisions/2026-09-18-iterative-evidence-survivor-screen.md`.
 - **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
 - **Route-Factored Medication Recommendation (RouteFact)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260922`, 60 complete epochs, 914,497 parameters in both arms, source revision `8eee27ad88b63990cc8f1c5355b4a47bd84c7923`, zero Test access). Tested whether forcing medication prediction through a noisy-OR over Train-supported multi-hot administration routes improves prediction over direct medication prediction with identical auxiliary route supervision. Result: $\Delta J = -0.008252$ (RouteFact 0.534931 vs RouteAux control 0.543183), $\Delta \text{F1} = -0.006919$, $\Delta \text{PR-AUC} = -0.005145$, $\Delta \text{DDI} = -0.001539$, $\Delta \text{AvgMed} = +0.115149$. Falsified and terminated per the frozen decision boundary (`KILL_ROUTEFACT_MECHANISM`); no post-hoc tuning, taxonomy merging, loss sweeps, or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-routefact-mechanism-screen-falsification.md`.
 - **Exact-Cardinality Regimen Choice (ECRC)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seeds `20260923` and `20260924`, 60 complete epochs across 6 lanes, 437,571 parameters in all four variants, source revision `c668a8e4a194c92a8933068e8ff99991d014c185`, zero Test access). Tested whether regimen cardinality acts as an informative decision context that changes named-medication preference utilities ($u_m(x, K)$) under exact fixed-cardinality and BCE formulations. Result: mean exact oracle-K $\Delta J = +0.000341$ (+0.034%, failing the $+0.004$ gate), mean exact predicted-K $\Delta J = -0.000491$ (negative deployable value), mean candidate Jaccard $0.531769$ (below the $0.537316$ floor). Falsified and terminated per the frozen decision boundary (`KILL_ECRC_CHOICE_MECHANISM`); no size-head tuning, rank sweeps, or re-tests authorized. Decision note: `research/memory/decisions/2026-09-18-ecrc-cardinality-context-screen-verdict.md`.

@@ -1,6 +1,6 @@
 # Iterative Evidence Survivor Screen
 
-Status: **DESIGN FROZEN / IMPLEMENTED / NOT EXECUTED**
+Status: **COMPLETED / ROUTING ENFORCED: RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE**
 
 This directory is the bounded survivor-discrimination round following the completed evidence-access architecture portfolio.
 
@@ -250,3 +250,47 @@ The preflight must verify:
 - exact state and forward equivalence between `reread_code` and the preceding `depth_reread` implementation under the canonical condition.
 
 A scientific run is not launched if preflight fails.
+
+## Terminal execution results (2026-09-18)
+
+Executed on physical GPUs 0–7 on the 319 Execution Plane from clean worktree at revision `82fb054abefe3a4b6560c9a3a2fd8640a32bc944` on `mimic-iii-canonical-131-paper-dev-v1` (4,233 Train patients / 10,489 visits; 1,004 Dev patients / 2,130 visits; 1,295,367 trainable parameters in all 8 variants; all 60 epochs completed; Test strictly sealed with `test_loaded = false`).
+
+### Question 1: Final-Architecture Resolution Attribution
+
+| Variant | Role | Selected Ckpt / OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI Rate | Avg Med Count |
+| :--- | :--- | :---: | ---: | ---: | ---: | ---: | ---: |
+| `resolution_visit_canonical` | Control (`reread_visit`) | Ep 8 / 0.35 | 0.536608 | 0.689280 | 0.785254 | 0.074260 | 19.8410 |
+| `resolution_code_canonical` | Candidate (`reread_code`) | Ep 4 / 0.35 | 0.551259 | 0.702581 | 0.796649 | 0.071966 | 20.7648 |
+| **Delta ($\Delta$)** | **Gain** | — | **+0.014651** | **+0.013301** | **+0.011395** | **-0.002295** | **+0.9238** |
+
+Verdict: **`CODE_RESOLUTION_CARRIES_FINAL_ARCHITECTURE`** (ΔJ $> +0.004$ with all guardrails passing: $\Delta \text{F1} \ge -0.002$, $\Delta \text{PRAUC} \ge -0.002$, $\Delta \text{DDI} \le +0.002$).
+
+### Question 2: Four-Condition Depth Stability
+
+| Condition | Source | Control Ckpt / OP (Jaccard) | Candidate Ckpt / OP (Jaccard) | $\Delta$ Jaccard | $\Delta$ F1 | $\Delta$ PR-AUC | $\Delta$ DDI Rate | $\Delta$ Avg Meds |
+| :--- | :--- | :---: | :---: | ---: | ---: | ---: | ---: | ---: |
+| `canonical` | Prior Portfolio (`result.json`) | Ep 5 / 0.35 (0.547115) | Ep 4 / 0.35 (0.551259) | **+0.004144** | +0.003790 | +0.005406 | -0.000731 | +0.3433 |
+| `stability_1` | Survivor Screen (`results.json`) | Ep 4 / 0.35 (0.551534) | Ep 5 / 0.35 (0.550884) | **-0.000650** | -0.000863 | +0.003052 | +0.004964 | +0.1703 |
+| `stability_2` | Survivor Screen (`results.json`) | Ep 6 / 0.35 (0.547138) | Ep 6 / 0.35 (0.548502) | **+0.001365** | +0.000824 | +0.002637 | +0.002049 | +1.1524 |
+| `stability_3` | Survivor Screen (`results.json`) | Ep 5 / 0.40 (0.546843) | Ep 5 / 0.35 (0.549875) | **+0.003033** | +0.002590 | +0.003085 | +0.002240 | +1.1305 |
+| **Mean** | **4 Conditions** | — | — | **+0.001973** | **+0.001585** | **+0.003545** | **+0.002130** | **+0.6991** |
+
+Summary Statistics:
+
+- Positive Jaccard conditions: 3 / 4 (failed 4/4 requirement; `stability_1` is $-0.000650$);
+- Material Jaccard conditions ($> +0.002$): 2 / 4 (failed $\ge 3/4$ requirement; only `canonical` and `stability_3`);
+- Mean $\Delta$ Jaccard: $+0.001973$ (failed $> +0.0040$ requirement);
+- Median $\Delta$ Jaccard: $+0.002199$;
+- Std $\Delta$ Jaccard: $0.002089$;
+- Range: $[-0.000650, +0.004144]$;
+- Mean guardrails pass: `False` (mean $\Delta \text{DDI} = +0.002130 > +0.002000$).
+
+Stability Verdict: **`UNSTABLE_DEPTH_REREAD`**
+
+### Final Routing Verdict
+
+```text
+RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE
+```
+
+The iterative re-reading gain observed in the canonical seed did not generalize robustly across prospective random seed offsets. The mechanism fails the predeclared stability criteria and is not promoted to Paper Candidate review. The project returns to architecture search.
