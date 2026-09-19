@@ -16,7 +16,7 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - exercised only on minimal harnesses
     _scipy_linear_sum_assignment = None
 
-PORTFOLIO_DIR = Path(__file__).resolve().parents[1] / "evidence-access-portfolio"
+PORTFOLIO_DIR = Path(__file__).resolve().parent.parent / "evidence-access-portfolio"
 if str(PORTFOLIO_DIR) not in sys.path:
     sys.path.insert(0, str(PORTFOLIO_DIR))
 

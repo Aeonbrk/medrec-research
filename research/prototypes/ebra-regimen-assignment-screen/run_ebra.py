@@ -21,7 +21,7 @@ import numpy as np
 import torch
 
 HERE = Path(__file__).resolve().parent
-REPO_ROOT = HERE.parents[3]
+REPO_ROOT = HERE.parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(HERE))
 PORTFOLIO_DIR = HERE.parent / "evidence-access-portfolio"
