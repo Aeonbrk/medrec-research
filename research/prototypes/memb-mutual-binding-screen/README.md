@@ -1,6 +1,6 @@
 # Medication–Evidence Mutual Binding (MEMB) Family Screen
 
-Status: **DESIGN FROZEN / IMPLEMENTED / 319 EXECUTION PENDING**
+Status: **COMPLETE / FALSIFIED (KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY)**
 
 This is a bounded architecture-family screen after `KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`. It is not an MSED rescue, not a modality-normalization rescue, not iterative rereading, and not output-side medication-set repair.
 
@@ -126,31 +126,22 @@ The lanes share:
 
 No current-medication target enters the model input.
 
-## Frozen 8-GPU screen
+## Eight GPU lanes
 
-| GPU | Lane | Matched role |
-| ---: | --- | --- |
-| 0 | `mutual_code` | scale-2 mutual FineCode binding candidate |
-| 1 | `scale2_code` | exact scale/sharpening control for GPU 0 |
-| 2 | `specificity_code` | scale-1 commonness candidate |
-| 3 | `foundation_code_anchor` | exact scale-1 FineCode control + historical anchor |
-| 4 | `mutual_local` | scale-2 mutual PredictionLocal candidate |
-| 5 | `scale2_local` | exact scale/sharpening control for GPU 4 |
-| 6 | `specificity_local` | scale-1 local-commonness candidate |
-| 7 | `prediction_local_anchor` | exact scale-1 local control + historical anchor |
+| GPU | Lane | Matched role | Params | Epochs | Selected Ep | Op Point | Dev Jaccard | Dev F1 | Dev PRAUC | Dev DDI | Avg Med |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | `mutual_code` | scale-2 mutual FineCode candidate | 1,295,367 | 30 | 7 | 0.35 | 0.542110 | 0.694402 | 0.785345 | 0.076355 | 21.17 |
+| 1 | `scale2_code` | scale-2 sharpening control for GPU 0 | 1,295,367 | 30 | 5 | 0.30 | 0.540015 | 0.693071 | 0.785565 | 0.071793 | 21.47 |
+| 2 | `specificity_code` | scale-1 commonness candidate | 1,295,367 | 30 | 5 | 0.30 | 0.547125 | 0.698713 | 0.793489 | 0.071194 | 21.26 |
+| 3 | `foundation_code_anchor` | exact scale-1 control + historical anchor | 1,295,367 | 30 | 5 | 0.30 | 0.546626 | 0.698386 | 0.792678 | 0.071069 | 21.43 |
+| 4 | `mutual_local` | scale-2 mutual PredictionLocal candidate | 1,295,367 | 30 | 5 | 0.35 | 0.547092 | 0.698671 | 0.794902 | 0.067738 | 20.92 |
+| 5 | `scale2_local` | scale-2 sharpening control for GPU 4 | 1,295,367 | 30 | 5 | 0.35 | 0.548099 | 0.699482 | 0.795203 | 0.068090 | 21.20 |
+| 6 | `specificity_local` | scale-1 local-commonness candidate | 1,295,367 | 30 | 5 | 0.30 | 0.548141 | 0.699645 | 0.795108 | 0.070112 | 21.37 |
+| 7 | `prediction_local_anchor` | exact scale-1 control + historical anchor | 1,295,367 | 30 | 3 | 0.35 | 0.548911 | 0.700462 | 0.794832 | 0.075148 | 19.96 |
 
-The four pre-registered commonness comparisons are:
+Every lane has the exact historical PortfolioModel parameter graph (1,295,367 parameters). Both historical anchors reproduce with exactly 0.0 absolute difference across all five metrics.
 
-```text
-P1 code scale 1:  specificity_code - foundation_code_anchor
-P2 code scale 2:  mutual_code      - scale2_code
-P3 local scale 1: specificity_local - prediction_local_anchor
-P4 local scale 2: mutual_local      - scale2_local
-```
-
-`scale2_code - foundation_code_anchor` and `scale2_local - prediction_local_anchor` are sharpening diagnostics only. They cannot validate cross-medication specificity.
-
-## Frozen decision rules
+## Frozen decision rules and falsification boundaries
 
 For each commonness comparison:
 
@@ -171,15 +162,37 @@ Delta J > +0.004 with guard failure
 => SIGNAL_WITH_SUPPORTING_METRIC_COST
 ```
 
-Family routing is intentionally stricter than one lucky lane:
+## Screen outcome and analysis
 
-1. if both code scale-1 and scale-2 comparisons are clean and the best code candidate exceeds `wide_global_add` (`J=0.549980`), promote the **code commonness** mechanism to stability review;
-2. if both local scale-1 and scale-2 comparisons are clean and the best local candidate exceeds `wide_global_add`, promote the **local commonness** mechanism to stability review;
-3. if only one scale is clean, record `SCALE_SENSITIVE_COMPETITION_SIGNAL_REVIEW_BEFORE_ANY_STABILITY` rather than selecting the favorable scale post hoc;
-4. a local lane may additionally trigger a bounded Pareto review if `Delta DDI <= -0.010` while Jaccard/F1/PRAUC each lose no more than `0.005`; this is not automatic stability authorization;
-5. otherwise terminate the family as `KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY`.
+### Pre-registered commonness comparisons
 
-No multi-seed stability, MIMIC-IV replication, or Test access is automatically authorized by the screen.
+| Comparison | Candidate | Control | Δ Jaccard | Δ F1 | Δ PR-AUC | Δ DDI | Verdict |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | :--- |
+| `code_commonness_scale1` | `specificity_code` | `foundation_code_anchor` | +0.000499 | +0.000327 | +0.000811 | +0.000126 | `KILL_NO_MATERIAL_SIGNAL` |
+| `code_commonness_scale2` | `mutual_code` | `scale2_code` | +0.002095 | +0.001332 | -0.000220 | +0.004562 | `WEAK_STOP` |
+| `local_commonness_scale1` | `specificity_local` | `prediction_local_anchor` | -0.000770 | -0.000817 | +0.000276 | -0.005036 | `KILL_NO_MATERIAL_SIGNAL` |
+| `local_commonness_scale2` | `mutual_local` | `scale2_local` | -0.001007 | -0.000811 | -0.000301 | -0.000351 | `KILL_NO_MATERIAL_SIGNAL` |
+
+### Sharpening diagnostics
+
+| Comparison | Candidate | Control | Δ Jaccard | Δ F1 | Δ PR-AUC | Δ DDI |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| `code_sharpening` | `scale2_code` | `foundation_code_anchor` | -0.006611 | -0.005315 | -0.007113 | +0.000724 |
+| `local_sharpening` | `scale2_local` | `prediction_local_anchor` | -0.000811 | -0.000980 | +0.000371 | -0.007058 |
+
+### Scientific attribution
+
+1. **Commonness penalty yields no material gain at scale 1:** In both the global FineCode read (`specificity_code`, $\Delta J = +0.000499$) and the local prediction read (`specificity_local`, $\Delta J = -0.000770$), subtracting evidence commonness $c_i$ without score sharpening produces no material signal and fails the $+0.0020$ threshold.
+2. **Mutual matching gain at scale 2 is an artifact of recovering from severe sharpening damage:** While `mutual_code` beats `scale2_code` by $\Delta J = +0.002095$ (with a large $+0.004562$ DDI safety penalty), both lanes are severely degraded by the $2 \times$ score scale: `scale2_code` loses $-0.006611$ Jaccard relative to `foundation_code_anchor` ($0.540015$ vs $0.546626$). `mutual_code` ($0.542110$) merely partially mitigates this destruction, remaining $-0.004516$ below the original base model.
+3. **Local mutual matching provides no benefit:** In the local path, `mutual_local` underperforms `scale2_local` by $\Delta J = -0.001007$, and both trail the historical anchor `prediction_local_anchor` ($0.548911$).
+4. **Pareto safety threshold not met:** While `specificity_local` drops DDI by $-0.005036$ (from $0.0751$ to $0.0701$), it does not meet the pre-registered Pareto gate of $\Delta \text{DDI} \le -0.010$.
+5. **No horizon censoring:** All lanes selected best Dev checkpoints between Epochs 3 and 7 (`safe_selected_epoch_max = 25 >= 7`).
+
+### Terminal scientific routing
+
+`KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY`.
+
+No multi-seed stability, MIMIC-IV replication, or Test set evaluation is authorized. Per the protocol, no temperature tuning, Sinkhorn iterations, OT marginals, or rerankers will be evaluated to rescue this mechanism.
 
 ## Training protocol
 

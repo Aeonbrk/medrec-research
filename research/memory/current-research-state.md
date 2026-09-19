@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: MEMB_MUTUAL_BINDING_SCREEN_IMPLEMENTED_PENDING_319_EXECUTION
+Human-facing phase: MEMB_MUTUAL_BINDING_SCREEN_FALSIFIED_ARCHITECTURE_SEARCH_RESET
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -156,24 +156,34 @@ Key matched comparison outcomes:
 
 Screen routing: `KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`. No multi-seed stability or MIMIC-IV replication is authorized. Decision note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-verdict.md`.
 
-### MEMB medication-evidence mutual-binding family screen — execution pending (2026-09-19)
+### MEMB mutual-binding family screen (2026-09-19)
 
-Following MSED falsification, the architecture search reset around an orthogonal unresolved question. Stable FineCode evidence access shows that medication identity should bind to fine clinical evidence before compression, while `prediction_local` shows a large medication-token local-support signal with a DDI-rate cost. The project has not yet tested whether evidence should be weighted by its support for one medication *relative to competing medication identities* before evidence aggregation.
+An eight-lane 30-epoch architecture screen on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `f1f74e5eb143f49a2bac73d81a13c42f33f4a4a2` (1,295,367 parameters across all eight variants, 30 complete epochs, zero Test access) evaluated whether evidence should be penalized by its cross-medication commonness ($c_i = \text{logsumexp}_n S[n,i] - \log(M)$) before evidence aggregation across both global FineCode and PredictionLocal reads.
 
-The frozen Medication–Evidence Mutual Binding (MEMB) screen uses the exact historical `PortfolioModel` parameter graph and adds zero learnable parameters. For raw medication-evidence affinity `S[m,i]`, define evidence commonness `c_i = logsumexp_n S[n,i] - log(M)`. Four pre-registered matched comparisons test the commonness term at two score scales and in two already-supported prediction paths:
+All eight physical RTX 3090 GPU lanes completed all 30 planned epochs without early stopping. All lanes selected best Dev checkpoints between Epochs 3 and 7 (`safe_selected_epoch_max = 25 >= 7`, zero horizon censoring):
 
-- `specificity_code - foundation_code_anchor`: `softmax_i(S-c)` versus `softmax_i(S)`;
-- `mutual_code - scale2_code`: `softmax_i(2S-c)` versus `softmax_i(2S)`;
-- `specificity_local - prediction_local_anchor`: `logmeanexp_i(r-c)` versus historical `logmeanexp_i(r)`;
-- `mutual_local - scale2_local`: `logmeanexp_i(2r-c)` versus `logmeanexp_i(2r)`.
+1. `mutual_code` (scale-2 mutual FineCode candidate): Ep 7 / 0.35, Dev Jaccard = **0.542110**, F1 = 0.694402, PRAUC = 0.785345, DDI = 0.076355.
+2. `scale2_code` (scale-2 sharpening control): Ep 5 / 0.30, Dev Jaccard = **0.540015**, F1 = 0.693071, PRAUC = 0.785565, DDI = 0.071793.
+3. `specificity_code` (scale-1 commonness candidate): Ep 5 / 0.30, Dev Jaccard = **0.547125**, F1 = 0.698713, PRAUC = 0.793489, DDI = 0.071194.
+4. `foundation_code_anchor` (exact scale-1 control + historical anchor): Ep 5 / 0.30, Dev Jaccard = **0.546626**, F1 = 0.698386, PRAUC = 0.792678, DDI = 0.071069.
+5. `mutual_local` (scale-2 mutual PredictionLocal candidate): Ep 5 / 0.35, Dev Jaccard = **0.547092**, F1 = 0.698671, PRAUC = 0.794902, DDI = 0.067738.
+6. `scale2_local` (scale-2 local sharpening control): Ep 5 / 0.35, Dev Jaccard = **0.548099**, F1 = 0.699482, PRAUC = 0.795203, DDI = 0.068090.
+7. `specificity_local` (scale-1 local-commonness candidate): Ep 5 / 0.30, Dev Jaccard = **0.548141**, F1 = 0.699645, PRAUC = 0.795108, DDI = 0.070112.
+8. `prediction_local_anchor` (exact scale-1 control + historical anchor): Ep 3 / 0.35, Dev Jaccard = **0.548911**, F1 = 0.700462, PRAUC = 0.794832, DDI = 0.075148.
 
-The scale-2 controls are mandatory because bidirectional soft matching algebraically sharpens the raw scores. They prevent generic sharpening from being misattributed to cross-medication specificity.
+Key matched comparison outcomes:
 
-Frozen execution revision: `f1f74e5eb143f49a2bac73d81a13c42f33f4a4a2` on branch `prototype/memb-mutual-binding-screen`. Eight complete 30-epoch Train/Dev lanes are planned under canonical RNG; Test remains sealed. No stability, MIMIC-IV, or Test execution is automatically authorized.
+- **Code commonness scale 1 (`specificity_code - foundation_code_anchor`)**: Subtracting commonness without score sharpening yields $\Delta J = +0.000499$ (+0.050 pp), failing the $+0.0020$ threshold (`KILL_NO_MATERIAL_SIGNAL`).
+- **Code commonness scale 2 (`mutual_code - scale2_code`)**: While $\Delta J = +0.002095$, this is an artifact of partial recovery from the severe degradation caused by scale-2 sharpening (`scale2_code` loses $-0.006611$ relative to base foundation); both scale-2 lanes underperform `foundation_code_anchor` ($0.546626$), and `mutual_code` incurs a large $+0.004562$ DDI safety cost (`WEAK_STOP`).
+- **Local commonness scale 1 (`specificity_local - prediction_local_anchor`)**: $\Delta J = -0.000770$ (-0.077 pp, `KILL_NO_MATERIAL_SIGNAL`). DDI drops by $-0.005036$, failing the pre-registered Pareto gate of $\Delta \text{DDI} \le -0.010$.
+- **Local commonness scale 2 (`mutual_local - scale2_local`)**: $\Delta J = -0.001007$ (-0.101 pp, `KILL_NO_MATERIAL_SIGNAL`).
+- **Anchor integrity**: Both historical anchors reproduce with exactly 0.0 absolute difference across all five metrics.
 
-This is a mechanism-family screen, not a novelty claim. Competitive attention, dual-softmax matching, label-specific representation, and token/region-to-label assignment have prior work. If the mechanism survives strongly, the next architecture must be materially larger than an axis-flipped softmax and receive a dedicated closest-work audit.
+Screen routing: `KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY`. No multi-seed stability or MIMIC-IV replication is authorized. Decision note: `research/memory/decisions/2026-09-19-memb-mutual-binding-screen-verdict.md`.
 
 ### Terminated mechanism screens
+
+- **Medication–Evidence Mutual Binding (MEMB)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `f1f74e5eb143f49a2bac73d81a13c42f33f4a4a2` (1,295,367 parameters across all eight lanes, zero added parameters, 30 complete epochs, zero Test access). Tested whether penalizing evidence common to competing medication identities via commonness penalty $c_i = \text{logsumexp}_n S[n,i] - \log(M)$ before aggregation improves medication decisions across global FineCode and PredictionLocal reads at two score scales. Result: scale-1 commonness deltas $\Delta J = +0.000499$ (code) and $\Delta J = -0.000770$ (local) fail the $+0.0020$ material signal threshold (`KILL_NO_MATERIAL_SIGNAL`); scale-2 mutual code gain ($\Delta J = +0.002095$, DDI $+0.004562$) merely partially recovers from the $-0.006611$ damage caused by score sharpening, with both scale-2 variants trailing base foundation ($0.546626$); local mutual matching underperforms its control ($\Delta J = -0.001007$); Pareto DDI reduction ($-0.0050$) falls short of the $-0.010$ gate. Falsified and terminated per frozen decision boundary (`KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY`); no multi-seed or MIMIC-IV evaluation scheduled. Decision note: `research/memory/decisions/2026-09-19-memb-mutual-binding-screen-verdict.md`.
 
 - **Medication-Specific Evidence Distribution (MSED)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `e54d3d5a2a5145d14beadb109d574ad82efdae9e` (1,363,465 parameters across all six MSED variants, 30 complete epochs, zero Test access). Tested whether representing the empirical distribution shape of medication-specific FineCode support potentials via an empirical characteristic spectrum carries decision value beyond a single scalar `logmeanexp` point statistic. Result: primary comparison delta $\Delta J = +0.000626$ fails the $+0.0020$ threshold (`KILL_NO_MATERIAL_SIGNAL`); in isolation without global context, distribution spectrum underperforms scalar LME by $\Delta J = -0.003699$; candidate trails prior best control `wide_global_add` (0.549980 vs 0.546806, $\Delta J = -0.003174$). Falsified and terminated per frozen decision boundary (`KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`); no multi-seed or MIMIC-IV evaluation scheduled. Decision note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-verdict.md`.
 
