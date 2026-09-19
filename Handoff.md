@@ -29,11 +29,20 @@ Read first:
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_3.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_4.md`
 - `research/memory/current-research-state.md`
 - `research/memory/decisions/2026-09-19-memb-mutual-binding-screen-verdict.md`
 - `research/prototypes/memb-mutual-binding-screen/README.md`
 - `research/prototypes/memb-mutual-binding-screen/closest-work-audit.md`
 - `research/prototypes/memb-mutual-binding-screen/result.json`
+
+## Prospective screening horizon
+
+New project-owned early DEVELOPMENT architecture/mechanism screens now default to **15 complete epochs** under contract v1.4. This is not early stopping.
+
+A decisive matched pair is interpretable at 15 epochs only when every arm selects Epoch 10 or earlier. Selection in Epochs 11–15 triggers an exact unchanged extension of that pair to 30 epochs. If a 30-epoch extension selects Epochs 26–30, the existing v1.3 rule extends the exact pair to 60.
+
+This change is prospective. Historical MEMB/MSED/MHEF and other completed 30/60-epoch runs remain valid as executed.
 
 ## Screen outcome summary
 
