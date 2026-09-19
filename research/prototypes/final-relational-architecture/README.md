@@ -1,6 +1,6 @@
 # Final Relational Architecture Search
 
-Status: **DESIGN FROZEN / IMPLEMENTED / NOT EXECUTED**
+Status: **EXECUTION TERMINATED EARLY / DECISIVE COMPLETED EVIDENCE PRESERVED**
 
 This round is intentionally placed before relational multi-seed stability.
 
@@ -377,3 +377,38 @@ No Test, MIMIC-IV, HPO, relation-rank sweep, extra relation type, safety rescue 
 ## Execution note
 
 The originating cloud environment could not resolve raw.githubusercontent.com, so server-side py_compile/import checks remain execution-blocking. The 319 local agent must complete static syntax/import checks and the committed CUDA/data preflight before any training lane is launched.
+
+## Execution Outcome and Preserved Evidence (2026-09-19)
+
+Execution was carried out on the 319 Execution Plane across 8 physical RTX 3090 GPUs at frozen source revision `bdc3464e8e1771e6f5d291772e2be82882a4aa00`. Five upstream lanes ran to full 30-epoch completion. Following decisive failure of the upstream non-separable pair hypothesis, the remaining 3 downstream lanes were terminated cleanly to preserve compute.
+
+### Completed 30-Epoch Scientific Evidence
+
+| Lane | Status | Params | Selected Ckpt / OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI Rate | Dev Avg Meds | $\Delta J$ vs Foundation |
+| :--- | :--- | :---: | :---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `foundation_code` | **COMPLETE** | 1,295,367 | Ep 5 / 0.30 | 0.546626 | 0.698386 | 0.792678 | 0.071069 | 21.4289 | 0.000000 |
+| `summary_add` | **COMPLETE** | 1,511,304 | Ep 5 / 0.35 | 0.549611 | 0.700831 | 0.795774 | 0.070840 | 20.4097 | **+0.002984** |
+| `summary_mul` | **COMPLETE** | 1,511,304 | Ep 5 / 0.35 | 0.546079 | 0.697773 | 0.794356 | 0.069782 | 19.9987 | -0.000547 |
+| `factorized_pair` | **COMPLETE** | 1,511,304 | Ep 5 / 0.30 | 0.544349 | 0.696591 | 0.792744 | 0.072023 | 21.4859 | -0.002277 |
+| `nonseparable_pair` | **COMPLETE** | 1,511,304 | Ep 5 / 0.35 | 0.543162 | 0.694911 | 0.792572 | 0.070803 | 19.9211 | -0.003464 |
+
+### Truncated Execution State
+
+| Lane | Status | Last Completed Epoch | Observed Ckpt at Termination | Elapsed Wall-Clock | Peak VRAM | Termination Reason |
+| :--- | :--- | :---: | :---: | :---: | :---: | :--- |
+| `joint_competition_pair` | **TRUNCATED_NON_INTERPRETABLE** | 25/30 | Ep 5 (OP=0.30) | 31,511s (525m) | 14,276 MB | Low expected value after upstream pair failure |
+| `untyped_edge_pair` | **TRUNCATED_NON_INTERPRETABLE** | 24/30 | Ep 5 (OP=0.30) | 32,012s (533m) | 14,276 MB | Low expected value after upstream pair failure |
+| `temporal_edge_pair` | **TRUNCATED_NON_INTERPRETABLE** | 15/30 | Ep 5 (OP=0.30) | 31,948s (532m) | 14,276 MB | Low expected value after upstream pair failure |
+
+Partial metrics from truncated lanes are descriptive execution state only. They are not valid scientific evidence and must not be used for mechanism survive/kill decisions.
+
+### Matched Pair Verdicts
+
+- **Pair A (`summary_operator`: `summary_add` vs `summary_mul`)**: $\Delta J = -0.003531$. Multiplicative conjunction fails against additive composition (`KILL_NO_MATERIAL_SIGNAL`).
+- **Pair B (`pair_granularity`: `factorized_pair` vs `nonseparable_pair`)**: $\Delta J = -0.001187$. Non-separable pair attention does not improve over factorized attention, and both fall below the foundation anchor (`KILL_NO_MATERIAL_SIGNAL`).
+
+### Primary Architectural Takeaway
+
+`summary_add` achieved the highest absolute Dev Jaccard (0.549611). Its additive structure indicates that modality-separated medication-specific evidence channels provide a promising architecture direction. It is classified as `BEST_COMPLETED_ARCHITECTURE_CLUE` (not `FINAL_MODEL`) pending capacity-matched isolation.
+
+Research routing: `TERMINATE_RELATIONAL_PAIR_REFINEMENT_REFORMULATE_AROUND_MODALITY_SEPARATED_FINE_CODE_EVIDENCE`.

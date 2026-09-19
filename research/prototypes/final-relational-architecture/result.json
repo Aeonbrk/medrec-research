@@ -1,0 +1,281 @@
+{
+  "best_completed_architecture": {
+    "delta_vs_foundation": {
+      "average_medication_count": -1.019215628329185,
+      "ddi_rate": -0.0002283313134401055,
+      "f1": 0.0024451532605269666,
+      "jaccard": 0.0029840341740619003,
+      "prauc": 0.0030959697340506853
+    },
+    "dev_average_medication_count": 20.409664090889184,
+    "dev_ddi_rate": 0.07084024838808278,
+    "dev_f1": 0.700831324317945,
+    "dev_jaccard": 0.5496105133650548,
+    "dev_prauc": 0.7957741928685147,
+    "interpretation": "Modality-separated medication-specific evidence channels may be more useful than multiplicative or dense pair-relation modeling. Currently a clue, not yet an attributed final model.",
+    "lane": "summary_add",
+    "parameter_count": 1511304,
+    "role": "BEST_COMPLETED_ARCHITECTURE_CLUE"
+  },
+  "complete_lanes": [
+    {
+      "completed_epochs": 30,
+      "cuda_peak_memory_mb": 1149.896484375,
+      "delta_vs_foundation": {
+        "average_medication_count": 0.0,
+        "ddi_rate": 0.0,
+        "f1": 0.0,
+        "jaccard": 0.0,
+        "prauc": 0.0
+      },
+      "dev_metrics": {
+        "average_medication_count": 21.42887971921837,
+        "ddi_rate": 0.07106857970152289,
+        "f1": 0.6983861710574181,
+        "jaccard": 0.5466264791909929,
+        "prauc": 0.792678223134464
+      },
+      "horizon_censored": false,
+      "lane": "foundation_code",
+      "parameter_count": 1295367,
+      "selected_checkpoint": 5,
+      "selected_operating_point": 0.3,
+      "status": "COMPLETE",
+      "wall_time_seconds": 1976.1076383590698
+    },
+    {
+      "completed_epochs": 30,
+      "cuda_peak_memory_mb": 1701.115234375,
+      "delta_vs_foundation": {
+        "average_medication_count": -1.019215628329185,
+        "ddi_rate": -0.0002283313134401055,
+        "f1": 0.0024451532605269666,
+        "jaccard": 0.0029840341740619003,
+        "prauc": 0.0030959697340506853
+      },
+      "dev_metrics": {
+        "average_medication_count": 20.409664090889184,
+        "ddi_rate": 0.07084024838808278,
+        "f1": 0.700831324317945,
+        "jaccard": 0.5496105133650548,
+        "prauc": 0.7957741928685147
+      },
+      "horizon_censored": false,
+      "lane": "summary_add",
+      "parameter_count": 1511304,
+      "selected_checkpoint": 5,
+      "selected_operating_point": 0.35,
+      "status": "COMPLETE",
+      "wall_time_seconds": 9479.161384344101
+    },
+    {
+      "completed_epochs": 30,
+      "cuda_peak_memory_mb": 1701.33203125,
+      "delta_vs_foundation": {
+        "average_medication_count": -1.4302101119332242,
+        "ddi_rate": -0.0012865030204833872,
+        "f1": -0.000613277832828163,
+        "jaccard": -0.0005473577017124365,
+        "prauc": 0.0016775653840956917
+      },
+      "dev_metrics": {
+        "average_medication_count": 19.998669607285144,
+        "ddi_rate": 0.0697820766810395,
+        "f1": 0.6977728932245899,
+        "jaccard": 0.5460791214892805,
+        "prauc": 0.7943557885185597
+      },
+      "horizon_censored": false,
+      "lane": "summary_mul",
+      "parameter_count": 1511304,
+      "selected_checkpoint": 5,
+      "selected_operating_point": 0.35,
+      "status": "COMPLETE",
+      "wall_time_seconds": 8295.077354192734
+    },
+    {
+      "completed_epochs": 30,
+      "cuda_peak_memory_mb": 2429.61376953125,
+      "delta_vs_foundation": {
+        "average_medication_count": 0.057000933992963354,
+        "ddi_rate": 0.0009545357510691715,
+        "f1": -0.0017955135095724106,
+        "jaccard": -0.002276980425570674,
+        "prauc": 6.587976057692568e-05
+      },
+      "dev_metrics": {
+        "average_medication_count": 21.485880653211332,
+        "ddi_rate": 0.07202311545259206,
+        "f1": 0.6965906575478457,
+        "jaccard": 0.5443494987654223,
+        "prauc": 0.7927441028950409
+      },
+      "horizon_censored": false,
+      "lane": "factorized_pair",
+      "parameter_count": 1511304,
+      "selected_checkpoint": 5,
+      "selected_operating_point": 0.3,
+      "status": "COMPLETE",
+      "wall_time_seconds": 14968.463332176208
+    },
+    {
+      "completed_epochs": 30,
+      "cuda_peak_memory_mb": 6372.33837890625,
+      "delta_vs_foundation": {
+        "average_medication_count": -1.5078101513360522,
+        "ddi_rate": -0.0002654943539547039,
+        "f1": -0.0034747009328678358,
+        "jaccard": -0.003464231221616876,
+        "prauc": -0.00010668885927811456
+      },
+      "dev_metrics": {
+        "average_medication_count": 19.921069567882316,
+        "ddi_rate": 0.07080308534756818,
+        "f1": 0.6949114701245502,
+        "jaccard": 0.5431622479693761,
+        "prauc": 0.7925715342751859
+      },
+      "horizon_censored": false,
+      "lane": "nonseparable_pair",
+      "parameter_count": 1511304,
+      "selected_checkpoint": 5,
+      "selected_operating_point": 0.35,
+      "status": "COMPLETE",
+      "wall_time_seconds": 30342.367656946182
+    }
+  ],
+  "evidence_role": "DEVELOPMENT",
+  "formal_pair_results": {
+    "pair_granularity": {
+      "candidate": "nonseparable_pair",
+      "candidate_dev": {
+        "average_medication_count": 19.921069567882316,
+        "ddi_rate": 0.07080308534756818,
+        "f1": 0.6949114701245502,
+        "jaccard": 0.5431622479693761,
+        "prauc": 0.7925715342751859
+      },
+      "candidate_selected_checkpoint": 5,
+      "control": "factorized_pair",
+      "control_dev": {
+        "average_medication_count": 21.485880653211332,
+        "ddi_rate": 0.07202311545259206,
+        "f1": 0.6965906575478457,
+        "jaccard": 0.5443494987654223,
+        "prauc": 0.7927441028950409
+      },
+      "control_selected_checkpoint": 5,
+      "delta": {
+        "average_medication_count": -1.5648110853290156,
+        "ddi_rate": -0.0012200301050238754,
+        "f1": -0.0016791874232954251,
+        "jaccard": -0.001187250796046202,
+        "prauc": -0.00017256861985504024
+      },
+      "finding": "nonseparable_pair does not outperform factorized_pair (-0.001187 Jaccard); both pair-level architectures underperform foundation_code.",
+      "guardrails_pass": true,
+      "horizon_censored": false,
+      "parameter_count": 1511304,
+      "verdict": "KILL_NO_MATERIAL_SIGNAL"
+    },
+    "summary_operator": {
+      "candidate": "summary_mul",
+      "candidate_dev": {
+        "average_medication_count": 19.998669607285144,
+        "ddi_rate": 0.0697820766810395,
+        "f1": 0.6977728932245899,
+        "jaccard": 0.5460791214892805,
+        "prauc": 0.7943557885185597
+      },
+      "candidate_selected_checkpoint": 5,
+      "control": "summary_add",
+      "control_dev": {
+        "average_medication_count": 20.409664090889184,
+        "ddi_rate": 0.07084024838808278,
+        "f1": 0.700831324317945,
+        "jaccard": 0.5496105133650548,
+        "prauc": 0.7957741928685147
+      },
+      "control_selected_checkpoint": 5,
+      "delta": {
+        "average_medication_count": -0.4109944836040391,
+        "ddi_rate": -0.0010581717070432817,
+        "f1": -0.0030584310933551295,
+        "jaccard": -0.0035313918757743368,
+        "prauc": -0.0014184043499549936
+      },
+      "finding": "summary_mul does not outperform summary_add; additive combination provides superior representation (+0.003532 Jaccard).",
+      "guardrails_pass": false,
+      "horizon_censored": false,
+      "parameter_count": 1511304,
+      "verdict": "KILL_NO_MATERIAL_SIGNAL"
+    }
+  },
+  "foundation_reproduction": {
+    "dev_metrics": {
+      "average_medication_count": 21.42887971921837,
+      "ddi_rate": 0.07106857970152289,
+      "f1": 0.6983861710574181,
+      "jaccard": 0.5466264791909929,
+      "prauc": 0.792678223134464
+    },
+    "pass": true,
+    "prior_comparison": {
+      "jaccard_abs_diff": 0.0,
+      "max_abs_diff": 0.0,
+      "pass": true
+    },
+    "selected_checkpoint": 5,
+    "selected_operating_point": 0.3
+  },
+  "profile_id": "mimic-iii-canonical-131-paper-dev-v1",
+  "research_routing": "TERMINATE_RELATIONAL_PAIR_REFINEMENT_REFORMULATE_AROUND_MODALITY_SEPARATED_FINE_CODE_EVIDENCE",
+  "schema_version": 1,
+  "source_revision": "bdc3464e8e1771e6f5d291772e2be82882a4aa00",
+  "status": "TERMINATED_EARLY_AFTER_DECISIVE_COMPLETED_PAIRS",
+  "termination_reason": "LOW_EXPECTED_VALUE_AFTER_COMPLETED_UPSTREAM_PAIR_FAILURE",
+  "test_loaded": false,
+  "training_horizon": {
+    "planned_epochs": 30,
+    "safe_selected_epoch_max": 25
+  },
+  "truncated_lanes": [
+    {
+      "completed_epochs": 25,
+      "cuda_peak_memory_mb": 14276.01953125,
+      "lane": "joint_competition_pair",
+      "observed_checkpoint_at_termination": 5,
+      "observed_operating_point_at_termination": 0.3,
+      "statement": "Partial metrics are descriptive execution state only. They are not valid scientific evidence and must not be used for mechanism survive/kill decisions.",
+      "status": "TRUNCATED_NON_INTERPRETABLE",
+      "termination_reason": "LOW_EXPECTED_VALUE_AFTER_COMPLETED_UPSTREAM_PAIR_FAILURE",
+      "wall_time_seconds_at_termination": 31511.427646160126
+    },
+    {
+      "completed_epochs": 24,
+      "cuda_peak_memory_mb": 14276.0302734375,
+      "lane": "untyped_edge_pair",
+      "observed_checkpoint_at_termination": 5,
+      "observed_operating_point_at_termination": 0.3,
+      "statement": "Partial metrics are descriptive execution state only. They are not valid scientific evidence and must not be used for mechanism survive/kill decisions.",
+      "status": "TRUNCATED_NON_INTERPRETABLE",
+      "termination_reason": "LOW_EXPECTED_VALUE_AFTER_COMPLETED_UPSTREAM_PAIR_FAILURE",
+      "wall_time_seconds_at_termination": 32012.15645289421
+    },
+    {
+      "completed_epochs": 15,
+      "cuda_peak_memory_mb": 14276.2978515625,
+      "lane": "temporal_edge_pair",
+      "observed_checkpoint_at_termination": 5,
+      "observed_operating_point_at_termination": 0.3,
+      "statement": "Partial metrics are descriptive execution state only. They are not valid scientific evidence and must not be used for mechanism survive/kill decisions.",
+      "status": "TRUNCATED_NON_INTERPRETABLE",
+      "termination_reason": "LOW_EXPECTED_VALUE_AFTER_COMPLETED_UPSTREAM_PAIR_FAILURE",
+      "wall_time_seconds_at_termination": 31948.549156188965
+    }
+  ],
+  "uninterpretable_pairs": {
+    "relation_competition": "TRUNCATED_NON_INTERPRETABLE - downstream of failed nonseparable_pair",
+    "temporal_edge": "TRUNCATED_NON_INTERPRETABLE - downstream of failed pair formulation"
+  }
+}

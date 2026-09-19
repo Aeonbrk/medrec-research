@@ -1,10 +1,10 @@
 # Handoff
 
-Updated: 2026-09-18.
+Updated: 2026-09-19.
 
 ```text
-Current phase: ARCHITECTURE SEARCH — RELATIONAL EVIDENCE STABILITY PREPARATION
-Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
+Current phase: POST_RELATIONAL_PAIR_FAILURE_MULTI_VIEW_REFORMULATION
+Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Active formal Idea: none
 Idea 009: absent
 Active formal Gate: none
@@ -19,17 +19,44 @@ Read first:
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_3.md`
 - `research/memory/current-research-state.md`
-- `research/memory/decisions/2026-09-18-relational-evidence-screen.md`
-- `research/prototypes/relational-evidence-screen/README.md`
+- `research/memory/decisions/2026-09-19-final-relational-architecture-early-termination.md`
+- `research/prototypes/final-relational-architecture/README.md`
+- `research/prototypes/final-relational-architecture/result.json`
 
 ## Current evidence
 
-The 8-lane relational-evidence architecture screen on `mimic-iii-canonical-131-paper-dev-v1` at revision `18ae6c89dcb6ca52137e18ebeabe36bd5a303002` evaluated fine-code stability and candidate-conditioned relational evidence:
+The 8-lane final relational architecture search on `mimic-iii-canonical-131-paper-dev-v1` at revision `bdc3464e8e1771e6f5d291772e2be82882a4aa00` tested whether non-separable pair relations formed before pooling improve medication recommendation. Five upstream lanes ran to full 30-epoch completion; following decisive upstream failure, three downstream lanes were terminated early to conserve compute:
 
-1. **Fine-Code Stability (4 Conditions)**: Medication-specific fine-code selection is strictly stable across 4 independent random seed conditions (`canonical`, `stability_1`, `stability_2`, `stability_3`). All 4/4 conditions exceed $+0.0100$ Jaccard gain (mean $\Delta J = +0.011734$, mean $\Delta \text{F1} = +0.010118$, mean $\Delta \text{PRAUC} = +0.007976$) with favorable safety (mean $\Delta \text{DDI} = -0.001640$). Verdict: `STABLE_FINE_CODE_ACCESS`. Fine-code clinical memory access is confirmed as a durable foundation.
-2. **Relational Evidence Hypothesis (`relational_code` vs `unary_code`)**: Multiplicative cross-type evidence conjunction ($u_D \odot u_P$, $u_D \odot u_H$, $u_P \odot u_H$) outperforms matched additive/unary composition at equal parameters (1,427,080): $\Delta J = +0.004105$, $\Delta \text{F1} = +0.003371$, $\Delta \text{PRAUC} = +0.001131$, and substantial DDI safety gain ($\Delta \text{DDI} = -0.005341$, dropping DDI rate from 7.52% to 6.98%). Verdict: `RELATIONAL_EVIDENCE_SIGNAL`.
-3. **Enforced Routing**: **`PROMOTE_RELATIONAL_EVIDENCE_TO_STABILITY_SCREEN`**. Relational cross-type evidence conjunction qualifies for multi-seed stability testing.
+1. **Foundation Anchor Reproduction**: `foundation_code` at Ep 5 / 0.30 achieves Dev Jaccard = **0.546626**, replicating prior `resolution_code` down to $10^{-9}$ (PASS).
+2. **Pair A (`summary_operator`)**: Multiplicative conjunction fails against additive composition (`summary_add` 0.549611 vs `summary_mul` 0.546079, $\Delta J = -0.003532$, verdict `KILL_NO_MATERIAL_SIGNAL`).
+3. **Pair B (`pair_granularity`)**: Non-separable code-pair attention fails to improve over factorized attention (`nonseparable_pair` 0.543162 vs `factorized_pair` 0.544349, $\Delta J = -0.001187$, verdict `KILL_NO_MATERIAL_SIGNAL`). Both pair-level formulations fall below the single-code baseline `foundation_code` (0.546626).
+4. **Truncated Downstream Lanes**: `joint_competition_pair` (stopped Ep 25), `untyped_edge_pair` (stopped Ep 24), `temporal_edge_pair` (stopped Ep 15) marked `TRUNCATED_NON_INTERPRETABLE`.
+5. **Key Architecture Clue**: `summary_add` achieved the highest completed Dev Jaccard (0.549611, $+0.002984$ vs foundation). Because its additive slots are a linear rotation of $(u_D, u_P, u_H)$, it indicates that modality-separated medication-specific evidence channels provide a promising direction. Classified as `BEST_COMPLETED_ARCHITECTURE_CLUE` pending capacity-matched isolation.
+6. **Enforced Routing**: `TERMINATE_RELATIONAL_PAIR_REFINEMENT_REFORMULATE_AROUND_MODALITY_SEPARATED_FINE_CODE_EVIDENCE`.
+
+## Terminal Final Relational Architecture Search Results (2026-09-19)
+
+Executed on the 319 Execution Plane across physical GPUs 0–7 at revision `bdc3464e8e1771e6f5d291772e2be82882a4aa00` (Test strictly sealed with `test_loaded = false`):
+
+| Lane | Status | Params | Selected Ckpt / OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI Rate | Dev Avg Meds | $\Delta J$ vs Foundation |
+| :--- | :--- | :---: | :---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `foundation_code` | **COMPLETE** | 1,295,367 | Ep 5 / 0.30 | 0.546626 | 0.698386 | 0.792678 | 0.071069 | 21.4289 | 0.000000 |
+| `summary_add` | **COMPLETE** | 1,511,304 | Ep 5 / 0.35 | 0.549611 | 0.700831 | 0.795774 | 0.070840 | 20.4097 | **+0.002984** |
+| `summary_mul` | **COMPLETE** | 1,511,304 | Ep 5 / 0.35 | 0.546079 | 0.697773 | 0.794356 | 0.069782 | 19.9987 | -0.000547 |
+| `factorized_pair` | **COMPLETE** | 1,511,304 | Ep 5 / 0.30 | 0.544349 | 0.696591 | 0.792744 | 0.072023 | 21.4859 | -0.002277 |
+| `nonseparable_pair` | **COMPLETE** | 1,511,304 | Ep 5 / 0.35 | 0.543162 | 0.694911 | 0.792572 | 0.070803 | 19.9211 | -0.003464 |
+| `joint_competition_pair` | **TRUNCATED** | 1,511,304 | Ep 5 / 0.30* | N/A* | N/A* | N/A* | N/A* | N/A* | TRUNCATED (Ep 25) |
+| `untyped_edge_pair` | **TRUNCATED** | 1,511,304 | Ep 5 / 0.30* | N/A* | N/A* | N/A* | N/A* | N/A* | TRUNCATED (Ep 24) |
+| `temporal_edge_pair` | **TRUNCATED** | 1,511,304 | Ep 5 / 0.30* | N/A* | N/A* | N/A* | N/A* | N/A* | TRUNCATED (Ep 15) |
+
+\* Partial metrics from truncated lanes are descriptive execution state only and are not valid scientific evidence.
+
+### Matched Comparisons
+
+- **Pair A (`summary_operator`: control `summary_add`, candidate `summary_mul`)**: $\Delta J = -0.003531$. Verdict: `KILL_NO_MATERIAL_SIGNAL`.
+- **Pair B (`pair_granularity`: control `factorized_pair`, candidate `nonseparable_pair`)**: $\Delta J = -0.001187$. Verdict: `KILL_NO_MATERIAL_SIGNAL`.
 
 ## Terminal Relational Evidence Screen Results
 

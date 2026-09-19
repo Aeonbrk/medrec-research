@@ -1,4 +1,4 @@
-# Current research state — 2026-09-18
+# Current research state — 2026-09-19
 
 This file is the live scientific synthesis and routing authority. It does not replace run-local evidence.
 
@@ -9,8 +9,8 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: ARCHITECTURE SEARCH — RELATIONAL EVIDENCE STABILITY PREPARATION
-Paper Experiment Contract: v1.0 + v1.1 + v1.2 amendments CURRENT
+Human-facing phase: POST_RELATIONAL_PAIR_FAILURE_MULTI_VIEW_REFORMULATION
+Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
 Available concurrent GPU capacity: 8 × RTX 3090-class
@@ -84,7 +84,32 @@ An eight-lane 60-epoch architecture screen on `mimic-iii-canonical-131-paper-dev
 
 Screen routing: `PROMOTE_RELATIONAL_EVIDENCE_TO_STABILITY_SCREEN`. Relational cross-type evidence conjunction qualifies for multi-seed stability evaluation.
 
+### Final relational architecture search & early termination (2026-09-19)
+
+An eight-lane 30-epoch architecture search on `mimic-iii-canonical-131-paper-dev-v1` at revision `bdc3464e8e1771e6f5d291772e2be82882a4aa00` (zero Test access) evaluated whether forming non-separable cross-type code pairs ($O(N_D \times N_P)$) before pooling overcomes the factorized formulation of relational-v1.
+
+Five upstream lanes completed all 30 planned epochs:
+
+1. `foundation_code`: Ep 5 / 0.30, Dev Jaccard = **0.546626** (exact numerical reproduction of prior `resolution_code`, difference $< 10^{-9}$).
+2. `summary_add`: Ep 5 / 0.35, Dev Jaccard = **0.549611**, F1 = 0.7008, PRAUC = 0.7958, DDI = 0.0708.
+3. `summary_mul`: Ep 5 / 0.35, Dev Jaccard = **0.546079**, F1 = 0.6978, PRAUC = 0.7944, DDI = 0.0698.
+4. `factorized_pair`: Ep 5 / 0.30, Dev Jaccard = **0.544349**, F1 = 0.6966, PRAUC = 0.7927, DDI = 0.0720.
+5. `nonseparable_pair`: Ep 5 / 0.35, Dev Jaccard = **0.543162**, F1 = 0.6949, PRAUC = 0.7926, DDI = 0.0708.
+
+Completed matched comparisons:
+
+- **Pair A (`summary_operator`)**: Multiplicative conjunction underperforms additive composition ($\Delta J = -0.003532$, verdict `KILL_NO_MATERIAL_SIGNAL`).
+- **Pair B (`pair_granularity`)**: Non-separable pair attention does not improve over factorized attention ($\Delta J = -0.001187$, verdict `KILL_NO_MATERIAL_SIGNAL`). Both pair-level formulations underperform the single-code baseline `foundation_code` (0.546626).
+
+Three downstream lanes (`joint_competition_pair`, `untyped_edge_pair`, `temporal_edge_pair`) built on the failed non-separable pair formulation were terminated early for efficiency and marked `TRUNCATED_NON_INTERPRETABLE` (partial metrics are descriptive execution state only, not valid scientific evidence).
+
+Key architectural takeaway: `summary_add` achieved the highest Dev Jaccard (0.549611, $+0.002984$ vs foundation). Because its additive slots are a linear rotation of $(u_D, u_P, u_H)$, it is not relational reasoning; rather, it indicates that providing distinct, un-entangled representation channels for each clinical modality is effective. It is classified as `BEST_COMPLETED_ARCHITECTURE_CLUE` pending capacity-matched isolation.
+
+Screen routing: `TERMINATE_RELATIONAL_PAIR_REFINEMENT_REFORMULATE_AROUND_MODALITY_SEPARATED_FINE_CODE_EVIDENCE`.
+
 ### Terminated mechanism screens
+
+- **Dense Non-Separable Clinical Code Pairs (`nonseparable_pair`)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at revision `bdc3464e8e1771e6f5d291772e2be82882a4aa00` (1,511,304 parameters, 30 complete epochs, zero Test access). Tested whether scoring explicit pairwise code interactions before pooling improves over factorized pair attention. Result: $\Delta J = -0.001187$ (nonseparable_pair 0.543162 vs factorized_pair 0.544349), and both underperform the single-code baseline `foundation_code` (0.546626). Combinatorial cross-code pairs dilute medication-conditioned evidence with uninformative co-occurrences while multiplying memory from 1.1GB to 6.4GB–14.3GB. Falsified and terminated per frozen decision boundary (`KILL_NO_MATERIAL_SIGNAL`); downstream pair refinements truncated. Decision note: `research/memory/decisions/2026-09-19-final-relational-architecture-early-termination.md`.
 
 - **Iterative Evidence Depth Re-Reading (`depth_reread`)**: Evaluated across a 4-condition stability screen on `mimic-iii-canonical-131-paper-dev-v1` at revision `82fb054abefe3a4b6560c9a3a2fd8640a32bc944` (60 complete epochs per lane, 1,295,367 parameters in all variants, zero Test access). While the canonical seed showed a $+0.004144$ gain, prospective seeds failed the strict stability criteria (mean $\Delta J = +0.001973$, 1 of 4 conditions negative at $\Delta J = -0.000650$, only 2 of 4 conditions $> +0.0020$, and mean $\Delta \text{DDI} = +0.002130$ violating safety guardrail). Terminated per frozen decision rule (`RETURN_TO_ARCHITECTURE_SEARCH_DEPTH_NOT_STABLE`); no cherry-picked seeds or post-hoc rescue authorized. Decision note: `research/memory/decisions/2026-09-18-iterative-evidence-survivor-screen.md`.
 - **Drug-Conditioned Precedent Memory (DCPM)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` (seed `20260921`, 60 complete epochs, 1,079,428 parameters in both arms, zero Test access). Tested whether candidate-specific query attention over cross-patient Train precedents improves prediction over a shared patient query. Result: $\Delta J = -0.001403$ (DCPM 0.542203 vs SharedPrecedent control 0.543606), $\Delta \text{DDI} = +0.002181$. Falsified and terminated per the frozen decision boundary (`KILL_DCPM_MECHANISM`); no post-hoc tuning or re-test authorized. Decision note: `research/memory/decisions/2026-09-18-dcpm-mechanism-screen-falsification.md`.
