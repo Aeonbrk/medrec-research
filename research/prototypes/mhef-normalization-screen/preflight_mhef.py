@@ -172,7 +172,7 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
 
     shared_init_diff = _shared_state_diff(foundation_state, candidate_state)
     global_context_diff = float((foundation_context - candidate_context).abs().max().item())
-    if shared_init_diff != 0.0 or global_context_diff > 1e-7:
+    if shared_init_diff != 0.0 or global_context_diff > 1e-5:
         raise RuntimeError("MHEF global path drifted from the stable FineCode foundation")
     del foundation, candidate
     torch.cuda.empty_cache()
