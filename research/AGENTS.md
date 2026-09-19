@@ -22,7 +22,7 @@ step back
 → survive / redesign once / kill
 ```
 
-Early screening normally uses one seed, one main configuration, full intended training budget, Train/Dev only, and the strongest practical equal-information control. A survivor expands to three development seeds when seed stability materially affects the next architecture decision.
+Early screening normally uses one seed, one main configuration, Train/Dev only, the strongest practical equal-information control, and the current default fixed horizon of 15 complete epochs. A matched comparison is interpretable only when every decisive arm selects Epoch 10 or earlier; Epochs 11–15 trigger an unchanged extension of that exact pair to 30 under the active experiment contract. A survivor expands to three development seeds when seed stability materially affects the next architecture decision.
 
 Architecture-first means the candidate changes at least one meaningful object, representation, information flow, prediction granularity, decoder/inference process, or supervision structure. Existing primitives are allowed when their composition creates a distinct capability.
 
