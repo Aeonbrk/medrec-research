@@ -3,15 +3,15 @@
 Updated: 2026-09-20.
 
 ~~~text
-Current phase: EBRA_REGIMEN_ASSIGNMENT_SCREEN_DESIGN_FROZEN_IMPLEMENTATION_PENDING
+Current phase: EBRA_REGIMEN_ASSIGNMENT_SCREEN_COMPLETE_KILLED
 Working branch: prototype/ebra-regimen-assignment-screen
-Scientific base: 83f422bd968bbcbf503179ec0a420c5a4029123d
+Scientific base: 5e01a15c7bd9587bc0e41cd5b016c2bded8df069
 Active formal Idea: none
 Active formal Gate: none
 Evidence role: DEVELOPMENT
 Test access: not authorized
 GPU capacity: 8 × RTX 3090 24GB
-Previous terminal routing: KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY
+Previous terminal routing: KILL_SET_ASSIGNMENT_HYPOTHESIS
 ~~~
 
 ## Repository-state warning
@@ -20,9 +20,10 @@ GitHub default main is currently older than the MEMB/v1.4 research line. The EBR
 
 Do not rebase onto default main or overwrite this research state until that branch divergence is explicitly reconciled.
 
-## Current hypothesis
+## Completed screen
 
-Evidence-Bound Regimen Assignment (EBRA) tests a decision-factorization hypothesis rather than another evidence-side refinement:
+Evidence-Bound Regimen Assignment (EBRA) tested a decision-factorization
+hypothesis rather than another evidence-side refinement:
 
 ~~~text
 fine legal EHR evidence
@@ -34,9 +35,33 @@ fine legal EHR evidence
 -> final medication set
 ~~~
 
-The candidate and control share the same proposal bank, K=M=131 learned queries, self-attention, cross-attention, FFN, full score matrix, NULL scorer, information budget, and initialization convention.
+The candidate and control shared the same proposal bank, K=M=131 learned
+queries, self-attention, cross-attention, FFN, full score matrix, NULL scorer,
+information budget, and initialization convention.
 
-Only the supervision/decoding responsibility differs.
+Only the supervision and decoding responsibility differed. The complete 15-
+epoch Train/Dev pair selected epoch 5 for `fixed_multilabel` at threshold 0.35
+and epoch 4 for `ebra_assignment` with native assignment decoding. Both arms
+had 1,593,483 parameters.
+
+Dev metrics were:
+
+~~~text
+fixed_multilabel: J=0.549849 F1=0.701033 PRAUC=0.797330 DDI=0.075543 AvgMed=20.321054
+ebra_assignment:  J=0.497956 F1=0.655389 PRAUC=0.770241 DDI=0.084804 AvgMed=29.111485
+delta:            J=-0.051893 F1=-0.045644 PRAUC=-0.027090 DDI=+0.009260 AvgMed=+8.790431
+~~~
+
+Both selected epochs were at most 10. v1.4 therefore marked the comparison
+`INTERPRETABLE`, with no 30- or 60-epoch extension. The frozen route is
+`KILL_SET_ASSIGNMENT_HYPOTHESIS`. No rescue sweep, count-equalization
+diagnostic, stability run, MIMIC-IV run, or Test run is authorized.
+
+Aggregate evidence is in
+`research/prototypes/ebra-regimen-assignment-screen/result.json`,
+`preflight.json`, `fixed_multilabel.results.json`, and
+`ebra_assignment.results.json`. The decision note is
+`research/memory/decisions/2026-09-20-ebra-regimen-assignment-screen-verdict.md`.
 
 ## Read first
 
@@ -62,9 +87,9 @@ Primary closest-work boundary already checked:
 
 Do not make generic first-set / first-matching / first-structured-MedRec novelty claims.
 
-## Local agent task
+## Completed local agent task
 
-Implement only the frozen two-arm comparison:
+The agent implemented and executed only the frozen two-arm comparison:
 
 ~~~text
 fixed_multilabel
@@ -72,17 +97,17 @@ vs
 ebra_assignment
 ~~~
 
-Then:
+Completed actions:
 
-1. run the scoped preflight in the local-agent handoff;
-2. execute both arms for 15 complete epochs, no early stopping, on MIMIC-III canonical Train/Dev;
-3. use canonical RNG torch/cuda/python=1203, numpy=2048;
-4. apply v1.4 horizon-censoring exactly;
-5. do not inspect partial curves to change the architecture;
-6. summarize Jaccard/F1/PRAUC/DDI/AvgMed and selected epochs;
-7. route using the frozen thresholds;
-8. update README, result.json, verdict note, current-research-state, and this Handoff;
-9. commit and push aggregate public-safe evidence only.
+1. ran the scoped preflight in the local-agent handoff;
+2. executed both arms for 15 complete epochs, with no early stopping, on MIMIC-III canonical Train/Dev;
+3. used canonical RNG torch/cuda/python=1203, numpy=2048;
+4. applied v1.4 horizon-censoring exactly;
+5. kept the architecture unchanged while the pair ran;
+6. summarized Jaccard/F1/PRAUC/DDI/AvgMed and selected epochs;
+7. routed using the frozen thresholds;
+8. updated README, result.json, verdict note, current-research-state, and this Handoff;
+9. committed and pushed aggregate public-safe evidence only.
 
 Test remains SEALED.
 

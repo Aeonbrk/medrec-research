@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: EBRA_REGIMEN_ASSIGNMENT_SCREEN_DESIGN_FROZEN_IMPLEMENTATION_PENDING
+Human-facing phase: EBRA_REGIMEN_ASSIGNMENT_SCREEN_COMPLETE_KILLED
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 + v1.4 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -301,13 +301,13 @@ This formulation is not a claim that medication dependencies or set-to-set MedRe
 
 Frozen screen:
 
-~~~text
+```text
 surface: mimic-iii-canonical-131-paper-dev-v1
 seed: torch/cuda/python=1203, numpy=2048
 training: 15 complete epochs, no early stopping
 main pair: ebra_assignment - fixed_multilabel
 Test: SEALED
-~~~
+```
 
 Contract v1.4 horizon-censoring applies unchanged. Primary mechanism survival requires Delta J > +0.004 with F1/PRAUC losses no worse than 0.002 and DDI increase no greater than 0.002; Delta J <= +0.002 kills the assignment hypothesis. A DDI reduction of at least 0.010 with J/F1/PRAUC loss each no worse than 0.005 routes to Pareto review.
 
@@ -316,7 +316,34 @@ Prototype spec: research/prototypes/ebra-regimen-assignment-screen/README.md.
 Closest-work boundary: research/prototypes/ebra-regimen-assignment-screen/closest-work-audit.md.  
 Local execution handoff: research/prototypes/ebra-regimen-assignment-screen/local-agent-handoff.md.
 
-Implementation and 319 execution are now authorized for this frozen pair only. No slot-count, NULL-bias, decoder-depth, assignment-temperature, retrieval, MoE, DDI-reranking, cardinality-head, or output-repair sweep is authorized.
+The frozen pair was implemented and executed on 319. No slot-count, NULL-bias, decoder-depth, assignment-temperature, retrieval, MoE, DDI-reranking, cardinality-head, or output-repair sweep is authorized.
+
+### Terminated screen: EBRA regimen assignment (2026-09-20)
+
+The exact `fixed_multilabel` versus `ebra_assignment` pair completed 15 epochs
+on `mimic-iii-canonical-131-paper-dev-v1` at source revision
+`5e01a15c7bd9587bc0e41cd5b016c2bded8df069`. Both arms used 1,593,483 trainable
+parameters, the canonical RNG (`torch/cuda/python=1203`, `numpy=2048`), and
+zero Test access. The scoped preflight passed shared FineCode proposal and
+decision paths, target-free inputs, finite forward/backward, permutation-
+invariant candidate loss, duplicate-free assignment decoding, and the native
+evaluator pass.
+
+| Arm | Selected epoch | Dev Jaccard | Dev F1 | Dev PRAUC | Dev DDI | AvgMed |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `fixed_multilabel` | 5 | 0.549849 | 0.701033 | 0.797330 | 0.075543 | 20.321054 |
+| `ebra_assignment` | 4 | 0.497956 | 0.655389 | 0.770241 | 0.084804 | 29.111485 |
+
+Candidate minus control was ΔJ `-0.051893`, ΔF1 `-0.045644`, ΔPRAUC
+`-0.027090`, ΔDDI `+0.009260`, and ΔAvgMed `+8.790431`. Both selected epochs
+were at most 10, so v1.4 marked the comparison `INTERPRETABLE` without a
+15-to-30 or 30-to-60 extension. The result routes to
+`KILL_SET_ASSIGNMENT_HYPOTHESIS`. The candidate's larger medication count did
+not produce an accuracy gain, so no count-equalization diagnostic is allowed.
+
+Evidence: `research/prototypes/ebra-regimen-assignment-screen/result.json`,
+`preflight.json`, and the two per-arm aggregate result files. Decision note:
+`research/memory/decisions/2026-09-20-ebra-regimen-assignment-screen-verdict.md`.
 
 ## Near-term evidence routing
 
@@ -394,8 +421,8 @@ MIMIC-IV Test remains sealed throughout reference setup and architecture search.
 
 ## Next action
 
-Implement and execute the frozen EBRA matched pair on branch prototype/ebra-regimen-assignment-screen.
-
-The local agent should first run only the scoped preflight needed to establish same information/proposal/decision graph, parameter matching, permutation-invariant candidate loss, duplicate-free assignment decoding, finite forward/backward, and zero Test loading. Then run fixed_multilabel and ebra_assignment for 15 complete epochs under contract v1.4.
-
-Do not redesign EBRA from partial curves. Do not create extra EBRA lanes to occupy GPUs. Apply the frozen survive/weak/kill routing after the pair is interpretable, update aggregate public-safe evidence, and keep Test sealed. Detached baseline recovery may continue independently.
+The EBRA pair is complete and terminated. Do not reopen the assignment
+hypothesis or spend more GPU time on rescue variants. Keep Test sealed and
+continue architecture search only with a separately frozen, mechanism-bearing
+hypothesis and matched control. Detached baseline recovery may continue
+independently.

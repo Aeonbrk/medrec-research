@@ -1,6 +1,6 @@
 # Evidence-Bound Regimen Assignment (EBRA) Screen
 
-Status: **DESIGN FROZEN / IMPLEMENTATION PENDING**
+Status: **EXECUTED / KILLED (2026-09-20)**
 
 EBRA is the next bounded architecture hypothesis after KILL_MEDICATION_EVIDENCE_COMPETITION_FAMILY.
 
@@ -161,3 +161,32 @@ Keep the package compact:
 - current-research-state and Handoff update.
 
 Do not commit patient-level outputs, model weights, split membership, private paths, or raw EHR data.
+
+## Executed result
+
+The exact matched pair ran for 15 complete epochs on source revision
+`5e01a15c7bd9587bc0e41cd5b016c2bded8df069` against
+`mimic-iii-canonical-131-paper-dev-v1`. The canonical RNG was
+`torch/cuda/python=1203` and `numpy=2048`. Test remained sealed.
+
+The scoped preflight passed the split, leakage, shared initialization, parameter,
+finite forward/backward, permutation-invariance, duplicate-free decoding, and
+repository-evaluator checks. Both arms have 1,593,483 trainable parameters.
+
+| Arm | Selected epoch | Operating point | Native decode | Jaccard | F1 | PRAUC | DDI | AvgMed |
+| --- | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `fixed_multilabel` | 5 | threshold 0.35 | no | 0.549849 | 0.701033 | 0.797330 | 0.075543 | 20.321054 |
+| `ebra_assignment` | 4 | native assignment | yes | 0.497956 | 0.655389 | 0.770241 | 0.084804 | 29.111485 |
+
+Candidate minus control was ΔJ `-0.051893`, ΔF1 `-0.045644`, ΔPRAUC
+`-0.027090`, ΔDDI `+0.009260`, and ΔAvgMed `+8.790431`. Both selected epochs
+are at most 10, so the v1.4 comparison is interpretable without a horizon
+extension. The frozen route is `KILL_SET_ASSIGNMENT_HYPOTHESIS`.
+
+The large medication-count increase did not produce a candidate gain, so no
+count-equalization diagnostic is authorized. Do not add assignment, NULL-bias,
+slot-count, decoder-depth, DDI, retrieval, MoE, or output-repair rescues.
+
+Aggregate artifacts are `result.json`, `preflight.json`,
+`fixed_multilabel.results.json`, and `ebra_assignment.results.json`. Restricted
+checkpoints, logits, logs, and patient-level records remain on 319.

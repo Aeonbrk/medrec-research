@@ -1,0 +1,36 @@
+{
+  "device": "cuda",
+  "duplicate_free_assignment_decode": "PASS",
+  "finite_forward_backward": {
+    "ebra_assignment": "PASS",
+    "fixed_multilabel": "PASS"
+  },
+  "full_score_matrix_shape": [
+    16,
+    131,
+    131
+  ],
+  "initialization_max_abs_diff": 0.0,
+  "parameter_count": {
+    "ebra_assignment": 1593483,
+    "fixed_multilabel": 1593483
+  },
+  "permutation_invariance": {
+    "labels_equal": true,
+    "loss_abs_diff": 0.0
+  },
+  "profile_id": "mimic-iii-canonical-131-paper-dev-v1",
+  "repository_native_evaluation": "PASS",
+  "snapshot_id": "molerec-table1-c721-www23",
+  "source_revision": "5e01a15c7bd9587bc0e41cd5b016c2bded8df069",
+  "split": {
+    "dev_patients": 1004,
+    "dev_visits": 2130,
+    "train_patients": 4233,
+    "train_visits": 10489
+  },
+  "status": "PASS",
+  "target_leakage_check": "PASS",
+  "test_loaded": false,
+  "train_dev_id": "gate01-train-dev-5752596a-20260913a"
+}
