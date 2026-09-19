@@ -67,7 +67,7 @@ The `scale2_*` lanes are mandatory because mutual matching algebraically sharpen
 3. Run repository-native checks that can detect relevant implementation failures.
 4. Set `SNAPSHOT_ROOT`, `TRAIN_DEV_ROOT`, `OUT_ROOT`, and optionally `PYTHON_BIN`.
 5. Run `preflight_memb.py`. It must pass target-leakage, exact shared initialization/parameter count, historical raw-affinity/potential identity, exact commonness formula attribution, finite forward/backward/no-history execution, and historical anchor identity.
-6. Only after preflight PASS, run `launch_8gpu.sh` for all eight complete 30-epoch lanes.
+6. Only after preflight PASS, run `bash research/prototypes/memb-mutual-binding-screen/launch_8gpu.sh` for all eight complete 30-epoch lanes.
 7. Do not inspect partial metrics for scientific decisions.
 8. If a relevant matched pair is horizon-censored at epoch 26–30, extend only that exact pair unchanged to 60 epochs under contract v1.3.
 9. After all interpretable lanes complete, run `summarize_memb.py`, preserve public-safe aggregate evidence, update decision/current-state/Handoff according to the actual routing, commit, and push.
