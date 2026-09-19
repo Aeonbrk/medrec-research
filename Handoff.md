@@ -3,65 +3,133 @@
 Updated: 2026-09-19.
 
 ```text
-Current phase: MHEF_NORMALIZATION_HYPOTHESIS_FALSIFIED_NEXT_DIRECTION_DECISION
-Working branch: prototype/mhef-normalization-screen
+Current phase: MSED_EVIDENCE_DISTRIBUTION_SCREEN_IMPLEMENTED_PENDING_319_EXECUTION
+Working branch: prototype/msed-evidence-distribution-screen
 Active formal Idea: none
 Active formal Gate: none
 Evidence role: DEVELOPMENT
 Test access: not authorized
 GPU capacity: 8 × RTX 3090 24GB
-Terminal routing: KILL_MHEF_NORMALIZATION_HYPOTHESIS
+Previous terminal routing: KILL_MHEF_NORMALIZATION_HYPOTHESIS
 ```
 
 ## Authoritative starting point
 
-This branch was executed on the 319 Execution Plane at frozen revision:
+This branch is created from the completed MHEF branch revision:
 
 ```text
-4584f8a0d080f4300f9ba5778da08f7f82cdc805
+627f1c5c1a89785733af2f8a99aa4a0e2cfb645d
 ```
 
 Read first:
 
 - `AGENTS.md`
 - `research/AGENTS.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_3.md`
 - `research/memory/current-research-state.md`
 - `research/memory/decisions/2026-09-19-mhef-normalization-screen-verdict.md`
-- `research/prototypes/mhef-normalization-screen/README.md`
-- `research/prototypes/mhef-normalization-screen/result.json`
+- `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-design.md`
+- `research/prototypes/msed-evidence-distribution-screen/README.md`
+- `research/prototypes/msed-evidence-distribution-screen/closest-work-audit.md`
 
-## What was completed
+## Why this family
 
-All 8 physical RTX 3090 GPU lanes completed all 30 planned epochs without early stopping or divergence:
+MHEF falsified modality-specific normalization as the missing mechanism. The next family is driven by a different structural clue: `PredictionLocal` improved Dev Jaccard by `+0.012976` over its matched aggregate control. Exact code inspection shows that the pair is approximately a comparison between the mean and normalized log-sum-exp of the same medication-token local support potentials.
 
-1. **Preflight passed:** exact FineCode global path preservation, zero data leakage, verified common parameter count (1,476,874 params across all lanes), and active mechanisms.
-2. **Execution completed:** all eight 30-epoch lanes completed. All models selected their peak checkpoint at Epoch 5 (`safe_selected_epoch_max = 25 >= 5`, no horizon censoring).
-3. **Public-safe evidence preserved:** aggregate results recorded in `research/prototypes/mhef-normalization-screen/result.json`.
-4. **Test set remained sealed:** zero Test evaluation performed (`test_loaded = false`).
+The new Rank-1 hypothesis is therefore:
 
-## Summary of empirical evidence
+> For each candidate medication, the complete empirical distribution of longitudinal FineCode support potentials carries decision information beyond the strong single `logmeanexp` statistic.
 
-| Lane | Role | Best Ep / OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI |
-| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
-| `mhef_independent_add` | Rank-1 Candidate | Ep 5 / 0.30 | 0.549397 | 0.700657 | 0.794860 | 0.072165 |
-| `coupled_budget_add` | Matched Normalization Control | Ep 5 / 0.30 | 0.547986 | 0.699394 | 0.793084 | 0.071378 |
-| `wide_global_add` | Capacity Absorption Control | Ep 5 / 0.30 | **0.549980** | 0.701313 | 0.794769 | 0.072489 |
-| `mhef_independent_concat` | Concat Candidate | Ep 5 / 0.30 | 0.545593 | 0.697693 | 0.794941 | 0.073200 |
-| `coupled_budget_concat` | Concat Control | Ep 5 / 0.35 | 0.545500 | 0.697330 | 0.793394 | 0.070904 |
-| `private_only_add` | Private-Only Ablation | Ep 5 / 0.30 | 0.547128 | 0.698678 | 0.792935 | 0.072477 |
-| `hash_partition_a_add` | Hash Partition A | Ep 5 / 0.35 | 0.544909 | 0.696626 | 0.793541 | 0.071163 |
-| `hash_partition_b_add` | Hash Partition B | Ep 5 / 0.35 | 0.544926 | 0.696638 | 0.793559 | 0.071163 |
+The working architecture is Medication-Specific Evidence Distribution (MSED).
 
-## Decisive scientific conclusions
+## Cloud-side work already complete
 
-- **Primary normalization comparison:** `mhef_independent_add - coupled_budget_add` yields $\Delta J = +0.001410$ (+0.141 pp), failing the $+0.0030$ material threshold (`KILL_NO_MATERIAL_SIGNAL`).
-- **Concat control:** `mhef_independent_concat - coupled_budget_concat` yields $\Delta J = +0.000093$ (+0.009 pp).
-- **Capacity absorption:** `wide_global_add` ($J = 0.549980$) outperforms `mhef_independent_add` ($J = 0.549397$), proving that the slight gain over the base foundation is absorbed by multi-slot capacity rather than heterogeneous normalization decoupling.
-- **Terminal routing:** `KILL_MHEF_NORMALIZATION_HYPOTHESIS`.
+Implemented under:
 
-## Next agent instructions
+`research/prototypes/msed-evidence-distribution-screen/`
 
-1. Do **NOT** attempt to rescue MHEF with query adapters, dynamic gating, extra layers, or post-hoc threshold/DDI tuning.
-2. Do **NOT** run multi-seed stability or MIMIC-IV replication on MHEF.
-3. Keep the Test set sealed.
-4. Formulate the next orthogonal architectural hypothesis building on the verified FineCode foundation.
+The package contains:
+
+- `msed_model.py`
+- `run_msed.py`
+- `preflight_msed.py`
+- `summarize_msed.py`
+- `launch_8gpu.sh`
+- `README.md`
+- `closest-work-audit.md`
+
+Cloud static syntax checks passed before push. The real CUDAoprivate-data preflight and full Train/Dev execution remain local-agent work.
+
+## Local-agent task
+
+Do not redesign the model before the frozen preflight.
+
+1. Fetch this branch and verify a clean checkout at its pushed HEAD.
+2. Run repository-native lint/tests that can detect implementation failures relevant to the screen.
+3. Set:
+
+```text
+SNAPSHOT_ROOT
+TRAIN_DEV_ROOT
+OUT_ROOT
+PYTHON_BIN  # optional if the correct environment is already active
+```
+
+4. Run `preflight_msed.py` on CUDA/private data. It must verify:
+
+```text
+correct frozen MIMIC-III Train/Dev profile
+no current-medication target leakage
+exact stable FineCode global-context preservation
+exact PredictionLocal raw local-score preservation
+exact PredictionLocal LME preservation
+same parameter graph/count/init across the six MSED variants
+primary pair identical before E[phi(r)] vs phi(LME(r))
+finite forward/backward/no-history execution
+historical anchor identity
+Test not loaded
+```
+
+5. If and only if preflight passes, launch:
+
+```bash
+research/prototypes/msed-evidence-distribution-screen/launch_8gpu.sh
+```
+
+## Frozen 8-GPU allocation
+
+```text
+GPU0  msed_ecf_global
+GPU1  point_lme_global
+GPU2  point_mean_global
+GPU3  point_max_global
+GPU4  msed_ecf_only
+GPU5  point_lme_only
+GPU6  prediction_local_anchor
+GPU7  foundation_code_anchor
+```
+
+Run all eight lanes for the complete 30 epochs. No early stopping and no interpretation from partial metrics.
+
+The primary comparison is:
+
+```text
+msed_ecf_global - point_lme_global
+```
+
+This pair has the same raw local medication-token scores, the same raw LME statistic, the same global FineCode context, the same feature dimensionality, decoder, parameter count, initialization, optimizer, RNG, and training horizon. It differs only in whether the nonlinear spectrum summarizes the empirical local-support distribution or the scalar LME point.
+
+## Decision rules
+
+Use the frozen rules in `README.md` and `summarize_msed.py`.
+
+Do not rescue a negative/weak result with kernel/frequency sweeps, learned pooling grids, temperatures, top-k, hidden-size/head sweeps, dynamic queries, extra hops, DDI weights, threshold tuning, or rerankers.
+
+If a relevant 30-epoch comparison selects epoch 26--30, extend that exact affected pair unchanged to 60 epochs under contract v1.3. Do not alter architecture or optimization.
+
+After complete interpretable lanes exist, run `summarize_msed.py`, preserve public-safe aggregate evidence, update decision memory/current state/Handoff according to the real routing, commit, and push.
+
+Do not automatically run multi-seed stability, MIMIC-IV, or Test. Test remains sealed.
