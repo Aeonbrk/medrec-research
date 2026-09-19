@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: MSED_EVIDENCE_DISTRIBUTION_SCREEN_IMPLEMENTED_PENDING_319_EXECUTION
+Human-facing phase: MSED_EVIDENCE_DISTRIBUTION_SCREEN_FALSIFIED
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -131,26 +131,34 @@ Key matched comparison outcomes:
 
 Screen routing: `KILL_MHEF_NORMALIZATION_HYPOTHESIS`. No multi-seed stability or MIMIC-IV replication is authorized.
 
-### MSED evidence-distribution architecture screen — design frozen, execution pending (2026-09-19)
+### MSED evidence-distribution architecture screen (2026-09-19)
 
-Following MHEF falsification, the project performed a family reset around the strongest unresolved structural clue: `prediction_local` previously improved Dev Jaccard by `+0.012976` over its matched aggregate control while using the same medication-token interaction network. Exact code inspection shows the key aggregation difference is approximately normalized log-sum-exp of medication-specific local FineCode support potentials versus their mean.
+An eight-lane 30-epoch architecture screen on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `e54d3d5a2a5145d14beadb109d574ad82efdae9e` (1,363,465 parameters across all six MSED variants, 30 complete epochs, zero Test access) evaluated whether predicting medications from the empirical distribution shape of longitudinal FineCode support potentials carries decision value beyond a single scalar point statistic (`logmeanexp`).
 
-Rank-1 hypothesis:
+All eight physical RTX 3090 GPU lanes completed 30 planned epochs without early stopping. All lanes selected best Dev checkpoints between Epochs 3 and 8 (`safe_selected_epoch_max = 25 >= 8`, zero horizon censoring):
 
-> For each candidate medication, the empirical distribution of longitudinal FineCode local-support potentials contains decision information beyond the already-strong single normalized log-sum-exp statistic.
+1. `msed_ecf_global` (Rank-1 distribution candidate): Ep 8 / 0.35, Dev Jaccard = **0.546806**, F1 = 0.698507, PRAUC = 0.793325, DDI = 0.076335.
+2. `point_lme_global` (decisive point-LME matched control): Ep 8 / 0.35, Dev Jaccard = **0.546180**, F1 = 0.698087, PRAUC = 0.792862, DDI = 0.076761.
+3. `point_mean_global` (mean point summary control): Ep 7 / 0.35, Dev Jaccard = **0.546378**, F1 = 0.698442, PRAUC = 0.791671, DDI = 0.077119.
+4. `point_max_global` (max point summary control): Ep 8 / 0.35, Dev Jaccard = **0.546652**, F1 = 0.698253, PRAUC = 0.793283, DDI = 0.074867.
+5. `msed_ecf_only` (distribution without global context): Ep 8 / 0.35, Dev Jaccard = **0.530734**, F1 = 0.684700, PRAUC = 0.777805, DDI = 0.071420.
+6. `point_lme_only` (matched control for lane 4): Ep 5 / 0.30, Dev Jaccard = **0.534433**, F1 = 0.687944, PRAUC = 0.780670, DDI = 0.076338.
+7. `prediction_local_anchor` (historical local-LME anchor): Ep 3 / 0.35, Dev Jaccard = **0.548911**, F1 = 0.700462, PRAUC = 0.794832, DDI = 0.075148.
+8. `foundation_code_anchor` (historical FineCode anchor): Ep 5 / 0.30, Dev Jaccard = **0.546626**, F1 = 0.698386, PRAUC = 0.792678, DDI = 0.071069.
 
-The frozen Medication-Specific Evidence Distribution (MSED) screen tests this with a capacity-matched primary pair:
+Key matched comparison outcomes:
 
-- `msed_ecf_global`: receives the stable global FineCode context plus `[LME(r), E_i phi(r_i)]`, where `phi` is a fixed-frequency bounded characteristic spectrum with one shared learnable score scale.
-- `point_lme_global`: receives the same global FineCode context, same raw local scores, same raw LME, same feature dimensionality, same projection/decoder/parameter count/init, but replaces the empirical distribution spectrum with `phi(LME(r))`.
+- **Primary distribution test (`distribution_beyond_lme_global`)**: Representing the empirical support distribution via characteristic spectrum yields $\Delta J = +0.000626$ (+0.063 pp) over scalar LME, failing the $+0.0020$ material signal threshold (`KILL_NO_MATERIAL_SIGNAL`).
+- **Distribution in isolation (`distribution_beyond_lme_only`)**: Without global FineCode context, characteristic spectrum distribution encoding performs worse than scalar LME ($\Delta J = -0.003699$, -0.370 pp).
+- **Point summary controls**: `msed_ecf_global` does not materially outperform simple linear mean ($\Delta J = +0.000428$) or hard max ($\Delta J = +0.000154$).
+- **Anchor integrity**: Both historical anchors reproduce with exactly 0.0 absolute difference across all five metrics.
+- **Absolute position**: `msed_ecf_global` (0.546806) underperforms prior best control `wide_global_add` (0.549980, $\Delta J = -0.003174$), prior best architecture `summary_add` (0.549611, $\Delta J = -0.002805$), and `prediction_local_anchor` (0.548911, $\Delta J = -0.002105$).
 
-Primary falsification: `msed_ecf_global - point_lme_global`. A gain therefore isolates support-distribution shape beyond the known LME statistic rather than extra width or a larger decoder.
-
-Additional controls: mean-point, max-point, MSED-only vs LME-only global-complement attribution, plus exact historical `prediction_local` and `foundation_code` anchors. Eight 30-epoch Train/Dev lanes are frozen under contract v1.3; Test remains sealed. No multi-seed, MIMIC-IV, or Test execution is authorized before a clean matched mechanism signal and absolute improvement over the strong `wide_global_add` control (Dev Jaccard 0.549980).
-
-Implementation branch: `prototype/msed-evidence-distribution-screen`. Design note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-design.md`.
+Screen routing: `KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`. No multi-seed stability or MIMIC-IV replication is authorized. Decision note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-verdict.md`.
 
 ### Terminated mechanism screens
+
+- **Medication-Specific Evidence Distribution (MSED)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `e54d3d5a2a5145d14beadb109d574ad82efdae9e` (1,363,465 parameters across all six MSED variants, 30 complete epochs, zero Test access). Tested whether representing the empirical distribution shape of medication-specific FineCode support potentials via an empirical characteristic spectrum carries decision value beyond a single scalar `logmeanexp` point statistic. Result: primary comparison delta $\Delta J = +0.000626$ fails the $+0.0020$ threshold (`KILL_NO_MATERIAL_SIGNAL`); in isolation without global context, distribution spectrum underperforms scalar LME by $\Delta J = -0.003699$; candidate trails prior best control `wide_global_add` (0.549980 vs 0.546806, $\Delta J = -0.003174$). Falsified and terminated per frozen decision boundary (`KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`); no multi-seed or MIMIC-IV evaluation scheduled. Decision note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-verdict.md`.
 
 - **Medication-Conditioned Heterogeneous Evidence Factorization (MHEF)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `4584f8a0d080f4300f9ba5778da08f7f82cdc805` (1,476,874 parameters across all 8 variants, 30 complete epochs, zero Test access). Tested whether decoupling diagnosis, procedure, and history evidence into independent normalization budgets outperforms a shared zero-sum budget. Result: primary comparison delta $\Delta J = +0.001410$ fails the $+0.0030$ threshold (`KILL_NO_MATERIAL_SIGNAL`), concat delta is $+0.000093$, and the gain is entirely absorbed by wide global multi-head capacity (`wide_global_add` $J = 0.549980$ vs candidate $0.549397$). Falsified and terminated per frozen decision boundary (`KILL_MHEF_NORMALIZATION_HYPOTHESIS`); no multi-seed or MIMIC-IV evaluation scheduled. Decision note: `research/memory/decisions/2026-09-19-mhef-normalization-screen-verdict.md`.
 

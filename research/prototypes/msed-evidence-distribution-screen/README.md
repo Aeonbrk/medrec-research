@@ -1,6 +1,6 @@
 # Medication-Specific Evidence Distribution (MSED) Screen
 
-Status: **DESIGN + IMPLEMENTATION READY / 319 EXECUTION PENDING**
+Status: **COMPLETE / FALSIFIED (KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS)**
 
 This screen is a family reset after `KILL_MHEF_NORMALIZATION_HYPOTHESIS`. It does not rescue MHEF, relational pairs, dynamic queries, iterative rereading, or output-side set repair.
 
@@ -103,20 +103,20 @@ Thus a gain isolates information in the **shape of the medication-specific suppo
 
 ## Eight GPU lanes
 
-| GPU | Lane | Role |
-| ---: | --- | --- |
-| 0 | `msed_ecf_global` | Rank-1 distribution candidate |
-| 1 | `point_lme_global` | decisive point-LME matched control |
-| 2 | `point_mean_global` | mean point-summary control |
-| 3 | `point_max_global` | max point-sumary control |
-| 4 | `msed_ecf_only` | distribution representation without global FineCode context |
-| 5 | `point_lme_only` | exact matched control for GPU 4 |
-| 6 | `prediction_local_anchor` | exact historical local-LME architecture anchor |
-| 7 | `foundation_code_anchor` | exact stable FineCode architecture anchor |
+| GPU | Lane | Role | Selected Ep | Op Point | Dev Jaccard | Dev F1 | Dev PRAUC | Dev DDI | Avg Med |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | `msed_ecf_global` | Rank-1 distribution candidate | 8 | 0.35 | 0.546806 | 0.698507 | 0.793325 | 0.076335 | 20.11 |
+| 1 | `point_lme_global` | decisive point-LME matched control | 8 | 0.35 | 0.546180 | 0.698087 | 0.792862 | 0.076761 | 20.36 |
+| 2 | `point_mean_global` | mean point-summary control | 7 | 0.35 | 0.546378 | 0.698442 | 0.791671 | 0.077119 | 21.14 |
+| 3 | `point_max_global` | max point-summary control | 8 | 0.35 | 0.546652 | 0.698253 | 0.793283 | 0.074867 | 20.15 |
+| 4 | `msed_ecf_only` | distribution without global context | 8 | 0.35 | 0.530734 | 0.684700 | 0.777805 | 0.071420 | 21.17 |
+| 5 | `point_lme_only` | exact matched control for GPU 4 | 5 | 0.30 | 0.534433 | 0.687944 | 0.780670 | 0.076338 | 21.85 |
+| 6 | `prediction_local_anchor` | historical local-LME anchor | 3 | 0.35 | 0.548911 | 0.700462 | 0.794832 | 0.075148 | 19.96 |
+| 7 | `foundation_code_anchor` | historical FineCode anchor | 5 | 0.30 | 0.546626 | 0.698386 | 0.792678 | 0.071069 | 21.43 |
 
-The six MSED variants share one parameter graph. The two anchors intentionally retain their historical parameter counts; they are absolute integrity anchors, not matched-capacity controls.
+The six MSED variants share one parameter graph (1,363,465 parameters each). The two anchors intentionally retain their historical parameter counts (1,295,367 parameters); both reproduce their historical evaluations with exactly 0.0 absolute difference across all five metrics.
 
-## Frozen falsification
+## Frozen falsification boundary
 
 Primary comparison: `msed_ecf_global - point_lme_global`.
 
@@ -137,14 +137,45 @@ Delta J > +0.004 with guardrail failure
 => stop; no safety rescue
 ```
 
-Before multi-seed stability can even be reviewed, all of the following are additionally required:
+## Screen outcome and analysis
 
-1. `msed_ecf_only - point_lme_only > +0.002 J` with guardrails, so the effect is not merely a global-branch/head interaction;
-2. the complete `msed_ecf_global` architecture must exceed the current strong matched-capacity control `wide_global_add` (Dev Jaccard `0.549980`);
-3. historical `prediction_local` and `foundation_code` anchors must reproduce exactly under the canonical RNG;
-4. no horizon censoring remains unresolved.
+### Primary falsification
 
-If `msed_ecf_global - msed_ecf_only <= +0.002 J` after the distribution mechanism otherwise survives, the global branch should be removed before any stability stage rather than preserved by inertia.
+`msed_ecf_global - point_lme_global`:
+
+```text
+Delta J:       +0.000626 (+0.063 pp)
+Delta F1:      +0.000421
+Delta PRAUC:   +0.000463
+Delta DDI:     -0.000427
+Delta AvgMed:  -0.243579
+Verdict:       KILL_NO_MATERIAL_SIGNAL
+```
+
+The gain of $+0.000626$ Dev Jaccard fails the frozen $+0.0020$ threshold (`KILL_NO_MATERIAL_SIGNAL`). Representing the empirical support distribution via a bounded characteristic spectrum yields no material decision value beyond the scalar logmeanexp point statistic.
+
+### Matched controls and ablations
+
+1. **Without global context (`msed_ecf_only - point_lme_only`)**:
+   $\Delta J = -0.003699$ (-0.370 pp). In isolation, encoding the distribution spectrum performs substantially worse than scalar LME.
+2. **Mean and max point summaries**:
+   - vs `point_mean_global`: $\Delta J = +0.000428$
+   - vs `point_max_global`: $\Delta J = +0.000154$
+   Distribution shape does not materially outperform simple linear mean or hard max pooling.
+3. **Global complement (`msed_ecf_global - msed_ecf_only`)**:
+   $\Delta J = +0.016072$, $\Delta F1 = +0.013807$, $\Delta PRAUC = +0.015520$, $\Delta DDI = +0.004915$. Global medication-specific FineCode context remains essential; distribution pooling cannot replace it.
+4. **Absolute position**:
+   `msed_ecf_global` (Dev Jaccard 0.546806) underperforms prior best control `wide_global_add` (0.549980, $\Delta J = -0.003174$), prior best architecture `summary_add` (0.549611, $\Delta J = -0.002805$), and `prediction_local_anchor` (0.548911, $\Delta J = -0.002105$).
+5. **Anchor reproduction**:
+   `prediction_local` and `foundation_code` historical checkpoints reproduce with exactly 0.0 absolute difference across all five metrics under the canonical RNG.
+6. **Horizon censoring**:
+   All lanes selected their best checkpoint between Epoch 3 and 8 (`safe_selected_epoch_max = 25 >= 8`). Zero horizon censoring.
+
+### Terminal scientific routing
+
+`KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`.
+
+No multi-seed stability, MIMIC-IV replication, or Test set evaluation is authorized. Per the research protocol, no hyperparameter sweeps, frequency adjustments, or architecture tweaks will be conducted to rescue this mechanism.
 
 ## Development protocol
 

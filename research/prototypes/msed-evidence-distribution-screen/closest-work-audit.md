@@ -7,11 +7,11 @@ This file records occupied conceptual territory so the screen does not confuse a
 ## Generic set and MIL aggregation is occupied
 
 **Deep Sets** — Zaheer et al., NeurIPS 2017.  
-Primary source: https://papers.nips.cc/paper/6931-deep-sets  
+Primary source: <https://papers.nips.cc/paper/6931-deep-sets>  
 It establishes generic permutation-invariant learning over sets. MSED therefore cannot claim novelty from treating evidence as a set/bag or from using a permutation-invariant aggregator.
 
 **Attention-based Deep Multiple Instance Learning** — Ilse, Tomczak, Welling, ICML 2018.  
-Primary source: https://proceedings.mlr.press/v80/ilse18a.html  
+Primary source: <https://proceedings.mlr.press/v80/ilse18a.html>  
 Attention MIL learns bag representations from weighted instance aggregation. MSED cannot claim label-aware/attention-style MIL pooling itself as new.
 
 ## Distribution pooling is occupied
