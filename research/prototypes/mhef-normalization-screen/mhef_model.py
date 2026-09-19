@@ -26,7 +26,7 @@ from portfolio_model import (  # noqa: E402
 )
 
 MHEF_VARIANTS = (
-    "mhef_indepent_add",
+    "mhef_independent_add",
     "coupled_budget_add",
     "wide_global_add",
     "mhef_independent_concat",
@@ -276,7 +276,7 @@ class MHEFModel(PortfolioModel):
         contexts, present = self._contexts(encoded, batch, drugs)
         persistence = self._persistence(batch)
 
-        if self.variant in {"mhef_indepent_concat", "coupled_budget_concat"}:
+        if self.variant in {"mhef_independent_concat", "coupled_budget_concat"}:
             return self._concat_logits(contexts, drugs, persistence)
         return self._additive_logits(contexts, present, drugs, persistence)
 

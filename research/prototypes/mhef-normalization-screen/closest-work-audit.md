@@ -70,7 +70,7 @@ The current MHEF object is narrower: candidate-medication-specific fine-code sco
 
 ### Multi-gate Mixture-of-Experts — KDD 2018
 
-**Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts**
+Paper: *Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts*
 
 MMoE shares experts while learning task-specific gates.
 

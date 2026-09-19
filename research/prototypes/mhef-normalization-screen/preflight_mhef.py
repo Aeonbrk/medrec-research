@@ -239,7 +239,7 @@ def run(args: argparse.Namespace) -> Dict[str, Any]:
         "normalization_concat": ("coupled_budget_concat", "mhef_independent_concat"),
         "capacity_wide_global": ("wide_global_add", "mhef_independent_add"),
         "global_complement": ("private_only_add", "mhef_independent_add"),
-        "semantic_partition_a": ("hash_partition_a_add", "mhef_indepent_add"),
+        "semantic_partition_a": ("hash_partition_a_add", "mhef_independent_add"),
         "semantic_partition_b": ("hash_partition_b_add", "mhef_independent_add"),
     }
     behavior: Dict[str, Any] = {}

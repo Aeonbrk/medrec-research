@@ -22,7 +22,7 @@ LANES = (
 )
 
 COMPARISONS: Dict[str, Tuple[str, str]] = {
-    "normalization_add": ("coupled_budget_add", "mhef_indepent_add"),
+    "normalization_add": ("coupled_budget_add", "mhef_independent_add"),
     "normalization_concat": ("coupled_budget_concat", "mhef_independent_concat"),
     "capacity_wide_global": ("wide_global_add", "mhef_independent_add"),
     "global_complement": ("private_only_add", "mhef_independent_add"),
