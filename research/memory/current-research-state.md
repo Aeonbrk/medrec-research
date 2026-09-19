@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: POST_RELATIONAL_PAIR_FAILURE_MULTI_VIEW_REFORMULATION
+Human-facing phase: POST_MHEF_NORMALIZATION_FALSIFICATION_ARCHITECTURE_SEARCH
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -107,7 +107,33 @@ Key architectural takeaway: `summary_add` achieved the highest Dev Jaccard (0.54
 
 Screen routing: `TERMINATE_RELATIONAL_PAIR_REFINEMENT_REFORMULATE_AROUND_MODALITY_SEPARATED_FINE_CODE_EVIDENCE`.
 
+### MHEF normalization-domain architecture screen (2026-09-19)
+
+An eight-lane 30-epoch architecture screen on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `4584f8a0d080f4300f9ba5778da08f7f82cdc805` (1,476,874 parameters per variant across all eight lanes, zero Test access) tested whether candidate-specific fine-code evidence should decouple diagnosis ($D$), procedure ($P$), and historical medication ($H$) evidence from a shared softmax into independent normalization budgets before medication-level prediction.
+
+All eight physical RTX 3090 GPU lanes completed all 30 planned epochs. All lanes selected their best checkpoint at Epoch 5 (`safe_selected_epoch_max = 25 >= 5`, no horizon censoring):
+
+1. `mhef_independent_add`: Ep 5 / 0.30, Dev Jaccard = **0.549397**, F1 = 0.700657, PRAUC = 0.794860, DDI = 0.072165.
+2. `coupled_budget_add` (matched normalization control): Ep 5 / 0.30, Dev Jaccard = **0.547986**, F1 = 0.699394, PRAUC = 0.793084, DDI = 0.071378.
+3. `wide_global_add` (matched capacity absorption control): Ep 5 / 0.30, Dev Jaccard = **0.549980**, F1 = 0.701313, PRAUC = 0.794769, DDI = 0.072489.
+4. `mhef_independent_concat`: Ep 5 / 0.30, Dev Jaccard = **0.545593**, F1 = 0.697693, PRAUC = 0.794941, DDI = 0.073200.
+5. `coupled_budget_concat`: Ep 5 / 0.35, Dev Jaccard = **0.545500**, F1 = 0.697330, PRAUC = 0.793394, DDI = 0.070904.
+6. `private_only_add`: Ep 5 / 0.30, Dev Jaccard = **0.547128**, F1 = 0.698678, PRAUC = 0.792935, DDI = 0.072477.
+7. `hash_partition_a_add`: Ep 5 / 0.35, Dev Jaccard = **0.544909**, F1 = 0.696626, PRAUC = 0.793541, DDI = 0.071163.
+8. `hash_partition_b_add`: Ep 5 / 0.35, Dev Jaccard = **0.544926**, F1 = 0.696638, PRAUC = 0.793559, DDI = 0.071163.
+
+Key matched comparison outcomes:
+
+- **Primary normalization test (`normalization_add`)**: Decoupled normalization yields $\Delta J = +0.001410$ (+0.141 pp) over the coupled budget, failing the $+0.0030$ material signal threshold (`KILL_NO_MATERIAL_SIGNAL`). Under concat fusion, the delta drops to $\Delta J = +0.000093$ (+0.009 pp).
+- **Capacity absorption (`capacity_wide_global`)**: Four identical global FineCode slots with the same head capacity (`wide_global_add`) reach Dev Jaccard = **0.549980**, exceeding `mhef_independent_add` by $+0.000583$. The modest lift over baseline is entirely absorbed by multi-head capacity rather than heterogeneous normalization decoupling.
+- **Partition controls (`semantic_partition_a/b`)**: Nonsemantic hash partitions degrade performance to $0.5449$, confirming that randomly splitting tokens destroys semantic alignment, but this does not salvage the primary hypothesis.
+- **Absolute position**: `mhef_independent_add` (0.549397) does not beat prior best `summary_add` (0.549611, $\Delta J = -0.000214$).
+
+Screen routing: `KILL_MHEF_NORMALIZATION_HYPOTHESIS`. No multi-seed stability or MIMIC-IV replication is authorized.
+
 ### Terminated mechanism screens
+
+- **Medication-Conditioned Heterogeneous Evidence Factorization (MHEF)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at frozen revision `4584f8a0d080f4300f9ba5778da08f7f82cdc805` (1,476,874 parameters across all 8 variants, 30 complete epochs, zero Test access). Tested whether decoupling diagnosis, procedure, and history evidence into independent normalization budgets outperforms a shared zero-sum budget. Result: primary comparison delta $\Delta J = +0.001410$ fails the $+0.0030$ threshold (`KILL_NO_MATERIAL_SIGNAL`), concat delta is $+0.000093$, and the gain is entirely absorbed by wide global multi-head capacity (`wide_global_add` $J = 0.549980$ vs candidate $0.549397$). Falsified and terminated per frozen decision boundary (`KILL_MHEF_NORMALIZATION_HYPOTHESIS`); no multi-seed or MIMIC-IV evaluation scheduled. Decision note: `research/memory/decisions/2026-09-19-mhef-normalization-screen-verdict.md`.
 
 - **Dense Non-Separable Clinical Code Pairs (`nonseparable_pair`)**: Evaluated on `mimic-iii-canonical-131-paper-dev-v1` at revision `bdc3464e8e1771e6f5d291772e2be82882a4aa00` (1,511,304 parameters, 30 complete epochs, zero Test access). Tested whether scoring explicit pairwise code interactions before pooling improves over factorized pair attention. Result: $\Delta J = -0.001187$ (nonseparable_pair 0.543162 vs factorized_pair 0.544349), and both underperform the single-code baseline `foundation_code` (0.546626). Combinatorial cross-code pairs dilute medication-conditioned evidence with uninformative co-occurrences while multiplying memory from 1.1GB to 6.4GB–14.3GB. Falsified and terminated per frozen decision boundary (`KILL_NO_MATERIAL_SIGNAL`); downstream pair refinements truncated. Decision note: `research/memory/decisions/2026-09-19-final-relational-architecture-early-termination.md`.
 

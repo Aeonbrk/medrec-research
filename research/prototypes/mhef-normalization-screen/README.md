@@ -1,6 +1,6 @@
 # MHEF Normalization-Domain Screen
 
-Status: **DESIGN + IMPLEMENTATION READY / EXECUTION PENDING 319 PREFLIGHT**
+Status: **EXECUTION_COMPLETE_HYPOTHESIS_FALSIFIED** (Routing: `KILL_MHEF_NORMALIZATION_HYPOTHESIS`)
 
 This screen follows the final relational-architecture termination. It does not rescue pair-relation modeling and does not stabilize `summary_add`.
 
@@ -214,3 +214,46 @@ The 319 local agent must still perform:
 6. scientific routing from real results.
 
 Partial lanes are execution state only and are not scientific evidence.
+
+## Completed execution evidence (2026-09-19)
+
+Execution was performed on the 319 Execution Plane across 8 physical RTX 3090 GPUs at frozen revision `4584f8a0d080f4300f9ba5778da08f7f82cdc805`.
+
+All 8 lanes completed all 30 planned epochs without early stopping or numerical divergence. Test set remained completely sealed (`test_loaded = false`). All 8 lanes reached peak Dev performance at Epoch 5; no horizon-censoring extension to 60 epochs was triggered (`safe_selected_epoch_max = 25 >= 5`).
+
+### All eight completed lanes
+
+| Lane | GPU | Params | Epochs | Best Ep | Best OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI | Avg Med |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `mhef_independent_add` | 0 | 1,476,874 | 30 | 5 | 0.30 | 0.549397 | 0.700657 | 0.794860 | 0.072165 | 21.58 |
+| `coupled_budget_add` | 1 | 1,476,874 | 30 | 5 | 0.30 | 0.547986 | 0.699394 | 0.793084 | 0.071378 | 21.05 |
+| `wide_global_add` | 2 | 1,476,874 | 30 | 5 | 0.30 | **0.549980** | 0.701313 | 0.794769 | 0.072489 | 21.59 |
+| `mhef_independent_concat` | 3 | 1,476,874 | 30 | 5 | 0.30 | 0.545593 | 0.697693 | 0.794941 | 0.073200 | 21.67 |
+| `coupled_budget_concat` | 4 | 1,476,874 | 30 | 5 | 0.35 | 0.545500 | 0.697330 | 0.793394 | 0.070904 | 20.25 |
+| `private_only_add` | 5 | 1,476,874 | 30 | 5 | 0.30 | 0.547128 | 0.698678 | 0.792935 | 0.072477 | 21.32 |
+| `hash_partition_a_add` | 6 | 1,476,874 | 30 | 5 | 0.35 | 0.544909 | 0.696626 | 0.793541 | 0.071163 | 20.33 |
+| `hash_partition_b_add` | 7 | 1,476,874 | 30 | 5 | 0.35 | 0.544926 | 0.696638 | 0.793559 | 0.071163 | 20.33 |
+
+### Matched comparisons
+
+| Comparison | Candidate | Control | Δ Jaccard | Δ F1 | Δ PR-AUC | Δ DDI | Verdict |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | :--- |
+| `normalization_add` | `mhef_independent_add` | `coupled_budget_add` | +0.001410 | +0.001263 | +0.001776 | +0.000787 | `KILL_NO_MATERIAL_SIGNAL` |
+| `capacity_wide_global` | `mhef_independent_add` | `wide_global_add` | -0.000583 | -0.000656 | +0.000091 | -0.000324 | `KILL_NO_MATERIAL_SIGNAL` |
+| `normalization_concat` | `mhef_independent_concat` | `coupled_budget_concat` | +0.000093 | +0.000363 | +0.001547 | +0.002296 | `KILL_NO_MATERIAL_SIGNAL` |
+| `global_complement` | `mhef_independent_add` | `private_only_add` | +0.002269 | +0.001979 | +0.001926 | -0.000312 | `WEAK_STOP` |
+| `semantic_partition_a` | `mhef_independent_add` | `hash_partition_a_add` | +0.004488 | +0.004031 | +0.001320 | +0.001002 | `CLEAN_MECHANISM_SIGNAL` |
+| `semantic_partition_b` | `mhef_independent_add` | `hash_partition_b_add` | +0.004471 | +0.004019 | +0.001302 | +0.001002 | `CLEAN_MECHANISM_SIGNAL` |
+
+### Absolute position against prior milestones
+
+- Rank-1 candidate (`mhef_independent_add`): Dev Jaccard = **0.549397**
+- Prior completed best (`summary_add`): Dev Jaccard = **0.549611** ($\Delta J = -0.000214$)
+- FineCode unaugmented foundation (`foundation_code`): Dev Jaccard = **0.546626** ($\Delta J = +0.002770$)
+
+### Scientific findings and terminal routing
+
+1. **Decoupled normalization does not produce material independent value**: The primary hypothesis test (`mhef_independent_add` vs `coupled_budget_add`) yields only $\Delta J = +0.001410$ (+0.141 pp), failing the $+0.0030$ material signal threshold. Under the concat fusion head, the normalization delta drops to effectively zero ($\Delta J = +0.000093$, +0.009 pp).
+2. **Gain is absorbed by wide global capacity**: The matched capacity control (`wide_global_add`), which provides four identical heads over the undivided global FineCode evidence vector, achieves Dev Jaccard = **0.549980**, outperforming `mhef_independent_add` by $+0.000583$. The modest lift over baseline is entirely attributable to multi-head capacity absorption rather than heterogeneous normalization decoupling.
+3. **Partition controls confirm semantic dependency**: The deterministic cardinality-preserving hash controls (`hash_partition_a_add` and `hash_partition_b_add`) degrade to Dev Jaccard 0.5449. This confirms that randomly splitting tokens harms semantic alignment, but does not salvage the normalization decoupling hypothesis given the failure against `coupled_budget_add` and `wide_global_add`.
+4. **Terminal Scientific Routing**: **`KILL_MHEF_NORMALIZATION_HYPOTHESIS`**. No multi-seed stability or MIMIC-IV replication is authorized. The hypothesis of candidate-specific heterogeneous evidence normalization factorization is definitively closed.

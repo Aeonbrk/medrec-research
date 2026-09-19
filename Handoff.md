@@ -3,118 +3,65 @@
 Updated: 2026-09-19.
 
 ```text
-Current phase: MHEF_NORMALIZATION_DOMAIN_SCREEN_IMPLEMENTED_PENDING_319_EXECUTION
+Current phase: MHEF_NORMALIZATION_HYPOTHESIS_FALSIFIED_NEXT_DIRECTION_DECISION
 Working branch: prototype/mhef-normalization-screen
 Active formal Idea: none
 Active formal Gate: none
 Evidence role: DEVELOPMENT
 Test access: not authorized
 GPU capacity: 8 × RTX 3090 24GB
+Terminal routing: KILL_MHEF_NORMALIZATION_HYPOTHESIS
 ```
 
 ## Authoritative starting point
 
-This branch was created from:
+This branch was executed on the 319 Execution Plane at frozen revision:
 
 ```text
-d957fa37a057b76f6abee75906c5351b9bb82e9e
+4584f8a0d080f4300f9ba5778da08f7f82cdc805
 ```
-
-which records the completed evidence and early termination of the final relational architecture search.
 
 Read first:
 
 - `AGENTS.md`
 - `research/AGENTS.md`
-- `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
-- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
-- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
-- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_3.md`
-- `research/memory/decisions/2026-09-19-final-relational-architecture-early-termination.md`
-- `research/memory/decisions/2026-09-19-mhef-normalization-screen-design.md`
+- `research/memory/current-research-state.md`
+- `research/memory/decisions/2026-09-19-mhef-normalization-screen-verdict.md`
 - `research/prototypes/mhef-normalization-screen/README.md`
-- `research/prototypes/mhef-normalization-screen/closest-work-audit.md`
+- `research/prototypes/mhef-normalization-screen/result.json`
 
-## What is already done
+## What was completed
 
-Cloud-side design and implementation are complete:
+All 8 physical RTX 3090 GPU lanes completed all 30 planned epochs without early stopping or divergence:
 
-- Rank-1 architecture narrowed to Medication-Conditioned Heterogeneous Evidence Factorization (MHEF);
-- decisive `IndependentBudget` vs `CoupledBudget` causal control frozen;
-- all eight GPU lanes implemented with one shared parameter graph;
-- capacity, fusion-head, global-path, and two semantic-partition controls implemented;
-- 30-epoch runner and v1.3 horizon-censoring semantics implemented;
-- optional exact 60-epoch runner mode exists only for a triggered censoring extension;
-- CUDA/data preflight and aggregate scientific routing scripts implemented;
-- Test remains sealed by construction.
+1. **Preflight passed:** exact FineCode global path preservation, zero data leakage, verified common parameter count (1,476,874 params across all lanes), and active mechanisms.
+2. **Execution completed:** all eight 30-epoch lanes completed. All models selected their peak checkpoint at Epoch 5 (`safe_selected_epoch_max = 25 >= 5`, no horizon censoring).
+3. **Public-safe evidence preserved:** aggregate results recorded in `research/prototypes/mhef-normalization-screen/result.json`.
+4. **Test set remained sealed:** zero Test evaluation performed (`test_loaded = false`).
 
-Cloud static checks completed:
+## Summary of empirical evidence
 
-```text
-python -m py_compile research/prototypes/mhef-normalization-screen/*.py
-bash -n research/prototypes/mhef-normalization-screen/launch_8gpu.sh
-```
+| Lane | Role | Best Ep / OP | Dev Jaccard | Dev F1 | Dev PR-AUC | Dev DDI |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: |
+| `mhef_independent_add` | Rank-1 Candidate | Ep 5 / 0.30 | 0.549397 | 0.700657 | 0.794860 | 0.072165 |
+| `coupled_budget_add` | Matched Normalization Control | Ep 5 / 0.30 | 0.547986 | 0.699394 | 0.793084 | 0.071378 |
+| `wide_global_add` | Capacity Absorption Control | Ep 5 / 0.30 | **0.549980** | 0.701313 | 0.794769 | 0.072489 |
+| `mhef_independent_concat` | Concat Candidate | Ep 5 / 0.30 | 0.545593 | 0.697693 | 0.794941 | 0.073200 |
+| `coupled_budget_concat` | Concat Control | Ep 5 / 0.35 | 0.545500 | 0.697330 | 0.793394 | 0.070904 |
+| `private_only_add` | Private-Only Ablation | Ep 5 / 0.30 | 0.547128 | 0.698678 | 0.792935 | 0.072477 |
+| `hash_partition_a_add` | Hash Partition A | Ep 5 / 0.35 | 0.544909 | 0.696626 | 0.793541 | 0.071163 |
+| `hash_partition_b_add` | Hash Partition B | Ep 5 / 0.35 | 0.544926 | 0.696638 | 0.793559 | 0.071163 |
 
-`ruff` is not installed in the cloud environment, so repository Ruff/format checks remain local-agent work.
+## Decisive scientific conclusions
 
-## Local agent task
+- **Primary normalization comparison:** `mhef_independent_add - coupled_budget_add` yields $\Delta J = +0.001410$ (+0.141 pp), failing the $+0.0030$ material threshold (`KILL_NO_MATERIAL_SIGNAL`).
+- **Concat control:** `mhef_independent_concat - coupled_budget_concat` yields $\Delta J = +0.000093$ (+0.009 pp).
+- **Capacity absorption:** `wide_global_add` ($J = 0.549980$) outperforms `mhef_independent_add` ($J = 0.549397$), proving that the slight gain over the base foundation is absorbed by multi-slot capacity rather than heterogeneous normalization decoupling.
+- **Terminal routing:** `KILL_MHEF_NORMALIZATION_HYPOTHESIS`.
 
-Do not redesign the model before executing the frozen preflight.
+## Next agent instructions
 
-1. Fetch this branch and verify clean HEAD.
-2. Run the applicable repository syntax/lint checks.
-3. Set the private execution-plane environment variables required by `launch_8gpu.sh`:
-
-```text
-SNAPSHOT_ROOT
-TRAIN_DEV_ROOT
-OUT_ROOT
-PYTHON_BIN   # optional; defaults to python
-```
-
-4. Run the CUDA/private-data preflight only. It checks:
-
-```text
-correct snapshot / Train-Dev profile
-no current-target leakage
-exact preservation of the stable global FineCode context
-one common parameter budget and initialization across all eight lanes
-finite forward/backward/no-history execution
-behaviorally active matched mechanisms
-hash partitions preserve typed evidence support and per-example D/P/H bucket sizes
-```
-
-5. If preflight passes, launch the eight fixed 30-epoch lanes with:
-
-```bash
-research/prototypes/mhef-normalization-screen/launch_8gpu.sh
-```
-
-6. Do not stop lanes based on partial metrics. Do not use Test.
-7. If the frozen v1.3 censoring rule triggers, extend the exact affected comparison unchanged with `run_mhef.py --epochs 60`; do not tune anything.
-8. After complete interpretable lanes exist, run `summarize_mhef.py` and record the real result/routing. Do not authorize multi-seed stability automatically.
-
-## Eight lanes
-
-```text
-GPU 0  mhef_independent_add
-GPU 1  coupled_budget_add
-GPU 2  wide_global_add
-GPU 3  mhef_independent_concat
-GPU 4  coupled_budget_concat
-GPU 5  private_only_add
-GPU 6  hash_partition_a_add
-GPU 7  hash_partition_b_add
-```
-
-## Primary falsification
-
-The main scientific comparison is:
-
-```text
-mhef_independent_add - coupled_budget_add
-```
-
-Interpret using the frozen screen thresholds in the README.
-
-If this comparison is not material, kill the normalization-domain hypothesis. Do not rescue it with a gate, query adapter, DDI correction, another attention block, or HPO.
+1. Do **NOT** attempt to rescue MHEF with query adapters, dynamic gating, extra layers, or post-hoc threshold/DDI tuning.
+2. Do **NOT** run multi-seed stability or MIMIC-IV replication on MHEF.
+3. Keep the Test set sealed.
+4. Formulate the next orthogonal architectural hypothesis building on the verified FineCode foundation.
