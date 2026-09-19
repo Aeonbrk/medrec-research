@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: POST_MHEF_NORMALIZATION_FALSIFICATION_ARCHITECTURE_SEARCH
+Human-facing phase: MSED_EVIDENCE_DISTRIBUTION_SCREEN_IMPLEMENTED_PENDING_319_EXECUTION
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -130,6 +130,25 @@ Key matched comparison outcomes:
 - **Absolute position**: `mhef_independent_add` (0.549397) does not beat prior best `summary_add` (0.549611, $\Delta J = -0.000214$).
 
 Screen routing: `KILL_MHEF_NORMALIZATION_HYPOTHESIS`. No multi-seed stability or MIMIC-IV replication is authorized.
+
+### MSED evidence-distribution architecture screen — design frozen, execution pending (2026-09-19)
+
+Following MHEF falsification, the project performed a family reset around the strongest unresolved structural clue: `prediction_local` previously improved Dev Jaccard by `+0.012976` over its matched aggregate control while using the same medication-token interaction network. Exact code inspection shows the key aggregation difference is approximately normalized log-sum-exp of medication-specific local FineCode support potentials versus their mean.
+
+Rank-1 hypothesis:
+
+> For each candidate medication, the empirical distribution of longitudinal FineCode local-support potentials contains decision information beyond the already-strong single normalized log-sum-exp statistic.
+
+The frozen Medication-Specific Evidence Distribution (MSED) screen tests this with a capacity-matched primary pair:
+
+- `msed_ecf_global`: receives the stable global FineCode context plus `[LME(r), E_i phi(r_i)]`, where `phi` is a fixed-frequency bounded characteristic spectrum with one shared learnable score scale.
+- `point_lme_global`: receives the same global FineCode context, same raw local scores, same raw LME, same feature dimensionality, same projection/decoder/parameter count/init, but replaces the empirical distribution spectrum with `phi(LME(r))`.
+
+Primary falsification: `msed_ecf_global - point_lme_global`. A gain therefore isolates support-distribution shape beyond the known LME statistic rather than extra width or a larger decoder.
+
+Additional controls: mean-point, max-point, MSED-only vs LME-only global-complement attribution, plus exact historical `prediction_local` and `foundation_code` anchors. Eight 30-epoch Train/Dev lanes are frozen under contract v1.3; Test remains sealed. No multi-seed, MIMIC-IV, or Test execution is authorized before a clean matched mechanism signal and absolute improvement over the strong `wide_global_add` control (Dev Jaccard 0.549980).
+
+Implementation branch: `prototype/msed-evidence-distribution-screen`. Design note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-design.md`.
 
 ### Terminated mechanism screens
 
