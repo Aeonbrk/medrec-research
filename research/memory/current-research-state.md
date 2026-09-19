@@ -10,7 +10,7 @@ Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
 Human-facing phase: MEMB_MUTUAL_BINDING_SCREEN_FALSIFIED_ARCHITECTURE_SEARCH_RESET
-Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
+Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 + v1.4 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
 Available concurrent GPU capacity: 8 × RTX 3090-class
@@ -21,6 +21,8 @@ Historical `Stage -1*`, Gate, Reproduction Mode, and Comparison Mode names remai
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_1.md`
 - `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_2.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_3.md`
+- `docs/specs/PAPER_EXPERIMENT_CONTRACT_V1_4.md`
 - `docs/specs/PAPER_EVALUATOR_SPEC.md`
 - `docs/guides/PAPER_METHOD_CARD_TEMPLATE.md`
 
@@ -37,6 +39,8 @@ Fairness requires that a competitor is not weakened by our execution choices: tr
 Central ablations and matched controls also need reasonable Dev selection when mechanically reusing the full model's recipe would materially disadvantage them.
 
 For new project-owned initial DEVELOPMENT screens, the canonical RNG convention is inherited from MoleRec: `torch=1203`, CUDA PyTorch `1203`, Python `random=1203`, and NumPy `2048`. Internal matched controls share that convention. External published baselines instead preserve their source-native seed policy when available. A survivor must still expand to a predeclared multi-seed stability experiment; the canonical seed is not stability evidence.
+
+As of contract v1.4, new project-owned early DEVELOPMENT architecture/mechanism screens default to **15 complete epochs**, not early stopping. A decisive matched comparison is interpretable only when every arm selects Epoch 10 or earlier. Selection in Epochs 11–15 triggers an exact unchanged extension of that pair to 30 epochs; the existing v1.3 26–30 -> 60 censoring safeguard remains active for such extensions. This change is prospective and does not rewrite historical 30/60-epoch evidence.
 
 ## Valid development evidence
 
