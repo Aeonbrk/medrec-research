@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: MEMB_MUTUAL_BINDING_SCREEN_FALSIFIED_ARCHITECTURE_SEARCH_RESET
+Human-facing phase: EBRA_REGIMEN_ASSIGNMENT_SCREEN_DESIGN_FROZEN_IMPLEMENTATION_PENDING
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 + v1.4 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -283,20 +283,40 @@ Routing verdict: `MULTIPLE_SURVIVORS_ARBITRATE_BEFORE_ANY_COMBINATION`. Per froz
 Artifact: `research/prototypes/evidence-access-portfolio/result.json`.
 Decision note: `research/memory/decisions/2026-09-18-evidence-access-portfolio-screen.md`.
 
-Direct Partial Regimen Assignment / structured-set prediction remains an untested candidate, not an admitted paper method.
+### EBRA regimen-assignment screen — design frozen (2026-09-20)
 
-If pursued, its question must be framed around explicit set-level competition, variable cardinality, and uniqueness in training/decoding—not the false claim that independent-label models contain no medication dependence, and not an unsupported claim that anonymous slots are clinical regimen roles.
+After MEMB/MSED/MHEF falsification, the next architecture hypothesis moves from evidence manipulation to **decision factorization**.
 
-Expensive structured training may start before baseline recovery or MICA stability finishes once all of the following are true:
+Evidence-Bound Regimen Assignment (EBRA) preserves the strong FineCode principle: each medication first obtains a medication-specific fine-evidence proposal. The new mechanism then asks whether the final prescription should be trained and decoded as one unordered partial assignment rather than as 131 fixed binary responsibilities.
 
-- legal input/output semantics are fixed;
-- the candidate has a falsifiable computation-level distinction from the closest known work;
-- the minimum model and strongest matched independent-label control are defined;
-- a valid end-to-end run can execute without adding unrelated modules.
+The frozen causal comparison is deliberately stronger than a plain BCE baseline:
 
-If the closest-work audit cannot explain the computational distinction by approximately 2026-09-21, pause expensive structured training rather than training first and inventing novelty later.
+- both arms share the same FineCode proposal bank;
+- both use K=M=131 learned decision queries;
+- both use the same one-layer self-attention, cross-attention, FFN, full medication score matrix, NULL scorer, information budget, and initialization convention;
+- fixed_multilabel hard-binds slot k to medication k and trains BCE on L[k,k]-L[k,NULL], followed by the paper-contract Dev-selected global threshold;
+- ebra_assignment allows every slot to choose any medication or NULL, trains with permutation-invariant bipartite supervision, and decodes by one-to-one assignment with no threshold or cardinality head.
 
-The first full architecture screen should answer only whether the structured model beats a credible matched independent-label control, whether cardinality/operating-point effects explain the gain, and whether the gain is worth the complexity. Add one cardinality-aware control only when it can falsify the mechanism. Do not force a confounded 2×2.
+This formulation is not a claim that medication dependencies or set-to-set MedRec are new. SSPNet already occupies permutation-consistent/set-to-set medication decoding but its published head remains sigmoid/threshold multi-label classification. DETR/DSPN occupy generic direct-set and matching primitives. The pre-screen claim is only the computation-level question of **fixed named-label responsibility versus native medication-or-NULL partial assignment under a matched FineCode proposal/decoder graph**.
+
+Frozen screen:
+
+~~~text
+surface: mimic-iii-canonical-131-paper-dev-v1
+seed: torch/cuda/python=1203, numpy=2048
+training: 15 complete epochs, no early stopping
+main pair: ebra_assignment - fixed_multilabel
+Test: SEALED
+~~~
+
+Contract v1.4 horizon-censoring applies unchanged. Primary mechanism survival requires Delta J > +0.004 with F1/PRAUC losses no worse than 0.002 and DDI increase no greater than 0.002; Delta J <= +0.002 kills the assignment hypothesis. A DDI reduction of at least 0.010 with J/F1/PRAUC loss each no worse than 0.005 routes to Pareto review.
+
+Design: research/memory/decisions/2026-09-20-ebra-regimen-assignment-screen-design.md.  
+Prototype spec: research/prototypes/ebra-regimen-assignment-screen/README.md.  
+Closest-work boundary: research/prototypes/ebra-regimen-assignment-screen/closest-work-audit.md.  
+Local execution handoff: research/prototypes/ebra-regimen-assignment-screen/local-agent-handoff.md.
+
+Implementation and 319 execution are now authorized for this frozen pair only. No slot-count, NULL-bias, decoder-depth, assignment-temperature, retrieval, MoE, DDI-reranking, cardinality-head, or output-repair sweep is authorized.
 
 ## Near-term evidence routing
 
@@ -374,4 +394,8 @@ MIMIC-IV Test remains sealed throughout reference setup and architecture search.
 
 ## Next action
 
-Return to architecture-family search after ECRC termination. Do not rescue ECRC by changing rank, size head, loss weighting, temperature, or decoder. The next project-owned initial architecture screen uses the canonical MoleRec development RNG convention from contract v1.2 and a strong matched control under the same convention. Search should change representation, information flow, prediction granularity, supervision, or decision process rather than another cardinality-conditioned correction. Detached baseline recovery may continue independently. Test remains sealed.
+Implement and execute the frozen EBRA matched pair on branch prototype/ebra-regimen-assignment-screen.
+
+The local agent should first run only the scoped preflight needed to establish same information/proposal/decision graph, parameter matching, permutation-invariant candidate loss, duplicate-free assignment decoding, finite forward/backward, and zero Test loading. Then run fixed_multilabel and ebra_assignment for 15 complete epochs under contract v1.4.
+
+Do not redesign EBRA from partial curves. Do not create extra EBRA lanes to occupy GPUs. Apply the frozen survive/weak/kill routing after the pair is interpretable, update aggregate public-safe evidence, and keep Test sealed. Detached baseline recovery may continue independently.
