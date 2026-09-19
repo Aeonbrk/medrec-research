@@ -33,7 +33,7 @@ Rules inherit downward. A nearer `AGENTS.md` may add or narrow rules for its sub
 
 ## Research boundaries
 
-- Default early screen: one seed, one main configuration, Train/Dev only, full intended training budget, and a strong matched control.
+- Default early screen: one seed, one main configuration, Train/Dev only, 15 complete epochs under the current horizon-censoring contract, and a strong matched control. If a decisive matched arm selects Epochs 11–15, extend that exact pair unchanged to 30 rather than interpreting the censored result.
 - Prefer architecture-level changes in representation, information flow, prediction granularity, decoder/inference, or supervision over repeated small correction heads.
 - Two bounded weak prototypes in one family normally trigger a family reset. Do not rescue weak mechanisms with broad hyperparameter sweeps.
 - Historical failures constrain the tested formulation; they are not universal bans on primitives such as GNNs, retrieval, MoE, structured prediction, or attention.
