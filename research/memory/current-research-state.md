@@ -9,7 +9,7 @@ Active formal Idea: none
 Ideas 001–008: terminated
 Idea 009: absent
 Active formal Gate: none
-Human-facing phase: MSED_EVIDENCE_DISTRIBUTION_SCREEN_FALSIFIED
+Human-facing phase: MEMB_MUTUAL_BINDING_SCREEN_IMPLEMENTED_PENDING_319_EXECUTION
 Paper Experiment Contract: v1.0 + v1.1 + v1.2 + v1.3 amendments CURRENT
 Paper claim: none
 New Test access: not authorized
@@ -155,6 +155,23 @@ Key matched comparison outcomes:
 - **Absolute position**: `msed_ecf_global` (0.546806) underperforms prior best control `wide_global_add` (0.549980, $\Delta J = -0.003174$), prior best architecture `summary_add` (0.549611, $\Delta J = -0.002805$), and `prediction_local_anchor` (0.548911, $\Delta J = -0.002105$).
 
 Screen routing: `KILL_MSED_DISTRIBUTION_SHAPE_HYPOTHESIS`. No multi-seed stability or MIMIC-IV replication is authorized. Decision note: `research/memory/decisions/2026-09-19-msed-evidence-distribution-screen-verdict.md`.
+
+### MEMB medication-evidence mutual-binding family screen — execution pending (2026-09-19)
+
+Following MSED falsification, the architecture search reset around an orthogonal unresolved question. Stable FineCode evidence access shows that medication identity should bind to fine clinical evidence before compression, while `prediction_local` shows a large medication-token local-support signal with a DDI-rate cost. The project has not yet tested whether evidence should be weighted by its support for one medication *relative to competing medication identities* before evidence aggregation.
+
+The frozen Medication–Evidence Mutual Binding (MEMB) screen uses the exact historical `PortfolioModel` parameter graph and adds zero learnable parameters. For raw medication-evidence affinity `S[m,i]`, define evidence commonness `c_i = logsumexp_n S[n,i] - log(M)`. Four pre-registered matched comparisons test the commonness term at two score scales and in two already-supported prediction paths:
+
+- `specificity_code - foundation_code_anchor`: `softmax_i(S-c)` versus `softmax_i(S)`;
+- `mutual_code - scale2_code`: `softmax_i(2S-c)` versus `softmax_i(2S)`;
+- `specificity_local - prediction_local_anchor`: `logmeanexp_i(r-c)` versus historical `logmeanexp_i(r)`;
+- `mutual_local - scale2_local`: `logmeanexp_i(2r-c)` versus `logmeanexp_i(2r)`.
+
+The scale-2 controls are mandatory because bidirectional soft matching algebraically sharpens the raw scores. They prevent generic sharpening from being misattributed to cross-medication specificity.
+
+Frozen execution revision: `f1f74e5eb143f49a2bac73d81a13c42f33f4a4a2` on branch `prototype/memb-mutual-binding-screen`. Eight complete 30-epoch Train/Dev lanes are planned under canonical RNG; Test remains sealed. No stability, MIMIC-IV, or Test execution is automatically authorized.
+
+This is a mechanism-family screen, not a novelty claim. Competitive attention, dual-softmax matching, label-specific representation, and token/region-to-label assignment have prior work. If the mechanism survives strongly, the next architecture must be materially larger than an axis-flipped softmax and receive a dedicated closest-work audit.
 
 ### Terminated mechanism screens
 
